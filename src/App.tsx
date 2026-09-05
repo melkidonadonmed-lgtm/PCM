@@ -81,42 +81,42 @@ export default function App() {
     return () => window.removeEventListener('resize', handleBreakpointChange);
   }, []);
 
-  // Auto-close sidebar on mobile scroll
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
-    
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > 30 && (currentScrollY > lastScrollY + 5 || window.innerWidth < 1024)) {
-        setSidebarOpen(false);
-      }
-      lastScrollY = currentScrollY;
-    };
-
-    const handleTouchMove = () => {
-      if (window.scrollY > 20 && window.innerWidth < 1024) {
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, []);
-
   // Navigation state
   const [activeTab, setActiveTab] = useState<ActiveTab>('prescription');
   const [certSubTab, setCertSubTab] = useState<'certificate' | 'referral'>('certificate');
   const [printDocType, setPrintDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>('prescription');
+
+  // Centralized tab navigation with scroll-to-top and responsive drawer auto-close
+  const handleSelectTab = (tab: ActiveTab) => {
+    if (tab === 'patients') {
+      setIsPatientModalOpen(true);
+      return;
+    }
+    if (tab === 'certificate') {
+      setCertSubTab('certificate');
+    } else if (tab === 'referral') {
+      setCertSubTab('referral');
+    }
+    setActiveTab(tab);
+
+    // Auto-close sidebar on mobile/tablet viewports
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+
+    // Always scroll to top when navigating between clinical areas
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
 
   const handleNavigateToPrint = (type?: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral') => {
     if (type) {
       setPrintDocType(type);
     }
     setActiveTab('print_preview');
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   // Modals state
@@ -325,6 +325,12 @@ export default function App() {
     localStorage.setItem('prescmed_patient', JSON.stringify(emptyPatient));
   };
 
+  // Clear doctor profile
+  const handleClearDoctor = () => {
+    setDoctor(DEFAULT_DOCTOR);
+    localStorage.setItem('prescmed_doctor', JSON.stringify(DEFAULT_DOCTOR));
+  };
+
   // Reset entire consultation (Zerar tudo: paciente + receitas + exames + documentos)
   const handleResetAll = () => {
     handleClearPatient();
@@ -359,18 +365,7 @@ export default function App() {
           darkMode={darkMode}
           onToggleDarkMode={() => setDarkMode(!darkMode)}
           activeTab={activeTab}
-          onSelectTab={(tab) => {
-            if (tab === 'patients') {
-              setIsPatientModalOpen(true);
-              return;
-            }
-            if (tab === 'certificate') {
-              setCertSubTab('certificate');
-            } else if (tab === 'referral') {
-              setCertSubTab('referral');
-            }
-            setActiveTab(tab);
-          }}
+          onSelectTab={handleSelectTab}
           isOpen={sidebarOpen}
           onToggleOpen={() => setSidebarOpen(!sidebarOpen)}
           onClose={() => setSidebarOpen(false)}
@@ -400,7 +395,7 @@ export default function App() {
               onToggleWeightCalc={handleToggleWeightCalc}
               onClearPrescription={handleClearPrescription}
               onNavigateToPrint={() => handleNavigateToPrint('prescription')}
-              onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
+              onNavigateToPediatricCalc={() => handleSelectTab('pediatric_calc')}
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
               onOpenPatientModal={() => setIsPatientModalOpen(true)}
             />
@@ -412,7 +407,7 @@ export default function App() {
               patient={patient}
               onUpdatePatientWeight={handleUpdatePatientWeight}
               onAddPrescriptionItem={handleAddPrescriptionItem}
-              onNavigateToPrescription={() => setActiveTab('prescription')}
+              onNavigateToPrescription={() => handleSelectTab('prescription')}
             />
           )}
 
@@ -449,7 +444,7 @@ export default function App() {
               darkMode={darkMode}
               patient={patient}
               onAddPrescriptionItem={handleAddPrescriptionItem}
-              onNavigateToPrescription={() => setActiveTab('prescription')}
+              onNavigateToPrescription={() => handleSelectTab('prescription')}
             />
           )}
 
@@ -465,8 +460,8 @@ export default function App() {
               certificate={certificate}
               referral={referral}
               initialDocType={printDocType}
-              onNavigateBack={() => setActiveTab('prescription')}
-              onBack={() => setActiveTab('prescription')}
+              onNavigateBack={() => handleSelectTab('prescription')}
+              onBack={() => handleSelectTab('prescription')}
               onClearPrescription={handleClearPrescription}
               onResetAll={handleResetAll}
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
@@ -479,14 +474,7 @@ export default function App() {
       <MobileBottomNav
         activeTab={activeTab}
         sidebarOpen={sidebarOpen}
-        onSelectTab={(tab) => {
-          if (tab === 'certificate') {
-            setCertSubTab('certificate');
-          } else if (tab === 'referral') {
-            setCertSubTab('referral');
-          }
-          setActiveTab(tab);
-        }}
+        onSelectTab={handleSelectTab}
         prescriptionCount={prescriptionItems.length}
         selectedExamsCount={selectedExams.length}
         onOpenMenu={() => setSidebarOpen(true)}
@@ -508,6 +496,7 @@ export default function App() {
           darkMode={darkMode}
           doctor={doctor}
           onSaveDoctor={setDoctor}
+          onClearDoctor={handleClearDoctor}
           onClose={() => setIsDoctorModalOpen(false)}
         />
       )}

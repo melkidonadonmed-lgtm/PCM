@@ -4,7 +4,7 @@ import {
   Calculator, 
   FlaskConical, 
   Award, 
-  Share2, 
+  Building2, 
   Download, 
   Users, 
   Stethoscope, 
@@ -135,7 +135,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'pediatric_calc' as ActiveTab,
-      label: 'Calculadora Pediátrica',
+      label: 'Calculadora Clínica',
+      fullLabel: 'Calculadora de Doses & Fluidos',
       shortLabel: 'Doses',
       icon: Calculator,
       badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
@@ -158,8 +159,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'referral' as ActiveTab,
       label: 'Encaminhamentos',
+      fullLabel: 'Encaminhamento & Referência',
       shortLabel: 'Encam.',
-      icon: Share2
+      icon: Building2
     },
     {
       id: 'protocols' as ActiveTab,
@@ -175,6 +177,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
+  const handleItemClick = (tabId: ActiveTab) => {
+    onSelectTab(tabId);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      onClose?.();
+    }
+  };
+
+  const handleDoctorClick = () => {
+    onOpenDoctorModal?.();
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      onClose?.();
+    }
+  };
+
+  const handlePatientClick = () => {
+    onOpenPatientModal?.();
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      onClose?.();
+    }
+  };
+
   const renderNavButton = (item: { id: ActiveTab; label: string; fullLabel?: string; shortLabel: string; icon: React.ElementType; badge?: string }) => {
     const Icon = item.icon;
     const isActive = activeTab === item.id;
@@ -185,7 +208,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           key={item.id}
           id={`nav-btn-${item.id}`}
           type="button"
-          onClick={() => onSelectTab(item.id)}
+          onClick={() => handleItemClick(item.id)}
           aria-current={isActive ? 'page' : undefined}
           className={`w-full h-14 mx-auto rounded-xl flex flex-col items-center justify-center gap-0.5 px-1 transition-all cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none relative ${
             isActive
@@ -219,7 +242,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         key={item.id}
         id={`nav-btn-${item.id}`}
         type="button"
-        onClick={() => onSelectTab(item.id)}
+        onClick={() => handleItemClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
         className={`w-full min-h-[44px] flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none ${
           isActive
@@ -298,11 +321,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Doctor Profile Badge */}
           {isOpen ? (
             <div
-              onClick={onOpenDoctorModal}
+              onClick={handleDoctorClick}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenDoctorModal?.();
+                  handleDoctorClick();
                 }
               }}
               role="button"
@@ -335,11 +358,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <button
               type="button"
-              onClick={onOpenDoctorModal}
+              onClick={handleDoctorClick}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenDoctorModal?.();
+                  handleDoctorClick();
                 }
               }}
               className="w-11 h-11 mx-auto rounded-xl bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 dark:border-white/25 hover:bg-navy-900 dark:hover:bg-white font-black text-xs flex items-center justify-center shadow-tactile-btn transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
@@ -365,11 +388,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Active Patient Badge */}
           {isOpen ? (
             <div
-              onClick={onOpenPatientModal}
+              onClick={handlePatientClick}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenPatientModal?.();
+                  handlePatientClick();
                 }
               }}
               role="button"
@@ -397,11 +420,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <button
               type="button"
-              onClick={onOpenPatientModal}
+              onClick={handlePatientClick}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenPatientModal?.();
+                  handlePatientClick();
                 }
               }}
               className="w-11 h-11 mx-auto rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30 flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none shadow-tactile-sm"

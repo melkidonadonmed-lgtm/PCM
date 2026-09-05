@@ -614,7 +614,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '2 caixas (30 cápsulas)',
-    defaultPosology: 'Tomar 1 cápsula via oral de 8 em 8 horas durante 7 a 10 dias.'
+    defaultPosology: 'Tomar 1 cápsula via oral de 8 em 8 horas durante 7 a 10 dias.',
+    isSpecialControl: true
   },
   {
     id: 'amoxicilina-875mg',
@@ -623,7 +624,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (14 ou 20 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas durante 7 a 10 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas durante 7 a 10 dias.',
+    isSpecialControl: true
   },
   {
     id: 'amoxicilina-susp-250mg',
@@ -638,7 +640,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     pediatricConcentrationMgMl: 50,
     pediatricUnitType: 'ml',
     pediatricMaxDoseMg: 1500,
-    pediatricDefaultDays: 10
+    pediatricDefaultDays: 10,
+    isSpecialControl: true
   },
   {
     id: 'amoxicilina-susp-400mg',
@@ -653,7 +656,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     pediatricConcentrationMgMl: 80,
     pediatricUnitType: 'ml',
     pediatricMaxDoseMg: 1500,
-    pediatricDefaultDays: 10
+    pediatricDefaultDays: 10,
+    isSpecialControl: true
   },
   {
     id: 'amox-clav-875mg',
@@ -662,7 +666,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (14 ou 20 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas durante 7 a 10 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas durante 7 a 10 dias.',
+    isSpecialControl: true
   },
   {
     id: 'amox-clav-500mg',
@@ -671,7 +676,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '2 caixas (21 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 7 a 10 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 7 a 10 dias.',
+    isSpecialControl: true
   },
   {
     id: 'amox-clav-susp-400mg',
@@ -686,7 +692,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     pediatricConcentrationMgMl: 80,
     pediatricUnitType: 'ml',
     pediatricMaxDoseMg: 1750,
-    pediatricDefaultDays: 10
+    pediatricDefaultDays: 10,
+    isSpecialControl: true
   },
   {
     id: 'amox-clav-susp-250mg',
@@ -701,7 +708,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     pediatricConcentrationMgMl: 50,
     pediatricUnitType: 'ml',
     pediatricMaxDoseMg: 1500,
-    pediatricDefaultDays: 10
+    pediatricDefaultDays: 10,
+    isSpecialControl: true
   },
   {
     id: 'cefalexina-500mg',
@@ -710,7 +718,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '2 caixas (28 cápsulas)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 6 em 6 horas durante 7 a 10 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral de 6 em 6 horas durante 7 a 10 dias.',
+    isSpecialControl: true
   },
   {
     id: 'cefalexina-susp-250mg',
@@ -725,7 +734,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     pediatricConcentrationMgMl: 50,
     pediatricUnitType: 'ml',
     pediatricMaxDoseMg: 2000,
-    pediatricDefaultDays: 10
+    pediatricDefaultDays: 10,
+    isSpecialControl: true
   },
   {
     id: 'ceftriaxona-1g-injetavel',
@@ -739,7 +749,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     pediatricDoseMgKg: 50,
     pediatricConcentrationMgMl: 100,
     pediatricUnitType: 'ml',
-    pediatricMaxDoseMg: 2000
+    pediatricMaxDoseMg: 2000,
+    isSpecialControl: true
   },
   {
     id: 'azitromicina-500mg',
@@ -748,7 +759,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (5 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia durante 5 dias (ou dose única de 1g para DST).'
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia durante 5 dias (ou dose única de 1g para DST).',
+    isSpecialControl: true
   },
   {
     id: 'azitromicina-susp-200mg',
@@ -763,7 +775,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     pediatricConcentrationMgMl: 40,
     pediatricUnitType: 'ml',
     pediatricMaxDoseMg: 500,
-    pediatricDefaultDays: 5
+    pediatricDefaultDays: 5,
+    isSpecialControl: true
   },
   {
     id: 'claritromicina-500mg',
@@ -772,7 +785,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (14 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 10 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 10 dias.',
+    isSpecialControl: true
   },
   {
     id: 'ciprofloxacino-500mg',
@@ -781,7 +795,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (14 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 14 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 14 dias.',
+    isSpecialControl: true
   },
   {
     id: 'levofloxacino-500mg',
@@ -790,7 +805,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (7 ou 10 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia por 7 a 10 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia por 7 a 10 dias.',
+    isSpecialControl: true
   },
   {
     id: 'bactrim-f-comprimido',
@@ -799,7 +815,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (10 ou 20 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 14 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 14 dias.',
+    isSpecialControl: true
   },
   {
     id: 'bactrim-susp-oral',
@@ -814,7 +831,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     pediatricConcentrationMgMl: 40,
     pediatricUnitType: 'ml',
     pediatricMaxDoseMg: 800,
-    pediatricDefaultDays: 10
+    pediatricDefaultDays: 10,
+    isSpecialControl: true
   },
   {
     id: 'nitrofurantoina-100mg',
@@ -823,7 +841,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (28 cápsulas)',
-    defaultPosology: 'Tomar 1 cápsula via oral de 6 em 6 horas junto às refeições por 5 dias.'
+    defaultPosology: 'Tomar 1 cápsula via oral de 6 em 6 horas junto às refeições por 5 dias.',
+    isSpecialControl: true
   },
   {
     id: 'fosfomicina-3g',
@@ -832,7 +851,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 envelope',
-    defaultPosology: 'Diluir em meio copo de água e tomar à noite com bexiga vazia em dose única.'
+    defaultPosology: 'Diluir em meio copo de água e tomar à noite com bexiga vazia em dose única.',
+    isSpecialControl: true
   },
   {
     id: 'metronidazol-400mg',
@@ -841,7 +861,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (24 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 7 dias (PROIBIDO ÁLCOOL).'
+    defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 7 dias (PROIBIDO ÁLCOOL).',
+    isSpecialControl: true
   },
   {
     id: 'clindamicina-300mg',
@@ -850,7 +871,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '2 caixas (32 cápsulas)',
-    defaultPosology: 'Tomar 1 cápsula via oral de 6 em 6 horas por 7 a 10 dias.'
+    defaultPosology: 'Tomar 1 cápsula via oral de 6 em 6 horas por 7 a 10 dias.',
+    isSpecialControl: true
   },
   {
     id: 'doxiciclina-100mg',
@@ -859,7 +881,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Oral',
     category: 'antibioticos',
     defaultQuantity: '1 caixa (15 comprimidos)',
-    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas após refeições por 7 a 14 dias.'
+    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas após refeições por 7 a 14 dias.',
+    isSpecialControl: true
   },
   {
     id: 'benzetacil-1200000',
@@ -868,7 +891,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Intramuscular',
     category: 'antibioticos',
     defaultQuantity: '1 frasco-ampola',
-    defaultPosology: 'Aplicar 1 ampola (1.200.000 UI) IM profundo em dose única.'
+    defaultPosology: 'Aplicar 1 ampola (1.200.000 UI) IM profundo em dose única.',
+    isSpecialControl: true
   },
   {
     id: 'benzetacil-600000',
@@ -877,7 +901,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     route: 'Uso Intramuscular',
     category: 'antibioticos',
     defaultQuantity: '1 frasco-ampola',
-    defaultPosology: 'Aplicar 1 ampola (600.000 UI) IM profundo para crianças < 27 kg.'
+    defaultPosology: 'Aplicar 1 ampola (600.000 UI) IM profundo para crianças < 27 kg.',
+    isSpecialControl: true
   },
   {
     id: 'fluconazol-150mg',

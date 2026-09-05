@@ -21,7 +21,8 @@ import {
   Layers,
   Edit2,
   Send,
-  Share2
+  Share2,
+  User
 } from 'lucide-react';
 import { PrescriptionItem, Patient, DoctorProfile } from '../types';
 import { generateScheduleTimes } from '../utils/doseCalculator';
@@ -58,6 +59,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   onOpenPatientModal
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   // Mobile active tab ('composer' | 'preview')
   const [mobileSection, setMobileSection] = useState<'composer' | 'preview'>('composer');
@@ -66,6 +68,18 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+
+  // Fechar dropdown de sugestões ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Atalho de Teclado Global: '/' ou 'Ctrl+K' / 'Cmd+K' para focar na busca rápida de fármacos
   useEffect(() => {
@@ -103,6 +117,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const [selectedQuantity, setSelectedQuantity] = useState('1 caixa');
   const [selectedPosology, setSelectedPosology] = useState('');
   const [selectedIsSpecial, setSelectedIsSpecial] = useState(false);
+
+  // Estados para edição inline nos cards de medicamentos prescritos
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editInstructions, setEditInstructions] = useState('');
+  const [editQuantity, setEditQuantity] = useState('');
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
 
   // Pediatric quick dosage calculation state
   const [selectedPediaDrugKey, setSelectedPediaDrugKey] = useState<string | null>(null);
@@ -337,15 +357,29 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     });
   }, [searchTerm, activeCategory]);
 
-  // Autocomplete suggestions (top 8)
+  // Autocomplete suggestions (Instantâneo A-Z: catálogo completo navegável de A a Z)
   const searchSuggestions = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    if (!term || term.length < 2) return [];
-    return UNIFIED_MEDICATIONS.filter(med =>
+    let baseList = UNIFIED_MEDICATIONS;
+    if (activeCategory !== 'all') {
+      baseList = baseList.filter(med => med.category === activeCategory);
+    }
+
+    if (!term) {
+      if (selectedLetter) {
+        return baseList
+          .filter(med => med.name.toUpperCase().startsWith(selectedLetter))
+          .sort((a, b) => a.name.localeCompare(b.name));
+      }
+      // Retorna todo o catálogo ordenado alfabeticamente para permitir rolagem de A a Z
+      return [...baseList].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return baseList.filter(med =>
       med.name.toLowerCase().includes(term) ||
       med.activeIngredient.toLowerCase().includes(term)
-    ).slice(0, 8);
-  }, [searchTerm]);
+    );
+  }, [searchTerm, activeCategory, selectedLetter]);
 
   // Select medication from database into the composer form
   const handleSelectMedication = (med: UnifiedMedication) => {
@@ -353,7 +387,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setSelectedRoute(med.route);
     setSelectedQuantity(med.defaultQuantity);
     setSelectedPosology(med.defaultPosology);
-    setSelectedIsSpecial(Boolean(med.isSpecialControl));
+    // Antibióticos e fármacos controlados recebem flag especial automaticamente
+    const isSpecial = Boolean(med.isSpecialControl || med.category === 'antibioticos');
+    setSelectedIsSpecial(isSpecial);
     setSearchTerm('');
     setShowSuggestions(false);
   };
@@ -369,6 +405,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       return;
     }
 
+    // Validação de segurança: se o nome corresponder a antibiótico catalogado, força controle especial
+    const isSpecialDetected = selectedIsSpecial || UNIFIED_MEDICATIONS.some(m =>
+      (m.name.toLowerCase().includes(selectedMedName.toLowerCase()) || selectedMedName.toLowerCase().includes(m.name.toLowerCase())) &&
+      (m.isSpecialControl || m.category === 'antibioticos')
+    );
+
     const newItem: PrescriptionItem = {
       id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       name: selectedMedName.trim(),
@@ -381,7 +423,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       scheduleTimes: generateScheduleTimes('8/8h'),
       instructions: selectedPosology.trim(),
       isContinuous: selectedPosology.toLowerCase().includes('contínuo'),
-      isSpecialControl: selectedIsSpecial
+      isSpecialControl: isSpecialDetected
     };
 
     onUpdateItems([...items, newItem]);
@@ -577,7 +619,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       return;
     }
     const encoded = encodeURIComponent(text);
-    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank', 'noopener,noreferrer');
   };
 
   // Apply a full clinical kit with 1 click
@@ -644,9 +686,102 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setTimeout(() => setItemAddedToast(false), 2500);
   };
 
+  // Funções de Edição Inline de Itens da Receita
+  const handleStartEditItem = (it: PrescriptionItem) => {
+    setEditingItemId(it.id);
+    setEditInstructions(it.instructions);
+    setEditQuantity(it.quantity);
+  };
+
+  const handleSaveEditItem = (id: string) => {
+    onUpdateItems(items.map(i => i.id === id ? {
+      ...i,
+      quantity: editQuantity.trim() || i.quantity,
+      presentation: editQuantity.trim() || i.presentation,
+      instructions: editInstructions.trim() || i.instructions,
+      frequencyText: editInstructions.trim() || i.frequencyText
+    } : i));
+    setEditingItemId(null);
+  };
+
+  const handleCancelEditItem = () => {
+    setEditingItemId(null);
+  };
+
+  const handleToggleSelectItem = (id: string) => {
+    setSelectedItemIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectedItemIds.length === items.length) {
+      setSelectedItemIds([]);
+    } else {
+      setSelectedItemIds(items.map(i => i.id));
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedItemIds.length === 0) return;
+    if (confirm(`Deseja remover os ${selectedItemIds.length} medicamentos selecionados?`)) {
+      onUpdateItems(items.filter(i => !selectedItemIds.includes(i.id)));
+      setSelectedItemIds([]);
+    }
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-20">
       
+      {/* Barra Rápida de Identificação do Paciente (Quickbar) */}
+      <section className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-navy-800 text-white dark:bg-navy-800 dark:text-cream-100 flex items-center justify-center font-bold shrink-0 border border-slate-200 dark:border-navy-600 shadow-tactile-sm">
+            <User className="w-4 h-4 text-amber-400" />
+          </div>
+          <div className="flex-1 min-w-[180px]">
+            <label className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">
+              Identificação do Paciente
+            </label>
+            <input
+              type="text"
+              value={patient.name}
+              onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
+              placeholder="Nome completo do paciente..."
+              className="w-full px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500 outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0 justify-between sm:justify-end">
+          <div className="w-28 sm:w-32">
+            <label className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5 flex items-center gap-1">
+              <Scale className="w-3 h-3 text-amber-500" /> Peso (kg)
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              min="0"
+              value={patient.weightKg || ''}
+              onChange={(e) => onUpdatePatient({ ...patient, weightKg: parseFloat(e.target.value) || 0 })}
+              placeholder="Ex: 14.5"
+              className="w-full px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 text-xs sm:text-sm font-bold text-amber-600 dark:text-amber-400 focus:ring-2 focus:ring-amber-500 outline-none"
+            />
+          </div>
+
+          <div className="pt-3.5">
+            <button
+              type="button"
+              onClick={onOpenPatientModal}
+              className="px-3 py-2 rounded-xl border border-slate-200 dark:border-navy-700 bg-slate-100 dark:bg-navy-800 hover:bg-slate-200 dark:hover:bg-navy-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition active:scale-95 cursor-pointer shadow-tactile-sm"
+              title="Ver e preencher dados cadastrais completos (CPF, Idade, Endereço)"
+            >
+              Ficha Completa
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Top Mobile View Switcher */}
       <div className="flex md:hidden items-center justify-between p-1 rounded-xl bg-slate-200 dark:bg-navy-900 border border-slate-300 dark:border-navy-700">
         <button
@@ -723,7 +858,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
 
             {/* Search Input with Instant Autocomplete */}
-            <div className="relative">
+            <div ref={searchContainerRef} className="relative">
               <label htmlFor="med-search-input" className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 <span className="flex items-center gap-1.5">
                   <span className="w-4 h-4 rounded-full bg-navy-800 dark:bg-cream-100 text-white dark:text-navy-950 text-[9px] font-black flex items-center justify-center shrink-0">1</span>
@@ -759,9 +894,46 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 )}
               </div>
 
-              {/* Suggestions Dropdown (Instant, No Blocker) */}
+              {/* Suggestions Dropdown (Instant, No Blocker, A-Z Navegável) */}
               {showSuggestions && searchSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile-navy z-30 divide-y divide-slate-100 dark:divide-navy-800">
+                <div className="absolute top-full left-0 right-0 mt-1 max-h-80 sm:max-h-96 overflow-y-auto overscroll-contain custom-scrollbar rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile-navy z-30 divide-y divide-slate-100 dark:divide-navy-800">
+                  {/* Sticky Header com Total e Orientação de Rolagem */}
+                  <div className="px-3.5 py-2 bg-slate-50 dark:bg-navy-950/95 text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center justify-between border-b border-slate-200 dark:border-navy-800 sticky top-0 z-20 backdrop-blur-xs">
+                    <span>{searchSuggestions.length} medicamentos ({searchTerm.trim() ? 'filtrados' : selectedLetter ? `Iniciados por "${selectedLetter}"` : 'Catálogo A a Z'})</span>
+                    <span className="text-[10px] text-slate-400 font-normal">Use a roda do mouse ou toque nas letras</span>
+                  </div>
+
+                  {/* Fita de Navegação Rápida A-Z (Quick Alpha Jump) */}
+                  {!searchTerm.trim() && (
+                    <div className="p-1.5 bg-slate-100/95 dark:bg-navy-900/95 border-b border-slate-200 dark:border-navy-800 sticky top-[33px] z-10 backdrop-blur-xs flex items-center gap-1 overflow-x-auto custom-scrollbar">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedLetter(null)}
+                        className={`px-2 py-1 rounded-lg text-[10px] font-extrabold shrink-0 transition-all cursor-pointer ${
+                          selectedLetter === null
+                            ? 'bg-navy-800 text-white dark:bg-cream-100 dark:text-navy-950 shadow-xs'
+                            : 'bg-white dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700'
+                        }`}
+                      >
+                        Todos
+                      </button>
+                      {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => (
+                        <button
+                          key={letter}
+                          type="button"
+                          onClick={() => setSelectedLetter(selectedLetter === letter ? null : letter)}
+                          className={`w-6 h-6 rounded-lg text-[10px] font-black shrink-0 flex items-center justify-center transition-all cursor-pointer ${
+                            selectedLetter === letter
+                              ? 'bg-navy-800 text-white dark:bg-cream-100 dark:text-navy-950 shadow-xs scale-105'
+                              : 'bg-white dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700'
+                          }`}
+                        >
+                          {letter}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   {searchSuggestions.map(med => (
                     <div
                       key={med.id}
@@ -781,6 +953,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       </span>
                     </div>
                   ))}
+
+                  <div className="p-2 text-center text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-50/50 dark:bg-navy-950/50">
+                    Fim do catálogo ({searchSuggestions.length} fármacos)
+                  </div>
                 </div>
               )}
             </div>
@@ -1119,7 +1295,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
           {/* Card 3: Lista de Medicamentos Prescritos na Receita */}
           <section className="p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-cream-50">
                   Medicamentos Prescritos
@@ -1127,18 +1303,41 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-navy-800 dark:bg-navy-700 text-white">
                   {items.length}
                 </span>
+
+                {items.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handleToggleSelectAll}
+                    className="text-[11px] font-semibold text-slate-500 hover:text-navy-900 dark:hover:text-cream-100 ml-2 cursor-pointer"
+                  >
+                    {selectedItemIds.length === items.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+                  </button>
+                )}
               </div>
 
-              {items.length > 0 && (
-                <button
-                  type="button"
-                  onClick={onClearPrescription}
-                  className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer"
-                >
-                  <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
-                  <span>Limpar Receita</span>
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {selectedItemIds.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteSelected}
+                    className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer bg-rose-50 dark:bg-rose-950/40 px-2.5 py-1 rounded-lg border border-rose-200 dark:border-rose-900"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    <span>Excluir Selecionados ({selectedItemIds.length})</span>
+                  </button>
+                )}
+
+                {items.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={onClearPrescription}
+                    className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    <span>Limpar Tudo</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {items.length === 0 ? (
@@ -1150,59 +1349,138 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 {items.map((it, idx) => (
                   <div
                     key={it.id}
-                    className="p-3.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 flex items-start justify-between gap-3 shadow-tactile-sm"
+                    className={`p-3.5 rounded-xl border transition-all shadow-tactile-sm ${
+                      selectedItemIds.includes(it.id)
+                        ? 'bg-sky-50/50 dark:bg-sky-950/20 border-sky-300 dark:border-sky-800'
+                        : 'bg-slate-50 dark:bg-navy-950 border-slate-200 dark:border-navy-800'
+                    }`}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="w-5 h-5 rounded-full bg-navy-800 dark:bg-navy-700 text-white text-[10px] font-black flex items-center justify-center shrink-0">
-                          {idx + 1}
-                        </span>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-cream-50 truncate">
-                          {it.name}
-                        </h4>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300">
-                          {it.route} • {it.quantity}
-                        </span>
-                        {it.isSpecialControl && (
-                          <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                            Controle Especial
+                    {editingItemId === it.id ? (
+                      /* Formulário de Edição Inline */
+                      <div className="space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900 dark:text-cream-50 flex items-center gap-1.5">
+                            <Edit2 className="w-3.5 h-3.5 text-amber-500" />
+                            Editando: {it.name}
                           </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-700 dark:text-slate-300 pl-7 leading-relaxed font-medium">
-                        {it.instructions}
-                      </p>
-                    </div>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleSaveEditItem(it.id)}
+                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1 cursor-pointer shadow-tactile-sm"
+                              title="Salvar alterações"
+                            >
+                              <Check className="w-3.5 h-3.5" /> Salvar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleCancelEditItem}
+                              className="px-2 py-1 rounded-lg border border-slate-300 dark:border-navy-700 hover:bg-slate-200 dark:hover:bg-navy-800 text-slate-600 dark:text-slate-300 text-xs font-semibold cursor-pointer"
+                              title="Cancelar edição"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
 
-                    {/* Action buttons (Move Up, Move Down, Delete) */}
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleMoveItem(idx, 'up')}
-                        disabled={idx === 0}
-                        className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500"
-                        title="Mover para cima"
-                      >
-                        <ChevronUp className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleMoveItem(idx, 'down')}
-                        disabled={idx === items.length - 1}
-                        className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500"
-                        title="Mover para baixo"
-                      >
-                        <ChevronDown className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(it.id)}
-                        className="p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition"
-                        title="Remover medicamento"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
+                              Apresentação / Quantidade
+                            </label>
+                            <input
+                              type="text"
+                              value={editQuantity}
+                              onChange={(e) => setEditQuantity(e.target.value)}
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none"
+                            />
+                          </div>
+                          <div className="sm:col-span-2">
+                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
+                              Instruções de Uso / Posologia
+                            </label>
+                            <input
+                              type="text"
+                              value={editInstructions}
+                              onChange={(e) => setEditInstructions(e.target.value)}
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Visualização Normal com Checkbox e Ações Rápidas */
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center pt-0.5">
+                          <input
+                            type="checkbox"
+                            checked={selectedItemIds.includes(it.id)}
+                            onChange={() => handleToggleSelectItem(it.id)}
+                            className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="w-5 h-5 rounded-full bg-navy-800 dark:bg-navy-700 text-white text-[10px] font-black flex items-center justify-center shrink-0">
+                              {idx + 1}
+                            </span>
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-cream-50 truncate">
+                              {it.name}
+                            </h4>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300">
+                              {it.route} • {it.quantity}
+                            </span>
+                            {it.isSpecialControl && (
+                              <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                Controle Especial
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-700 dark:text-slate-300 pl-7 leading-relaxed font-medium">
+                            {it.instructions}
+                          </p>
+                        </div>
+
+                        {/* Action buttons (Edit, Move Up, Move Down, Delete) */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditItem(it)}
+                            className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 text-slate-500 hover:text-amber-500 transition cursor-pointer"
+                            title="Editar quantidade ou posologia"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleMoveItem(idx, 'up')}
+                            disabled={idx === 0}
+                            className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 cursor-pointer"
+                            title="Mover para cima"
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleMoveItem(idx, 'down')}
+                            disabled={idx === items.length - 1}
+                            className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 cursor-pointer"
+                            title="Mover para baixo"
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(it.id)}
+                            className="p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition cursor-pointer"
+                            title="Remover medicamento"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

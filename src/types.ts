@@ -87,6 +87,7 @@ export interface ExamItem {
   selected: boolean;
   urgency: 'routine' | 'urgent';
   clinicalIndication?: string;
+  isImage?: boolean;
 }
 
 export interface MedicalCertificate {
@@ -118,6 +119,7 @@ export interface MedicalReferral {
   hypothesisCID: string;
   priority: 'eletivo' | 'prioritario' | 'urgente';
   date?: string;
+  observations?: string;
 }
 
 export interface ClinicalProtocol {

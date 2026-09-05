@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   Award, 
-  Share2, 
   Download,
   CheckCircle2,
   AlertCircle,
@@ -75,6 +74,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
     if (onSelectSubTab) onSelectSubTab(tab);
   };
   const specialtiesList = [
+    'Fisioterapia',
     'Cardiologia',
     'Pediatria Especializada / Alergologia',
     'Otorrinolaringologia',
@@ -92,6 +92,14 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
   // Specialty quick CIDs mapping for fast 1-click inclusion in referral
   const specialtyCidSuggestions: Record<string, { code: string; label: string }[]> = {
+    'Fisioterapia': [
+      { code: 'M54.5', label: 'Lombalgia / Dor Lombar' },
+      { code: 'M54.2', label: 'Cervicalgia' },
+      { code: 'M75.1', label: 'Manguito Rotador (Ombro)' },
+      { code: 'S93.4', label: 'Entorse de Tornozelo' },
+      { code: 'M17.9', label: 'Gonartrose (Artrose de Joelho)' },
+      { code: 'M65.9', label: 'Tendinopatia / Sinovite' }
+    ],
     'Cardiologia': [
       { code: 'I10', label: 'Hipertensão Arterial (HAS)' },
       { code: 'I20.9', label: 'Angina Pectoris' },
@@ -228,7 +236,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
     }
     msg += `------------------------------------\n_Documento emitido conforme Resolução CFM 1.658/2002._`;
 
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleSendReferralWhatsApp = () => {
@@ -240,14 +248,23 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
     msg += `Ao(À) Colega da especialidade *${referral.destinationSpecialty || 'Especialista'}*:\n\n`;
     msg += `Encaminho o(a) paciente para avaliação e conduta clínica especializada.\n\n`;
     if (referral.reason) {
-      msg += `📌 *Motivo / Hipótese Diagnóstica:* ${referral.reason}\n\n`;
+      msg += `📌 *Motivo:* ${referral.reason}\n\n`;
+    }
+    if (referral.destinationInstitution) {
+      msg += `🏥 *Unidade / Hospital:* ${referral.destinationInstitution}\n\n`;
+    }
+    if (referral.hypothesisCID) {
+      msg += `🏷️ *Hipótese Diagnóstica (CID-10):* ${referral.hypothesisCID}\n\n`;
     }
     if (referral.clinicalSummary) {
-      msg += `📝 *Resumo Clínico & Condutas Prévias:* ${referral.clinicalSummary}\n\n`;
+      msg += `📝 *Resumo Clínico:* ${referral.clinicalSummary}\n\n`;
+    }
+    if (referral.observations) {
+      msg += `💬 *Observações / Recomendações:* ${referral.observations}\n\n`;
     }
     msg += `------------------------------------\n_PrescMed — Referência e Contrarreferência Ambulatorial_`;
 
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
   };
 
   const currentSpecialtySuggestions = specialtyCidSuggestions[referral.destinationSpecialty] || [];
@@ -288,7 +305,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Share2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
+          <Building2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
           <span>Encaminhamento</span>
         </button>
       </div>
@@ -609,7 +626,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     border: '1px solid rgba(255, 255, 255, 0.12)'
                   }}
                 >
-                  <Share2 className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
+                  <Building2 className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
                 </div>
                 <div>
                   <h3 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
@@ -690,6 +707,23 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
+                {/* Specialty Quick Chips */}
+                <div className="flex items-center gap-1 flex-wrap mt-2">
+                  {['Fisioterapia', 'Cardiologia', 'Ortopedia & Traumatologia', 'Neurologia / Neuropediatria', 'Cirurgia Geral / Pediátrica', 'Oftalmologia', 'Psiquiatria / Psicologia', 'Dermatologia'].map(sp => (
+                    <button
+                      key={sp}
+                      type="button"
+                      onClick={() => onUpdateReferral({ ...referral, destinationSpecialty: sp })}
+                      className={`text-[10px] px-2 py-0.5 rounded-md font-semibold border transition-all cursor-pointer ${
+                        referral.destinationSpecialty === sp
+                          ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      {sp.split(' / ')[0].split(' & ')[0]}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div>
@@ -780,6 +814,20 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none tactile-input leading-relaxed font-sans"
                 />
               </div>
+            </div>
+
+            {/* Observações e Recomendações ao Serviço de Destino */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
+                Observações e Recomendações ao Serviço de Destino (Opcional)
+              </label>
+              <textarea
+                rows={2}
+                value={referral.observations || ''}
+                onChange={(e) => onUpdateReferral({ ...referral, observations: e.target.value })}
+                placeholder="Ex: Paciente com limitação funcional de marcha. Solicita-se fisioterapia motora 2x por semana. Segue em anexo laudo de RX de quadril..."
+                className="w-full p-3 rounded-xl text-xs sm:text-sm font-normal focus:outline-none tactile-input leading-relaxed"
+              />
             </div>
 
             {/* Integrated CID-10 Finder for Referral / Encaminhamento */}

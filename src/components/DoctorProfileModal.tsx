@@ -6,6 +6,7 @@ interface DoctorProfileModalProps {
   darkMode: boolean;
   doctor: DoctorProfile;
   onSaveDoctor: (doctor: DoctorProfile) => void;
+  onClearDoctor?: () => void;
   onClose: () => void;
 }
 
@@ -13,6 +14,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
   darkMode,
   doctor,
   onSaveDoctor,
+  onClearDoctor,
   onClose
 }) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -57,11 +59,11 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
   ];
 
   const handleClear = () => {
-    setFormData({
+    const emptyDoctor: DoctorProfile = {
       name: '',
       crm: '',
       crmState: 'SP',
-      specialty: '',
+      specialty: 'Clínica Médica',
       rqe: '',
       clinicName: '',
       address: '',
@@ -71,7 +73,13 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       showSignature: true,
       signatureText: '',
       stampText: ''
-    });
+    };
+    setFormData(emptyDoctor);
+    if (onClearDoctor) {
+      onClearDoctor();
+    } else {
+      onSaveDoctor(emptyDoctor);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -149,13 +157,12 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
 
             <div>
               <label htmlFor="doc-input-name" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Nome Completo com Título *
+                Nome Completo com Título
               </label>
               <input
                 ref={nameInputRef}
                 id="doc-input-name"
                 type="text"
-                required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Ex: Dr. Melki Donadon"
@@ -166,12 +173,11 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <div className="grid grid-cols-12 gap-2.5">
               <div className="col-span-8">
                 <label htmlFor="doc-input-crm" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Número do CRM *
+                  Número do CRM
                 </label>
                 <input
                   id="doc-input-crm"
                   type="text"
-                  required
                   value={formData.crm}
                   onChange={(e) => setFormData({ ...formData, crm: e.target.value })}
                   placeholder="Ex: 12345"

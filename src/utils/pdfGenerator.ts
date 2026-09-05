@@ -11,6 +11,7 @@ export interface PDFExportOptions {
   examIndication: string;
   certificate: MedicalCertificate;
   referral: MedicalReferral;
+  examFilter?: 'all' | 'lab' | 'image';
 }
 
 const numberToWordsPtBr = (num: number): string => {
@@ -32,7 +33,8 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     exams,
     examIndication,
     certificate,
-    referral
+    referral,
+    examFilter = 'all'
   } = options;
 
   const pdf = new jsPDF({
@@ -67,7 +69,7 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
   });
 
   // Helper to draw Header
-  const renderHeader = (doc: jsPDF, isSecondCopy = false) => {
+  const renderHeader = (doc: jsPDF, customBadge?: string, isSecondCopy = false) => {
     let y = 14;
 
     // Doctor Icon / Symbol
@@ -100,13 +102,15 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     doc.text(`${docClinic} • ${docAddress} • Tel: ${docPhone}`, marginX, y + 18);
 
     // Document Title Badge on Top Right
-    let badgeText = 'RECEITUÁRIO MÉDICO';
-    if (docType === 'special_prescription') badgeText = 'RECEITA CONTROLE ESPECIAL';
-    else if (docType === 'exams') badgeText = 'SOLICITAÇÃO DE EXAMES';
-    else if (docType === 'certificate') badgeText = 'ATESTADO MÉDICO';
-    else if (docType === 'referral') badgeText = 'ENCAMINHAMENTO MÉDICO';
+    let badgeText = customBadge || 'RECEITUÁRIO MÉDICO';
+    if (!customBadge) {
+      if (docType === 'special_prescription') badgeText = 'RECEITA CONTROLE ESPECIAL';
+      else if (docType === 'exams') badgeText = 'SOLICITAÇÃO DE EXAMES';
+      else if (docType === 'certificate') badgeText = 'ATESTADO MÉDICO';
+      else if (docType === 'referral') badgeText = 'ENCAMINHAMENTO MÉDICO';
+    }
 
-    const badgeWidth = 62;
+    const badgeWidth = 68;
     const badgeX = pageWidth - marginX - badgeWidth;
     doc.setFillColor(241, 245, 249);
     doc.setDrawColor(203, 213, 225);
@@ -193,7 +197,6 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     doc.setDrawColor(15, 23, 42);
     doc.rect(marginX, bottomY + 3, 11, 11, 'S');
 
-    // QR mini grid simulation
     doc.setFillColor(15, 23, 42);
     doc.rect(marginX + 1, bottomY + 4, 3, 3, 'F');
     doc.rect(marginX + 7, bottomY + 4, 3, 3, 'F');
@@ -242,52 +245,123 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     doc.text(docSpecialty, signatureX + (signatureWidth / 2), bottomY + 25.5, { align: 'center' });
   };
 
-  // Render content according to docType
-  const renderDocumentContent = (isSecondCopy = false) => {
-    let currentY = renderHeader(pdf, isSecondCopy);
+  // 1. PRESCRIPTION AUTO-SPLITTER (Simples vs. Especial em 2 vias com max 3 itens/folha)
+  if (docType === 'prescription') {
+    const simpleItems = prescriptionItems.filter(i => !i.isSpecialControl);
+    let currentY = renderHeader(pdf, 'RECEITUÁRIO SIMPLES', false);
 
-    // 1. PRESCRIPTIONS (Standard & Special Control)
-    if (docType === 'prescription' || docType === 'special_prescription') {
-      if (prescriptionItems.length === 0) {
-        pdf.setFont('times', 'italic');
-        pdf.setFontSize(11);
-        pdf.setTextColor(148, 163, 184);
-        pdf.text('Nenhum medicamento adicionado nesta prescrição.', pageWidth / 2, currentY + 30, { align: 'center' });
-      } else {
-        const itemsByRoute = prescriptionItems.reduce((acc, item) => {
-          const route = (item.route || 'Oral').toUpperCase();
-          if (!acc[route]) acc[route] = [];
-          acc[route].push(item);
-          return acc;
-        }, {} as { [route: string]: PrescriptionItem[] });
+    if (simpleItems.length === 0) {
+      pdf.setFont('times', 'italic');
+      pdf.setFontSize(11);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text('Nenhum medicamento simples nesta prescrição (Verifique a Receita Especial).', pageWidth / 2, currentY + 30, { align: 'center' });
+    } else {
+      const itemsByRoute = simpleItems.reduce((acc, item) => {
+        const route = (item.route || 'Oral').toUpperCase();
+        if (!acc[route]) acc[route] = [];
+        acc[route].push(item);
+        return acc;
+      }, {} as { [route: string]: PrescriptionItem[] });
 
-        Object.entries(itemsByRoute).forEach(([route, items]) => {
-          // Route Header
-          pdf.setFillColor(241, 245, 249);
-          pdf.setDrawColor(203, 213, 225);
+      Object.entries(itemsByRoute).forEach(([route, rItems]) => {
+        pdf.setFillColor(241, 245, 249);
+        pdf.setDrawColor(203, 213, 225);
+        pdf.roundedRect(marginX, currentY, contentWidth, 6.5, 1, 1, 'FD');
+
+        pdf.setTextColor(7, 89, 133);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8.5);
+        pdf.text(`USO ${route}`, marginX + 3, currentY + 4.5);
+        currentY += 9;
+
+        const rows: any[] = [];
+        rItems.forEach((item, idx) => {
+          const headline = `${idx + 1})  ${item.name.toUpperCase()}  (${item.presentation})  -------------  ${item.quantity}`;
+          let posology = item.instructions;
+          if (item.scheduleTimes && item.scheduleTimes.length > 0) {
+            posology += `\nHorários sugeridos: [ ${item.scheduleTimes.join(' • ')} ]`;
+          }
+          if (item.durationDays) {
+            posology += `\nDuração do tratamento: ${item.durationDays} dias`;
+          } else if (item.isContinuous) {
+            posology += `\nTratamento de uso contínuo`;
+          }
+          rows.push([headline, posology]);
+        });
+
+        autoTable(pdf, {
+          startY: currentY,
+          margin: { left: marginX, right: marginX },
+          body: rows.map(r => [
+            {
+              content: `${r[0]}\n${r[1]}`,
+              styles: { font: 'times', fontSize: 10, cellPadding: { top: 2.5, bottom: 3, left: 3, right: 3 } }
+            }
+          ]),
+          theme: 'plain',
+          styles: { textColor: [15, 23, 42], lineColor: [226, 232, 240], lineWidth: 0.1 },
+          columnStyles: { 0: { cellWidth: contentWidth } }
+        });
+
+        currentY = (pdf as any).lastAutoTable.finalY + 4;
+      });
+    }
+
+    renderFooter(pdf);
+    return pdf;
+  }
+
+  // 2. RECEITA DE CONTROLE ESPECIAL EM 2 VIAS (RDC 20/2011 e Portaria 344/98 - MAX 3 ITENS POR FOLHA)
+  if (docType === 'special_prescription') {
+    const specialItems = prescriptionItems.filter(i => Boolean(i.isSpecialControl));
+    
+    // Divide em blocos de até 3 medicamentos
+    const chunks: PrescriptionItem[][] = [];
+    if (specialItems.length === 0) {
+      chunks.push([]);
+    } else {
+      for (let i = 0; i < specialItems.length; i += 3) {
+        chunks.push(specialItems.slice(i, i + 3));
+      }
+    }
+
+    chunks.forEach((chunk, chunkIndex) => {
+      // 1ª Via: Farmácia (Retenção) e 2ª Via: Paciente
+      [false, true].forEach((isSecondCopy, viaIndex) => {
+        if (chunkIndex > 0 || viaIndex > 0) {
+          pdf.addPage('a4', 'portrait');
+        }
+
+        const badgeSuffix = chunks.length > 1 ? ` (Folha ${chunkIndex + 1}/${chunks.length})` : '';
+        let currentY = renderHeader(pdf, `RECEITA CONTROLE ESPECIAL${badgeSuffix}`, isSecondCopy);
+
+        if (chunk.length === 0) {
+          pdf.setFont('times', 'italic');
+          pdf.setFontSize(11);
+          pdf.setTextColor(148, 163, 184);
+          pdf.text('Nenhum medicamento sujeito a controle especial nesta prescrição.', pageWidth / 2, currentY + 30, { align: 'center' });
+        } else {
+          pdf.setFillColor(254, 242, 242);
+          pdf.setDrawColor(254, 202, 202);
           pdf.roundedRect(marginX, currentY, contentWidth, 6.5, 1, 1, 'FD');
 
-          pdf.setTextColor(7, 89, 133); // #075985
+          pdf.setTextColor(153, 27, 27);
           pdf.setFont('helvetica', 'bold');
           pdf.setFontSize(8.5);
-          pdf.text(`USO ${route}`, marginX + 3, currentY + 4.5);
-
+          pdf.text(`MEDICAMENTOS SOB CONTROLE ESPECIAL (MAX 3 POR FOLHA)`, marginX + 3, currentY + 4.5);
           currentY += 9;
 
-          // Items Table via autoTable
           const rows: any[] = [];
-          items.forEach((item, idx) => {
-            const headline = `${idx + 1})  ${item.name.toUpperCase()}  (${item.presentation})  -------------  ${item.quantity}`;
+          chunk.forEach((item, idx) => {
+            const itemNumber = (chunkIndex * 3) + idx + 1;
+            const headline = `${itemNumber})  ${item.name.toUpperCase()}  (${item.presentation})  -------------  ${item.quantity}`;
             let posology = item.instructions;
             if (item.scheduleTimes && item.scheduleTimes.length > 0) {
               posology += `\nHorários sugeridos: [ ${item.scheduleTimes.join(' • ')} ]`;
             }
             if (item.durationDays) {
               posology += `\nDuração do tratamento: ${item.durationDays} dias`;
-            } else if (item.isContinuous) {
-              posology += `\nTratamento de uso contínuo`;
             }
-
             rows.push([headline, posology]);
           });
 
@@ -301,25 +375,15 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
               }
             ]),
             theme: 'plain',
-            styles: {
-              textColor: [15, 23, 42],
-              lineColor: [226, 232, 240],
-              lineWidth: 0.1
-            },
-            columnStyles: {
-              0: { cellWidth: contentWidth }
-            }
+            styles: { textColor: [15, 23, 42], lineColor: [226, 232, 240], lineWidth: 0.1 },
+            columnStyles: { 0: { cellWidth: contentWidth } }
           });
 
           currentY = (pdf as any).lastAutoTable.finalY + 4;
-        });
-      }
+        }
 
-      // If Special Prescription, add Buyer & Supplier Box
-      if (docType === 'special_prescription') {
-        const remainingSpace = pageHeight - currentY - 40;
+        // Quadro Regulatório de Comprador & Fornecedor
         const boxY = Math.max(currentY + 2, pageHeight - 65);
-
         autoTable(pdf, {
           startY: boxY,
           margin: { left: marginX, right: marginX },
@@ -353,11 +417,22 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
             1: { cellWidth: contentWidth / 2 }
           }
         });
-      }
-    }
 
-    // 2. EXAMS REQUEST
-    else if (docType === 'exams') {
+        renderFooter(pdf);
+      });
+    });
+
+    return pdf;
+  }
+
+  // 3. EXAM AUTO-SPLITTER (Laboratoriais vs. Imagem & Gráficos)
+  if (docType === 'exams') {
+    const labExams = exams.filter(e => !e.isImage);
+    const imageExams = exams.filter(e => Boolean(e.isImage));
+
+    const renderExamTable = (examList: ExamItem[], pageTitle: string) => {
+      let currentY = renderHeader(pdf, pageTitle, false);
+
       if (examIndication) {
         pdf.setFillColor(254, 248, 238);
         pdf.setDrawColor(253, 230, 138);
@@ -371,32 +446,31 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(15, 23, 42);
         pdf.text(examIndication, marginX + 38, currentY + 6.5);
-
         currentY += 14;
       }
 
       pdf.setTextColor(7, 89, 133);
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(9);
-      pdf.text('EXAMES COMPLEMENTARES SOLICITADOS:', marginX, currentY);
+      pdf.text('EXAMES SOLICITADOS:', marginX, currentY);
       currentY += 3;
 
-      if (exams.length === 0) {
+      if (examList.length === 0) {
         pdf.setFont('times', 'italic');
         pdf.setFontSize(11);
         pdf.setTextColor(148, 163, 184);
-        pdf.text('Nenhum exame selecionado neste pedido.', pageWidth / 2, currentY + 30, { align: 'center' });
+        pdf.text('Nenhum exame selecionado nesta categoria.', pageWidth / 2, currentY + 30, { align: 'center' });
       } else {
         autoTable(pdf, {
           startY: currentY,
           margin: { left: marginX, right: marginX },
           theme: 'striped',
-          head: [['ITEM', 'EXAME', 'CATEGORIA', 'PREPARO / OBSERVAÇÃO']],
-          body: exams.map((exam, idx) => [
+          head: [['ITEM', 'EXAME', 'CATEGORIA', 'TIPO / PREPARO']],
+          body: examList.map((exam, idx) => [
             String(idx + 1).padStart(2, '0'),
             exam.name,
             exam.category || 'Geral',
-            exam.description || (exam.urgency === 'urgent' ? 'Urgente • Prioritário' : 'Rotina Laboratorial')
+            exam.isImage ? 'Diagnóstico por Imagem / Gráfico' : (exam.description || 'Rotina Laboratorial')
           ]),
           headStyles: {
             fillColor: [30, 79, 122],
@@ -417,163 +491,173 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
           }
         });
       }
+
+      renderFooter(pdf);
+    };
+
+    if (examFilter === 'lab') {
+      renderExamTable(labExams, 'SOLICITAÇÃO DE EXAMES LABORATORIAIS');
+    } else if (examFilter === 'image') {
+      renderExamTable(imageExams, 'SOLICITAÇÃO DE EXAMES DE IMAGEM');
+    } else {
+      // Se 'all': se tiver ambos, gera 2 páginas separadas; senão, gera 1 página com o título apropriado
+      if (labExams.length > 0 && imageExams.length > 0) {
+        renderExamTable(labExams, 'SOLICITAÇÃO DE EXAMES LABORATORIAIS');
+        pdf.addPage('a4', 'portrait');
+        renderExamTable(imageExams, 'SOLICITAÇÃO DE EXAMES DE IMAGEM');
+      } else if (imageExams.length > 0) {
+        renderExamTable(imageExams, 'SOLICITAÇÃO DE EXAMES DE IMAGEM');
+      } else {
+        renderExamTable(labExams, 'SOLICITAÇÃO DE EXAMES LABORATORIAIS');
+      }
     }
 
-    // 3. ATESTADO MÉDICO
-    else if (docType === 'certificate') {
-      currentY += 6;
+    return pdf;
+  }
 
-      pdf.setTextColor(15, 23, 42);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(15);
-      pdf.text('ATESTADO MÉDICO', pageWidth / 2, currentY, { align: 'center' });
+  // 4. ATESTADO MÉDICO
+  if (docType === 'certificate') {
+    let currentY = renderHeader(pdf, 'ATESTADO MÉDICO', false);
+    currentY += 6;
 
+    pdf.setTextColor(15, 23, 42);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(15);
+    pdf.text('ATESTADO MÉDICO', pageWidth / 2, currentY, { align: 'center' });
+
+    pdf.setDrawColor(203, 213, 225);
+    pdf.setLineWidth(0.4);
+    pdf.line(pageWidth / 2 - 35, currentY + 2.5, pageWidth / 2 + 35, currentY + 2.5);
+    currentY += 16;
+
+    const certPatient = certificate.patientName?.trim() || patientName;
+    const certDocNumber = (certificate.documentNumber?.trim() || (patientDoc !== '—' ? patientDoc : ''))
+      ? `portador(a) do documento nº ${certificate.documentNumber?.trim() || patientDoc}, `
+      : '';
+    const daysCount = Math.max(1, certificate.daysOff || 1);
+    const daysWritten = numberToWordsPtBr(daysCount);
+    const startDateFormatted = certificate.startDate
+      ? new Date(certificate.startDate + 'T00:00:00').toLocaleDateString('pt-BR')
+      : new Date().toLocaleDateString('pt-BR');
+    const endDateFormatted = certificate.endDate
+      ? new Date(certificate.endDate + 'T00:00:00').toLocaleDateString('pt-BR')
+      : new Date().toLocaleDateString('pt-BR');
+
+    const certText = `Atesto para os devidos fins de direito que o(a) paciente ${certPatient.toUpperCase()}, ${certDocNumber}esteve sob meus cuidados médicos profissionais no dia ${startDateFormatted}, necessitando de ${daysCount} (${daysWritten}) dia(s) de repouso e afastamento de suas atividades habituais ${certificate.periodText || ''}, com retorno previsto a partir de ${endDateFormatted}.`;
+
+    pdf.setFont('times', 'normal');
+    pdf.setFontSize(12);
+    pdf.setTextColor(15, 23, 42);
+    const splitCert = pdf.splitTextToSize(certText, contentWidth);
+    pdf.text(splitCert, marginX, currentY, { lineHeightFactor: 1.6 });
+
+    currentY += (splitCert.length * 8) + 12;
+
+    if (certificate.includeCID && certificate.cid10Code) {
+      pdf.setFillColor(248, 250, 252);
       pdf.setDrawColor(203, 213, 225);
-      pdf.setLineWidth(0.4);
-      pdf.line(pageWidth / 2 - 35, currentY + 2.5, pageWidth / 2 + 35, currentY + 2.5);
+      pdf.roundedRect(marginX, currentY, contentWidth, 12, 1.5, 1.5, 'FD');
 
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.setTextColor(30, 79, 122);
+      pdf.text('DIAGNÓSTICO CODIFICADO (CID-10):', marginX + 4, currentY + 5);
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(15, 23, 42);
+      pdf.text(`${certificate.cid10Code} — ${certificate.cid10Description || ''}`, marginX + 4, currentY + 9);
       currentY += 16;
-
-      const certPatient = certificate.patientName?.trim() || patientName;
-      const certDocNumber = (certificate.documentNumber?.trim() || (patientDoc !== '—' ? patientDoc : ''))
-        ? `portador(a) do documento nº ${certificate.documentNumber?.trim() || patientDoc}, `
-        : '';
-      const daysCount = Math.max(1, certificate.daysOff || 1);
-      const daysWritten = numberToWordsPtBr(daysCount);
-      const startDateFormatted = certificate.startDate
-        ? new Date(certificate.startDate + 'T00:00:00').toLocaleDateString('pt-BR')
-        : new Date().toLocaleDateString('pt-BR');
-      const endDateFormatted = certificate.endDate
-        ? new Date(certificate.endDate + 'T00:00:00').toLocaleDateString('pt-BR')
-        : new Date().toLocaleDateString('pt-BR');
-
-      const certText = `Atesto para os devidos fins de direito que o(a) paciente ${certPatient.toUpperCase()}, ${certDocNumber}esteve sob meus cuidados médicos profissionais no dia ${startDateFormatted}, necessitando de ${daysCount} (${daysWritten}) dia(s) de repouso e afastamento de suas atividades habituais ${certificate.periodText || ''}, com retorno previsto a partir de ${endDateFormatted}.`;
-
-      pdf.setFont('times', 'normal');
-      pdf.setFontSize(12);
-      pdf.setTextColor(15, 23, 42);
-
-      const splitCertText = pdf.splitTextToSize(certText, contentWidth - 10);
-      pdf.text(splitCertText, marginX + 5, currentY, { lineHeightFactor: 1.6 });
-
-      currentY += (splitCertText.length * 7.5) + 12;
-
-      // CID-10 Box
-      if (certificate.includeCID && certificate.cid10Code) {
-        pdf.setFillColor(241, 245, 249);
-        pdf.setDrawColor(203, 213, 225);
-        pdf.roundedRect(marginX + 5, currentY, contentWidth - 10, 16, 1.5, 1.5, 'FD');
-
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(8.5);
-        pdf.setTextColor(15, 23, 42);
-        pdf.text('Diagnóstico Codificado (CID-10): ', marginX + 9, currentY + 5.5);
-
-        pdf.setTextColor(3, 105, 161);
-        pdf.text(`${certificate.cid10Code} - ${certificate.cid10Description || ''}`, marginX + 56, currentY + 5.5);
-
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(7);
-        pdf.setTextColor(100, 116, 139);
-        pdf.text('* Inclusão do CID expressamente solicitada e autorizada pelo(a) paciente (Resolução CFM nº 1.658/2002).', marginX + 9, currentY + 11.5);
-
-        currentY += 22;
-      }
-
-      // Observations
-      if (certificate.observations) {
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(9);
-        pdf.setTextColor(15, 23, 42);
-        pdf.text('Observações Médicas:', marginX + 5, currentY);
-
-        pdf.setFont('times', 'italic');
-        pdf.setFontSize(10.5);
-        pdf.setTextColor(51, 65, 85);
-        const splitObs = pdf.splitTextToSize(certificate.observations, contentWidth - 10);
-        pdf.text(splitObs, marginX + 5, currentY + 5);
-      }
     }
 
-    // 4. ENCAMINHAMENTO
-    else if (docType === 'referral') {
-      currentY += 4;
-
-      pdf.setTextColor(15, 23, 42);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(13);
-      pdf.text('GUIA DE ENCAMINHAMENTO & REFERÊNCIA', pageWidth / 2, currentY, { align: 'center' });
-
-      pdf.setDrawColor(203, 213, 225);
-      pdf.setLineWidth(0.4);
-      pdf.line(pageWidth / 2 - 45, currentY + 2, pageWidth / 2 + 45, currentY + 2);
-
-      currentY += 10;
-
-      // Destination Specialty Box
-      pdf.setFillColor(240, 253, 244);
-      pdf.setDrawColor(187, 247, 208);
-      pdf.roundedRect(marginX, currentY, contentWidth, 14, 1.5, 1.5, 'FD');
-
+    if (certificate.observations) {
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(7.5);
-      pdf.setTextColor(20, 83, 45);
-      pdf.text('AO SERVIÇO ESPECIALIZADO DE:', marginX + 4, currentY + 4.5);
+      pdf.setTextColor(100, 116, 139);
+      pdf.text('OBSERVAÇÕES ADICIONAIS:', marginX, currentY);
+      currentY += 4;
 
-      pdf.setFontSize(11);
-      pdf.setTextColor(6, 78, 59);
-      pdf.text(referral.destinationSpecialty || 'Especialidade Médica', marginX + 4, currentY + 9.5);
-
-      if (referral.destinationInstitution) {
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(7.5);
-        pdf.setTextColor(51, 65, 85);
-        pdf.text(`Local / Instituição: ${referral.destinationInstitution}`, marginX + 110, currentY + 9.5);
-      }
-
-      currentY += 18;
-
-      const referralSections = [
-        { title: 'MOTIVO DA SOLICITAÇÃO', content: referral.reason || 'Avaliação e conduta terapêutica especializada.' },
-        { title: 'RESUMO CLÍNICO / EVOLUÇÃO', content: referral.clinicalSummary || 'Histórico clínico e exame físico sem alterações agudas no momento.' },
-        { title: 'EXAMES COMPLEMENTARES REALIZADOS', content: referral.relevantExams },
-        { title: 'HIPÓTESE DIAGNÓSTICA (CID-10)', content: referral.hypothesisCID }
-      ].filter(s => !!s.content);
-
-      referralSections.forEach(section => {
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(7.5);
-        pdf.setTextColor(71, 85, 105);
-        pdf.text(section.title, marginX, currentY);
-        currentY += 3.5;
-
-        pdf.setFillColor(248, 250, 252);
-        pdf.setDrawColor(203, 213, 225);
-
-        pdf.setFont('times', 'normal');
-        pdf.setFontSize(10);
-        pdf.setTextColor(15, 23, 42);
-
-        const lines = pdf.splitTextToSize(section.content || '', contentWidth - 6);
-        const boxHeight = Math.max(10, (lines.length * 5) + 5);
-
-        pdf.roundedRect(marginX, currentY, contentWidth, boxHeight, 1, 1, 'FD');
-        pdf.text(lines, marginX + 3, currentY + 5);
-
-        currentY += boxHeight + 4;
-      });
+      pdf.setFont('times', 'italic');
+      pdf.setFontSize(10);
+      pdf.setTextColor(51, 65, 85);
+      const splitObs = pdf.splitTextToSize(certificate.observations, contentWidth);
+      pdf.text(splitObs, marginX, currentY);
     }
 
     renderFooter(pdf);
-  };
+    return pdf;
+  }
 
-  // Render 1st page
-  renderDocumentContent(false);
+  // 5. ENCAMINHAMENTO MÉDICO
+  if (docType === 'referral') {
+    let currentY = renderHeader(pdf, 'ENCAMINHAMENTO MÉDICO', false);
+    currentY += 4;
 
-  // If special control prescription, add 2nd page (Paciente)
-  if (docType === 'special_prescription') {
-    pdf.addPage('a4', 'portrait');
-    renderDocumentContent(true);
+    pdf.setTextColor(15, 23, 42);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(13);
+    pdf.text('GUIA DE ENCAMINHAMENTO & REFERÊNCIA', pageWidth / 2, currentY, { align: 'center' });
+
+    pdf.setDrawColor(203, 213, 225);
+    pdf.setLineWidth(0.4);
+    pdf.line(pageWidth / 2 - 45, currentY + 2, pageWidth / 2 + 45, currentY + 2);
+    currentY += 10;
+
+    // Destination Specialty Box
+    pdf.setFillColor(240, 253, 244);
+    pdf.setDrawColor(187, 247, 208);
+    pdf.roundedRect(marginX, currentY, contentWidth, 14, 1.5, 1.5, 'FD');
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(20, 83, 45);
+    pdf.text('AO SERVIÇO ESPECIALIZADO DE:', marginX + 4, currentY + 4.5);
+
+    pdf.setFontSize(11);
+    pdf.setTextColor(6, 78, 59);
+    pdf.text(referral.destinationSpecialty || 'Especialidade Médica', marginX + 4, currentY + 9.5);
+
+    if (referral.destinationInstitution) {
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(51, 65, 85);
+      pdf.text(`Local / Instituição: ${referral.destinationInstitution}`, marginX + 110, currentY + 9.5);
+    }
+    currentY += 18;
+
+    const referralSections = [
+      { title: 'MOTIVO DA SOLICITAÇÃO', content: referral.reason || 'Avaliação e conduta terapêutica especializada.' },
+      { title: 'RESUMO CLÍNICO / EVOLUÇÃO', content: referral.clinicalSummary || 'Histórico clínico e exame físico sem alterações agudas no momento.' },
+      { title: 'EXAMES COMPLEMENTARES REALIZADOS', content: referral.relevantExams },
+      { title: 'HIPÓTESE DIAGNÓSTICA (CID-10)', content: referral.hypothesisCID },
+      { title: 'OBSERVAÇÕES E RECOMENDAÇÕES AO SERVIÇO', content: referral.observations }
+    ].filter(s => !!s.content);
+
+    referralSections.forEach(section => {
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(71, 85, 105);
+      pdf.text(section.title, marginX, currentY);
+      currentY += 3.5;
+
+      pdf.setFillColor(248, 250, 252);
+      pdf.setDrawColor(203, 213, 225);
+
+      pdf.setFont('times', 'normal');
+      pdf.setFontSize(10);
+      pdf.setTextColor(15, 23, 42);
+
+      const lines = pdf.splitTextToSize(section.content || '', contentWidth - 6);
+      const boxHeight = Math.max(10, (lines.length * 5) + 5);
+
+      pdf.roundedRect(marginX, currentY, contentWidth, boxHeight, 1, 1, 'FD');
+      pdf.text(lines, marginX + 3, currentY + 5);
+
+      currentY += boxHeight + 4;
+    });
+
+    renderFooter(pdf);
+    return pdf;
   }
 
   return pdf;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Download, 
   QrCode, 
@@ -18,7 +18,11 @@ import {
   FileCheck,
   Send,
   Copy,
-  Printer
+  Printer,
+  Building2,
+  AlertTriangle,
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -133,6 +137,13 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
   const [fitToMobile, setFitToMobile] = useState(true);
+
+  // Estados para Controle Especial (1ª e 2ª vias + paginação de até 3 itens/folha)
+  const [specialVia, setSpecialVia] = useState<'pharmacy' | 'patient'>('pharmacy');
+  const [specialPageIndex, setSpecialPageIndex] = useState(0);
+
+  // Estado para Filtro de Exames (Todos vs Laboratório vs Imagem)
+  const [examFilter, setExamFilter] = useState<'all' | 'lab' | 'image'>('all');
   
   const printSheetRef = useRef<HTMLDivElement>(null);
 
@@ -142,6 +153,36 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       setDocType(initialDocType);
     }
   }, [initialDocType]);
+
+  // Separação de Medicamentos Simples vs. Controle Especial (RDC 20/2011 e Portaria 344/98)
+  const simpleItems = useMemo(() => prescriptionItems.filter(i => !i.isSpecialControl), [prescriptionItems]);
+  const specialItems = useMemo(() => prescriptionItems.filter(i => Boolean(i.isSpecialControl)), [prescriptionItems]);
+  const hasMixedItems = simpleItems.length > 0 && specialItems.length > 0;
+
+  // Chunks de no máximo 3 itens por folha para controle especial
+  const specialChunks = useMemo(() => {
+    const chunks: PrescriptionItem[][] = [];
+    if (specialItems.length === 0) {
+      chunks.push([]);
+    } else {
+      for (let i = 0; i < specialItems.length; i += 3) {
+        chunks.push(specialItems.slice(i, i + 3));
+      }
+    }
+    return chunks;
+  }, [specialItems]);
+
+  // Exames filtrados por categoria (Laboratório vs Imagem)
+  const labExams = useMemo(() => effectiveExams.filter(e => !e.isImage), [effectiveExams]);
+  const imageExams = useMemo(() => effectiveExams.filter(e => Boolean(e.isImage)), [effectiveExams]);
+
+  const displayedExams = useMemo(() => {
+    if (examFilter === 'lab') return labExams;
+    if (examFilter === 'image') return imageExams;
+    return effectiveExams;
+  }, [examFilter, labExams, imageExams, effectiveExams]);
+
+  const currentSpecialChunk = specialChunks[specialPageIndex] || [];
 
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : null;
   const patientName = patient?.name?.trim() || certificate?.patientName?.trim() || referral?.patientName?.trim() || 'Não identificado';
@@ -164,9 +205,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
   const getDocTitle = () => {
     switch (docType) {
-      case 'prescription': return 'Receita_Medica';
+      case 'prescription': return 'Receita_Simples';
       case 'special_prescription': return 'Receita_Controle_Especial';
-      case 'exams': return 'Pedido_Exames';
+      case 'exams': 
+        if (examFilter === 'lab') return 'Pedido_Exames_Laboratoriais';
+        if (examFilter === 'image') return 'Pedido_Exames_Imagem';
+        return 'Pedido_Exames';
       case 'certificate': return 'Atestado_Medico';
       case 'referral': return 'Encaminhamento_Medico';
       default: return 'Documento_Medico';
@@ -188,7 +232,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
         exams: effectiveExams,
         examIndication,
         certificate,
-        referral
+        referral,
+        examFilter
       });
 
       const cleanPatient = (patientName || 'Paciente').replace(/[^a-zA-Z0-9]/g, '_');
@@ -268,7 +313,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       return;
     }
     const encoded = encodeURIComponent(text);
-    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleCopyFormattedText = () => {
@@ -301,12 +346,17 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  const itemsByRoute = prescriptionItems.reduce((acc, item) => {
-    const route = (item.route || 'Oral').toUpperCase();
-    if (!acc[route]) acc[route] = [];
-    acc[route].push(item);
-    return acc;
-  }, {} as { [route: string]: PrescriptionItem[] });
+  // Medicamentos ativos para visualização no preview (Simples vs Chunk da Receita Especial)
+  const activePrescriptionItems = docType === 'prescription' ? simpleItems : currentSpecialChunk;
+
+  const itemsByRoute = useMemo(() => {
+    return activePrescriptionItems.reduce((acc, item) => {
+      const route = (item.route || 'Oral').toUpperCase();
+      if (!acc[route]) acc[route] = [];
+      acc[route].push(item);
+      return acc;
+    }, {} as { [route: string]: PrescriptionItem[] });
+  }, [activePrescriptionItems]);
 
   return (
     <div id="print-preview-section" className="space-y-4 sm:space-y-5 pb-12">
@@ -425,7 +475,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             }`}
           >
             <FileText className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
-            <span>Receita Padrão ({prescriptionItems.length})</span>
+            <span>Receita Simples ({simpleItems.length})</span>
           </button>
 
           <button
@@ -440,7 +490,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             }`}
           >
             <Layers className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
-            <span>Controle Especial (2 Vias)</span>
+            <span>Controle Especial ({specialItems.length})</span>
+            <span className="text-[10px] px-1.5 py-0.2 bg-rose-500/20 text-rose-300 font-bold rounded">2 Vias</span>
           </button>
 
           <button
@@ -484,7 +535,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                 : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
             }`}
           >
-            <Share2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
+            <Building2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
             <span>Encaminhamentos</span>
           </button>
         </div>
@@ -505,6 +556,160 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <span>{fitToMobile ? 'Zoom' : 'Ajustar'}</span>
         </button>
       </div>
+
+      {/* Banner de Prescrição Mista */}
+      {hasMixedItems && (docType === 'prescription' || docType === 'special_prescription') && (
+        <div 
+          className="tactile-card p-3 sm:p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm border no-print"
+          style={{
+            backgroundColor: darkMode ? 'rgba(56, 142, 230, 0.08)' : 'rgba(7, 89, 133, 0.05)',
+            borderColor: darkMode ? 'rgba(56, 142, 230, 0.25)' : 'rgba(7, 89, 133, 0.2)',
+            color: darkMode ? '#BAE6FD' : '#0369A1'
+          }}
+        >
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck className="w-5 h-5 shrink-0 text-sky-500 dark:text-sky-400" />
+            <span>
+              <strong>Prescrição Mista:</strong> Medicamentos simples (<strong>{simpleItems.length}</strong>) e controlados/antibióticos (<strong>{specialItems.length}</strong>) foram separados automaticamente conforme RDC 20/2011 e Portaria 344/98.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setDocType(docType === 'prescription' ? 'special_prescription' : 'prescription')}
+            className="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shrink-0 whitespace-nowrap cursor-pointer transition-all active:scale-95 self-start sm:self-auto"
+          >
+            {docType === 'prescription' ? 'Ver Receita Especial (2 vias)' : 'Ver Receita Simples'}
+          </button>
+        </div>
+      )}
+
+      {/* Controles para Receita de Controle Especial (Alternar Via & Paginação de Folhas) */}
+      {docType === 'special_prescription' && (
+        <div 
+          className="tactile-card p-3 sm:p-3.5 rounded-xl flex flex-wrap items-center justify-between gap-3 border no-print"
+          style={{
+            backgroundColor: 'var(--surface-card)',
+            borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(11, 19, 43, 0.08)'
+          }}
+        >
+          {/* Seletor de Via */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-xs font-bold text-slate-400 mr-1">Visualizar Via:</span>
+            <button
+              type="button"
+              onClick={() => setSpecialVia('pharmacy')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                specialVia === 'pharmacy'
+                  ? 'bg-rose-700 text-white border-rose-600 shadow-xs'
+                  : darkMode
+                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+              }`}
+            >
+              1ª Via (Farmácia / Retenção)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSpecialVia('patient')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                specialVia === 'patient'
+                  ? 'bg-sky-700 text-white border-sky-600 shadow-xs'
+                  : darkMode
+                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+              }`}
+            >
+              2ª Via (Paciente / Orientação)
+            </button>
+          </div>
+
+          {/* Paginação se houver mais de 3 medicamentos (chunks > 1) */}
+          {specialChunks.length > 1 && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-400">
+                Folha <strong>{specialPageIndex + 1}</strong> de <strong>{specialChunks.length}</strong> (máx. 3 por folha)
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  disabled={specialPageIndex === 0}
+                  onClick={() => setSpecialPageIndex(prev => Math.max(0, prev - 1))}
+                  className="p-1.5 rounded-lg border border-slate-300 dark:border-white/10 disabled:opacity-30 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5"
+                  title="Folha anterior"
+                >
+                  <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                </button>
+                <button
+                  type="button"
+                  disabled={specialPageIndex >= specialChunks.length - 1}
+                  onClick={() => setSpecialPageIndex(prev => Math.min(specialChunks.length - 1, prev + 1))}
+                  className="p-1.5 rounded-lg border border-slate-300 dark:border-white/10 disabled:opacity-30 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5"
+                  title="Próxima folha"
+                >
+                  <ChevronRight className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Controles para Exames (Filtrar Laboratório vs Imagem) */}
+      {docType === 'exams' && (
+        <div 
+          className="tactile-card p-3 sm:p-3.5 rounded-xl flex flex-wrap items-center justify-between gap-3 border no-print"
+          style={{
+            backgroundColor: 'var(--surface-card)',
+            borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(11, 19, 43, 0.08)'
+          }}
+        >
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-xs font-bold text-slate-400 mr-1">Filtrar Guia:</span>
+            <button
+              type="button"
+              onClick={() => setExamFilter('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                examFilter === 'all'
+                  ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-xs'
+                  : darkMode
+                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+              }`}
+            >
+              Todos ({effectiveExams.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setExamFilter('lab')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                examFilter === 'lab'
+                  ? 'bg-emerald-700 text-white border-emerald-600 shadow-xs'
+                  : darkMode
+                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+              }`}
+            >
+              Laboratoriais ({labExams.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setExamFilter('image')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                examFilter === 'image'
+                  ? 'bg-sky-700 text-white border-sky-600 shadow-xs'
+                  : darkMode
+                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+              }`}
+            >
+              Imagem / Gráficos ({imageExams.length})
+            </button>
+          </div>
+          <span className="text-[11px] text-slate-400 font-medium">
+            {examFilter === 'lab' ? 'Guia para análises clínicas (sangue, urina, fezes).' : examFilter === 'image' ? 'Guia para centros de diagnóstico por imagem (raio-x, USG, TC).' : 'Guia unificada com todos os exames.'}
+          </span>
+        </div>
+      )}
 
       {/* A4 Paper Container Wrapper */}
       <div className="flex justify-center p-2 sm:p-5 bg-slate-900/20 rounded-2xl overflow-x-auto">
@@ -566,15 +771,21 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                     border: '1px solid #CBD5E1'
                   }}
                 >
-                  {docType === 'prescription' && 'RECEITUÁRIO MÉDICO'}
-                  {docType === 'special_prescription' && 'RECEITA CONTROLE ESPECIAL'}
-                  {docType === 'exams' && 'SOLICITAÇÃO DE EXAMES'}
+                  {docType === 'prescription' && 'RECEITUÁRIO SIMPLES'}
+                  {docType === 'special_prescription' && `RECEITA CONTROLE ESPECIAL${specialChunks.length > 1 ? ` (FOLHA ${specialPageIndex + 1}/${specialChunks.length})` : ''}`}
+                  {docType === 'exams' && (
+                    examFilter === 'lab' 
+                      ? 'SOLICITAÇÃO DE EXAMES LABORATORIAIS' 
+                      : examFilter === 'image' 
+                      ? 'SOLICITAÇÃO DE EXAMES DE IMAGEM & GRÁFICOS' 
+                      : 'SOLICITAÇÃO DE EXAMES'
+                  )}
                   {docType === 'certificate' && 'ATESTADO MÉDICO'}
                   {docType === 'referral' && 'ENCAMINHAMENTO MÉDICO'}
                 </span>
                 {docType === 'special_prescription' && (
-                  <span className="text-[9px] sm:text-[10px] font-bold block uppercase tracking-wide font-sans" style={{ color: '#991B1B' }}>
-                    1ª Via: Farmácia / 2ª Via: Paciente
+                  <span className="text-[9px] sm:text-[10px] font-bold block uppercase tracking-wide font-sans" style={{ color: specialVia === 'pharmacy' ? '#991B1B' : '#075985' }}>
+                    {specialVia === 'pharmacy' ? '1ª Via: Farmácia (Retenção)' : '2ª Via: Paciente (Orientação)'}
                   </span>
                 )}
                 <span className="text-xs sm:text-xs font-medium font-sans" style={{ color: '#64748B' }}>
@@ -774,20 +985,26 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
                   <div className="pb-1.5" style={{ borderBottom: '1.5px solid #CBD5E1' }}>
                     <span className="font-bold text-xs sm:text-sm tracking-wider uppercase font-sans text-sky-900">
-                      EXAMES COMPLEMENTARES SOLICITADOS:
+                      {examFilter === 'lab' 
+                        ? 'EXAMES LABORATORIAIS SOLICITADOS:' 
+                        : examFilter === 'image' 
+                        ? 'EXAMES DE IMAGEM & GRÁFICOS SOLICITADOS:' 
+                        : 'EXAMES COMPLEMENTARES SOLICITADOS:'}
                     </span>
                   </div>
 
-                  {effectiveExams.length === 0 ? (
+                  {displayedExams.length === 0 ? (
                     <div className="py-16 text-center italic text-base text-slate-400 font-serif">
-                      Nenhum exame selecionado neste pedido.
+                      Nenhum exame selecionado neste pedido {examFilter !== 'all' ? `(filtro: ${examFilter})` : ''}.
                     </div>
                   ) : (
                     <ol className="list-decimal list-inside space-y-3 pl-2 text-sm sm:text-base font-serif text-slate-950 font-semibold leading-relaxed">
-                      {effectiveExams.map((exam) => (
+                      {displayedExams.map((exam) => (
                         <li key={exam.id} className="leading-relaxed">
                           <span className="font-bold">{exam.name}</span>
-                          <span className="text-xs sm:text-sm font-normal italic ml-2 text-slate-600 font-sans">({exam.category})</span>
+                          <span className="text-xs sm:text-sm font-normal italic ml-2 text-slate-600 font-sans">
+                            ({exam.isImage ? 'Imagem / Gráfico' : exam.category})
+                          </span>
                         </li>
                       ))}
                     </ol>

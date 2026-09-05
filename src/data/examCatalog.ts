@@ -42,15 +42,29 @@ export const EXAM_CATALOG: ExamItem[] = [
   { id: 'sangue-oculto', category: 'Urinálise / Parasitologia', name: 'Pesquisa de Sangue Oculto nas Fezes (Método Imunoquímico)', selected: false, urgency: 'routine' },
 
   // Imagem & Métodos Gráficos
-  { id: 'rx-torax', category: 'Imagem & Gráficos', name: 'Radiografia de Tórax em PA e Perfil', selected: false, urgency: 'routine' },
-  { id: 'rx-abdomen', category: 'Imagem & Gráficos', name: 'Radiografia Simples de Abdome (Ortostática e Decúbito)', selected: false, urgency: 'routine' },
-  { id: 'usg-abdomen-total', category: 'Imagem & Gráficos', name: 'Ultrassonografia de Abdome Total com Doppler', selected: false, urgency: 'routine' },
-  { id: 'usg-vias-urinarias', category: 'Imagem & Gráficos', name: 'Ultrassonografia dos Rins e Vias Urinárias', selected: false, urgency: 'routine' },
-  { id: 'usg-tireoide', category: 'Imagem & Gráficos', name: 'Ultrassonografia da Glândula Tireoide com Doppler', selected: false, urgency: 'routine' },
-  { id: 'tc-cranio', category: 'Imagem & Gráficos', name: 'Tomografia Computadorizada de Crânio sem Contraste', selected: false, urgency: 'urgent' },
-  { id: 'tc-torax', category: 'Imagem & Gráficos', name: 'Tomografia Computadorizada de Tórax de Alta Resolução', selected: false, urgency: 'routine' },
-  { id: 'ecg', category: 'Imagem & Gráficos', name: 'Eletrocardiograma Convencional de 12 Derivações (ECG)', selected: false, urgency: 'routine' },
-  { id: 'ecocardiograma', category: 'Imagem & Gráficos', name: 'Ecocardiograma Transtorácico com Doppler Colorido', selected: false, urgency: 'routine' }
+  { id: 'rx-torax', category: 'Imagem & Gráficos', name: 'Radiografia de Tórax em PA e Perfil', selected: false, urgency: 'routine', isImage: true },
+  { id: 'rx-abdomen', category: 'Imagem & Gráficos', name: 'Radiografia Simples de Abdome (Ortostática e Decúbito)', selected: false, urgency: 'routine', isImage: true },
+  { id: 'usg-abdomen-total', category: 'Imagem & Gráficos', name: 'Ultrassonografia de Abdome Total com Doppler', selected: false, urgency: 'routine', isImage: true },
+  { id: 'usg-vias-urinarias', category: 'Imagem & Gráficos', name: 'Ultrassonografia dos Rins e Vias Urinárias', selected: false, urgency: 'routine', isImage: true },
+  { id: 'usg-tireoide', category: 'Imagem & Gráficos', name: 'Ultrassonografia da Glândula Tireoide com Doppler', selected: false, urgency: 'routine', isImage: true },
+  { id: 'tc-cranio', category: 'Imagem & Gráficos', name: 'Tomografia Computadorizada de Crânio sem Contraste', selected: false, urgency: 'urgent', isImage: true },
+  { id: 'tc-torax', category: 'Imagem & Gráficos', name: 'Tomografia Computadorizada de Tórax de Alta Resolução', selected: false, urgency: 'routine', isImage: true },
+  { id: 'ecg', category: 'Imagem & Gráficos', name: 'Eletrocardiograma Convencional de 12 Derivações (ECG)', selected: false, urgency: 'routine', isImage: true },
+  { id: 'ecocardiograma', category: 'Imagem & Gráficos', name: 'Ecocardiograma Transtorácico com Doppler Colorido', selected: false, urgency: 'routine', isImage: true },
+  { id: 'usg-obstetrica-1tri', category: 'Imagem & Gráficos', name: 'Ultrassonografia Obstétrica Inicial / Transvaginal', selected: false, urgency: 'routine', isImage: true },
+  { id: 'usg-morfologica', category: 'Imagem & Gráficos', name: 'Ultrassonografia Morfológica Fetal (2º Trimestre)', selected: false, urgency: 'routine', isImage: true },
+  { id: 'usg-obstetrica-doppler', category: 'Imagem & Gráficos', name: 'Ultrassonografia Obstétrica com Dopplerfluxometria', selected: false, urgency: 'routine', isImage: true },
+  { id: 'usg-pelvica-transvaginal', category: 'Imagem & Gráficos', name: 'Ultrassonografia Pélvica / Transvaginal', selected: false, urgency: 'routine', isImage: true },
+  { id: 'mamografia-bilateral', category: 'Imagem & Gráficos', name: 'Mamografia Digital Bilateral para Rastreio', selected: false, urgency: 'routine', isImage: true },
+
+  // Exames Complementares Específicos para Rastreio e Ciclos de Vida
+  { id: 'psa-total-livre', category: 'Endócrino', name: 'PSA Total e Livre (Antígeno Prostático Específico)', selected: false, urgency: 'routine' },
+  { id: 'totg-75g', category: 'Bioquímica', name: 'Teste Oral de Tolerância à Glicose (TOTG 75g - 0h e 2h)', selected: false, urgency: 'routine' },
+  { id: 'swab-egeb', category: 'Inflamatório / Sorologia', name: 'Pesquisa de Estreptococo B (EGB) por Swab Vaginal/Retal', selected: false, urgency: 'routine' },
+  { id: 'toxoplasmose-sorologia', category: 'Inflamatório / Sorologia', name: 'Sorologia para Toxoplasmose (IgM e IgG)', selected: false, urgency: 'routine' },
+  { id: 'rubeola-sorologia', category: 'Inflamatório / Sorologia', name: 'Sorologia para Rubéola (IgM e IgG)', selected: false, urgency: 'routine' },
+  { id: 'anti-hcv-hepatite-c', category: 'Inflamatório / Sorologia', name: 'Sorologia Anti-HCV (Hepatite C)', selected: false, urgency: 'routine' },
+  { id: 'vdrl-sifilis-quantitativo', category: 'Inflamatório / Sorologia', name: 'VDRL / Sorologia Quantitativa para Sífilis', selected: false, urgency: 'routine' }
 ];
 
 export interface ExamPackage {
@@ -62,6 +76,55 @@ export interface ExamPackage {
 }
 
 export const EXAM_PACKAGES: ExamPackage[] = [
+  {
+    id: 'pre-natal-1tri',
+    name: 'Pré-Natal — 1º Trimestre',
+    badge: 'Obstetrícia',
+    examIds: ['tipagem-sanguinea', 'hemograma', 'glicemia-jejum', 'eas-urina', 'urocultura-tsa', 'vdrl-sifilis-quantitativo', 'hiv-hepatites', 'toxoplasmose-sorologia', 'rubeola-sorologia', 'usg-obstetrica-1tri'],
+    description: 'Rotina oficial MS do 1º trimestre gestacional (laboratorial + USG obstétrica).'
+  },
+  {
+    id: 'pre-natal-2tri',
+    name: 'Pré-Natal — 2º Trimestre',
+    badge: 'Obstetrícia',
+    examIds: ['totg-75g', 'hemograma', 'eas-urina', 'urocultura-tsa', 'usg-morfologica'],
+    description: 'Rastreio de diabetes gestacional, anemia e malformações fetais (20-24 sem).'
+  },
+  {
+    id: 'pre-natal-3tri',
+    name: 'Pré-Natal — 3º Trimestre',
+    badge: 'Obstetrícia',
+    examIds: ['hemograma', 'glicemia-jejum', 'vdrl-sifilis-quantitativo', 'hiv-hepatites', 'swab-egeb', 'eas-urina', 'urocultura-tsa', 'usg-obstetrica-doppler'],
+    description: 'Reta final gestacional: reavaliação sorológica, EGB (35-37 sem) e vitalidade fetal.'
+  },
+  {
+    id: 'rotina-homem',
+    name: 'Rotina & Saúde do Homem',
+    badge: 'Check-up',
+    examIds: ['hemograma', 'glicemia-jejum', 'perfil-lipidico', 'psa-total-livre', 'acido-urico', 'ureia-creatinina', 'hepatograma', 'eas-urina', 'ecg'],
+    description: 'Painel preventivo metabólico, cardiovascular e próstata para homens.'
+  },
+  {
+    id: 'rotina-mulher',
+    name: 'Rotina & Saúde da Mulher',
+    badge: 'Check-up',
+    examIds: ['hemograma', 'ferritina', 'tsh-t4livre', 'glicemia-jejum', 'perfil-lipidico', 'eas-urina', 'usg-pelvica-transvaginal', 'mamografia-bilateral'],
+    description: 'Rastreio preventivo feminino ginecológico, mamário, tireoidiano e metabólico.'
+  },
+  {
+    id: 'rotina-idoso',
+    name: 'Rotina do Idoso & Geriatria',
+    badge: 'Geriatria',
+    examIds: ['hemograma', 'vitamina-b12', 'vitamina-d', 'tsh-t4livre', 'glicemia-jejum', 'hba1c', 'ureia-creatinina', 'eletronograma', 'perfil-lipidico', 'eas-urina', 'ecg'],
+    description: 'Painel geriátrico abrangente: função cognitiva, óssea, cardiovascular e renal.'
+  },
+  {
+    id: 'painel-ist',
+    name: 'Painel IST & Sorologias',
+    badge: 'Infectologia',
+    examIds: ['hiv-hepatites', 'anti-hcv-hepatite-c', 'vdrl-sifilis-quantitativo', 'eas-urina'],
+    description: 'Rastreio sistemático de infecções sexualmente transmissíveis (HIV, Sífilis, Hepatites).'
+  },
   {
     id: 'checkup-geral',
     name: 'Check-up Geral Clínico',

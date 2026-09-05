@@ -66,7 +66,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     <nav
       id="mobile-bottom-nav"
       aria-label="Navegação Inferior Mobile"
-      className="md:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-around px-2 border-t backdrop-blur-md no-print pb-safe isolate panel-navy panel-projected-top"
+      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-around px-2 border-t backdrop-blur-md no-print pb-safe isolate panel-navy panel-projected-top"
       style={{
         borderColor: 'var(--surface-panel-border)'
       }}

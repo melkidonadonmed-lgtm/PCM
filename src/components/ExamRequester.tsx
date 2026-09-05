@@ -7,7 +7,10 @@ import {
   Trash2, 
   Download, 
   Sparkles, 
-  FileCheck
+  FileCheck,
+  X,
+  SlidersHorizontal,
+  ChevronRight
 } from 'lucide-react';
 import { ExamItem, Patient } from '../types';
 import { EXAM_CATALOG, EXAM_PACKAGES, ExamPackage } from '../data/examCatalog';
@@ -37,6 +40,10 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [customExamName, setCustomExamName] = useState('');
 
+  // Estado do Modal de Seleção Granular de Kits
+  const [activeKitModal, setActiveKitModal] = useState<ExamPackage | null>(null);
+  const [selectedKitExamIds, setSelectedKitExamIds] = useState<string[]>([]);
+
   const updateExams = onUpdateSelectedExams || onUpdateExams || (() => {});
 
   const categories = useMemo(() => {
@@ -56,15 +63,38 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
     }
   };
 
-  const applyPackage = (pkg: ExamPackage) => {
+  // Abrir modal de seleção granular do kit
+  const handleOpenKitModal = (pkg: ExamPackage) => {
+    setActiveKitModal(pkg);
+    setSelectedKitExamIds([...pkg.examIds]);
+  };
+
+  const handleToggleKitExam = (id: string) => {
+    setSelectedKitExamIds(prev => 
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleAllKitExams = () => {
+    if (!activeKitModal) return;
+    if (selectedKitExamIds.length === activeKitModal.examIds.length) {
+      setSelectedKitExamIds([]);
+    } else {
+      setSelectedKitExamIds([...activeKitModal.examIds]);
+    }
+  };
+
+  const handleConfirmKitSelection = () => {
+    if (!activeKitModal) return;
     const newExams = [...selectedExams];
-    pkg.examIds.forEach(id => {
+    selectedKitExamIds.forEach(id => {
       const found = EXAM_CATALOG.find(e => e.id === id);
       if (found && !newExams.some(e => e.id === id)) {
         newExams.push({ ...found, selected: true });
       }
     });
     updateExams(newExams);
+    setActiveKitModal(null);
   };
 
   const handleAddCustomExam = (e: React.FormEvent) => {
@@ -138,53 +168,6 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         </button>
       </div>
 
-      {/* Quick Clinical Packages */}
-      <div 
-        className="tactile-card p-3.5 sm:p-4 rounded-2xl"
-        style={{
-          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-        }}
-      >
-        <div className="flex items-center gap-1.5 mb-2.5">
-          <Sparkles className="w-4 h-4 text-navy-900 dark:text-cream-200" strokeWidth={1.75} />
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-            Painéis & Pacotes Clínicos:
-          </span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {EXAM_PACKAGES.map((pkg) => (
-            <button
-              key={pkg.id}
-              type="button"
-              onClick={() => applyPackage(pkg)}
-              className="p-3 rounded-xl border text-left transition-all cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 flex flex-col justify-between group tactile-flat"
-              style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
-                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-              }}
-            >
-              <div>
-                <div className="flex items-center justify-between gap-1 mb-1">
-                  <span className="font-bold text-xs" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-                    {pkg.name}
-                  </span>
-                  <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    {pkg.badge}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-400 line-clamp-2">
-                  {pkg.description}
-                </p>
-              </div>
-              <div className="mt-2 text-[11px] font-semibold text-sky-700 dark:text-sky-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                <Plus className="w-3 h-3" strokeWidth={1.75} /> Incluir {pkg.examIds.length} exames
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Clinical Indication */}
       <div 
         className="tactile-card p-3.5 sm:p-4 rounded-2xl"
@@ -193,14 +176,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
-        <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1.5">
+        <label className="block text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1.5">
           Indicação Clínica / Hipótese Diagnóstica (Para o Laboratório / Convênio)
         </label>
         <input
           type="text"
           value={clinicalIndication}
           onChange={(e) => onUpdateClinicalIndication(e.target.value)}
-          placeholder="Ex: Investigação de síndrome febril aguda a esclarecer, controle de rotina, etc."
+          placeholder="Ex: Investigação de síndrome febril aguda, controle pré-natal, check-up de rotina, etc."
           className="w-full p-3 rounded-xl text-xs font-medium focus:outline-none tactile-input"
         />
       </div>
@@ -232,7 +215,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               />
               <button
                 type="submit"
-                className="tactile-btn-primary px-4 py-2.5 rounded-xl text-xs font-bold"
+                className="tactile-btn-primary px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer"
+                title="Adicionar exame personalizado"
               >
                 +
               </button>
@@ -261,7 +245,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
 
           {/* Exams Grid */}
           <div 
-            className="tactile-card p-3 rounded-2xl max-h-[520px] overflow-y-auto space-y-1.5 divide-y"
+            className="tactile-card p-3 rounded-2xl max-h-[480px] overflow-y-auto space-y-1.5 divide-y"
             style={{
               backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
@@ -292,7 +276,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                       <div className="font-semibold text-xs truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                         {exam.name}
                       </div>
-                      <span className="text-[10px] text-slate-400 font-medium">{exam.category}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-slate-400 font-medium">{exam.category}</span>
+                        {exam.isImage && (
+                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20">
+                            Imagem / Gráfico
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -323,17 +314,17 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             {selectedExams.length > 0 && (
               <button
                 type="button"
-                onClick={() => onUpdateSelectedExams([])}
+                onClick={() => updateExams([])}
                 className="text-[11px] font-semibold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer"
               >
-                Limpar
+                Limpar Tudo
               </button>
             )}
           </div>
 
           {selectedExams.length === 0 ? (
             <div className="p-6 text-center text-slate-400 text-xs">
-              Nenhum exame selecionado ainda. Clique nos exames ao lado ou em um dos pacotes para incluir.
+              Nenhum exame selecionado ainda. Clique nos exames ao lado ou em um dos pacotes na base para incluir.
             </div>
           ) : (
             <div className="space-y-1.5 max-h-[380px] overflow-y-auto">
@@ -350,13 +341,20 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     <div className="text-xs font-semibold truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                       {index + 1}. {exam.name}
                     </div>
-                    <span className="text-[9px] text-navy-900 dark:text-cream-100 font-medium">{exam.category}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] text-navy-900 dark:text-cream-100 font-medium">{exam.category}</span>
+                      {exam.isImage && (
+                        <span className="text-[8px] px-1 py-0.2 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold">
+                          Imagem
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => toggleExam(exam)}
                     className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"
-                    title="Remover"
+                    title="Remover exame"
                   >
                     <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
                   </button>
@@ -379,6 +377,170 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           )}
         </div>
       </div>
+
+      {/* BASE: Carrossel Horizontal de Painéis & Pacotes Clínicos */}
+      <div 
+        className="tactile-card p-4 sm:p-5 rounded-2xl"
+        style={{
+          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
+        }}
+      >
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-navy-900 dark:text-cream-200" strokeWidth={1.75} />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-cream-50">
+              Combos & Pacotes Clínicos Pré-Configurados
+            </h3>
+          </div>
+          <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
+            Clique em um combo para selecionar exames granulares com checkboxes
+          </span>
+        </div>
+
+        {/* Carrossel Horizontal com Rolagem Suave */}
+        <div className="flex items-stretch gap-3 overflow-x-auto pb-2 custom-scrollbar fade-scroll-x">
+          {EXAM_PACKAGES.map((pkg) => (
+            <div
+              key={pkg.id}
+              onClick={() => handleOpenKitModal(pkg)}
+              className="w-72 sm:w-80 shrink-0 p-3.5 rounded-xl border text-left transition-all cursor-pointer hover:border-slate-400 dark:hover:border-slate-500 flex flex-col justify-between group tactile-flat hover:shadow-tactile-sm"
+              style={{
+                backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
+                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
+              }}
+            >
+              <div>
+                <div className="flex items-center justify-between gap-1 mb-1.5">
+                  <span className="font-bold text-xs line-clamp-1" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                    {pkg.name}
+                  </span>
+                  <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                    {pkg.badge}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                  {pkg.description}
+                </p>
+              </div>
+
+              <div className="mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-semibold text-sky-600 dark:text-sky-400">
+                <span className="flex items-center gap-1">
+                  <SlidersHorizontal className="w-3 h-3" />
+                  {pkg.examIds.length} exames no kit
+                </span>
+                <span className="flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform text-xs">
+                  Revisar & Adicionar <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* MODAL: Seleção Granular de Exames do Kit */}
+      {activeKitModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div 
+            className="w-full max-w-lg rounded-2xl border p-5 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+            style={{
+              backgroundColor: darkMode ? '#0F172A' : '#FFFFFF',
+              borderColor: darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(15,23,42,0.12)'
+            }}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-3 border-b pb-3" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.1)' }}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+                    {activeKitModal.name}
+                  </h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold border border-sky-500/20">
+                    {activeKitModal.badge}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  {activeKitModal.description}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveKitModal(null)}
+                className="text-slate-400 hover:text-slate-200 p-1 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Selection Controls */}
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-slate-600 dark:text-slate-300">
+                {selectedKitExamIds.length} de {activeKitModal.examIds.length} exames marcados
+              </span>
+              <button
+                type="button"
+                onClick={handleToggleAllKitExams}
+                className="text-sky-600 dark:text-sky-400 font-bold hover:underline cursor-pointer"
+              >
+                {selectedKitExamIds.length === activeKitModal.examIds.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+              </button>
+            </div>
+
+            {/* List of Exams with Checkboxes */}
+            <div className="max-h-64 overflow-y-auto space-y-1.5 divide-y divide-slate-100 dark:divide-slate-800 pr-1">
+              {activeKitModal.examIds.map(id => {
+                const exam = EXAM_CATALOG.find(e => e.id === id);
+                if (!exam) return null;
+                const isChecked = selectedKitExamIds.includes(id);
+
+                return (
+                  <label
+                    key={id}
+                    className="pt-1.5 flex items-center justify-between p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer transition"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleToggleKitExam(id)}
+                        className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                          {exam.name}
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          {exam.category} {exam.isImage ? '• Imagem/Gráfico' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2 pt-3 border-t" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.1)' }}>
+              <button
+                type="button"
+                onClick={() => setActiveKitModal(null)}
+                className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmKitSelection}
+                disabled={selectedKitExamIds.length === 0}
+                className="tactile-btn-primary px-4 py-2 rounded-xl text-xs font-bold disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Incluir {selectedKitExamIds.length} Exames no Pedido</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
