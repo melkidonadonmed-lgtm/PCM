@@ -333,9 +333,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   <Award className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                  <h2 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                     Emissão de Atestado Médico
-                  </h3>
+                  </h2>
                   <p className="text-xs text-slate-400 font-medium">
                     Atestado de afastamento, repouso ou comparecimento em conformidade com o CFM.
                   </p>
@@ -346,8 +346,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={handleSendCertificateWhatsApp}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
+                  className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
                   title="Enviar o atestado médico diretamente pelo WhatsApp"
+                  aria-label="Enviar o atestado médico diretamente pelo WhatsApp"
                 >
                   <Send className="w-4 h-4" strokeWidth={2} />
                   <span>Enviar no WhatsApp</span>
@@ -367,11 +368,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             {/* Patient data for Certificate */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="cert-patient-name" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                   <User className="w-3.5 h-3.5 text-slate-400" />
                   <span>Nome do Paciente</span>
                 </label>
                 <input
+                  id="cert-patient-name"
                   type="text"
                   value={patient?.name ?? certificate.patientName ?? ''}
                   onChange={(e) => handlePatientNameChange(e.target.value)}
@@ -381,11 +383,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="cert-patient-doc" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                   <Hash className="w-3.5 h-3.5 text-slate-400" />
                   <span>Documento (RG / CPF)</span>
                 </label>
                 <input
+                  id="cert-patient-doc"
                   type="text"
                   value={patient?.documentNumber ?? certificate.documentNumber ?? ''}
                   onChange={(e) => handlePatientDocChange(e.target.value)}
@@ -395,11 +398,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="cert-purpose-select" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                   <FileText className="w-3.5 h-3.5 text-slate-400" />
                   <span>Finalidade / Motivo</span>
                 </label>
                 <select
+                  id="cert-purpose-select"
                   value={certificate.periodText}
                   onChange={(e) => onUpdateCertificate({ ...certificate, periodText: e.target.value })}
                   className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none tactile-input cursor-pointer"
@@ -453,8 +457,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                 <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Dias de Repouso (Manual)</label>
+                  <label htmlFor="cert-days-off-input" className="block text-[10px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">Dias de Repouso (Manual)</label>
                   <input
+                    id="cert-days-off-input"
                     type="number"
                     min="0"
                     max="180"
@@ -470,11 +475,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                  <label htmlFor="cert-start-date" className="block text-[10px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                     <Calendar className="w-3 h-3 text-slate-400" />
                     <span>Data de Início</span>
                   </label>
                   <input
+                    id="cert-start-date"
                     type="date"
                     value={certificate.startDate}
                     onChange={(e) => onUpdateCertificate({ ...certificate, startDate: e.target.value })}
@@ -488,11 +494,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                  <label htmlFor="cert-end-date" className="block text-[10px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                     <Calendar className="w-3 h-3 text-slate-400" />
                     <span>Data de Retorno Previsto</span>
                   </label>
                   <input
+                    id="cert-end-date"
                     type="date"
                     value={certificate.endDate}
                     onChange={(e) => onUpdateCertificate({ ...certificate, endDate: e.target.value })}
@@ -554,8 +561,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   {/* Direct Code & Description manual inputs for fine-tuning */}
                   <div className="pt-2 grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div className="sm:col-span-1">
-                      <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Código CID-10</label>
+                      <label htmlFor="cert-cid-code" className="block text-[10px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">Código CID-10</label>
                       <input
+                        id="cert-cid-code"
                         type="text"
                         value={certificate.cid10Code || ''}
                         onChange={(e) => onUpdateCertificate({ ...certificate, cid10Code: e.target.value.toUpperCase() })}
@@ -570,8 +578,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     </div>
 
                     <div className="sm:col-span-3">
-                      <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Descrição do Diagnóstico (Edição Livre)</label>
+                      <label htmlFor="cert-cid-desc" className="block text-[10px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">Descrição do Diagnóstico (Edição Livre)</label>
                       <input
+                        id="cert-cid-desc"
                         type="text"
                         value={certificate.cid10Description || ''}
                         onChange={(e) => onUpdateCertificate({ ...certificate, cid10Description: e.target.value })}
@@ -595,10 +604,11 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             {/* Observations */}
             <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
+              <label htmlFor="cert-observations" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">
                 Observações Complementares / Recomendações (Opcional)
               </label>
               <textarea
+                id="cert-observations"
                 rows={2}
                 value={certificate.observations}
                 onChange={(e) => onUpdateCertificate({ ...certificate, observations: e.target.value })}
@@ -629,9 +639,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   <Building2 className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                  <h2 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                     Guia de Encaminhamento & Referência Especializada
-                  </h3>
+                  </h2>
                   <p className="text-xs text-slate-400 font-medium">
                     Referência e contrarreferência para ambulatórios de especialidades e hospitais.
                   </p>
@@ -642,8 +652,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={handleSendReferralWhatsApp}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
+                  className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
                   title="Enviar a guia de encaminhamento diretamente pelo WhatsApp"
+                  aria-label="Enviar a guia de encaminhamento diretamente pelo WhatsApp"
                 >
                   <Send className="w-4 h-4" strokeWidth={2} />
                   <span>Enviar no WhatsApp</span>
@@ -663,11 +674,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             {/* Patient data for Referral */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="ref-patient-name" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                   <User className="w-3.5 h-3.5 text-slate-400" />
                   <span>Nome do Paciente</span>
                 </label>
                 <input
+                  id="ref-patient-name"
                   type="text"
                   value={patient?.name ?? referral.patientName ?? ''}
                   onChange={(e) => handlePatientNameChange(e.target.value)}
@@ -677,11 +689,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="ref-patient-doc" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                   <Hash className="w-3.5 h-3.5 text-slate-400" />
                   <span>Documento (RG / CPF)</span>
                 </label>
                 <input
+                  id="ref-patient-doc"
                   type="text"
                   value={patient?.documentNumber ?? referral.documentNumber ?? ''}
                   onChange={(e) => handlePatientDocChange(e.target.value)}
@@ -694,11 +707,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             {/* Specialty & Destination */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="ref-specialty-select" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                   <Stethoscope className="w-3.5 h-3.5 text-emerald-500" />
                   <span>Especialidade de Destino</span>
                 </label>
                 <select
+                  id="ref-specialty-select"
                   value={referral.destinationSpecialty}
                   onChange={(e) => onUpdateReferral({ ...referral, destinationSpecialty: e.target.value })}
                   className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none tactile-input cursor-pointer"
@@ -727,11 +741,12 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="ref-institution-input" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
                   <Building2 className="w-3.5 h-3.5 text-slate-400" />
                   <span>Serviço / Hospital de Destino</span>
                 </label>
                 <input
+                  id="ref-institution-input"
                   type="text"
                   value={referral.destinationInstitution || ''}
                   onChange={(e) => onUpdateReferral({ ...referral, destinationInstitution: e.target.value })}
@@ -769,8 +784,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             {/* Motivo & Resumo Clínico */}
             <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">Motivo do Encaminhamento</label>
+              <label htmlFor="ref-reason-input" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">Motivo do Encaminhamento</label>
               <input
+                id="ref-reason-input"
                 type="text"
                 value={referral.reason}
                 onChange={(e) => onUpdateReferral({ ...referral, reason: e.target.value })}
@@ -780,8 +796,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">Resumo da História Clínica & Exame Físico</label>
+              <label htmlFor="ref-clinical-summary" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">Resumo da História Clínica & Exame Físico</label>
               <textarea
+                id="ref-clinical-summary"
                 rows={3}
                 value={referral.clinicalSummary}
                 onChange={(e) => onUpdateReferral({ ...referral, clinicalSummary: e.target.value })}
@@ -792,8 +809,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">Exames Relevantes Realizados</label>
+                <label htmlFor="ref-relevant-exams" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">Exames Relevantes Realizados</label>
                 <textarea
+                  id="ref-relevant-exams"
                   rows={3}
                   value={referral.relevantExams}
                   onChange={(e) => onUpdateReferral({ ...referral, relevantExams: e.target.value })}
@@ -803,10 +821,11 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
+                <label htmlFor="ref-hypothesis-cid" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">
                   Texto da Hipótese Diagnóstica (CID-10)
                 </label>
                 <textarea
+                  id="ref-hypothesis-cid"
                   rows={3}
                   value={referral.hypothesisCID}
                   onChange={(e) => onUpdateReferral({ ...referral, hypothesisCID: e.target.value })}
@@ -818,10 +837,11 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             {/* Observações e Recomendações ao Serviço de Destino */}
             <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
+              <label htmlFor="ref-observations" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">
                 Observações e Recomendações ao Serviço de Destino (Opcional)
               </label>
               <textarea
+                id="ref-observations"
                 rows={2}
                 value={referral.observations || ''}
                 onChange={(e) => onUpdateReferral({ ...referral, observations: e.target.value })}

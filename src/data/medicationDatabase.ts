@@ -1,5 +1,9 @@
+import type { PrescriptionKind } from '../types';
 export interface UnifiedMedication {
   id: string;
+  prescriptionKind: PrescriptionKind;
+  controlledSubstances?: string[];
+  regulatoryNote?: string;
   name: string;
   activeIngredient: string;
   route: string;
@@ -21,6 +25,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   // ==========================================
   {
     id: 'dipirona-500mg',
+    prescriptionKind: 'simple',
     name: 'Dipirona Sódica 500mg comprimido (Novalgina, Anador)',
     activeIngredient: 'Dipirona monoidratada',
     route: 'Uso Oral',
@@ -30,6 +35,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dipirona-1g',
+    prescriptionKind: 'simple',
     name: 'Dipirona Sódica 1g comprimido (Novalgina 1g)',
     activeIngredient: 'Dipirona monoidratada',
     route: 'Uso Oral',
@@ -39,6 +45,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dipirona-gotas-500mg',
+    prescriptionKind: 'simple',
     name: 'Dipirona Sódica 500mg/mL gotas (Novalgina Gotas)',
     activeIngredient: 'Dipirona monoidratada',
     route: 'Uso Oral',
@@ -53,6 +60,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dipirona-ampola',
+    prescriptionKind: 'simple',
     name: 'Dipirona Sódica 500mg/mL ampola 2mL (1g) / 5mL (2,5g)',
     activeIngredient: 'Dipirona monoidratada',
     route: 'Uso Intravenoso',
@@ -62,6 +70,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'paracetamol-500mg',
+    prescriptionKind: 'simple',
     name: 'Paracetamol 500mg comprimido (Tylenol, Sonridor)',
     activeIngredient: 'Paracetamol',
     route: 'Uso Oral',
@@ -71,6 +80,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'paracetamol-750mg',
+    prescriptionKind: 'simple',
     name: 'Paracetamol 750mg comprimido (Tylenol 750)',
     activeIngredient: 'Paracetamol',
     route: 'Uso Oral',
@@ -80,6 +90,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'paracetamol-gotas-200mg',
+    prescriptionKind: 'simple',
     name: 'Paracetamol 200mg/mL gotas (Tylenol Gotas)',
     activeIngredient: 'Paracetamol',
     route: 'Uso Oral',
@@ -94,6 +105,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'paracetamol-gotas-100mg-bebe',
+    prescriptionKind: 'simple',
     name: 'Paracetamol 100mg/mL gotas bebê (Tylenol Bebê)',
     activeIngredient: 'Paracetamol',
     route: 'Uso Oral',
@@ -108,6 +120,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'paracetamol-solucao-32mg',
+    prescriptionKind: 'simple',
     name: 'Paracetamol 32mg/mL (160mg/5mL) solução oral',
     activeIngredient: 'Paracetamol',
     route: 'Uso Oral',
@@ -122,6 +135,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ibuprofeno-600mg',
+    prescriptionKind: 'simple',
     name: 'Ibuprofeno 600mg comprimido (Advil, Alivium, Buprovil)',
     activeIngredient: 'Ibuprofeno',
     route: 'Uso Oral',
@@ -131,6 +145,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ibuprofeno-400mg',
+    prescriptionKind: 'simple',
     name: 'Ibuprofeno 400mg comprimido / cápsula (Advil 400)',
     activeIngredient: 'Ibuprofeno',
     route: 'Uso Oral',
@@ -140,6 +155,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ibuprofeno-100mg-gotas',
+    prescriptionKind: 'simple',
     name: 'Ibuprofeno 100mg/mL gotas (Alivium 100)',
     activeIngredient: 'Ibuprofeno',
     route: 'Uso Oral',
@@ -154,6 +170,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ibuprofeno-50mg-gotas',
+    prescriptionKind: 'simple',
     name: 'Ibuprofeno 50mg/mL gotas (Alivium 50)',
     activeIngredient: 'Ibuprofeno',
     route: 'Uso Oral',
@@ -168,6 +185,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ibuprofeno-30mg-susp',
+    prescriptionKind: 'simple',
     name: 'Ibuprofeno 30mg/mL suspensão oral (Alivium)',
     activeIngredient: 'Ibuprofeno',
     route: 'Uso Oral',
@@ -182,6 +200,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'cetoprofeno-100mg',
+    prescriptionKind: 'simple',
     name: 'Cetoprofeno 100mg comprimido (Profenid)',
     activeIngredient: 'Cetoprofeno',
     route: 'Uso Oral',
@@ -191,6 +210,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'cetoprofeno-150mg-biprofenid',
+    prescriptionKind: 'simple',
     name: 'Cetoprofeno 150mg comprimido lib. prolongada (Bi-Profenid)',
     activeIngredient: 'Cetoprofeno',
     route: 'Uso Oral',
@@ -200,6 +220,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'cetoprofeno-gotas-20mg',
+    prescriptionKind: 'simple',
     name: 'Cetoprofeno 20mg/mL gotas (Profenid Gotas)',
     activeIngredient: 'Cetoprofeno',
     route: 'Uso Oral',
@@ -214,6 +235,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'cetoprofeno-injetavel-100mg',
+    prescriptionKind: 'simple',
     name: 'Cetoprofeno 100mg pó liofilizado injetável IV/IM',
     activeIngredient: 'Cetoprofeno',
     route: 'Uso Intravenoso',
@@ -223,6 +245,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'diclofenaco-sodico-50mg',
+    prescriptionKind: 'simple',
     name: 'Diclofenaco Sódico 50mg comprimido (Voltaren)',
     activeIngredient: 'Diclofenaco sódico',
     route: 'Uso Oral',
@@ -232,6 +255,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'diclofenaco-sodico-75mg-retard',
+    prescriptionKind: 'simple',
     name: 'Diclofenaco Sódico 75mg / 100mg lib. prolongada (Voltaren Retard/SR)',
     activeIngredient: 'Diclofenaco sódico',
     route: 'Uso Oral',
@@ -241,6 +265,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'diclofenaco-potassico-50mg',
+    prescriptionKind: 'simple',
     name: 'Diclofenaco Potássico 50mg comprimido (Cataflam)',
     activeIngredient: 'Diclofenaco potássico',
     route: 'Uso Oral',
@@ -250,6 +275,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'diclofenaco-potassico-gotas-15mg',
+    prescriptionKind: 'simple',
     name: 'Diclofenaco Potássico 15mg/mL gotas (Cataflam Gotas)',
     activeIngredient: 'Diclofenaco potássico',
     route: 'Uso Oral',
@@ -264,6 +290,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'diclofenaco-ampola-75mg',
+    prescriptionKind: 'simple',
     name: 'Diclofenaco Sódico 75mg/3mL ampola IM (Voltaren)',
     activeIngredient: 'Diclofenaco sódico',
     route: 'Uso Intramuscular',
@@ -273,6 +300,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'meloxicam-15mg',
+    prescriptionKind: 'simple',
     name: 'Meloxicam 15mg comprimido (Movatec, Bioflac)',
     activeIngredient: 'Meloxicam',
     route: 'Uso Oral',
@@ -282,6 +310,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'meloxicam-7-5mg',
+    prescriptionKind: 'simple',
     name: 'Meloxicam 7,5mg comprimido (Movatec, Bioflac)',
     activeIngredient: 'Meloxicam',
     route: 'Uso Oral',
@@ -291,6 +320,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'nimesulida-100mg',
+    prescriptionKind: 'simple',
     name: 'Nimesulida 100mg comprimido (Nisulid, Maxsulid)',
     activeIngredient: 'Nimesulida',
     route: 'Uso Oral',
@@ -300,6 +330,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'nimesulida-gotas-50mg',
+    prescriptionKind: 'simple',
     name: 'Nimesulida 50mg/mL gotas (Nisulid Gotas)',
     activeIngredient: 'Nimesulida',
     route: 'Uso Oral',
@@ -309,6 +340,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'celecoxibe-200mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['celecoxibe'],
     name: 'Celecoxibe 200mg cápsulas (Celebra)',
     activeIngredient: 'Celecoxibe',
     route: 'Uso Oral',
@@ -318,6 +351,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'etoricoxibe-90mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['etoricoxibe'],
     name: 'Etoricoxibe 90mg comprimido (Arcoxia)',
     activeIngredient: 'Etoricoxibe',
     route: 'Uso Oral',
@@ -327,6 +362,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'naproxeno-500mg',
+    prescriptionKind: 'simple',
     name: 'Naproxeno 500mg comprimido (Flanax 550mg)',
     activeIngredient: 'Naproxeno',
     route: 'Uso Oral',
@@ -336,6 +372,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'tenoxicam-20mg',
+    prescriptionKind: 'simple',
     name: 'Tenoxicam 20mg comprimido / pó injetável (Tilatil, Teflan)',
     activeIngredient: 'Tenoxicam',
     route: 'Uso Oral',
@@ -345,6 +382,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'piroxicam-20mg',
+    prescriptionKind: 'simple',
     name: 'Piroxicam 20mg cápsula (Feldene)',
     activeIngredient: 'Piroxicam',
     route: 'Uso Oral',
@@ -354,6 +392,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'acido-mefenamico-500mg',
+    prescriptionKind: 'simple',
     name: 'Ácido Mefenâmico 500mg comprimido (Ponstan)',
     activeIngredient: 'Ácido mefenâmico',
     route: 'Uso Oral',
@@ -363,6 +402,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'clonixinato-lisina-ciclobenzaprina',
+    prescriptionKind: 'simple',
     name: 'Clonixinato de Lisina + Ciclobenzaprina (Dolamin Flex)',
     activeIngredient: 'Clonixinato de lisina + ciclobenzaprina',
     route: 'Uso Oral',
@@ -372,6 +412,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'buscopan-composto-comp',
+    prescriptionKind: 'simple',
     name: 'Escopolamina + Dipirona comprimido (Buscopan Composto)',
     activeIngredient: 'Butilbrometo de escopolamina + dipirona',
     route: 'Uso Oral',
@@ -381,6 +422,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'buscopan-composto-ampola',
+    prescriptionKind: 'simple',
     name: 'Escopolamina + Dipirona ampola 5mL (Buscopan Composto)',
     activeIngredient: 'Butilbrometo de escopolamina + dipirona',
     route: 'Uso Intravenoso',
@@ -390,6 +432,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dorflex-comp',
+    prescriptionKind: 'simple',
     name: 'Dipirona + Orfenadrina + Cafeína (Dorflex)',
     activeIngredient: 'Dipirona + citrato de orfenadrina + cafeína',
     route: 'Uso Oral',
@@ -399,6 +442,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'torsilax-comp',
+    prescriptionKind: 'simple',
     name: 'Paracetamol + Cafeína + Carisoprodol + Diclofenaco (Torsilax, Tandrilax)',
     activeIngredient: 'Paracetamol + carisoprodol + diclofenaco + cafeína',
     route: 'Uso Oral',
@@ -408,6 +452,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'neosaldina-drageas',
+    prescriptionKind: 'simple',
     name: 'Dipirona + Isometepteno + Cafeína (Neosaldina)',
     activeIngredient: 'Dipirona + mucato de isometepteno + cafeína',
     route: 'Uso Oral',
@@ -417,6 +462,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dramin-b6-comp',
+    prescriptionKind: 'simple',
     name: 'Dimenidrinato + Piridoxina (Dramin B6)',
     activeIngredient: 'Dimenidrinato + cloridrato de piridoxina',
     route: 'Uso Oral',
@@ -426,6 +472,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'plasil-10mg',
+    prescriptionKind: 'simple',
     name: 'Metoclopramida 10mg comprimido (Plasil)',
     activeIngredient: 'Cloridrato de metoclopramida',
     route: 'Uso Oral',
@@ -435,6 +482,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ondansetrona-4mg-flash',
+    prescriptionKind: 'simple',
     name: 'Ondansetrona 4mg orodispersível (Vonau Flash, Ono)',
     activeIngredient: 'Cloridrato de ondansetrona',
     route: 'Uso Oral',
@@ -444,6 +492,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ondansetrona-sol-oral-0-8mg',
+    prescriptionKind: 'simple',
     name: 'Ondansetrona 0,8mg/mL (4mg/5mL) solução oral (Vonau)',
     activeIngredient: 'Cloridrato de ondansetrona',
     route: 'Uso Oral',
@@ -458,6 +507,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ondansetrona-ampola-4mg',
+    prescriptionKind: 'simple',
     name: 'Ondansetrona 2mg/mL ampola 2mL (4mg) e 4mL (8mg)',
     activeIngredient: 'Cloridrato de ondansetrona',
     route: 'Uso Intravenoso',
@@ -467,6 +517,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'tramadol-50mg',
+    prescriptionKind: 'pending',
+    regulatoryNote: 'Apresentação com enquadramento específico: confira a norma e use o formulário apropriado. Classificação automática não validada.',
     name: 'Tramadol 50mg cápsulas (Tramal, Sylador)',
     activeIngredient: 'Cloridrato de tramadol',
     route: 'Uso Oral',
@@ -477,6 +529,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'tramadol-gotas-100mg',
+    prescriptionKind: 'pending',
+    regulatoryNote: 'Apresentação com enquadramento específico: confira a norma e use o formulário apropriado. Classificação automática não validada.',
     name: 'Tramadol 100mg/mL gotas (Tramal Gotas)',
     activeIngredient: 'Cloridrato de tramadol',
     route: 'Uso Oral',
@@ -487,6 +541,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'codeina-30mg',
+    prescriptionKind: 'pending',
+    regulatoryNote: 'Apresentação com enquadramento específico: confira a norma e use o formulário apropriado. Classificação automática não validada.',
     name: 'Codeína 30mg comprimido (Codein)',
     activeIngredient: 'Fosfato de codeína',
     route: 'Uso Oral',
@@ -497,6 +553,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'tylex-30mg',
+    prescriptionKind: 'pending',
+    regulatoryNote: 'Apresentação com enquadramento específico: confira a norma e use o formulário apropriado. Classificação automática não validada.',
     name: 'Codeína 30mg + Paracetamol 500mg (Tylex 30, Paco)',
     activeIngredient: 'Fosfato de codeína + paracetamol',
     route: 'Uso Oral',
@@ -507,6 +565,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'morfina-10mg',
+    prescriptionKind: 'notification',
+    regulatoryNote: 'Exige Notificação de Receita A. Este app não emite esse formulário.',
     name: 'Morfina 10mg / 30mg comprimido (Dimorf)',
     activeIngredient: 'Sulfato de morfina',
     route: 'Uso Oral',
@@ -517,6 +577,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'prednisona-20mg',
+    prescriptionKind: 'simple',
     name: 'Prednisona 20mg comprimido (Meticorten)',
     activeIngredient: 'Prednisona',
     route: 'Uso Oral',
@@ -526,6 +587,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'prednisolona-sol-3mg',
+    prescriptionKind: 'simple',
     name: 'Prednisolona 3mg/mL solução oral (Prelone, Predsim)',
     activeIngredient: 'Fosfato sódico de prednisolona',
     route: 'Uso Oral',
@@ -541,6 +603,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'prednisolona-gotas-11mg',
+    prescriptionKind: 'simple',
     name: 'Prednisolona 11mg/mL gotas (Predsim Gotas)',
     activeIngredient: 'Fosfato sódico de prednisolona',
     route: 'Uso Oral',
@@ -555,6 +618,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dexametasona-4mg',
+    prescriptionKind: 'simple',
     name: 'Dexametasona 4mg comprimido (Decadron)',
     activeIngredient: 'Dexametasona',
     route: 'Uso Oral',
@@ -564,6 +628,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dexametasona-elixir-0-1mg',
+    prescriptionKind: 'simple',
     name: 'Dexametasona 0,1mg/mL elixir (Decadron Elixir)',
     activeIngredient: 'Dexametasona',
     route: 'Uso Oral',
@@ -578,6 +643,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dexametasona-ampola-4mg',
+    prescriptionKind: 'simple',
     name: 'Dexametasona 4mg/mL ampola 2,5mL (Decadron Injetável)',
     activeIngredient: 'Fosfato dissódico de dexametasona',
     route: 'Uso Intravenoso',
@@ -587,6 +653,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'hidrocortisona-injetavel',
+    prescriptionKind: 'simple',
     name: 'Hidrocortisona 100mg / 500mg pó injetável (Cortisonal, Flebocortid)',
     activeIngredient: 'Succinato sódico de hidrocortisona',
     route: 'Uso Intravenoso',
@@ -596,6 +663,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'diprospan-ampola',
+    prescriptionKind: 'simple',
     name: 'Dipropionato + Fosfato de Betametasona (Diprospan, Celestone Soluspan)',
     activeIngredient: 'Dipropionato de betametasona + fosfato dissódico de betametasona',
     route: 'Uso Intramuscular',
@@ -609,6 +677,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   // ==========================================
   {
     id: 'amoxicilina-500mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Amoxicilina 500mg cápsulas (Amoxil, Novocilin)',
     activeIngredient: 'Amoxicilina tri-hidratada',
     route: 'Uso Oral',
@@ -619,6 +688,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'amoxicilina-875mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Amoxicilina 875mg comprimido (Novocilin 875)',
     activeIngredient: 'Amoxicilina tri-hidratada',
     route: 'Uso Oral',
@@ -629,6 +699,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'amoxicilina-susp-250mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Amoxicilina 250mg/5mL suspensão oral (Amoxil, Novocilin)',
     activeIngredient: 'Amoxicilina tri-hidratada',
     route: 'Uso Oral',
@@ -645,6 +716,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'amoxicilina-susp-400mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Amoxicilina 400mg/5mL suspensão oral (Novocilin 400)',
     activeIngredient: 'Amoxicilina tri-hidratada',
     route: 'Uso Oral',
@@ -661,6 +733,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'amox-clav-875mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Amoxicilina + Clavulanato 875/125mg (Clavulin BD)',
     activeIngredient: 'Amoxicilina + clavulanato de potássio',
     route: 'Uso Oral',
@@ -671,6 +744,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'amox-clav-500mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Amoxicilina + Clavulanato 500/125mg (Clavulin)',
     activeIngredient: 'Amoxicilina + clavulanato de potássio',
     route: 'Uso Oral',
@@ -681,6 +755,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'amox-clav-susp-400mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Amoxicilina + Clavulanato 400/57mg/5mL suspensão (Clavulin BD)',
     activeIngredient: 'Amoxicilina + clavulanato de potássio',
     route: 'Uso Oral',
@@ -697,6 +772,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'amox-clav-susp-250mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Amoxicilina + Clavulanato 250/62,5mg/5mL suspensão (Clavulin)',
     activeIngredient: 'Amoxicilina + clavulanato de potássio',
     route: 'Uso Oral',
@@ -713,6 +789,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'cefalexina-500mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Cefalexina 500mg comprimido / cápsula (Keflex, Cefagel)',
     activeIngredient: 'Cefalexina monoidratada',
     route: 'Uso Oral',
@@ -723,6 +800,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'cefalexina-susp-250mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Cefalexina 250mg/5mL suspensão oral (Keflex)',
     activeIngredient: 'Cefalexina monoidratada',
     route: 'Uso Oral',
@@ -739,6 +817,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ceftriaxona-1g-injetavel',
+    prescriptionKind: 'antimicrobial',
     name: 'Ceftriaxona 1g frasco-ampola IV/IM (Rocefin)',
     activeIngredient: 'Ceftriaxona dissódica',
     route: 'Uso Intravenoso',
@@ -754,6 +833,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'azitromicina-500mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Azitromicina 500mg comprimido (Zitromax, Astro)',
     activeIngredient: 'Azitromicina di-hidratada',
     route: 'Uso Oral',
@@ -764,6 +844,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'azitromicina-susp-200mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Azitromicina 200mg/5mL suspensão oral (Astro, Zitromax)',
     activeIngredient: 'Azitromicina di-hidratada',
     route: 'Uso Oral',
@@ -780,6 +861,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'claritromicina-500mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Claritromicina 500mg comprimido (Klaricid)',
     activeIngredient: 'Claritromicina',
     route: 'Uso Oral',
@@ -790,6 +872,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ciprofloxacino-500mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Ciprofloxacino 500mg comprimido (Cipro)',
     activeIngredient: 'Cloridrato de ciprofloxacino',
     route: 'Uso Oral',
@@ -800,6 +883,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'levofloxacino-500mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Levofloxacino 500mg comprimido (Levaquin, Tamiram)',
     activeIngredient: 'Levofloxacino hemi-hidratado',
     route: 'Uso Oral',
@@ -810,6 +894,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'bactrim-f-comprimido',
+    prescriptionKind: 'antimicrobial',
     name: 'Sulfametoxazol + Trimetoprima 800+160mg comprimido (Bactrim F)',
     activeIngredient: 'Sulfametoxazol + trimetoprima',
     route: 'Uso Oral',
@@ -820,6 +905,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'bactrim-susp-oral',
+    prescriptionKind: 'antimicrobial',
     name: 'Sulfametoxazol + Trimetoprima 200+40mg/5mL suspensão (Bactrim)',
     activeIngredient: 'Sulfametoxazol + trimetoprima',
     route: 'Uso Oral',
@@ -836,6 +922,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'nitrofurantoina-100mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Nitrofurantoína 100mg cápsulas (Macrodantina)',
     activeIngredient: 'Nitrofurantoína',
     route: 'Uso Oral',
@@ -846,6 +933,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'fosfomicina-3g',
+    prescriptionKind: 'antimicrobial',
     name: 'Fosfomicina Trometamol 3g envelope (Monuril)',
     activeIngredient: 'Fosfomicina trometamol',
     route: 'Uso Oral',
@@ -856,6 +944,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'metronidazol-400mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Metronidazol 400mg comprimido (Flagyl)',
     activeIngredient: 'Metronidazol',
     route: 'Uso Oral',
@@ -866,6 +955,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'clindamicina-300mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Clindamicina 300mg cápsulas (Dalacin C)',
     activeIngredient: 'Cloridrato de clindamicina',
     route: 'Uso Oral',
@@ -876,6 +966,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'doxiciclina-100mg',
+    prescriptionKind: 'antimicrobial',
     name: 'Doxiciclina 100mg comprimido (Vibramicina, Doxiclin)',
     activeIngredient: 'Hiclato de doxiciclina',
     route: 'Uso Oral',
@@ -886,6 +977,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'benzetacil-1200000',
+    prescriptionKind: 'antimicrobial',
     name: 'Benzilpenicilina Benzatina 1.200.000 UI (Benzetacil)',
     activeIngredient: 'Benzilpenicilina benzatina',
     route: 'Uso Intramuscular',
@@ -896,6 +988,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'benzetacil-600000',
+    prescriptionKind: 'antimicrobial',
     name: 'Benzilpenicilina Benzatina 600.000 UI (Benzetacil Infantil)',
     activeIngredient: 'Benzilpenicilina benzatina',
     route: 'Uso Intramuscular',
@@ -906,6 +999,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'fluconazol-150mg',
+    prescriptionKind: 'simple',
     name: 'Fluconazol 150mg cápsula (Zoltec)',
     activeIngredient: 'Fluconazol',
     route: 'Uso Oral',
@@ -915,6 +1009,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'nistatina-susp-oral',
+    prescriptionKind: 'simple',
     name: 'Nistatina 100.000 UI/mL suspensão oral (Micostatin, Canditrat)',
     activeIngredient: 'Nistatina',
     route: 'Uso Oral',
@@ -924,6 +1019,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'albendazol-400mg',
+    prescriptionKind: 'simple',
     name: 'Albendazol 400mg comprimido mastigável (Zentel)',
     activeIngredient: 'Albendazol',
     route: 'Uso Oral',
@@ -933,6 +1029,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ivermectina-6mg',
+    prescriptionKind: 'simple',
     name: 'Ivermectina 6mg comprimido (Revectina)',
     activeIngredient: 'Ivermectina',
     route: 'Uso Oral',
@@ -942,6 +1039,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'nitazoxanida-500mg',
+    prescriptionKind: 'simple',
     name: 'Nitazoxanida 500mg comprimido (Annita)',
     activeIngredient: 'Nitazoxanida',
     route: 'Uso Oral',
@@ -951,6 +1049,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'aciclovir-200mg',
+    prescriptionKind: 'simple',
     name: 'Aciclovir 200mg / 400mg comprimido (Zovirax)',
     activeIngredient: 'Aciclovir',
     route: 'Uso Oral',
@@ -960,6 +1059,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'oseltamivir-75mg',
+    prescriptionKind: 'simple',
     name: 'Oseltamivir 75mg cápsulas (Tamiflu)',
     activeIngredient: 'Fosfato de oseltamivir',
     route: 'Uso Oral',
@@ -973,6 +1073,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   // ==========================================
   {
     id: 'losartana-50mg',
+    prescriptionKind: 'simple',
     name: 'Losartana Potássica 50mg comprimido (Cozaar, Corus, Aradois)',
     activeIngredient: 'Losartana potássica',
     route: 'Uso Oral',
@@ -982,6 +1083,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'losartana-100mg',
+    prescriptionKind: 'simple',
     name: 'Losartana Potássica 100mg comprimido (Cozaar 100)',
     activeIngredient: 'Losartana potássica',
     route: 'Uso Oral',
@@ -991,6 +1093,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'losartana-hctz-50-12',
+    prescriptionKind: 'simple',
     name: 'Losartana + Hidroclorotiazida 50+12,5mg / 100+25mg (Hyzaar)',
     activeIngredient: 'Losartana potássica + hidroclorotiazida',
     route: 'Uso Oral',
@@ -1000,6 +1103,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'enalapril-10mg',
+    prescriptionKind: 'simple',
     name: 'Maleato de Enalapril 10mg / 20mg comprimido (Renitec)',
     activeIngredient: 'Maleato de enalapril',
     route: 'Uso Oral',
@@ -1009,6 +1113,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'captopril-25mg',
+    prescriptionKind: 'simple',
     name: 'Captopril 25mg / 50mg comprimido (Capoten, Captosen)',
     activeIngredient: 'Captopril',
     route: 'Uso Oral',
@@ -1018,6 +1123,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'anlodipino-5mg',
+    prescriptionKind: 'simple',
     name: 'Besilato de Anlodipino 5mg comprimido (Norvasc, Cordarex)',
     activeIngredient: 'Besilato de anlodipino',
     route: 'Uso Oral',
@@ -1027,6 +1133,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'anlodipino-10mg',
+    prescriptionKind: 'simple',
     name: 'Besilato de Anlodipino 10mg comprimido (Norvasc 10)',
     activeIngredient: 'Besilato de anlodipino',
     route: 'Uso Oral',
@@ -1036,6 +1143,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'hidroclorotiazida-25mg',
+    prescriptionKind: 'simple',
     name: 'Hidroclorotiazida 25mg comprimido (Clorana)',
     activeIngredient: 'Hidroclorotiazida',
     route: 'Uso Oral',
@@ -1045,6 +1153,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'clortalidona-25mg',
+    prescriptionKind: 'simple',
     name: 'Clortalidona 12,5mg / 25mg / 50mg comprimido (Higroton)',
     activeIngredient: 'Clortalidona',
     route: 'Uso Oral',
@@ -1054,6 +1163,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'furosemida-40mg',
+    prescriptionKind: 'simple',
     name: 'Furosemida 40mg comprimido (Lasix)',
     activeIngredient: 'Furosemida',
     route: 'Uso Oral',
@@ -1063,6 +1173,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'furosemida-ampola-20mg',
+    prescriptionKind: 'simple',
     name: 'Furosemida 10mg/mL ampola 2mL (20mg) (Lasix)',
     activeIngredient: 'Furosemida',
     route: 'Uso Intravenoso',
@@ -1072,6 +1183,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'espironolactona-25mg',
+    prescriptionKind: 'simple',
     name: 'Espironolactona 25mg comprimido (Aldactone)',
     activeIngredient: 'Espironolactona',
     route: 'Uso Oral',
@@ -1081,6 +1193,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'metoprolol-succinato-50mg',
+    prescriptionKind: 'simple',
     name: 'Succinato de Metoprolol 25mg / 50mg / 100mg (Selozok)',
     activeIngredient: 'Succinato de metoprolol',
     route: 'Uso Oral',
@@ -1090,6 +1203,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'atenolol-50mg',
+    prescriptionKind: 'simple',
     name: 'Atenolol 25mg / 50mg / 100mg comprimido (Ablok, Atenol)',
     activeIngredient: 'Atenolol',
     route: 'Uso Oral',
@@ -1099,6 +1213,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'carvedilol-12-5mg',
+    prescriptionKind: 'simple',
     name: 'Carvedilol 3,125mg / 6,25mg / 12,5mg / 25mg (Coreg, Cardilol)',
     activeIngredient: 'Carvedilol',
     route: 'Uso Oral',
@@ -1108,6 +1223,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'propranolol-40mg',
+    prescriptionKind: 'simple',
     name: 'Propranolol 40mg comprimido (Inderal, Amprax)',
     activeIngredient: 'Cloridrato de propranolol',
     route: 'Uso Oral',
@@ -1117,6 +1233,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'metildopa-250mg',
+    prescriptionKind: 'simple',
     name: 'Metildopa 250mg / 500mg comprimido (Aldomet)',
     activeIngredient: 'Metildopa',
     route: 'Uso Oral',
@@ -1126,6 +1243,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'sinvastatina-20mg',
+    prescriptionKind: 'simple',
     name: 'Sinvastatina 20mg / 40mg comprimido (Zocor, Sinvacor)',
     activeIngredient: 'Sinvastatina',
     route: 'Uso Oral',
@@ -1135,6 +1253,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'atorvastatina-20mg',
+    prescriptionKind: 'simple',
     name: 'Atorvastatina 10mg / 20mg / 40mg / 80mg (Citalor, Lipitor)',
     activeIngredient: 'Atorvastatina cálcica',
     route: 'Uso Oral',
@@ -1144,6 +1263,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'rosuvastatina-20mg',
+    prescriptionKind: 'simple',
     name: 'Rosuvastatina 5mg / 10mg / 20mg / 40mg (Crestor)',
     activeIngredient: 'Rosuvastatina cálcica',
     route: 'Uso Oral',
@@ -1153,6 +1273,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'aas-100mg',
+    prescriptionKind: 'simple',
     name: 'Ácido Acetilsalicílico 100mg (Aspirina Prevent, Somalgin Cardio)',
     activeIngredient: 'Ácido acetilsalicílico',
     route: 'Uso Oral',
@@ -1162,6 +1283,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'clopidogrel-75mg',
+    prescriptionKind: 'simple',
     name: 'Clopidogrel 75mg comprimido (Plavix)',
     activeIngredient: 'Bissulfato de clopidogrel',
     route: 'Uso Oral',
@@ -1171,6 +1293,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'varfarina-5mg',
+    prescriptionKind: 'simple',
     name: 'Varfarina Sódica 5mg comprimido (Marevan, Coumadin)',
     activeIngredient: 'Varfarina sódica',
     route: 'Uso Oral',
@@ -1180,6 +1303,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'rivaroxabana-20mg',
+    prescriptionKind: 'simple',
     name: 'Rivaroxabana 10mg / 15mg / 20mg (Xarelto)',
     activeIngredient: 'Rivaroxabana',
     route: 'Uso Oral',
@@ -1193,6 +1317,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   // ==========================================
   {
     id: 'metformina-850mg',
+    prescriptionKind: 'simple',
     name: 'Cloridrato de Metformina 850mg (Glifage)',
     activeIngredient: 'Cloridrato de metformina',
     route: 'Uso Oral',
@@ -1202,6 +1327,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'metformina-500mg-xr',
+    prescriptionKind: 'simple',
     name: 'Cloridrato de Metformina 500mg XR lib. prolongada (Glifage XR)',
     activeIngredient: 'Cloridrato de metformina',
     route: 'Uso Oral',
@@ -1211,6 +1337,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'gliclazida-mr-30mg',
+    prescriptionKind: 'simple',
     name: 'Gliclazida MR 30mg liberação modificada (Diamicron MR)',
     activeIngredient: 'Gliclazida',
     route: 'Uso Oral',
@@ -1220,6 +1347,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'glibenclamida-5mg',
+    prescriptionKind: 'simple',
     name: 'Glibenclamida 5mg comprimido (Daonil)',
     activeIngredient: 'Glibenclamida',
     route: 'Uso Oral',
@@ -1229,6 +1357,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dapagliflozina-10mg',
+    prescriptionKind: 'simple',
     name: 'Dapagliflozina 10mg comprimido (Forxiga)',
     activeIngredient: 'Dapagliflozina',
     route: 'Uso Oral',
@@ -1238,6 +1367,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'empagliflozina-25mg',
+    prescriptionKind: 'simple',
     name: 'Empagliflozina 10mg / 25mg comprimido (Jardiance)',
     activeIngredient: 'Empagliflozina',
     route: 'Uso Oral',
@@ -1247,6 +1377,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'vildagliptina-50mg',
+    prescriptionKind: 'simple',
     name: 'Vildagliptina 50mg comprimido (Galvus)',
     activeIngredient: 'Vildagliptina',
     route: 'Uso Oral',
@@ -1256,6 +1387,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'insulina-nph-100ui',
+    prescriptionKind: 'simple',
     name: 'Insulina Humana NPH 100 UI/mL frasco 10mL / refil (Humulin N, Novolin N)',
     activeIngredient: 'Insulina humana NPH',
     route: 'Uso Subcutâneo',
@@ -1265,6 +1397,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'insulina-regular-100ui',
+    prescriptionKind: 'simple',
     name: 'Insulina Humana Regular 100 UI/mL frasco 10mL (Humulin R, Novolin R)',
     activeIngredient: 'Insulina humana regular',
     route: 'Uso Subcutâneo',
@@ -1274,6 +1407,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'levotiroxina-50mcg',
+    prescriptionKind: 'simple',
     name: 'Levotiroxina Sódica 25mcg / 50mcg / 75mcg / 100mcg (Puran T4, Synthroid, Levoid)',
     activeIngredient: 'Levotiroxina sódica',
     route: 'Uso Oral',
@@ -1287,6 +1421,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   // ==========================================
   {
     id: 'salbutamol-spray-100mcg',
+    prescriptionKind: 'simple',
     name: 'Sulfato de Salbutamol Spray 100mcg/dose (Aerolin)',
     activeIngredient: 'Sulfato de salbutamol',
     route: 'Uso Inalatória',
@@ -1296,6 +1431,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'salbutamol-gotas-5mg',
+    prescriptionKind: 'simple',
     name: 'Sulfato de Salbutamol 5mg/mL solução para inalação (Aerolin Gotas)',
     activeIngredient: 'Sulfato de salbutamol',
     route: 'Uso Inalatória',
@@ -1310,6 +1446,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'ipratropio-gotas-0-25mg',
+    prescriptionKind: 'simple',
     name: 'Brometo de Ipratrópio 0,25mg/mL gotas (Atrovent)',
     activeIngredient: 'Brometo de ipratrópio',
     route: 'Uso Inalatória',
@@ -1324,6 +1461,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'budesonida-spray-nasal-50mcg',
+    prescriptionKind: 'simple',
     name: 'Budesonida Spray Nasal 32mcg / 50mcg / 64mcg / 100mcg (Busonid, Noex)',
     activeIngredient: 'Budesonida',
     route: 'Uso Nasal',
@@ -1333,6 +1471,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'budesonida-inalacao-0-25mg',
+    prescriptionKind: 'simple',
     name: 'Budesonida 0,25mg/mL / 0,50mg/mL suspensão para inalação (Pulmicort)',
     activeIngredient: 'Budesonida',
     route: 'Uso Inalatória',
@@ -1342,6 +1481,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'beclometasona-spray-250mcg',
+    prescriptionKind: 'simple',
     name: 'Dipropionato de Beclometasona 50mcg / 250mcg spray (Clenil HFA)',
     activeIngredient: 'Dipropionato de beclometasona',
     route: 'Uso Inalatória',
@@ -1351,6 +1491,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'loratadina-10mg',
+    prescriptionKind: 'simple',
     name: 'Loratadina 10mg comprimido (Claritin)',
     activeIngredient: 'Loratadina',
     route: 'Uso Oral',
@@ -1360,6 +1501,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'loratadina-xarope-1mg',
+    prescriptionKind: 'simple',
     name: 'Loratadina 1mg/mL xarope (Claritin Xarope)',
     activeIngredient: 'Loratadina',
     route: 'Uso Oral',
@@ -1374,6 +1516,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'desloratadina-5mg',
+    prescriptionKind: 'simple',
     name: 'Desloratadina 5mg comprimido (Desalex, Esalerg)',
     activeIngredient: 'Desloratadina',
     route: 'Uso Oral',
@@ -1383,6 +1526,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'cetirizina-10mg',
+    prescriptionKind: 'simple',
     name: 'Cetirizina 10mg comprimido / gotas 10mg/mL (Zyrtec)',
     activeIngredient: 'Dicloridrato de cetirizina',
     route: 'Uso Oral',
@@ -1392,6 +1536,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dexclorfeniramina-2mg',
+    prescriptionKind: 'simple',
     name: 'Dexclorfeniramina 2mg comprimido (Polaramine)',
     activeIngredient: 'Maleato de dexclorfeniramina',
     route: 'Uso Oral',
@@ -1401,6 +1546,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'dexclorfeniramina-xarope',
+    prescriptionKind: 'simple',
     name: 'Dexclorfeniramina 0,4mg/mL xarope (Polaramine)',
     activeIngredient: 'Maleato de dexclorfeniramina',
     route: 'Uso Oral',
@@ -1415,6 +1561,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'hidroxizina-25mg',
+    prescriptionKind: 'simple',
     name: 'Hidroxizina 25mg comprimido (Hixizine)',
     activeIngredient: 'Cloridrato de hidroxizina',
     route: 'Uso Oral',
@@ -1424,6 +1571,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'acetilcisteina-600mg',
+    prescriptionKind: 'simple',
     name: 'Acetilcisteína 200mg / 600mg sachê efervescente (Fluimucil)',
     activeIngredient: 'Acetilcisteína',
     route: 'Uso Oral',
@@ -1433,6 +1581,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'soro-fisiologico-spray-0-9',
+    prescriptionKind: 'simple',
     name: 'Cloreto de Sódio 0,9% spray nasal (Sorine, Rinosoro)',
     activeIngredient: 'Cloreto de sódio',
     route: 'Uso Nasal',
@@ -1446,6 +1595,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   // ==========================================
   {
     id: 'omeprazol-20mg',
+    prescriptionKind: 'simple',
     name: 'Omeprazol 20mg cápsula (Losec, Prilosec, Pratiprazol)',
     activeIngredient: 'Omeprazol magnésico',
     route: 'Uso Oral',
@@ -1455,6 +1605,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'pantoprazol-40mg',
+    prescriptionKind: 'simple',
     name: 'Pantoprazol 40mg comprimido (Pantozol)',
     activeIngredient: 'Pantoprazol sódico',
     route: 'Uso Oral',
@@ -1464,6 +1615,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'domperidona-10mg',
+    prescriptionKind: 'simple',
     name: 'Domperidona 10mg comprimido (Motilium)',
     activeIngredient: 'Domperidona',
     route: 'Uso Oral',
@@ -1473,6 +1625,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'simeticona-gotas-75mg',
+    prescriptionKind: 'simple',
     name: 'Simeticona 75mg/mL gotas (Luftal)',
     activeIngredient: 'Simeticona',
     route: 'Uso Oral',
@@ -1487,6 +1640,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'sais-reidratacao-sro',
+    prescriptionKind: 'simple',
     name: 'Sais de Reidratação Oral (SRO) envelopes (Reidrat, Pedialyte)',
     activeIngredient: 'Cloreto de sódio + glicose + cloreto de potássio + citrato',
     route: 'Uso Oral',
@@ -1496,6 +1650,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'sulfato-zinco-gotas-10mg',
+    prescriptionKind: 'simple',
     name: 'Sulfato de Zinco 10mg Zn elementar/mL gotas (Zincoquel, Bio-Zinco)',
     activeIngredient: 'Sulfato de zinco heptaidratado',
     route: 'Uso Oral',
@@ -1510,6 +1665,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'racecadotrila-100mg',
+    prescriptionKind: 'simple',
     name: 'Racecadotrila 100mg cápsulas (Tiorfan)',
     activeIngredient: 'Racecadotrila',
     route: 'Uso Oral',
@@ -1519,6 +1675,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'racecadotrila-sache-30mg',
+    prescriptionKind: 'simple',
     name: 'Racecadotrila 10mg / 30mg sachês granulado (Tiorfan Pediátrico)',
     activeIngredient: 'Racecadotrila',
     route: 'Uso Oral',
@@ -1533,6 +1690,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'lactulose-xarope',
+    prescriptionKind: 'simple',
     name: 'Lactulose 667mg/mL xarope (Lactulona)',
     activeIngredient: 'Lactulose',
     route: 'Uso Oral',
@@ -1542,6 +1700,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'sulfato-ferroso-40mg',
+    prescriptionKind: 'simple',
     name: 'Sulfato Ferroso 40mg Fe elementar comprimido (Ferro)',
     activeIngredient: 'Sulfato ferroso',
     route: 'Uso Oral',
@@ -1551,6 +1710,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'sulfato-ferroso-gotas-25mg',
+    prescriptionKind: 'simple',
     name: 'Sulfato Ferroso gotas (25mg Fe/mL = 1,25mg/gota)',
     activeIngredient: 'Sulfato ferroso',
     route: 'Uso Oral',
@@ -1569,6 +1729,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   // ==========================================
   {
     id: 'fluoxetina-20mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['fluoxetina'],
     name: 'Cloridrato de Fluoxetina 20mg cápsula (Prozac, Daforin)',
     activeIngredient: 'Cloridrato de fluoxetina',
     route: 'Uso Oral',
@@ -1579,6 +1741,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'sertralina-50mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['sertralina'],
     name: 'Cloridrato de Sertralina 50mg comprimido (Zoloft, Assert, Tolrest)',
     activeIngredient: 'Cloridrato de sertralina',
     route: 'Uso Oral',
@@ -1589,6 +1753,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'escitalopram-10mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['escitalopram'],
     name: 'Oxalato de Escitalopram 10mg / 20mg (Lexapro, Exodus)',
     activeIngredient: 'Oxalato de escitalopram',
     route: 'Uso Oral',
@@ -1599,6 +1765,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'amitriptilina-25mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['amitriptilina'],
     name: 'Cloridrato de Amitriptilina 25mg comprimido (Tryptanol, Amytril)',
     activeIngredient: 'Cloridrato de amitriptilina',
     route: 'Uso Oral',
@@ -1609,6 +1777,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'diazepam-10mg',
+    prescriptionKind: 'notification',
+    regulatoryNote: 'Exige Notificação de Receita B. Este app não emite esse formulário.',
     name: 'Diazepam 5mg / 10mg comprimido (Valium)',
     activeIngredient: 'Diazepam',
     route: 'Uso Oral',
@@ -1619,6 +1789,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'clonazepam-2mg',
+    prescriptionKind: 'notification',
+    regulatoryNote: 'Exige Notificação de Receita B. Este app não emite esse formulário.',
     name: 'Clonazepam 0,5mg / 2mg comprimido (Rivotril)',
     activeIngredient: 'Clonazepam',
     route: 'Uso Oral',
@@ -1629,6 +1801,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'clonazepam-gotas-2-5mg',
+    prescriptionKind: 'notification',
+    regulatoryNote: 'Exige Notificação de Receita B. Este app não emite esse formulário.',
     name: 'Clonazepam 2,5mg/mL gotas (Rivotril Gotas)',
     activeIngredient: 'Clonazepam',
     route: 'Uso Oral',
@@ -1639,6 +1813,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'zolpidem-10mg',
+    prescriptionKind: 'notification',
+    regulatoryNote: 'Exige Notificação de Receita B. Este app não emite esse formulário.',
     name: 'Hemitartarato de Zolpidem 10mg comprimido (Stilnox, Patz)',
     activeIngredient: 'Hemitartarato de zolpidem',
     route: 'Uso Oral',
@@ -1649,6 +1825,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'pregabalina-75mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['pregabalina'],
     name: 'Pregabalina 75mg / 150mg cápsulas (Lyrica, Dorene)',
     activeIngredient: 'Pregabalina',
     route: 'Uso Oral',
@@ -1659,6 +1837,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'carbamazepina-200mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['carbamazepina'],
     name: 'Carbamazepina 200mg / 400mg comprimido (Tegretol)',
     activeIngredient: 'Carbamazepina',
     route: 'Uso Oral',
@@ -1669,6 +1849,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'haloperidol-5mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['haloperidol'],
     name: 'Haloperidol 1mg / 5mg comprimido (Haldol)',
     activeIngredient: 'Haloperidol',
     route: 'Uso Oral',
@@ -1679,6 +1861,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'risperidona-2mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['risperidona'],
     name: 'Risperidona 1mg / 2mg / 3mg comprimido (Risperdal)',
     activeIngredient: 'Risperidona',
     route: 'Uso Oral',
@@ -1689,6 +1873,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'quetiapina-25mg',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['quetiapina'],
     name: 'Quetiapina 25mg / 100mg / 200mg comprimido (Seroquel)',
     activeIngredient: 'Hemifumarato de quetiapina',
     route: 'Uso Oral',
@@ -1699,6 +1885,8 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
   },
   {
     id: 'cloridrato-metilfenidato-10mg',
+    prescriptionKind: 'notification',
+    regulatoryNote: 'Exige Notificação de Receita A. Este app não emite esse formulário.',
     name: 'Cloridrato de Metilfenidato 10mg (Ritalina)',
     activeIngredient: 'Cloridrato de metilfenidato',
     route: 'Uso Oral',

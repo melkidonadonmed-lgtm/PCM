@@ -82,8 +82,9 @@ export const Header: React.FC<HeaderProps> = ({
                 className="w-full h-full object-cover rounded-xl select-none pointer-events-none" 
               />
             </div>
+            <h1 className="sr-only">PresCMed — Prescrição Médica e Doses Pediátricas</h1>
             <div className="hidden sm:block">
-              <div className="flex items-center gap-1 sm:gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5" aria-hidden="true">
                 <span className="font-extrabold text-base sm:text-lg tracking-tight text-navy-900 dark:text-cream-50">
                   PresC<span className="text-navy-700 dark:text-cream-300 font-black">Med</span>
                 </span>
@@ -161,6 +162,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center gap-1">
                 <input
                   id="header-input-weight"
+                  aria-label="Peso rápido do paciente em quilogramas"
                   type="number"
                   step="0.1"
                   min="0.5"

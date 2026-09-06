@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { safeStorage, getStorageMessages, downloadLocalBackup } from './utils/storage';
+import { normalizePrescriptionItem } from './utils/prescriptionRules';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { MobileBottomNav } from './components/MobileBottomNav';
@@ -50,7 +52,7 @@ const DEFAULT_PATIENT: Patient = {
 export default function App() {
   // Theme state (Tema Claro como padrão preferido pelo usuário)
   const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('prescmed_theme');
+    const saved = safeStorage.getItem('prescmed_theme');
     return saved !== null ? saved === 'dark' : false;
   });
 
@@ -82,6 +84,14 @@ export default function App() {
   }, []);
 
   // Navigation state
+  const [consultationVersion, setConsultationVersion] = useState(0);
+  const [printOrigin, setPrintOrigin] = useState<ActiveTab>('prescription');
+  const [storageWarnings, setStorageWarnings] = useState<string[]>(getStorageMessages);
+  useEffect(() => {
+    const update = () => setStorageWarnings(getStorageMessages());
+    window.addEventListener('prescmed-storage-warning', update); update();
+    return () => window.removeEventListener('prescmed-storage-warning', update);
+  }, []);
   const [activeTab, setActiveTab] = useState<ActiveTab>('prescription');
   const [certSubTab, setCertSubTab] = useState<'certificate' | 'referral'>('certificate');
   const [printDocType, setPrintDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>('prescription');
@@ -112,6 +122,7 @@ export default function App() {
     if (type) {
       setPrintDocType(type);
     }
+    setPrintOrigin(activeTab === 'print_preview' ? printOrigin : activeTab);
     setActiveTab('print_preview');
     if (window.innerWidth < 1024) {
       setSidebarOpen(false);
@@ -126,7 +137,7 @@ export default function App() {
   // Doctor profile state
   const [doctor, setDoctor] = useState<DoctorProfile>(() => {
     try {
-      const saved = localStorage.getItem('prescmed_doctor');
+      const saved = safeStorage.getItem('prescmed_doctor');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
@@ -142,7 +153,7 @@ export default function App() {
   // Patient state (starts clean)
   const [patient, setPatient] = useState<Patient>(() => {
     try {
-      const saved = localStorage.getItem('prescmed_patient');
+      const saved = safeStorage.getItem('prescmed_patient');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
@@ -157,11 +168,11 @@ export default function App() {
 
   // Prescription items state (starts clean)
   const [prescriptionItems, setPrescriptionItems] = useState<PrescriptionItem[]>(() => {
-    const saved = localStorage.getItem('prescmed_prescription');
+    const saved = safeStorage.getItem('prescmed_prescription');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) return parsed.map(normalizePrescriptionItem);
       } catch (e) {}
     }
     return [];
@@ -169,7 +180,7 @@ export default function App() {
 
   // Selected exams state
   const [selectedExams, setSelectedExams] = useState<ExamItem[]>(() => {
-    const saved = localStorage.getItem('prescmed_exams');
+    const saved = safeStorage.getItem('prescmed_exams');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }
@@ -178,12 +189,12 @@ export default function App() {
 
   // Clinical indication for exams
   const [examIndication, setExamIndication] = useState<string>(() => {
-    return localStorage.getItem('prescmed_exam_indication') || 'Investigação clínica de rotina e controle metabólico.';
+    return safeStorage.getItem('prescmed_exam_indication') || 'Investigação clínica de rotina e controle metabólico.';
   });
 
   // Medical certificate state
   const [certificate, setCertificate] = useState<MedicalCertificate>(() => {
-    const saved = localStorage.getItem('prescmed_certificate');
+    const saved = safeStorage.getItem('prescmed_certificate');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }
@@ -198,7 +209,7 @@ export default function App() {
       startDate: today,
       endDate: tomorrow,
       periodText: 'por motivo de doença e necessidade de repouso',
-      includeCID: true,
+      includeCID: false,
       cid10Code: 'J00',
       cid10Description: 'Nasofaringite aguda (resfriado comum)',
       observations: 'Paciente necessita de repouso e hidratação domiciliar durante o período estipulado.',
@@ -208,7 +219,7 @@ export default function App() {
 
   // Medical referral state
   const [referral, setReferral] = useState<MedicalReferral>(() => {
-    const saved = localStorage.getItem('prescmed_referral');
+    const saved = safeStorage.getItem('prescmed_referral');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }
@@ -229,7 +240,7 @@ export default function App() {
 
   // Sync to localStorage
   useEffect(() => {
-    localStorage.setItem('prescmed_theme', darkMode ? 'dark' : 'light');
+    safeStorage.setItem('prescmed_theme', darkMode ? 'dark' : 'light');
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -238,11 +249,11 @@ export default function App() {
   }, [darkMode]);
 
   useEffect(() => {
-    localStorage.setItem('prescmed_doctor', JSON.stringify(doctor));
+    safeStorage.setItem('prescmed_doctor', JSON.stringify(doctor));
   }, [doctor]);
 
   useEffect(() => {
-    localStorage.setItem('prescmed_patient', JSON.stringify(patient));
+    safeStorage.setItem('prescmed_patient', JSON.stringify(patient));
     setCertificate(prev => ({
       ...prev,
       patientName: patient.name || '',
@@ -256,23 +267,23 @@ export default function App() {
   }, [patient]);
 
   useEffect(() => {
-    localStorage.setItem('prescmed_prescription', JSON.stringify(prescriptionItems));
+    safeStorage.setItem('prescmed_prescription', JSON.stringify(prescriptionItems));
   }, [prescriptionItems]);
 
   useEffect(() => {
-    localStorage.setItem('prescmed_exams', JSON.stringify(selectedExams));
+    safeStorage.setItem('prescmed_exams', JSON.stringify(selectedExams));
   }, [selectedExams]);
 
   useEffect(() => {
-    localStorage.setItem('prescmed_exam_indication', examIndication);
+    safeStorage.setItem('prescmed_exam_indication', examIndication);
   }, [examIndication]);
 
   useEffect(() => {
-    localStorage.setItem('prescmed_certificate', JSON.stringify(certificate));
+    safeStorage.setItem('prescmed_certificate', JSON.stringify(certificate));
   }, [certificate]);
 
   useEffect(() => {
-    localStorage.setItem('prescmed_referral', JSON.stringify(referral));
+    safeStorage.setItem('prescmed_referral', JSON.stringify(referral));
   }, [referral]);
 
   // Handler to update patient weight from anywhere
@@ -287,13 +298,13 @@ export default function App() {
 
   // Add prescription item handler
   const handleAddPrescriptionItem = (newItem: PrescriptionItem) => {
-    setPrescriptionItems(prev => [...prev, newItem]);
+    setPrescriptionItems(prev => [...prev, normalizePrescriptionItem(newItem)]);
   };
 
   // Clear prescription items (zerar receita)
   const handleClearPrescription = () => {
     setPrescriptionItems([]);
-    localStorage.removeItem('prescmed_prescription');
+    safeStorage.removeItem('prescmed_prescription');
   };
 
   // Clear patient data (limpar dados do paciente globalmente)
@@ -322,21 +333,26 @@ export default function App() {
       patientName: '',
       documentNumber: ''
     }));
-    localStorage.setItem('prescmed_patient', JSON.stringify(emptyPatient));
+    safeStorage.setItem('prescmed_patient', JSON.stringify(emptyPatient));
   };
 
   // Clear doctor profile
   const handleClearDoctor = () => {
     setDoctor(DEFAULT_DOCTOR);
-    localStorage.setItem('prescmed_doctor', JSON.stringify(DEFAULT_DOCTOR));
+    safeStorage.setItem('prescmed_doctor', JSON.stringify(DEFAULT_DOCTOR));
   };
 
   // Reset entire consultation (Zerar tudo: paciente + receitas + exames + documentos)
   const handleResetAll = () => {
+    if (!window.confirm('Iniciar novo atendimento? Os dados e documentos do atendimento atual serão limpos.')) return;
     handleClearPatient();
     handleClearPrescription();
+    setConsultationVersion(v => v + 1);
+    setExamIndication('');
+    setCertificate(prev => ({ ...prev, patientName: '', documentNumber: '', includeCID: false, cid10Code: '', cid10Description: '', observations: '', daysOff: 1, startDate: new Date().toISOString().slice(0, 10), endDate: new Date().toISOString().slice(0, 10) }));
+    setReferral(prev => ({ ...prev, patientName: '', documentNumber: '', destinationSpecialty: '', destinationInstitution: '', reason: '', clinicalSummary: '', relevantExams: '', hypothesisCID: '', date: new Date().toISOString().slice(0, 10) }));
     setSelectedExams([]);
-    localStorage.removeItem('prescmed_exams');
+    safeStorage.removeItem('prescmed_exams');
     setActiveTab('prescription');
   };
 
@@ -382,8 +398,11 @@ export default function App() {
 
         {/* Main Content Area */}
         <main className="flex-1 min-w-0 pb-20 lg:pb-6">
-          {activeTab === 'prescription' && (
+          {storageWarnings.length > 0 && <aside role="alert" className="clinical-card m-4 p-4 no-print"><p className="font-semibold">Atenção ao salvamento local</p>{storageWarnings.map(w => <p key={w} className="text-sm mt-1">{w}</p>)}<button className="clinical-button secondary mt-3" onClick={downloadLocalBackup}>Baixar backup dos dados originais</button></aside>}
+          <div hidden={activeTab !== 'prescription'}>
             <PrescriptionBuilder
+              key={consultationVersion}
+              isActive={activeTab === 'prescription'}
               darkMode={darkMode}
               doctor={doctor}
               onUpdateDoctor={setDoctor}
@@ -399,7 +418,7 @@ export default function App() {
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
               onOpenPatientModal={() => setIsPatientModalOpen(true)}
             />
-          )}
+          </div>
 
           {activeTab === 'pediatric_calc' && (
             <PediatricCalculator
@@ -435,6 +454,8 @@ export default function App() {
               referral={referral}
               onUpdateReferral={setReferral}
               initialSubTab={certSubTab}
+              activeSubTab={certSubTab}
+              onSelectSubTab={handleSelectTab}
               onNavigateToPrint={(type) => handleNavigateToPrint(type)}
             />
           )}
@@ -460,8 +481,9 @@ export default function App() {
               certificate={certificate}
               referral={referral}
               initialDocType={printDocType}
-              onNavigateBack={() => handleSelectTab('prescription')}
-              onBack={() => handleSelectTab('prescription')}
+              onNavigateBack={() => handleSelectTab(printOrigin)}
+              onOpenPatientModal={() => setIsPatientModalOpen(true)}
+              onBack={() => handleSelectTab(printOrigin)}
               onClearPrescription={handleClearPrescription}
               onResetAll={handleResetAll}
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}

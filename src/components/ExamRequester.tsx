@@ -176,10 +176,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
-        <label className="block text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1.5">
+        <label 
+          htmlFor="exam-clinical-indication" 
+          className="block text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1.5 cursor-pointer"
+        >
           Indicação Clínica / Hipótese Diagnóstica (Para o Laboratório / Convênio)
         </label>
         <input
+          id="exam-clinical-indication"
           type="text"
           value={clinicalIndication}
           onChange={(e) => onUpdateClinicalIndication(e.target.value)}
@@ -197,7 +201,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             <div className="relative flex-1">
               <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
               <input
+                id="exam-search-input"
                 type="text"
+                aria-label="Buscar exame complementar"
                 placeholder="Buscar exame (ex: Hemograma, PCR, Dengue, Ureia, Raio-X, ECG)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -207,7 +213,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
 
             <form onSubmit={handleAddCustomExam} className="flex gap-2">
               <input
+                id="custom-exam-input"
                 type="text"
+                aria-label="Adicionar exame avulso personalizado"
                 placeholder="Adicionar exame avulso..."
                 value={customExamName}
                 onChange={(e) => setCustomExamName(e.target.value)}
@@ -217,6 +225,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 type="submit"
                 className="tactile-btn-primary px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer"
                 title="Adicionar exame personalizado"
+                aria-label="Adicionar exame personalizado"
               >
                 +
               </button>
@@ -255,10 +264,12 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               const selected = isExamSelected(exam.id);
 
               return (
-                <div
+                <button
+                  type="button"
                   key={exam.id}
                   onClick={() => toggleExam(exam)}
-                  className={`pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all ${
+                  aria-pressed={selected}
+                  className={`w-full text-left pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all ${
                     selected 
                       ? 'bg-navy-900/10 dark:bg-cream-100/10 border border-navy-900/30 dark:border-cream-100/30' 
                       : 'hover:bg-slate-500/5'
@@ -292,7 +303,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                       Urgência
                     </span>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>
@@ -466,6 +477,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveKitModal(null)}
+                aria-label="Fechar modal de pacote de exames"
                 className="text-slate-400 hover:text-slate-200 p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -503,6 +515,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => handleToggleKitExam(id)}
+                        aria-label={`Selecionar exame ${exam.name}`}
                         className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
                       />
                       <div className="min-w-0 flex-1">

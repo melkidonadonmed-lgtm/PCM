@@ -111,19 +111,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  const handleTriggerResetAll = () => {
-    setConfirmModal({
-      isOpen: true,
-      title: 'Iniciar Novo Atendimento Completo?',
-      description: 'Esta ação limpará todas as receitas, os exames selecionados e os dados cadastrais do paciente atual para iniciar uma nova consulta do zero.',
-      confirmLabel: 'Iniciar Novo Atendimento',
-      variant: 'warning',
-      onConfirm: () => {
-        onResetAll?.();
-        setConfirmModal(prev => ({ ...prev, isOpen: false }));
-      }
-    });
-  };
+  const handleTriggerResetAll = () => onResetAll?.();
 
   const primaryNavItems = [
     {
@@ -216,6 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-slate-300 hover:bg-white/10 hover:text-white'
           }`}
           title={item.fullLabel || item.label}
+          aria-label={item.fullLabel || item.label}
         >
           <Icon
             className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
@@ -348,12 +337,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </p>
                 </div>
               </div>
-              <button 
-                type="button"
-                className="mt-2 w-full py-1.5 min-h-[36px] text-[10px] font-bold text-cream-100 hover:text-white dark:text-navy-900 dark:hover:text-navy-950 text-center rounded-lg bg-white/10 hover:bg-white/20 dark:bg-cream-100 dark:hover:bg-white border border-white/10 dark:border-white/20 transition cursor-pointer shadow-tactile-sm"
+              <div 
+                aria-hidden="true"
+                className="mt-2 w-full py-1.5 min-h-[36px] text-[10px] font-bold text-cream-100 hover:text-white dark:text-navy-900 dark:hover:text-navy-950 text-center rounded-lg bg-white/10 hover:bg-white/20 dark:bg-cream-100 dark:hover:bg-white border border-white/10 dark:border-white/20 transition shadow-tactile-sm flex items-center justify-center select-none pointer-events-none"
               >
                 Editar Perfil Médico
-              </button>
+              </div>
             </div>
           ) : (
             <button
@@ -387,17 +376,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Active Patient Badge */}
           {isOpen ? (
-            <div
+            <button
+              type="button"
               onClick={handlePatientClick}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handlePatientClick();
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group active:scale-95 shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none min-h-[44px]"
+              className="w-full text-left p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group active:scale-95 shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none min-h-[44px]"
               title="Clique para editar paciente"
             >
               <div className="flex items-center gap-2">
@@ -416,7 +398,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </p>
                 </div>
               </div>
-            </div>
+            </button>
           ) : (
             <button
               type="button"

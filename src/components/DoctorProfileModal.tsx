@@ -316,9 +316,9 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <div className="flex items-center gap-2.5">
               <Shield className="w-4 h-4 text-emerald-500" />
               <div>
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                <label htmlFor="doc-input-show-sig" className="text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer block">
                   Exibir Linha de Assinatura e Carimbo
-                </p>
+                </label>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400">
                   Inclui campo formal no rodapé das folhas A4
                 </p>

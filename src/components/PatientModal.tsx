@@ -30,6 +30,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     documentNumber: patient?.documentNumber || '',
     motherName: patient?.motherName || '',
     phone: patient?.phone || '',
+    address: patient?.address || '',
     allergies: patient?.allergies || [],
     notes: patient?.notes || ''
   });
@@ -166,6 +167,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               type="button"
               role="switch"
               aria-checked={formData.weightCalcEnabled}
+              aria-label="Cálculo de Dose por Peso (Pediátrico)"
               onClick={() => setFormData({ ...formData, weightCalcEnabled: !formData.weightCalcEnabled })}
               className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                 formData.weightCalcEnabled ? 'bg-emerald-600' : 'bg-slate-400 dark:bg-slate-700'
@@ -180,6 +182,9 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             </button>
           </div>
 
+          <label className="block text-sm font-semibold">Endereço completo
+            <input className="clinical-input" value={formData.address || ''} onChange={e => setFormData({ ...formData, address: e.target.value })} placeholder="Rua, número, bairro, cidade/UF e CEP" autoComplete="street-address" />
+          </label>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="patient-modal-weight" className="block text-xs font-bold uppercase text-slate-400 mb-1">

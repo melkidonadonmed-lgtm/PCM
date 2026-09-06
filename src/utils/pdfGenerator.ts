@@ -1,9 +1,11 @@
-import jsPDF from 'jspdf';
+import { buildPrescriptionDocuments } from './prescriptionRules';
+import { generatePrescriptionPDF } from './prescriptionPdf';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral } from '../types';
 
 export interface PDFExportOptions {
-  docType: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral';
+  docType: 'prescription' | 'antimicrobial_prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral';
   doctor: DoctorProfile;
   patient: Patient;
   prescriptionItems: PrescriptionItem[];
@@ -36,6 +38,11 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     referral,
     examFilter = 'all'
   } = options;
+
+  if (['prescription', 'antimicrobial_prescription', 'special_prescription'].includes(docType)) {
+    const kind = docType === 'prescription' ? 'simple' : docType === 'antimicrobial_prescription' ? 'antimicrobial' : 'c1';
+    return generatePrescriptionPDF(buildPrescriptionDocuments(prescriptionItems).filter(d => d.kind === kind), doctor, patient);
+  }
 
   const pdf = new jsPDF({
     orientation: 'portrait',
@@ -192,29 +199,10 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     doc.setLineWidth(0.5);
     doc.line(marginX, bottomY, pageWidth - marginX, bottomY);
 
-    // QR Code / Digital Verification Block
-    doc.setFillColor(255, 255, 255);
-    doc.setDrawColor(15, 23, 42);
-    doc.rect(marginX, bottomY + 3, 11, 11, 'S');
-
-    doc.setFillColor(15, 23, 42);
-    doc.rect(marginX + 1, bottomY + 4, 3, 3, 'F');
-    doc.rect(marginX + 7, bottomY + 4, 3, 3, 'F');
-    doc.rect(marginX + 1, bottomY + 10, 3, 3, 'F');
-    doc.rect(marginX + 5.5, bottomY + 8, 2, 2, 'F');
-
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
-    doc.text('VALIDAÇÃO DIGITAL CFM', marginX + 13, bottomY + 6);
-
-    doc.setTextColor(100, 116, 139);
+    doc.setTextColor(80);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.5);
-    const codeId = Math.random().toString(36).substr(2, 6).toUpperCase();
-    doc.text(`Código: DOC-PRESC-${codeId}`, marginX + 13, bottomY + 9.5);
-    doc.setTextColor(5, 150, 105);
-    doc.text('Assinatura Eletrônica Válida • prescmed.digital', marginX + 13, bottomY + 13);
+    doc.setFontSize(8);
+    doc.text(['Documento para impressão', 'e assinatura manuscrita.'], marginX, bottomY + 7);
 
     // City & Doctor Signature Line
     const signatureWidth = 75;
@@ -245,187 +233,6 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     doc.text(docSpecialty, signatureX + (signatureWidth / 2), bottomY + 25.5, { align: 'center' });
   };
 
-  // 1. PRESCRIPTION AUTO-SPLITTER (Simples vs. Especial em 2 vias com max 3 itens/folha)
-  if (docType === 'prescription') {
-    const simpleItems = prescriptionItems.filter(i => !i.isSpecialControl);
-    let currentY = renderHeader(pdf, 'RECEITUÁRIO SIMPLES', false);
-
-    if (simpleItems.length === 0) {
-      pdf.setFont('times', 'italic');
-      pdf.setFontSize(11);
-      pdf.setTextColor(148, 163, 184);
-      pdf.text('Nenhum medicamento simples nesta prescrição (Verifique a Receita Especial).', pageWidth / 2, currentY + 30, { align: 'center' });
-    } else {
-      const itemsByRoute = simpleItems.reduce((acc, item) => {
-        const route = (item.route || 'Oral').toUpperCase();
-        if (!acc[route]) acc[route] = [];
-        acc[route].push(item);
-        return acc;
-      }, {} as { [route: string]: PrescriptionItem[] });
-
-      Object.entries(itemsByRoute).forEach(([route, rItems]) => {
-        pdf.setFillColor(241, 245, 249);
-        pdf.setDrawColor(203, 213, 225);
-        pdf.roundedRect(marginX, currentY, contentWidth, 6.5, 1, 1, 'FD');
-
-        pdf.setTextColor(7, 89, 133);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(8.5);
-        pdf.text(`USO ${route}`, marginX + 3, currentY + 4.5);
-        currentY += 9;
-
-        const rows: any[] = [];
-        rItems.forEach((item, idx) => {
-          const headline = `${idx + 1})  ${item.name.toUpperCase()}  (${item.presentation})  -------------  ${item.quantity}`;
-          let posology = item.instructions;
-          if (item.scheduleTimes && item.scheduleTimes.length > 0) {
-            posology += `\nHorários sugeridos: [ ${item.scheduleTimes.join(' • ')} ]`;
-          }
-          if (item.durationDays) {
-            posology += `\nDuração do tratamento: ${item.durationDays} dias`;
-          } else if (item.isContinuous) {
-            posology += `\nTratamento de uso contínuo`;
-          }
-          rows.push([headline, posology]);
-        });
-
-        autoTable(pdf, {
-          startY: currentY,
-          margin: { left: marginX, right: marginX },
-          body: rows.map(r => [
-            {
-              content: `${r[0]}\n${r[1]}`,
-              styles: { font: 'times', fontSize: 10, cellPadding: { top: 2.5, bottom: 3, left: 3, right: 3 } }
-            }
-          ]),
-          theme: 'plain',
-          styles: { textColor: [15, 23, 42], lineColor: [226, 232, 240], lineWidth: 0.1 },
-          columnStyles: { 0: { cellWidth: contentWidth } }
-        });
-
-        currentY = (pdf as any).lastAutoTable.finalY + 4;
-      });
-    }
-
-    renderFooter(pdf);
-    return pdf;
-  }
-
-  // 2. RECEITA DE CONTROLE ESPECIAL EM 2 VIAS (RDC 20/2011 e Portaria 344/98 - MAX 3 ITENS POR FOLHA)
-  if (docType === 'special_prescription') {
-    const specialItems = prescriptionItems.filter(i => Boolean(i.isSpecialControl));
-    
-    // Divide em blocos de até 3 medicamentos
-    const chunks: PrescriptionItem[][] = [];
-    if (specialItems.length === 0) {
-      chunks.push([]);
-    } else {
-      for (let i = 0; i < specialItems.length; i += 3) {
-        chunks.push(specialItems.slice(i, i + 3));
-      }
-    }
-
-    chunks.forEach((chunk, chunkIndex) => {
-      // 1ª Via: Farmácia (Retenção) e 2ª Via: Paciente
-      [false, true].forEach((isSecondCopy, viaIndex) => {
-        if (chunkIndex > 0 || viaIndex > 0) {
-          pdf.addPage('a4', 'portrait');
-        }
-
-        const badgeSuffix = chunks.length > 1 ? ` (Folha ${chunkIndex + 1}/${chunks.length})` : '';
-        let currentY = renderHeader(pdf, `RECEITA CONTROLE ESPECIAL${badgeSuffix}`, isSecondCopy);
-
-        if (chunk.length === 0) {
-          pdf.setFont('times', 'italic');
-          pdf.setFontSize(11);
-          pdf.setTextColor(148, 163, 184);
-          pdf.text('Nenhum medicamento sujeito a controle especial nesta prescrição.', pageWidth / 2, currentY + 30, { align: 'center' });
-        } else {
-          pdf.setFillColor(254, 242, 242);
-          pdf.setDrawColor(254, 202, 202);
-          pdf.roundedRect(marginX, currentY, contentWidth, 6.5, 1, 1, 'FD');
-
-          pdf.setTextColor(153, 27, 27);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(8.5);
-          pdf.text(`MEDICAMENTOS SOB CONTROLE ESPECIAL (MAX 3 POR FOLHA)`, marginX + 3, currentY + 4.5);
-          currentY += 9;
-
-          const rows: any[] = [];
-          chunk.forEach((item, idx) => {
-            const itemNumber = (chunkIndex * 3) + idx + 1;
-            const headline = `${itemNumber})  ${item.name.toUpperCase()}  (${item.presentation})  -------------  ${item.quantity}`;
-            let posology = item.instructions;
-            if (item.scheduleTimes && item.scheduleTimes.length > 0) {
-              posology += `\nHorários sugeridos: [ ${item.scheduleTimes.join(' • ')} ]`;
-            }
-            if (item.durationDays) {
-              posology += `\nDuração do tratamento: ${item.durationDays} dias`;
-            }
-            rows.push([headline, posology]);
-          });
-
-          autoTable(pdf, {
-            startY: currentY,
-            margin: { left: marginX, right: marginX },
-            body: rows.map(r => [
-              {
-                content: `${r[0]}\n${r[1]}`,
-                styles: { font: 'times', fontSize: 10, cellPadding: { top: 2.5, bottom: 3, left: 3, right: 3 } }
-              }
-            ]),
-            theme: 'plain',
-            styles: { textColor: [15, 23, 42], lineColor: [226, 232, 240], lineWidth: 0.1 },
-            columnStyles: { 0: { cellWidth: contentWidth } }
-          });
-
-          currentY = (pdf as any).lastAutoTable.finalY + 4;
-        }
-
-        // Quadro Regulatório de Comprador & Fornecedor
-        const boxY = Math.max(currentY + 2, pageHeight - 65);
-        autoTable(pdf, {
-          startY: boxY,
-          margin: { left: marginX, right: marginX },
-          theme: 'grid',
-          head: [
-            ['IDENTIFICAÇÃO DO COMPRADOR', 'IDENTIFICAÇÃO DO FORNECEDOR']
-          ],
-          body: [
-            [
-              'Nome: _____________________________________\nRG: __________________  CPF: ________________\nEndereço: __________________________________\nCidade/UF: _____________  Tel: _______________',
-              'Farmácia/Drogaria: _________________________\nAssinatura do Farmacêutico: __________________\nData: ____/____/________   Lote: ____________\nQuantidade Dispensada: _____________________'
-            ]
-          ],
-          headStyles: {
-            fillColor: [248, 250, 252],
-            textColor: [15, 23, 42],
-            fontSize: 7,
-            fontStyle: 'bold',
-            lineWidth: 0.2,
-            lineColor: [203, 213, 225]
-          },
-          bodyStyles: {
-            fillColor: [255, 255, 255],
-            textColor: [51, 65, 85],
-            fontSize: 7,
-            lineWidth: 0.2,
-            lineColor: [203, 213, 225]
-          },
-          columnStyles: {
-            0: { cellWidth: contentWidth / 2 },
-            1: { cellWidth: contentWidth / 2 }
-          }
-        });
-
-        renderFooter(pdf);
-      });
-    });
-
-    return pdf;
-  }
-
-  // 3. EXAM AUTO-SPLITTER (Laboratoriais vs. Imagem & Gráficos)
   if (docType === 'exams') {
     const labExams = exams.filter(e => !e.isImage);
     const imageExams = exams.filter(e => Boolean(e.isImage));

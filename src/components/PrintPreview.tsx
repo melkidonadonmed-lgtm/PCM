@@ -1,3 +1,5 @@
+import { buildPrescriptionDocuments, prescriptionDocumentText } from '../utils/prescriptionRules';
+import { PrescriptionReview } from './PrescriptionReview';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Download, 
@@ -89,6 +91,7 @@ interface PrintPreviewProps {
   onClearPrescription?: () => void;
   onResetAll?: () => void;
   onOpenDoctorModal?: () => void;
+  onOpenPatientModal?: () => void;
 }
 
 export const PrintPreview: React.FC<PrintPreviewProps> = ({
@@ -128,7 +131,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   onNavigateBack,
   onBack,
   onClearPrescription,
-  onResetAll
+  onResetAll,
+  onOpenPatientModal,
+  onOpenDoctorModal
 }) => {
   const effectiveExams = exams.length > 0 ? exams : selectedExams;
   const handleBack = onNavigateBack || onBack || (() => {});
@@ -154,23 +159,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     }
   }, [initialDocType]);
 
-  // Separação de Medicamentos Simples vs. Controle Especial (RDC 20/2011 e Portaria 344/98)
-  const simpleItems = useMemo(() => prescriptionItems.filter(i => !i.isSpecialControl), [prescriptionItems]);
-  const specialItems = useMemo(() => prescriptionItems.filter(i => Boolean(i.isSpecialControl)), [prescriptionItems]);
-  const hasMixedItems = simpleItems.length > 0 && specialItems.length > 0;
-
-  // Chunks de no máximo 3 itens por folha para controle especial
-  const specialChunks = useMemo(() => {
-    const chunks: PrescriptionItem[][] = [];
-    if (specialItems.length === 0) {
-      chunks.push([]);
-    } else {
-      for (let i = 0; i < specialItems.length; i += 3) {
-        chunks.push(specialItems.slice(i, i + 3));
-      }
-    }
-    return chunks;
-  }, [specialItems]);
+  const prescriptionDocuments = useMemo(() => buildPrescriptionDocuments(prescriptionItems), [prescriptionItems]);
+  const simpleItems = prescriptionDocuments.filter(d => d.kind === 'simple').flatMap(d => d.items);
+  const specialItems = prescriptionDocuments.filter(d => d.kind === 'c1').flatMap(d => d.items);
+  const hasMixedItems = prescriptionDocuments.length > 1;
+  const specialChunks = prescriptionDocuments.filter(d => d.kind === 'c1').map(d => d.items);
 
   // Exames filtrados por categoria (Laboratório vs Imagem)
   const labExams = useMemo(() => effectiveExams.filter(e => !e.isImage), [effectiveExams]);
@@ -258,20 +251,15 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     const header = `📋 *DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}📅 *Data:* ${dateStr}\n------------------------------------\n`;
 
     if (docType === 'prescription' || docType === 'special_prescription') {
-      if (prescriptionItems.length === 0) return '';
-      let text = `${header}💊 *PRESCRIÇÃO TERAPÊUTICA:*\n`;
-      prescriptionItems.forEach((it, idx) => {
-        text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
-      });
-      text += `\n------------------------------------\n⚠️ _Siga as instruções médicas e os horários informados._`;
-      return text;
+      const kind = docType === 'prescription' ? 'simple' : 'c1';
+      return prescriptionDocuments.filter(d => d.kind === kind).map(d => header + prescriptionDocumentText(d)).join('\n\n');
     } else if (docType === 'certificate') {
       let text = `${header}📄 *ATESTADO MÉDICO*\n\n`;
       text += `Atesto para os devidos fins que o(a) paciente *${patientName}* esteve sob atendimento médico nesta data (${dateStr}).\n\n`;
       if (certificate?.daysOff) {
         text += `👉 *Recomendação:* Repouso e afastamento das atividades laborais por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
       }
-      if (certificate?.cid10Code) {
+      if (certificate?.includeCID && certificate?.cid10Code) {
         text += `📌 *CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ' - ' + certificate.cid10Description : ''}\n\n`;
       }
       if (certificate?.observations) {
@@ -340,12 +328,6 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     }
   };
 
-  const handleCopyValidation = () => {
-    navigator.clipboard.writeText(`https://prescmed.digital/validar/doc-${Math.random().toString(36).substr(2, 9).toUpperCase()}`);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
-
   // Medicamentos ativos para visualização no preview (Simples vs Chunk da Receita Especial)
   const activePrescriptionItems = docType === 'prescription' ? simpleItems : currentSpecialChunk;
 
@@ -357,6 +339,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       return acc;
     }, {} as { [route: string]: PrescriptionItem[] });
   }, [activePrescriptionItems]);
+
+  if (['prescription', 'special_prescription'].includes(docType)) {
+    return <PrescriptionReview items={prescriptionItems} doctor={doctor} patient={patient} onBack={handleBack} onEditPatient={onOpenPatientModal || handleBack} onEditDoctor={onOpenDoctorModal || handleBack} />;
+  }
 
   return (
     <div id="print-preview-section" className="space-y-4 sm:space-y-5 pb-12">
@@ -377,6 +363,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               backgroundColor: 'var(--surface-inset)'
             }}
             title="Voltar para Edição"
+            aria-label="Voltar para Edição"
           >
             <ArrowLeft className="w-5 h-5 icon-sculpted" strokeWidth={1.75} />
           </button>
@@ -388,7 +375,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               </span>
             </h2>
             <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Documento formatado em alta fidelidade com fontes serifadas e espaçamento legal.
+              Revise o conteúdo, baixe o PDF e assine o documento impresso.
             </p>
           </div>
         </div>
@@ -401,6 +388,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             onClick={handleCopyFormattedText}
             className="h-10 sm:h-11 px-3.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-100/80 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
             title="Copiar texto formatado para prontuário/PEP"
+            aria-label="Copiar texto formatado para prontuário ou PEP"
           >
             {copiedLink ? (
               <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" strokeWidth={2} />
@@ -416,6 +404,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             onClick={() => window.print()}
             className="h-10 sm:h-11 px-3.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-100/80 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
             title="Imprimir direto pelo navegador (Ctrl+P)"
+            aria-label="Imprimir direto pelo navegador"
           >
             <Printer className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
             <span>Imprimir</span>
@@ -425,8 +414,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleSendWhatsApp}
-            className="h-10 sm:h-11 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition-all active:scale-95 cursor-pointer"
+            className="h-10 sm:h-11 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition-all active:scale-95 cursor-pointer"
             title="Enviar o documento diretamente para o WhatsApp do paciente ou familiar"
+            aria-label="Enviar o documento diretamente para o WhatsApp do paciente ou familiar"
           >
             <Send className="w-4 h-4 shrink-0" strokeWidth={2} />
             <span>Enviar no WhatsApp</span>
@@ -439,6 +429,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             disabled={isExportingPdf}
             className="h-10 sm:h-11 px-5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white dark:bg-cream-100 dark:hover:bg-white dark:text-navy-950 text-xs sm:text-sm font-black flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border border-white/20 dark:border-navy-900/30 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             title="Gerar e baixar arquivo PDF padrão A4 (10mm)"
+            aria-label="Gerar e baixar arquivo PDF padrão A4"
           >
             {isExportingPdf ? (
               <>
@@ -570,7 +561,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="w-5 h-5 shrink-0 text-sky-500 dark:text-sky-400" />
             <span>
-              <strong>Prescrição Mista:</strong> Medicamentos simples (<strong>{simpleItems.length}</strong>) e controlados/antibióticos (<strong>{specialItems.length}</strong>) foram separados automaticamente conforme RDC 20/2011 e Portaria 344/98.
+              <strong>Prescrição Mista:</strong> Medicamentos simples (<strong>{simpleItems.length}</strong>) e controle especial C1 (<strong>{specialItems.length}</strong>) foram separados automaticamente por tipo de receituário.
             </span>
           </div>
           <button
@@ -627,7 +618,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           {specialChunks.length > 1 && (
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-slate-400">
-                Folha <strong>{specialPageIndex + 1}</strong> de <strong>{specialChunks.length}</strong> (máx. 3 por folha)
+                Folha <strong>{specialPageIndex + 1}</strong> de <strong>{specialChunks.length}</strong> (até 3 substâncias C1 por receita)
               </span>
               <div className="flex items-center gap-1">
                 <button
@@ -742,9 +733,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                     <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={1.75} />
                   </div>
                   <div>
-                    <h1 className="font-extrabold text-lg sm:text-2xl tracking-tight uppercase leading-none font-sans" style={{ color: '#0F172A' }}>
+                    <h2 className="font-extrabold text-lg sm:text-2xl tracking-tight uppercase leading-none font-sans" style={{ color: '#0F172A' }}>
                       {docName}
-                    </h1>
+                    </h2>
                     <p className="text-xs sm:text-sm font-bold font-sans mt-0.5" style={{ color: '#1E4F7A' }}>
                       CRM-{docCrmState} {docCrm} {doctor?.rqe ? `• RQE ${doctor.rqe}` : ''}
                     </p>
@@ -1153,26 +1144,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             className="print-footer print-avoid-break w-full mt-auto pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6"
             style={{ borderTop: '2px solid #0F172A' }}
           >
-            {/* Left: Validation QR Code & Security Stamp */}
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
-              <div 
-                onClick={handleCopyValidation}
-                className="w-14 h-14 sm:w-16 sm:h-16 p-1 rounded-lg flex items-center justify-center shadow-xs cursor-pointer"
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  border: '1.5px solid #0F172A'
-                }}
-                title="Clique para validar autenticidade digital"
-              >
-                <QrCode className="w-full h-full" style={{ color: '#0F172A' }} />
-              </div>
-              <div className="text-[10px] sm:text-xs leading-tight font-sans text-slate-600">
-                <span className="font-bold block text-slate-900">VALIDAÇÃO DIGITAL CFM</span>
-                <span>Código: DOC-PRESC-{Math.random().toString(36).substr(2, 6).toUpperCase()}</span>
-                <span className="block font-semibold text-emerald-800">Assinatura Eletrônica Válida</span>
-                <span>Consulte em prescmed.digital</span>
-              </div>
-            </div>
+            <p className="text-xs text-slate-600">Documento para impressão e assinatura manuscrita.</p>
 
             {/* Right: City, Date & Doctor Signature Line */}
             <div className="text-center sm:text-right w-full sm:w-auto font-sans">

@@ -3,7 +3,7 @@ import {
   Pill,
   Calculator,
   FileText,
-  ClipboardList,
+  FlaskConical,
   Download,
   Menu
 } from 'lucide-react';
@@ -29,38 +29,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onOpenMenu
 }) => {
   const items = [
-    {
-      id: 'prescription' as ActiveTab,
-      label: 'Prescrição',
-      icon: Pill,
-      badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
-    },
-    {
-      id: 'pediatric_calc' as ActiveTab,
-      label: 'Calculadoras',
-      icon: Calculator
-    },
-    {
-      id: 'certificate' as ActiveTab,
-      label: 'Documentos',
-      icon: FileText
-    },
-    {
-      id: 'protocols' as ActiveTab,
-      label: 'Protocolos',
-      icon: ClipboardList
-    },
-    {
-      id: 'print_preview' as ActiveTab,
-      label: 'Exportar',
-      icon: Download
-    }
+    { id: 'prescription' as ActiveTab, label: 'Prescrever', icon: Pill, badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined },
+    { id: 'exams' as ActiveTab, label: 'Exames', icon: FlaskConical, badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined },
+    { id: 'certificate' as ActiveTab, label: 'Documentos', icon: FileText },
+    { id: 'pediatric_calc' as ActiveTab, label: 'Calculadoras', icon: Calculator },
   ];
-
-  // Solicitação de Exames e Encaminhamentos não têm slot fixo na barra (só cabem 5-6
-  // itens sem espremer o alvo de toque) — ficam acessíveis em 1 toque a mais via "Mais",
-  // que abre o menu lateral completo com os 7 destinos rotulados.
-  const isMoreActive = activeTab === 'exams' || activeTab === 'referral';
+  const isMoreActive = activeTab === 'protocols';
 
   return (
     <nav
@@ -73,14 +47,17 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     >
       {items.map((item) => {
         const Icon = item.icon;
-        const isActive = activeTab === item.id;
+        const isActive = activeTab === item.id || (item.id === 'certificate' && activeTab === 'referral');
 
         return (
           <button
             key={item.id}
             id={`mobile-nav-${item.id}`}
+            type="button"
             onClick={() => onSelectTab(item.id)}
-            className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] h-12 px-3 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
+            aria-current={isActive ? 'page' : undefined}
+            aria-label={item.badge ? `${item.label} (${item.badge})` : item.label}
+            className={`flex flex-col items-center justify-center min-w-0 flex-1 min-h-[48px] h-12 px-1 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
               isActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
             }`}
             style={
@@ -119,8 +96,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         aria-haspopup="dialog"
         aria-expanded={sidebarOpen}
         aria-controls="prescmed-sidebar"
-        aria-label="Mais opções: Exames, Encaminhamentos e menu completo"
-        className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] h-12 px-3 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
+        aria-label="Mais opções: Protocolos, configurações e menu completo"
+        className={`flex flex-col items-center justify-center min-w-0 flex-1 min-h-[48px] h-12 px-1 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
           isMoreActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
         }`}
         style={
@@ -135,11 +112,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
             strokeWidth={1.75}
           />
-          {selectedExamsCount > 0 && (
-            <span className="absolute -top-1 -right-2.5 min-w-[18px] h-4 px-1 rounded-full font-extrabold text-[9px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15">
-              {selectedExamsCount}
-            </span>
-          )}
+
         </div>
         <span
           className="text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors"

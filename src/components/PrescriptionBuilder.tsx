@@ -26,10 +26,14 @@ import {
 } from 'lucide-react';
 import { PrescriptionItem, Patient, DoctorProfile } from '../types';
 import { generateScheduleTimes } from '../utils/doseCalculator';
-import { generateMedicalPDF } from '../utils/pdfGenerator';
+import { QuantityAssistant, EMPTY_QUANTITY_PLAN } from './QuantityAssistant';
+import type { PrescriptionKind, QuantityPlan } from '../types';
+import { PRESCRIPTION_LABELS, normalizePrescriptionItem, prescriptionIssues, catalogPresentation } from '../utils/prescriptionRules';
+import { safeStorage } from '../utils/storage';
 import { UNIFIED_MEDICATIONS, UnifiedMedication, CATEGORY_LABELS } from '../data/medicationDatabase';
 
 interface PrescriptionBuilderProps {
+  isActive?: boolean;
   darkMode: boolean;
   doctor: DoctorProfile;
   onUpdateDoctor: (doctor: DoctorProfile) => void;
@@ -48,6 +52,7 @@ interface PrescriptionBuilderProps {
 
 export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   darkMode,
+  isActive = true,
   doctor,
   patient,
   onUpdatePatient,
@@ -83,6 +88,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
   // Atalho de Teclado Global: '/' ou 'Ctrl+K' / 'Cmd+K' para focar na busca rápida de fármacos
   useEffect(() => {
+    if (!isActive) return;
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       const activeTag = (document.activeElement?.tagName || '').toLowerCase();
       const isEditing = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
@@ -109,14 +115,25 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, []);
+  }, [isActive]);
 
   // Active form fields for adding/editing
   const [selectedMedName, setSelectedMedName] = useState('');
   const [selectedRoute, setSelectedRoute] = useState('Uso Oral');
   const [selectedQuantity, setSelectedQuantity] = useState('1 caixa');
   const [selectedPosology, setSelectedPosology] = useState('');
-  const [selectedIsSpecial, setSelectedIsSpecial] = useState(false);
+  const [selectedKind, setSelectedKind] = useState<PrescriptionKind>('pending');
+  const [selectedMedicationId, setSelectedMedicationId] = useState<string>();
+  const [selectedPresentation, setSelectedPresentation] = useState('');
+  const [selectedSubstances, setSelectedSubstances] = useState('');
+  const [selectedDays, setSelectedDays] = useState('');
+  const [editDays, setEditDays] = useState('');
+  const [quantityPlan, setQuantityPlan] = useState<QuantityPlan>(EMPTY_QUANTITY_PLAN);
+  const [formError, setFormError] = useState('');
+  const [editPresentation, setEditPresentation] = useState('');
+  const [editKind, setEditKind] = useState<PrescriptionKind>('pending');
+  const [editSubstances, setEditSubstances] = useState('');
+  const [editQuantityPlan, setEditQuantityPlan] = useState<QuantityPlan>(EMPTY_QUANTITY_PLAN);
 
   // Estados para edição inline nos cards de medicamentos prescritos
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
@@ -142,12 +159,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
   // Estados de Recolher/Expandir (Collapsible) para Kits e Calculadora Pediátrica
   const [showKits, setShowKits] = useState<boolean>(() => {
-    const saved = localStorage.getItem('prescmed_show_kits');
+    const saved = safeStorage.getItem('prescmed_show_kits');
     return saved !== null ? saved === 'true' : false; // Fechado por padrão para dar prioridade máxima à busca
   });
 
   const [showPediaCalc, setShowPediaCalc] = useState<boolean>(() => {
-    const saved = localStorage.getItem('prescmed_show_pedia_calc');
+    const saved = safeStorage.getItem('prescmed_show_pedia_calc');
     if (saved !== null) return saved === 'true';
     return false; // Fechado por padrão, com expansão sob demanda
   });
@@ -155,7 +172,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const toggleKits = () => {
     setShowKits(prev => {
       const next = !prev;
-      localStorage.setItem('prescmed_show_kits', String(next));
+      safeStorage.setItem('prescmed_show_kits', String(next));
       return next;
     });
   };
@@ -163,7 +180,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const togglePediaCalc = () => {
     setShowPediaCalc(prev => {
       const next = !prev;
-      localStorage.setItem('prescmed_show_pedia_calc', String(next));
+      safeStorage.setItem('prescmed_show_pedia_calc', String(next));
       return next;
     });
   };
@@ -387,9 +404,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setSelectedRoute(med.route);
     setSelectedQuantity(med.defaultQuantity);
     setSelectedPosology(med.defaultPosology);
-    // Antibióticos e fármacos controlados recebem flag especial automaticamente
-    const isSpecial = Boolean(med.isSpecialControl || med.category === 'antibioticos');
-    setSelectedIsSpecial(isSpecial);
+    setSelectedMedicationId(med.id);
+    setSelectedPresentation(catalogPresentation(med.name));
+    setSelectedSubstances((med.controlledSubstances || []).join(', '));
+    setSelectedDays('');
+    setSelectedKind(med.prescriptionKind);
+    setQuantityPlan(EMPTY_QUANTITY_PLAN);
     setSearchTerm('');
     setShowSuggestions(false);
   };
@@ -397,36 +417,39 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   // Add Item to Prescription
   const handleAddMedicationToPrescription = () => {
     if (!selectedMedName.trim()) {
-      alert('Por favor, selecione ou digite o nome do medicamento.');
+      setFormError('Selecione ou digite o nome do medicamento.');
       return;
     }
     if (!selectedPosology.trim()) {
-      alert('Por favor, informe a posologia / instruções de uso.');
+      setFormError('Informe a posologia / instruções de uso.');
       return;
     }
-
-    // Validação de segurança: se o nome corresponder a antibiótico catalogado, força controle especial
-    const isSpecialDetected = selectedIsSpecial || UNIFIED_MEDICATIONS.some(m =>
-      (m.name.toLowerCase().includes(selectedMedName.toLowerCase()) || selectedMedName.toLowerCase().includes(m.name.toLowerCase())) &&
-      (m.isSpecialControl || m.category === 'antibioticos')
-    );
 
     const newItem: PrescriptionItem = {
       id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       name: selectedMedName.trim(),
-      presentation: selectedQuantity || 'Uso oral',
+      presentation: selectedPresentation.trim(),
+      medicationId: selectedMedicationId,
+      schemaVersion: 2,
+      prescriptionKind: selectedKind,
+      classificationReviewed: selectedKind !== 'pending',
+      quantityPlan,
+      controlledSubstances: selectedSubstances.split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
+      durationDays: selectedDays ? Number(selectedDays) : undefined,
       route: selectedRoute,
-      quantity: selectedQuantity.trim() || '1 unidade',
+      quantity: selectedQuantity.trim(),
       doseCalculatedText: '',
       frequencyText: selectedPosology.trim(),
-      scheduleInterval: '8/8h',
-      scheduleTimes: generateScheduleTimes('8/8h'),
+      scheduleInterval: '',
+      scheduleTimes: [],
       instructions: selectedPosology.trim(),
       isContinuous: selectedPosology.toLowerCase().includes('contínuo'),
-      isSpecialControl: isSpecialDetected
+      isSpecialControl: selectedKind === 'c1'
     };
 
-    onUpdateItems([...items, newItem]);
+    if (!newItem.presentation || !newItem.quantity) { setFormError('Informe apresentação e quantidade dispensada.'); return; }
+    setFormError('');
+    onUpdateItems([...items, normalizePrescriptionItem(newItem)]);
     setItemAddedToast(true);
     setTimeout(() => setItemAddedToast(false), 2000);
 
@@ -434,7 +457,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setSelectedMedName('');
     setSelectedQuantity('1 caixa');
     setSelectedPosology('');
-    setSelectedIsSpecial(false);
+    setSelectedKind('pending');
+    setSelectedSubstances('');
+    setSelectedDays('');
+    setSelectedMedicationId(undefined);
+    setSelectedPresentation('');
+    setQuantityPlan(EMPTY_QUANTITY_PLAN);
   };
 
   // Pediatric Quick Calculator Calculation
@@ -543,24 +571,34 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   // Insert pediatric calculated dose into the prescription
   const handleApplyPediaDose = () => {
     if (!calculatedPediaResult) return;
+    const ids: Record<string, string> = {
+      dipirona_gotas: 'dipirona-gotas-500mg', paracetamol_gotas: 'paracetamol-gotas-200mg',
+      ibuprofeno_100: 'ibuprofeno-100mg-gotas', amoxicilina_susp: 'amoxicilina-susp-250mg',
+      prednisolona_sol: 'prednisolona-sol-3mg', azitromicina_susp: 'azitromicina-susp-200mg',
+      cefalexina_susp: 'cefalexina-susp-250mg', sulfametoxazol_susp: 'bactrim-susp-oral',
+    };
     const newItem: PrescriptionItem = {
       id: `item-pedia-${Date.now()}`,
       name: calculatedPediaResult.name,
-      presentation: calculatedPediaResult.quantity,
+      presentation: catalogPresentation(calculatedPediaResult.name),
+      prescriptionKind: 'pending',
+      medicationId: ids[selectedPediaDrugKey],
+      quantityPlan: { ...EMPTY_QUANTITY_PLAN, dose: calculatedPediaResult.calculatedDrops ?? calculatedPediaResult.calculatedMl, unit: calculatedPediaResult.calculatedDrops ? 'gotas' : 'mL', source: 'stale' },
       route: calculatedPediaResult.route,
       quantity: calculatedPediaResult.quantity,
       doseCalculatedText: calculatedPediaResult.calculatedDrops
         ? `${calculatedPediaResult.calculatedDrops} gotas`
         : `${calculatedPediaResult.calculatedMl} mL`,
       frequencyText: calculatedPediaResult.instructions,
-      scheduleInterval: '6/6h',
-      scheduleTimes: generateScheduleTimes('6/6h'),
+      scheduleInterval: '',
+      scheduleTimes: [],
       instructions: calculatedPediaResult.instructions,
       isContinuous: false,
       calculatedFromWeight: patientWeight
     };
 
-    onUpdateItems([...items, newItem]);
+    onUpdateItems([...items, normalizePrescriptionItem(newItem)]);
+    handleStartEditItem(normalizePrescriptionItem(newItem));
     setItemAddedToast(true);
     setTimeout(() => setItemAddedToast(false), 2000);
   };
@@ -581,46 +619,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     onUpdateItems(newItems);
   };
 
-  // Copy prescription text
-  const handleCopyText = () => {
-    if (items.length === 0) return;
-    const text = items.map((it, idx) => `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n`).join('\n');
-    navigator.clipboard.writeText(text);
-    setCopiedSuccess(true);
-    setTimeout(() => setCopiedSuccess(false), 2000);
-  };
-
-  // Format prescription for WhatsApp
-  const formatPrescriptionForWhatsApp = () => {
-    if (items.length === 0) return '';
-    const doctorLine = doctor?.name?.trim()
-      ? `👨‍⚕️ *${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n`
-      : '👨‍⚕️ *Receituário Médico*\n';
-    const patientLine = patient?.name?.trim()
-      ? `👤 *Paciente:* ${patient.name.trim()}${patient?.weightKg && patient.weightKg > 0 ? ` (${patient.weightKg} kg)` : ''}\n`
-      : '';
-    const dateLine = `📅 *Data:* ${new Date().toLocaleDateString('pt-BR')}\n`;
-
-    let text = `📋 *RECEITUÁRIO MÉDICO DIGITAL*\n${doctorLine}${patientLine}${dateLine}------------------------------------\n`;
-
-    items.forEach((it, idx) => {
-      text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
-    });
-
-    text += `\n------------------------------------\n⚠️ _Documento de orientação terapêutica emitido pelo médico. Siga as orientações e horários informados._`;
-    return text;
-  };
-
-  // Open WhatsApp with formatted prescription
-  const handleSendWhatsApp = () => {
-    const text = formatPrescriptionForWhatsApp();
-    if (!text) {
-      alert('Adicione pelo menos um medicamento à receita antes de enviar.');
-      return;
-    }
-    const encoded = encodeURIComponent(text);
-    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank', 'noopener,noreferrer');
-  };
+  // Sharing always goes through the same document review and validation.
+  const handleCopyText = onNavigateToPrint;
+  const handleSendWhatsApp = onNavigateToPrint;
 
   // Apply a full clinical kit with 1 click
   const handleApplyClinicalKit = (kit: typeof clinicalKits[0]) => {
@@ -667,13 +668,14 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       return {
         id: `kit-item-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 4)}`,
         name: itemName,
-        presentation: itemPresentation,
+        presentation: catalogPresentation(itemName),
+        prescriptionKind: 'pending',
         route: kitItem.route,
         quantity: itemPresentation,
         doseCalculatedText: itemDoseCalculatedText,
         frequencyText: itemInstructions,
-        scheduleInterval: '8/8h',
-        scheduleTimes: generateScheduleTimes('8/8h'),
+        scheduleInterval: '',
+        scheduleTimes: [],
         instructions: itemInstructions,
         isContinuous: false,
         isSpecialControl: Boolean((kitItem as any).isSpecial),
@@ -681,7 +683,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       };
     });
 
-    onUpdateItems([...items, ...newPrescriptionItems]);
+    onUpdateItems([...items, ...newPrescriptionItems.map(normalizePrescriptionItem)]);
     setItemAddedToast(true);
     setTimeout(() => setItemAddedToast(false), 2500);
   };
@@ -691,13 +693,25 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setEditingItemId(it.id);
     setEditInstructions(it.instructions);
     setEditQuantity(it.quantity);
+    setEditDays(it.durationDays ? String(it.durationDays) : '');
+    setEditPresentation(it.presentation === it.quantity ? '' : it.presentation);
+    setEditKind(normalizePrescriptionItem(it).prescriptionKind);
+    setEditSubstances((normalizePrescriptionItem(it).controlledSubstances || []).join(', '));
+    setEditQuantityPlan(it.quantityPlan ?? EMPTY_QUANTITY_PLAN);
   };
 
   const handleSaveEditItem = (id: string) => {
     onUpdateItems(items.map(i => i.id === id ? {
       ...i,
-      quantity: editQuantity.trim() || i.quantity,
-      presentation: editQuantity.trim() || i.presentation,
+      quantity: editQuantity.trim(),
+      presentation: editPresentation.trim(),
+      schemaVersion: 2,
+      prescriptionKind: editKind,
+      classificationReviewed: editKind !== 'pending',
+      controlledSubstances: editSubstances.split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
+      quantityPlan: editQuantityPlan,
+      durationDays: editDays ? Number(editDays) : undefined,
+      scheduleTimes: [],
       instructions: editInstructions.trim() || i.instructions,
       frequencyText: editInstructions.trim() || i.frequencyText
     } : i));
@@ -731,7 +745,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20">
+    <div className="prescription-workspace w-full max-w-7xl mx-auto space-y-6 pb-20">
+      <nav aria-label="Etapas da prescrição" className="clinical-card flex flex-wrap gap-3 p-3 mb-4">
+        <button className="clinical-button secondary" onClick={onOpenPatientModal}>1. {patientName || 'Identificar paciente'}</button>
+        <button className="clinical-button secondary" onClick={() => { setMobileSection('composer'); searchInputRef.current?.focus(); }}>2. Adicionar medicamentos</button>
+        <button className="clinical-button" onClick={onNavigateToPrint} disabled={!items.length}>3. Revisar e exportar ({items.length})</button>
+      </nav>
       
       {/* Barra Rápida de Identificação do Paciente (Quickbar) */}
       <section className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -740,10 +759,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             <User className="w-4 h-4 text-amber-400" />
           </div>
           <div className="flex-1 min-w-[180px]">
-            <label className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">
+            <label htmlFor="pb-patient-name" className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">
               Identificação do Paciente
             </label>
             <input
+              id="pb-patient-name"
+              name="patientName"
               type="text"
               value={patient.name}
               onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
@@ -755,10 +776,13 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
         <div className="flex items-center gap-3 shrink-0 justify-between sm:justify-end">
           <div className="w-28 sm:w-32">
-            <label className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5 flex items-center gap-1">
+            <label htmlFor="pb-patient-weight" className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5 flex items-center gap-1">
               <Scale className="w-3 h-3 text-amber-500" /> Peso (kg)
             </label>
             <input
+              id="pb-patient-weight"
+              name="patientWeight"
+              aria-label="Peso do paciente em quilogramas"
               type="number"
               step="0.1"
               min="0"
@@ -820,9 +844,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <Search className="w-4 h-4 text-amber-400" strokeWidth={1.75} />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-cream-50">
+                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-cream-50">
                     Prescrição Rápida de Medicamentos
-                  </h3>
+                  </h2>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     Catálogo com 370+ fármacos do SUS, RENAME e Referência (Adulto & Pediátrico)
                   </p>
@@ -935,10 +959,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   )}
 
                   {searchSuggestions.map(med => (
-                    <div
+                    <button type="button"
                       key={med.id}
                       onClick={() => handleSelectMedication(med)}
-                      className="p-3 hover:bg-sky-50 dark:hover:bg-navy-800 cursor-pointer flex items-center justify-between gap-2 transition"
+                      className="w-full text-left p-3 hover:bg-sky-50 dark:hover:bg-navy-800 cursor-pointer flex items-center justify-between gap-2 transition"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-bold text-slate-900 dark:text-cream-50 truncate">
@@ -951,7 +975,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-slate-100 dark:bg-navy-800 text-sky-600 dark:text-sky-400 shrink-0">
                         {med.route}
                       </span>
-                    </div>
+                    </button>
                   ))}
 
                   <div className="p-2 text-center text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-50/50 dark:bg-navy-950/50">
@@ -964,15 +988,17 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             {/* Form de Edição e Adição Direta */}
             <div className="p-4 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 space-y-3">
               <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="pb-confirm-med" className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   <span className="w-4 h-4 rounded-full bg-navy-800 dark:bg-cream-100 text-white dark:text-navy-950 text-[9px] font-black flex items-center justify-center shrink-0">2</span>
                   Confirme o Medicamento *
                 </label>
                 <div className="relative">
                   <input
+                    id="pb-confirm-med"
+                    name="confirmMed"
                     type="text"
                     value={selectedMedName}
-                    onChange={(e) => setSelectedMedName(e.target.value)}
+                    onChange={(e) => { setSelectedMedName(e.target.value); setSelectedMedicationId(undefined); setSelectedKind('pending'); setSelectedPresentation(''); }}
                     placeholder="Preenchido ao escolher acima — ou digite livremente aqui"
                     className={`w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-navy-900 border text-sm font-bold text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500/50 outline-none transition-colors ${
                       selectedMedName.trim()
@@ -988,13 +1014,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
                 <div className="sm:col-span-4">
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                  <label htmlFor="pb-route-select" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
                     Via de Administração
                   </label>
                   <select
+                    id="pb-route-select"
+                    name="routeSelect"
+                    aria-label="Via de Administração"
                     value={selectedRoute}
                     onChange={(e) => setSelectedRoute(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100 cursor-pointer"
                   >
                     <option value="Uso Oral">Uso Oral</option>
                     <option value="Uso Tópico">Uso Tópico</option>
@@ -1011,44 +1040,52 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </div>
 
                 <div className="sm:col-span-4">
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                    Quantidade / Apresentação
+                  <label htmlFor="pb-quantity-input" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                    Quantidade dispensada
                   </label>
                   <input
+                    id="pb-quantity-input"
+                    name="quantityInput"
                     type="text"
                     value={selectedQuantity}
-                    onChange={(e) => setSelectedQuantity(e.target.value)}
+                    onChange={(e) => { setSelectedQuantity(e.target.value); setQuantityPlan(p => ({ ...p, source: 'manual' })); }}
                     placeholder="Ex: 1 caixa, 2 frascos"
                     className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
-                <div className="sm:col-span-4 flex items-center pt-5">
-                  <label className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedIsSpecial}
-                      onChange={(e) => setSelectedIsSpecial(e.target.checked)}
-                      className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500"
-                    />
-                    <span>Receita de Controle Especial</span>
-                  </label>
-                </div>
+                <label className="sm:col-span-4">Tipo de receita
+                  <select className="clinical-input" value={selectedKind} disabled={Boolean(selectedMedicationId)} onChange={e => setSelectedKind(e.target.value as PrescriptionKind)}>
+                    {Object.entries(PRESCRIPTION_LABELS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+                  </select>
+                </label>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                <label htmlFor="pb-posology-textarea" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
                   Instruções de Uso / Posologia *
                 </label>
                 <textarea
+                  id="pb-posology-textarea"
+                  name="posologyTextarea"
                   rows={2}
                   value={selectedPosology}
-                  onChange={(e) => setSelectedPosology(e.target.value)}
+                  onChange={(e) => { setSelectedPosology(e.target.value); setQuantityPlan(p => ({ ...p, source: p.source === 'suggested' ? 'stale' : p.source })); }}
                   placeholder="Ex: Tomar 1 comprimido via oral de 8 em 8 horas após as refeições por 5 dias..."
                   className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-medium outline-none text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500/50"
                 />
               </div>
 
+              <label className="block">Apresentação / concentração e forma farmacêutica *
+                <input className="clinical-input" value={selectedPresentation} onChange={e => setSelectedPresentation(e.target.value)} placeholder="Ex.: 500 mg, cápsula; 250 mg/5 mL, suspensão oral" />
+              </label>
+              <label className="block">Duração / período de fornecimento (dias)
+                <input className="clinical-input" type="number" min="1" step="1" value={selectedDays} onChange={e => { setSelectedDays(e.target.value); setQuantityPlan(p => ({ ...p, source: p.source === 'suggested' ? 'stale' : p.source })); }} placeholder="Informe o período definido pelo prescritor" />
+              </label>
+              {selectedKind === 'c1' && !selectedMedicationId && <label className="block">Substâncias C1 (separadas por vírgula)<input className="clinical-input" value={selectedSubstances} onChange={e => setSelectedSubstances(e.target.value)} /></label>}
+              <QuantityAssistant value={quantityPlan} onChange={setQuantityPlan} onApply={text => { setSelectedQuantity(text); setSelectedDays(String(quantityPlan.days)); }} />
+              {selectedKind === 'pending' && <p role="status" className="text-sm">A classificação precisa ser revisada antes de exportar. Para itens do catálogo ainda pendentes, use um formulário apropriado após conferir o enquadramento.</p>}
+              {formError && <p role="alert" className="text-red-700 dark:text-red-300">{formError}</p>}
               {/* Posology Shortcuts */}
               <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                 <span className="text-[10px] font-bold text-slate-400 mr-1">Atalhos de Posologia:</span>
@@ -1081,18 +1118,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           {/* Card 2: Kits Rápidos de Plantão & Visita Domiciliar (Com Toggle Recolhível) */}
           <section className="rounded-2xl bg-white dark:bg-navy-900 border border-cream-300/80 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy overflow-hidden transition-all">
             {/* Header Accordion Bar */}
-            <div 
+            <button 
+              type="button"
               onClick={toggleKits}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  toggleKits();
-                }
-              }}
-              role="button"
-              tabIndex={0}
               aria-expanded={showKits}
-              className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-navy-800/60 transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+              aria-controls="kits-content-panel"
+              className="w-full p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-navy-800/60 transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none text-left"
             >
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-navy-900/10 dark:bg-cream-100/15 text-navy-900 dark:text-cream-100 flex items-center justify-center font-bold border border-navy-900/20 dark:border-cream-100/25 shrink-0">
@@ -1100,9 +1131,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-cream-50">
+                    <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-cream-50">
                       Kits Rápidos de Plantão & Visita Domiciliar
-                    </h3>
+                    </h2>
                     <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border border-navy-900/20 dark:border-cream-100/25">
                       {clinicalKits.length} Kits
                     </span>
@@ -1123,20 +1154,17 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   {showKits ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </div>
               </div>
-            </div>
+            </button>
 
             {/* Kits Content (Visible when expanded) */}
             {showKits && (
-              <div className="p-4 sm:p-5 pt-0 sm:pt-0 border-t border-slate-100 dark:border-navy-800 animate-tab-fade">
+              <div id="kits-content-panel" className="p-4 sm:p-5 pt-0 sm:pt-0 border-t border-slate-100 dark:border-navy-800 animate-tab-fade">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-3">
                   {clinicalKits.map(kit => (
                     <button
                       key={kit.id}
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleApplyClinicalKit(kit);
-                      }}
+                      onClick={() => handleApplyClinicalKit(kit)}
                       className="p-3 rounded-xl border bg-slate-50 dark:bg-navy-800 hover:border-navy-800/50 dark:hover:border-cream-100/50 border-slate-200 dark:border-navy-700 text-left transition active:scale-95 cursor-pointer shadow-tactile-sm group flex flex-col justify-between"
                       title="Clique para adicionar todo o combo de medicamentos à receita"
                     >
@@ -1166,60 +1194,59 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
           {/* Card 3: Assistente de Doses Pediátricas Inteligente (Gotas / mL - Com Toggle Recolhível) */}
           <section className="rounded-2xl border transition-all bg-white dark:bg-navy-900 border-cream-300/80 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy overflow-hidden">
-            {/* Header Accordion Bar */}
-            <div 
-              onClick={togglePediaCalc}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  togglePediaCalc();
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              aria-expanded={showPediaCalc}
-              className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-navy-800/60 transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
-            >
-              <div className="flex items-center gap-2.5">
+            {/* Header Accordion Bar (Desacoplado de botões aninhados) */}
+            <div className="p-4 sm:p-5 flex items-center justify-between transition-colors bg-transparent gap-3">
+              <button
+                type="button"
+                onClick={togglePediaCalc}
+                aria-expanded={showPediaCalc}
+                aria-controls="pedia-calc-content-panel"
+                className="flex items-center gap-2.5 flex-1 min-w-0 text-left cursor-pointer select-none hover:opacity-90 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 rounded-xl"
+              >
                 <div className="w-8 h-8 rounded-xl bg-navy-900/10 dark:bg-cream-100/15 text-navy-900 dark:text-cream-100 flex items-center justify-center font-bold border border-navy-900/20 dark:border-cream-100/25 shrink-0">
                   <Calculator className="w-4 h-4" strokeWidth={1.75} />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-cream-50">
+                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-cream-50">
                     Calculadora Pediátrica Rápida (Gotas / mL)
-                  </h3>
+                  </h2>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     {hasWeight 
                       ? `Cálculo automático ajustado para ${patientWeight} kg` 
                       : 'Informe o peso do paciente para cálculo instantâneo'}
                   </p>
                 </div>
-              </div>
+              </button>
 
               <div className="flex items-center gap-2 shrink-0">
                 {/* Weight Indicator Button */}
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenPatientModal();
-                  }}
+                  onClick={onOpenPatientModal}
                   className="px-3 py-1.5 rounded-xl bg-navy-900/10 hover:bg-navy-900/20 dark:bg-cream-100/15 dark:hover:bg-cream-100/25 border border-navy-900/20 dark:border-cream-100/25 text-navy-900 dark:text-cream-100 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
                   title="Clique para alterar o peso do paciente"
+                  aria-label={`Alterar peso do paciente. Atual: ${hasWeight ? patientWeight + ' kg' : 'não definido'}`}
                 >
                   <Scale className="w-3.5 h-3.5" strokeWidth={1.75} />
                   <span>{hasWeight ? `${patientWeight} kg` : 'Definir Peso'}</span>
                 </button>
 
-                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-navy-800 flex items-center justify-center text-slate-500 dark:text-slate-300">
+                <button
+                  type="button"
+                  onClick={togglePediaCalc}
+                  aria-expanded={showPediaCalc}
+                  aria-controls="pedia-calc-content-panel"
+                  aria-label={showPediaCalc ? "Recolher calculadora pediátrica rápida" : "Expandir calculadora pediátrica rápida"}
+                  className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-navy-800 flex items-center justify-center text-slate-500 dark:text-slate-300 cursor-pointer hover:bg-slate-200 dark:hover:bg-navy-700 transition"
+                >
                   {showPediaCalc ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </div>
+                </button>
               </div>
             </div>
 
             {/* Pedia Content (Visible when expanded) */}
             {showPediaCalc && (
-              <div className="p-4 sm:p-5 pt-0 sm:pt-0 border-t border-slate-100 dark:border-navy-800 animate-tab-fade space-y-3">
+              <div id="pedia-calc-content-panel" className="p-4 sm:p-5 pt-0 sm:pt-0 border-t border-slate-100 dark:border-navy-800 animate-tab-fade space-y-3">
                 {/* Quick Pediatric Drug Buttons */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 mb-1">
                   {[
@@ -1297,9 +1324,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           <section className="p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy space-y-3">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-cream-50">
+                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-cream-50">
                   Medicamentos Prescritos
-                </h3>
+                </h2>
                 <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-navy-800 dark:bg-navy-700 text-white">
                   {items.length}
                 </span>
@@ -1308,7 +1335,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <button
                     type="button"
                     onClick={handleToggleSelectAll}
-                    className="text-[11px] font-semibold text-slate-500 hover:text-navy-900 dark:hover:text-cream-100 ml-2 cursor-pointer"
+                    className="text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:text-navy-900 dark:hover:text-cream-50 ml-2 cursor-pointer transition-colors"
                   >
                     {selectedItemIds.length === items.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
                   </button>
@@ -1383,26 +1410,35 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           </div>
                         </div>
 
+                        <label className="block">Apresentação<input className="clinical-input" value={editPresentation} onChange={e => setEditPresentation(e.target.value)} /></label>
+                        <label className="block">Classificação revisada<select className="clinical-input" value={editKind} disabled={Boolean(it.medicationId)} onChange={e => setEditKind(e.target.value as PrescriptionKind)}>{Object.entries(PRESCRIPTION_LABELS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
+                        {editKind === 'c1' && <label className="block">Substâncias C1 (separadas por vírgula)<input className="clinical-input" disabled={Boolean(it.medicationId)} value={editSubstances} onChange={e => setEditSubstances(e.target.value)} /></label>}
+                        <label className="block">Duração / período (dias)<input className="clinical-input" type="number" min="1" step="1" value={editDays} onChange={e => { setEditDays(e.target.value); setEditQuantityPlan(p => ({ ...p, source: p.source === 'suggested' ? 'stale' : p.source })); }} /></label>
+                        <QuantityAssistant value={editQuantityPlan} onChange={setEditQuantityPlan} onApply={text => { setEditQuantity(text); setEditDays(String(editQuantityPlan.days)); }} />
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
-                              Apresentação / Quantidade
+                            <label htmlFor={`pb-edit-qty-${it.id}`} className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
+                              Quantidade dispensada
                             </label>
                             <input
+                              id={`pb-edit-qty-${it.id}`}
+                              name={`editQuantity-${it.id}`}
                               type="text"
                               value={editQuantity}
-                              onChange={(e) => setEditQuantity(e.target.value)}
+                              onChange={(e) => { setEditQuantity(e.target.value); setEditQuantityPlan(p => ({ ...p, source: 'manual' })); }}
                               className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none"
                             />
                           </div>
                           <div className="sm:col-span-2">
-                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
+                            <label htmlFor={`pb-edit-inst-${it.id}`} className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
                               Instruções de Uso / Posologia
                             </label>
                             <input
+                              id={`pb-edit-inst-${it.id}`}
+                              name={`editInstructions-${it.id}`}
                               type="text"
                               value={editInstructions}
-                              onChange={(e) => setEditInstructions(e.target.value)}
+                              onChange={(e) => { setEditInstructions(e.target.value); setEditQuantityPlan(p => ({ ...p, source: p.source === 'suggested' ? 'stale' : p.source })); }}
                               className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none"
                             />
                           </div>
@@ -1414,6 +1450,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                         <div className="flex items-center pt-0.5">
                           <input
                             type="checkbox"
+                            id={`select-med-${it.id}`}
+                            aria-label={`Selecionar ${it.name} para ações em lote`}
                             checked={selectedItemIds.includes(it.id)}
                             onChange={() => handleToggleSelectItem(it.id)}
                             className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
@@ -1425,21 +1463,22 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                             <span className="w-5 h-5 rounded-full bg-navy-800 dark:bg-navy-700 text-white text-[10px] font-black flex items-center justify-center shrink-0">
                               {idx + 1}
                             </span>
-                            <h4 className="text-xs font-bold text-slate-900 dark:text-cream-50 truncate">
+                            <h3 className="text-xs font-bold text-slate-900 dark:text-cream-50 truncate">
                               {it.name}
-                            </h4>
+                            </h3>
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300">
                               {it.route} • {it.quantity}
                             </span>
-                            {it.isSpecialControl && (
+                            {true && (
                               <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                Controle Especial
+                                {PRESCRIPTION_LABELS[normalizePrescriptionItem(it).prescriptionKind]}
                               </span>
                             )}
                           </div>
                           <p className="text-xs text-slate-700 dark:text-slate-300 pl-7 leading-relaxed font-medium">
                             {it.instructions}
                           </p>
+                          {prescriptionIssues(it).length > 0 && <p className="text-sm mt-2 text-amber-800 dark:text-amber-200">{prescriptionIssues(it).join(' ')}</p>}
                         </div>
 
                         {/* Action buttons (Edit, Move Up, Move Down, Delete) */}
@@ -1493,11 +1532,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <button
                     type="button"
                     onClick={handleSendWhatsApp}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-tactile-btn transition active:scale-95 cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-tactile-btn transition active:scale-95 cursor-pointer"
                     title="Enviar a receita completa diretamente para o WhatsApp do paciente"
                   >
                     <Send className="w-3.5 h-3.5" strokeWidth={2} />
-                    <span>Enviar no WhatsApp</span>
+                    <span>Revisar para compartilhar</span>
                   </button>
 
                   <button
@@ -1516,7 +1555,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   className="px-4 py-2 rounded-xl bg-navy-800 dark:bg-navy-700 hover:bg-navy-900 text-white text-xs font-bold shadow-tactile-btn flex items-center gap-2 transition active:scale-95 cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  <span>Visualizar PDF A4</span>
+                  <span>Revisar e exportar</span>
                 </button>
               </div>
             )}
@@ -1528,9 +1567,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                Visualização em Tempo Real (A4)
-              </h3>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                Resumo do atendimento — revise antes de emitir
+              </h2>
             </div>
             <button
               type="button"
@@ -1637,10 +1676,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               type="button"
               onClick={handleSendWhatsApp}
               disabled={items.length === 0}
-              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-tactile-btn transition active:scale-95 cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 disabled:opacity-40 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-tactile-btn transition active:scale-95 cursor-pointer"
             >
               <Send className="w-4 h-4" strokeWidth={2} />
-              <span>Enviar no WhatsApp</span>
+              <span>Revisar para compartilhar</span>
             </button>
           </div>
         </div>

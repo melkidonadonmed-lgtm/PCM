@@ -485,6 +485,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   color: darkMode ? '#F4F7FC' : '#0B132B'
                 }}
                 title="Diminuir 1 kg"
+                aria-label="Diminuir 1 kg"
               >
                 -1
               </button>
@@ -497,21 +498,27 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   color: darkMode ? '#94A3B8' : '#526071'
                 }}
                 title="Diminuir 0.5 kg"
+                aria-label="Diminuir 0,5 kg"
               >
                 -0.5
               </button>
             </div>
 
             <div className="px-3 text-center min-w-[90px] sm:min-w-[110px]">
-              <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
+              <label 
+                htmlFor="ped-calc-weight-input"
+                className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block cursor-pointer"
+              >
                 PESO ATUAL
-              </span>
+              </label>
               <div className="flex items-baseline justify-center gap-1">
                 <input
+                  id="ped-calc-weight-input"
                   type="number"
                   min="0.5"
                   max="160"
                   step="0.5"
+                  aria-label="Peso atual do paciente em quilogramas"
                   value={patientWeight}
                   onChange={(e) => onUpdatePatientWeight(parseFloat(e.target.value) || 1)}
                   className="w-16 sm:w-20 font-black text-2xl text-center bg-transparent border-b-2 border-emerald-600 dark:border-emerald-500 focus:outline-none focus:border-sky-500"
@@ -531,6 +538,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   color: darkMode ? '#94A3B8' : '#526071'
                 }}
                 title="Aumentar 0.5 kg"
+                aria-label="Aumentar 0,5 kg"
               >
                 +0.5
               </button>
@@ -543,6 +551,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   color: darkMode ? '#F4F7FC' : '#0B132B'
                 }}
                 title="Aumentar 1 kg"
+                aria-label="Aumentar 1 kg"
               >
                 +1
               </button>
@@ -582,7 +591,9 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             <div className="relative flex-1">
               <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
               <input
+                id="ped-search-input"
                 type="text"
+                aria-label="Buscar medicamento ou apresentação pediátrica"
                 placeholder="Buscar medicamento ou apresentação pediátrica (ex: Paracetamol, Amoxicilina, Dipirona)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

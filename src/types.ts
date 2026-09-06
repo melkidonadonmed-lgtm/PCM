@@ -27,6 +27,7 @@ export interface Patient {
   motherName?: string;
   notes?: string;
   phone?: string;
+  address?: string;
 }
 
 export interface PediatricMedication {
@@ -63,6 +64,13 @@ export interface AdultMedication {
 }
 
 export interface PrescriptionItem {
+  schemaVersion?: 2;
+  medicationId?: string;
+  prescriptionKind?: PrescriptionKind;
+  classificationReviewed?: boolean;
+  controlledSubstances?: string[];
+  regulatoryNote?: string;
+  quantityPlan?: QuantityPlan;
   id: string;
   name: string;
   presentation: string;
@@ -77,6 +85,28 @@ export interface PrescriptionItem {
   isContinuous: boolean;
   isSpecialControl?: boolean; // Receita de controle especial (C1, B1, etc.)
   calculatedFromWeight?: number; // If calculated for a specific weight
+}
+
+export type PrescriptionKind = 'simple' | 'antimicrobial' | 'c1' | 'notification' | 'pending';
+export interface QuantityPlan {
+  dose?: number;
+  administrationsPerDay?: number;
+  days?: number;
+  unit: 'mL' | 'comprimidos' | 'cápsulas' | 'gotas' | 'doses';
+  packageSize?: number;
+  packageUnit: 'mL' | 'comprimidos' | 'cápsulas' | 'gotas' | 'doses';
+  packageLabel: 'frasco' | 'caixa';
+  dropsPerMl?: number;
+  regimen: 'regular' | 'asNeeded' | 'variable';
+  source?: 'manual' | 'suggested' | 'stale';
+}
+
+export interface PrescriptionDocument {
+  id: string;
+  kind: 'simple' | 'antimicrobial' | 'c1';
+  title: string;
+  copies: number;
+  items: PrescriptionItem[];
 }
 
 export interface ExamItem {

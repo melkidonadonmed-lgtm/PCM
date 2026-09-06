@@ -116,7 +116,11 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
     <div ref={containerRef} className="space-y-2.5">
       {/* Label and Helper Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-        <label className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5" style={{ color: darkMode ? '#94A3B8' : '#475569' }}>
+        <label 
+          htmlFor="cid-search-input"
+          className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 cursor-pointer" 
+          style={{ color: darkMode ? '#94A3B8' : '#475569' }}
+        >
           <Search className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
           <span>{label}</span>
         </label>
@@ -175,6 +179,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 type="button"
                 onClick={onClearCid}
                 title="Remover CID selecionado"
+                aria-label="Remover CID selecionado"
                 className="p-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
@@ -192,8 +197,10 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
           </div>
 
           <input
+            id="cid-search-input"
             ref={inputRef}
             type="text"
+            aria-label={label}
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -219,6 +226,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   setSearchTerm('');
                   inputRef.current?.focus();
                 }}
+                aria-label="Limpar termo de busca do CID"
                 className="p-1 rounded-md text-slate-400 hover:text-slate-200 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
@@ -228,6 +236,8 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
+              aria-label="Abrir catálogo completo de CID-10"
+              aria-expanded={isOpen}
               className="p-1 rounded-md text-slate-400 hover:text-slate-200 cursor-pointer"
               title="Abrir catálogo completo"
             >
