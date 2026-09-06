@@ -141,18 +141,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const [editQuantity, setEditQuantity] = useState('');
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
 
-  // Pediatric quick dosage calculation state
-  const [selectedPediaDrugKey, setSelectedPediaDrugKey] = useState<string | null>(null);
-  const [calculatedPediaResult, setCalculatedPediaResult] = useState<{
-    name: string;
-    route: string;
-    quantity: string;
-    instructions: string;
-    calculatedDrops?: number;
-    calculatedMl?: number;
-    doseMg?: number;
-  } | null>(null);
-
   // Feedbacks
   const [copiedSuccess, setCopiedSuccess] = useState(false);
   const [itemAddedToast, setItemAddedToast] = useState(false);
@@ -163,24 +151,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     return saved !== null ? saved === 'true' : false; // Fechado por padrão para dar prioridade máxima à busca
   });
 
-  const [showPediaCalc, setShowPediaCalc] = useState<boolean>(() => {
-    const saved = safeStorage.getItem('prescmed_show_pedia_calc');
-    if (saved !== null) return saved === 'true';
-    return false; // Fechado por padrão, com expansão sob demanda
-  });
-
   const toggleKits = () => {
     setShowKits(prev => {
       const next = !prev;
       safeStorage.setItem('prescmed_show_kits', String(next));
-      return next;
-    });
-  };
-
-  const togglePediaCalc = () => {
-    setShowPediaCalc(prev => {
-      const next = !prev;
-      safeStorage.setItem('prescmed_show_pedia_calc', String(next));
       return next;
     });
   };
@@ -463,144 +437,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setSelectedMedicationId(undefined);
     setSelectedPresentation('');
     setQuantityPlan(EMPTY_QUANTITY_PLAN);
-  };
-
-  // Pediatric Quick Calculator Calculation
-  const handleCalculatePedia = (drugKey: string) => {
-    setSelectedPediaDrugKey(drugKey);
-    const weight = patientWeight;
-
-    if (!weight || weight <= 0) {
-      setCalculatedPediaResult(null);
-      return;
-    }
-
-    if (drugKey === 'dipirona_gotas') {
-      let drops = Math.round(weight * 1);
-      if (drops > 40) drops = 40;
-      setCalculatedPediaResult({
-        name: 'Dipirona Sódica 500mg/mL gotas (Novalgina)',
-        route: 'Uso Oral',
-        quantity: '1 frasco (20 mL)',
-        instructions: `Administrar ${drops} gotas via oral de 6 em 6 horas em caso de dor ou febre (Temp >= 37,8°C).`,
-        calculatedDrops: drops,
-        doseMg: drops * 25
-      });
-    } else if (drugKey === 'paracetamol_gotas') {
-      let drops = Math.round(weight * 1);
-      if (drops > 35) drops = 35;
-      setCalculatedPediaResult({
-        name: 'Paracetamol 200mg/mL gotas (Tylenol)',
-        route: 'Uso Oral',
-        quantity: '1 frasco (15 mL)',
-        instructions: `Administrar ${drops} gotas via oral de 6 em 6 horas em caso de febre ou dor.`,
-        calculatedDrops: drops,
-        doseMg: drops * 10
-      });
-    } else if (drugKey === 'ibuprofeno_100') {
-      let drops = Math.round(weight * 1);
-      if (drops > 30) drops = 30;
-      setCalculatedPediaResult({
-        name: 'Ibuprofeno 100mg/mL gotas (Alivium 100)',
-        route: 'Uso Oral',
-        quantity: '1 frasco (20 mL)',
-        instructions: `Administrar ${drops} gotas via oral de 8 em 8 horas por 3 dias em caso de dor ou febre.`,
-        calculatedDrops: drops,
-        doseMg: drops * 5
-      });
-    } else if (drugKey === 'amoxicilina_susp') {
-      let mlPerDose = parseFloat(((weight * 50) / 3 / 50).toFixed(1));
-      setCalculatedPediaResult({
-        name: 'Amoxicilina 250mg/5mL suspensão oral (Amoxil)',
-        route: 'Uso Oral',
-        quantity: '2 frascos (150 mL)',
-        instructions: `Administrar ${mlPerDose} mL via oral de 8 em 8 horas durante 10 dias seguidos.`,
-        calculatedMl: mlPerDose,
-        doseMg: mlPerDose * 50
-      });
-    } else if (drugKey === 'prednisolona_sol') {
-      let mlPerDose = parseFloat((weight / 3).toFixed(1));
-      setCalculatedPediaResult({
-        name: 'Prednisolona 3mg/mL solução oral (Prelone, Predsim)',
-        route: 'Uso Oral',
-        quantity: '1 frasco (60 mL)',
-        instructions: `Administrar ${mlPerDose} mL via oral 1 vez ao dia pela manhã por 3 a 5 dias.`,
-        calculatedMl: mlPerDose,
-        doseMg: weight
-      });
-    } else if (drugKey === 'azitromicina_susp') {
-      let mlPerDose = parseFloat(((weight * 10) / 40).toFixed(1));
-      setCalculatedPediaResult({
-        name: 'Azitromicina 200mg/5mL suspensão oral (Astro, Zitromax)',
-        route: 'Uso Oral',
-        quantity: '1 frasco (600 mg)',
-        instructions: `Administrar ${mlPerDose} mL via oral 1 vez ao dia durante 5 dias consecutivos.`,
-        calculatedMl: mlPerDose,
-        doseMg: weight * 10
-      });
-    } else if (drugKey === 'cefalexina_susp') {
-      let mlPerDose = parseFloat(((weight * 50) / 4 / 50).toFixed(1));
-      setCalculatedPediaResult({
-        name: 'Cefalexina 250mg/5mL suspensão oral (Keflex)',
-        route: 'Uso Oral',
-        quantity: '2 frascos (100 mL)',
-        instructions: `Administrar ${mlPerDose} mL via oral de 6 em 6 horas durante 7 a 10 dias.`,
-        calculatedMl: mlPerDose,
-        doseMg: mlPerDose * 50
-      });
-    } else if (drugKey === 'sulfametoxazol_susp') {
-      let mlPerDose = parseFloat(((weight * 40) / 2 / 40).toFixed(1));
-      setCalculatedPediaResult({
-        name: 'Sulfametoxazol + Trimetoprima 200+40mg/5mL suspensão (Bactrim)',
-        route: 'Uso Oral',
-        quantity: '1 frasco (100 mL)',
-        instructions: `Administrar ${mlPerDose} mL via oral de 12 em 12 horas por 7 a 10 dias.`,
-        calculatedMl: mlPerDose,
-        doseMg: weight * 20
-      });
-    }
-  };
-
-  // Recalculate if weight changes
-  useEffect(() => {
-    if (selectedPediaDrugKey) {
-      handleCalculatePedia(selectedPediaDrugKey);
-    }
-  }, [patientWeight]);
-
-  // Insert pediatric calculated dose into the prescription
-  const handleApplyPediaDose = () => {
-    if (!calculatedPediaResult) return;
-    const ids: Record<string, string> = {
-      dipirona_gotas: 'dipirona-gotas-500mg', paracetamol_gotas: 'paracetamol-gotas-200mg',
-      ibuprofeno_100: 'ibuprofeno-100mg-gotas', amoxicilina_susp: 'amoxicilina-susp-250mg',
-      prednisolona_sol: 'prednisolona-sol-3mg', azitromicina_susp: 'azitromicina-susp-200mg',
-      cefalexina_susp: 'cefalexina-susp-250mg', sulfametoxazol_susp: 'bactrim-susp-oral',
-    };
-    const newItem: PrescriptionItem = {
-      id: `item-pedia-${Date.now()}`,
-      name: calculatedPediaResult.name,
-      presentation: catalogPresentation(calculatedPediaResult.name),
-      prescriptionKind: 'pending',
-      medicationId: ids[selectedPediaDrugKey],
-      quantityPlan: { ...EMPTY_QUANTITY_PLAN, dose: calculatedPediaResult.calculatedDrops ?? calculatedPediaResult.calculatedMl, unit: calculatedPediaResult.calculatedDrops ? 'gotas' : 'mL', source: 'stale' },
-      route: calculatedPediaResult.route,
-      quantity: calculatedPediaResult.quantity,
-      doseCalculatedText: calculatedPediaResult.calculatedDrops
-        ? `${calculatedPediaResult.calculatedDrops} gotas`
-        : `${calculatedPediaResult.calculatedMl} mL`,
-      frequencyText: calculatedPediaResult.instructions,
-      scheduleInterval: '',
-      scheduleTimes: [],
-      instructions: calculatedPediaResult.instructions,
-      isContinuous: false,
-      calculatedFromWeight: patientWeight
-    };
-
-    onUpdateItems([...items, normalizePrescriptionItem(newItem)]);
-    handleStartEditItem(normalizePrescriptionItem(newItem));
-    setItemAddedToast(true);
-    setTimeout(() => setItemAddedToast(false), 2000);
   };
 
   // Remove item
@@ -1087,19 +923,22 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               {selectedKind === 'pending' && <p role="status" className="text-sm">A classificação precisa ser revisada antes de exportar. Para itens do catálogo ainda pendentes, use um formulário apropriado após conferir o enquadramento.</p>}
               {formError && <p role="alert" className="text-red-700 dark:text-red-300">{formError}</p>}
               {/* Posology Shortcuts */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                <span className="text-[10px] font-bold text-slate-400 mr-1">Atalhos de Posologia:</span>
-                {posologyShortcuts.map((ps, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setSelectedPosology(ps.text)}
-                    className="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-navy-800 hover:bg-cream-200 dark:hover:bg-navy-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300 transition active:scale-95 cursor-pointer shadow-tactile-sm"
-                  >
-                    {ps.label}
-                  </button>
-                ))}
-              </div>
+              <label className="block">
+                Atalhos de posologia
+                <select
+                  className="clinical-input"
+                  value=""
+                  onChange={(e) => {
+                    const escolhido = posologyShortcuts[Number(e.target.value)];
+                    if (escolhido) setSelectedPosology(escolhido.text);
+                  }}
+                >
+                  <option value="">Escolher um atalho…</option>
+                  {posologyShortcuts.map((ps, idx) => (
+                    <option key={idx} value={idx}>{ps.label}</option>
+                  ))}
+                </select>
+              </label>
 
               {/* Add Button */}
               <div className="pt-2 flex justify-end">
@@ -1132,17 +971,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-cream-50">
-                      Kits Rápidos de Plantão & Visita Domiciliar
+                      Kits Rápidos
                     </h2>
                     <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border border-navy-900/20 dark:border-cream-100/25">
                       {clinicalKits.length} Kits
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                    {showKits 
-                      ? 'Carregue o combo terapêutico completo em 1 clique (combos pré-calculados)' 
-                      : 'Clique para expandir e selecionar combos de prescrição rápida'}
-                  </p>
                 </div>
               </div>
 
@@ -1187,134 +1021,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       </div>
                     </button>
                   ))}
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Card 3: Assistente de Doses Pediátricas Inteligente (Gotas / mL - Com Toggle Recolhível) */}
-          <section className="rounded-2xl border transition-all bg-white dark:bg-navy-900 border-cream-300/80 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy overflow-hidden">
-            {/* Header Accordion Bar (Desacoplado de botões aninhados) */}
-            <div className="p-4 sm:p-5 flex items-center justify-between transition-colors bg-transparent gap-3">
-              <button
-                type="button"
-                onClick={togglePediaCalc}
-                aria-expanded={showPediaCalc}
-                aria-controls="pedia-calc-content-panel"
-                className="flex items-center gap-2.5 flex-1 min-w-0 text-left cursor-pointer select-none hover:opacity-90 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 rounded-xl"
-              >
-                <div className="w-8 h-8 rounded-xl bg-navy-900/10 dark:bg-cream-100/15 text-navy-900 dark:text-cream-100 flex items-center justify-center font-bold border border-navy-900/20 dark:border-cream-100/25 shrink-0">
-                  <Calculator className="w-4 h-4" strokeWidth={1.75} />
-                </div>
-                <div>
-                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-cream-50">
-                    Calculadora Pediátrica Rápida (Gotas / mL)
-                  </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                    {hasWeight 
-                      ? `Cálculo automático ajustado para ${patientWeight} kg` 
-                      : 'Informe o peso do paciente para cálculo instantâneo'}
-                  </p>
-                </div>
-              </button>
-
-              <div className="flex items-center gap-2 shrink-0">
-                {/* Weight Indicator Button */}
-                <button
-                  type="button"
-                  onClick={onOpenPatientModal}
-                  className="px-3 py-1.5 rounded-xl bg-navy-900/10 hover:bg-navy-900/20 dark:bg-cream-100/15 dark:hover:bg-cream-100/25 border border-navy-900/20 dark:border-cream-100/25 text-navy-900 dark:text-cream-100 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
-                  title="Clique para alterar o peso do paciente"
-                  aria-label={`Alterar peso do paciente. Atual: ${hasWeight ? patientWeight + ' kg' : 'não definido'}`}
-                >
-                  <Scale className="w-3.5 h-3.5" strokeWidth={1.75} />
-                  <span>{hasWeight ? `${patientWeight} kg` : 'Definir Peso'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={togglePediaCalc}
-                  aria-expanded={showPediaCalc}
-                  aria-controls="pedia-calc-content-panel"
-                  aria-label={showPediaCalc ? "Recolher calculadora pediátrica rápida" : "Expandir calculadora pediátrica rápida"}
-                  className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg bg-slate-100 dark:bg-navy-800 flex items-center justify-center text-slate-500 dark:text-slate-300 cursor-pointer hover:bg-slate-200 dark:hover:bg-navy-700 transition"
-                >
-                  {showPediaCalc ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Pedia Content (Visible when expanded) */}
-            {showPediaCalc && (
-              <div id="pedia-calc-content-panel" className="p-4 sm:p-5 pt-0 sm:pt-0 border-t border-slate-100 dark:border-navy-800 animate-tab-fade space-y-3">
-                {/* Quick Pediatric Drug Buttons */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 mb-1">
-                  {[
-                    { id: 'dipirona_gotas', name: 'Dipirona Gotas', sub: '500mg/mL (1 gts/kg)' },
-                    { id: 'paracetamol_gotas', name: 'Paracetamol Gotas', sub: '200mg/mL (1 gts/kg)' },
-                    { id: 'ibuprofeno_100', name: 'Ibuprofeno 100mg/mL', sub: 'Gotas (1 gts/kg)' },
-                    { id: 'amoxicilina_susp', name: 'Amox 250mg/5mL', sub: '50mg/kg/dia 8/8h' },
-                    { id: 'prednisolona_sol', name: 'Prednisolona 3mg/mL', sub: '1mg/kg/dia pela manhã' },
-                    { id: 'azitromicina_susp', name: 'Azitro 200mg/5mL', sub: '10mg/kg/dia (5 dias)' },
-                    { id: 'cefalexina_susp', name: 'Cefalexina 250mg/5mL', sub: '50mg/kg/dia 6/6h' },
-                    { id: 'sulfametoxazol_susp', name: 'SMZ+TMP Suspensão', sub: '40+8mg/kg/dia 12/12h' }
-                  ].map(drug => (
-                    <button
-                      key={drug.id}
-                      type="button"
-                      onClick={() => handleCalculatePedia(drug.id)}
-                      className={`p-2.5 rounded-xl border text-left transition-all active:scale-95 cursor-pointer shadow-tactile-sm ${
-                        selectedPediaDrugKey === drug.id
-                          ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream border border-navy-800 dark:border-white/30 font-bold'
-                          : 'bg-slate-50 dark:bg-navy-800 hover:border-navy-800/40 dark:hover:border-cream-200/40 border-slate-200 dark:border-navy-700 text-slate-800 dark:text-slate-100'
-                      }`}
-                    >
-                      <p className="text-xs font-bold truncate">{drug.name}</p>
-                      <p className={`text-[10px] truncate ${selectedPediaDrugKey === drug.id ? 'text-cream-200 dark:text-navy-800 font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
-                        {drug.sub}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Dynamic Calculation Result Box */}
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-tactile-inset">
-                  <div className="space-y-0.5 min-w-0 flex-1">
-                    {calculatedPediaResult ? (
-                      <>
-                        <p className="text-xs font-bold text-slate-900 dark:text-cream-50">
-                          {calculatedPediaResult.name}
-                        </p>
-                        <p className="text-[11px] text-navy-900 dark:text-cream-100 font-semibold">
-                          Dose para {patientWeight} kg: {calculatedPediaResult.calculatedDrops ? `${calculatedPediaResult.calculatedDrops} gotas` : `${calculatedPediaResult.calculatedMl} mL`}
-                          <span className="text-slate-500 dark:text-slate-400 font-normal ml-1">
-                            ({calculatedPediaResult.instructions})
-                          </span>
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                          {hasWeight
-                            ? 'Selecione um medicamento pediátrico acima para cálculo instantâneo.'
-                            : 'Informe o peso do paciente acima para ativar o cálculo de doses pediátricas.'}
-                        </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                          Conversão automática em gotas ou volume em mL conforme protocolos pediátricos.
-                        </p>
-                      </>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    disabled={!calculatedPediaResult}
-                    onClick={handleApplyPediaDose}
-                    className="btn-tactile-primary px-4 py-2 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed font-bold text-xs transition active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4" strokeWidth={2} />
-                    <span>Inserir na Receita</span>
-                  </button>
                 </div>
               </div>
             )}

@@ -192,6 +192,53 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         />
       </div>
 
+      {/* BASE: Carrossel Horizontal de Painéis & Pacotes Clínicos */}
+      {/* Combos: sem o cartao externo, que so acrescentava moldura. Os cards
+          encolheram e perderam a descricao — ela reaparece no modal de revisao,
+          que e onde a escolha de fato acontece. */}
+      <div>
+        <div className="flex items-center gap-1.5 mb-2">
+          <Sparkles className="w-4 h-4 text-navy-900 dark:text-cream-200" strokeWidth={1.75} />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-cream-50">
+            Combos Clínicos
+          </h3>
+        </div>
+
+        {/* Carrossel horizontal. Os itens sao <button>: a regiao ja e alcancavel
+            pelo teclado atraves deles, sem precisar de uma parada extra. */}
+        <div className="flex items-stretch gap-2 overflow-x-auto pb-2 custom-scrollbar fade-scroll-x">
+          {EXAM_PACKAGES.map((pkg) => (
+            <button
+              key={pkg.id}
+              type="button"
+              onClick={() => handleOpenKitModal(pkg)}
+              className="w-52 sm:w-56 shrink-0 p-3 min-h-[44px] rounded-xl border text-left transition-all cursor-pointer hover:border-slate-400 dark:hover:border-slate-500 flex flex-col justify-between gap-2 group tactile-flat hover:shadow-tactile-sm"
+              style={{
+                backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
+                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
+              }}
+            >
+              <div className="flex items-start justify-between gap-1.5">
+                <span className="font-bold text-xs leading-snug line-clamp-2" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                  {pkg.name}
+                </span>
+                <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                  {pkg.badge}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] font-semibold text-sky-700 dark:text-sky-400">
+                <span className="flex items-center gap-1">
+                  <SlidersHorizontal className="w-3 h-3" />
+                  {pkg.examIds.length} exames
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Main Grid: Catalog Left & Selected Exams Right */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
         {/* Left 2 Cols: Exam Catalog Matrix */}
@@ -391,71 +438,6 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               </button>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* BASE: Carrossel Horizontal de Painéis & Pacotes Clínicos */}
-      <div 
-        className="tactile-card p-4 sm:p-5 rounded-2xl"
-        style={{
-          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-        }}
-      >
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-navy-900 dark:text-cream-200" strokeWidth={1.75} />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-cream-50">
-              Combos & Pacotes Clínicos Pré-Configurados
-            </h3>
-          </div>
-          <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
-            Clique em um combo para selecionar exames granulares com checkboxes
-          </span>
-        </div>
-
-        {/* Carrossel Horizontal com Rolagem Suave */}
-        <div
-          className="flex items-stretch gap-3 overflow-x-auto pb-2 custom-scrollbar fade-scroll-x rounded-xl focus-visible:outline-3 focus-visible:outline-sky-600 focus-visible:outline-offset-2"
-          tabIndex={0}
-          role="group"
-          aria-label="Kits de exames — role horizontalmente ou use as setas do teclado"
-        >
-          {EXAM_PACKAGES.map((pkg) => (
-            <div
-              key={pkg.id}
-              onClick={() => handleOpenKitModal(pkg)}
-              className="w-72 sm:w-80 shrink-0 p-3.5 rounded-xl border text-left transition-all cursor-pointer hover:border-slate-400 dark:hover:border-slate-500 flex flex-col justify-between group tactile-flat hover:shadow-tactile-sm"
-              style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
-                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-              }}
-            >
-              <div>
-                <div className="flex items-center justify-between gap-1 mb-1.5">
-                  <span className="font-bold text-xs line-clamp-1" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-                    {pkg.name}
-                  </span>
-                  <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
-                    {pkg.badge}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                  {pkg.description}
-                </p>
-              </div>
-
-              <div className="mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-semibold text-sky-600 dark:text-sky-400">
-                <span className="flex items-center gap-1">
-                  <SlidersHorizontal className="w-3 h-3" />
-                  {pkg.examIds.length} exames no kit
-                </span>
-                <span className="flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform text-xs">
-                  Revisar & Adicionar <ChevronRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
