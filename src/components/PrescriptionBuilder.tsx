@@ -1237,7 +1237,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   aria-expanded={showPediaCalc}
                   aria-controls="pedia-calc-content-panel"
                   aria-label={showPediaCalc ? "Recolher calculadora pediátrica rápida" : "Expandir calculadora pediátrica rápida"}
-                  className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-navy-800 flex items-center justify-center text-slate-500 dark:text-slate-300 cursor-pointer hover:bg-slate-200 dark:hover:bg-navy-700 transition"
+                  className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg bg-slate-100 dark:bg-navy-800 flex items-center justify-center text-slate-500 dark:text-slate-300 cursor-pointer hover:bg-slate-200 dark:hover:bg-navy-700 transition"
                 >
                   {showPediaCalc ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
@@ -1622,7 +1622,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
               {/* Prescription Body Items */}
               {items.length === 0 ? (
-                <div className="py-16 text-center text-slate-400 italic text-xs">
+                <div className="py-16 text-center text-slate-600 italic text-xs">
                   Nenhum medicamento inserido na receita.
                 </div>
               ) : (

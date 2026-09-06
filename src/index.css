@@ -137,8 +137,10 @@
     --accent-primary-subtle: rgba(20, 32, 50, 0.08);
     --accent-primary-border: rgba(20, 32, 50, 0.22);
 
-    --accent-emerald: #059669;
-    --accent-emerald-hover: #047857;
+    /* Escurecidos para uso como texto sobre --accent-emerald-subtle (#EBF7F3):
+       #059669 media 3.43:1 (reprovado). #036145 mede 7.17:1. */
+    --accent-emerald: #036145;
+    --accent-emerald-hover: #02543D;
     --accent-emerald-subtle: rgba(5, 150, 105, 0.08);
     --accent-emerald-border: rgba(5, 150, 105, 0.22);
 
@@ -147,8 +149,9 @@
     --accent-amber-subtle: rgba(20, 32, 50, 0.08);
     --accent-amber-border: rgba(20, 32, 50, 0.22);
 
-    --accent-rose: #E11D48;
-    --accent-rose-hover: #BE123C;
+    /* #E11D48 media 4.14:1 sobre --accent-rose-subtle (#FDEDF0). #A50036 mede 6.99:1. */
+    --accent-rose: #A50036;
+    --accent-rose-hover: #8B0030;
     --accent-rose-subtle: rgba(225, 29, 72, 0.08);
     --accent-rose-border: rgba(225, 29, 72, 0.22);
 
@@ -1129,7 +1132,10 @@ html {
 .clinical-card {
   color: var(--text-main); background: var(--surface-card);
   border: 1px solid var(--border-strong); border-radius: 12px;
-  box-shadow: 0 2px 8px rgb(15 23 42 / 4%);
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 4%),
+    0 3px 6px -2px rgb(15 23 42 / 4%),
+    0 8px 16px -6px rgb(15 23 42 / 5%);
 }
 .clinical-input, .quantity-assistant input, .quantity-assistant select {
   display: block; width: 100%; min-height: 44px; padding: 8px 10px; margin-top: 5px;
@@ -1149,13 +1155,28 @@ html {
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible {
   outline: 3px solid #0284c7 !important; outline-offset: 3px;
 }
-.tactile-card { box-shadow: 0 2px 8px rgb(15 23 42 / 5%) !important; }
+.tactile-card {
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 4%),
+    0 3px 6px -2px rgb(15 23 42 / 5%),
+    0 8px 18px -6px rgb(15 23 42 / 6%),
+    inset 0 1px 0 rgb(255 255 255 / 85%);
+}
 .icon-sculpted { filter: none !important; }
-.panel-projected-top, .shadow-tactile-btn { box-shadow: 0 1px 4px rgb(0 0 0 / 12%) !important; }
+.panel-projected-top, .shadow-tactile-btn {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 10%),
+    0 3px 8px -2px rgb(0 0 0 / 12%),
+    inset 0 1px 0 rgb(255 255 255 / 18%);
+}
 .rx-page {
   position: relative; width: 210mm; height: 297mm; margin: 0 auto 24px;
   background: #fff; color: #141414; overflow: hidden;
-  box-shadow: 0 2px 12px rgb(0 0 0 / 12%); flex-shrink: 0;
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 8%),
+    0 6px 14px -4px rgb(0 0 0 / 10%),
+    0 16px 32px -12px rgb(0 0 0 / 12%);
+  flex-shrink: 0;
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -1169,9 +1190,84 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 
 
+/* ==========================================================================
+   AJUSTES DO WORKSPACE DE PRESCRICAO
+
+   Este bloco e deliberadamente NAO-ENCAMADADO. Regras fora de camada vencem
+   qualquer @layer, entao ele sobrepoe tanto os utilitarios do Tailwind
+   (@layer utilities) quanto as classes .shadow-tactile* definidas acima,
+   que tambem sao nao-encamadadas mas menos especificas.
+
+   NAO mova para @layer components: .truncate, .animate-pulse e a elevacao
+   reduzida PRECISAM vencer, e o encamadamento os faz perder silenciosamente
+   (verificado: label caiu de 14px para 10px, .animate-pulse voltou a animar
+   e a sombra voltou para a elevacao cheia de 25px de blur).
+
+   O defeito original aqui era um unico valor: min-height: 40px nos botoes,
+   que anulava 44 declaracoes min-h-[44px] e as primitivas
+   .btn-tactile-primary e .clinical-button, ambas ja em 44px.
+   ========================================================================== */
 .prescription-workspace :is(label, input, select, textarea) { font-size: 14px; }
 .prescription-workspace :is(input:not([type=checkbox]), select, textarea) { min-height: 44px; }
-.prescription-workspace button { min-height: 40px; }
+
+/* WCAG 2.5.5 Target Size (Enhanced): piso incondicional de 44px. */
+.prescription-workspace :is(button, [role="button"]) {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
 .prescription-workspace .truncate { white-space: normal; overflow: visible; }
 .prescription-workspace .animate-pulse { animation: none; }
-.prescription-workspace :is(.shadow-tactile, .shadow-tactile-lg, .shadow-tactile-navy) { box-shadow: 0 2px 8px rgb(0 0 0 / 6%); }
+
+/* Elevacao reduzida preservada, agora com difusao fisica multicamadas:
+   contato + penumbra + oclusao de ambiente + micro-relevo de luz no topo. */
+.prescription-workspace :is(.shadow-tactile, .shadow-tactile-lg, .shadow-tactile-navy) {
+  box-shadow:
+    0 1px 2px rgb(20 32 50 / 5%),
+    0 3px 6px -2px rgb(20 32 50 / 5%),
+    0 8px 16px -6px rgb(20 32 50 / 6%),
+    inset 0 1px 0 rgb(255 255 255 / 85%);
+}
+
+.dark .prescription-workspace :is(.shadow-tactile, .shadow-tactile-lg, .shadow-tactile-navy) {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 35%),
+    0 3px 6px -2px rgb(0 0 0 / 40%),
+    0 8px 16px -6px rgb(0 0 0 / 45%),
+    inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+
+/* ==========================================================================
+   ELEVACAO CROMATICA DO TEMA CLARO (WCAG 1.4.3 AA)
+   Medido com axe-core 4.10.2 em 7 rotas: 188 nos reprovados, todos no tema
+   claro. O tema escuro mede 0 violacoes e permanece intocado.
+   Escopo em @layer utilities (mesma camada das classes-alvo), com
+   especificidade (0,2,1) > (0,1,0): precedencia sem !important.
+   Piores razoes sobre os 10 fundos claros medidos na aplicacao:
+     #075985 = 5.28 : 1   #036145 = 5.23 : 1   #973C00 = 4.95 : 1
+     #45556C = 5.29 : 1   #A50036 = 5.52 : 1
+   ========================================================================== */
+@layer utilities {
+  /* :not(:is(...) *) exclui descendentes das superficies navy, que permanecem
+     escuras mesmo no tema claro (sidebar, barra inferior e paineis). Nelas o
+     texto claro original ja atinge contraste conforme. */
+  html:not(.dark)
+    :is(.text-sky-600, .text-sky-700):not(:is(#prescmed-sidebar, #mobile-bottom-nav, .panel-navy, .surface-panel) *)
+    { color: #075985; }
+
+  html:not(.dark)
+    :is(.text-emerald-600, .text-emerald-700):not(:is(#prescmed-sidebar, #mobile-bottom-nav, .panel-navy, .surface-panel) *)
+    { color: #036145; }
+
+  html:not(.dark)
+    :is(.text-amber-600, .text-amber-700):not(:is(#prescmed-sidebar, #mobile-bottom-nav, .panel-navy, .surface-panel) *)
+    { color: #973C00; }
+
+  html:not(.dark)
+    :is(.text-slate-400, .text-slate-500):not(:is(#prescmed-sidebar, #mobile-bottom-nav, .panel-navy, .surface-panel) *)
+    { color: #45556C; }
+
+  html:not(.dark)
+    :is(.text-rose-600, .text-rose-700):not(:is(#prescmed-sidebar, #mobile-bottom-nav, .panel-navy, .surface-panel) *)
+    { color: #A50036; }
+}

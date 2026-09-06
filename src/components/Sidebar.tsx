@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileEdit, 
   Calculator, 
@@ -67,6 +67,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const hasDoctor = Boolean(doctor?.name?.trim());
 
   // Estado do Modal de Confirmação HITL para Ações Destrutivas
+  // Abaixo de 1024px a barra lateral é uma gaveta sobreposta. Fechada, ela
+  // fica com 2px de largura e overflow:hidden, mas seus 7 botões de navegação
+  // continuavam focáveis por teclado — o foco ia para controles invisíveis
+  // (WCAG 2.4.7 e 2.4.11). Fora da faixa de gaveta, a barra recolhida vira um
+  // rail de 72px legítimo e permanece utilizável.
+  const [isDrawer, setIsDrawer] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.innerWidth < 1024
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1023.98px)');
+    const sync = () => setIsDrawer(query.matches);
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
+
+  // React 19 trata inert como booleano: a string vazia usada no React 18 vira false.
+  const isHiddenDrawer = isDrawer && !isOpen;
+
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -278,6 +298,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <aside
         id="prescmed-sidebar"
         aria-label="Menu Lateral de Navegação"
+        {...(isHiddenDrawer ? { inert: true, 'aria-hidden': true } : {})}
         className={`fixed lg:sticky top-[68px] sm:top-[72px] left-0 h-[calc(100dvh-68px)] sm:h-[calc(100dvh-72px)] z-40 flex flex-col flex-shrink-0 transition-all duration-300 no-print rounded-r-2xl lg:rounded-2xl border ${
           isOpen ? 'w-64 sm:w-72 shadow-tactile-navy' : 'w-0 lg:w-[72px] overflow-hidden'
         }`}
@@ -301,7 +322,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={onClose || onToggleOpen}
               aria-label="Fechar menu lateral"
-              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg flex items-center justify-center text-slate-400 hover:text-white cursor-pointer"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-slate-400 hover:text-white cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -461,7 +482,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={onToggleOpen}
-              className={`min-h-[40px] py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-white/10 flex items-center transition cursor-pointer active:scale-95 ${
+              className={`min-h-[44px] py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-white/10 flex items-center transition cursor-pointer active:scale-95 ${
                 isOpen ? 'w-full justify-center gap-1.5 px-3' : 'w-11 h-11 mx-auto justify-center'
               }`}
               title={isOpen ? 'Recolher Menu Lateral' : 'Expandir Menu Lateral'}

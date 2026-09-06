@@ -233,7 +233,12 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           </div>
 
           {/* Category Chips */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar fade-scroll-x">
+          <div
+            className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar fade-scroll-x rounded-xl focus-visible:outline-3 focus-visible:outline-sky-600 focus-visible:outline-offset-2"
+            tabIndex={0}
+            role="group"
+            aria-label="Categorias de exames — role horizontalmente ou use as setas do teclado"
+          >
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -410,7 +415,12 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         </div>
 
         {/* Carrossel Horizontal com Rolagem Suave */}
-        <div className="flex items-stretch gap-3 overflow-x-auto pb-2 custom-scrollbar fade-scroll-x">
+        <div
+          className="flex items-stretch gap-3 overflow-x-auto pb-2 custom-scrollbar fade-scroll-x rounded-xl focus-visible:outline-3 focus-visible:outline-sky-600 focus-visible:outline-offset-2"
+          tabIndex={0}
+          role="group"
+          aria-label="Kits de exames — role horizontalmente ou use as setas do teclado"
+        >
           {EXAM_PACKAGES.map((pkg) => (
             <div
               key={pkg.id}

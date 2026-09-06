@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
+import { useModalA11y } from '../hooks/useModalA11y';
 import { AlertTriangle, X, Check } from 'lucide-react';
 
 export interface ConfirmationModalProps {
@@ -26,29 +27,24 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 }) => {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      // Foco no botão de confirmação e listener de Escape
-      confirmButtonRef.current?.focus();
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') onCancel();
-      };
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [isOpen, onCancel]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Contenção de foco, inertização do fundo, Escape e restauração do foco.
+  useModalA11y({ dialogRef, isOpen, onClose: onCancel, initialFocusRef: confirmButtonRef });
 
   if (!isOpen) return null;
 
   const isDanger = variant === 'danger';
 
   return (
-    <div 
+    <div
+      ref={dialogRef}
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-tab-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
       aria-describedby="confirm-modal-desc"
+      tabIndex={-1}
       onClick={onCancel}
     >
       <div 

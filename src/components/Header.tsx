@@ -175,7 +175,8 @@ export const Header: React.FC<HeaderProps> = ({
                     }
                   }}
                   placeholder="--"
-                  className="w-14 text-xs font-black outline-none bg-transparent text-navy-900 dark:text-cream-50"
+                  inputMode="decimal"
+                  className="w-16 min-h-[44px] py-2 text-xs font-black outline-none bg-transparent text-navy-900 dark:text-cream-50 rounded-lg"
                 />
                 <span className="text-[10px] font-bold text-slate-400">kg</span>
               </div>

@@ -186,7 +186,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
             <h2 className="text-base sm:text-lg font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
               Decks de Protocolos por Patologia
             </h2>
-            <p className="text-xs font-medium" style={{ color: darkMode ? '#8E9CAE' : '#64748B' }}>
+            <p className="text-xs font-medium" style={{ color: darkMode ? '#8E9CAE' : '#45556C' }}>
               Tratamentos de 1ª linha acionáveis, com dose pediátrica calculada para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
             </p>
           </div>
@@ -429,7 +429,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
             <h3 className="text-sm sm:text-base font-bold tracking-tight" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
               Urgência & Expansão Volêmica
             </h3>
-            <p className="text-xs font-medium" style={{ color: darkMode ? '#8E9CAE' : '#64748B' }}>
+            <p className="text-xs font-medium" style={{ color: darkMode ? '#8E9CAE' : '#45556C' }}>
               Dengue (Grupos A, C e D), Choque Séptico e Hipoglicemia — cálculo para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
             </p>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useModalA11y } from '../hooks/useModalA11y';
 import {
   Search,
   X,
@@ -49,6 +50,10 @@ export const MedicationSelectionModal: React.FC<MedicationSelectionModalProps> =
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Contenção de foco e inertização do fundo enquanto a busca está aberta.
+  useModalA11y({ dialogRef, isOpen, onClose, initialFocusRef: searchInputRef });
   const listContainerRef = useRef<HTMLDivElement>(null);
 
   const patientWeight = patient?.weightKg ?? 0;
@@ -136,10 +141,12 @@ export const MedicationSelectionModal: React.FC<MedicationSelectionModalProps> =
 
   return (
     <div
+      ref={dialogRef}
       className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-xs isolate animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-labelledby="medication-search-modal-title"
+      tabIndex={-1}
     >
       <div
         className="w-full max-w-3xl max-h-[92vh] rounded-2xl border flex flex-col shadow-tactile-lg overflow-hidden transition-all"
