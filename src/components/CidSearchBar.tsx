@@ -238,7 +238,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Abrir catálogo completo de CID-10"
               aria-expanded={isOpen}
-              className="p-1 rounded-md text-slate-400 hover:text-slate-200 cursor-pointer"
+              className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-md text-slate-400 hover:text-slate-200 cursor-pointer"
               title="Abrir catálogo completo"
             >
               <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />

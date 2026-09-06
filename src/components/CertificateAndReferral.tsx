@@ -342,22 +342,22 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={handleSendCertificateWhatsApp}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
+                  className="tactile-btn-success px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                   title="Enviar o atestado médico diretamente pelo WhatsApp"
                   aria-label="Enviar o atestado médico diretamente pelo WhatsApp"
                 >
-                  <Send className="w-4 h-4" strokeWidth={2} />
+                  <Send className="w-4 h-4" strokeWidth={1.75} />
                   <span>Enviar no WhatsApp</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => onNavigateToPrint('certificate')}
-                  className="tactile-btn-success px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
+                  className="tactile-btn-success px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
                   <span>Visualizar & Baixar PDF</span>
@@ -442,9 +442,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     key={d}
                     type="button"
                     onClick={() => handleDaysChange(d)}
-                    className={`text-xs px-3 py-1.5 rounded-xl border font-bold transition-all cursor-pointer active:scale-95 ${
+                    className={`text-xs px-3 py-1.5 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-xl border font-bold transition-all cursor-pointer active:scale-95 ${
                       certificate.daysOff === d
-                        ? 'bg-sky-700 dark:bg-sky-600 text-white border-sky-600 shadow-sm'
+                        ? 'bg-sky-700 dark:bg-sky-700 text-white border-sky-600 shadow-sm'
                         : darkMode
                         ? 'bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white'
                         : 'bg-white text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'
@@ -524,18 +524,22 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             >
               {/* Checkbox toggle */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
-                <div className="flex items-center gap-2.5">
+                {/* A linha inteira e o alvo (>= 44px): o rotulo envolve o controle. */}
+                <label
+                  htmlFor="toggle-include-cid"
+                  className="flex items-center gap-2.5 min-h-[44px] py-1 pr-2 rounded-lg cursor-pointer select-none"
+                >
                   <input
                     type="checkbox"
                     id="toggle-include-cid"
                     checked={certificate.includeCID}
                     onChange={(e) => onUpdateCertificate({ ...certificate, includeCID: e.target.checked })}
-                    className="w-4 h-4 rounded text-sky-700 focus:ring-sky-500 cursor-pointer"
+                    className="w-5 h-5 rounded text-sky-700 focus:ring-sky-500 cursor-pointer"
                   />
-                  <label htmlFor="toggle-include-cid" className="text-xs sm:text-sm font-bold cursor-pointer select-none" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                  <span className="text-xs sm:text-sm font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                     Incluir Código CID-10 no Atestado
-                  </label>
-                </div>
+                  </span>
+                </label>
 
                 <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
                   <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
@@ -652,7 +656,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={handleSendReferralWhatsApp}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
                   title="Enviar a guia de encaminhamento diretamente pelo WhatsApp"
                   aria-label="Enviar a guia de encaminhamento diretamente pelo WhatsApp"
                 >
@@ -728,7 +732,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                       key={sp}
                       type="button"
                       onClick={() => onUpdateReferral({ ...referral, destinationSpecialty: sp })}
-                      className={`text-[10px] px-2 py-0.5 rounded-md font-semibold border transition-all cursor-pointer ${
+                      className={`text-[11px] px-3 py-2 min-h-[44px] inline-flex items-center justify-center rounded-lg font-semibold border transition-all cursor-pointer ${
                         referral.destinationSpecialty === sp
                           ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -763,7 +767,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                       key={p}
                       type="button"
                       onClick={() => onUpdateReferral({ ...referral, priority: p })}
-                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold capitalize border transition-all cursor-pointer active:scale-95 ${
+                      className={`flex-1 py-2.5 min-h-[44px] rounded-xl text-xs font-bold capitalize border transition-all cursor-pointer active:scale-95 ${
                         referral.priority === p
                           ? p === 'urgente'
                             ? 'bg-rose-700 text-white border-rose-600 shadow-sm'

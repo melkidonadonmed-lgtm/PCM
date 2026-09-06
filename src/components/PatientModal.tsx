@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { useModalA11y } from '../hooks/useModalA11y';
 import { User, Check, X, Eraser } from 'lucide-react';
 import { Patient } from '../types';
 
@@ -18,6 +19,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   onClose
 }) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<Patient>({
     id: patient?.id || 'pat-' + Date.now(),
@@ -35,18 +37,9 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     notes: patient?.notes || ''
   });
 
-  // Acessibilidade WCAG 2.1: Foco inicial e listener da tecla Escape
-  useEffect(() => {
-    nameInputRef.current?.focus();
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  // Acessibilidade de diálogo modal: contenção de foco, inertização do fundo,
+  // bloqueio de rolagem, Escape e restauração do foco ao disparador.
+  useModalA11y({ dialogRef, isOpen: true, onClose, initialFocusRef: nameInputRef });
 
   const handleClear = () => {
     const emptyPat: Patient = {
@@ -76,11 +69,13 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   };
 
   return (
-    <div 
+    <div
+      ref={dialogRef}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs isolate animate-tab-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="patient-modal-title"
+      tabIndex={-1}
       onClick={onClose}
     >
       <div 

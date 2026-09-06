@@ -384,7 +384,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('pediatric')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+          className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
             activeTab === 'pediatric'
               ? 'bg-navy-800 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-navy-900 dark:hover:text-cream-100'
@@ -397,7 +397,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('adult')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+          className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
             activeTab === 'adult'
               ? 'bg-navy-800 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-navy-900 dark:hover:text-cream-100'
@@ -410,7 +410,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('hydration')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+          className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
             activeTab === 'hydration'
               ? 'bg-navy-800 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-navy-900 dark:hover:text-cream-100'
@@ -423,7 +423,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('diet')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+          className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
             activeTab === 'diet'
               ? 'bg-navy-800 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-navy-900 dark:hover:text-cream-100'
@@ -521,7 +521,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   aria-label="Peso atual do paciente em quilogramas"
                   value={patientWeight}
                   onChange={(e) => onUpdatePatientWeight(parseFloat(e.target.value) || 1)}
-                  className="w-16 sm:w-20 font-black text-2xl text-center bg-transparent border-b-2 border-emerald-600 dark:border-emerald-500 focus:outline-none focus:border-sky-500"
+                  className="w-16 sm:w-20 min-h-[44px] font-black text-2xl text-center bg-transparent border-b-2 border-emerald-600 dark:border-emerald-500 focus:outline-none focus:border-sky-500"
                   style={{ color: darkMode ? '#388EE6' : '#0F5E94' }}
                 />
                 <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400">kg</span>

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useModalA11y } from '../hooks/useModalA11y';
 import {
   X,
   Pill,
@@ -87,16 +88,10 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
     }
   }, [isOpen, medicationGroup, patientWeight, hasWeight]);
 
-  // Tecla ESC para fechar
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  // Acessibilidade de diálogo modal. Antes deste hook o overlay não expunha
+  // papel de diálogo (WCAG 4.1.2) e apenas escutava Escape.
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalA11y({ dialogRef, isOpen, onClose });
 
   // Aplica uma opção selecionada aos campos do formulário
   const applyOption = (opt: MedicationOption, currentWeight: number) => {
@@ -219,7 +214,14 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
   if (!isOpen || !medicationGroup) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs isolate animate-fadeIn">
+    <div
+      ref={dialogRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs isolate animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="med-presentation-title"
+      tabIndex={-1}
+    >
       {/* Container do Painel/Modal */}
       <div
         className="w-full max-w-2xl max-h-[92vh] rounded-2xl border flex flex-col shadow-tactile-lg overflow-hidden"
@@ -244,7 +246,7 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="font-extrabold text-base sm:text-lg tracking-tight truncate text-navy-900 dark:text-cream-50">
+                  <h3 id="med-presentation-title" className="font-extrabold text-base sm:text-lg tracking-tight truncate text-navy-900 dark:text-cream-50">
                     {medicationGroup.baseName}
                   </h3>
                   {medicationGroup.isSpecialControl && (
