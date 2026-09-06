@@ -397,49 +397,9 @@ body {
   padding: 0.65rem 0.75rem 0.25rem;
 }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.75rem 1rem;
-  min-height: 44px;
-  border-radius: var(--radius-md);
-  color: var(--nav-text);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.92rem;
-  border: 1px solid transparent;
-  transition: var(--transition-smooth);
-  position: relative;
-  cursor: pointer;
-}
-
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--nav-active-text);
-  transform: translateX(3px);
-}
-
-.nav-item.active,
-.nav-item-active {
-  background: var(--nav-active-bg) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: var(--nav-active-text) !important;
-  box-shadow: var(--tactile-bevel), var(--nav-active-glow) !important;
-}
-
-.nav-item.active::before,
-.nav-item-active::before {
-  content: '';
-  position: absolute;
-  left: -2px;
-  top: 25%;
-  height: 50%;
-  width: 4px;
-  border-radius: var(--radius-pill);
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent);
-}
+/* .nav-item / .nav-item.active foram removidos: nao existiam em nenhum
+   componente. A definicao valida de .nav-item-active fica adiante, junto do
+   restante do sistema de navegacao. */
 
 /* 1. Z-0 Inset Tray / Form Input Fields (Micro-Cavidade Côncava) */
 .tactile-input,
@@ -846,16 +806,19 @@ body.dark {
     var(--nav-active-glow);
 }
 
+/* Item horizontal: o acento vai no topo, centralizado, acompanhando a
+   largura do rotulo — nao na lateral. */
 .nav-item-active::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 20%;
-  height: 60%;
-  width: 4px;
-  border-radius: 0 9999px 9999px 0;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 3px;
+  border-radius: 0 0 9999px 9999px;
   background: var(--nav-accent);
-  box-shadow: 0 0 12px var(--nav-accent);
+  box-shadow: 0 0 10px var(--nav-accent);
 }
 
 /* Tipografia editorial para títulos de página */

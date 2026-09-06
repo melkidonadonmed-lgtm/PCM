@@ -1,4 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  DEFAULT_TAB,
+  TAB_TITLES,
+  hashMatchesTab,
+  hashToTab,
+  tabToHash,
+  type RouteTab
+} from './utils/navigation';
 import { safeStorage, getStorageMessages, downloadLocalBackup } from './utils/storage';
 import { normalizePrescriptionItem } from './utils/prescriptionRules';
 import { Header } from './components/Header';
@@ -92,16 +100,25 @@ export default function App() {
     window.addEventListener('prescmed-storage-warning', update); update();
     return () => window.removeEventListener('prescmed-storage-warning', update);
   }, []);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('prescription');
-  const [certSubTab, setCertSubTab] = useState<'certificate' | 'referral'>('certificate');
+  // A tela inicial vem da URL: recarregar, favoritar ou compartilhar um link
+  // passa a devolver o usuario ao mesmo lugar.
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() =>
+    typeof window === 'undefined' ? DEFAULT_TAB : hashToTab(window.location.hash)
+  );
+  const [certSubTab, setCertSubTab] = useState<'certificate' | 'referral'>(() =>
+    typeof window !== 'undefined' && hashToTab(window.location.hash) === 'referral'
+      ? 'referral'
+      : 'certificate'
+  );
   const [printDocType, setPrintDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>('prescription');
 
-  // Centralized tab navigation with scroll-to-top and responsive drawer auto-close
-  const handleSelectTab = (tab: ActiveTab) => {
-    if (tab === 'patients') {
-      setIsPatientModalOpen(true);
-      return;
-    }
+  // Regiao viva que anuncia a troca de tela e destino do foco apos navegar.
+  const mainRef = useRef<HTMLElement>(null);
+  const primeiroRenderRef = useRef(true);
+
+  // Aplica um destino sem tocar no historico. Usado tanto pela navegacao do
+  // usuario quanto pelos botoes Voltar/Avancar do navegador.
+  const applyTab = useCallback((tab: RouteTab) => {
     if (tab === 'certificate') {
       setCertSubTab('certificate');
     } else if (tab === 'referral') {
@@ -116,18 +133,59 @@ export default function App() {
 
     // Always scroll to top when navigating between clinical areas
     window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
+
+  // Centralized tab navigation. `patients` nao e um destino: abre um modal.
+  const handleSelectTab = (tab: ActiveTab) => {
+    if (tab === 'patients') {
+      setIsPatientModalOpen(true);
+      return;
+    }
+    applyTab(tab as RouteTab);
   };
+
+  // activeTab -> URL. Cada destino vira uma entrada de historico, entao o
+  // botao Voltar do navegador passa a voltar de tela em vez de sair do app.
+  useEffect(() => {
+    if (activeTab === 'patients' || activeTab === 'models') return;
+    const tab = activeTab as RouteTab;
+    if (hashMatchesTab(window.location.hash, tab)) return;
+    if (primeiroRenderRef.current) {
+      // Normaliza a URL de entrada sem empilhar uma entrada extra.
+      window.history.replaceState(null, "", tabToHash(tab));
+    } else {
+      window.history.pushState(null, "", tabToHash(tab));
+    }
+  }, [activeTab]);
+
+  // URL -> activeTab. popstate cobre Voltar/Avancar; hashchange cobre a URL
+  // editada na mao ou um link colado na barra de enderecos.
+  useEffect(() => {
+    const sincronizar = () => applyTab(hashToTab(window.location.hash));
+    window.addEventListener('popstate', sincronizar);
+    window.addEventListener('hashchange', sincronizar);
+    return () => {
+      window.removeEventListener('popstate', sincronizar);
+      window.removeEventListener('hashchange', sincronizar);
+    };
+  }, [applyTab]);
+
+  // Troca de tela move o foco para o conteudo e anuncia o destino. Sem isso a
+  // navegacao e silenciosa: o foco ficava parado no botao da barra lateral.
+  useEffect(() => {
+    if (primeiroRenderRef.current) {
+      primeiroRenderRef.current = false;
+      return;
+    }
+    mainRef.current?.focus({ preventScroll: true });
+  }, [activeTab, certSubTab]);
 
   const handleNavigateToPrint = (type?: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral') => {
     if (type) {
       setPrintDocType(type);
     }
     setPrintOrigin(activeTab === 'print_preview' ? printOrigin : activeTab);
-    setActiveTab('print_preview');
-    if (window.innerWidth < 1024) {
-      setSidebarOpen(false);
-    }
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    applyTab('print_preview');
   };
 
   // Modals state
@@ -361,6 +419,23 @@ export default function App() {
       className="min-h-screen font-sans antialiased flex flex-col transition-colors duration-300"
       style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-main)' }}
     >
+      {/* Atalho de teclado para pular a navegacao: 12+ paradas de tabulacao
+          separavam o inicio da pagina do conteudo no desktop. */}
+      <a
+        href="#conteudo-principal"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[10000] focus:px-4 focus:py-3 focus:min-h-[44px] focus:inline-flex focus:items-center focus:rounded-xl focus:bg-navy-900 focus:text-white focus:font-bold focus:text-sm focus:shadow-tactile-lg focus:outline-3 focus:outline-sky-400 focus:outline-offset-2"
+        onClick={() => mainRef.current?.focus({ preventScroll: true })}
+      >
+        Pular para o conteúdo
+      </a>
+
+      {/* Anuncio de troca de tela para leitores de tela. */}
+      <p aria-live="polite" aria-atomic="true" className="sr-only">
+        {activeTab === 'patients' || activeTab === 'models'
+          ? ''
+          : TAB_TITLES[activeTab as RouteTab]}
+      </p>
+
       {/* Top Application Header */}
       <Header
         darkMode={darkMode}
@@ -397,7 +472,12 @@ export default function App() {
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 min-w-0 pb-20 lg:pb-6">
+        <main
+          id="conteudo-principal"
+          ref={mainRef}
+          tabIndex={-1}
+          className="flex-1 min-w-0 pb-20 lg:pb-6 outline-none"
+        >
           {storageWarnings.length > 0 && <aside role="alert" className="clinical-card m-4 p-4 no-print"><p className="font-semibold">Atenção ao salvamento local</p>{storageWarnings.map(w => <p key={w} className="text-sm mt-1">{w}</p>)}<button className="clinical-button secondary mt-3" onClick={downloadLocalBackup}>Baixar backup dos dados originais</button></aside>}
           <div hidden={activeTab !== 'prescription'}>
             <PrescriptionBuilder

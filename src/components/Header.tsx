@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
                   PRO
                 </span>
               </div>
-              <p className="text-[11px] hidden md:block font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] hidden lg:block font-medium text-slate-500 dark:text-slate-400">
                 Prescrições Rápidas & Doses Pediátricas Inteligentes
               </p>
             </div>
@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="header-patient-chip"
             role="button"
             tabIndex={0}
-            className="flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer group w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[360px] min-h-[44px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+            className="flex items-center gap-2 sm:gap-2.5 px-3 py-1 rounded-xl border transition-all cursor-pointer group w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[360px] h-11 min-h-[44px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
             style={{
               backgroundColor: darkMode ? '#141E2C' : '#F8F4EC',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#E3D7BD'
@@ -147,19 +147,18 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Quick Weight Input in Header */}
-          <div 
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border shadow-tactile-sm transition-all"
+          <div
+            className="hidden lg:flex items-center gap-2 px-3 h-11 min-h-[44px] rounded-xl border shadow-tactile-sm transition-all"
             style={{
               backgroundColor: darkMode ? '#141E2C' : '#F8F4EC',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#E3D7BD'
             }}
           >
             <Scale className="w-4 h-4 text-navy-900 dark:text-cream-200 flex-shrink-0" strokeWidth={1.75} />
-            <div className="flex flex-col items-start">
-              <label htmlFor="header-input-weight" className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                Peso
-              </label>
-              <div className="flex items-center gap-1">
+            <label htmlFor="header-input-weight" className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex-shrink-0">
+              Peso
+            </label>
+            <div className="flex items-center gap-1">
                 <input
                   id="header-input-weight"
                   aria-label="Peso rápido do paciente em quilogramas"
@@ -174,12 +173,11 @@ export const Header: React.FC<HeaderProps> = ({
                       onQuickWeightChange(isNaN(val) ? 0 : val);
                     }
                   }}
-                  placeholder="--"
-                  inputMode="decimal"
-                  className="w-16 min-h-[44px] py-2 text-xs font-black outline-none bg-transparent text-navy-900 dark:text-cream-50 rounded-lg"
-                />
-                <span className="text-[10px] font-bold text-slate-400">kg</span>
-              </div>
+                placeholder="--"
+                inputMode="decimal"
+                className="w-12 min-h-[44px] text-sm font-black text-center outline-none bg-transparent text-navy-900 dark:text-cream-50 rounded-lg"
+              />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">kg</span>
             </div>
           </div>
         </div>

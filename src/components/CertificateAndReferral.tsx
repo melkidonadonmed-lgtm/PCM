@@ -342,22 +342,22 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={handleSendCertificateWhatsApp}
-                  className="px-4 py-2.5 min-h-[44px] rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
+                  className="tactile-btn-success px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                   title="Enviar o atestado médico diretamente pelo WhatsApp"
                   aria-label="Enviar o atestado médico diretamente pelo WhatsApp"
                 >
-                  <Send className="w-4 h-4" strokeWidth={2} />
+                  <Send className="w-4 h-4" strokeWidth={1.75} />
                   <span>Enviar no WhatsApp</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => onNavigateToPrint('certificate')}
-                  className="tactile-btn-success px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
+                  className="tactile-btn-success px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
                   <span>Visualizar & Baixar PDF</span>
