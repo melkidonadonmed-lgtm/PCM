@@ -161,7 +161,11 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           type="button"
           onClick={onNavigateToPrint}
           disabled={selectedExams.length === 0}
-          className="tactile-btn-success px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          className={`px-4 py-2 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+            selectedExams.length === 0
+              ? 'tactile-btn-secondary opacity-70 cursor-not-allowed'
+              : 'tactile-btn-success cursor-pointer'
+          }`}
         >
           <Download className="w-4 h-4" strokeWidth={1.75} />
           <span>Visualizar & Baixar PDF ({selectedExams.length})</span>
@@ -378,7 +382,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <button
                 type="button"
                 onClick={() => updateExams([])}
-                className="text-[11px] font-semibold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer"
+                className="min-h-[44px] px-2 inline-flex items-center text-[11px] font-semibold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer rounded-lg"
               >
                 Limpar Tudo
               </button>
@@ -416,8 +420,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   <button
                     type="button"
                     onClick={() => toggleExam(exam)}
-                    className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"
+                    className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-400 hover:text-rose-600 cursor-pointer rounded-lg"
                     title="Remover exame"
+                    aria-label={`Remover ${exam.name} do pedido`}
                   >
                     <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
                   </button>

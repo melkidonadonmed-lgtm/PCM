@@ -294,7 +294,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
 
               {/* Medications List with Individual Add Actions */}
               <div 
-                className="rounded-xl border divide-y tactile-flat"
+                className="@container rounded-xl border divide-y tactile-flat"
                 style={{
                   backgroundColor: 'var(--surface-inset)',
                   borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
@@ -306,7 +306,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   const isAdult = !isPed && (med.presentation.toLowerCase().includes('comprimido') || med.posology.toLowerCase().includes('adulto'));
 
                   return (
-                    <div key={`${protocol.id}-med-${idx}`} className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-colors">
+                    <div key={`${protocol.id}-med-${idx}`} className="p-3 flex flex-col @sm:flex-row @sm:items-center justify-between gap-2.5 transition-colors">
                       <div className="flex items-start gap-2.5 min-w-0 flex-1">
                         <Pill className="w-4 h-4 text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
                         <div className="min-w-0 flex-1">
@@ -338,7 +338,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAddSingleMedication(med, protocol, idx)}
-                        className={`px-3 py-2 min-h-[38px] rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 ${
+                        className={`w-full @sm:w-auto px-3 py-2 min-h-[44px] rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 ${
                           isMedAdded 
                             ? 'bg-emerald-600 text-white shadow-sm' 
                             : 'tactile-btn-secondary hover:border-sky-500'
