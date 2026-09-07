@@ -50,20 +50,20 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       <div 
         className="w-full max-w-md rounded-2xl p-6 relative border shadow-tactile-lg isolate transition-all"
         style={{
-          backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : '#E3D7BD',
+          backgroundColor: darkMode ? '#192130' : '#FFFFFF',
+          borderColor: darkMode ? 'rgba(255, 255, 255, 0.06)' : '#E2E8F0',
           boxShadow: darkMode 
-            ? '0 24px 50px -8px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255,255,255,0.1)' 
+            ? '0 24px 50px -8px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255,255,255,0.08)' 
             : '0 20px 40px -8px rgba(20, 32, 50, 0.18), inset 0 1px 0 rgba(255,255,255,0.95)'
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-4">
           <div 
-            className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
+            className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
               isDanger 
-                ? 'bg-rose-500/15 text-rose-500 border-rose-500/30' 
-                : 'bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border-navy-900/20 dark:border-cream-100/25'
+                ? 'bg-rose-500/10 text-rose-500' 
+                : 'bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100'
             }`}
           >
             <AlertTriangle className="w-6 h-6" />
@@ -93,11 +93,11 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </button>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-white/10">
+        <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-200/80 dark:border-white/5">
           <button
             type="button"
             onClick={onCancel}
-            className="min-h-[44px] px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl border border-slate-300 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all cursor-pointer"
+            className="min-h-[44px] px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl border border-transparent bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 transition-all cursor-pointer"
           >
             {cancelLabel}
           </button>
@@ -106,7 +106,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             ref={confirmButtonRef}
             type="button"
             onClick={onConfirm}
-            className={`min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl shadow-tactile-btn flex items-center gap-2 cursor-pointer transition-all active:scale-95 ${
+            className={`min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl shadow-tactile-btn border-none flex items-center gap-2 cursor-pointer transition-all active:scale-95 ${
               isDanger 
                 ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white' 
                 : 'bg-navy-900 hover:bg-navy-950 text-white dark:bg-cream-100 dark:hover:bg-white dark:text-navy-950'

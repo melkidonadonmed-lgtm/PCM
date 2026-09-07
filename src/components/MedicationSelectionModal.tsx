@@ -364,17 +364,20 @@ export const MedicationSelectionModal: React.FC<MedicationSelectionModalProps> =
                       </span>
 
                       {group.hasPediatric && (
-                        <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                           Pediátrico
                         </span>
                       )}
                       {group.hasAdult && (
-                        <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-700 dark:text-sky-400 border border-sky-500/25">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-sky-700 dark:text-sky-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
                           Adulto
                         </span>
                       )}
                       {group.isSpecialControl && (
-                        <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                           Controle Especial
                         </span>
                       )}
@@ -395,8 +398,8 @@ export const MedicationSelectionModal: React.FC<MedicationSelectionModalProps> =
                     {/* Linha 4: Motivo do match fuzzy + quantidade de apresentações */}
                     <div className="flex items-center gap-2 flex-wrap mt-1.5">
                       {searchTerm && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-700 dark:text-sky-300 flex items-center gap-1">
-                          <Sparkles className="w-2.5 h-2.5 text-sky-500" />
+                        <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-sky-500" />
                           <span>{res.matchedHighlight}</span>
                         </span>
                       )}

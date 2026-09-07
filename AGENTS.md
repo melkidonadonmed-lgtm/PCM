@@ -75,7 +75,20 @@ src/
 - **SPA sem roteador:** a navegação é feita por estado (`activeTab: ActiveTab`) em `App.tsx`, que renderiza condicionalmente cada view. Não há react-router nem URLs por tela.
 - **Estado centralizado em `App.tsx`:** médico, paciente, itens da prescrição, exames, atestado e encaminhamento vivem em `useState` no App e são passados por props (prop drilling — os componentes recebem `darkMode`, dados e callbacks como `onUpdatePatient`, `onNavigateToPrint`). Siga esse padrão; não introduza gerenciador de estado global.
 - **Persistência em `localStorage`:** chaves `prescmed_theme`, `prescmed_doctor`, `prescmed_patient`, `prescmed_prescription`, `prescmed_exams`, sincronizadas via `useEffect`. Leituras usam try/catch com fallback para defaults.
-- **Tema claro/escuro:** booleano `darkMode` no App; aplica/remove a classe `dark` no `<html>`. Componentes recebem `darkMode` como prop e alternam classes manualmente (o app não depende apenas do seletor `dark:` do Tailwind). Paleta Light: canvas creme (`--bg-app: #F9F6F0`), cards branco-quente (`--surface-card: #FFFDF9`), texto navy. Paleta Dark: obsidian (`--bg-app: #0D0F12`), superfícies grafite (`--surface-card: #1A1D24`). **Chrome de navegação (Header, Sidebar, MobileBottomNav) é sempre deep navy nos dois temas** — usa os tokens `--surface-panel*` e as classes `.panel-navy`/`.panel-navy-inset`; textos sobre o navy são sempre claros (#F1F5F9/#CBD5E1/#94A3B8). Prefira os tokens `var(--*)` de `index.css` a cores hardcoded ao criar novos estilos.
+- **Tema claro/escuro:** booleano `darkMode` no App; aplica/remove a classe `dark` no `<html>`. Componentes recebem `darkMode` como prop e alternam classes manualmente (o app não depende apenas do seletor `dark:` do Tailwind).
+  - **Paleta Light:** canvas límpido hospitalar (`--bg-app: #F8FAFC`), cards branco puro (`--surface-card: #FFFFFF`), bandejas embutidas suaves (`--surface-inset: #F1F5F9`). Proibido usar tons terrosos/lama (`#ECE3D4`) em superfícies embutidas.
+  - **Paleta Dark (Grafite Ardósia Aveludado):** fundo relaxante (`--bg-app: #121824`), superfícies elevadas em grafite nobre (`--surface-card: #192130`, `--bg-surface-elevated: #202A3C`), bandejas embutidas ardósia (`--surface-inset: #141C28`), sem pretos densos opressivos.
+  - **Chrome de navegação (Header, Sidebar, MobileBottomNav):** sempre deep navy nos dois temas (`--surface-panel: #0C121A`), textos sempre claros (#F1F5F9/#CBD5E1).
+  - **Diretriz de Botões (Zero Contornos Grosseiros):**
+    - Botões primários (`.btn-tactile-primary`, `.clinical-button`): **nunca usar bordas duras** (`border: none`). No tema escuro, adota acabamento Creme/Baunilha nobre com texto escuro e elevação tátil aveludada. No tema claro, gradiente navy elegante.
+    - Botões secundários: estilo soft-flat (`border: 1px solid transparent`, fundo sutil `rgba(255,255,255,0.06)` no escuro / `rgba(0,0,0,0.04)` no claro), sem linhas de contorno contrastantes.
+    - Botões em bandejas embutidas (ex: Decks de Protocolos): devem ter contraste nítido (branco puro com sombra suave no claro / translúcido sutil no escuro).
+  - **Erradicação de "Blobs" de Texto Translúcidos:**
+    - Proibido o uso de pílulas/caixas com fundos semi-transparentes saturados e bordas destacadas (`bg-emerald-500/15 border-emerald-500/30`, etc.).
+    - Substituir sempre por **tipografia limpa acompanhada de micro-pontos de status (dots de 6px)** ou badges em tom neutro suave.
+  - **Hierarquia de Steppers de Atendimento:**
+    - A etapa em execução deve ser claramente indicada como ativa (destaque visual pleno).
+    - Etapas anteriores mostram preenchimento/conclusão sutil, e a etapa subsequente atua como botão de transição/avanço claro.
 - **Geração de documentos:** `PrintPreview.tsx` renderiza o documento formatado e usa `html2canvas` para captura; `pdfGenerator.ts` monta PDFs programaticamente com jsPDF/autoTable. A folha A4 do documento (`printable-a4-sheet` e todo o conteúdo médico) é **sempre branca com texto escuro, nos dois temas** — nunca aplique o tema da app dentro da folha. Há um helper de conversão de cores (oklch/oklab → rgb) porque o html2canvas não suporta cores modernas do CSS — mantenha isso em mente ao criar estilos que aparecem em documentos exportados.
 
 ## Convenções de código
@@ -83,6 +96,7 @@ src/
 - **Idioma:** UI, dados clínicos e textos de documentos em **português (pt-BR)**; comentários de código misturam português e inglês. Novos textos de UI devem ser em pt-BR.
 - **Componentes:** funcionais com hooks, exportação nomeada (`export function X` / `export const X`), um componente principal por arquivo em PascalCase.
 - **Estilo:** Tailwind utility classes inline; design tokens como CSS custom properties em `src/index.css` (ex.: `--bg-app`, `--surface-card`). Breakpoint de referência para "mobile": `lg` (1024px) — a sidebar fecha automaticamente abaixo dele.
+- **Normas Clínicas e Sanitárias YMYL:** Antimicrobianos devem ser estritamente segregados em Receituário de Antimicrobianos (2 vias, RDC 20/2011) e substâncias sujeitas a controle especial C1 em 2 vias (Portaria 344/98, máx 3 substâncias por folha). Nunca misturar antimicrobianos ou C1 em receita simples. Cálculos pediátricos devem respeitar rigorosamente a posologia por kg/dose.
 - **Tipos:** centralizados em `src/types.ts`; adicione novos tipos de domínio lá. `tsconfig` não é estrito e permite `allowJs`, mas escreva código tipado.
 - **Path alias:** `@/*` mapeia para a raiz do projeto (pouco usado; os imports existentes são relativos — prefira relativos dentro de `src/`).
 - **Formatação numérica:** doses e volumes usam locale pt-BR (`toLocaleString('pt-BR')`, vírgula decimal) nos textos de prescrição.

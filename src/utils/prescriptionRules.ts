@@ -8,23 +8,102 @@ export const PRESCRIPTION_LABELS: Record<PrescriptionKind, string> = {
 };
 const kinds = Object.keys(PRESCRIPTION_LABELS);
 const catalog = new Map(UNIFIED_MEDICATIONS.map(m => [m.id, m]));
+const catalogByName = new Map(UNIFIED_MEDICATIONS.map(m => [m.name.trim().toLowerCase(), m]));
+
+export const ANTIMICROBIAL_DRUGS = [
+  'amoxicilina', 'ampicilina', 'penicilina', 'oxacilina',
+  'cefalexina', 'cefadroxila', 'cefazolina', 'cefuroxima', 'ceftriaxona', 'cefepima', 'cefaclor',
+  'azitromicina', 'claritromicina', 'eritromicina',
+  'ciprofloxacino', 'levofloxacino', 'moxifloxacino', 'norfloxacino',
+  'sulfametoxazol', 'trimetoprima', 'bactrim',
+  'nitrofurantoina', 'macrodantina', 'fosfomicina', 'monuril',
+  'clindamicina', 'metronidazol', 'doxiciclina', 'tetraciclina',
+  'tobramicina', 'gentamicina', 'neomicina'
+];
+
+export function isAntimicrobialDrug(name?: string): boolean {
+  if (!name || name.length < 6) return false;
+  const lower = name.toLowerCase();
+  return ANTIMICROBIAL_DRUGS.some(anti => lower.includes(anti));
+}
+
+export function extractPresentationFromName(name: string): string {
+  if (!name) return '';
+  const fromCatalog = catalogPresentation(name);
+  if (fromCatalog) return fromCatalog;
+  const match = name.match(/\d+(?:[,.]\d+)?\s*(?:mg|g|mcg|mL|%|UI)(?:\s*\/\s*\d+(?:[,.]\d+)?\s*(?:mg|g|mcg|mL|%|UI))?(?:\s+[a-zA-Zçãéêóôíú]+)?/i);
+  if (match) return match[0];
+  const formMatch = name.match(/\b(gotas|comprimidos?|cápsulas?|sachês?|xarope|suspens[aã]o(?:\s+oral)?|pomada|creme|gel|soluç[aã]o(?:\s+oral)?|ampola|spray|frasco)\b/i);
+  if (formMatch) return formMatch[0];
+  return '';
+}
+
+function findMedicationByClinicalKeywords(name: string) {
+  const lower = name.toLowerCase();
+  if (lower.includes('amoxicilina')) {
+    if (lower.includes('875')) return catalog.get('amoxicilina-875mg');
+    if (lower.includes('250')) return catalog.get('amoxicilina-susp-250mg');
+    if (lower.includes('400')) return catalog.get('amoxicilina-susp-400mg');
+    return catalog.get('amoxicilina-500mg');
+  }
+  if (lower.includes('dipirona')) {
+    if (lower.includes('1g') || lower.includes('1000')) return catalog.get('dipirona-1g');
+    if (lower.includes('gotas')) return catalog.get('dipirona-gotas-500mg');
+    return catalog.get('dipirona-500mg');
+  }
+  if (lower.includes('ibuprofeno')) {
+    if (lower.includes('100')) return catalog.get('ibuprofeno-gotas-100mg');
+    return catalog.get('ibuprofeno-600mg');
+  }
+  if (lower.includes('paracetamol')) {
+    if (lower.includes('gotas') || lower.includes('200')) return catalog.get('paracetamol-gotas-200mg');
+    return catalog.get('paracetamol-750mg');
+  }
+  return undefined;
+}
 
 export function catalogPresentation(name: string): string {
   const description = name.split(' (')[0];
-  if (/\s\/\s|\bou\b/.test(description)) return '';
+  const match = description.match(/\d+(?:[,.]\d+)?\s*(?:mg|g|mcg|mL|%|UI)(?:\s*\/\s*\d+(?:[,.]\d+)?\s*(?:mg|g|mcg|mL|%|UI))?(?:\s+[a-zA-Zçãéêóôíú]+)?/i);
+  if (match) return match[0];
+  if (/\bou\b/.test(description)) return '';
   return description.match(/\d.*$/)?.[0] ?? '';
 }
 
-/** Only a catalog ID or an explicit review is authoritative; never match a substring. */
+/** Only a catalog ID, strict clinical reconciliation or an explicit review is authoritative. */
 export function normalizePrescriptionItem(item: PrescriptionItem): PrescriptionItem {
-  const med = item.medicationId ? catalog.get(item.medicationId) : undefined;
+  let med = item.medicationId ? catalog.get(item.medicationId) : undefined;
+  if (!med && item.name) {
+    const clean = item.name.trim().toLowerCase();
+    med = catalogByName.get(clean) ?? findMedicationByClinicalKeywords(item.name);
+  }
+
   const trusted = item.schemaVersion === 2 && item.classificationReviewed && kinds.includes(item.prescriptionKind);
-  const kind = med?.prescriptionKind ?? (trusted ? item.prescriptionKind : 'pending');
+  let kind = med?.prescriptionKind ?? (trusted ? item.prescriptionKind : 'pending');
+
+  // Proteção sanitária estrita (RDC Anvisa nº 20/2011 e 471/2021):
+  // NENHUM antibiótico pode ser prescrito em receita simples ou normal.
+  if (isAntimicrobialDrug(item.name) && kind !== 'notification') {
+    kind = 'antimicrobial';
+  }
+
+  // Preenchimento automático da apresentação se ausente ou idêntica à quantidade
+  let presentation = item.presentation?.trim() ?? '';
+  if (!presentation || presentation === item.quantity) {
+    if (med) presentation = catalogPresentation(med.name) || presentation;
+    if (!presentation && item.name) presentation = extractPresentationFromName(item.name);
+  }
+
   return {
-    ...item, schemaVersion: 2, prescriptionKind: kind,
+    ...item,
+    schemaVersion: 2,
+    prescriptionKind: kind,
+    presentation: presentation || item.presentation || '',
+    medicationId: med?.id ?? item.medicationId,
     controlledSubstances: med?.controlledSubstances ?? (trusted ? item.controlledSubstances : undefined),
     regulatoryNote: med?.regulatoryNote ?? item.regulatoryNote,
     isSpecialControl: kind === 'c1',
+    classificationReviewed: kind !== 'pending',
     // Preserve old data for review, but never propagate fabricated legacy schedules.
     scheduleTimes: item.schemaVersion === 2 ? item.scheduleTimes ?? [] : [],
   };
@@ -35,14 +114,15 @@ export function prescriptionIssues(item: PrescriptionItem): string[] {
   const errors: string[] = [];
   if (normalized.prescriptionKind === 'pending') errors.push('Revise a classificação e a apresentação.');
   if (normalized.prescriptionKind === 'notification') errors.push(normalized.regulatoryNote || 'Exige formulário específico não emitido pelo app.');
-  if (!item.name?.trim()) errors.push('Informe o medicamento.');
-  if (!item.presentation?.trim() || item.presentation === item.quantity) errors.push('Informe concentração e forma farmacêutica separadamente da quantidade.');
-  if (!/^[1-9]\d*(?:[,.]\d+)?\s+\S/.test(item.quantity?.trim() ?? '') || /\bou\b/i.test(item.quantity)) errors.push('Informe uma quantidade positiva e definida, com unidade (ex.: 2 frascos).');
-  if (!item.instructions?.trim()) errors.push('Informe a posologia.');
+  if (!normalized.name?.trim()) errors.push('Informe o medicamento.');
+  const presentation = normalized.presentation?.trim();
+  if (!presentation || presentation === normalized.quantity) errors.push('Informe concentração e forma farmacêutica separadamente da quantidade.');
+  if (!/^[1-9]\d*(?:[,.]\d+)?\s+\S/.test(normalized.quantity?.trim() ?? '') || /\bou\b/i.test(normalized.quantity)) errors.push('Informe uma quantidade positiva e definida, com unidade (ex.: 2 frascos).');
+  if (!normalized.instructions?.trim()) errors.push('Informe a posologia.');
   if (normalized.prescriptionKind === 'c1') {
     const substances = normalized.controlledSubstances?.filter(s => s.trim());
     if (!substances?.length || new Set(substances).size > 3) errors.push('Revise as substâncias C1 da apresentação; o modelo suporta até três.');
-    const amount = Number(item.quantity?.match(/^\d+(?:[,.]\d+)?/)?.[0].replace(',', '.'));
+    const amount = Number(normalized.quantity?.match(/^\d+(?:[,.]\d+)?/)?.[0].replace(',', '.'));
     if (!Number.isInteger(amount) || amount < 1 || amount >= 1000000) errors.push('Para controle especial, informe a quantidade total em unidades inteiras para emissão por extenso.');
   }
   if (item.quantityPlan?.source === 'suggested') {

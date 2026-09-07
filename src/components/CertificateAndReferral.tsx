@@ -324,13 +324,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
               <div className="flex items-center gap-3">
                 <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm"
-                  style={{
-                    backgroundColor: darkMode ? '#1E4F7A' : '#0F6292',
-                    border: '1px solid rgba(255, 255, 255, 0.12)'
-                  }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center panel-navy text-cream-100 border border-white/10 shadow-tactile-sm"
                 >
-                  <Award className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
+                  <Award className="w-5 h-5 icon-sculpted" strokeWidth={1.75} />
                 </div>
                 <div>
                   <h2 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
@@ -357,7 +353,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigateToPrint('certificate')}
-                  className="tactile-btn-success px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
+                  className="tactile-btn-primary px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
                   <span>Visualizar & Baixar PDF</span>
@@ -634,13 +630,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
               <div className="flex items-center gap-3">
                 <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm"
-                  style={{
-                    backgroundColor: darkMode ? '#155730' : '#15803D',
-                    border: '1px solid rgba(255, 255, 255, 0.12)'
-                  }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center panel-navy text-cream-100 border border-white/10 shadow-tactile-sm"
                 >
-                  <Building2 className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
+                  <Building2 className="w-5 h-5 icon-sculpted" strokeWidth={1.75} />
                 </div>
                 <div>
                   <h2 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
@@ -656,7 +648,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={handleSendReferralWhatsApp}
-                  className="px-4 py-2.5 min-h-[44px] rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
+                  className="tactile-btn-success px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                   title="Enviar a guia de encaminhamento diretamente pelo WhatsApp"
                   aria-label="Enviar a guia de encaminhamento diretamente pelo WhatsApp"
                 >
@@ -667,7 +659,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigateToPrint('referral')}
-                  className="tactile-btn-success px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
+                  className="tactile-btn-primary px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
                   <span>Visualizar & Baixar PDF</span>

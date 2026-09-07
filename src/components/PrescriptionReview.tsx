@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Download, Copy, Check, FileText } from 'lucide-react';
+import { ArrowLeft, Download, Copy, Check, FileText, AlertTriangle, User, Stethoscope, Layers } from 'lucide-react';
 import type { DoctorProfile, Patient, PrescriptionItem, PrescriptionDocument } from '../types';
 import { buildPrescriptionDocuments, prescriptionDocumentText, prescriptionIssues } from '../utils/prescriptionRules';
 import { generatePrescriptionPDF, layoutPrescriptionPages, prescriptionIdentityIssues } from '../utils/prescriptionPdf';
@@ -22,34 +22,202 @@ export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatie
     try { return { pages: layoutPrescriptionPages([selected], doctor, patient, date), error: '' }; }
     catch (e) { return { pages: [], error: e instanceof Error ? e.message : 'Falha ao montar as páginas.' }; }
   }, [selected, doctor, patient, date]);
+
   const exportDocuments = (docs: PrescriptionDocument[]) => {
-    try { generatePrescriptionPDF(docs, doctor, patient, date).save('Receitas.pdf'); setMessage('PDF exportado. Imprima e assine as vias.'); }
-    catch (e) { setMessage(e instanceof Error ? e.message : 'Não foi possível exportar.'); }
+    try {
+      generatePrescriptionPDF(docs, doctor, patient, date).save('Receitas.pdf');
+      setMessage('PDF exportado com sucesso. Imprima e assine as vias.');
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : 'Não foi possível exportar.');
+    }
   };
+
   const canExport = selected && !selectedProblems.length && !identityProblems.length && !layout.error;
-  return <section className="prescription-review space-y-5 p-4 sm:p-6 max-w-6xl mx-auto">
-    <header className="clinical-card p-5 no-print">
-      <button className="clinical-button secondary mb-4" onClick={onBack}><ArrowLeft size={18} />Voltar aos medicamentos</button>
-      <p className="text-sm mb-1">Etapa 3 de 3</p><h1 className="text-2xl font-semibold">Revisar e exportar</h1>
-      <p className="mt-2">{items.length} medicamentos · {documents.length} receitas. Confira o documento e suas vias antes de imprimir.</p>
-      <p className="text-sm mt-2">PDF para impressão e assinatura manuscrita. O app não realiza assinatura digital.</p>
-      <div className="flex flex-wrap gap-2 mt-4"><button className="clinical-button secondary" onClick={onEditPatient}>Editar paciente</button><button className="clinical-button secondary" onClick={onEditDoctor}>Editar prescritor</button></div>
-    </header>
-    {(problems.length > 0 || identityProblems.length > 0 || layout.error) && <div role="alert" className="clinical-card p-4 no-print">
-      <h2 className="font-semibold">Pendências para emissão</h2><ul className="list-disc pl-5 mt-2 text-sm">{[...problems, ...identityProblems, ...(layout.error ? [layout.error] : [])].map((p, i) => <li key={i}>{p}</li>)}</ul>
-      <button className="clinical-button secondary mt-3" onClick={onBack}>Corrigir medicamentos</button>
-    </div>}
-    {!documents.length && <div className="clinical-card p-6"><FileText className="mb-3" /><p>Nenhuma receita pronta para revisão. Adicione medicamentos e resolva a classificação dos itens pendentes.</p></div>}
-    {!!documents.length && <>
-      <nav aria-label="Receitas geradas" className="flex flex-wrap gap-2 no-print">{documents.map(d => <button key={d.id} aria-pressed={d.id === selected?.id} onClick={() => { setSelectedId(d.id); setMessage(''); }} className={`clinical-button ${d.id === selected?.id ? '' : 'secondary'}`}>{d.title} · {d.items.length} itens · {d.copies} {d.copies === 1 ? 'via' : 'vias'}{d.kind === 'c1' ? ` (${d.id})` : ''}</button>)}</nav>
-      <div className="clinical-card p-4 flex flex-wrap gap-3 items-center no-print">
-        <button className="clinical-button" disabled={!canExport} onClick={() => exportDocuments([selected])}><Download size={18} />Exportar selecionado</button>
-        <button className="clinical-button secondary" disabled={!!problems.length || !!prescriptionIdentityIssues(doctor, patient, documents).length} onClick={() => exportDocuments(documents)}>Exportar todos</button>
-        <button className="clinical-button secondary" disabled={!canExport} onClick={async () => { try { await navigator.clipboard.writeText(`Paciente: ${patient.name}\nPrescritor: ${doctor.name} — CRM ${doctor.crm}/${doctor.crmState}\nData: ${date.toLocaleDateString('pt-BR')}\n\n${prescriptionDocumentText(selected)}`); setMessage('Texto do documento selecionado copiado.'); } catch { setMessage('Não foi possível copiar. Use a exportação PDF.'); } }}><Copy size={18} />Copiar selecionado</button>
-        <span className="text-sm">{layout.pages.length} páginas, incluindo todas as vias</span>
-      </div>
-      {message && <p role="status" className="flex gap-2 no-print"><Check size={18} />{message}</p>}
-      <PrescriptionPages pages={layout.pages} />
-    </>}
-  </section>;
+
+  return (
+    <section className="prescription-review space-y-5 p-4 sm:p-6 max-w-6xl mx-auto">
+      {/* Header Clínico de Revisão */}
+      <header className="tactile-card p-4 sm:p-6 rounded-2xl space-y-4 no-print" style={{ backgroundColor: 'var(--surface-card)', borderColor: 'var(--border-medium)' }}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/60 dark:border-white/10 pb-4">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="clinical-button secondary"
+              onClick={onBack}
+              aria-label="Voltar aos medicamentos"
+            >
+              <ArrowLeft size={16} />
+              <span>Voltar aos medicamentos</span>
+            </button>
+            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-navy-900/10 dark:bg-white/10 text-navy-900 dark:text-cream-100 font-bold uppercase tracking-wider">
+              Etapa 3 de 3 • Revisão Final
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="clinical-button secondary text-xs"
+              onClick={onEditPatient}
+              title="Editar dados cadastrais do paciente"
+            >
+              <User size={14} />
+              <span>Paciente: {patient.name || 'Identificar'}</span>
+            </button>
+            <button
+              type="button"
+              className="clinical-button secondary text-xs"
+              onClick={onEditDoctor}
+              title="Editar dados do médico prescritor"
+            >
+              <Stethoscope size={14} />
+              <span>Médico: {doctor.name ? `Dr(a). ${doctor.name}` : 'Identificar'}</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-cream-50">
+            Revisar Documentos e Exportar PDF
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+            {items.length} medicamento(s) distribuído(s) em {documents.length} receituário(s) normativo(s). Confira o layout e as vias antes da impressão.
+          </p>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+            Padrão CFM/Anvisa para impressão e assinatura manuscrita (sem necessidade de certificado digital em nuvem).
+          </p>
+        </div>
+      </header>
+
+      {/* Alertas de Pendências Clínicas ou Legais */}
+      {(problems.length > 0 || identityProblems.length > 0 || layout.error) && (
+        <div role="alert" className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 no-print space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
+            <h2 className="font-bold text-sm">Pendências para Emissão do Documento</h2>
+          </div>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            {[...problems, ...identityProblems, ...(layout.error ? [layout.error] : [])].map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+          </ul>
+          <div className="pt-1">
+            <button
+              type="button"
+              className="clinical-button secondary text-xs"
+              onClick={onBack}
+            >
+              Corrigir medicamentos na receita
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Sem documentos */}
+      {!documents.length && (
+        <div className="tactile-card p-8 rounded-2xl text-center space-y-3" style={{ backgroundColor: 'var(--surface-card)' }}>
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
+            <FileText size={24} />
+          </div>
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            Nenhuma receita pronta para revisão.
+          </p>
+          <p className="text-xs text-slate-500 max-w-md mx-auto">
+            Adicione medicamentos no formulário e resolva a classificação de qualquer item pendente.
+          </p>
+          <button type="button" className="clinical-button" onClick={onBack}>
+            Adicionar Medicamentos
+          </button>
+        </div>
+      )}
+
+      {/* Documentos Prontos */}
+      {!!documents.length && (
+        <>
+          {/* Seletor de Receitas Geradas (Tabs) */}
+          <nav aria-label="Receitas geradas" className="flex flex-wrap items-center gap-2 no-print">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1 mr-1">
+              <Layers size={14} />
+              <span>Receitas:</span>
+            </span>
+            {documents.map(d => {
+              const isCurrent = d.id === selected?.id;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  aria-pressed={isCurrent}
+                  onClick={() => { setSelectedId(d.id); setMessage(''); }}
+                  className={`clinical-button ${isCurrent ? '' : 'secondary'} text-xs`}
+                >
+                  <span>{d.title}</span>
+                  <span className="opacity-70">({d.items.length} itens • {d.copies} {d.copies === 1 ? 'via' : 'vias'})</span>
+                  {d.kind === 'c1' && <span className="text-[10px] font-extrabold px-1 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300">C1</span>}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Barra de Ações Rápidas */}
+          <div className="tactile-card p-3.5 sm:p-4 rounded-2xl flex flex-wrap gap-2.5 items-center justify-between no-print" style={{ backgroundColor: 'var(--surface-card)', borderColor: 'var(--border-medium)' }}>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="clinical-button"
+                disabled={!canExport}
+                onClick={() => exportDocuments([selected])}
+              >
+                <Download size={16} />
+                <span>Exportar Selecionado</span>
+              </button>
+
+              <button
+                type="button"
+                className="clinical-button secondary"
+                disabled={!!problems.length || !!prescriptionIdentityIssues(doctor, patient, documents).length}
+                onClick={() => exportDocuments(documents)}
+              >
+                <Download size={16} />
+                <span>Exportar Todas ({documents.length})</span>
+              </button>
+
+              <button
+                type="button"
+                className="clinical-button secondary"
+                disabled={!canExport}
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      `Paciente: ${patient.name}\nPrescritor: ${doctor.name} — CRM ${doctor.crm}/${doctor.crmState}\nData: ${date.toLocaleDateString('pt-BR')}\n\n${prescriptionDocumentText(selected)}`
+                    );
+                    setMessage('Texto do documento selecionado copiado para a área de transferência.');
+                  } catch {
+                    setMessage('Não foi possível copiar. Use a exportação em PDF.');
+                  }
+                }}
+              >
+                <Copy size={16} />
+                <span>Copiar Texto</span>
+              </button>
+            </div>
+
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              {layout.pages.length} página(s) gerada(s)
+            </span>
+          </div>
+
+          {/* Toast de Feedback */}
+          {message && (
+            <div role="status" className="p-3 rounded-xl bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/25 flex items-center gap-2 text-xs font-bold no-print">
+              <Check size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>{message}</span>
+            </div>
+          )}
+
+          {/* Páginas do Documento Renderizadas em Visualização Fiel */}
+          <PrescriptionPages pages={layout.pages} />
+        </>
+      )}
+    </section>
+  );
 }
