@@ -250,7 +250,8 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
                     {medicationGroup.baseName}
                   </h3>
                   {medicationGroup.isSpecialControl && (
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
                       Controle Especial
                     </span>
                   )}
@@ -269,7 +270,7 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
                     onClose();
                     onOpenMedicationSearchModal();
                   }}
-                  className="text-[11px] font-bold px-2.5 py-1.5 rounded-lg border flex items-center gap-1.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-300 border-sky-500/30 transition-all cursor-pointer"
+                  className="text-[11px] font-bold px-2.5 py-1.5 rounded-lg border-none flex items-center gap-1.5 bg-slate-200/60 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-sky-600 dark:text-sky-300 transition-all cursor-pointer"
                   title="Trocar medicamento usando busca inteligente"
                 >
                   <Search className="w-3.5 h-3.5" />
@@ -305,8 +306,8 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
 
             <div className="flex items-center gap-2">
               {hasWeight ? (
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 font-bold text-[11px]">
-                  <Scale className="w-3.5 h-3.5" strokeWidth={2} />
+                <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-medium text-[11px]">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                   <span>{patientWeight} kg (Doses calculadas ativas)</span>
                 </div>
               ) : (
@@ -459,11 +460,13 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
                           {opt.presentation}
                         </div>
                         {opt.isPediatric ? (
-                          <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 flex-shrink-0">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 flex-shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                             Pediátrico
                           </span>
                         ) : (
-                          <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-sky-500/15 text-sky-700 dark:text-sky-400 border border-sky-500/25 flex-shrink-0">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-sky-700 dark:text-sky-300 flex-shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
                             Adulto
                           </span>
                         )}

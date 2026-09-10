@@ -134,13 +134,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       >
         <div className="flex items-center gap-3">
           <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white"
-            style={{
-              backgroundColor: darkMode ? '#854D0E' : '#B45309',
-              border: '1px solid rgba(255, 255, 255, 0.12)'
-            }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center panel-navy text-cream-100 border border-white/10 shadow-tactile-sm"
           >
-            <FlaskConical className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
+            <FlaskConical className="w-5 h-5 icon-sculpted" strokeWidth={1.75} />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -163,8 +159,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           disabled={selectedExams.length === 0}
           className={`px-4 py-2 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
             selectedExams.length === 0
-              ? 'tactile-btn-secondary opacity-70 cursor-not-allowed'
-              : 'tactile-btn-success cursor-pointer'
+              ? 'tactile-btn-secondary opacity-60 cursor-not-allowed'
+              : 'tactile-btn-primary cursor-pointer active:scale-95'
           }`}
         >
           <Download className="w-4 h-4" strokeWidth={1.75} />
@@ -344,18 +340,16 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                         {exam.name}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400 font-medium">{exam.category}</span>
-                        {exam.isImage && (
-                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20">
-                            Imagem / Gráfico
-                          </span>
-                        )}
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                          {exam.type === 'lab' ? 'Laboratorial' : 'Imagem / Gráfico'}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   {exam.urgency === 'urgent' && (
-                    <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/20">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-700 dark:text-rose-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
                       Urgência
                     </span>
                   )}
@@ -452,7 +446,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           <div 
             className="w-full max-w-lg rounded-2xl border p-5 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
             style={{
-              backgroundColor: darkMode ? '#0F172A' : '#FFFFFF',
+              backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(15,23,42,0.12)'
             }}
           >

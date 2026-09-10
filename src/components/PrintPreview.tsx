@@ -370,7 +370,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <div>
             <h2 className="text-base sm:text-lg font-bold flex items-center gap-2" style={{ color: darkMode ? '#F4F7FC' : '#0B132B' }}>
               <span>Exportar & Baixar PDF</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-bold uppercase tracking-wider">
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-200/70 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-semibold uppercase tracking-wider">
                 A4 • Margens 10mm
               </span>
             </h2>
@@ -386,7 +386,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleCopyFormattedText}
-            className="h-10 sm:h-11 px-3.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-100/80 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
+            className="h-10 sm:h-11 px-3.5 rounded-xl border border-transparent bg-slate-200/60 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
             title="Copiar texto formatado para prontuário/PEP"
             aria-label="Copiar texto formatado para prontuário ou PEP"
           >
@@ -402,7 +402,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => window.print()}
-            className="h-10 sm:h-11 px-3.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-100/80 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
+            className="h-10 sm:h-11 px-3.5 rounded-xl border border-transparent bg-slate-200/60 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
             title="Imprimir direto pelo navegador (Ctrl+P)"
             aria-label="Imprimir direto pelo navegador"
           >
@@ -414,7 +414,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleSendWhatsApp}
-            className="h-10 sm:h-11 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition-all active:scale-95 cursor-pointer"
+            className="h-10 sm:h-11 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border-none transition-all active:scale-95 cursor-pointer"
             title="Enviar o documento diretamente para o WhatsApp do paciente ou familiar"
             aria-label="Enviar o documento diretamente para o WhatsApp do paciente ou familiar"
           >
@@ -427,7 +427,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             type="button"
             onClick={handleExportPDF}
             disabled={isExportingPdf}
-            className="h-10 sm:h-11 px-5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white dark:bg-cream-100 dark:hover:bg-white dark:text-navy-950 text-xs sm:text-sm font-black flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border border-white/20 dark:border-navy-900/30 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="h-10 sm:h-11 px-5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white dark:bg-cream-100 dark:hover:bg-white dark:text-navy-950 text-xs sm:text-sm font-black flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border-none transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             title="Gerar e baixar arquivo PDF padrão A4 (10mm)"
             aria-label="Gerar e baixar arquivo PDF padrão A4"
           >

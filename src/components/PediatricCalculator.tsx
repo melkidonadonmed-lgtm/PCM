@@ -447,13 +447,9 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
               <span 
-                className="p-2 rounded-xl text-white flex-shrink-0"
-                style={{
-                  backgroundColor: darkMode ? '#155730' : '#15803D',
-                  border: '1px solid rgba(255, 255, 255, 0.12)'
-                }}
+                className="w-10 h-10 rounded-xl flex items-center justify-center panel-navy text-cream-100 border border-white/10 shadow-tactile-sm flex-shrink-0"
               >
-                <Calculator className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
+                <Calculator className="w-5 h-5 icon-sculpted" strokeWidth={1.75} />
               </span>
               <h2 className="text-lg sm:text-xl font-bold tracking-tight" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                 {activeTab === 'pediatric' && 'Calculadora de Doses Pediátricas'}
