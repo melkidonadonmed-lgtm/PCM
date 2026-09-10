@@ -1,4 +1,4 @@
-# AGENTS.md — Remix PresCMed new
+# AGENTS.md — PresCMed (PCM)
 
 ## Visão geral do projeto
 
