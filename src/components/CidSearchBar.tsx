@@ -398,11 +398,11 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
 
       {/* Quick Picks / Top Diagnósticos Bar */}
       {showQuickChips && (
-        <div className="space-y-1.5 pt-0.5">
-          <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <details className="space-y-1.5 pt-0.5">
+          <summary className="cursor-pointer min-h-[44px] flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
             <Tag className="w-3 h-3 text-sky-500" />
-            <span>Diagnósticos Mais Frequentes (1 clique):</span>
-          </div>
+            <span>Diagnósticos frequentes</span>
+          </summary>
 
           <div className="flex items-center gap-1.5 flex-wrap">
             {quickPicks.map((pick) => {
@@ -427,7 +427,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               );
             })}
           </div>
-        </div>
+        </details>
       )}
     </div>
   );

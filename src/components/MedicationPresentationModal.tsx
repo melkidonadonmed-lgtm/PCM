@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { Patient, PrescriptionItem, PediatricMedication } from '../types';
 import { BaseMedicationGroup, MedicationOption } from '../utils/medicationCatalog';
-import { calculatePediatricDose, generateScheduleTimes } from '../utils/doseCalculator';
+import { calculatePediatricDose } from '../utils/doseCalculator';
 import { normalizeText, calculateStringSimilarity } from '../utils/fuzzySearch';
 
 interface MedicationPresentationModalProps {
@@ -163,7 +163,7 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
       doseCalculatedText: '',
       frequencyText: customPosology.trim(),
       scheduleInterval: customFrequency,
-      scheduleTimes: generateScheduleTimes(customFrequency),
+      scheduleTimes: [],
       durationDays: customDays > 0 ? customDays : undefined,
       instructions: customPosology.trim() || 'Tomar conforme orientação médica.',
       isContinuous: customFrequency === 'Uso Contínuo',
@@ -199,7 +199,7 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
       doseCalculatedText: '',
       frequencyText: posText,
       scheduleInterval: opt.defaultFrequency || '8/8h',
-      scheduleTimes: generateScheduleTimes(opt.defaultFrequency || '8/8h'),
+      scheduleTimes: [],
       durationDays: opt.defaultDays || 5,
       instructions: posText,
       isContinuous: opt.defaultFrequency === 'Uso Contínuo',

@@ -1,5 +1,7 @@
 # PresCMed — auditoria e implementação
 
+> Registro histórico de 06/09. Para a retomada de 10/09, correções implementadas e limites da validação atual, consulte [RETOMADA-10-09-2026.md](RETOMADA-10-09-2026.md).
+
 Verificação técnica: 06/09/2026. Alterações anteriores, já preparadas no Git, foram preservadas.
 
 ## Evidência e limites

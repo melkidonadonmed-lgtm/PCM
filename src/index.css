@@ -1223,6 +1223,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .prescription-workspace :is(label, input, select, textarea) { font-size: 14px; }
 .prescription-workspace :is(input:not([type=checkbox]), select, textarea) { min-height: 44px; }
 
+/* Mantem o titulo e a orientacao legiveis enquanto atenua apenas os controles. */
+.prescription-workspace .prescription-composer:disabled :is(input, select, textarea, button) {
+  opacity: 0.56;
+  cursor: not-allowed;
+}
+
 /* WCAG 2.5.5 Target Size (Enhanced): piso incondicional de 44px. */
 .prescription-workspace :is(button, [role="button"]) {
   min-height: 44px;

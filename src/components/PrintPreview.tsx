@@ -3,7 +3,6 @@ import { PrescriptionReview } from './PrescriptionReview';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Download, 
-  QrCode, 
   ShieldCheck, 
   FileText, 
   Award, 

@@ -56,15 +56,15 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-sidebar"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
-            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-400 dark:focus-visible:ring-cream-100 outline-none panel-navy-inset hover:bg-white/10"
+            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex flex-col gap-0.5 items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-400 dark:focus-visible:ring-cream-100 outline-none panel-navy-inset hover:bg-white/10"
             style={{
               color: '#FDFBF7'
             }}
           >
-            <Menu className="w-5 h-5" strokeWidth={1.75} />
+            <Menu className="w-5 h-5" strokeWidth={1.75} /><span className="text-[9px]">Menu</span>
           </button>
 
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="hidden sm:flex items-center gap-2 sm:gap-2.5">
             {/* Brand Emblem */}
             <div 
               className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] sm:min-w-[40px] rounded-xl flex items-center justify-center relative overflow-hidden flex-shrink-0 border"
@@ -185,7 +185,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 dark:focus-visible:ring-cream-100 outline-none panel-navy-inset hover:bg-white/10"
+            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex flex-col gap-0.5 items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 dark:focus-visible:ring-cream-100 outline-none panel-navy-inset hover:bg-white/10"
             style={{
               borderColor: 'var(--surface-panel-border)',
               color: '#FDFBF7'
@@ -197,6 +197,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <Moon className="w-5 h-5 text-cream-100" strokeWidth={1.75} />
             )}
+            <span className="text-[9px]">Tema</span>
           </button>
         </div>
       </div>

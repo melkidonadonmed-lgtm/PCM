@@ -401,8 +401,8 @@ export default function App() {
   };
 
   // Reset entire consultation (Zerar tudo: paciente + receitas + exames + documentos)
+  // A confirmação é feita pelo ConfirmationModal na Sidebar antes de chamar este handler.
   const handleResetAll = () => {
-    if (!window.confirm('Iniciar novo atendimento? Os dados e documentos do atendimento atual serão limpos.')) return;
     handleClearPatient();
     handleClearPrescription();
     setConsultationVersion(v => v + 1);

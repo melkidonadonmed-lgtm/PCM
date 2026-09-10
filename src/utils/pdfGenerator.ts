@@ -39,6 +39,8 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     examFilter = 'all'
   } = options;
 
+  // Receitas: caminho mantido apenas como API completa/defensiva — na UI o PrintPreview
+  // desvia docTypes de receita para PrescriptionReview antes de chegar aqui.
   if (['prescription', 'antimicrobial_prescription', 'special_prescription'].includes(docType)) {
     const kind = docType === 'prescription' ? 'simple' : docType === 'antimicrobial_prescription' ? 'antimicrobial' : 'c1';
     return generatePrescriptionPDF(buildPrescriptionDocuments(prescriptionItems).filter(d => d.kind === kind), doctor, patient);
@@ -374,7 +376,13 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
       pdf.setFontSize(8.5);
       pdf.setTextColor(15, 23, 42);
       pdf.text(`${certificate.cid10Code} — ${certificate.cid10Description || ''}`, marginX + 4, currentY + 9);
-      currentY += 16;
+
+      // Ressalva legal: inclusão do CID exige consentimento do paciente (Res. CFM 1.658/2002)
+      pdf.setFont('helvetica', 'italic');
+      pdf.setFontSize(6.5);
+      pdf.setTextColor(100, 116, 139);
+      pdf.text('Inclusão do CID autorizada expressamente pelo paciente, conforme Res. CFM nº 1.658/2002.', marginX + 4, currentY + 15.5);
+      currentY += 21;
     }
 
     if (certificate.observations) {

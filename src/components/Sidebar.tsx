@@ -131,7 +131,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  const handleTriggerResetAll = () => onResetAll?.();
+  const handleTriggerResetAll = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Iniciar Novo Atendimento?',
+      description: 'Os dados e documentos do atendimento atual serão limpos: paciente, receitas, exames, atestado e encaminhamento.',
+      confirmLabel: 'Novo Atendimento',
+      variant: 'danger',
+      onConfirm: () => {
+        onResetAll?.();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
 
   const primaryNavItems = [
     {
@@ -311,7 +323,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
       >
         <div className={`overflow-y-auto flex-1 custom-scrollbar ${
-          isOpen ? 'p-3 space-y-4' : 'py-3 px-2 space-y-3 flex flex-col items-center'
+          // pb-24 no mobile: a bottom nav fixa (h-16 + safe-area, z-50) cobre o fim
+          // do drawer; sem esse respiro o "Novo Atendimento Completo" fica inclicavel.
+          isOpen ? 'p-3 pb-24 lg:pb-3 space-y-4' : 'py-3 px-2 space-y-3 flex flex-col items-center'
         }`}>
           
           {/* Mobile Header with Close Button */}
@@ -469,9 +483,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 type="button"
                 onClick={handleTriggerResetAll}
-                className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-sky-300 hover:text-sky-200 hover:bg-sky-500/10 dark:text-cream-100 dark:hover:text-white dark:hover:bg-white/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+                className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/8 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-cream-100 outline-none"
               >
-                <RotateCcw className="w-4 h-4 shrink-0 text-sky-300 dark:text-cream-200" />
+                <RotateCcw className="w-4 h-4 shrink-0 text-slate-400" />
                 <span>Novo Atendimento Completo</span>
               </button>
             </div>
