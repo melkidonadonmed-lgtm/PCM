@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { flushSync } from 'react-dom';
 import {
   DEFAULT_TAB,
   TAB_TITLES,
@@ -119,20 +120,33 @@ export default function App() {
   // Aplica um destino sem tocar no historico. Usado tanto pela navegacao do
   // usuario quanto pelos botoes Voltar/Avancar do navegador.
   const applyTab = useCallback((tab: RouteTab) => {
-    if (tab === 'certificate') {
-      setCertSubTab('certificate');
-    } else if (tab === 'referral') {
-      setCertSubTab('referral');
-    }
-    setActiveTab(tab);
+    const updateDOM = () => {
+      if (tab === 'certificate') {
+        setCertSubTab('certificate');
+      } else if (tab === 'referral') {
+        setCertSubTab('referral');
+      }
+      setActiveTab(tab);
 
-    // Auto-close sidebar on mobile/tablet viewports
-    if (window.innerWidth < 1024) {
-      setSidebarOpen(false);
-    }
+      // Auto-close sidebar on mobile/tablet viewports
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      }
 
-    // Always scroll to top when navigating between clinical areas
-    window.scrollTo({ top: 0, behavior: 'instant' });
+      // Always scroll to top when navigating between clinical areas
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    };
+
+    // Suporte à View Transitions API para transições de tela suaves sem saltos
+    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+      (document as unknown as { startViewTransition: (cb: () => void) => void }).startViewTransition(() => {
+        flushSync(() => {
+          updateDOM();
+        });
+      });
+    } else {
+      updateDOM();
+    }
   }, []);
 
   // Centralized tab navigation. `patients` nao e um destino: abre um modal.

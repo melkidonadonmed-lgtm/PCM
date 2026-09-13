@@ -1,5 +1,4 @@
-import React, { useState, useRef } from 'react';
-import { useModalA11y } from '../hooks/useModalA11y';
+import React, { useState, useRef, useEffect } from 'react';
 import { User, Check, X, Eraser } from 'lucide-react';
 import { Patient } from '../types';
 
@@ -19,7 +18,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   onClose
 }) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const [formData, setFormData] = useState<Patient>({
     id: patient?.id || 'pat-' + Date.now(),
@@ -37,9 +36,51 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     notes: patient?.notes || ''
   });
 
-  // Acessibilidade de diálogo modal: contenção de foco, inertização do fundo,
-  // bloqueio de rolagem, Escape e restauração do foco ao disparador.
-  useModalA11y({ dialogRef, isOpen: true, onClose, initialFocusRef: nameInputRef });
+  // Ciclo de vida do <dialog> nativo com Top Layer e Light Dismiss
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
+    // Foco inicial garantido no campo de nome
+    nameInputRef.current?.focus({ preventScroll: true });
+
+    // Fechamento nativo por Escape
+    const handleCancel = (e: Event) => {
+      e.preventDefault();
+      onClose();
+    };
+
+    // Fallback de light-dismiss para navegadores sem suporte ao atributo `closedby="any"`
+    const handleClickFallback = (event: MouseEvent) => {
+      if ('closedBy' in HTMLDialogElement.prototype) return;
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      const isInside = (
+        rect.top <= event.clientY &&
+        event.clientY <= rect.top + rect.height &&
+        rect.left <= event.clientX &&
+        event.clientX <= rect.left + rect.width
+      );
+      if (!isInside) {
+        onClose();
+      }
+    };
+
+    dialog.addEventListener('cancel', handleCancel);
+    dialog.addEventListener('click', handleClickFallback);
+
+    return () => {
+      dialog.removeEventListener('cancel', handleCancel);
+      dialog.removeEventListener('click', handleClickFallback);
+      if (dialog.open) {
+        dialog.close();
+      }
+    };
+  }, [onClose]);
 
   const handleClear = () => {
     const emptyPat: Patient = {
@@ -69,14 +110,11 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   };
 
   return (
-    <div
+    <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs isolate animate-tab-fade"
-      role="dialog"
-      aria-modal="true"
+      {...({ closedby: 'any' } as React.DialogHTMLAttributes<HTMLDialogElement>)}
       aria-labelledby="patient-modal-title"
-      tabIndex={-1}
-      onClick={onClose}
+      className="native-modal-dialog p-3 sm:p-4 bg-transparent outline-none max-w-md w-full animate-tab-fade"
     >
       <div 
         className="w-full max-w-md rounded-2xl border overflow-hidden shadow-tactile-lg isolate transition-all"
@@ -85,7 +123,6 @@ export const PatientModal: React.FC<PatientModalProps> = ({
           borderColor: 'var(--surface-card-border)',
           boxShadow: darkMode ? '0 24px 50px -8px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -8px rgba(20,32,50,0.18), inset 0 1px 0 rgba(255,255,255,0.95)'
         }}
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div 
@@ -321,6 +358,6 @@ export const PatientModal: React.FC<PatientModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </dialog>
   );
 };
