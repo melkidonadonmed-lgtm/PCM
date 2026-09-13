@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
       id="prescmed-header" 
       className="sticky top-0 z-50 w-full border-b backdrop-blur-md transition-colors no-print isolate panel-navy panel-projected-bottom"
       style={{
-        backgroundColor: darkMode ? '#0A0F18' : '#142032',
+        backgroundColor: 'var(--surface-panel)',
         borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.1)',
         boxShadow: darkMode 
           ? '0 12px 28px -5px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.08)'
@@ -56,6 +56,8 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-sidebar"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
+            aria-expanded={sidebarOpen}
+            aria-controls="prescmed-sidebar"
             className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex flex-col gap-0.5 items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-400 dark:focus-visible:ring-cream-100 outline-none panel-navy-inset hover:bg-white/10"
             style={{
               color: '#FDFBF7'
@@ -116,17 +118,19 @@ export const Header: React.FC<HeaderProps> = ({
             }}
             title="Clique para definir ou editar os dados do paciente"
           >
-            <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 border ${
-              hasPatient 
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' 
-                : 'bg-white/10 text-cream-100 border-white/20'
-            }`}>
-              {hasPatient ? <User className="w-4 h-4" strokeWidth={1.75} /> : <UserPlus className="w-4 h-4" strokeWidth={1.75} />}
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 border border-white/10 bg-white/5 text-slate-200">
+              {hasPatient ? <User className="w-4 h-4 text-slate-200" strokeWidth={1.75} /> : <UserPlus className="w-4 h-4 text-slate-400" strokeWidth={1.75} />}
             </div>
             <div className="text-left overflow-hidden min-w-0 flex-1">
               <div className="text-[11px] sm:text-xs font-bold truncate text-white flex items-center justify-between gap-1">
-                <span className="truncate">
-                  {hasPatient ? patientName : 'Identificar Paciente'}
+                <span className="truncate flex items-center gap-1.5">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                      hasPatient ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]' : 'bg-slate-500'
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate">{hasPatient ? patientName : 'Identificar Paciente'}</span>
                 </span>
                 <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform opacity-80 flex-shrink-0 text-slate-300" strokeWidth={1.75} />
               </div>

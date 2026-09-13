@@ -1,14 +1,54 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Download, Copy, Check, FileText, AlertTriangle, User, Stethoscope, Layers } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Download, 
+  Copy, 
+  Check, 
+  FileText, 
+  AlertTriangle, 
+  User, 
+  Stethoscope, 
+  Layers,
+  FlaskConical,
+  Award,
+  Building2
+} from 'lucide-react';
 import type { DoctorProfile, Patient, PrescriptionItem, PrescriptionDocument } from '../types';
 import { buildPrescriptionDocuments, prescriptionDocumentText, prescriptionIssues } from '../utils/prescriptionRules';
 import { generatePrescriptionPDF, layoutPrescriptionPages, prescriptionIdentityIssues } from '../utils/prescriptionPdf';
 import { PrescriptionPages } from './PrescriptionPages';
 
-export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatient, onEditDoctor }: {
-  items: PrescriptionItem[]; doctor: DoctorProfile; patient: Patient;
-  onBack: () => void; onEditPatient: () => void; onEditDoctor: () => void;
-}) {
+export interface PrescriptionReviewProps {
+  items: PrescriptionItem[];
+  doctor: DoctorProfile;
+  patient: Patient;
+  onBack: () => void;
+  onEditPatient: () => void;
+  onEditDoctor: () => void;
+  onNavigateToPrescription?: () => void;
+  onNavigateToExams?: () => void;
+  onNavigateToDocuments?: () => void;
+  onSwitchDocType?: (type: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral') => void;
+  examsCount?: number;
+  hasCertificate?: boolean;
+  hasReferral?: boolean;
+}
+
+export function PrescriptionReview({ 
+  items, 
+  doctor, 
+  patient, 
+  onBack, 
+  onEditPatient, 
+  onEditDoctor,
+  onNavigateToPrescription,
+  onNavigateToExams,
+  onNavigateToDocuments,
+  onSwitchDocType,
+  examsCount = 0,
+  hasCertificate = false,
+  hasReferral = false
+}: PrescriptionReviewProps) {
   const documents = useMemo(() => buildPrescriptionDocuments(items), [items]);
   const [selectedId, setSelectedId] = useState('');
   const [message, setMessage] = useState('');
@@ -39,16 +79,41 @@ export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatie
       {/* Header Clínico de Revisão */}
       <header className="tactile-card p-4 sm:p-6 rounded-2xl space-y-4 no-print" style={{ backgroundColor: 'var(--surface-card)', borderColor: 'var(--border-medium)' }}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/60 dark:border-white/10 pb-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
               className="clinical-button secondary"
-              onClick={onBack}
+              onClick={onNavigateToPrescription || onBack}
               aria-label="Voltar aos medicamentos"
             >
               <ArrowLeft size={16} />
               <span>Voltar aos medicamentos</span>
             </button>
+
+            {onNavigateToExams && (
+              <button
+                type="button"
+                className="clinical-button secondary text-xs"
+                onClick={onNavigateToExams}
+                title="Ir para a solicitação de exames"
+              >
+                <FlaskConical size={14} />
+                <span>Exames {examsCount > 0 ? `(${examsCount})` : ''}</span>
+              </button>
+            )}
+
+            {onNavigateToDocuments && (
+              <button
+                type="button"
+                className="clinical-button secondary text-xs"
+                onClick={onNavigateToDocuments}
+                title="Ir para emissão de atestados e encaminhamentos"
+              >
+                <Award size={14} />
+                <span>Documentos</span>
+              </button>
+            )}
+
             <span className="text-[11px] px-2.5 py-1 rounded-lg bg-navy-900/10 dark:bg-white/10 text-navy-900 dark:text-cream-100 font-bold uppercase tracking-wider">
               Etapa 3 de 3 • Revisão Final
             </span>
@@ -91,9 +156,9 @@ export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatie
 
       {/* Alertas de Pendências Clínicas ou Legais */}
       {(problems.length > 0 || identityProblems.length > 0 || layout.error) && (
-        <div role="alert" className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 no-print space-y-3">
+        <div role="alert" className="p-4 sm:p-5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 no-print space-y-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
             <h2 className="font-bold text-sm">Pendências para Emissão do Documento</h2>
           </div>
           <ul className="list-disc pl-5 space-y-1 text-xs">
@@ -105,7 +170,7 @@ export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatie
             <button
               type="button"
               className="clinical-button secondary text-xs"
-              onClick={onBack}
+              onClick={onNavigateToPrescription || onBack}
             >
               Corrigir medicamentos na receita
             </button>
@@ -113,7 +178,7 @@ export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatie
         </div>
       )}
 
-      {/* Sem documentos */}
+      {/* Sem documentos de prescrição */}
       {!documents.length && (
         <div className="tactile-card p-8 rounded-2xl text-center space-y-3" style={{ backgroundColor: 'var(--surface-card)' }}>
           <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
@@ -125,20 +190,91 @@ export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatie
           <p className="text-xs text-slate-500 max-w-md mx-auto">
             Adicione medicamentos no formulário e resolva a classificação de qualquer item pendente.
           </p>
-          <button type="button" className="clinical-button" onClick={onBack}>
-            Adicionar Medicamentos
-          </button>
+          <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
+            <button type="button" className="clinical-button" onClick={onNavigateToPrescription || onBack}>
+              Adicionar Medicamentos
+            </button>
+            {onSwitchDocType && (
+              <>
+                <button type="button" className="clinical-button secondary text-xs" onClick={() => onSwitchDocType('exams')}>
+                  <FlaskConical size={14} className="mr-1 inline" />
+                  Ver Exames {examsCount > 0 ? `(${examsCount})` : ''}
+                </button>
+                <button type="button" className="clinical-button secondary text-xs" onClick={() => onSwitchDocType('certificate')}>
+                  <Award size={14} className="mr-1 inline" />
+                  Ver Atestado
+                </button>
+                <button type="button" className="clinical-button secondary text-xs" onClick={() => onSwitchDocType('referral')}>
+                  <Building2 size={14} className="mr-1 inline" />
+                  Ver Encaminhamento
+                </button>
+              </>
+            )}
+          </div>
         </div>
       )}
 
       {/* Documentos Prontos */}
       {!!documents.length && (
         <>
-          {/* Seletor de Receitas Geradas (Tabs) */}
+          {/* Alternador de Tipo de Documento Global no Atendimento */}
+          <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 no-print">
+            <div className="flex items-center gap-1.5 overflow-x-auto py-1">
+              <button
+                type="button"
+                className="clinical-button text-xs font-bold"
+                aria-pressed="true"
+              >
+                <FileText size={14} />
+                <span>Receituários ({documents.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (onSwitchDocType) onSwitchDocType('exams');
+                  else if (onNavigateToExams) onNavigateToExams();
+                }}
+                className="clinical-button secondary text-xs"
+                title="Visualizar pedido de exames"
+              >
+                <FlaskConical size={14} />
+                <span>Exames {examsCount > 0 ? `(${examsCount})` : ''}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (onSwitchDocType) onSwitchDocType('certificate');
+                  else if (onNavigateToDocuments) onNavigateToDocuments();
+                }}
+                className="clinical-button secondary text-xs"
+                title="Visualizar atestado médico"
+              >
+                <Award size={14} />
+                <span>Atestados</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (onSwitchDocType) onSwitchDocType('referral');
+                  else if (onNavigateToDocuments) onNavigateToDocuments();
+                }}
+                className="clinical-button secondary text-xs"
+                title="Visualizar guia de encaminhamento"
+              >
+                <Building2 size={14} />
+                <span>Encaminhamento</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Seletor de Receitas Geradas (Tabs das Vias Normativas) */}
           <nav aria-label="Receitas geradas" className="flex flex-wrap items-center gap-2 no-print">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1 mr-1">
               <Layers size={14} />
-              <span>Receitas:</span>
+              <span>Vias Normativas:</span>
             </span>
             {documents.map(d => {
               const isCurrent = d.id === selected?.id;
@@ -152,7 +288,12 @@ export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatie
                 >
                   <span>{d.title}</span>
                   <span className="opacity-70">({d.items.length} itens • {d.copies} {d.copies === 1 ? 'via' : 'vias'})</span>
-                  {d.kind === 'c1' && <span className="text-[10px] font-extrabold px-1 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300">C1</span>}
+                  {d.kind === 'c1' && (
+                    <span className="text-[10px] font-bold text-slate-300 inline-flex items-center">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block mr-1"></span>
+                      C1
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -208,8 +349,8 @@ export function PrescriptionReview({ items, doctor, patient, onBack, onEditPatie
 
           {/* Toast de Feedback */}
           {message && (
-            <div role="status" className="p-3 rounded-xl bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/25 flex items-center gap-2 text-xs font-bold no-print">
-              <Check size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div role="status" className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 flex items-center gap-2 text-xs font-bold no-print">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
               <span>{message}</span>
             </div>
           )}

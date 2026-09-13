@@ -338,10 +338,11 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                           <button
                             type="button"
                             onClick={(e) => handleAppend(item, e)}
-                            className="text-[10px] font-bold px-2 py-1 rounded bg-emerald-600/20 text-emerald-500 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer"
+                            className="text-xs font-bold px-2.5 py-1.5 min-h-[36px] sm:min-h-[44px] rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer inline-flex items-center gap-1.5"
                             title="Inserir na hipótese"
                           >
-                            + Inserir
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                            <span>Inserir</span>
                           </button>
                         )}
 
@@ -364,7 +365,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                     <button
                       type="button"
                       onClick={handleCustomSubmit}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow cursor-pointer active:scale-95 transition-all"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow cursor-pointer active:scale-95 transition-all"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Usar diagnóstico digitado "{searchTerm}"</span>
@@ -378,7 +379,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
             <div 
               className="p-2.5 border-t text-[11px] flex items-center justify-between text-slate-400"
               style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : '#FAF7F1',
+                backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--surface-card)',
                 borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
               }}
             >
@@ -387,7 +388,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer min-h-[44px] px-2 flex items-center"
               >
                 Fechar catálogo
               </button>
@@ -412,16 +413,16 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   key={pick.code}
                   type="button"
                   onClick={() => onSelectCid({ code: pick.code, description: pick.description, category: pick.category })}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+                  className={`text-[11px] px-3 py-2 min-h-[44px] rounded-xl font-medium transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
                     isSelected
-                      ? 'bg-sky-700 text-white border-sky-600 font-bold shadow-xs'
+                      ? 'bg-sky-700 text-white border-transparent font-bold shadow-xs'
                       : darkMode
-                      ? 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'
+                      ? 'bg-slate-800/60 text-slate-300 border border-slate-700/60 hover:bg-slate-700 hover:text-white'
+                      : 'bg-white text-slate-700 border border-slate-200 hover:bg-sky-50 hover:border-sky-300'
                   }`}
                   title={`${pick.code} - ${pick.description}`}
                 >
-                  <span className="font-mono font-bold text-sky-500 dark:text-sky-400 text-[10px]">{pick.code}</span>
+                  <span className={`font-mono font-bold text-[10px] ${isSelected ? 'text-sky-200' : 'text-sky-500 dark:text-sky-400'}`}>{pick.code}</span>
                   <span className="truncate max-w-[150px]">{pick.description.split('(')[0].trim()}</span>
                 </button>
               );

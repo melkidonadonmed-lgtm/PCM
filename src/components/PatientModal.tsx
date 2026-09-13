@@ -81,8 +81,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       <div 
         className="w-full max-w-md rounded-2xl border overflow-hidden shadow-tactile-lg isolate transition-all"
         style={{
-          backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255,255,255,0.12)' : '#E3D7BD',
+          backgroundColor: 'var(--surface-card)',
+          borderColor: 'var(--surface-card-border)',
           boxShadow: darkMode ? '0 24px 50px -8px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -8px rgba(20,32,50,0.18), inset 0 1px 0 rgba(255,255,255,0.95)'
         }}
         onClick={(e) => e.stopPropagation()}
@@ -91,8 +91,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         <div 
           className="p-4 border-b flex items-center justify-between" 
           style={{ 
-            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : '#E3D7BD',
-            backgroundColor: darkMode ? '#141E2C' : '#F8F4EC'
+            borderColor: 'var(--surface-card-border)',
+            backgroundColor: 'var(--surface-inset)'
           }}
         >
           <div className="flex items-center gap-2.5">
@@ -107,7 +107,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de dados do paciente"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition-all"
+            className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition-all"
           >
             <X className="w-5 h-5" strokeWidth={1.75} />
           </button>
@@ -292,7 +292,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             />
           </div>
 
-          <div className="pt-3 border-t flex items-center justify-between gap-2" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : '#E3D7BD' }}>
+          <div className="pt-3 border-t flex items-center justify-between gap-2" style={{ borderColor: 'var(--surface-card-border)' }}>
             <button
               type="button"
               onClick={handleClear}

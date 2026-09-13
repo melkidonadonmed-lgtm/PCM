@@ -230,7 +230,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs font-bold px-3.5 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition-all cursor-pointer border-none active:scale-95 ${
+              className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer border-none active:scale-95 ${
                 isSelected
                   ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-sm'
                   : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10'
@@ -332,7 +332,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAddSingleMedication(med, protocol, idx)}
-                        className={`w-full @sm:w-auto px-3.5 py-1.5 min-h-[38px] rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 border-none shadow-xs ${
+                        className={`w-full @sm:w-auto px-3.5 py-2 min-h-[44px] rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 border-none shadow-xs ${
                           isMedAdded 
                             ? 'bg-emerald-600 text-white shadow-sm' 
                             : 'bg-white dark:bg-white/10 hover:bg-sky-50 dark:hover:bg-white/15 text-sky-700 dark:text-sky-300'
@@ -514,9 +514,12 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] font-medium text-amber-800 dark:text-amber-300">
-                    <span className="font-bold">Atenção Médica: </span>
-                    {protocol.clinicalNotes}
+                  <div className="p-2.5 rounded-xl bg-amber-500/8 border border-amber-500/15 text-[11px] font-medium text-amber-900 dark:text-amber-200 flex items-start gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1" />
+                    <div>
+                      <span className="font-bold">Atenção Médica: </span>
+                      {protocol.clinicalNotes}
+                    </div>
                   </div>
                 </div>
               </div>

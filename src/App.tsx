@@ -256,16 +256,12 @@ export default function App() {
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0];
     return {
-      id: 'cert-1',
       patientName: '',
-      documentType: 'CPF',
       documentNumber: '',
-      daysOff: 2,
-      startDate: today,
-      endDate: tomorrow,
+      daysOff: 1,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date().toISOString().split('T')[0],
       periodText: 'por motivo de doença e necessidade de repouso',
       includeCID: false,
       cid10Code: 'J00',
@@ -476,7 +472,7 @@ export default function App() {
           id="conteudo-principal"
           ref={mainRef}
           tabIndex={-1}
-          className="flex-1 min-w-0 pb-20 lg:pb-6 outline-none"
+          className="flex-1 min-w-0 pb-mobile-container lg:pb-6 outline-none"
         >
           {storageWarnings.length > 0 && <aside role="alert" className="clinical-card m-4 p-4 no-print"><p className="font-semibold">Atenção ao salvamento local</p>{storageWarnings.map(w => <p key={w} className="text-sm mt-1">{w}</p>)}<button className="clinical-button secondary mt-3" onClick={downloadLocalBackup}>Baixar backup dos dados originais</button></aside>}
           <div hidden={activeTab !== 'prescription'}>
@@ -494,6 +490,7 @@ export default function App() {
               onToggleWeightCalc={handleToggleWeightCalc}
               onClearPrescription={handleClearPrescription}
               onNavigateToPrint={() => handleNavigateToPrint('prescription')}
+              onNavigateToExams={() => handleSelectTab('exams')}
               onNavigateToPediatricCalc={() => handleSelectTab('pediatric_calc')}
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
               onOpenPatientModal={() => setIsPatientModalOpen(true)}
@@ -519,6 +516,8 @@ export default function App() {
               onUpdateExams={setSelectedExams}
               clinicalIndication={examIndication}
               onUpdateClinicalIndication={setExamIndication}
+              onNavigateToPrescription={() => handleSelectTab('prescription')}
+              onNavigateToDocuments={() => handleSelectTab('certificate')}
               onNavigateToPrint={() => handleNavigateToPrint('exams')}
             />
           )}
@@ -536,6 +535,8 @@ export default function App() {
               initialSubTab={certSubTab}
               activeSubTab={certSubTab}
               onSelectSubTab={handleSelectTab}
+              onNavigateToExams={() => handleSelectTab('exams')}
+              onNavigateToPrescription={() => handleSelectTab('prescription')}
               onNavigateToPrint={(type) => handleNavigateToPrint(type)}
             />
           )}
@@ -567,6 +568,10 @@ export default function App() {
               onClearPrescription={handleClearPrescription}
               onResetAll={handleResetAll}
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
+              onNavigateToPrescription={() => handleSelectTab('prescription')}
+              onNavigateToExams={() => handleSelectTab('exams')}
+              onNavigateToDocuments={() => handleSelectTab('certificate')}
+              printOrigin={printOrigin}
             />
           )}
         </main>
@@ -579,6 +584,8 @@ export default function App() {
         onSelectTab={handleSelectTab}
         prescriptionCount={prescriptionItems.length}
         selectedExamsCount={selectedExams.length}
+        hasPatient={Boolean(patient.name?.trim())}
+        patientWeight={patient.weightKg > 0 ? patient.weightKg : undefined}
         onOpenMenu={() => setSidebarOpen(true)}
       />
 

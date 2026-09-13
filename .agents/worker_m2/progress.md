@@ -1,0 +1,42 @@
+# Progress Log — Worker M2
+
+- **Status**: Implementação do Milestone 2 Concluída com Sucesso
+- **Last visited**: 2026-09-13T01:30:00Z
+- **Tarefas Concluídas**:
+  - [x] Leitura de ORIGINAL_REQUEST.md, AGENTS.md, PROJECT.md e handoff.md do Explorer 2
+  - [x] Criação de DISPATCH.md, BRIEFING.md e progress.md
+  - [x] Inspeção minuciosa dos 6 arquivos-alvo:
+    - `src/components/PrescriptionBuilder.tsx`
+    - `src/components/ExamRequester.tsx`
+    - `src/components/CertificateAndReferral.tsx`
+    - `src/components/PrintPreview.tsx`
+    - `src/components/PrescriptionReview.tsx`
+    - `src/App.tsx`
+  - [x] Implementação das correções em `PrescriptionBuilder.tsx`:
+    - Cópia real de texto da receita via `navigator.clipboard.writeText` com toast de feedback ("Copiado para a área de transferência!").
+    - Compartilhamento WhatsApp direto sem redirecionamento para o preview.
+    - Conexão do atalho `onNavigateToPediatricCalc` na barra de peso do paciente e no topo do compositor.
+    - Desatamento da competição de botões no rodapé: Zerar, Copiar e WhatsApp como ações secundárias; Revisar Receita como secundária; Avançar para Exames como CTA tátil primário.
+    - Alinhamento do Stepper clínico em 3 etapas lineares de atendimento.
+    - Unificação da coluna lateral simulada em uma única ação limpa "Revisar & Emitir PDF".
+  - [x] Implementação do fluxo linear em `ExamRequester.tsx`:
+    - Stepper clínico visualmente ativo na Etapa 2 (Exames).
+    - Botão secundário "◀ Voltar para Prescrição" (`onNavigateToPrescription`).
+    - CTA tátil primário "Avançar para Documentos ➔" (`onNavigateToDocuments`).
+    - Ação de visualização do pedido mantida ("Visualizar Pedido de Exames").
+  - [x] Implementação do fluxo linear em `CertificateAndReferral.tsx`:
+    - Stepper clínico visualmente ativo na Etapa 3 (Documentos).
+    - Botão secundário "◀ Voltar para Exames" (`onNavigateToExams`) no topo e rodapé do Atestado e do Encaminhamento.
+    - CTA tátil primário "Finalizar Atendimento & Emitir Documentos ➔" (`() => onNavigateToPrint('certificate' / 'referral')`).
+    - Conformidade ética e sanitária preservada (Res. CFM 1.658/2002 para CID-10, WhatsApp direto).
+  - [x] Resolução do loop circular e desatamento em `PrescriptionReview.tsx` e `PrintPreview.tsx`:
+    - Em `PrescriptionReview.tsx`: inclusão de abas para alternância global entre tipos de documento (Receituários, Exames, Atestados, Encaminhamentos) e botões de atalho.
+    - Em `PrescriptionReview.tsx`: botão "Voltar aos medicamentos" respeitando `onNavigateToPrescription || onBack`.
+    - Em `PrintPreview.tsx`: roteamento inteligente de retorno (`handleSmartBack`) baseado no documento ativo (Exames -> volta para Exames; Atestado/Encaminhamento -> volta para Documentos; Receita -> volta para Prescrição).
+    - Encaminhamento correto de callbacks de navegação entre `PrintPreview` e `PrescriptionReview`.
+  - [x] Conexão dos callbacks e propagação de estado em `App.tsx`:
+    - Passagem de `onNavigateToExams` e `onNavigateToPediatricCalc` para `PrescriptionBuilder`.
+    - Passagem de `onNavigateToPrescription` e `onNavigateToDocuments` para `ExamRequester`.
+    - Passagem de `onNavigateToExams` e `onNavigateToPrescription` para `CertificateAndReferral`.
+    - Passagem de `onNavigateToPrescription`, `onNavigateToExams`, `onNavigateToDocuments` e `printOrigin` para `PrintPreview`.
+  - [x] Elaboração do relatório técnico de handoff com os 5 componentes obrigatórios (`handoff.md`).

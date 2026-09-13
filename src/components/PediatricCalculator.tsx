@@ -565,12 +565,12 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               key={p.label}
               type="button"
               onClick={() => onUpdatePatientWeight(p.weight)}
-              className={`text-xs px-3.5 py-2 min-h-[44px] rounded-xl border font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 active:scale-95 ${
+              className={`text-xs px-3.5 py-2 min-h-[44px] rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 active:scale-95 ${
                 patientWeight === p.weight
-                  ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-600/25'
+                  ? 'bg-emerald-600 text-white border-transparent shadow-tactile-sm'
                   : darkMode
-                  ? 'bg-slate-800/80 text-slate-300 border-slate-700/80 hover:bg-slate-700 hover:text-white'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                  ? 'bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700 hover:text-white'
+                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
               }`}
             >
               {p.label}
@@ -613,12 +613,12 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl border whitespace-nowrap transition-all cursor-pointer flex-shrink-0 active:scale-95 ${
+                className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer flex-shrink-0 active:scale-95 ${
                   selectedCategory === cat
-                    ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                    ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-none shadow-tactile-navy dark:shadow-tactile-cream'
                     : darkMode
-                    ? 'bg-slate-800/80 text-slate-300 border-slate-700/80 hover:bg-slate-700 hover:text-white'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                    ? 'bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700 hover:text-white'
+                    : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
                 }`}
               >
                 {cat}
@@ -665,7 +665,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                           <button
                             type="button"
                             onClick={() => handleAddMedication(med)}
-                            className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 ml-auto cursor-pointer ${
+                            className={`px-3 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center gap-1.5 ml-auto cursor-pointer ${
                               isAdded ? 'bg-emerald-700 text-white' : 'tactile-btn-primary'
                             }`}
                           >
@@ -713,7 +713,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   key={f.id}
                   type="button"
                   onClick={() => setAdultRenalFunction(f.id as any)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     adultRenalFunction === f.id
                       ? 'bg-navy-800 dark:bg-navy-700 text-white shadow-tactile-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -742,7 +742,8 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   <div className="space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="text-[9px] uppercase font-extrabold px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 inline-flex items-center">
+                          <span className="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block mr-1.5"></span>
                           {med.category}
                         </span>
                         <h4 className="text-sm font-bold text-slate-900 dark:text-cream-50 mt-1">
@@ -762,8 +763,8 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                     </div>
 
                     {warning && (
-                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2 rounded-xl border border-amber-500/20">
-                        <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      <div className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
                         <span>{warning}</span>
                       </div>
                     )}
@@ -772,7 +773,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddAdultMedication(med)}
-                    className={`w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 ${
+                    className={`w-full py-2.5 min-h-[44px] rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 ${
                       isAdded ? 'bg-emerald-700 text-white' : 'tactile-btn-primary'
                     }`}
                   >
@@ -798,7 +799,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           >
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold border border-cyan-500/20">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold border border-slate-200 dark:border-slate-700 shadow-tactile-sm">
                   <Droplets className="w-5 h-5" />
                 </div>
                 <div>
@@ -831,51 +832,31 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 text-center">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400 block">Microgotas</span>
-                <span className="text-base sm:text-lg font-black text-sky-600 dark:text-sky-400">{hollidaySegar.microgotasMin}</span>
-                <span className="text-[10px] text-slate-400 block">microgotas/min</span>
+                <span className="text-[10px] font-extrabold uppercase text-slate-400 block">NaCl 20%</span>
+                <span className="text-base sm:text-lg font-black text-slate-800 dark:text-slate-200">{hollidaySegar.nacl20Ml} mL</span>
+                <span className="text-[10px] text-slate-400 block">eletrólitos</span>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 text-center">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400 block">Macrogotas</span>
-                <span className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400">{hollidaySegar.macrogotasMin}</span>
-                <span className="text-[10px] text-slate-400 block">gotas/min</span>
-              </div>
-            </div>
-
-            {/* Composição Proporcional da Solução (4:1) */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 space-y-2">
-              <h4 className="text-xs font-bold text-slate-900 dark:text-cream-50 uppercase tracking-wider">
-                Composição da Solução de Manutenção (4 Partes SG 5% : 1 Parte SF 0,9%)
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-semibold">
-                <div className="p-2 rounded-lg bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-slate-800 dark:text-slate-200">
-                  🔹 Soro Glicosado 5%: <span className="text-cyan-600 dark:text-cyan-400 font-bold">{hollidaySegar.sg5Ml} mL</span>
-                </div>
-                <div className="p-2 rounded-lg bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-slate-800 dark:text-slate-200">
-                  🔹 Soro Fisiológico 0,9%: <span className="text-cyan-600 dark:text-cyan-400 font-bold">{hollidaySegar.sfMl} mL</span>
-                </div>
-                <div className="p-2 rounded-lg bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 text-slate-800 dark:text-slate-200">
-                  🔹 KCl 10% (Reposição K+): <span className="text-cyan-600 dark:text-cyan-400 font-bold">{hollidaySegar.kcl10Ml} mL</span>
-                </div>
+                <span className="text-[10px] font-extrabold uppercase text-slate-400 block">KCl 19,1%</span>
+                <span className="text-base sm:text-lg font-black text-slate-800 dark:text-slate-200">{hollidaySegar.kcl19Ml} mL</span>
+                <span className="text-[10px] text-slate-400 block">eletrólitos</span>
               </div>
             </div>
 
             <button
               type="button"
               onClick={handleAddHydrationToPrescription}
-              className={`w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition active:scale-95 ${
-                addedMedsMap.hydration ? 'bg-emerald-700 text-white' : 'tactile-btn-primary'
-              }`}
+              className="tactile-btn-primary w-full py-3 min-h-[44px] rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-95"
             >
-              {addedMedsMap.hydration ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-              <span>{addedMedsMap.hydration ? 'Prescrição de Hidratação Adicionada!' : 'Inserir Prescrição de Hidratação Venosa na Receita'}</span>
+              <Plus className="w-4 h-4" />
+              <span>Inserir Hidratação de Holliday-Segar na Receita</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* CONTEÚDO 4: ABA DIETA & NECESSIDADE CALÓRICA */}
+      {/* CONTEÚDO 4: ABA DIETA & NUTRIÇÃO PEDIÁTRICA */}
       {activeTab === 'diet' && (
         <div className="space-y-4">
           <div 
@@ -887,7 +868,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           >
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold border border-amber-500/20">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold border border-slate-200 dark:border-slate-700 shadow-tactile-sm">
                   <Utensils className="w-5 h-5" />
                 </div>
                 <div>
@@ -910,7 +891,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                     key={cat.id}
                     type="button"
                     onClick={() => setDietAgeCategory(cat.id as any)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       dietAgeCategory === cat.id
                         ? 'bg-navy-800 dark:bg-navy-700 text-white shadow-tactile-sm'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'

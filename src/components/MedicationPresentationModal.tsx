@@ -226,8 +226,8 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
       <div
         className="w-full max-w-2xl max-h-[92vh] rounded-2xl border flex flex-col shadow-tactile-lg overflow-hidden"
         style={{
-          backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255,255,255,0.12)' : '#E3D7BD',
+          backgroundColor: 'var(--surface-card)',
+          borderColor: 'var(--surface-card-border)',
           boxShadow: darkMode ? '0 24px 50px -8px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -8px rgba(20,32,50,0.18), inset 0 1px 0 rgba(255,255,255,0.95)'
         }}
       >
@@ -235,8 +235,8 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
         <div
           className="p-4 sm:p-5 border-b flex-shrink-0 relative space-y-3"
           style={{
-            backgroundColor: darkMode ? '#141E2C' : '#F8F4EC',
-            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : '#E3D7BD'
+            backgroundColor: 'var(--surface-inset)',
+            borderColor: 'var(--surface-card-border)'
           }}
         >
           <div className="flex items-start justify-between gap-3">
@@ -270,7 +270,7 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
                     onClose();
                     onOpenMedicationSearchModal();
                   }}
-                  className="text-[11px] font-bold px-2.5 py-1.5 rounded-lg border-none flex items-center gap-1.5 bg-slate-200/60 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-sky-600 dark:text-sky-300 transition-all cursor-pointer"
+                  className="text-[11px] font-bold px-3 py-2 min-h-[44px] rounded-xl border-none flex items-center gap-1.5 bg-slate-200/60 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-sky-600 dark:text-sky-300 transition-all cursor-pointer"
                   title="Trocar medicamento usando busca inteligente"
                 >
                   <Search className="w-3.5 h-3.5" />
@@ -281,10 +281,11 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
               <button
                 type="button"
                 onClick={onClose}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-500/15 transition-colors cursor-pointer"
+                className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-500/15 transition-colors cursor-pointer"
                 title="Fechar (Esc)"
+                aria-label="Fechar"
               >
-                <X className="w-4 h-4" strokeWidth={2} />
+                <X className="w-5 h-5" strokeWidth={2} />
               </button>
             </div>
           </div>
@@ -335,9 +336,10 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
                     <button
                       type="button"
                       onClick={() => setShowWeightEdit(true)}
-                      className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 cursor-pointer transition-colors"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 min-h-[36px] rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
                     >
-                      + Informar Peso
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                      <span>+ Informar Peso</span>
                     </button>
                   )}
                 </div>
@@ -353,9 +355,9 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
                 <button
                   type="button"
                   onClick={() => setActiveTab('all')}
-                  className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                  className={`text-xs font-bold px-3 py-2 min-h-[40px] rounded-xl transition-all cursor-pointer ${
                     activeTab === 'all'
-                      ? 'bg-sky-600 text-white border-sky-500 shadow-xs'
+                      ? 'bg-sky-600 text-white border-none shadow-tactile-sm'
                       : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-slate-500/10'
                   }`}
                 >
@@ -364,9 +366,9 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
                 <button
                   type="button"
                   onClick={() => setActiveTab('adult')}
-                  className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                  className={`text-xs font-bold px-3 py-2 min-h-[40px] rounded-xl transition-all cursor-pointer ${
                     activeTab === 'adult'
-                      ? 'bg-sky-600 text-white border-sky-500 shadow-xs'
+                      ? 'bg-sky-600 text-white border-none shadow-tactile-sm'
                       : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-slate-500/10'
                   }`}
                 >
@@ -375,9 +377,9 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
                 <button
                   type="button"
                   onClick={() => setActiveTab('pediatric')}
-                  className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                  className={`text-xs font-bold px-3 py-2 min-h-[40px] rounded-xl transition-all cursor-pointer ${
                     activeTab === 'pediatric'
-                      ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
+                      ? 'bg-emerald-600 text-white border-none shadow-tactile-sm'
                       : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-slate-500/10'
                   }`}
                 >
@@ -628,14 +630,14 @@ export const MedicationPresentationModal: React.FC<MedicationPresentationModalPr
         <div
           className="p-4 border-t flex items-center justify-between gap-3 flex-shrink-0"
           style={{
-            backgroundColor: darkMode ? '#141E2C' : '#F8F4EC',
-            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : '#E3D7BD'
+            backgroundColor: 'var(--surface-inset)',
+            borderColor: 'var(--surface-card-border)'
           }}
         >
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 min-h-[42px] rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
+            className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
           >
             Cancelar
           </button>
