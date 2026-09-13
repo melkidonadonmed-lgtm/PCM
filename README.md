@@ -207,7 +207,7 @@ prescmed-pcm/
 
 ---
 
-## 💻 Como Executar Localmente
+## 💻 Como Rodar Localmente (Setup & Execução)
 
 ### Pré-requisitos
 - **Node.js** (versão 20 ou superior recomendada)
@@ -215,7 +215,7 @@ prescmed-pcm/
 
 ### 1. Clonar o repositório e instalar dependências
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/melkidonadonmed-lgtm/PCM.git
 cd pcm
 npm install
 ```
@@ -226,8 +226,12 @@ npm run dev
 ```
 O aplicativo estará disponível em: `http://localhost:3000`
 
-### 3. Build de Produção
+### 3. Validação Unificada e Build
 ```bash
+# Executar verificação completa (lint + test + build)
+npm run check
+
+# Ou apenas gerar o bundle estático
 npm run build
 ```
 Os arquivos estáticos otimizados serão gerados na pasta `dist/`.
@@ -236,6 +240,26 @@ Os arquivos estáticos otimizados serão gerados na pasta `dist/`.
 ```bash
 npm run preview
 ```
+
+---
+
+## 🚢 Como Fazer Deploy
+
+Sendo uma SPA 100% estática e client-side, o build de produção (`dist/`) pode ser hospedado em qualquer servidor HTTP estático ou CDN:
+
+- **GitHub Pages / Vercel / Netlify / Cloudflare Pages:** Basta apontar o diretório de publicação para `dist/`.
+- **Nginx / Apache / Docker:** Servir a pasta `dist/` com fallback para `index.html`.
+
+---
+
+## 🔐 Variáveis de Ambiente
+
+O PresCMed opera em modo **Zero-Knowledge / 100% Client-Side**, não requerendo banco de dados em nuvem ou tráfego de dados sensíveis. As variáveis opcionais estão descritas no arquivo `.env.example`:
+
+| Variável | Descrição | Padrão |
+|---|---|---|
+| `PORT` | Porta do servidor de desenvolvimento | `3000` |
+| `NODE_ENV` | Modo de execução (`development` / `production`) | `development` |
 
 ---
 

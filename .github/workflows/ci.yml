@@ -1,0 +1,42 @@
+name: PresCMed CI
+
+on:
+  push:
+    branches: [ main, develop, fix/*, feat/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 1. Instalação determinística de dependências
+      - name: Install Dependencies
+        run: npm ci
+
+      # 2. Análise estática e checagem de tipos (TypeScript)
+      - name: Type Check & Lint
+        run: npm run lint
+
+      # 3. Execução da suíte de testes clínicos e regulatórios
+      - name: Run Clinical & Pharmacological Tests
+        run: npm test
+
+      # 4. Build de produção (Vite)
+      - name: Build Production SPA
+        run: npm run build
