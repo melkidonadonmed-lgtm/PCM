@@ -4,8 +4,7 @@ import {
   Calculator,
   FileText,
   FlaskConical,
-  Download,
-  Menu
+  Download
 } from 'lucide-react';
 import { ActiveTab } from '../types';
 
@@ -16,7 +15,9 @@ interface MobileBottomNavProps {
   onSelectTab: (tab: ActiveTab) => void;
   prescriptionCount: number;
   selectedExamsCount: number;
-  onOpenMenu: () => void;
+  hasPatient?: boolean;
+  patientWeight?: number;
+  onOpenMenu?: () => void;
 }
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
@@ -26,21 +27,48 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onSelectTab,
   prescriptionCount,
   selectedExamsCount,
+  hasPatient = false,
+  patientWeight,
   onOpenMenu
 }) => {
   const items = [
-    { id: 'prescription' as ActiveTab, label: 'Prescrever', icon: Pill, badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined },
-    { id: 'exams' as ActiveTab, label: 'Exames', icon: FlaskConical, badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined },
-    { id: 'certificate' as ActiveTab, label: 'Documentos', icon: FileText },
-    { id: 'pediatric_calc' as ActiveTab, label: 'Calculadoras', icon: Calculator },
+    {
+      id: 'prescription' as ActiveTab,
+      label: 'Prescrever',
+      icon: Pill,
+      badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
+    },
+    {
+      id: 'pediatric_calc' as ActiveTab,
+      label: 'Calculadora',
+      icon: Calculator,
+      badge: patientWeight && patientWeight > 0 ? `${patientWeight}kg` : undefined
+    },
+    {
+      id: 'exams' as ActiveTab,
+      label: 'Exames',
+      icon: FlaskConical,
+      badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
+    },
+    {
+      id: 'certificate' as ActiveTab,
+      label: 'Documentos',
+      icon: FileText,
+      badge: undefined
+    },
+    {
+      id: 'print_preview' as ActiveTab,
+      label: 'Emitir PDF',
+      icon: Download,
+      badge: undefined
+    }
   ];
-  const isMoreActive = activeTab === 'protocols';
 
   return (
     <nav
       id="mobile-bottom-nav"
       aria-label="Navegação Inferior Mobile"
-      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-around px-2 border-t backdrop-blur-md no-print pb-safe isolate panel-navy panel-projected-top"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around px-2 border-t backdrop-blur-md no-print isolate panel-navy panel-projected-top h-mobile-nav pb-safe"
       style={{
         borderColor: 'var(--surface-panel-border)'
       }}
@@ -79,7 +107,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               )}
             </div>
             <span
-              className="text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors"
+              className="text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-[68px]"
               style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
             >
               {item.label}
@@ -87,40 +115,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           </button>
         );
       })}
-
-      {/* Mais: abre o menu lateral completo (inclui Exames e Encaminhamentos) */}
-      <button
-        id="mobile-nav-more"
-        type="button"
-        onClick={onOpenMenu}
-        aria-haspopup="dialog"
-        aria-expanded={sidebarOpen}
-        aria-controls="prescmed-sidebar"
-        aria-label="Mais opções: Protocolos, configurações e menu completo"
-        className={`flex flex-col items-center justify-center min-w-0 flex-1 min-h-[48px] h-12 px-1 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
-          isMoreActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
-        }`}
-        style={
-          isMoreActive
-            ? { backgroundColor: 'var(--surface-panel-hover)' }
-            : {}
-        }
-      >
-        <div className="relative">
-          <Menu
-            className="w-5 h-5 icon-sculpted transition-colors"
-            style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
-            strokeWidth={1.75}
-          />
-
-        </div>
-        <span
-          className="text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors"
-          style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
-        >
-          Mais
-        </span>
-      </button>
     </nav>
   );
 };

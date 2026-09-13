@@ -131,7 +131,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  const handleTriggerResetAll = () => onResetAll?.();
+  const handleTriggerResetAll = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Iniciar Novo Atendimento?',
+      description: 'Os dados e documentos do atendimento atual serão limpos: paciente, receitas, exames, atestado e encaminhamento.',
+      confirmLabel: 'Novo Atendimento',
+      variant: 'danger',
+      onConfirm: () => {
+        onResetAll?.();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
 
   const primaryNavItems = [
     {
@@ -218,9 +230,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           type="button"
           onClick={() => handleItemClick(item.id)}
           aria-current={isActive ? 'page' : undefined}
-          className={`w-full h-14 mx-auto rounded-xl flex flex-col items-center justify-center gap-0.5 px-1 transition-all cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none relative ${
+          className={`w-full h-14 mx-auto rounded-xl flex flex-col items-center justify-center gap-0.5 px-1 transition-all cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none relative border-none ${
             isActive
-              ? 'bg-navy-950 text-cream-50 border border-white/20 shadow-tactile-navy dark:bg-cream-100 dark:text-navy-950 dark:border-white/30 dark:shadow-tactile-cream font-extrabold'
+              ? 'bg-navy-950 text-cream-50 shadow-tactile-navy dark:bg-cream-100 dark:text-navy-950 dark:shadow-tactile-cream font-extrabold'
               : 'text-slate-300 hover:bg-white/10 hover:text-white'
           }`}
           title={item.fullLabel || item.label}
@@ -253,9 +265,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => handleItemClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`w-full min-h-[44px] flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none ${
+        className={`w-full min-h-[44px] flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none border-none ${
           isActive
-            ? 'bg-navy-950 text-cream-50 border border-white/20 shadow-tactile-navy dark:bg-cream-100 dark:text-navy-950 dark:border-white/30 dark:shadow-tactile-cream font-extrabold'
+            ? 'bg-navy-950 text-cream-50 shadow-tactile-navy dark:bg-cream-100 dark:text-navy-950 dark:shadow-tactile-cream font-extrabold'
             : 'text-slate-300 hover:bg-white/5 hover:text-white'
         }`}
         title={item.label}
@@ -291,7 +303,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div 
           onClick={onClose || onToggleOpen}
           aria-label="Fechar menu lateral"
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-xs lg:hidden transition-opacity cursor-pointer"
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs lg:hidden transition-opacity cursor-pointer"
         />
       )}
 
@@ -299,11 +311,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         id="prescmed-sidebar"
         aria-label="Menu Lateral de Navegação"
         {...(isHiddenDrawer ? { inert: true, 'aria-hidden': true } : {})}
-        className={`fixed lg:sticky top-[68px] sm:top-[72px] left-0 h-[calc(100dvh-68px)] sm:h-[calc(100dvh-72px)] z-40 flex flex-col flex-shrink-0 transition-all duration-300 no-print rounded-r-2xl lg:rounded-2xl border ${
+        className={`fixed lg:sticky top-[68px] sm:top-[72px] left-0 h-[calc(100dvh-68px)] sm:h-[calc(100dvh-72px)] z-50 flex flex-col flex-shrink-0 transition-all duration-300 no-print rounded-r-2xl lg:rounded-2xl border ${
           isOpen ? 'w-64 sm:w-72 shadow-tactile-navy' : 'w-0 lg:w-[72px] overflow-hidden'
         }`}
         style={{
-          backgroundColor: darkMode ? '#0A0F18' : '#142032',
+          backgroundColor: 'var(--surface-panel)',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.1)',
           boxShadow: darkMode
             ? '0 16px 36px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.08)'
@@ -311,7 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
       >
         <div className={`overflow-y-auto flex-1 custom-scrollbar ${
-          isOpen ? 'p-3 space-y-4' : 'py-3 px-2 space-y-3 flex flex-col items-center'
+          isOpen ? 'p-3 pb-sidebar-safe lg:pb-3 space-y-4' : 'py-3 px-2 space-y-3 flex flex-col items-center'
         }`}>
           
           {/* Mobile Header with Close Button */}
@@ -344,7 +356,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               title="Clique para editar CRM e dados profissionais"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 dark:border-white/25 flex items-center justify-center font-black text-xs shadow-tactile-btn shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-navy-950 text-cream-100 dark:bg-cream-100 dark:text-navy-950 flex items-center justify-center font-black text-xs shadow-tactile-btn shrink-0 border-none">
                   CRM
                 </div>
                 <div className="overflow-hidden min-w-0 flex-1">
@@ -360,7 +372,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
               <div 
                 aria-hidden="true"
-                className="mt-2 w-full py-1.5 min-h-[36px] text-[10px] font-bold text-cream-100 hover:text-white dark:text-navy-900 dark:hover:text-navy-950 text-center rounded-lg bg-white/10 hover:bg-white/20 dark:bg-cream-100 dark:hover:bg-white border border-white/10 dark:border-white/20 transition shadow-tactile-sm flex items-center justify-center select-none pointer-events-none"
+                className="mt-2 w-full py-1.5 min-h-[36px] text-[10px] font-bold text-cream-100 hover:text-white dark:text-navy-900 dark:hover:text-navy-950 text-center rounded-lg bg-white/10 hover:bg-white/20 dark:bg-cream-100 dark:hover:bg-white border-none transition shadow-tactile-sm flex items-center justify-center select-none pointer-events-none"
               >
                 Editar Perfil Médico
               </div>
@@ -375,7 +387,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   handleDoctorClick();
                 }
               }}
-              className="w-11 h-11 mx-auto rounded-xl bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 dark:border-white/25 hover:bg-navy-900 dark:hover:bg-white font-black text-xs flex items-center justify-center shadow-tactile-btn transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+              className="w-11 h-11 mx-auto rounded-xl bg-navy-950 text-cream-100 dark:bg-cream-100 dark:text-navy-950 hover:bg-navy-900 dark:hover:bg-white font-black text-xs flex items-center justify-center shadow-tactile-btn transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none border-none"
               title={hasDoctor ? `Dr(a). ${doctor?.name} (CRM: ${doctor?.crm}/${doctor?.crmState})` : 'Configurar CRM / Perfil Médico'}
               aria-label="Perfil do Médico"
             >
@@ -404,7 +416,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               title="Clique para editar paciente"
             >
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-white/10 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
                   <Users className="w-3.5 h-3.5" />
                 </div>
                 <div className="overflow-hidden min-w-0 flex-1">
@@ -414,8 +426,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <p className="text-xs font-bold truncate text-white">
                     {hasPatient ? patientName : 'Não identificado'}
                   </p>
-                  <p className="text-[10px] font-semibold text-emerald-400">
-                    {patientWeight > 0 ? `${patientWeight} kg` : 'Sem peso'} {patient?.ageText ? `• ${patient.ageText}` : ''}
+                  <p className="text-[10px] font-semibold text-slate-300 flex items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block mr-1.5"></span>
+                    <span>{patientWeight > 0 ? `${patientWeight} kg` : 'Sem peso'} {patient?.ageText ? `• ${patient.ageText}` : ''}</span>
                   </p>
                 </div>
               </div>
@@ -430,11 +443,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   handlePatientClick();
                 }
               }}
-              className="w-11 h-11 mx-auto rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30 flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none shadow-tactile-sm"
+              className="w-11 h-11 mx-auto rounded-xl bg-white/10 text-emerald-400 hover:bg-white/15 border-none flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none shadow-tactile-sm relative"
               title={hasPatient ? `Paciente: ${patientName} (${patientWeight ? patientWeight + 'kg' : 'sem peso'})` : 'Definir / Identificar Paciente'}
               aria-label="Dados do Paciente"
             >
               <Users className="w-5 h-5" />
+              {hasPatient && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 absolute top-1.5 right-1.5"></span>
+              )}
             </button>
           )}
 
@@ -469,9 +485,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 type="button"
                 onClick={handleTriggerResetAll}
-                className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-sky-300 hover:text-sky-200 hover:bg-sky-500/10 dark:text-cream-100 dark:hover:text-white dark:hover:bg-white/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+                className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/8 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-cream-100 outline-none"
               >
-                <RotateCcw className="w-4 h-4 shrink-0 text-sky-300 dark:text-cream-200" />
+                <RotateCcw className="w-4 h-4 shrink-0 text-slate-400" />
                 <span>Novo Atendimento Completo</span>
               </button>
             </div>

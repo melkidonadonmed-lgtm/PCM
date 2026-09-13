@@ -15,7 +15,9 @@ import {
   Clock,
   User,
   Hash,
-  Send
+  Send,
+  ArrowLeft,
+  ArrowRight
 } from 'lucide-react';
 import { MedicalCertificate, MedicalReferral, Patient, DoctorProfile } from '../types';
 import { CidSearchBar } from './CidSearchBar';
@@ -34,6 +36,8 @@ interface CertificateAndReferralProps {
   initialSubTab?: 'certificate' | 'referral';
   onSelectSubTab?: (tab: 'certificate' | 'referral') => void;
   onNavigateToPrint: (docType?: 'certificate' | 'referral') => void;
+  onNavigateToExams?: () => void;
+  onNavigateToPrescription?: () => void;
 }
 
 export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
@@ -48,7 +52,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
   activeSubTab,
   initialSubTab,
   onSelectSubTab,
-  onNavigateToPrint
+  onNavigateToPrint,
+  onNavigateToExams,
+  onNavigateToPrescription
 }) => {
   const [internalSubTab, setInternalSubTab] = useState<'certificate' | 'referral'>(initialSubTab || activeSubTab || 'certificate');
   const currentSubTab = activeSubTab || internalSubTab;
@@ -73,6 +79,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
     setInternalSubTab(tab);
     if (onSelectSubTab) onSelectSubTab(tab);
   };
+
   const specialtiesList = [
     'Fisioterapia',
     'Cardiologia',
@@ -271,6 +278,85 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
   return (
     <div id="certificate-and-referral-section" className="space-y-4 sm:space-y-5">
+      {/* Workflow Stepper */}
+      <div 
+        className="tactile-card p-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 border shadow-tactile-sm"
+        style={{
+          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+          borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)'
+        }}
+      >
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={onNavigateToPrescription}
+            disabled={!onNavigateToPrescription}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              onNavigateToPrescription ? 'cursor-pointer hover:opacity-80 active:scale-95' : 'opacity-60 cursor-default'
+            }`}
+            style={{
+              backgroundColor: darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(15,23,42,0.04)',
+              color: darkMode ? '#94A3B8' : '#64748B'
+            }}
+          >
+            <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">1</span>
+            <span>Medicamentos</span>
+          </button>
+
+          <span className="text-slate-400">➔</span>
+
+          <button
+            type="button"
+            onClick={onNavigateToExams}
+            disabled={!onNavigateToExams}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              onNavigateToExams ? 'cursor-pointer hover:opacity-80 active:scale-95' : 'opacity-60 cursor-default'
+            }`}
+            style={{
+              backgroundColor: darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(15,23,42,0.04)',
+              color: darkMode ? '#94A3B8' : '#64748B'
+            }}
+          >
+            <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">2</span>
+            <span>Exames</span>
+          </button>
+
+          <span className="text-slate-400">➔</span>
+
+          <div 
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold shadow-tactile-sm"
+            style={{
+              backgroundColor: darkMode ? '#F1F5F9' : '#0F172A',
+              color: darkMode ? '#0F172A' : '#F1F5F9'
+            }}
+          >
+            <span className="w-5 h-5 rounded-full bg-navy-950 text-white dark:bg-white dark:text-navy-950 flex items-center justify-center text-[10px] font-bold">3</span>
+            <span>Documentos (Atestado & Guia)</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {onNavigateToExams && (
+            <button
+              type="button"
+              onClick={onNavigateToExams}
+              className="tactile-btn-secondary px-3 py-1.5 min-h-[38px] text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Voltar a Exames</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => onNavigateToPrint(currentSubTab)}
+            className="tactile-btn-primary px-3 py-1.5 min-h-[38px] text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+          >
+            <span>Finalizar & Emitir</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
       {/* Subtabs Switcher */}
       <div 
         className="tactile-card p-1.5 rounded-2xl flex items-center gap-1.5 max-w-sm mx-auto"
@@ -282,9 +368,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
         <button
           type="button"
           onClick={() => handleSwitchTab('certificate')}
-          className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 ${
+          className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 border-none ${
             currentSubTab === 'certificate'
-              ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+              ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream'
               : darkMode
               ? 'text-slate-400 hover:text-white'
               : 'text-slate-600 hover:text-slate-900'
@@ -297,9 +383,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
         <button
           type="button"
           onClick={() => handleSwitchTab('referral')}
-          className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 ${
+          className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 border-none ${
             currentSubTab === 'referral'
-              ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+              ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream'
               : darkMode
               ? 'text-slate-400 hover:text-white'
               : 'text-slate-600 hover:text-slate-900'
@@ -338,7 +424,19 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {onNavigateToExams && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToExams}
+                    className="tactile-btn-secondary px-3.5 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                    title="Voltar para a solicitação de exames"
+                  >
+                    <ArrowLeft className="w-4 h-4" strokeWidth={1.75} />
+                    <span>Voltar a Exames</span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={handleSendCertificateWhatsApp}
@@ -356,7 +454,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   className="tactile-btn-primary px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
-                  <span>Visualizar & Baixar PDF</span>
+                  <span>Finalizar Atendimento & Emitir Documentos ➔</span>
                 </button>
               </div>
             </div>
@@ -438,9 +536,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     key={d}
                     type="button"
                     onClick={() => handleDaysChange(d)}
-                    className={`text-xs px-3 py-1.5 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-xl border font-bold transition-all cursor-pointer active:scale-95 ${
+                    className={`text-xs px-3 py-1.5 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-xl font-bold transition-all cursor-pointer active:scale-95 ${
                       certificate.daysOff === d
-                        ? 'bg-sky-700 dark:bg-sky-700 text-white border-sky-600 shadow-sm'
+                        ? 'bg-sky-700 text-white border-transparent shadow-tactile-sm'
                         : darkMode
                         ? 'bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white'
                         : 'bg-white text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'
@@ -472,7 +570,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
                 <div>
                   <label htmlFor="cert-start-date" className="block text-[10px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
-                    <Calendar className="w-3 h-3 text-slate-400" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
                     <span>Data de Início</span>
                   </label>
                   <input
@@ -491,7 +589,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
                 <div>
                   <label htmlFor="cert-end-date" className="block text-[10px] font-bold uppercase text-slate-400 mb-1 flex items-center gap-1 cursor-pointer">
-                    <Calendar className="w-3 h-3 text-slate-400" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
                     <span>Data de Retorno Previsto</span>
                   </label>
                   <input
@@ -616,6 +714,52 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 className="w-full p-3 rounded-xl text-xs sm:text-sm font-normal focus:outline-none tactile-input leading-relaxed"
               />
             </div>
+
+            {/* Bottom Actions Tray for Certificate */}
+            <div 
+              className="pt-4 border-t flex flex-col sm:flex-row items-center justify-between gap-3"
+              style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}
+            >
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {onNavigateToExams && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToExams}
+                    className="tactile-btn-secondary flex-1 sm:flex-initial px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Voltar a Exames</span>
+                  </button>
+                )}
+                {onNavigateToPrescription && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToPrescription}
+                    className="tactile-btn-secondary flex-1 sm:flex-initial px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                  >
+                    <span>Voltar à Prescrição</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={handleSendCertificateWhatsApp}
+                  className="tactile-btn-success flex-1 sm:flex-initial px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>WhatsApp</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onNavigateToPrint('certificate')}
+                  className="tactile-btn-primary flex-1 sm:flex-initial px-5 py-2.5 min-h-[44px] text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                >
+                  <span>Finalizar Atendimento & Emitir Documentos ➔</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -625,6 +769,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
         <div className="space-y-4">
           <div 
             className="tactile-card p-4 sm:p-5 md:p-6 rounded-2xl space-y-5"
+            style={{
+              backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
+            }}
           >
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
@@ -645,6 +793,18 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
+                {onNavigateToExams && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToExams}
+                    className="tactile-btn-secondary px-3.5 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                    title="Voltar para a solicitação de exames"
+                  >
+                    <ArrowLeft className="w-4 h-4" strokeWidth={1.75} />
+                    <span>Voltar a Exames</span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={handleSendReferralWhatsApp}
@@ -662,7 +822,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   className="tactile-btn-primary px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
-                  <span>Visualizar & Baixar PDF</span>
+                  <span>Finalizar Atendimento & Emitir Documentos ➔</span>
                 </button>
               </div>
             </div>
@@ -724,10 +884,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                       key={sp}
                       type="button"
                       onClick={() => onUpdateReferral({ ...referral, destinationSpecialty: sp })}
-                      className={`text-[11px] px-3 py-2 min-h-[44px] inline-flex items-center justify-center rounded-lg font-semibold border transition-all cursor-pointer ${
+                      className={`text-[11px] px-3 py-2 min-h-[44px] inline-flex items-center justify-center rounded-lg font-semibold transition-all cursor-pointer ${
                         referral.destinationSpecialty === sp
-                          ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                          ? 'bg-emerald-600 text-white border-none shadow-sm'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
                       }`}
                     >
                       {sp.split(' / ')[0].split(' & ')[0]}
@@ -759,16 +919,16 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                       key={p}
                       type="button"
                       onClick={() => onUpdateReferral({ ...referral, priority: p })}
-                      className={`flex-1 py-2.5 min-h-[44px] rounded-xl text-xs font-bold capitalize border transition-all cursor-pointer active:scale-95 ${
+                      className={`flex-1 py-2.5 min-h-[44px] rounded-xl text-xs font-bold capitalize transition-all cursor-pointer active:scale-95 ${
                         referral.priority === p
                           ? p === 'urgente'
-                            ? 'bg-rose-700 text-white border-rose-600 shadow-sm'
+                            ? 'bg-rose-700 text-white border-none shadow-sm'
                             : p === 'prioritario'
-                            ? 'bg-amber-700 text-white border-amber-600 shadow-sm'
-                            : 'bg-emerald-700 text-white border-emerald-600 shadow-sm'
+                            ? 'bg-amber-700 text-white border-none shadow-sm'
+                            : 'bg-emerald-700 text-white border-none shadow-sm'
                           : darkMode
-                          ? 'bg-slate-800/80 text-slate-400 border-slate-700/60 hover:bg-slate-700 hover:text-slate-200'
-                          : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                          ? 'bg-slate-800/80 text-slate-400 border border-slate-700/60 hover:bg-slate-700 hover:text-slate-200'
+                          : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       {p}
@@ -879,7 +1039,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                         key={item.code}
                         type="button"
                         onClick={() => handleAppendCidForReferral({ code: item.code, description: item.label })}
-                        className="text-[11px] px-2.5 py-1 rounded-lg border font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+                        className="text-[11px] px-3 py-2 min-h-[44px] rounded-xl border font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
                         style={{
                           backgroundColor: darkMode ? '#152E22' : 'var(--surface-card)',
                           borderColor: darkMode ? 'rgba(52, 211, 153, 0.3)' : 'rgba(21, 128, 61, 0.2)',
@@ -908,6 +1068,52 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 showQuickChips={false}
                 variant="referral"
               />
+            </div>
+
+            {/* Bottom Actions Tray for Referral */}
+            <div 
+              className="pt-4 border-t flex flex-col sm:flex-row items-center justify-between gap-3"
+              style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}
+            >
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {onNavigateToExams && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToExams}
+                    className="tactile-btn-secondary flex-1 sm:flex-initial px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Voltar a Exames</span>
+                  </button>
+                )}
+                {onNavigateToPrescription && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToPrescription}
+                    className="tactile-btn-secondary flex-1 sm:flex-initial px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                  >
+                    <span>Voltar à Prescrição</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={handleSendReferralWhatsApp}
+                  className="tactile-btn-success flex-1 sm:flex-initial px-4 py-2.5 min-h-[44px] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>WhatsApp</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onNavigateToPrint('referral')}
+                  className="tactile-btn-primary flex-1 sm:flex-initial px-5 py-2.5 min-h-[44px] text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                >
+                  <span>Finalizar Atendimento & Emitir Documentos ➔</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -3,7 +3,6 @@ import { PrescriptionReview } from './PrescriptionReview';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Download, 
-  QrCode, 
   ShieldCheck, 
   FileText, 
   Award, 
@@ -92,6 +91,10 @@ interface PrintPreviewProps {
   onResetAll?: () => void;
   onOpenDoctorModal?: () => void;
   onOpenPatientModal?: () => void;
+  onNavigateToPrescription?: () => void;
+  onNavigateToExams?: () => void;
+  onNavigateToDocuments?: () => void;
+  printOrigin?: string;
 }
 
 export const PrintPreview: React.FC<PrintPreviewProps> = ({
@@ -133,7 +136,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   onClearPrescription,
   onResetAll,
   onOpenPatientModal,
-  onOpenDoctorModal
+  onOpenDoctorModal,
+  onNavigateToPrescription,
+  onNavigateToExams,
+  onNavigateToDocuments,
+  printOrigin
 }) => {
   const effectiveExams = exams.length > 0 ? exams : selectedExams;
   const handleBack = onNavigateBack || onBack || (() => {});
@@ -158,6 +165,28 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       setDocType(initialDocType);
     }
   }, [initialDocType]);
+
+  const handleSmartBack = () => {
+    if (docType === 'exams' && onNavigateToExams) {
+      onNavigateToExams();
+      return;
+    }
+    if ((docType === 'certificate' || docType === 'referral') && onNavigateToDocuments) {
+      onNavigateToDocuments();
+      return;
+    }
+    if ((docType === 'prescription' || docType === 'special_prescription') && onNavigateToPrescription) {
+      onNavigateToPrescription();
+      return;
+    }
+    handleBack();
+  };
+
+  const backButtonLabel = useMemo(() => {
+    if (docType === 'exams') return 'Voltar para Exames';
+    if (docType === 'certificate' || docType === 'referral') return 'Voltar para Documentos';
+    return 'Voltar para Prescrição';
+  }, [docType]);
 
   const prescriptionDocuments = useMemo(() => buildPrescriptionDocuments(prescriptionItems), [prescriptionItems]);
   const simpleItems = prescriptionDocuments.filter(d => d.kind === 'simple').flatMap(d => d.items);
@@ -282,7 +311,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     } else if (docType === 'exams') {
       let text = `${header}🧪 *SOLICITAÇÃO DE EXAMES COMPLEMENTARES*\n\n`;
       if (exams.length === 0) return '';
-      exams.forEach((ex, idx) => {
+      exams.forEach((ex) => {
         text += `• ${ex.name}\n`;
       });
       if (examIndication) {
@@ -341,7 +370,33 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   }, [activePrescriptionItems]);
 
   if (['prescription', 'special_prescription'].includes(docType)) {
-    return <PrescriptionReview items={prescriptionItems} doctor={doctor} patient={patient} onBack={handleBack} onEditPatient={onOpenPatientModal || handleBack} onEditDoctor={onOpenDoctorModal || handleBack} />;
+    return (
+      <PrescriptionReview
+        items={prescriptionItems}
+        doctor={doctor}
+        patient={patient}
+        onBack={() => {
+          if (printOrigin === 'exams' && onNavigateToExams) {
+            onNavigateToExams();
+          } else if ((printOrigin === 'certificate' || printOrigin === 'referral') && onNavigateToDocuments) {
+            onNavigateToDocuments();
+          } else if (onNavigateToPrescription) {
+            onNavigateToPrescription();
+          } else {
+            handleBack();
+          }
+        }}
+        onEditPatient={onOpenPatientModal || handleBack}
+        onEditDoctor={onOpenDoctorModal || handleBack}
+        onNavigateToPrescription={onNavigateToPrescription}
+        onNavigateToExams={onNavigateToExams}
+        onNavigateToDocuments={onNavigateToDocuments}
+        onSwitchDocType={(type) => setDocType(type)}
+        examsCount={effectiveExams.length}
+        hasCertificate={Boolean(certificate?.patientName || certificate?.documentNumber)}
+        hasReferral={Boolean(referral?.patientName || referral?.documentNumber)}
+      />
+    );
   }
 
   return (
@@ -357,15 +412,16 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={handleBack}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border flex items-center justify-center text-slate-400 hover:text-slate-100 cursor-pointer transition-all active:scale-95 tactile-btn-secondary"
+            onClick={handleSmartBack}
+            className="px-3.5 py-2 min-h-[44px] rounded-xl border flex items-center gap-2 text-slate-400 hover:text-slate-100 cursor-pointer transition-all active:scale-95 tactile-btn-secondary text-xs sm:text-sm font-semibold"
             style={{
               backgroundColor: 'var(--surface-inset)'
             }}
-            title="Voltar para Edição"
-            aria-label="Voltar para Edição"
+            title={backButtonLabel}
+            aria-label={backButtonLabel}
           >
-            <ArrowLeft className="w-5 h-5 icon-sculpted" strokeWidth={1.75} />
+            <ArrowLeft className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
+            <span>{backButtonLabel}</span>
           </button>
           <div>
             <h2 className="text-base sm:text-lg font-bold flex items-center gap-2" style={{ color: darkMode ? '#F4F7FC' : '#0B132B' }}>
@@ -386,7 +442,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleCopyFormattedText}
-            className="h-10 sm:h-11 px-3.5 rounded-xl border border-transparent bg-slate-200/60 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
+            className="min-h-[44px] h-11 px-3.5 rounded-xl border border-transparent bg-slate-200/60 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
             title="Copiar texto formatado para prontuário/PEP"
             aria-label="Copiar texto formatado para prontuário ou PEP"
           >
@@ -402,7 +458,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => window.print()}
-            className="h-10 sm:h-11 px-3.5 rounded-xl border border-transparent bg-slate-200/60 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
+            className="min-h-[44px] h-11 px-3.5 rounded-xl border border-transparent bg-slate-200/60 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
             title="Imprimir direto pelo navegador (Ctrl+P)"
             aria-label="Imprimir direto pelo navegador"
           >
@@ -414,7 +470,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleSendWhatsApp}
-            className="h-10 sm:h-11 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border-none transition-all active:scale-95 cursor-pointer"
+            className="min-h-[44px] h-11 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border-none transition-all active:scale-95 cursor-pointer"
             title="Enviar o documento diretamente para o WhatsApp do paciente ou familiar"
             aria-label="Enviar o documento diretamente para o WhatsApp do paciente ou familiar"
           >
@@ -427,7 +483,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             type="button"
             onClick={handleExportPDF}
             disabled={isExportingPdf}
-            className="h-10 sm:h-11 px-5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white dark:bg-cream-100 dark:hover:bg-white dark:text-navy-950 text-xs sm:text-sm font-black flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border-none transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="min-h-[44px] h-11 px-5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white dark:bg-cream-100 dark:hover:bg-white dark:text-navy-950 text-xs sm:text-sm font-black flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border-none transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             title="Gerar e baixar arquivo PDF padrão A4 (10mm)"
             aria-label="Gerar e baixar arquivo PDF padrão A4"
           >
@@ -457,12 +513,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('prescription')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 border-none ${
               docType === 'prescription'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream'
                 : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-navy-800/60 text-slate-300 hover:bg-navy-700'
+                : 'bg-white text-slate-700 hover:bg-cream-100 shadow-xs'
             }`}
           >
             <FileText className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -472,28 +528,31 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('special_prescription')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 border-none ${
               docType === 'special_prescription'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream'
                 : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-navy-800/60 text-slate-300 hover:bg-navy-700'
+                : 'bg-white text-slate-700 hover:bg-cream-100 shadow-xs'
             }`}
           >
             <Layers className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
             <span>Controle Especial ({specialItems.length})</span>
-            <span className="text-[10px] px-1.5 py-0.2 bg-rose-500/20 text-rose-300 font-bold rounded">2 Vias</span>
+            <span className="text-[10px] font-bold text-slate-300 inline-flex items-center">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 inline-block mr-1"></span>
+              2 Vias
+            </span>
           </button>
 
           <button
             type="button"
             onClick={() => setDocType('exams')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 border-none ${
               docType === 'exams'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream'
                 : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-navy-800/60 text-slate-300 hover:bg-navy-700'
+                : 'bg-white text-slate-700 hover:bg-cream-100 shadow-xs'
             }`}
           >
             <FlaskConical className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -503,12 +562,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('certificate')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 border-none ${
               docType === 'certificate'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream'
                 : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-navy-800/60 text-slate-300 hover:bg-navy-700'
+                : 'bg-white text-slate-700 hover:bg-cream-100 shadow-xs'
             }`}
           >
             <Award className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -518,12 +577,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('referral')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 border-none ${
               docType === 'referral'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream'
                 : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-navy-800/60 text-slate-300 hover:bg-navy-700'
+                : 'bg-white text-slate-700 hover:bg-cream-100 shadow-xs'
             }`}
           >
             <Building2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -589,12 +648,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={() => setSpecialVia('pharmacy')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+              className={`px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer border-none ${
                 specialVia === 'pharmacy'
-                  ? 'bg-rose-700 text-white border-rose-600 shadow-xs'
+                  ? 'bg-rose-700 text-white shadow-xs'
                   : darkMode
-                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               1ª Via (Farmácia / Retenção)
@@ -602,12 +661,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={() => setSpecialVia('patient')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+              className={`px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer border-none ${
                 specialVia === 'patient'
-                  ? 'bg-sky-700 text-white border-sky-600 shadow-xs'
+                  ? 'bg-sky-700 text-white shadow-xs'
                   : darkMode
-                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               2ª Via (Paciente / Orientação)
@@ -625,7 +684,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                   type="button"
                   disabled={specialPageIndex === 0}
                   onClick={() => setSpecialPageIndex(prev => Math.max(0, prev - 1))}
-                  className="p-1.5 rounded-lg border border-slate-300 dark:border-white/10 disabled:opacity-30 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5"
+                  className="min-w-[44px] min-h-[44px] rounded-xl border border-slate-300 dark:border-white/10 disabled:opacity-30 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center"
                   title="Folha anterior"
                 >
                   <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
@@ -634,7 +693,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                   type="button"
                   disabled={specialPageIndex >= specialChunks.length - 1}
                   onClick={() => setSpecialPageIndex(prev => Math.min(specialChunks.length - 1, prev + 1))}
-                  className="p-1.5 rounded-lg border border-slate-300 dark:border-white/10 disabled:opacity-30 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5"
+                  className="min-w-[44px] min-h-[44px] rounded-xl border border-slate-300 dark:border-white/10 disabled:opacity-30 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center"
                   title="Próxima folha"
                 >
                   <ChevronRight className="w-4 h-4 text-slate-600 dark:text-slate-300" />
@@ -659,12 +718,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={() => setExamFilter('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+              className={`px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer border-none ${
                 examFilter === 'all'
-                  ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-xs'
+                  ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-xs'
                   : darkMode
-                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               Todos ({effectiveExams.length})
@@ -672,12 +731,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={() => setExamFilter('lab')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+              className={`px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer border-none ${
                 examFilter === 'lab'
-                  ? 'bg-emerald-700 text-white border-emerald-600 shadow-xs'
+                  ? 'bg-emerald-700 text-white shadow-xs'
                   : darkMode
-                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               Laboratoriais ({labExams.length})
@@ -685,12 +744,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={() => setExamFilter('image')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+              className={`px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer border-none ${
                 examFilter === 'image'
-                  ? 'bg-sky-700 text-white border-sky-600 shadow-xs'
+                  ? 'bg-sky-700 text-white shadow-xs'
                   : darkMode
-                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               Imagem / Gráficos ({imageExams.length})
@@ -1199,7 +1258,20 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={handleSmartBack}
+            className="tactile-btn-secondary px-3.5 py-2.5 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+            style={{
+              backgroundColor: 'var(--surface-inset)',
+              color: darkMode ? '#CBD5E1' : '#334155'
+            }}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>{backButtonLabel}</span>
+          </button>
+
           <button
             type="button"
             onClick={handleShare}

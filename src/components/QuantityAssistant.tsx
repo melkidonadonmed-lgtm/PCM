@@ -131,17 +131,17 @@ export function QuantityAssistant({ value, onChange, onApply }: {
       </div>
 
       <div
-        className={`my-3 p-3 rounded-xl border text-xs font-medium flex items-start gap-2 ${
+        className={`my-3 p-3 rounded-xl border text-xs font-medium flex items-start gap-2.5 ${
           suggestion
-            ? 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/30'
+            ? 'bg-slate-100 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700'
             : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10'
         }`}
         aria-live="polite"
       >
         {suggestion ? (
-          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" strokeWidth={2} />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
         ) : (
-          <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" strokeWidth={1.75} />
+          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0 mt-1.5" />
         )}
         <span>
           {suggestion?.explanation ?? 'Informe dados completos e compatíveis. Para uso se necessário ou variável, preencha a quantidade manualmente.'}

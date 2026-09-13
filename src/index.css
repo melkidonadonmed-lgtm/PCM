@@ -42,6 +42,26 @@
   --shadow-tactile-lg: 0 22px 50px -10px rgba(10, 17, 28, 0.25), 0 8px 20px -4px rgba(10, 17, 28, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@utility h-mobile-nav {
+  height: calc(4rem + env(safe-area-inset-bottom, 0px));
+}
+
+@utility pb-mobile-container {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@utility bottom-toast-mobile {
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@utility pb-sidebar-safe {
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
 @layer base {
   html {
     width: 100%;
@@ -739,13 +759,13 @@ body {
   box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
-/* Fundo da Aplicação: Baunilha / Creme Nobre com Profundidade Atmosférica Real */
+/* Fundo da Aplicação: Canvas Hospitalar Límpido */
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-app);
   background-image:
-    radial-gradient(ellipse 90% 60% at 50% -10%, #FCF9F3 0%, rgba(245, 239, 230, 0) 70%),
-    linear-gradient(180deg, #F8F3EA 0%, #EFE7DA 100%);
+    radial-gradient(ellipse 90% 60% at 50% -10%, #FFFFFF 0%, rgba(248, 250, 252, 0) 70%),
+    linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
@@ -754,8 +774,8 @@ body {
 body.dark {
   background-color: var(--bg-app);
   background-image:
-    radial-gradient(ellipse 90% 60% at 50% -10%, #172236 0%, rgba(14, 20, 32, 0) 70%),
-    linear-gradient(180deg, #111827 0%, #0A0E17 100%);
+    radial-gradient(ellipse 90% 60% at 50% -10%, #1E2838 0%, rgba(18, 24, 36, 0) 70%),
+    linear-gradient(180deg, #161F2E 0%, #121824 100%);
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
@@ -862,17 +882,17 @@ p, .text-pretty {
    Tactile High-Contrast Cross-Browser Scrollbars (WCAG 2.1 AA Compliant)
    ========================================================================== */
 :root {
-  --scrollbar-track-color: #EFE8D4;
-  --scrollbar-thumb-color: #243550;
-  --scrollbar-thumb-hover-color: #0F1A2A;
-  --scrollbar-border-color: #F5EFE6;
+  --scrollbar-track-color: #F1F5F9;
+  --scrollbar-thumb-color: #94A3B8;
+  --scrollbar-thumb-hover-color: #64748B;
+  --scrollbar-border-color: #F8FAFC;
 }
 
 .dark, [data-theme="dark"] {
-  --scrollbar-track-color: #141E2C;
-  --scrollbar-thumb-color: #CBD5E1;
-  --scrollbar-thumb-hover-color: #FFFFFF;
-  --scrollbar-border-color: #0E1420;
+  --scrollbar-track-color: #141C28;
+  --scrollbar-thumb-color: #334155;
+  --scrollbar-thumb-hover-color: #64748B;
+  --scrollbar-border-color: #121824;
 }
 
 /* Firefox / CSS Standards */
@@ -1222,6 +1242,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
    ========================================================================== */
 .prescription-workspace :is(label, input, select, textarea) { font-size: 14px; }
 .prescription-workspace :is(input:not([type=checkbox]), select, textarea) { min-height: 44px; }
+
+/* Mantem o titulo e a orientacao legiveis enquanto atenua apenas os controles. */
+.prescription-workspace .prescription-composer:disabled :is(input, select, textarea, button) {
+  opacity: 0.56;
+  cursor: not-allowed;
+}
 
 /* WCAG 2.5.5 Target Size (Enhanced): piso incondicional de 44px. */
 .prescription-workspace :is(button, [role="button"]) {

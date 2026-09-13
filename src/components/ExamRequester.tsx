@@ -10,7 +10,9 @@ import {
   FileCheck,
   X,
   SlidersHorizontal,
-  ChevronRight
+  ChevronRight,
+  ArrowLeft,
+  ArrowRight
 } from 'lucide-react';
 import { ExamItem, Patient } from '../types';
 import { EXAM_CATALOG, EXAM_PACKAGES, ExamPackage } from '../data/examCatalog';
@@ -24,6 +26,8 @@ interface ExamRequesterProps {
   clinicalIndication: string;
   onUpdateClinicalIndication: (text: string) => void;
   onNavigateToPrint: () => void;
+  onNavigateToPrescription?: () => void;
+  onNavigateToDocuments?: () => void;
 }
 
 export const ExamRequester: React.FC<ExamRequesterProps> = ({
@@ -34,7 +38,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   onUpdateExams,
   clinicalIndication,
   onUpdateClinicalIndication,
-  onNavigateToPrint
+  onNavigateToPrint,
+  onNavigateToPrescription,
+  onNavigateToDocuments
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
@@ -124,7 +130,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
 
   return (
     <div id="exam-requester-section" className="space-y-4 sm:space-y-5">
-      {/* Top Header Card */}
+      {/* Top Header Card com Fluxo Linear */}
       <div 
         className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4"
         style={{
@@ -133,13 +139,25 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         }}
       >
         <div className="flex items-center gap-3">
+          {onNavigateToPrescription && (
+            <button
+              type="button"
+              onClick={onNavigateToPrescription}
+              className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-cream-100 cursor-pointer transition-all active:scale-95 tactile-btn-secondary shrink-0"
+              title="Voltar para Prescrição de Medicamentos"
+              aria-label="Voltar para Prescrição de Medicamentos"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          )}
+
           <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center panel-navy text-cream-100 border border-white/10 shadow-tactile-sm"
+            className="w-10 h-10 rounded-xl flex items-center justify-center panel-navy text-cream-100 border border-white/10 shadow-tactile-sm shrink-0"
           >
             <FlaskConical className="w-5 h-5 icon-sculpted" strokeWidth={1.75} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-base sm:text-lg font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                 Solicitação de Exames Complementares
               </h2>
@@ -153,19 +171,35 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onNavigateToPrint}
-          disabled={selectedExams.length === 0}
-          className={`px-4 py-2 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-            selectedExams.length === 0
-              ? 'tactile-btn-secondary opacity-60 cursor-not-allowed'
-              : 'tactile-btn-primary cursor-pointer active:scale-95'
-          }`}
-        >
-          <Download className="w-4 h-4" strokeWidth={1.75} />
-          <span>Visualizar & Baixar PDF ({selectedExams.length})</span>
-        </button>
+        {/* Ações do Cabeçalho: Visualizar Pedido & Avançar para Documentos */}
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <button
+            type="button"
+            onClick={onNavigateToPrint}
+            disabled={selectedExams.length === 0}
+            className={`px-4 py-2 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+              selectedExams.length === 0
+                ? 'tactile-btn-secondary opacity-50 cursor-not-allowed'
+                : 'tactile-btn-secondary cursor-pointer active:scale-95'
+            }`}
+            title="Visualizar pedido de exames e imprimir"
+          >
+            <Download className="w-4 h-4" strokeWidth={1.75} />
+            <span>Visualizar Pedido ({selectedExams.length})</span>
+          </button>
+
+          {onNavigateToDocuments && (
+            <button
+              type="button"
+              onClick={onNavigateToDocuments}
+              className="btn-tactile-primary px-4 py-2 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all shadow-tactile"
+              title="Avançar para Atestados e Encaminhamentos"
+            >
+              <span>Avançar para Documentos</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Clinical Indication */}
@@ -193,9 +227,6 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       </div>
 
       {/* BASE: Carrossel Horizontal de Painéis & Pacotes Clínicos */}
-      {/* Combos: sem o cartao externo, que so acrescentava moldura. Os cards
-          encolheram e perderam a descricao — ela reaparece no modal de revisao,
-          que e onde a escolha de fato acontece. */}
       <div>
         <div className="flex items-center gap-1.5 mb-2">
           <Sparkles className="w-4 h-4 text-navy-900 dark:text-cream-200" strokeWidth={1.75} />
@@ -204,8 +235,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           </h3>
         </div>
 
-        {/* Carrossel horizontal. Os itens sao <button>: a regiao ja e alcancavel
-            pelo teclado atraves deles, sem precisar de uma parada extra. */}
+        {/* Carrossel horizontal */}
         <div className="flex items-stretch gap-2 overflow-x-auto pb-2 custom-scrollbar fade-scroll-x">
           {EXAM_PACKAGES.map((pkg) => (
             <button
@@ -270,7 +300,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               />
               <button
                 type="submit"
-                className="tactile-btn-primary px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer"
+                className="tactile-btn-primary min-h-[44px] min-w-[44px] px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer flex items-center justify-center"
                 title="Adicionar exame personalizado"
                 aria-label="Adicionar exame personalizado"
               >
@@ -291,12 +321,12 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 ${
+                className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer active:scale-95 border-none ${
                   selectedCategory === cat
-                    ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                    ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream'
                     : darkMode
-                    ? 'bg-slate-800/80 text-slate-300 border-slate-700/80 hover:bg-slate-700'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                    ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                    : 'bg-white text-slate-700 hover:bg-slate-100 shadow-xs'
                 }`}
               >
                 {cat}
@@ -321,9 +351,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   key={exam.id}
                   onClick={() => toggleExam(exam)}
                   aria-pressed={selected}
-                  className={`w-full text-left pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all ${
+                  className={`w-full text-left flex items-center justify-between p-3 min-h-[44px] rounded-xl cursor-pointer transition-all border-none ${
                     selected 
-                      ? 'bg-navy-900/10 dark:bg-cream-100/10 border border-navy-900/30 dark:border-cream-100/30' 
+                      ? 'bg-navy-900/10 dark:bg-cream-100/10 shadow-tactile-sm' 
                       : 'hover:bg-slate-500/5'
                   }`}
                 >
@@ -385,7 +415,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
 
           {selectedExams.length === 0 ? (
             <div className="p-6 text-center text-slate-400 text-xs">
-              Nenhum exame selecionado ainda. Clique nos exames ao lado ou em um dos pacotes na base para incluir.
+              Nenhum exame selecionado ainda. Clique nos exames ao lado ou em um dos pacotes acima para incluir.
             </div>
           ) : (
             <div className="space-y-1.5 max-h-[380px] overflow-y-auto">
@@ -405,7 +435,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     <div className="flex items-center gap-1.5">
                       <span className="text-[9px] text-navy-900 dark:text-cream-100 font-medium">{exam.category}</span>
                       {exam.isImage && (
-                        <span className="text-[8px] px-1 py-0.2 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold">
+                        <span className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 inline-flex items-center">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 inline-block mr-1"></span>
                           Imagem
                         </span>
                       )}
@@ -425,18 +456,46 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             </div>
           )}
 
-          {selectedExams.length > 0 && (
-            <div className="pt-2 border-t" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+          {/* Rodapé de Ações com Fluxo Linear */}
+          <div className="pt-3 border-t space-y-2" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+            {selectedExams.length > 0 && (
               <button
                 type="button"
                 onClick={onNavigateToPrint}
-                className="tactile-btn-success w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer"
+                className="tactile-btn-secondary w-full py-2.5 min-h-[44px] text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                title="Visualizar pedido e emitir PDF"
               >
                 <Download className="w-4 h-4" strokeWidth={1.75} />
-                <span>Gerar & Baixar PDF</span>
+                <span>Visualizar Pedido de Exames</span>
               </button>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {onNavigateToPrescription && (
+                <button
+                  type="button"
+                  onClick={onNavigateToPrescription}
+                  className="tactile-btn-secondary w-full py-2.5 min-h-[44px] text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                  title="Voltar para a etapa de prescrição de medicamentos"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Voltar para Prescrição</span>
+                </button>
+              )}
+
+              {onNavigateToDocuments && (
+                <button
+                  type="button"
+                  onClick={onNavigateToDocuments}
+                  className="btn-tactile-primary w-full py-2.5 min-h-[44px] text-xs font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-tactile"
+                  title="Avançar para a próxima etapa: atestados e encaminhamentos"
+                >
+                  <span>Avançar para Documentos</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
@@ -457,7 +516,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                     {activeKitModal.name}
                   </h3>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold border border-sky-500/20">
+                  <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 inline-flex items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block mr-1.5"></span>
                     {activeKitModal.badge}
                   </span>
                 </div>
@@ -469,7 +529,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 type="button"
                 onClick={() => setActiveKitModal(null)}
                 aria-label="Fechar modal de pacote de exames"
-                className="text-slate-400 hover:text-slate-200 p-1 cursor-pointer"
+                className="text-slate-400 hover:text-slate-200 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer rounded-xl"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -483,7 +543,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <button
                 type="button"
                 onClick={handleToggleAllKitExams}
-                className="text-sky-600 dark:text-sky-400 font-bold hover:underline cursor-pointer"
+                className="text-sky-600 dark:text-sky-400 font-bold hover:underline cursor-pointer min-h-[44px] px-2 flex items-center"
               >
                 {selectedKitExamIds.length === activeKitModal.examIds.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
               </button>
@@ -499,7 +559,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 return (
                   <label
                     key={id}
-                    className="pt-1.5 flex items-center justify-between p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer transition"
+                    className="pt-1.5 flex items-center justify-between p-2.5 min-h-[44px] rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer transition"
                   >
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       <input
@@ -528,7 +588,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveKitModal(null)}
-                className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                className="px-4 py-2.5 min-h-[44px] rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
               >
                 Cancelar
               </button>
@@ -536,7 +596,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 type="button"
                 onClick={handleConfirmKitSelection}
                 disabled={selectedKitExamIds.length === 0}
-                className="tactile-btn-primary px-4 py-2 rounded-xl text-xs font-bold disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                className="tactile-btn-primary px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 <span>Incluir {selectedKitExamIds.length} Exames no Pedido</span>
