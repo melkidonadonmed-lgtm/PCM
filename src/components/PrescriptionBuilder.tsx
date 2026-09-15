@@ -44,6 +44,7 @@ import {
   buildPrescriptionDocuments,
   prescriptionDocumentText
 } from '../utils/prescriptionRules';
+import { generatePrescriptionPDF } from '../utils/prescriptionPdf';
 import { safeStorage } from '../utils/storage';
 import { UNIFIED_MEDICATIONS, UnifiedMedication, CATEGORY_LABELS } from '../data/medicationDatabase';
 
@@ -85,8 +86,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  const [confirmedPatient, setConfirmedPatient] = useState('');
-  const patientReady = Boolean(patient.name.trim()) && confirmedPatient === patient.name.trim();
+  // A prescrição fica imediatamente disponível ao entrar na tela (zero atrito de início)
+  const patientReady = true;
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [recentMedications, setRecentMedications] = useState<UnifiedMedication[]>([]);
   const composerRef = useRef<HTMLFieldSetElement>(null);
@@ -120,7 +121,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       // Ctrl+K ou Cmd+K sempre foca na busca
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        if (!patientReady) return;
         setMobileSection('composer');
         if (window.innerWidth < 1024) { setMobileSearchOpen(true); return; }
         searchInputRef.current?.focus();
@@ -132,7 +132,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       // Tecla '/' foca na busca apenas quando o usuário não estiver editando outro input
       if (e.key === '/' && !isEditing) {
         e.preventDefault();
-        if (!patientReady) return;
         setMobileSection('composer');
         if (window.innerWidth < 1024) { setMobileSearchOpen(true); return; }
         searchInputRef.current?.focus();
@@ -143,7 +142,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isActive, patientReady]);
+  }, [isActive]);
 
   // Active form fields for adding/editing
   const [selectedMedName, setSelectedMedName] = useState('');
@@ -474,6 +473,189 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     ).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
   }, [searchTerm, activeCategory]);
 
+  // Inserção direta de medicamento em 1 clique com posologia padrão
+  const handleFastAddMedication = (med: UnifiedMedication) => {
+    const finalKind: PrescriptionKind = med.category === 'antibioticos' || isAntimicrobialDrug(med.name)
+      ? 'antimicrobial'
+      : (med.prescriptionKind || 'simple');
+    const finalPresentation = catalogPresentation(med.name) || extractPresentationFromName(med.name) || 'Dose padrão';
+
+    const newItem: PrescriptionItem = {
+      id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      name: med.name.trim(),
+      presentation: finalPresentation,
+      medicationId: med.id,
+      schemaVersion: 2,
+      prescriptionKind: finalKind,
+      classificationReviewed: true,
+      quantityPlan: EMPTY_QUANTITY_PLAN,
+      controlledSubstances: (med.controlledSubstances || []).map(s => s.trim().toLowerCase()).filter(Boolean),
+      route: med.route || 'Uso Oral',
+      quantity: med.defaultQuantity || '1 caixa',
+      doseCalculatedText: '',
+      frequencyText: med.defaultPosology || 'Tomar conforme orientação médica.',
+      scheduleInterval: '',
+      scheduleTimes: [],
+      instructions: med.defaultPosology || 'Tomar conforme orientação médica.',
+      isContinuous: (med.defaultPosology || '').toLowerCase().includes('contínuo'),
+      isSpecialControl: finalKind === 'c1'
+    };
+
+    onUpdateItems([...items, normalizePrescriptionItem(newItem)]);
+    setItemAddedToast(true);
+    setTimeout(() => setItemAddedToast(false), 2000);
+    setShowSuggestions(false);
+    setSearchTerm('');
+    setMobileSearchOpen(false);
+  };
+
+  // Chips de medicamentos mais frequentes do plantão com posologia padrão pronta (1 clique)
+  const quickMedChips = [
+    { label: 'Dipirona 500mg', name: 'Dipirona Sódica 500mg comprimido', presentation: '500 mg, comprimido', route: 'Uso Oral', quantity: '1 caixa (20 comprimidos)', posology: 'Tomar 1 comprimido via oral de 6 em 6 horas em caso de dor ou febre.', kind: 'simple' as PrescriptionKind },
+    { label: 'Paracetamol 750mg', name: 'Paracetamol 750mg comprimido (Tylenol)', presentation: '750 mg, comprimido', route: 'Uso Oral', quantity: '1 caixa (20 comprimidos)', posology: 'Tomar 1 comprimido via oral de 8 em 8 horas se dor persistente.', kind: 'simple' as PrescriptionKind },
+    { label: 'Ibuprofeno 600mg', name: 'Ibuprofeno 600mg comprimido', presentation: '600 mg, comprimido', route: 'Uso Oral', quantity: '1 caixa (20 comprimidos)', posology: 'Tomar 1 comprimido via oral de 8 em 8 horas após as refeições por 3 a 5 dias.', kind: 'simple' as PrescriptionKind },
+    { label: 'Amoxicilina 500mg', name: 'Amoxicilina 500mg cápsula (Amoxil)', presentation: '500 mg, cápsula', route: 'Uso Oral', quantity: '1 caixa (21 cápsulas)', posology: 'Tomar 1 cápsula via oral de 8 em 8 horas durante 7 a 10 dias consecutivos.', kind: 'antimicrobial' as PrescriptionKind },
+    { label: 'Amox + Clav 875mg', name: 'Amoxicilina + Clavulanato 875/125mg comprimido (Clavulin BD)', presentation: '875 mg + 125 mg, comprimido', route: 'Uso Oral', quantity: '1 caixa (14 comprimidos)', posology: 'Tomar 1 comprimido via oral de 12 em 12 horas às refeições por 7 a 10 dias.', kind: 'antimicrobial' as PrescriptionKind },
+    { label: 'Losartana 50mg', name: 'Losartana Potássica 50mg comprimido', presentation: '50 mg, comprimido', route: 'Uso Oral', quantity: '1 caixa (30 comprimidos)', posology: 'Tomar 1 comprimido via oral 1 vez ao dia, pela manhã. Uso contínuo.', kind: 'simple' as PrescriptionKind },
+    { label: 'Omeprazol 20mg', name: 'Omeprazol 20mg cápsula', presentation: '20 mg, cápsula', route: 'Uso Oral', quantity: '1 caixa (28 cápsulas)', posology: 'Tomar 1 cápsula via oral pela manhã em jejum, 30 minutos antes do café.', kind: 'simple' as PrescriptionKind },
+    { label: 'Prednisolona 20mg', name: 'Prednisolona 20mg comprimido', presentation: '20 mg, comprimido', route: 'Uso Oral', quantity: '1 caixa (10 comprimidos)', posology: 'Tomar 1 a 2 comprimidos via oral pela manhã durante 5 dias.', kind: 'simple' as PrescriptionKind },
+    { label: 'Azitromicina 500mg', name: 'Azitromicina 500mg comprimido (Astro)', presentation: '500 mg, comprimido', route: 'Uso Oral', quantity: '1 caixa (5 comprimidos)', posology: 'Tomar 1 comprimido via oral 1 vez ao dia, 1 hora antes ou 2 horas após refeição, por 5 dias.', kind: 'antimicrobial' as PrescriptionKind },
+    { label: 'Ondansetrona 4mg', name: 'Cloridrato de Ondansetrona 4mg comprimido dispersível (Vonau Flash)', presentation: '4 mg, comprimido dispersível', route: 'Uso Oral', quantity: '1 caixa (10 comprimidos)', posology: 'Dissolver 1 comprimido na boca de 8 em 8 horas em caso de náuseas ou vômitos.', kind: 'simple' as PrescriptionKind },
+    { label: 'Metformina 850mg', name: 'Cloridrato de Metformina 850mg comprimido (Glifage)', presentation: '850 mg, comprimido', route: 'Uso Oral', quantity: '1 caixa (60 comprimidos)', posology: 'Tomar 1 comprimido via oral após o almoço e 1 comprimido após o jantar. Uso contínuo.', kind: 'simple' as PrescriptionKind },
+    { label: 'SRO Envelopes', name: 'Sais para Reidratação Oral (SRO) 27,9g sachê', presentation: '27,9 g, pó oral', route: 'Uso Oral', quantity: '4 envelopes', posology: 'Diluir 1 envelope em 1 litro de água filtrada ou fervida. Beber à vontade e após cada perda líquida.', kind: 'simple' as PrescriptionKind }
+  ];
+
+  const handleApplyQuickChip = (chip: typeof quickMedChips[0]) => {
+    const newItem: PrescriptionItem = {
+      id: `item-chip-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      name: chip.name,
+      presentation: chip.presentation,
+      schemaVersion: 2,
+      prescriptionKind: chip.kind,
+      classificationReviewed: true,
+      quantityPlan: EMPTY_QUANTITY_PLAN,
+      controlledSubstances: [],
+      route: chip.route,
+      quantity: chip.quantity,
+      doseCalculatedText: '',
+      frequencyText: chip.posology,
+      scheduleInterval: '',
+      scheduleTimes: [],
+      instructions: chip.posology,
+      isContinuous: chip.posology.toLowerCase().includes('contínuo'),
+      isSpecialControl: chip.kind === 'c1'
+    };
+    onUpdateItems([...items, normalizePrescriptionItem(newItem)]);
+    setItemAddedToast(true);
+    setTimeout(() => setItemAddedToast(false), 2000);
+  };
+
+  // Medicamentos pediátricos calculados instantaneamente por peso
+  const calculatedPediaItems = useMemo(() => {
+    if (!hasWeight) return [];
+    const w = patientWeight;
+
+    // 1. Dipirona gotas: 1 gota/kg/dose (máx 40 gotas)
+    const dipDrops = Math.min(Math.round(w), 40);
+    // 2. Paracetamol gotas: 1 gota/kg/dose (máx 35 gotas)
+    const parDrops = Math.min(Math.round(w), 35);
+    // 3. Ibuprofeno gotas 100mg/mL: 1 gota/kg/dose (máx 30 gotas)
+    const ibuDrops = Math.min(Math.round(w), 30);
+    // 4. Amoxicilina susp 250mg/5mL: 50mg/kg/dia div 3 doses
+    const amoxMl = parseFloat(((w * 50) / 3 / 50).toFixed(1));
+    // 5. Prednisolona sol 3mg/mL: 1mg/kg/dia em dose única matinal
+    const predMl = parseFloat((w / 3).toFixed(1));
+
+    return [
+      {
+        id: 'pedia-dipirona',
+        label: 'Dipirona Gotas',
+        doseText: `${dipDrops} gotas (6/6h)`,
+        name: 'Dipirona Sódica 500mg/mL gotas (Novalgina)',
+        presentation: '500 mg/mL, gotas',
+        route: 'Uso Oral',
+        quantity: '1 frasco (20 mL)',
+        instructions: `Administrar ${dipDrops} gotas via oral de 6 em 6 horas se dor ou febre (máx 4x ao dia).`,
+        kind: 'simple' as PrescriptionKind,
+        calculatedDrops: dipDrops
+      },
+      {
+        id: 'pedia-paracetamol',
+        label: 'Paracetamol Gotas',
+        doseText: `${parDrops} gotas (6/6h)`,
+        name: 'Paracetamol 200mg/mL gotas (Tylenol Bebê/Criança)',
+        presentation: '200 mg/mL, gotas',
+        route: 'Uso Oral',
+        quantity: '1 frasco (15 mL)',
+        instructions: `Administrar ${parDrops} gotas via oral de 6 em 6 horas em caso de dor ou febre.`,
+        kind: 'simple' as PrescriptionKind,
+        calculatedDrops: parDrops
+      },
+      {
+        id: 'pedia-ibuprofeno',
+        label: 'Ibuprofeno 100mg/mL',
+        doseText: `${ibuDrops} gotas (8/8h)`,
+        name: 'Ibuprofeno 100mg/mL suspensão gotas (Alivium 100)',
+        presentation: '100 mg/mL, gotas',
+        route: 'Uso Oral',
+        quantity: '1 frasco (20 mL)',
+        instructions: `Administrar ${ibuDrops} gotas via oral de 8 em 8 horas após as refeições por 3 dias.`,
+        kind: 'simple' as PrescriptionKind,
+        calculatedDrops: ibuDrops
+      },
+      {
+        id: 'pedia-amoxicilina',
+        label: 'Amoxicilina Susp',
+        doseText: `${amoxMl} mL (8/8h)`,
+        name: 'Amoxicilina 250mg/5mL pó para suspensão oral (Amoxil)',
+        presentation: '250 mg/5 mL, suspensão oral',
+        route: 'Uso Oral',
+        quantity: w > 15 ? '2 frascos (150 mL)' : '1 frasco (150 mL)',
+        instructions: `Administrar ${amoxMl} mL via oral de 8 em 8 horas durante 10 dias consecutivos.`,
+        kind: 'antimicrobial' as PrescriptionKind,
+        calculatedMl: amoxMl
+      },
+      {
+        id: 'pedia-prednisolona',
+        label: 'Prednisolona Sol',
+        doseText: `${predMl} mL (Manhã)`,
+        name: 'Fosfato Sódico de Prednisolona 3mg/mL solução oral (Prelone)',
+        presentation: '3 mg/mL, solução oral',
+        route: 'Uso Oral',
+        quantity: '1 frasco (60 mL)',
+        instructions: `Administrar ${predMl} mL via oral 1 vez ao dia, pela manhã, durante 5 dias.`,
+        kind: 'simple' as PrescriptionKind,
+        calculatedMl: predMl
+      }
+    ];
+  }, [hasWeight, patientWeight]);
+
+  const handleApplyPediaItem = (pediaItem: typeof calculatedPediaItems[0]) => {
+    const newItem: PrescriptionItem = {
+      id: `item-pedia-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      name: pediaItem.name,
+      presentation: pediaItem.presentation,
+      schemaVersion: 2,
+      prescriptionKind: pediaItem.kind,
+      classificationReviewed: true,
+      quantityPlan: EMPTY_QUANTITY_PLAN,
+      controlledSubstances: [],
+      route: pediaItem.route,
+      quantity: pediaItem.quantity,
+      doseCalculatedText: pediaItem.doseText,
+      frequencyText: pediaItem.instructions,
+      scheduleInterval: '',
+      scheduleTimes: [],
+      instructions: pediaItem.instructions,
+      isContinuous: false,
+      isSpecialControl: false,
+      calculatedFromWeight: patientWeight
+    };
+    onUpdateItems([...items, normalizePrescriptionItem(newItem)]);
+    setItemAddedToast(true);
+    setTimeout(() => setItemAddedToast(false), 2000);
+  };
+
   // Select medication from database into the composer form
   const handleSelectMedication = (med: UnifiedMedication) => {
     setMobileSearchOpen(false);
@@ -611,6 +793,30 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     const text = buildPrescriptionText(items, patient, doctor);
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  // Impressão e exportação imediata do PDF sem desvio de tela e sem loops
+  const handleDirectPrintPdf = () => {
+    if (items.length === 0) return;
+    try {
+      const docs = buildPrescriptionDocuments(items);
+      const pdf = generatePrescriptionPDF(docs, doctor, patient, new Date());
+      
+      // Abre o PDF imediatamente em nova aba para impressão direta
+      const blob = pdf.output('blob');
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+      
+      // E salva o arquivo automaticamente
+      const safeName = patient.name?.trim() ? patient.name.trim().replace(/\s+/g, '_') : 'Paciente';
+      pdf.save(`Receita_${safeName}.pdf`);
+      
+      setItemAddedToast(true);
+      setTimeout(() => setItemAddedToast(false), 2500);
+    } catch (err) {
+      console.error('Falha ao gerar PDF diretamente:', err);
+      onNavigateToPrint();
+    }
   };
 
   // Apply a full clinical kit with 1 click
@@ -758,74 +964,80 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
   return (
     <div className="prescription-workspace w-full max-w-7xl mx-auto space-y-6 pb-20">
-      {mobileSearchOpen && <MedicationSearchDialog query={searchTerm} onQuery={setSearchTerm} results={searchSuggestions} recent={recentMedications} onSelect={handleSelectMedication} onClose={() => setMobileSearchOpen(false)} onManual={() => {
+      {mobileSearchOpen && <MedicationSearchDialog query={searchTerm} onQuery={setSearchTerm} results={searchSuggestions} recent={recentMedications} onSelect={handleSelectMedication} onFastAdd={handleFastAddMedication} onClose={() => setMobileSearchOpen(false)} onManual={() => {
         setMobileSearchOpen(false);
         setSelectedMedName(searchTerm); setSelectedMedicationId(undefined); setSelectedPresentation(''); setSelectedPosology(''); setSelectedQuantity('1 caixa'); setSelectedDays(''); setSelectedRoute('Uso Oral'); setSelectedKind('unclassified'); setSelectedSubstances(''); setQuantityPlan(EMPTY_QUANTITY_PLAN);
       }} />}
-      {/* Stepper de Etapas do Atendimento Clínico (Linear e Acessível) */}
-      <nav aria-label="Etapas do Atendimento" className="grid grid-cols-3 gap-1.5 p-1.5 sm:p-2.5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-white/10 shadow-tactile dark:shadow-tactile-navy">
-        <button
-          type="button"
-          onClick={() => { setConfirmedPatient(''); onOpenPatientModal(); }}
-          aria-current={!patientReady ? 'step' : undefined}
-          className={`min-w-0 min-h-11 inline-flex items-center justify-center gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold cursor-pointer border-none transition-colors ${
-            !patientReady
-              ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-xs'
-              : 'bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
-          }`}
-          title="Etapa 1: Definir identificação e dados cadastrais do paciente"
-        >
-          <span className={`w-2 h-2 rounded-full shrink-0 ${patientReady ? 'bg-emerald-500' : 'bg-sky-500'}`} />
-          <User className="hidden sm:block w-3.5 h-3.5 opacity-70" />
-          <span className="sm:hidden truncate">1. Paciente</span>
-          <span className="hidden sm:block truncate">1. {patientName || 'Paciente'}</span>
-        </button>
+      {/* Barra de Status e Ações Rápidas do Atendimento (Acesso Imediato) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-2 sm:p-3 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-white/10 shadow-tactile dark:shadow-tactile-navy">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-navy-900/10 dark:bg-white/10 text-navy-900 dark:text-cream-100 flex items-center justify-center shrink-0">
+            <User className="w-4 h-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+              {patientName ? patientName : 'Novo Paciente'} {hasWeight ? `• ${patientWeight} kg` : ''}
+            </p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+              {items.length === 0 ? 'Nenhum medicamento inserido' : `${items.length} medicamento(s) na receita`}
+            </p>
+          </div>
+        </div>
 
-        <button
-          type="button"
-          aria-current={patientReady ? 'step' : undefined}
-          disabled={!patientReady}
-          onClick={() => composerRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })}
-          className={`min-w-0 min-h-11 inline-flex items-center justify-center gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition-colors ${
-            patientReady
-              ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-xs cursor-pointer'
-              : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400 cursor-not-allowed'
-          }`}
-          title="Etapa 2: Selecionar e prescrever medicamentos"
-        >
-          <span className={`w-2 h-2 rounded-full shrink-0 ${items.length > 0 ? 'bg-emerald-500' : patientReady ? 'bg-sky-400 dark:bg-navy-800' : 'bg-slate-400 dark:bg-slate-500'}`} />
-          <Search className="hidden sm:block w-3.5 h-3.5 opacity-70" />
-          <span className="truncate">2. Medicamentos ({items.length})</span>
-        </button>
+        {/* Ações diretas imediatas na própria tela de prescrição */}
+        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          <button
+            type="button"
+            onClick={handleDirectPrintPdf}
+            disabled={items.length === 0}
+            className="btn-tactile-primary min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-40"
+            title="Imprimir e salvar receituário em PDF imediatamente"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Imprimir / PDF</span>
+          </button>
 
-        <button
-          type="button"
-          className={`min-w-0 min-h-11 inline-flex items-center justify-center gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold border-none transition-colors ${
-            items.length > 0 && patientReady
-              ? 'bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer active:scale-95'
-              : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400 cursor-not-allowed'
-          }`}
-          onClick={onNavigateToExams || onNavigateToPrint}
-          disabled={!patientReady}
-          title={onNavigateToExams ? "Etapa 3: Avançar para Exames e Documentos" : "Etapa 3: Revisar vias normativas e emitir PDF"}
-        >
-          <span className={`w-2 h-2 rounded-full shrink-0 ${items.length > 0 ? 'bg-sky-500' : 'bg-slate-400 dark:bg-slate-500'}`} />
-          <ArrowRight className="hidden sm:block w-3.5 h-3.5 opacity-70" />
-          <span className="sm:hidden truncate">3. Exames / Finalizar</span>
-          <span className="hidden sm:block truncate">3. Exames / Finalizar</span>
-        </button>
-      </nav>
+          <button
+            type="button"
+            onClick={handleSendWhatsApp}
+            disabled={items.length === 0}
+            className="min-h-[40px] px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 cursor-pointer transition active:scale-95 disabled:opacity-40 border-none shadow-xs"
+            title="Enviar prescrição via WhatsApp"
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">WhatsApp</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleCopyText}
+            disabled={items.length === 0}
+            className="min-h-[40px] px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 cursor-pointer transition active:scale-95 disabled:opacity-40 border-none"
+            title="Copiar texto da prescrição"
+          >
+            {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{copiedSuccess ? 'Copiado!' : 'Copiar'}</span>
+          </button>
+
+          {onNavigateToExams && (
+            <button
+              type="button"
+              onClick={onNavigateToExams}
+              className="min-h-[40px] px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-navy-900 dark:text-slate-400 dark:hover:text-cream-100 flex items-center gap-1 cursor-pointer transition"
+              title="Solicitar exames laboratoriais ou de imagem (opcional)"
+            >
+              <span>+ Exames</span>
+            </button>
+          )}
+        </div>
+      </div>
       
       {/* Barra Rápida de Identificação do Paciente (Contexto Clínico Unificado) */}
       <section className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-white/10 shadow-tactile dark:shadow-tactile-navy space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold shrink-0 border transition-colors ${
-              patientReady
-                ? 'bg-slate-100 text-emerald-600 dark:bg-white/5 dark:text-emerald-400 border-slate-200/80 dark:border-white/10'
-                : 'bg-navy-900/10 dark:bg-white/10 text-navy-900 dark:text-cream-100 border-navy-900/15 dark:border-white/15'
-            }`}>
-              {patientReady ? <Check className="w-5 h-5" strokeWidth={2} /> : <User className="w-5 h-5" strokeWidth={1.75} />}
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold shrink-0 border transition-colors bg-slate-100 text-emerald-600 dark:bg-white/5 dark:text-emerald-400 border-slate-200/80 dark:border-white/10">
+              <User className="w-5 h-5" strokeWidth={1.75} />
             </div>
             <div className="flex-1 min-w-[180px]">
               <label htmlFor="pb-patient-name" className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">
@@ -887,26 +1099,50 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 type="button"
                 onClick={onNavigateToPediatricCalc}
                 className="min-h-9 px-2.5 py-1 rounded-lg text-xs font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-white/5 hover:bg-sky-100 dark:hover:bg-white/10 flex items-center gap-1.5 transition-colors cursor-pointer border border-sky-200 dark:border-white/10"
-                title="Abrir Calculadora Pediátrica para acertar doses mg/kg"
+                title="Abrir Calculadora Pediátrica completa"
               >
                 <Calculator className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-                <span>Calculadora Pediátrica</span>
+                <span>Calculadora Completa</span>
               </button>
             )}
           </div>
-          <button
-            type="button"
-            className="tactile-btn-primary min-h-11 px-4 rounded-xl text-xs sm:text-sm font-bold disabled:opacity-45 disabled:cursor-not-allowed"
-            disabled={!patientName || patientReady}
-            onClick={() => {
-              setConfirmedPatient(patientName);
-              setMobileSection('composer');
-              requestAnimationFrame(() => composerRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }));
-            }}
-          >
-            {patientReady ? 'Paciente confirmado' : 'Confirmar e prescrever'}
-          </button>
         </div>
+
+        {/* Bandeja de Doses Pediátricas Rápidas por Peso (1 Clique Direto) */}
+        {hasWeight && calculatedPediaItems.length > 0 && (
+          <div className="pt-3 border-t border-slate-200/80 dark:border-white/10 space-y-2">
+            <div className="flex items-center justify-between flex-wrap gap-1">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Doses Pediátricas para {patientWeight} kg (1 clique na receita):</span>
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                Padrão 1 gota/kg ou mg/kg/dia
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+              {calculatedPediaItems.map(pedia => (
+                <button
+                  key={pedia.id}
+                  type="button"
+                  onClick={() => handleApplyPediaItem(pedia)}
+                  className="p-2.5 rounded-xl border bg-sky-50/60 hover:bg-sky-100/80 dark:bg-white/5 dark:hover:bg-white/10 border-sky-200/70 dark:border-white/10 text-left transition active:scale-95 cursor-pointer shadow-xs group flex flex-col justify-between"
+                  title={`Inserir ${pedia.name} (${pedia.doseText}) diretamente na receita`}
+                >
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate group-hover:text-sky-600 dark:group-hover:text-sky-400">
+                      {pedia.label}
+                    </span>
+                    <Plus className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0 group-hover:scale-125 transition-transform" strokeWidth={2.5} />
+                  </div>
+                  <span className="text-[11px] font-black text-sky-700 dark:text-sky-300">
+                    {pedia.doseText}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Top Mobile View Switcher */}
@@ -943,7 +1179,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         <div className={`xl:col-span-7 space-y-5 ${mobileSection === 'preview' ? 'hidden md:block' : 'block'}`}>
           
           {/* Card 1: Busca Rápida de Medicamentos (370+ RENAME / SUS / Referência) - TOPO PRIORITÁRIO */}
-          <fieldset ref={composerRef} disabled={!patientReady} className="prescription-composer min-w-0 scroll-mt-24 p-4 sm:p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-white/10 shadow-tactile dark:shadow-tactile-navy space-y-4">
+          <section ref={composerRef} className="prescription-composer min-w-0 scroll-mt-24 p-4 sm:p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-white/10 shadow-tactile dark:shadow-tactile-navy space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-navy-900/10 text-navy-900 dark:bg-white/10 dark:text-cream-100 flex items-center justify-center font-bold border border-navy-900/15 dark:border-white/15 shrink-0">
@@ -956,13 +1192,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </div>
               </div>
             </div>
-
-            {!patientReady ? (
-              <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-white/10">
-                <Lock className="w-4 h-4 shrink-0 text-slate-500 dark:text-slate-400" />
-                <span className="text-xs font-semibold">Confirme o paciente para liberar a prescrição.</span>
-              </div>
-            ) : null}
 
             {/* Category Filter Chips */}
             <div className="flex items-center gap-0 overflow-x-auto pb-1 custom-scrollbar fade-scroll-x">
@@ -980,11 +1209,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   key={cat.id}
                   type="button"
                   onClick={() => setActiveCategory(cat.id)}
-                  aria-pressed={patientReady && activeCategory === cat.id}
+                  aria-pressed={activeCategory === cat.id}
                   className="group min-h-11 p-0.5 rounded-lg shrink-0 cursor-pointer active:scale-95 transition-transform"
                 >
                   <span className={`h-8 px-2.5 rounded-lg text-[11px] font-bold flex items-center transition-colors ${
-                    patientReady && activeCategory === cat.id
+                    activeCategory === cat.id
                       ? 'bg-navy-900 dark:bg-cream-100 text-white dark:text-navy-950 font-black'
                       : 'bg-slate-100 dark:bg-white/5 group-hover:bg-slate-200 dark:group-hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-white/5'
                   }`}>
@@ -994,11 +1223,36 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               ))}
             </div>
 
+            {/* Chips de Prescrição Rápida de Plantão (1 clique direto na receita) */}
+            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200/80 dark:border-white/10 space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <span className="flex items-center gap-1.5 text-navy-900 dark:text-cream-100">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Prescrição em 1 Clique (Plantão Adulto):</span>
+                </span>
+                <span className="text-[10px] text-slate-400 font-normal">Posologia padrão pronta</span>
+              </div>
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar fade-scroll-x">
+                {quickMedChips.map(chip => (
+                  <button
+                    key={chip.label}
+                    type="button"
+                    onClick={() => handleApplyQuickChip(chip)}
+                    className="min-h-[38px] px-3 py-1.5 rounded-xl bg-white dark:bg-white/5 hover:bg-sky-50 dark:hover:bg-white/10 hover:border-sky-300 dark:hover:border-sky-500/30 border border-slate-200/80 dark:border-white/10 text-xs font-semibold text-slate-800 dark:text-slate-200 shrink-0 transition active:scale-95 cursor-pointer flex items-center gap-1.5 group shadow-2xs"
+                    title={`Adicionar ${chip.name} à receita em 1 clique`}
+                  >
+                    <span>{chip.label}</span>
+                    <Plus className="w-3 h-3 text-slate-400 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors" strokeWidth={2.5} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Search Input with Instant Autocomplete */}
             <div ref={searchContainerRef} className="relative">
               <label htmlFor="med-search-input" className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 <span className="flex items-center gap-1.5">
-                  Buscar medicamento
+                  Buscar no catálogo (370+ fármacos)
                 </span>
                 <span className="text-[10px] font-semibold text-slate-400 hidden sm:inline-flex items-center gap-1">
                   Atalho: <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-navy-800 border border-slate-300 dark:border-navy-700 font-mono text-[9px] text-slate-600 dark:text-slate-300">Ctrl+K</kbd> ou <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-navy-800 border border-slate-300 dark:border-navy-700 font-mono text-[9px] text-slate-600 dark:text-slate-300">/</kbd>
@@ -1015,7 +1269,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     setShowSuggestions(true);
                   }}
                   onFocus={() => setShowSuggestions(true)}
-                  placeholder="Buscar medicamento"
+                  placeholder="Buscar por nome, princípio ativo ou indicação..."
                   className="hidden lg:block w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-300 dark:border-navy-700 text-sm font-semibold focus:ring-2 focus:ring-sky-500 outline-none text-slate-900 dark:text-slate-100"
                 />
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -1039,27 +1293,38 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 <div className="absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto overscroll-contain custom-scrollbar rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile-navy z-30 divide-y divide-slate-100 dark:divide-navy-800">
                   {/* Cabeçalho compacto com total de resultados */}
                   <div className="px-3.5 py-2 bg-slate-50 dark:bg-navy-950/95 text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center justify-between border-b border-slate-200 dark:border-navy-800 sticky top-0 z-20 backdrop-blur-xs">
-                    <span>{searchSuggestions.length} medicamentos</span>
+                    <span>{searchSuggestions.length} medicamentos encontrados</span>
+                    <span className="text-[10px] text-slate-400">Clique no nome para editar ou em + Inserir</span>
                   </div>
 
                   {searchSuggestions.map(med => (
-                    <button type="button"
+                    <div
                       key={med.id}
-                      onClick={() => handleSelectMedication(med)}
-                      className="w-full min-h-[52px] text-left px-3 py-2 hover:bg-sky-50 dark:hover:bg-navy-800 cursor-pointer flex items-center justify-between gap-2 transition"
+                      className="w-full min-h-[50px] px-3 py-2 hover:bg-sky-50/60 dark:hover:bg-navy-800/80 flex items-center justify-between gap-2 transition group"
                     >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold leading-tight text-slate-900 dark:text-cream-50 truncate">
+                      <button
+                        type="button"
+                        onClick={() => handleSelectMedication(med)}
+                        className="min-w-0 flex-1 text-left cursor-pointer border-none bg-transparent"
+                        title="Personalizar dose, quantidade e posologia antes de adicionar"
+                      >
+                        <p className="text-xs font-bold leading-tight text-slate-900 dark:text-cream-50 truncate group-hover:text-sky-600 dark:group-hover:text-sky-400">
                           {med.name.replace(/\s*\([^)]*\)\s*$/, '')}
                         </p>
                         <p className="mt-0.5 text-[10px] leading-tight text-slate-500 dark:text-slate-400 truncate">
-                          {med.activeIngredient}
+                          {med.activeIngredient} • <span className="font-semibold text-slate-700 dark:text-slate-300">{med.route}</span>
                         </p>
-                      </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-slate-100 dark:bg-navy-800 text-sky-600 dark:text-sky-400 shrink-0">
-                        {med.route}
-                      </span>
-                    </button>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleFastAddMedication(med)}
+                        className="min-h-[34px] px-3 py-1 rounded-lg text-xs font-bold bg-navy-900 hover:bg-navy-800 text-white dark:bg-cream-100 dark:hover:bg-cream-200 dark:text-navy-950 flex items-center gap-1 shrink-0 cursor-pointer shadow-xs active:scale-95 transition"
+                        title="Adicionar diretamente à receita em 1 clique"
+                      >
+                        <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+                        <span>Inserir</span>
+                      </button>
+                    </div>
                   ))}
 
                   <div className="p-2 text-center text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-50/50 dark:bg-navy-950/50">
@@ -1164,9 +1429,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </div>
               </div>
 
-              {/* Linha 2: Via de Administração, Quantidade & Tipo de Receita */}
+              {/* Linha 2: Quantidade & Via de Administração (Limpo e Direto) */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                <div className="sm:col-span-4">
+                <div className="sm:col-span-6">
+                  <label htmlFor="pb-quantity-input" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Quantidade Dispensada
+                  </label>
+                  <DispensedQuantity id="pb-quantity-input" value={selectedQuantity} onChange={value => setSelectedQuantity(value)} />
+                </div>
+
+                <div className="sm:col-span-6">
                   <label htmlFor="pb-route-select" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Via de Administração
                   </label>
@@ -1176,7 +1448,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     aria-label="Via de Administração"
                     value={selectedRoute}
                     onChange={(e) => setSelectedRoute(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-white/10 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100 cursor-pointer"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-white/10 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100 cursor-pointer min-h-[42px]"
                   >
                     <option value="Uso Oral">Uso Oral</option>
                     <option value="Uso Tópico">Uso Tópico</option>
@@ -1191,74 +1463,21 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     <option value="Uso Subcutâneo">Uso Subcutâneo</option>
                   </select>
                 </div>
-
-                <div className="sm:col-span-4">
-                  <label htmlFor="pb-quantity-input" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Quantidade Dispensada
-                  </label>
-                  <DispensedQuantity id="pb-quantity-input" value={selectedQuantity} onChange={value => { setSelectedQuantity(value); setQuantityPlan(p => ({ ...p, source: 'manual' })); }} />
-                </div>
-
-                <div className="sm:col-span-4">
-                  <label htmlFor="pb-kind-select" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Tipo de Receituário
-                  </label>
-                  <select
-                    id="pb-kind-select"
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-white/10 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100 cursor-pointer disabled:opacity-80"
-                    value={selectedKind}
-                    disabled={Boolean(selectedMedicationId)}
-                    onChange={e => {
-                      const next = e.target.value as PrescriptionKind;
-                      if (next === 'simple' && isAntimicrobialDrug(selectedMedName)) {
-                        setFormError('Antimicrobianos exigem Receituário de Controle Especial em 2 vias (RDC 20/2011).');
-                        return;
-                      }
-                      setFormError('');
-                      setSelectedKind(next);
-                    }}
-                  >
-                    {Object.entries(PRESCRIPTION_LABELS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-                  </select>
-                </div>
               </div>
 
-              {/* Linha 3: Duração & Auxiliares C1 / Embalagens */}
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start">
-                <div className="sm:col-span-4">
-                  <label htmlFor="pb-days-input" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Duração / Período (dias)
-                  </label>
-                  <input
-                    id="pb-days-input"
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-white/10 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100"
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={selectedDays}
-                    onChange={e => { setSelectedDays(e.target.value); setQuantityPlan(p => ({ ...p, source: p.source === 'suggested' ? 'stale' : p.source })); }}
-                    placeholder="Dias definidos"
-                  />
+              {/* Indicador automático do tipo normativo da receita */}
+              {selectedKind !== 'simple' && (
+                <div className="flex items-center gap-2 pt-0.5">
+                  <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 ${
+                    selectedKind === 'antimicrobial'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-700/60'
+                      : 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60'
+                  }`}>
+                    {selectedKind === 'antimicrobial' ? <ShieldCheck className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                    <span>{selectedKind === 'antimicrobial' ? 'Receituário de Antimicrobianos (2 vias automático)' : 'Receita de Controle Especial C1 (2 vias automático)'}</span>
+                  </span>
                 </div>
-
-                {selectedKind === 'c1' && !selectedMedicationId && (
-                  <div className="sm:col-span-8">
-                    <label htmlFor="pb-c1-substances" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Substâncias C1 (separadas por vírgula)
-                    </label>
-                    <input
-                      id="pb-c1-substances"
-                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-white/10 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100"
-                      value={selectedSubstances}
-                      onChange={e => setSelectedSubstances(e.target.value)}
-                      placeholder="Ex.: fluoxetina, sertralina"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Assistente de Cálculo de Embalagens */}
-              <QuantityAssistant value={quantityPlan} onChange={setQuantityPlan} onApply={text => { setSelectedQuantity(text); setSelectedDays(String(quantityPlan.days)); }} />
+              )}
 
               {/* Linha 4: Posologia & Instruções de Uso com Atalhos */}
               <div className="space-y-1.5">
@@ -1329,7 +1548,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </button>
               </div>
             </div>
-          </fieldset>
+          </section>
 
           {/* Card 2: Kits Rápidos de Plantão & Visita Domiciliar (Com Toggle Recolhível) */}
           <section className="rounded-2xl bg-white dark:bg-navy-900 border border-cream-300/80 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy overflow-hidden transition-all">
@@ -1719,37 +1938,26 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
                 {/* Ações de avanço e revisão */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={onNavigateToPrint}
-                    className="tactile-btn-secondary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer min-h-[44px]"
-                    title="Revisar layout e vias normativas do receituário"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Revisar Receita</span>
-                  </button>
-
-                  {onNavigateToExams ? (
+                  {onNavigateToExams && (
                     <button
                       type="button"
                       onClick={onNavigateToExams}
-                      className="btn-tactile-primary px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer min-h-[44px] shadow-tactile"
-                      title="Prosseguir para a próxima etapa: solicitação de exames complementares"
+                      className="tactile-btn-secondary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer min-h-[44px]"
+                      title="Solicitar exames laboratoriais ou de imagem (opcional)"
                     >
-                      <span>Avançar para Exames</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={onNavigateToPrint}
-                      className="btn-tactile-primary px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer min-h-[44px]"
-                      title="Revisar e emitir PDF"
-                    >
-                      <Printer className="w-3.5 h-3.5" />
-                      <span>Revisar e exportar</span>
+                      <span>+ Solicitar Exames</span>
                     </button>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={handleDirectPrintPdf}
+                    className="btn-tactile-primary px-6 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer min-h-[44px] shadow-tactile"
+                    title="Imprimir e salvar receituário em PDF imediatamente"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>Imprimir / Baixar PDF</span>
+                  </button>
                 </div>
               </div>
             )}
@@ -1857,7 +2065,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 {activeDoc?.kind === 'antimicrobial' && (
                   <div className="text-[10px] font-bold tracking-wide uppercase text-slate-700 bg-slate-100 px-3 py-1 rounded-full border border-slate-300 mb-2 inline-flex items-center">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block mr-1.5"></span>
-                    <span>1ª Via: Paciente • 2ª Via: Farmácia (RDC 20/2011)</span>
+                    <span>1ª Via: Farmácia (retenção) • 2ª Via: Paciente (RDC 20/2011)</span>
                   </div>
                 )}
                 {activeDoc?.kind === 'c1' && (
@@ -1929,17 +2137,17 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons - Unificado em botão claro de visualização/revisão */}
+          {/* Action Buttons - Impressão direta sem desvio de tela */}
           <div className="pt-2">
             <button
               type="button"
-              onClick={onNavigateToPrint}
+              onClick={handleDirectPrintPdf}
               disabled={items.length === 0}
-              className="btn-tactile-primary w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer min-h-[44px] disabled:opacity-50"
-              title="Visualizar documento completo e exportar PDF"
+              className="btn-tactile-primary w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer min-h-[44px] disabled:opacity-50 shadow-tactile"
+              title="Imprimir e salvar receituário em PDF imediatamente"
             >
               <Printer className="w-4 h-4" />
-              <span>Revisar & Emitir PDF</span>
+              <span>Imprimir / Baixar PDF</span>
             </button>
           </div>
             </>

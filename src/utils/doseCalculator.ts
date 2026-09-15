@@ -66,25 +66,32 @@ export function calculatePediatricDose(
       const drops = Math.min(100, Math.round(safeWeight * 1.0)); // standard pediatric practice in Brazil: 1 gota/kg
       calculatedDrops = drops;
       volumeMl = drops / 20;
+      targetMg = (drops / 20) * (med.concentrationMgPerMl || 200);
     } else if (med.id === 'dipirona-gotas') {
       // 500 mg/mL (1 gota = 25 mg). Dose 20 mg/kg -> for 12 kg = 240 mg -> approx 10 a 12 gotas (0.5 a 1 gota/kg)
       const drops = Math.min(40, Math.max(4, Math.round((targetMg / 500) * 20)));
       calculatedDrops = drops;
       volumeMl = drops / 20;
+      targetMg = (drops / 20) * (med.concentrationMgPerMl || 500);
     } else if (med.id === 'ibuprofeno-gotas-50') {
       // 50 mg/mL (1 gota = 2.5 mg). 10 mg/kg -> 4 gotas/kg
       const drops = Math.min(160, Math.round(safeWeight * 3));
       calculatedDrops = drops;
       volumeMl = drops / 20;
+      targetMg = (drops / 20) * (med.concentrationMgPerMl || 50);
     } else if (med.id === 'ibuprofeno-gotas-100') {
       // 100 mg/mL (1 gota = 5 mg). 10 mg/kg -> 2 gotas/kg (1 a 2 gotas por kg)
       const drops = Math.min(80, Math.max(3, Math.round(safeWeight * 1.5)));
       calculatedDrops = drops;
       volumeMl = drops / 20;
+      targetMg = (drops / 20) * (med.concentrationMgPerMl || 100);
     } else if (med.id === 'simeticona-gotas') {
       const drops = safeWeight < 12 ? 8 : 16;
       calculatedDrops = drops;
       volumeMl = drops / 25;
+      if (med.concentrationMgPerMl > 0) {
+        targetMg = volumeMl * med.concentrationMgPerMl;
+      }
     } else {
       calculatedDrops = Math.round(volumeMl * dropsPerMl);
     }

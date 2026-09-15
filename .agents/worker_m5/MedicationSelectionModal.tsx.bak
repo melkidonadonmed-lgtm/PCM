@@ -1,0 +1,3 @@
+# Registro de Limpeza de Componente Órfão
+O componente `MedicationSelectionModal.tsx` era código morto (374 linhas não importadas) e foi retirado do diretório `src/components/`.
+Substituído integralmente por `MedicationSearchDialog.tsx`.

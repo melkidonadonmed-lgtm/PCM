@@ -17,7 +17,9 @@ import {
   Hash,
   Send,
   ArrowLeft,
-  ArrowRight
+  ArrowRight,
+  X,
+  Check
 } from 'lucide-react';
 import { MedicalCertificate, MedicalReferral, Patient, DoctorProfile } from '../types';
 import { CidSearchBar } from './CidSearchBar';
@@ -204,7 +206,43 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
   const handleAppendCidForReferral = (cid: { code: string; description: string }) => {
     const formatted = `${cid.code} - ${cid.description}`;
     const current = referral.hypothesisCID ? referral.hypothesisCID.trim() : '';
+    // Avoid duplicate insertions of the same code
+    const regex = new RegExp(`(^|\\/|\\s)${cid.code}(\\s|-|\\/|$)`, 'i');
+    if (current && regex.test(current)) {
+      return;
+    }
     const updated = current ? `${current} / ${formatted}` : formatted;
+    onUpdateReferral({
+      ...referral,
+      hypothesisCID: updated
+    });
+  };
+
+  // Extract structured CID chips from hypothesisCID string
+  const parsedReferralCids = React.useMemo(() => {
+    if (!referral.hypothesisCID?.trim()) return [];
+    return referral.hypothesisCID
+      .split(/\s*\/|\n+/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(item => {
+        const match = item.match(/^([A-Z][0-9]{2}(?:\.[0-9]{1,2})?)\s*[-:]?\s*(.*)$/i);
+        if (match) {
+          return { code: match[1].toUpperCase(), label: match[2]?.trim() || match[1].toUpperCase(), full: item };
+        }
+        return { code: '', label: item, full: item };
+      });
+  }, [referral.hypothesisCID]);
+
+  const selectedReferralCodes = React.useMemo(() => {
+    return parsedReferralCids.map(c => c.code).filter(Boolean);
+  }, [parsedReferralCids]);
+
+  const handleRemoveCidFromReferral = (itemToRemove: { code: string; label: string; full: string }) => {
+    const updated = parsedReferralCids
+      .filter(c => c.full !== itemToRemove.full && (!c.code || c.code !== itemToRemove.code))
+      .map(c => c.full)
+      .join(' / ');
     onUpdateReferral({
       ...referral,
       hypothesisCID: updated
@@ -277,7 +315,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
   const currentSpecialtySuggestions = specialtyCidSuggestions[referral.destinationSpecialty] || [];
 
   return (
-    <div id="certificate-and-referral-section" className="space-y-4 sm:space-y-5">
+    <div id="certificate-and-referral-section" className="space-y-4 sm:space-y-5 pb-28 sm:pb-32">
       {/* Workflow Stepper */}
       <div 
         className="tactile-card p-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 border shadow-tactile-sm"
@@ -299,7 +337,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               color: darkMode ? '#94A3B8' : '#64748B'
             }}
           >
-            <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">1</span>
+            <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px] font-bold relative border border-slate-200/60 dark:border-slate-700/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 absolute -top-0.5 -right-0.5" />
+              1
+            </span>
             <span>Medicamentos</span>
           </button>
 
@@ -317,7 +358,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               color: darkMode ? '#94A3B8' : '#64748B'
             }}
           >
-            <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">2</span>
+            <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px] font-bold relative border border-slate-200/60 dark:border-slate-700/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 absolute -top-0.5 -right-0.5" />
+              2
+            </span>
             <span>Exames</span>
           </button>
 
@@ -340,7 +384,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             <button
               type="button"
               onClick={onNavigateToExams}
-              className="tactile-btn-secondary px-3 py-1.5 min-h-[38px] text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+              className="tactile-btn-secondary px-3 py-1.5 min-h-[44px] text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Voltar a Exames</span>
@@ -349,7 +393,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
           <button
             type="button"
             onClick={() => onNavigateToPrint(currentSubTab)}
-            className="tactile-btn-primary px-3 py-1.5 min-h-[38px] text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+            className="tactile-btn-primary px-3 py-1.5 min-h-[44px] text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
           >
             <span>Finalizar & Emitir</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -963,26 +1007,160 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label htmlFor="ref-relevant-exams" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">Exames Relevantes Realizados</label>
-                <textarea
-                  id="ref-relevant-exams"
-                  rows={3}
-                  value={referral.relevantExams}
-                  onChange={(e) => onUpdateReferral({ ...referral, relevantExams: e.target.value })}
-                  placeholder="Ex: Hemograma completo sem alterações, RX de tórax com hiperinsuflação discreta..."
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-normal focus:outline-none tactile-input leading-relaxed"
-                />
+            {/* Exames Relevantes Realizados */}
+            <div>
+              <label htmlFor="ref-relevant-exams" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">
+                Exames Relevantes Realizados (Opcional)
+              </label>
+              <textarea
+                id="ref-relevant-exams"
+                rows={2}
+                value={referral.relevantExams}
+                onChange={(e) => onUpdateReferral({ ...referral, relevantExams: e.target.value })}
+                placeholder="Ex: Hemograma completo sem alterações, RX de tórax com hiperinsuflação discreta..."
+                className="w-full p-3 rounded-xl text-xs sm:text-sm font-normal focus:outline-none tactile-input leading-relaxed"
+              />
+            </div>
+
+            {/* Integrated Hipótese Diagnóstica & CID-10 Finder */}
+            <div 
+              className="p-4 sm:p-5 rounded-2xl border space-y-4"
+              style={{
+                backgroundColor: darkMode ? '#0E1713' : '#F4FBF7',
+                borderColor: darkMode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(21, 128, 61, 0.18)'
+              }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b pb-3" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-500" />
+                  <h4 className="text-xs sm:text-sm font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                    Hipótese Diagnóstica & Códigos CID-10
+                  </h4>
+                  {parsedReferralCids.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
+                      {parsedReferralCids.length} {parsedReferralCids.length === 1 ? 'definido' : 'definidos'}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                  Selecione sugestões ou pesquise no catálogo
+                </span>
               </div>
 
-              <div>
+              {/* Active Selected CID Chips (Instant visual confirmation with 1-click removal) */}
+              {parsedReferralCids.length > 0 && (
+                <div 
+                  className="p-3 rounded-xl border space-y-2"
+                  style={{
+                    backgroundColor: darkMode ? '#14251D' : '#E8F6EF',
+                    borderColor: darkMode ? 'rgba(16, 185, 129, 0.3)' : 'rgba(21, 128, 61, 0.25)'
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                      Diagnósticos inseridos no documento:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onUpdateReferral({ ...referral, hypothesisCID: '' })}
+                      className="text-[10px] font-semibold text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                    >
+                      Limpar todos
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {parsedReferralCids.map((cidItem, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 border border-emerald-500/40 text-slate-800 dark:text-slate-100 shadow-xs"
+                      >
+                        {cidItem.code && (
+                          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            {cidItem.code}
+                          </span>
+                        )}
+                        <span className="truncate max-w-[240px]">{cidItem.label}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCidFromReferral(cidItem)}
+                          title={`Remover ${cidItem.code || cidItem.label}`}
+                          aria-label={`Remover ${cidItem.code || cidItem.label}`}
+                          className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center -mr-2 rounded hover:bg-rose-500/20 hover:text-rose-500 text-slate-400 transition-colors cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Specialty suggestions bar */}
+              {currentSpecialtySuggestions.length > 0 && (
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
+                    Sugestões rápidas para {referral.destinationSpecialty}:
+                  </span>
+
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {currentSpecialtySuggestions.map((item) => {
+                      const isSelected = selectedReferralCodes.includes(item.code.toUpperCase());
+                      return (
+                        <button
+                          key={item.code}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              handleRemoveCidFromReferral({ code: item.code, label: item.label, full: `${item.code} - ${item.label}` });
+                            } else {
+                              handleAppendCidForReferral({ code: item.code, description: item.label });
+                            }
+                          }}
+                          className={`text-[11px] px-3 py-1.5 min-h-[44px] rounded-xl border font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all ${
+                            isSelected
+                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                              : darkMode
+                              ? 'bg-[#152E22] text-[#6EE7B7] border-emerald-500/30 hover:bg-[#1C3D2E]'
+                              : 'bg-white text-emerald-800 border-emerald-600/20 hover:bg-emerald-50'
+                          }`}
+                          title={`${isSelected ? 'Remover' : 'Adicionar'} ${item.code} - ${item.label}`}
+                        >
+                          <span className="font-mono font-bold">{item.code}</span>
+                          <span>{item.label}</span>
+                          {isSelected ? (
+                            <Check className="w-3.5 h-3.5 text-white" />
+                          ) : (
+                            <Plus className="w-3.5 h-3.5 text-emerald-500" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* General CID Search Bar for Referral */}
+              <CidSearchBar
+                darkMode={darkMode}
+                selectedCode=""
+                selectedCodes={selectedReferralCodes}
+                onSelectCid={handleAppendCidForReferral}
+                onAppendCid={handleAppendCidForReferral}
+                label="Pesquisar Qualquer Diagnóstico no Catálogo CID-10"
+                placeholder="Buscar diagnóstico CID para o encaminhamento (ex: Pneumonia, Asma, Enxaqueca, Fibromialgia, G43, J45)..."
+                showQuickChips={true}
+                variant="referral"
+              />
+
+              {/* Direct synchronized textarea for manual review / fine-tuning */}
+              <div className="pt-2">
                 <label htmlFor="ref-hypothesis-cid" className="block text-[11px] font-bold uppercase text-slate-400 mb-1 cursor-pointer">
-                  Texto da Hipótese Diagnóstica (CID-10)
+                  Texto da Hipótese Diagnóstica (Edição Livre / Exibição no Documento)
                 </label>
                 <textarea
                   id="ref-hypothesis-cid"
-                  rows={3}
+                  rows={2}
                   value={referral.hypothesisCID}
                   onChange={(e) => onUpdateReferral({ ...referral, hypothesisCID: e.target.value })}
                   placeholder="Ex: J45.9 - Asma não especificada / J30.4 - Rinite alérgica..."
@@ -1003,70 +1181,6 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 onChange={(e) => onUpdateReferral({ ...referral, observations: e.target.value })}
                 placeholder="Ex: Paciente com limitação funcional de marcha. Solicita-se fisioterapia motora 2x por semana. Segue em anexo laudo de RX de quadril..."
                 className="w-full p-3 rounded-xl text-xs sm:text-sm font-normal focus:outline-none tactile-input leading-relaxed"
-              />
-            </div>
-
-            {/* Integrated CID-10 Finder for Referral / Encaminhamento */}
-            <div 
-              className="p-4 sm:p-5 rounded-2xl border space-y-3.5"
-              style={{
-                backgroundColor: darkMode ? '#0E1713' : '#F4FBF7',
-                borderColor: darkMode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(21, 128, 61, 0.18)'
-              }}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b pb-2.5" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-emerald-500" />
-                  <h4 className="text-xs sm:text-sm font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-                    Buscador de CID-10 para Encaminhamento
-                  </h4>
-                </div>
-                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                  Clique no diagnóstico para preencher ou adicionar à hipótese
-                </span>
-              </div>
-
-              {/* Specialty suggestions bar */}
-              {currentSpecialtySuggestions.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
-                    Sugestões para {referral.destinationSpecialty}:
-                  </span>
-
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {currentSpecialtySuggestions.map((item) => (
-                      <button
-                        key={item.code}
-                        type="button"
-                        onClick={() => handleAppendCidForReferral({ code: item.code, description: item.label })}
-                        className="text-[11px] px-3 py-2 min-h-[44px] rounded-xl border font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
-                        style={{
-                          backgroundColor: darkMode ? '#152E22' : 'var(--surface-card)',
-                          borderColor: darkMode ? 'rgba(52, 211, 153, 0.3)' : 'rgba(21, 128, 61, 0.2)',
-                          color: darkMode ? '#6EE7B7' : '#166534'
-                        }}
-                        title={`Adicionar ${item.code} - ${item.label}`}
-                      >
-                        <span className="font-mono font-bold">{item.code}</span>
-                        <span>{item.label}</span>
-                        <Plus className="w-3 h-3 text-emerald-500" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* General CID Search Bar for Referral */}
-              <CidSearchBar
-                darkMode={darkMode}
-                selectedCode=""
-                selectedDescription=""
-                onSelectCid={handleSelectCidForReferral}
-                onAppendCid={handleAppendCidForReferral}
-                label="Pesquisar Qualquer Diagnóstico CID-10"
-                placeholder="Buscar diagnóstico CID para o encaminhamento (ex: Pneumonia, Asma, Enxaqueca, Fibromialgia, G43, J45)..."
-                showQuickChips={false}
-                variant="referral"
               />
             </div>
 

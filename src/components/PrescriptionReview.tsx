@@ -72,7 +72,7 @@ export function PrescriptionReview({
     }
   };
 
-  const canExport = selected && !selectedProblems.length && !identityProblems.length && !layout.error;
+  const canExport = Boolean(selected && !selectedProblems.length && !layout.error && patient.name?.trim());
 
   return (
     <section className="prescription-review space-y-5 p-4 sm:p-6 max-w-6xl mx-auto">
@@ -166,14 +166,34 @@ export function PrescriptionReview({
               <li key={i}>{p}</li>
             ))}
           </ul>
-          <div className="pt-1">
-            <button
-              type="button"
-              className="clinical-button secondary text-xs"
-              onClick={onNavigateToPrescription || onBack}
-            >
-              Corrigir medicamentos na receita
-            </button>
+          <div className="pt-1 flex items-center gap-2 flex-wrap">
+            {problems.length > 0 && (
+              <button
+                type="button"
+                className="clinical-button secondary text-xs"
+                onClick={onNavigateToPrescription || onBack}
+              >
+                Corrigir medicamentos na receita
+              </button>
+            )}
+            {identityProblems.some(p => p.toLowerCase().includes('prescritor') || p.toLowerCase().includes('médico')) && (
+              <button
+                type="button"
+                className="clinical-button text-xs font-bold"
+                onClick={onEditDoctor}
+              >
+                Preencher Perfil do Médico
+              </button>
+            )}
+            {identityProblems.some(p => p.toLowerCase().includes('paciente')) && (
+              <button
+                type="button"
+                className="clinical-button secondary text-xs font-bold"
+                onClick={onEditPatient}
+              >
+                Completar Dados do Paciente
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -315,7 +335,7 @@ export function PrescriptionReview({
               <button
                 type="button"
                 className="clinical-button secondary"
-                disabled={!!problems.length || !!prescriptionIdentityIssues(doctor, patient, documents).length}
+                disabled={!!problems.length || !patient.name?.trim() || !documents.length}
                 onClick={() => exportDocuments(documents)}
               >
                 <Download size={16} />

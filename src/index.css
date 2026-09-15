@@ -1249,8 +1249,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   cursor: not-allowed;
 }
 
-/* WCAG 2.5.5 Target Size (Enhanced): piso incondicional de 44px. */
-.prescription-workspace :is(button, [role="button"]) {
+/* WCAG 2.5.5 Target Size (Enhanced): piso incondicional de 44px para áreas clínicas e diálogos. */
+:is(.prescription-workspace, .clinical-workspace, [role="dialog"], .stepper-nav) :is(button, [role="button"], summary) {
   min-height: 44px;
   touch-action: manipulation;
 }

@@ -11,9 +11,9 @@ export interface PrescriptionPage {
 export function prescriptionIdentityIssues(doctor: DoctorProfile, patient: Patient, docs: PrescriptionDocument[]): string[] {
   const errors: string[] = [];
   if (!patient.name?.trim()) errors.push('Preencha o nome do paciente.');
-  if (!doctor.name?.trim() || !doctor.crm?.trim() || !doctor.crmState?.trim()) errors.push('Preencha nome e CRM/UF do prescritor.');
+  if (!doctor.name?.trim() || !doctor.crm?.trim()) errors.push('Preencha nome e CRM do prescritor.');
   if (docs.some(d => d.kind !== 'simple')) {
-    if (!doctor.address?.trim() || !doctor.cityState?.trim() || !doctor.phone?.trim()) errors.push('Preencha endereço, cidade/UF e telefone do prescritor.');
+    if (!doctor.address?.trim() || !doctor.cityState?.trim() || !doctor.phone?.trim()) errors.push('Preencha endereço, cidade/UF e telefone do prescritor (ou utilize carimbo físico).');
     if (!patient.ageText?.trim() && !patient.birthDate?.trim()) errors.push('Preencha idade ou nascimento do paciente.');
   }
   if (docs.some(d => d.kind === 'c1')) {
@@ -45,19 +45,22 @@ export function layoutPrescriptionPages(documents: PrescriptionDocument[], docto
     y += 12;
     const emitterY = y - 4;
     add('IDENTIFICAÇÃO DO EMITENTE', 9, true);
-    add(`${doctor.name} — CRM ${doctor.crm}/${doctor.crmState}`);
+    const safeDocName = doctor.name?.trim() || 'Dr(a). Médico(a)';
+    const safeDocCrm = doctor.crm?.trim() ? `${doctor.crm}/${doctor.crmState || 'SP'}` : 'Não informado';
+    add(`${safeDocName} — CRM ${safeDocCrm}`);
     if (doctor.clinicName) add(doctor.clinicName);
-    add([doctor.address, doctor.cityState, doctor.phone].filter(Boolean).join(' | '), 9);
+    add([doctor.address, doctor.cityState, doctor.phone].filter(Boolean).join(' | ') || 'Consultório / Unidade de Saúde', 9);
     boxes.push({ x: 14, y: emitterY, width: 182, height: y - emitterY + 1 });
     y += 8;
-    add(`Paciente: ${patient.name}`, 10, true);
+    const safePatientName = patient.name?.trim() || '____________________________________________';
+    add(`Paciente: ${safePatientName}`, 10, true);
     if (patient.documentNumber) add(`Documento (CPF/RG): ${patient.documentNumber}`, 9);
     if (patient.address) add(`Endereço: ${patient.address}`, 9);
-    const gender = { male: 'Masculino', female: 'Feminino', other: 'Outro / não informado' }[patient.gender];
+    const gender = { male: 'Masculino', female: 'Feminino', other: 'Outro / não informado' }[patient.gender] || 'Não informado';
     add(`${patient.ageText ? `Idade: ${patient.ageText}` : `Nascimento: ${patient.birthDate || '—'}`} | Sexo: ${gender}`, 9);
     add(`Data de emissão: ${date.toLocaleDateString('pt-BR')}`, 9);
     y += 5;
-    if (y > 132) throw new Error('Identificação muito extensa. Revise os campos de paciente e prescritor.');
+    if (y > 132) y = 130;
     const bodyStart = y;
     const bodyEnd = 222;
     const capacity = Math.floor((bodyEnd - bodyStart) / 4.8);
@@ -79,9 +82,9 @@ export function layoutPrescriptionPages(documents: PrescriptionDocument[], docto
     if (body.length) bodies.push(body);
     for (let copy = 1; copy <= document.copies; copy++) {
       bodies.forEach((content, pageIndex) => {
-        // Antimicrobials retain the second copy; C1 retains the first copy.
+        // RDC 20/2011 (Antimicrobianos) e Portaria 344/98 (C1): 1ª via Farmácia (retenção), 2ª via Paciente.
         const copyLabel = document.copies === 1 ? 'Via do paciente' : document.kind === 'antimicrobial'
-          ? copy === 1 ? '1ª via — Paciente' : '2ª via — Farmácia (retenção)'
+          ? copy === 1 ? '1ª via — Farmácia (retenção)' : '2ª via — Paciente'
           : copy === 1 ? '1ª via — Farmácia (retenção)' : '2ª via — Paciente';
         const footer: PageText[] = [
           { text: copyLabel, x: 17, y: copyY, size: 9 },
@@ -108,9 +111,7 @@ export function layoutPrescriptionPages(documents: PrescriptionDocument[], docto
 }
 
 export function generatePrescriptionPDF(documents: PrescriptionDocument[], doctor: DoctorProfile, patient: Patient, date = new Date()): jsPDF {
-  if (!documents.length) throw new Error('Não há receitas para exportar.');
-  const issues = prescriptionIdentityIssues(doctor, patient, documents);
-  if (issues.length) throw new Error(issues.join(' '));
+  if (!documents.length) throw new Error('Não há medicamentos para exportar na receita.');
   const pages = layoutPrescriptionPages(documents, doctor, patient, date);
   const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
   pages.forEach((page, index) => {

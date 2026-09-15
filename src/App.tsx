@@ -322,16 +322,30 @@ export default function App() {
 
   useEffect(() => {
     safeStorage.setItem('prescmed_patient', JSON.stringify(patient));
-    setCertificate(prev => ({
-      ...prev,
-      patientName: patient.name || '',
-      documentNumber: patient.documentNumber || ''
-    }));
-    setReferral(prev => ({
-      ...prev,
-      patientName: patient.name || '',
-      documentNumber: patient.documentNumber || ''
-    }));
+    const nextPatientName = patient.name || '';
+    const nextDocNumber = patient.documentNumber || '';
+
+    setCertificate(prev => {
+      if (prev.patientName === nextPatientName && prev.documentNumber === nextDocNumber) {
+        return prev;
+      }
+      return {
+        ...prev,
+        patientName: nextPatientName,
+        documentNumber: nextDocNumber
+      };
+    });
+
+    setReferral(prev => {
+      if (prev.patientName === nextPatientName && prev.documentNumber === nextDocNumber) {
+        return prev;
+      }
+      return {
+        ...prev,
+        patientName: nextPatientName,
+        documentNumber: nextDocNumber
+      };
+    });
   }, [patient]);
 
   useEffect(() => {

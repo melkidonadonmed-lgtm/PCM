@@ -43,3 +43,28 @@ Padronizar superfícies e componentes de acordo com as diretrizes do PresCMed:
 - [ ] Nenhum botão primário exibe bordas duras contrastantes ou acabamento grosseiro.
 - [ ] O visual no modo escuro utiliza a paleta ardósia/grafite aveludada sem pretos absolutos opressivos e sem blobs saturados.
 - [ ] A folha de visualização de impressão e emissão de PDF permanece íntegra (fundo branco, tipografia escura, regras sanitárias CFM/ANVISA preservadas).
+
+## Follow-up — 2026-09-15T01:54:20Z
+
+Auditoria profunda, validação em navegador real e refinamento de excelência do frontend moderno do PresCMed (PCM).
+
+Working directory: c:/Users/melki/projetos/pcm
+Integrity mode: development
+
+## Requirements
+
+### R1. Auditoria Holística de Qualidade Frontend (Modern Web Guidance)
+Classificar o sistema de design (Luxury Obsidian & Hospitalar Suave), inspecionar linha a linha o código fonte, detectar erros de ciclo de vida e estado no React 19/Tailwind v4.
+
+### R2. Teste Seriado de Componentes e Simulação de Fluxo do Usuário
+Executar testes determinísticos e simulação de jornada completa (caminho feliz e de borda) nos componentes de prescrição, calculadora de dose por peso, busca de CID-10, solicitação de exames e emissão de documentos.
+
+### R3. Validação em Navegador Real (Chrome DevTools)
+Inspecionar DOM, console, acessibilidade e renderização visual na URL local (http://localhost:3000) sem falhas de runtime ou cortes de layout.
+
+## Acceptance Criteria
+
+### Integridade e Execução
+- [ ] Zero erros de compilação no TypeScript (`npm run lint` passa com código 0)
+- [ ] Zero loops de navegação ou redirecionamentos indesejados ao prescrever ou exportar
+- [ ] Buscador de CID-10 100% responsivo, sem cortes pela barra de tarefas e com feedback visual imediato

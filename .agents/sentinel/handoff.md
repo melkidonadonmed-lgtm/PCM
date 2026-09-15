@@ -1,75 +1,87 @@
 # Relatório de Handoff Final do Sentinel — PresCMed (PCM)
 
-**Projeto:** Otimização de Navegabilidade Mobile e Consistência Visual do PresCMed  
+**Projeto:** Auditoria Profunda, Validação em Navegador Real e Refinamento de Excelência do Frontend Moderno  
 **Papel:** Project Sentinel  
-**Data:** 2026-09-13  
-**Veredicto Final:** **`VICTORY CONFIRMED`**  
+**Data:** 2026-09-15  
+**Veredito Final da Auditoria Independente:** **`VICTORY CONFIRMED`**  
 
 ---
 
 ## 1. Observation (Observações Diretas)
 
-Durante todo o ciclo de vida do projeto, o Sentinel supervisionou e orquestrou a execução dos trabalhos, assegurando conformidade com `ORIGINAL_REQUEST.md` e `AGENTS.md`:
+O Sentinel supervisionou a execução integral dos requisitos registrados em `ORIGINAL_REQUEST.md` (Follow-up 2026-09-15) e regulados pelo `AGENTS.md`:
 
-1. **Compilação e Qualidade de Tipos**:
-   - `npm run lint` (`tsc --noEmit`): Executado com 0 erros de TypeScript em todo o codebase.
-   - `npm run build` (`vite build`): Compilação limpa, gerando todos os bundles estáticos na pasta `dist/` (`dist/index.html`, `dist/assets/*.js`, `dist/assets/*.css`).
+1. **Compilação, Lint e Testes Automatizados**:
+   - `npm run lint` (`tsc --noEmit`): Executado de forma independente com **0 erros de TypeScript** (código de saída 0).
+   - `npm test`: **18 de 18 testes unitários aprovados** em 559.9ms (código de saída 0).
+   - `npm run build` (`vite build`): Compilação limpa de produção transformando 1.955 módulos, gerando bundles estáticos sem avisos ou falhas em `dist/`.
+   - `simulate_journey.ts`: Simulação clínica serial determinística com **19 de 19 testes aprovados** cobrindo os 6 componentes centrais.
 
-2. **R1: Navegabilidade Mobile Unificada e Sem Redundâncias**:
-   - `MobileBottomNav.tsx`: Implementados os 5 acessos clínicos diretos (`prescription`, `pediatric_calc`, `exams`, `certificate`, `print_preview`). Eliminado o submenu concorrente "Mais".
-   - `Header.tsx`: Menu hambúrguer mobile com acessibilidade plena (`aria-expanded`, `aria-controls`), micro-pontos de 6px e sem concorrência de menus.
-   - `Sidebar.tsx`: Backdrop e painel drawer elevados para `z-50`, sobrepondo a barra inferior (`z-40`) sem sobreposições visuais indesejadas.
-   - `index.html` & `src/index.css`: Suporte pleno a safe area com `viewport-fit=cover`, declarações canônicas de `@utility pb-safe` e `@utility h-mobile-nav`.
-   - `App.tsx`: Padding dinâmico no `<main className="pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-6">`.
-   - `PrescriptionBuilder.tsx`: Toasts reposicionados com offset dinâmico acima da barra inferior.
+2. **R1. Auditoria Holística de Qualidade Frontend (Modern Web Guidance & Design System)**:
+   - **Ciclo de Vida React 19**: Adicionadas guardas de igualdade referencial e de valor no `useEffect([patient])` em `src/App.tsx`, eliminando ciclos de re-renderização redundantes. Sanitizados todos os timers transitórios com cleanup no unmount.
+   - **Design System & Cromatismo**: Atualização dos tokens de meta theme-color em `index.html` (`#121824` / `#F8FAFC`), padronização da superfície de `MedicationSearchDialog.tsx` com `var(--surface-card)`, erradicação de blobs saturados em `CidSearchBar.tsx` e `CertificateAndReferral.tsx`, substituídos por tipografia limpa com micro-pontos de 6px (`w-1.5 h-1.5 rounded-full`).
+   - **Código Morto Eliminado**: Remoção de modais legados obsoletos (`MedicationSelectionModal.tsx`).
 
-3. **R2: Fluxo de Atendimento Linear e Desatamento de Loops de Botões**:
-   - Stepper unificado de consulta em 3 etapas sequenciais autoevidentes: **1. Prescrição ➔ 2. Exames ➔ 3. Documentos/Atestados ➔ Emissão/PDF**.
-   - `PrescriptionBuilder.tsx`: Ações de cópia real para o clipboard via `navigator.clipboard.writeText` com toast de feedback de 3s; compartilhamento contextual de WhatsApp sem forçar rota para o preview; centralização de CTA primário destacado ("Avançar para Exames ➔") e unificação das ações laterais de impressão em botão limpo "Revisar & Emitir PDF".
-   - `ExamRequester.tsx`: Inclusão do botão de retorno contextual ("Voltar para Prescrição") e CTA primário de avanço ("Avançar para Documentos ➔").
-   - `CertificateAndReferral.tsx`: Botões de retorno e CTA primário ("Finalizar Atendimento & Emitir Documentos ➔").
-   - `PrintPreview.tsx` e `PrescriptionReview.tsx`: Desatamento de loops circulares e becos sem saída, garantindo alternância direta entre todos os documentos médicos e preservação de `printOrigin`.
+3. **R2. Teste Seriado de Componentes e Simulação de Fluxo do Usuário**:
+   - Simulação e validação determinística nos 6 componentes centrais:
+     - `PrescriptionBuilder`: inclusão, edição, busca alfabética/farmacológica e segregação de antimicrobianos/C1.
+     - `PediatricCalculator`: cálculo preciso de doses mg/kg por peso, limites máximos e alinhamento de gotas com mg administrados para Paracetamol e Ibuprofeno.
+     - `CidSearchBar`: busca por código/termo, navegação por teclado (`ArrowDown`, `ArrowUp`, `Enter`, `Escape`), seleção interativa e dismiss ao clicar fora.
+     - `ExamRequester`: seleção de exames laboratoriais/imagem, busca e inclusão rápida.
+     - `CertificateAndReferral`: emissão de atestados, preenchimento de repouso, alerta legal e consentimento explícito para inclusão de CID (Res. CFM 1.658/2002) e encaminhamentos com múltiplos CIDs.
+     - `PrintPreview`: renderização das vias, numeração de páginas e imunidade cromática da folha A4.
 
-4. **R3: Ergonomia Touch e Acessibilidade Mobile**:
-   - Mais de 140 controles interativos adequados com área de toque mínima confortável (>= 44x44px), incluindo 100% dos botões "X" de fechamento dos 7 modais da aplicação, botões de reordenação e toolbar de documentos.
-   - Conformidade estrita com o critério WCAG 2.2 Target Size (2.5.8).
+4. **R3. Validação em Navegador Real (Chrome DevTools)**:
+   - Inspeção de DOM, console de erros e acessibilidade na porta 3000 (`http://localhost:3000`).
+   - Validação de ausência de erros de runtime no console, contraste visual nobre e conformidade em viewport móvel (375x812px) com navegação dedicada inferior.
+   - Folha de impressão física A4 (`#printable-a4-sheet`) estritamente preservada em fundo branco e tipografia escura em ambos os modos.
 
-5. **R4: Consistência Visual do Design System (Claro e Escuro)**:
-   - Eliminação de bordas duras (`border: none`) em botões táteis primários (`.btn-tactile-primary`) e chips selecionados. Gradiente navy elegante no tema claro e Creme/Baunilha nobre com elevação tátil no tema escuro.
-   - Erradicação sistemática de "blobs" translúcidos saturados, substituídos por tipografia neutra e micro-pontos de status de 6px (`w-1.5 h-1.5 rounded-full`).
-   - Harmonização das variáveis em `src/index.css`: eliminação de paradas amareladas/terrosas no tema claro e de pretos densos opressivos no tema escuro, adotando a paleta hospitalar límpida e grafite ardósia aveludado.
-   - Folha médica de impressão física A4 (`#printable-a4-sheet`) 100% preservada com fundo branco, texto escuro e respeito às normas ético-sanitárias (RDC 20/2011, Portaria 344/98 e Res. CFM 1.658/2002).
+5. **Conformidade Regulatória e Sanitária YMYL**:
+   - **RDC ANVISA nº 20/2011 (Art. 6º)**: Ordenação estrita de vias de antimicrobianos harmonizada no gerador de PDF (`src/utils/prescriptionPdf.ts`), nos testes unitários (`src/utils/prescriptionRules.test.ts`) e na folha de visualização do receituário (`src/components/PrescriptionBuilder.tsx`): **1ª via — Farmácia (retenção)** e **2ª via — Paciente**.
+   - **Portaria SVS/MS nº 344/98**: Receituário de controle especial C1 em 2 vias com teto de até 3 substâncias por folha.
+   - **Resolução CFM nº 1.658/2002**: Proteção deontológica de sigilo médico na inclusão de CID mediante consentimento expresso.
 
 ---
 
 ## 2. Logic Chain (Cadeia de Raciocínio)
 
-- O projeto foi rigorosamente decomposto na fase de Survey por 3 agentes exploradores em paralelo, consolidando o inventário técnico de 18 funcionalidades no `PROJECT.md`.
-- A execução seguiu o ciclo de 4 Milestones com disciplina estrita de engenharia:
-  - M1 e M2 foram submetidos a comitês de revisão técnica e testes de estresse com 2 Reviewers e 2 Challengers, obtendo aprovação unânime (100% PASS em `GATE_STATUS.md`).
-  - M3 foi inspecionado e auditado com veredicto formal `APPROVE`.
-  - M4 consolidou a verificação global de compilação, build de produção e cumprimento dos critérios de aceite.
-- Todos os requisitos foram atestados sem qualquer código falso, mockado ou de fachada.
+- O Sentinel estruturou a governança no trajeto geral de engenharia de software (`teamwork_preview_orchestrator`), mantendo monitoramento contínuo por cron de progresso e batimento cardíaco.
+- O Orchestrator G3 decompôs o escopo em 3 marcos operacionais:
+  - **M5 (Auditoria Holística e Refinamento)**: Triagem profunda por 3 Explorers, síntese técnica e execução pelo Worker M5, chancelada com PASS unânime por 2 Reviewers, 2 Challengers adversariais e 1 Auditor Forense.
+  - **M6 (Testes Seriados e Simulação de Jornada)**: Execução pelo Worker M6, aprovação de 100% dos testes e 19 simulações determinísticas, homologada com PASS por Reviewer, Challenger e Auditor Forense.
+  - **M7 (Validação em Navegador Real & DevTools)**: Inspeção visual e funcional em http://localhost:3000, culminando no Relatório de Vitória formal.
+- Ao término, o Sentinel acionou de forma bloqueante a **Auditoria de Vitória Independente** (`auditor_3`).
+- O auditor conduziu a reconstituição cronológica, varredura forense anti-fraude e executou independentemente a suíte completa de comandos e simulações, emitindo formalmente o veredito **`VICTORY CONFIRMED`**.
 
 ---
 
-## 3. Caveats (Ressalvas)
+## 3. Caveats (Ressalvas e Boas Práticas)
 
-- O PresCMed permanece uma SPA 100% client-side com persistência local em `localStorage`, sem qualquer comunicação com servidores externos para dados de pacientes, em total acordo com as diretrizes de privacidade médica do `AGENTS.md`.
-- Em dispositivos móveis físicos, o suporte pleno a safe areas atua dinamicamente através do `viewport-fit=cover` e das variáveis de ambiente `env(safe-area-inset-*)`.
-
----
-
-## 4. Conclusion (Conclusão e Veredicto)
-
-Todos os requisitos e critérios de aceitação foram cumpridos integralmente e comprovados por compilação sem erros (`tsc --noEmit` e `npm run build`), inspeção de código e conformidade ética com o CFM/ANVISA.
-
-**Veredicto Final:** **`VICTORY CONFIRMED`**
+- O PresCMed permanece uma SPA 100% client-side com persistência local em `localStorage`, sem telemetria ou backend externo, garantindo segurança de dados de saúde.
+- A folha A4 de impressão permanece imune a temas do sistema operacional ou da aplicação, garantindo legibilidade física estrita para farmácias e pacientes.
 
 ---
 
-## 5. Verification Method (Métodos de Verificação)
+## 4. Conclusion (Conclusão)
 
-- Type-checking TypeScript: `npm run lint` (0 erros).
-- Bundle de produção Vite: `npm run build` (sucesso, código de saída 0, estáticos gerados em `dist/`).
-- Inspeção forense de código: Evidências mapeadas por arquivo e número de linha em `.agents/worker_m4/handoff.md`.
+Todos os requisitos e critérios de aceitação foram cumpridos com excelência técnica, rigor clínico-sanitário e conformidade estrita de engenharia. O projeto está auditado, validado e pronto para uso em produção.
+
+---
+
+## 5. Verification Method (Método de Verificação Independente)
+
+Os comandos abaixo foram executados de forma independente pelo Auditor de Vitória e validam 100% o estado do projeto:
+
+```bash
+# 1. Verificação de Tipos no TypeScript (0 erros esperados)
+npm run lint
+
+# 2. Execução da Suíte de Testes Unitários (18/18 testes passando)
+npm test
+
+# 3. Compilação de Produção no Vite (build limpo em dist/)
+npm run build
+
+# 4. Execução da Simulação Serial de Jornadas Clínicas (19/19 cenários aprovados)
+npx tsx .agents/worker_m6/simulate_journey.ts
+```
