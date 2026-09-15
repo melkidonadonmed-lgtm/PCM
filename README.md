@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6.svg?logo=typescript)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-6.2-646cff.svg?logo=vite)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8.svg?logo=tailwindcss)](https://tailwindcss.com)
-[![Testes Unitários](https://img.shields.io/badge/Testes-15%20passando-emerald.svg)](src/utils/prescriptionRules.test.ts)
+[![Testes Unitários](https://img.shields.io/badge/Testes-18%20passando-emerald.svg)](src/utils/prescriptionRules.test.ts)
 [![Privacidade](https://img.shields.io/badge/Privacidade-100%25%20Client--Side-success.svg)](#-segurança--privacidade-zero-knowledge)
 
 O **PresCMed (PCM)** é um sistema progressivo e completo de prescrição médica digital, cálculo de doses clínicas/pediátricas e emissão de documentos ambulatoriais e hospitalares, adaptado às diretrizes sanitárias e práticas médicas do Brasil (**pt-BR**).
@@ -97,13 +97,16 @@ O sistema conta com um motor de classificação farmacológica que analisa ativa
 
 ### 6. Decks de Protocolos Clínicos Ambulatoriais
 
-- Guias rápidos para patologias frequentes da prática clínica (Faringoamigdalite, Otite Média Aguda, Pneumonia Comunitária, ITU, Asma, Anafilaxia, Crise Convulsiva, etc.).
+- **27 decks de patologias** frequentes da prática clínica brasileira, organizados por especialidade: Cardiovascular (HAS, dislipidemia), Endocrinologia (DM2), Pneumologia (asma — crise e etapas GINA), Gastroenterologia (DRGE, náuseas/vômitos), Ortopedia (dor aguda, lombalgia, fascite plantar), Neurologia (enxaqueca, valproato, crise epiléptica), Psiquiatria (ISRS), Alergologia (rinite/urticária), Dermatologia (dermatite atópica), Otorrinolaringologia (OMA, rinossinusite), Infectologia (tuberculose, malária, antifúngicos) e Ginecologia (contracepção hormonal).
+- Cada deck traz conduta de 1ª linha, itens prescritíveis com apresentação e posologia de referência, alerta clínico e referência normativa.
 - Prescrição imediata em **1 clique**: os medicamentos do protocolo são transportados diretamente para o construtor de receitas, ajustando as doses caso o paciente seja pediátrico.
 
 ### 7. Busca Rápida, Acessibilidade & Entrada por Voz
 
-- **Fuzzy Search:** Busca tolerante a pequenos erros de digitação e acentuação no banco unificado de medicamentos.
+- **Catálogo unificado com ~219 fármacos** em 8 categorias (incluindo contracepção hormonal completa, incretomiméticos e antifúngicos), com nomes de marca e princípio ativo.
+- **Fuzzy Search:** Busca tolerante a pequenos erros de digitação e acentuação, com respostas instantâneas durante a digitação.
 - **Pesquisa por Voz:** Integração com a Web Speech API para ditar medicamentos e posologias diretamente na interface.
+- **Atalhos de Teclado:** `Ctrl+K` (ou `/`) abre a busca de fármacos; teclas `1` a `7` navegam entre as telas.
 - **Acessibilidade Completa (WCAG 2.2):** Navegação por teclado, foco controlado em modais (`useModalA11y`), suporte a leitores de tela com regiões vivas (`aria-live`) e botões de confirmação para ações críticas.
 
 ### 8. Visualização & Emissão de Documentos (PDF / Impressão)
@@ -143,11 +146,10 @@ A interface do PresCMed foi concebida para longos plantões médicos, oferecendo
 | :--- | :--- | :--- |
 | **Framework UI** | [React 19](https://react.dev/) | Renderização rápida com hooks modernos e gerenciamento de estado direto |
 | **Linguagem** | [TypeScript ~5.8](https://www.typescriptlang.org/) | Tipagem estrita de modelos clínicos e interfaces de domínio |
-| **Build & Bundler** | [Vite 6](https://vitejs.dev/) | HMR ultra-rápido e otimização de bundle |
+| **Build & Bundler** | [Vite 6](https://vitejs.dev/) | HMR ultra-rápido, **code splitting por tela** (`React.lazy`) e chunks dedicados para os geradores de PDF |
 | **Estilização** | [Tailwind CSS v4](https://tailwindcss.com/) | Nova engine baseada em `@theme` e variáveis CSS nativas |
 | **Ícones** | [Lucide React](https://lucide.dev/) | Conjunto de ícones médicos e de utilidade de alta densidade |
-| **Animações** | [Motion](https://motion.dev/) | Transições táteis e feedback visual suave |
-| **Geração de PDF** | [jsPDF](https://github.com/parallax/jsPDF) + [AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable) | Emissão programática vetorial de documentos A4 |
+| **Geração de PDF** | [jsPDF](https://github.com/parallax/jsPDF) + [AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable) | Emissão programática vetorial de documentos A4 (carregado sob demanda) |
 | **Captura Visual** | [html2canvas](https://html2canvas.hertzen.com/) | Renderização fiel para pré-visualização e impressão |
 | **Testes** | Node.js Test Runner + [tsx](https://github.com/privatenumber/tsx) | Execução rápida de testes clínicos sem overhead de configuração |
 
@@ -174,8 +176,11 @@ prescmed-pcm/
     │   ├── PrescriptionBuilder.tsx# Construtor principal de receitas médicas
     │   ├── PrescriptionPages.tsx  # Divisão visual dos documentos (Simples, Anti, C1)
     │   ├── PrescriptionReview.tsx # Revisão de pendências e conferência sanitária
-    │   ├── PediatricCalculator.tsx# Calculadora de doses por peso e fluidos
+    │   ├── MedicationSearchDialog.tsx # Diálogo de busca rápida de fármacos (com voz)
+    │   ├── MedicationVoiceSearch.tsx  # Ditado por voz (Web Speech API)
+    │   ├── DispensedQuantity.tsx  # Quantidade dispensada por item
     │   ├── QuantityAssistant.tsx  # Assistente de cálculo de frascos e embalagens
+    │   ├── PediatricCalculator.tsx# Calculadora de doses por peso e fluidos
     │   ├── ExamRequester.tsx      # Módulo de solicitação de exames
     │   ├── CertificateAndReferral.tsx # Atestados médicos e encaminhamentos
     │   ├── ClinicalProtocolsView.tsx  # Decks de protocolos e condutas de 1ª linha
@@ -185,23 +190,24 @@ prescmed-pcm/
     │   ├── CidSearchBar.tsx       # Barra de busca no catálogo CID-10
     │   └── ConfirmationModal.tsx  # Modal de confirmação para ações destrutivas
     ├── data/                      # Catálogos clínicos estáticos em pt-BR
-    │   ├── medicationDatabase.ts  # Catálogo unificado de medicamentos (adulto e pediátrico)
+    │   ├── medicationDatabase.ts  # Catálogo unificado de ~219 fármacos (8 categorias)
     │   ├── pediatricMeds.ts       # Medicamentos pediátricos e parâmetros por kg
     │   ├── adultMeds.ts           # Medicamentos adultos com posologias padrão
-    │   ├── clinicalProtocols.ts   # Protocolos ambulatoriais categorizados
+    │   ├── clinicalProtocols.ts   # 27 decks de protocolos ambulatoriais categorizados
     │   ├── examCatalog.ts         # Catálogo de exames laboratoriais e imagem
     │   └── cidCatalog.ts          # Banco de dados de códigos CID-10
     ├── hooks/                     # Custom hooks reutilizáveis
     │   └── useModalA11y.ts        # Gestão de acessibilidade e foco em modais
     └── utils/                     # Lógica de negócio, regras sanitárias e utilitários
         ├── prescriptionRules.ts   # Motor de classificação sanitária (RDC 20/Portaria 344)
-        ├── prescriptionRules.test.ts # Suíte com 15 testes de regras clínicas
+        ├── prescriptionRules.test.ts # Suíte de testes das regras clínicas
         ├── doseCalculator.ts      # Cálculo de dose por peso e intervalos horários
         ├── prescriptionPdf.ts     # Geração vetorial do PDF de prescrições
         ├── pdfGenerator.ts        # Geração de PDF para exames, atestados e encaminhamentos
         ├── fuzzySearch.ts         # Algoritmo de busca por aproximação fonética/texto
+        ├── medicationCatalog.ts   # Agrupamento adulto+pediátrico para busca
         ├── quantityWords.ts       # Conversão de números para escrita por extenso
-        ├── navigation.ts          # Sincronização de abas com hash de URL
+        ├── navigation.ts          # Sincronização de abas com hash de URL (pt-BR)
         └── storage.ts             # Armazenamento seguro e resiliente em localStorage
 ```
 
@@ -210,7 +216,7 @@ prescmed-pcm/
 ## 💻 Como Rodar Localmente (Setup & Execução)
 
 ### Pré-requisitos
-- **Node.js** (versão 20 ou superior recomendada)
+- **Node.js 24 LTS** (ver `engines` no `package.json` e `.nvmrc`)
 - Gerenciador de pacotes: **npm** ou **bun**
 
 ### 1. Clonar o repositório e instalar dependências
@@ -254,12 +260,12 @@ Sendo uma SPA 100% estática e client-side, o build de produção (`dist/`) pode
 
 ## 🔐 Variáveis de Ambiente
 
-O PresCMed opera em modo **Zero-Knowledge / 100% Client-Side**, não requerendo banco de dados em nuvem ou tráfego de dados sensíveis. As variáveis opcionais estão descritas no arquivo `.env.example`:
+O PresCMed opera em modo **Zero-Knowledge / 100% Client-Side**, não requerendo banco de dados em nuvem ou tráfego de dados sensíveis. **Nenhuma variável é exigida para executar o app.** O arquivo `.env.example` documenta apenas variáveis herdadas do template Google AI Studio, **não utilizadas pelo código atual**:
 
-| Variável | Descrição | Padrão |
+| Variável | Descrição | Status |
 |---|---|---|
-| `PORT` | Porta do servidor de desenvolvimento | `3000` |
-| `NODE_ENV` | Modo de execução (`development` / `production`) | `development` |
+| `GEMINI_API_KEY` | Chave de API do Gemini (injeção AI Studio) | Não usada pelo código |
+| `APP_URL` | URL de hospedagem (Cloud Run AI Studio) | Não usada pelo código |
 
 ---
 
