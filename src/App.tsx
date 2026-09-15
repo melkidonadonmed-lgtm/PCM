@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { flushSync } from 'react-dom';
 import {
   DEFAULT_TAB,
   TAB_TITLES,
+  TAB_ORDER,
   hashMatchesTab,
   hashToTab,
   tabToHash,
@@ -13,12 +14,7 @@ import { normalizePrescriptionItem } from './utils/prescriptionRules';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { MobileBottomNav } from './components/MobileBottomNav';
-import { PediatricCalculator } from './components/PediatricCalculator';
 import { PrescriptionBuilder } from './components/PrescriptionBuilder';
-import { ExamRequester } from './components/ExamRequester';
-import { CertificateAndReferral } from './components/CertificateAndReferral';
-import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
-import { PrintPreview } from './components/PrintPreview';
 import { PatientModal } from './components/PatientModal';
 import { DoctorProfileModal } from './components/DoctorProfileModal';
 import { 
@@ -30,6 +26,23 @@ import {
   MedicalCertificate, 
   MedicalReferral 
 } from './types';
+
+// Views sob demanda: o bundle principal carrega só o fluxo de prescrição.
+// As demais telas chegam em chunks separados na primeira visita.
+const PediatricCalculator = lazy(() => import('./components/PediatricCalculator').then(m => ({ default: m.PediatricCalculator })));
+const ExamRequester = lazy(() => import('./components/ExamRequester').then(m => ({ default: m.ExamRequester })));
+const CertificateAndReferral = lazy(() => import('./components/CertificateAndReferral').then(m => ({ default: m.CertificateAndReferral })));
+const ClinicalProtocolsView = lazy(() => import('./components/ClinicalProtocolsView').then(m => ({ default: m.ClinicalProtocolsView })));
+const PrintPreview = lazy(() => import('./components/PrintPreview').then(m => ({ default: m.PrintPreview })));
+
+/** Fallback de Suspense: superfície neutra, sem pulso (mantém o layout estável). */
+function LazyViewFallback() {
+  return (
+    <div className="min-h-[50vh] flex items-center justify-center" role="status" aria-label="Carregando tela">
+      <div className="h-8 w-8 rounded-full border-[3px] border-slate-300 border-t-navy-800 animate-spin" />
+    </div>
+  );
+}
 
 const DEFAULT_DOCTOR: DoctorProfile = {
   name: '',
@@ -161,7 +174,7 @@ export default function App() {
   // activeTab -> URL. Cada destino vira uma entrada de historico, entao o
   // botao Voltar do navegador passa a voltar de tela em vez de sair do app.
   useEffect(() => {
-    if (activeTab === 'patients' || activeTab === 'models') return;
+    if (activeTab === 'patients') return;
     const tab = activeTab as RouteTab;
     if (hashMatchesTab(window.location.hash, tab)) return;
     if (primeiroRenderRef.current) {
@@ -368,6 +381,31 @@ export default function App() {
     safeStorage.setItem('prescmed_referral', JSON.stringify(referral));
   }, [referral]);
 
+  // Atalhos de teclado globais: 1-7 navega entre as abas. Ignorado quando o
+  // foco está em campo de texto ou quando há modificadores pressionados
+  // (não roubar Ctrl+1 do navegador).
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable ||
+          target.closest('[role="dialog"]'))
+      ) {
+        return;
+      }
+      const index = Number(e.key) - 1;
+      if (!Number.isInteger(index) || index < 0 || index >= TAB_ORDER.length) return;
+      handleSelectTab(TAB_ORDER[index]);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Handler to update patient weight from anywhere
   const handleUpdatePatientWeight = (newWeight: number) => {
     setPatient(prev => ({ ...prev, weightKg: newWeight }));
@@ -455,7 +493,7 @@ export default function App() {
 
       {/* Anuncio de troca de tela para leitores de tela. */}
       <p aria-live="polite" aria-atomic="true" className="sr-only">
-        {activeTab === 'patients' || activeTab === 'models'
+        {activeTab === 'patients'
           ? ''
           : TAB_TITLES[activeTab as RouteTab]}
       </p>
@@ -526,81 +564,88 @@ export default function App() {
           </div>
 
           {activeTab === 'pediatric_calc' && (
-            <PediatricCalculator
-              darkMode={darkMode}
-              patient={patient}
-              onUpdatePatientWeight={handleUpdatePatientWeight}
-              onAddPrescriptionItem={handleAddPrescriptionItem}
-              onNavigateToPrescription={() => handleSelectTab('prescription')}
-            />
+            <Suspense fallback={<LazyViewFallback />}>
+              <PediatricCalculator
+                darkMode={darkMode}
+                patient={patient}
+                onUpdatePatientWeight={handleUpdatePatientWeight}
+                onAddPrescriptionItem={handleAddPrescriptionItem}
+                onNavigateToPrescription={() => handleSelectTab('prescription')}
+              />
+            </Suspense>
           )}
 
           {activeTab === 'exams' && (
-            <ExamRequester
-              darkMode={darkMode}
-              patient={patient}
-              selectedExams={selectedExams}
-              onUpdateSelectedExams={setSelectedExams}
-              onUpdateExams={setSelectedExams}
-              clinicalIndication={examIndication}
-              onUpdateClinicalIndication={setExamIndication}
-              onNavigateToPrescription={() => handleSelectTab('prescription')}
-              onNavigateToDocuments={() => handleSelectTab('certificate')}
-              onNavigateToPrint={() => handleNavigateToPrint('exams')}
-            />
+            <Suspense fallback={<LazyViewFallback />}>
+              <ExamRequester
+                darkMode={darkMode}
+                patient={patient}
+                selectedExams={selectedExams}
+                onUpdateSelectedExams={setSelectedExams}
+                clinicalIndication={examIndication}
+                onUpdateClinicalIndication={setExamIndication}
+                onNavigateToPrescription={() => handleSelectTab('prescription')}
+                onNavigateToDocuments={() => handleSelectTab('certificate')}
+                onNavigateToPrint={() => handleNavigateToPrint('exams')}
+              />
+            </Suspense>
           )}
 
           {(activeTab === 'certificate' || activeTab === 'referral') && (
-            <CertificateAndReferral
-              darkMode={darkMode}
-              patient={patient}
-              onUpdatePatient={setPatient}
-              doctor={doctor}
-              certificate={certificate}
-              onUpdateCertificate={setCertificate}
-              referral={referral}
-              onUpdateReferral={setReferral}
-              initialSubTab={certSubTab}
-              activeSubTab={certSubTab}
-              onSelectSubTab={handleSelectTab}
-              onNavigateToExams={() => handleSelectTab('exams')}
-              onNavigateToPrescription={() => handleSelectTab('prescription')}
-              onNavigateToPrint={(type) => handleNavigateToPrint(type)}
-            />
+            <Suspense fallback={<LazyViewFallback />}>
+              <CertificateAndReferral
+                darkMode={darkMode}
+                patient={patient}
+                onUpdatePatient={setPatient}
+                doctor={doctor}
+                certificate={certificate}
+                onUpdateCertificate={setCertificate}
+                referral={referral}
+                onUpdateReferral={setReferral}
+                initialSubTab={certSubTab}
+                activeSubTab={certSubTab}
+                onSelectSubTab={handleSelectTab}
+                onNavigateToExams={() => handleSelectTab('exams')}
+                onNavigateToPrescription={() => handleSelectTab('prescription')}
+                onNavigateToPrint={(type) => handleNavigateToPrint(type)}
+              />
+            </Suspense>
           )}
 
           {activeTab === 'protocols' && (
-            <ClinicalProtocolsView
-              darkMode={darkMode}
-              patient={patient}
-              onAddPrescriptionItem={handleAddPrescriptionItem}
-              onNavigateToPrescription={() => handleSelectTab('prescription')}
-            />
+            <Suspense fallback={<LazyViewFallback />}>
+              <ClinicalProtocolsView
+                darkMode={darkMode}
+                patient={patient}
+                onAddPrescriptionItem={handleAddPrescriptionItem}
+                onNavigateToPrescription={() => handleSelectTab('prescription')}
+              />
+            </Suspense>
           )}
 
           {activeTab === 'print_preview' && (
-            <PrintPreview
-              darkMode={darkMode}
-              doctor={doctor}
-              patient={patient}
-              prescriptionItems={prescriptionItems}
-              exams={selectedExams}
-              selectedExams={selectedExams}
-              examIndication={examIndication}
-              certificate={certificate}
-              referral={referral}
-              initialDocType={printDocType}
-              onNavigateBack={() => handleSelectTab(printOrigin)}
-              onOpenPatientModal={() => setIsPatientModalOpen(true)}
-              onBack={() => handleSelectTab(printOrigin)}
-              onClearPrescription={handleClearPrescription}
-              onResetAll={handleResetAll}
-              onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
-              onNavigateToPrescription={() => handleSelectTab('prescription')}
-              onNavigateToExams={() => handleSelectTab('exams')}
-              onNavigateToDocuments={() => handleSelectTab('certificate')}
-              printOrigin={printOrigin}
-            />
+            <Suspense fallback={<LazyViewFallback />}>
+              <PrintPreview
+                darkMode={darkMode}
+                doctor={doctor}
+                patient={patient}
+                prescriptionItems={prescriptionItems}
+                selectedExams={selectedExams}
+                examIndication={examIndication}
+                certificate={certificate}
+                referral={referral}
+                initialDocType={printDocType}
+                onNavigateBack={() => handleSelectTab(printOrigin)}
+                onOpenPatientModal={() => setIsPatientModalOpen(true)}
+                onClearPrescription={handleClearPrescription}
+                onResetAll={handleResetAll}
+                onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
+                onNavigateToPrescription={() => handleSelectTab('prescription')}
+                onNavigateToExams={() => handleSelectTab('exams')}
+                onNavigateToDocuments={() => handleSelectTab('certificate')}
+                printOrigin={printOrigin}
+              />
+            </Suspense>
           )}
         </main>
       </div>

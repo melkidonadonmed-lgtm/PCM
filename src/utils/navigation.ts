@@ -4,7 +4,7 @@ import type { ActiveTab } from '../types';
  * Destinos reais da aplicação — os valores de ActiveTab que correspondem a uma
  * tela. `patients` fica de fora de propósito: ele abre um modal, não navega.
  */
-export type RouteTab = Exclude<ActiveTab, 'patients' | 'models'>;
+export type RouteTab = Exclude<ActiveTab, 'patients'>;
 
 /** Rota inicial quando a URL não diz nada ou diz algo desconhecido. */
 export const DEFAULT_TAB: RouteTab = 'prescription';
@@ -41,6 +41,20 @@ export const TAB_TITLES: Record<RouteTab, string> = {
   protocols: 'Protocolos clínicos',
   print_preview: 'Exportar e baixar PDF'
 };
+
+/**
+ * Ordem canônica dos destinos — alimenta os atalhos de teclado (1 a 7).
+ * O índice 0 é "1" na UI e assim por diante.
+ */
+export const TAB_ORDER: RouteTab[] = [
+  'prescription',
+  'pediatric_calc',
+  'exams',
+  'certificate',
+  'referral',
+  'protocols',
+  'print_preview'
+];
 
 export function tabToHash(tab: RouteTab): string {
   return `#/${TAB_TO_SLUG[tab]}`;

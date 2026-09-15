@@ -671,6 +671,16 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     defaultQuantity: '1 ampola (1 mL)',
     defaultPosology: 'Aplicar 1 ampola (1mL) IM profundo em dose única (PROIBIDO USO IV).'
   },
+  {
+    id: 'cetorolaco-sl-10mg',
+    prescriptionKind: 'simple',
+    name: 'Trometamol de Cetorolaco 10mg comprimido sublingual (Toragesic SL, Deocil SL, Algitrat SL)',
+    activeIngredient: 'Trometamol de cetorolaco',
+    route: 'Uso Sublingual',
+    category: 'analgesicos',
+    defaultQuantity: '1 caixa (10 comprimidos)',
+    defaultPosology: 'Colocar 1 comprimido sob a língua de 8 em 8 horas se dor intensa. Tempo máximo de uso: 5 dias.'
+  },
 
   // ==========================================
   // 2. ANTIBIÓTICOS, ANTIFÚNGICOS E ANTIPARASITÁRIOS
@@ -1067,6 +1077,36 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     defaultQuantity: '1 caixa (10 cápsulas)',
     defaultPosology: 'Tomar 1 cápsula via oral de 12 em 12 horas durante 5 dias consecutivos.'
   },
+  {
+    id: 'itraconazol-100mg',
+    prescriptionKind: 'simple',
+    name: 'Itraconazol 100mg cápsula (Sporanox, Itraspor)',
+    activeIngredient: 'Itraconazol',
+    route: 'Uso Oral',
+    category: 'antibioticos',
+    defaultQuantity: '1 caixa (10 ou 30 cápsulas)',
+    defaultPosology: 'Tomar 100mg a 200mg (1 a 2 cápsulas) via oral 1 vez ao dia junto às refeições principais, conforme o sítio da micose (7 a 30 dias).'
+  },
+  {
+    id: 'terbinafina-250mg',
+    prescriptionKind: 'simple',
+    name: 'Cloridrato de Terbinafina 250mg comprimido / 1% creme (Lamisil)',
+    activeIngredient: 'Cloridrato de terbinafina',
+    route: 'Uso Oral',
+    category: 'antibioticos',
+    defaultQuantity: '1 caixa (14 ou 42 comprimidos)',
+    defaultPosology: 'Onicomicose das mãos: 1 comprimido ao dia por 6 semanas; dos pés: 12 semanas. Tópico: aplicar no local 1 a 2 vezes ao dia por 1 a 2 semanas.'
+  },
+  {
+    id: 'miconazol-creme-2',
+    prescriptionKind: 'simple',
+    name: 'Nitrato de Miconazol 20mg/g (2%) creme dermatológico (Vodol, Daktarin)',
+    activeIngredient: 'Nitrato de miconazol',
+    route: 'Tópica',
+    category: 'antibioticos',
+    defaultQuantity: '1 bisnaga (28 g)',
+    defaultPosology: 'Aplicar camada fina sobre a lesão limpa e seca 2 vezes ao dia por 2 a 4 semanas.'
+  },
 
   // ==========================================
   // 3. CARDIOLOGIA, HIPERTENSÃO E ANTICOAGULAÇÃO
@@ -1311,6 +1351,106 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     defaultQuantity: '1 caixa (28 comprimidos)',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia com alimentos.'
   },
+  {
+    id: 'valsartana-160mg',
+    prescriptionKind: 'simple',
+    name: 'Valsartana 80mg / 160mg / 320mg comprimido (Diovan, Tareg)',
+    activeIngredient: 'Valsartana',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia, com ou sem alimento. Contraindicada na gestação.'
+  },
+  {
+    id: 'candesartana-16mg',
+    prescriptionKind: 'simple',
+    name: 'Candesartana Cilexetila 8mg / 16mg / 32mg comprimido (Atacand, Blopress)',
+    activeIngredient: 'Candesartana cilexetila',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia, com ou sem alimento. Contraindicada na gestação.'
+  },
+  {
+    id: 'olmesartana-40mg',
+    prescriptionKind: 'simple',
+    name: 'Olmesartana Medoxomila 20mg / 40mg comprimido (Benicar, Olmetec)',
+    activeIngredient: 'Olmesartana medoxomila',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia, com ou sem alimento. Contraindicada na gestação.'
+  },
+  {
+    id: 'ramipril-5mg',
+    prescriptionKind: 'simple',
+    name: 'Ramipril 2,5mg / 5mg comprimido (Triatec)',
+    activeIngredient: 'Ramipril',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia (IECA — vigiar tosse seca). Contraindicado na gestação.'
+  },
+  {
+    id: 'nifedipino-retard-30mg',
+    prescriptionKind: 'simple',
+    name: 'Nifedipino 20mg Retard / 30mg / 60mg OROS (Adalat OROS, Adalat Retard)',
+    activeIngredient: 'Nifedipino',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido de liberação prolongada via oral 1 vez ao dia (OROS 30/60mg) ou 2 vezes ao dia (Retard 20mg). Não partir, não mastigar.'
+  },
+  {
+    id: 'nebivolol-5mg',
+    prescriptionKind: 'simple',
+    name: 'Nebivolol 5mg comprimido (Nebilet)',
+    activeIngredient: 'Nebivolol',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (28 ou 30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia, com ou sem alimento.'
+  },
+  {
+    id: 'indapamida-1-5mg',
+    prescriptionKind: 'simple',
+    name: 'Indapamida 1,5mg SR / 2,5mg comprimido (Natrilix SR, Fludex)',
+    activeIngredient: 'Indapamida',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã (diurético tiazídico-like — vigiar potássio e ácido úrico).'
+  },
+  {
+    id: 'pravastatina-40mg',
+    prescriptionKind: 'simple',
+    name: 'Pravastatina Sódica 10mg / 20mg / 40mg comprimido (Pravacol)',
+    activeIngredient: 'Pravastatina sódica',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia à noite (estatina de potência média).'
+  },
+  {
+    id: 'pitavastatina-4mg',
+    prescriptionKind: 'simple',
+    name: 'Pitavastatina 2mg / 4mg comprimido (Livalo)',
+    activeIngredient: 'Pitavastatina',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia.'
+  },
+  {
+    id: 'ezetimiba-10mg',
+    prescriptionKind: 'simple',
+    name: 'Ezetimiba 10mg comprimido (Zetia; em combinação com estatina: Vytorin)',
+    activeIngredient: 'Ezetimiba',
+    route: 'Uso Oral',
+    category: 'cardio',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia, isolado ou associado à estatina (inibidor da absorção de colesterol).'
+  },
 
   // ==========================================
   // 4. DIABETES, ENDOCRINOLOGIA E METABOLISMO
@@ -1414,6 +1554,96 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     category: 'diabetes',
     defaultQuantity: '1 caixa (30 comprimidos)',
     defaultPosology: 'Tomar 1 comprimido em jejum absoluto com água, 30 a 60 minutos antes do café da manhã.'
+  },
+  {
+    id: 'metformina-1000mg',
+    prescriptionKind: 'simple',
+    name: 'Cloridrato de Metformina 1000mg comprimido (Glifage 1000, Dimefor 1000)',
+    activeIngredient: 'Cloridrato de metformina',
+    route: 'Uso Oral',
+    category: 'diabetes',
+    defaultQuantity: '2 caixas (60 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 2 vezes ao dia junto às refeições (máx usual 2000 a 2550 mg/dia).'
+  },
+  {
+    id: 'glimepirida-2mg',
+    prescriptionKind: 'simple',
+    name: 'Glimepirida 1mg / 2mg / 4mg comprimido (Amaryl, Glimep)',
+    activeIngredient: 'Glimepirida',
+    route: 'Uso Oral',
+    category: 'diabetes',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral junto ao café da manhã (sulfonilureia — vigiar hipoglicemia).'
+  },
+  {
+    id: 'sitagliptina-100mg',
+    prescriptionKind: 'simple',
+    name: 'Sitagliptina 25mg / 50mg / 100mg comprimido (Januvia)',
+    activeIngredient: 'Sitagliptina',
+    route: 'Uso Oral',
+    category: 'diabetes',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido de 100mg via oral 1 vez ao dia (inibidor de DPP-4).'
+  },
+  {
+    id: 'linagliptina-5mg',
+    prescriptionKind: 'simple',
+    name: 'Linagliptina 5mg comprimido (Trayenta)',
+    activeIngredient: 'Linagliptina',
+    route: 'Uso Oral',
+    category: 'diabetes',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia, com ou sem alimento.'
+  },
+  {
+    id: 'canagliflozina-100mg',
+    prescriptionKind: 'simple',
+    name: 'Canagliflozina 100mg / 300mg comprimido (Invokana)',
+    activeIngredient: 'Canagliflozina',
+    route: 'Uso Oral',
+    category: 'diabetes',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia antes da 1ª refeição (iSGLT2). Suspender em jejum prolongado ou cirurgia eletiva.'
+  },
+  {
+    id: 'semaglutida-sc',
+    prescriptionKind: 'simple',
+    name: 'Semaglutida 0,25mg / 0,5mg / 1mg caneta SC semanal (Ozempic)',
+    activeIngredient: 'Semaglutida',
+    route: 'Uso Subcutâneo',
+    category: 'diabetes',
+    defaultQuantity: '1 caneta (titulação conforme resposta)',
+    defaultPosology: 'Aplicar 1 injeção SC 1 vez por semana, mesmo dia da semana, a qualquer hora (iniciar 0,25mg por 4 semanas e titular).'
+  },
+  {
+    id: 'semaglutida-oral',
+    prescriptionKind: 'simple',
+    name: 'Semaglutida 3mg / 7mg / 14mg comprimido oral (Rybelsus)',
+    activeIngredient: 'Semaglutida',
+    route: 'Uso Oral',
+    category: 'diabetes',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido em jejum absoluto, com no máximo 120 mL de água, 30 minutos antes do café da manhã.'
+  },
+  {
+    id: 'dulaglutida-1-5mg',
+    prescriptionKind: 'simple',
+    name: 'Dulaglutida 0,75mg / 1,5mg caneta SC semanal (Trulicity)',
+    activeIngredient: 'Dulaglutida',
+    route: 'Uso Subcutâneo',
+    category: 'diabetes',
+    defaultQuantity: '1 caneta preenchida',
+    defaultPosology: 'Aplicar 1 injeção SC 1 vez por semana, no mesmo dia da semana, em abdome, coxa ou braço.'
+  },
+  {
+    id: 'tirzepatida-sc',
+    prescriptionKind: 'simple',
+    name: 'Tirzepatida 2,5mg a 15mg caneta SC semanal (Mounjaro)',
+    activeIngredient: 'Tirzepatida',
+    route: 'Uso Subcutâneo',
+    category: 'diabetes',
+    defaultQuantity: '1 caneta preenchida',
+    defaultPosology: 'Aplicar 1 injeção SC 1 vez por semana (titular 2,5mg → 5mg → 7,5mg → 10mg → 12,5mg → 15mg conforme resposta e tolerância).'
   },
 
   // ==========================================
@@ -1589,6 +1819,66 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     defaultQuantity: '1 frasco (50 mL)',
     defaultPosology: 'Aplicar 2 a 3 jatos em cada narina várias vezes ao dia.'
   },
+  {
+    id: 'fluticasona-nasal-50mcg',
+    prescriptionKind: 'simple',
+    name: 'Propionato de Fluticasona 50mcg spray nasal (Flixonase)',
+    activeIngredient: 'Propionato de fluticasona',
+    route: 'Uso Nasal',
+    category: 'respiratorio',
+    defaultQuantity: '1 frasco spray (120 doses)',
+    defaultPosology: 'Aplicar 1 a 2 jatos em cada narina 1 a 2 vezes ao dia (rinite alérgica persistente).'
+  },
+  {
+    id: 'fluticasona-furoato-nasal',
+    prescriptionKind: 'simple',
+    name: 'Furoato de Fluticasona 27,5mcg spray nasal (Avamys)',
+    activeIngredient: 'Furoato de fluticasona',
+    route: 'Uso Nasal',
+    category: 'respiratorio',
+    defaultQuantity: '1 frasco spray (120 doses)',
+    defaultPosology: 'Aplicar 2 jatos em cada narina 1 vez ao dia (rinite alérgica — potente, minimamente sistêmico).'
+  },
+  {
+    id: 'fluticasona-inalatorio',
+    prescriptionKind: 'simple',
+    name: 'Propionato de Fluticasona 50mcg / 125mcg / 250mcg inalatório oral (Flixotide)',
+    activeIngredient: 'Propionato de fluticasona',
+    route: 'Uso Inalatória',
+    category: 'respiratorio',
+    defaultQuantity: '1 frasco inalatório (120 doses)',
+    defaultPosology: 'Inalar 1 a 2 jatos (conforme potência) de 12/12h com espaçador; enxaguar a boca após o uso.'
+  },
+  {
+    id: 'budesonida-formoterol',
+    prescriptionKind: 'simple',
+    name: 'Budesonida + Fumarato de Formoterol 200/6mcg ou 400/12mcg (Symbicort, Alenia, Foraseq)',
+    activeIngredient: 'Budesonida + fumarato de formoterol',
+    route: 'Uso Inalatória',
+    category: 'respiratorio',
+    defaultQuantity: '1 frasco / 1 caixa (60 cápsulas)',
+    defaultPosology: 'Manutenção: 1 a 2 inalações de 12/12h. Esquema SMART: usar inalação adicional como resgate ao início dos sintomas.'
+  },
+  {
+    id: 'fluticasona-salmeterol',
+    prescriptionKind: 'simple',
+    name: 'Fluticasona + Salmeterol 50/25mcg, 125/25mcg ou 250/25mcg (Seretide)',
+    activeIngredient: 'Propionato de fluticasona + xinafoato de salmeterol',
+    route: 'Uso Inalatória',
+    category: 'respiratorio',
+    defaultQuantity: '1 frasco inalatório (120 doses)',
+    defaultPosology: 'Inalar 1 a 2 jatos de 12/12h (manutenção da asma — não é resgate). Enxaguar a boca após o uso.'
+  },
+  {
+    id: 'fexofenadina-180mg',
+    prescriptionKind: 'simple',
+    name: 'Cloridrato de Fexofenadina 120mg / 180mg comprimido (Allegra, Allexofed)',
+    activeIngredient: 'Cloridrato de fexofenadina',
+    route: 'Uso Oral',
+    category: 'respiratorio',
+    defaultQuantity: '1 caixa (12 comprimidos)',
+    defaultPosology: 'Rinite alérgica: 120mg 1x/dia. Urticária crônica espontânea: 180mg 1x/dia (anti-histamínico de 2ª geração, não sedativo).'
+  },
 
   // ==========================================
   // 6. GASTROENTEROLOGIA E REIDRATAÇÃO
@@ -1612,6 +1902,46 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     category: 'gastro',
     defaultQuantity: '1 caixa (28 comprimidos)',
     defaultPosology: 'Tomar 1 comprimido pela manhã em jejum 30 min antes do café.'
+  },
+  {
+    id: 'esomeprazol-40mg',
+    prescriptionKind: 'simple',
+    name: 'Esomeprazol Magnésico 20mg / 40mg comprimido (Nexium, Esomex)',
+    activeIngredient: 'Esomeprazol magnésico',
+    route: 'Uso Oral',
+    category: 'gastro',
+    defaultQuantity: '1 caixa (28 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido pela manhã em jejum, 30 minutos antes do café.'
+  },
+  {
+    id: 'lansoprazol-30mg',
+    prescriptionKind: 'simple',
+    name: 'Lansoprazol 15mg / 30mg cápsula com microgrânulos (Prazol, Lanz, Ogastro)',
+    activeIngredient: 'Lansoprazol',
+    route: 'Uso Oral',
+    category: 'gastro',
+    defaultQuantity: '1 caixa (30 cápsulas)',
+    defaultPosology: 'Tomar 1 cápsula pela manhã em jejum, 30 a 60 minutos antes do café.'
+  },
+  {
+    id: 'rabeprazol-20mg',
+    prescriptionKind: 'simple',
+    name: 'Rabeprazol Sódico 10mg / 20mg comprimido (Pariet)',
+    activeIngredient: 'Rabeprazol sódico',
+    route: 'Uso Oral',
+    category: 'gastro',
+    defaultQuantity: '1 caixa (28 ou 30 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido pela manhã em jejum.'
+  },
+  {
+    id: 'dexlansoprazol-60mg',
+    prescriptionKind: 'simple',
+    name: 'Dexlansoprazol 30mg / 60mg cápsula dupla liberação retardada (Dexilant)',
+    activeIngredient: 'Dexlansoprazol',
+    route: 'Uso Oral',
+    category: 'gastro',
+    defaultQuantity: '1 caixa (30 cápsulas)',
+    defaultPosology: 'Tomar 1 cápsula via oral 1 vez ao dia, com ou sem alimento. Não abrir, não mastigar.'
   },
   {
     id: 'domperidona-10mg',
@@ -1894,6 +2224,242 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     defaultQuantity: '1 caixa (30 ou 60 comprimidos)',
     defaultPosology: 'Tomar 1 comprimido 1 a 2 vezes ao dia (manhã e almoço).',
     isSpecialControl: true
+  },
+  {
+    id: 'sumatriptana-50mg',
+    prescriptionKind: 'simple',
+    name: 'Succinato de Sumatriptana 50mg comprimido revestido (Imigran, Sumax)',
+    activeIngredient: 'Succinato de sumatriptana',
+    route: 'Uso Oral',
+    category: 'snc',
+    defaultQuantity: '1 caixa (4 ou 6 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido ao primeiro sinal de cefaleia (não durante a aura). Pode repetir após 2 horas se alívio parcial (máx 200mg/24h).'
+  },
+  {
+    id: 'naratriptana-2-5mg',
+    prescriptionKind: 'simple',
+    name: 'Cloridrato de Naratriptana 2,5mg comprimido revestido (Naramig)',
+    activeIngredient: 'Cloridrato de naratriptana',
+    route: 'Uso Oral',
+    category: 'snc',
+    defaultQuantity: '1 caixa (2 ou 6 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido ao início da crise de enxaqueca. Se necessário, repetir 1 dose após 4 horas (máx 5mg/24h).'
+  },
+  {
+    id: 'divalproato-er-500mg',
+    prescriptionKind: 'simple',
+    name: 'Divalproato de Sódio ER 250mg / 500mg comprimido liberação prolongada (Depakote ER)',
+    activeIngredient: 'Divalproato de sódio',
+    route: 'Uso Oral',
+    category: 'snc',
+    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultPosology: 'Iniciar 500mg à noite ou 12/12h; titular até 1000 a 2000mg/dia conforme nível sérico (50 a 100 mcg/mL). ALTO RISCO TERATOGÊNICO — contraindicado em mulheres em idade fértil sem contracepção de alta eficácia.'
+  },
+  {
+    id: 'acido-valproico-xarope',
+    prescriptionKind: 'simple',
+    name: 'Valproato de Sódio / Ácido Valproico 250mg cápsula / xarope 250mg/5mL (Depakene, Valpakine)',
+    activeIngredient: 'Valproato de sódio / ácido valproico',
+    route: 'Uso Oral',
+    category: 'snc',
+    defaultQuantity: '1 frasco (100 mL)',
+    defaultPosology: '10 a 15 mg/kg/dia divididos em 2 a 3 tomadas junto às refeições; titular 5 a 10 mg/kg/semana (dose usual 20 a 30 mg/kg/dia; máx 60 mg/kg/dia). ALTO RISCO TERATOGÊNICO.'
+  },
+  {
+    id: 'ciclobenzaprina-10mg',
+    prescriptionKind: 'simple',
+    name: 'Cloridrato de Ciclobenzaprina 5mg / 10mg comprimido revestido (Miosan, Musculare)',
+    activeIngredient: 'Cloridrato de ciclobenzaprina',
+    route: 'Uso Oral',
+    category: 'snc',
+    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultPosology: 'Tomar 5 a 10mg à noite ao deitar (ou até 8/8h em quadros espásticos) por no máximo 7 a 10 dias. Causa sonolência — evitar em idosos.'
+  },
+  {
+    id: 'fenitoina-ampola',
+    prescriptionKind: 'simple',
+    name: 'Fenitoína Sódica 50mg/mL ampola 5mL (Hidantal)',
+    activeIngredient: 'Fenitoína sódica',
+    route: 'Uso Intravenoso',
+    category: 'snc',
+    defaultQuantity: '2 ampolas (10 mL)',
+    defaultPosology: 'Dose de ataque 20 mg/kg diluída EXCLUSIVAMENTE em SF 0,9% (precipita em glicosado), máx 50 mg/min em adultos e 1 mg/kg/min em crianças, sob monitorização cardíaca.'
+  },
+  {
+    id: 'midazolam-ampola',
+    prescriptionKind: 'c1',
+    controlledSubstances: ['midazolam'],
+    name: 'Midazolam 5mg/mL ampola 3mL / 10mL (Dormonid)',
+    activeIngredient: 'Midazolam',
+    route: 'Uso Intramuscular',
+    category: 'snc',
+    defaultQuantity: '3 ampolas',
+    defaultPosology: 'Crise convulsiva: Adulto (>40kg) 10mg IM dose única; Pediátrico 0,2 mg/kg IM ou na mucosa jugal/bucal (máx 10mg).',
+    isSpecialControl: true
+  },
+
+  // ==========================================
+  // 8. GINECOLOGIA, CONTRACEPÇÃO HORMONAL
+  // ==========================================
+  {
+    id: 'etinilestradiol-levonorgestrel',
+    prescriptionKind: 'simple',
+    name: 'Etinilestradiol 0,03mg + Levonorgestrel 0,15mg cartela 21/28cp (Ciclo 21, Microvlar, Nordette)',
+    activeIngredient: 'Etinilestradiol + levonorgestrel',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (21 ou 28 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido via oral 1x/dia no mesmo horário, com pausa de 7 dias (cartela 21) ou sem pausa (28cp).'
+  },
+  {
+    id: 'etinilestradiol-drospirenona',
+    prescriptionKind: 'simple',
+    name: 'Etinilestradiol 0,03mg + Drospirenona 3mg (Yasmin) / 0,02mg + 3mg 24+4 (Yaz, Iumi)',
+    activeIngredient: 'Etinilestradiol + drospirenona',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (21 ou 24 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido 1x/dia no mesmo horário. Yasmin: pausa 7 dias; Yaz: regime 24+4.'
+  },
+  {
+    id: 'etinilestradiol-gestodeno',
+    prescriptionKind: 'simple',
+    name: 'Etinilestradiol + Gestodeno (Femiane, Diminut, Gestinol, Minesse)',
+    activeIngredient: 'Etinilestradiol + gestodeno',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (21 ou 24 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido 1x/dia no mesmo horário, conforme esquema da cartela (21cp com pausa ou 24+4).'
+  },
+  {
+    id: 'etinilestradiol-desogestrel',
+    prescriptionKind: 'simple',
+    name: 'Etinilestradiol 0,02/0,03mg + Desogestrel 0,15mg cartela 21cp (Mercilon, Gracial)',
+    activeIngredient: 'Etinilestradiol + desogestrel',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (21 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido 1x/dia no mesmo horário, com pausa de 7 dias entre cartelas.'
+  },
+  {
+    id: 'etinilestradiol-ciproterona',
+    prescriptionKind: 'simple',
+    name: 'Etinilestradiol 0,035mg + Acetato de Ciproterona 2mg (Diane 35, Selene, Diclin)',
+    activeIngredient: 'Etinilestradiol + acetato de ciproterona',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (21 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido 1x/dia no mesmo horário com pausa de 7 dias (CO antiandrogênica — acne/hibertricose). Contraindicada em fumantes ≥35 anos.'
+  },
+  {
+    id: 'estradiol-dienogeste-qlaira',
+    prescriptionKind: 'simple',
+    name: 'Valerato de Estradiol + Dienogeste esquema multifásico 28cp (Qlaira)',
+    activeIngredient: 'Valerato de estradiol + dienogeste',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (28 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido 1x/dia seguindo a sequência multifásica da cartela, sem pausa entre cartelas.'
+  },
+  {
+    id: 'desogestrel-75mcg',
+    prescriptionKind: 'simple',
+    name: 'Desogestrel 75mcg (0,075mg) cartela 28cp — minipílula (Cerazette, Nactali, Pérola)',
+    activeIngredient: 'Desogestrel',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (28 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido 1x/dia rigorosamente no mesmo horário, sem pausa entre cartelas (ideal para lactantes e contraindicação a estrogênio).'
+  },
+  {
+    id: 'noretisterona-0-35mg',
+    prescriptionKind: 'simple',
+    name: 'Noretisterona 0,35mg cartela 28cp — minipílula (Micronor)',
+    activeIngredient: 'Noretisterona',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (28 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido 1x/dia no mesmo horário, sem pausa entre cartelas.'
+  },
+  {
+    id: 'drospirenona-4mg',
+    prescriptionKind: 'simple',
+    name: 'Drospirenona 4mg cartela 24+4cp (Slinda)',
+    activeIngredient: 'Drospirenona',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 cartela (28 comprimidos)',
+    defaultPosology: 'Tomar 1 comprimido 1x/dia no mesmo horário, regime 24+4.'
+  },
+  {
+    id: 'perlutan-injetavel',
+    prescriptionKind: 'simple',
+    name: 'Enantato de Estradiol 10mg + Algestona Acetofenida 150mg injetável mensal (Perlutan, Uno-Ciclo)',
+    activeIngredient: 'Enantato de estradiol + algestona acetofenida',
+    route: 'Uso Intramuscular',
+    category: 'outros',
+    defaultQuantity: '2 ampolas',
+    defaultPosology: 'Aplicar 1 ampola IM profunda a cada 30 dias (a partir do 5º dia do ciclo).'
+  },
+  {
+    id: 'depo-provera',
+    prescriptionKind: 'simple',
+    name: 'Acetato de Medroxiprogesterona 150mg/mL injetável trimestral (Depo-Provera)',
+    activeIngredient: 'Acetato de medroxiprogesterona',
+    route: 'Uso Intramuscular',
+    category: 'outros',
+    defaultQuantity: '1 ampola (1 mL)',
+    defaultPosology: 'Aplicar 1 ampola IM profunda a cada 90 dias (a partir do 5º dia do ciclo).'
+  },
+  {
+    id: 'diu-levonorgestrel',
+    prescriptionKind: 'simple',
+    name: 'DIU hormonal de Levonorgestrel 52mg (Mirena) / 19,5mg (Kyleena)',
+    activeIngredient: 'Levonorgestrel (sistema intrauterino)',
+    route: 'Intrauterina',
+    category: 'outros',
+    defaultQuantity: '1 dispositivo (inserção em consultório)',
+    defaultPosology: 'Inserção intrauterina por profissional treinado; duração até 5 anos (52mg) ou 4 anos (19,5mg).'
+  },
+  {
+    id: 'implante-etonogestrel',
+    prescriptionKind: 'simple',
+    name: 'Implante subdérmico de Etonogestrel 68mg haste única (Implanon NXT)',
+    activeIngredient: 'Etonogestrel (implante subdérmico)',
+    route: 'Uso Subcutâneo',
+    category: 'outros',
+    defaultQuantity: '1 haste implantável (3 anos)',
+    defaultPosology: 'Inserção subdérmica no braço não dominante por profissional treinado; proteção contraceptiva por 3 anos.'
+  },
+  {
+    id: 'anuva-vaginal',
+    prescriptionKind: 'simple',
+    name: 'Anel vaginal Etinilestradiol 2,7mg + Etonogestrel 11,7mg (NuvaRing, Circlet)',
+    activeIngredient: 'Etinilestradiol + etonogestrel (anel vaginal)',
+    route: 'Vaginal',
+    category: 'outros',
+    defaultQuantity: '1 anel vaginal',
+    defaultPosology: 'Inserir 1 anel na vagina a cada 28 dias (permanece 21 dias + 7 dias de pausa).'
+  },
+  {
+    id: 'adesivo-evra',
+    prescriptionKind: 'simple',
+    name: 'Adesivo transdérmico Etinilestradiol 600mcg + Norelgestromina 6mg (Evra)',
+    activeIngredient: 'Etinilestradiol + norelgestromina (adesivo)',
+    route: 'Transdérmica',
+    category: 'outros',
+    defaultQuantity: '1 caixa (3 adesivos)',
+    defaultPosology: 'Aplicar 1 adesivo na pele limpa e seca a cada 7 dias por 3 semanas (trocar semanalmente) + 1 semana de pausa.'
+  },
+  {
+    id: 'levonorgestrel-1-5mg-emergencia',
+    prescriptionKind: 'simple',
+    name: 'Levonorgestrel 1,5mg comprimido dose única — contracepção de emergência (Pozato Uni, Pilem, Diad)',
+    activeIngredient: 'Levonorgestrel',
+    route: 'Uso Oral',
+    category: 'outros',
+    defaultQuantity: '1 comprimido',
+    defaultPosology: 'Tomar 1 comprimido em dose única o mais precocemente possível após a relação desprotegida (até 72 horas).'
   }
 ];
 
@@ -1905,5 +2471,6 @@ export const CATEGORY_LABELS: Record<string, string> = {
   diabetes: 'Diabetes & Endócrino',
   respiratorio: 'Respiratório & Alergia',
   gastro: 'Gastroenterologia',
-  snc: 'SNC & Psiquiatria'
+  snc: 'SNC & Psiquiatria',
+  outros: 'Ginecologia & Outros'
 };

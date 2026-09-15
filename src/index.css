@@ -2,20 +2,13 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-vanilla-50: #FDFCF7;
-  --color-vanilla-100: #F7F3E8;
-  --color-vanilla-200: #EFE8D4;
-  --color-vanilla-300: #E3D7BD;
-  --color-vanilla-400: #CEBF9C;
-  --color-vanilla-500: #B8A375;
-  --color-vanilla-900: #3D3526;
-
+  /* Paleta creme: mantidos APENAS os tons com uso real nos componentes
+     (cream-50/100/200/300). Tons vanilla-* e cream-400/900 foram removidos:
+     nenhum uso em src/. */
   --color-cream-50: #FCFAF5;
   --color-cream-100: #F5EFE6;
   --color-cream-200: #ECE3D4;
   --color-cream-300: #DFD3BF;
-  --color-cream-400: #C9B89C;
-  --color-cream-900: #383024;
 
   --color-navy-700: #24344D;
   --color-navy-800: #1B283C;
@@ -152,6 +145,9 @@
     --accent-hover: #0A111C;
     --nav-accent: #FFFFFF;
 
+    /* Cor de texto do botão primário (inversão por tema sem !important) */
+    --btn-primary-fg: #FDFBF7;
+
     --accent-primary: #142032;
     --accent-primary-hover: #0A111C;
     --accent-primary-subtle: rgba(20, 32, 50, 0.08);
@@ -245,6 +241,8 @@
     --accent: #F5EFE6;
     --accent-hover: #FFFFFF;
     --nav-accent: #F5EFE6;
+
+    --btn-primary-fg: #0A111C;
 
     --accent-primary: #F5EFE6;
     --accent-primary-hover: #FFFFFF;
@@ -341,7 +339,8 @@ body {
   color: var(--text-inverse);
   font-size: 1rem;
   font-weight: 800;
-  box-shadow: 0 4px 12px rgba(0, 180, 216, 0.35), var(--tactile-bevel);
+  /* Sombra neutra navy: o ciano antigo (rgba(0,180,216,...)) destoava da paleta */
+  box-shadow: 0 4px 12px -2px rgba(10, 17, 28, 0.35), var(--tactile-bevel);
   border-top: 1px solid rgba(255, 255, 255, 0.4);
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 }
@@ -475,14 +474,20 @@ body {
 .tactile-card {
   background-color: var(--bg-surface);
   border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: var(--shadow-projected), var(--tactile-card-bevel);
+  /* Fonte ÚNICA de elevação do card estático (consolidação das 3 definições
+     anteriores). Card estático NÃO tem hover de elevação — apenas
+     .tactile-card-interactive levanta. */
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 4%),
+    0 3px 6px -2px rgb(15 23 42 / 5%),
+    0 8px 18px -6px rgb(15 23 42 / 6%),
+    inset 0 1px 0 rgb(255 255 255 / 85%);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   position: relative;
   overflow: hidden;
   isolation: isolate;
   transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
               border-color 0.22s ease;
 }
 
@@ -500,22 +505,15 @@ body {
 .dark .tactile-card {
   background-color: var(--bg-surface);
   border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 30%),
+    0 3px 6px -2px rgb(0 0 0 / 35%),
+    0 8px 18px -6px rgb(0 0 0 / 45%),
+    inset 0 1px 0 rgb(255 255 255 / 6%);
 }
 
 .dark .tactile-card::after {
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-}
-
-.tactile-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-projected), 0 20px 40px -10px rgba(0,0,0,0.15), var(--tactile-card-bevel);
-}
-
-.dark .tactile-card:hover {
-  box-shadow: 
-    0 4px 14px rgba(0, 0, 0, 0.6),
-    0 24px 50px -6px rgba(0, 0, 0, 0.75),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 /* 3. Z-2 Interactive Elevated Cards & Controls */
@@ -574,7 +572,7 @@ body {
 .btn-tactile-primary,
 .btn-primary-tactile {
   background: linear-gradient(180deg, #1E2D44 0%, #121D2C 100%);
-  color: #FDFBF7 !important;
+  color: var(--btn-primary-fg);
   border: none;
   box-shadow: 
     0 4px 12px -2px rgba(10, 17, 28, 0.3),
@@ -618,7 +616,7 @@ body {
 .dark .btn-tactile-primary,
 .dark .btn-primary-tactile {
   background: linear-gradient(180deg, #FFFFFF 0%, #EFE7DA 100%);
-  color: #0A111C !important;
+  color: var(--btn-primary-fg);
   border: none;
   box-shadow: 
     0 4px 14px -2px rgba(0, 0, 0, 0.35),
@@ -646,7 +644,7 @@ body {
 
 .tactile-btn-success {
   background: linear-gradient(180deg, #10B981 0%, #059669 100%);
-  color: #FFFFFF !important;
+  color: #FFFFFF;
   border: none;
   box-shadow: 
     0 4px 12px -2px rgba(16, 185, 129, 0.35),
@@ -1140,7 +1138,7 @@ html {
   border: none;
   border-radius: 12px;
   background: linear-gradient(180deg, #1C2B42 0%, #101B2B 100%);
-  color: #FDFBF7 !important;
+  color: var(--btn-primary-fg);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1163,7 +1161,7 @@ html {
 }
 .clinical-button.secondary {
   background: rgba(0, 0, 0, 0.04);
-  color: var(--text-main) !important;
+  color: var(--text-main);
   border: 1px solid transparent;
   box-shadow: none;
 }
@@ -1172,13 +1170,13 @@ html {
 }
 .dark .clinical-button {
   background: linear-gradient(180deg, #FFFFFF 0%, #EFE7DA 100%);
-  color: #0A111C !important;
+  color: var(--btn-primary-fg);
   border: none;
   box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.35);
 }
 .dark .clinical-button.secondary {
   background: rgba(255, 255, 255, 0.06);
-  color: var(--text-main) !important;
+  color: var(--text-main);
   border: 1px solid transparent;
   box-shadow: none;
 }
@@ -1187,13 +1185,6 @@ html {
 }
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible {
   outline: 3px solid #0284c7 !important; outline-offset: 3px;
-}
-.tactile-card {
-  box-shadow:
-    0 1px 2px rgb(15 23 42 / 4%),
-    0 3px 6px -2px rgb(15 23 42 / 5%),
-    0 8px 18px -6px rgb(15 23 42 / 6%),
-    inset 0 1px 0 rgb(255 255 255 / 85%);
 }
 .icon-sculpted { filter: none !important; }
 .panel-projected-top, .shadow-tactile-btn {

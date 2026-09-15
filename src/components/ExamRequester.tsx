@@ -22,7 +22,6 @@ interface ExamRequesterProps {
   patient: Patient;
   selectedExams: ExamItem[];
   onUpdateSelectedExams?: (exams: ExamItem[]) => void;
-  onUpdateExams?: (exams: ExamItem[]) => void;
   clinicalIndication: string;
   onUpdateClinicalIndication: (text: string) => void;
   onNavigateToPrint: () => void;
@@ -35,7 +34,6 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   patient,
   selectedExams = [],
   onUpdateSelectedExams,
-  onUpdateExams,
   clinicalIndication,
   onUpdateClinicalIndication,
   onNavigateToPrint,
@@ -50,7 +48,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   const [activeKitModal, setActiveKitModal] = useState<ExamPackage | null>(null);
   const [selectedKitExamIds, setSelectedKitExamIds] = useState<string[]>([]);
 
-  const updateExams = onUpdateSelectedExams || onUpdateExams || (() => {});
+  const updateExams = onUpdateSelectedExams || (() => {});
 
   const categories = useMemo(() => {
     const list = Array.from(new Set(EXAM_CATALOG.map(e => e.category)));

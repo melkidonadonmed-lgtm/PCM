@@ -23,7 +23,8 @@ import {
   Building2,
   AlertTriangle,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  X
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -79,14 +80,12 @@ interface PrintPreviewProps {
   doctor: DoctorProfile;
   patient: Patient;
   prescriptionItems?: PrescriptionItem[];
-  exams?: ExamItem[];
   selectedExams?: ExamItem[];
   examIndication?: string;
   certificate?: MedicalCertificate;
   referral?: MedicalReferral;
   initialDocType?: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral';
   onNavigateBack?: () => void;
-  onBack?: () => void;
   onClearPrescription?: () => void;
   onResetAll?: () => void;
   onOpenDoctorModal?: () => void;
@@ -102,7 +101,6 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   doctor,
   patient,
   prescriptionItems = [],
-  exams = [],
   selectedExams = [],
   examIndication = '',
   certificate = {
@@ -132,7 +130,6 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   },
   initialDocType = 'prescription',
   onNavigateBack,
-  onBack,
   onClearPrescription,
   onResetAll,
   onOpenPatientModal,
@@ -142,12 +139,13 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   onNavigateToDocuments,
   printOrigin
 }) => {
-  const effectiveExams = exams.length > 0 ? exams : selectedExams;
-  const handleBack = onNavigateBack || onBack || (() => {});
+  const effectiveExams = selectedExams;
+  const handleBack = onNavigateBack || (() => {});
   const [docType, setDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>(initialDocType);
   const [copiedLink, setCopiedLink] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
+  const [exportError, setExportError] = useState(false);
   const [fitToMobile, setFitToMobile] = useState(true);
 
   // Estados para Controle Especial (1ª e 2ª vias + paginação de até 3 itens/folha)
@@ -267,6 +265,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       setTimeout(() => setExportSuccess(false), 3000);
     } catch (err) {
       console.error('Erro ao exportar PDF via jsPDF & autoTable:', err);
+      // Falha não pode ser silenciosa: o médico precisa saber que o arquivo não saiu.
+      setExportError(true);
+      setTimeout(() => setExportError(false), 4000);
     } finally {
       setIsExportingPdf(false);
     }
@@ -275,47 +276,48 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   // Formatted text builder for WhatsApp and Clipboard
   const getFormattedDocumentText = (): string => {
     const dateStr = new Date().toLocaleDateString('pt-BR');
-    const docLine = docName !== 'Dr(a). Médico(a)' ? `👨‍⚕️ *${docName}* — CRM ${docCrm}/${docCrmState}\n` : '👨‍⚕️ *Documento Médico*\n';
-    const patientLine = patientName !== 'Não identificado' ? `👤 *Paciente:* ${patientName}${patientWeight ? ` (${patientWeight} kg)` : ''}\n` : '';
-    const header = `📋 *DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}📅 *Data:* ${dateStr}\n------------------------------------\n`;
+    // Texto sóbrio, sem emojis: destinatário é documento médico (YMYL).
+    const docLine = docName !== 'Dr(a). Médico(a)' ? `*${docName}* — CRM ${docCrm}/${docCrmState}\n` : '*Documento Médico*\n';
+    const patientLine = patientName !== 'Não identificado' ? `*Paciente:* ${patientName}${patientWeight ? ` (${patientWeight} kg)` : ''}\n` : '';
+    const header = `*DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}*Data:* ${dateStr}\n------------------------------------\n`;
 
     if (docType === 'prescription' || docType === 'special_prescription') {
       const kind = docType === 'prescription' ? 'simple' : 'c1';
       return prescriptionDocuments.filter(d => d.kind === kind).map(d => header + prescriptionDocumentText(d)).join('\n\n');
     } else if (docType === 'certificate') {
-      let text = `${header}📄 *ATESTADO MÉDICO*\n\n`;
+      let text = `${header}*ATESTADO MÉDICO*\n\n`;
       text += `Atesto para os devidos fins que o(a) paciente *${patientName}* esteve sob atendimento médico nesta data (${dateStr}).\n\n`;
       if (certificate?.daysOff) {
-        text += `👉 *Recomendação:* Repouso e afastamento das atividades laborais por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
+        text += `*Recomendação:* Repouso e afastamento das atividades laborais por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
       }
       if (certificate?.includeCID && certificate?.cid10Code) {
-        text += `📌 *CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ' - ' + certificate.cid10Description : ''}\n\n`;
+        text += `*CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ' - ' + certificate.cid10Description : ''}\n\n`;
       }
       if (certificate?.observations) {
-        text += `📝 *Observação:* ${certificate.observations}\n\n`;
+        text += `*Observação:* ${certificate.observations}\n\n`;
       }
       text += `------------------------------------\n_${docName} — CRM ${docCrm}/${docCrmState}_`;
       return text;
     } else if (docType === 'referral') {
-      let text = `${header}🩺 *ENCAMINHAMENTO MÉDICO*\n\n`;
+      let text = `${header}*ENCAMINHAMENTO MÉDICO*\n\n`;
       text += `Ao(À) Colega Especialista em *${referral?.destinationSpecialty || 'Medicina'}*:\n\n`;
       text += `Encaminho o(a) paciente *${patientName}* para avaliação e conduta clínica.\n\n`;
       if (referral?.reason) {
-        text += `📌 *Motivo / Hipótese:* ${referral.reason}\n\n`;
+        text += `*Motivo / Hipótese:* ${referral.reason}\n\n`;
       }
       if (referral?.clinicalSummary) {
-        text += `📝 *Resumo Clínico:* ${referral.clinicalSummary}\n\n`;
+        text += `*Resumo Clínico:* ${referral.clinicalSummary}\n\n`;
       }
       text += `------------------------------------\n_${docName} — CRM ${docCrm}/${docCrmState}_`;
       return text;
     } else if (docType === 'exams') {
-      let text = `${header}🧪 *SOLICITAÇÃO DE EXAMES COMPLEMENTARES*\n\n`;
-      if (exams.length === 0) return '';
-      exams.forEach((ex) => {
+      let text = `${header}*SOLICITAÇÃO DE EXAMES COMPLEMENTARES*\n\n`;
+      if (selectedExams.length === 0) return '';
+      selectedExams.forEach((ex) => {
         text += `• ${ex.name}\n`;
       });
       if (examIndication) {
-        text += `\n📌 *Indicação Clínica:* ${examIndication}\n`;
+        text += `\n*Indicação Clínica:* ${examIndication}\n`;
       }
       text += `\n------------------------------------\n_${docName} — CRM ${docCrm}/${docCrmState}_`;
       return text;
@@ -496,6 +498,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               <>
                 <Check className="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" strokeWidth={2.5} />
                 <span>Baixado com Sucesso!</span>
+              </>
+            ) : exportError ? (
+              <>
+                <X className="w-4 h-4 text-rose-400 shrink-0" strokeWidth={2.5} />
+                <span>Falha ao gerar — tente novamente</span>
               </>
             ) : (
               <>
@@ -1300,6 +1307,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               <>
                 <Check className="w-4 h-4 text-emerald-300" strokeWidth={1.75} />
                 <span>PDF Baixado!</span>
+              </>
+            ) : exportError ? (
+              <>
+                <X className="w-4 h-4 text-rose-300" strokeWidth={2} />
+                <span>Falha ao gerar — tente novamente</span>
               </>
             ) : (
               <>

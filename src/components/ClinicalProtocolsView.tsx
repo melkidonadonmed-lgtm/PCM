@@ -32,7 +32,14 @@ const CATEGORY_ACCENT: { [category: string]: string } = {
   'Cardiovascular': 'rose',
   'Endocrinológica': 'emerald',
   'Gastrointestinal': 'amber',
-  'Ginecológica': 'emerald'
+  'Ginecológica': 'emerald',
+  'Pneumologia': 'primary',
+  'Ortopedia': 'amber',
+  'Neurologia': 'rose',
+  'Psiquiatria': 'emerald',
+  'Alergologia': 'primary',
+  'Dermatologia': 'amber',
+  'Otorrinolaringologia': 'rose'
 };
 
 export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({

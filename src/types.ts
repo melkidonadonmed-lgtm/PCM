@@ -197,6 +197,5 @@ export type ActiveTab =
   | 'certificate' 
   | 'referral' 
   | 'protocols'
-  | 'models'
   | 'print_preview' 
   | 'patients';

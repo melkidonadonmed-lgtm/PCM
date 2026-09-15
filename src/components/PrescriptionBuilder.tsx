@@ -1,7 +1,7 @@
 import { MedicationVoiceSearch } from './MedicationVoiceSearch';
 import { DispensedQuantity } from './DispensedQuantity';
 import { MedicationSearchDialog } from './MedicationSearchDialog';
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useDeferredValue, useRef } from 'react';
 import {
   Plus,
   Trash2,
@@ -189,7 +189,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
   const hasWeight = patientWeight > 0;
   const patientName = patient?.name?.trim() || '';
-  const currentPrescriptionStep = !patientReady ? 1 : items.length > 0 ? 2 : 2;
+
 
   // Auto-reconciliação de itens legados ou incompletos na lista para prevenir discrepâncias e falsos erros
   useEffect(() => {
@@ -440,23 +440,14 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     }
   ];
 
-  // Filter medications based on search and category
-  const filteredMedications = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    return UNIFIED_MEDICATIONS.filter(med => {
-      const matchCat = activeCategory === 'all' || med.category === activeCategory;
-      if (!matchCat) return false;
-      if (!term) return true;
-      return (
-        med.name.toLowerCase().includes(term) ||
-        med.activeIngredient.toLowerCase().includes(term)
-      );
-    });
-  }, [searchTerm, activeCategory]);
+  // Termo diferido: a digitação permanece instantânea (resposta imediata no
+  // input) enquanto a filtragem do catálogo usa o valor adiantado sem travar o
+  // frame atual — busca continua fluida conforme o catálogo cresce.
+  const deferredSearchTerm = useDeferredValue(searchTerm);
 
   // Autocomplete suggestions (Instantâneo A-Z: catálogo completo navegável de A a Z)
   const searchSuggestions = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
+    const term = deferredSearchTerm.trim().toLowerCase();
     let baseList = UNIFIED_MEDICATIONS;
     if (activeCategory !== 'all') {
       baseList = baseList.filter(med => med.category === activeCategory);
@@ -471,7 +462,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       med.name.toLowerCase().includes(term) ||
       med.activeIngredient.toLowerCase().includes(term)
     ).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
-  }, [searchTerm, activeCategory]);
+  }, [deferredSearchTerm, activeCategory]);
+
+  // Piso de renderização: a lista A-Z do catálogo completo não deve montar
+  // milhares de nós no dropdown. Renderiza o topo já relevante; o termo digitado
+  // refina a busca. (Somente quando não há termo — com termo os resultados
+  // costumam caber todos.)
+  const SUGGESTION_RENDER_CAP = 60;
+  const renderedSuggestions = searchTerm.trim()
+    ? searchSuggestions
+    : searchSuggestions.slice(0, SUGGESTION_RENDER_CAP);
 
   // Inserção direta de medicamento em 1 clique com posologia padrão
   const handleFastAddMedication = (med: UnifiedMedication) => {
@@ -1031,6 +1031,42 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           )}
         </div>
       </div>
+
+      {/* Empty state com CTA direto: a receita vazia ganha um convite de 1 clique
+          para iniciar a busca de medicamento (mesmo comportamento do Ctrl+K). */}
+      {items.length === 0 && (
+        <section
+          className="flex flex-col items-center justify-center gap-3 px-6 py-10 rounded-2xl bg-slate-50 dark:bg-navy-900/60 border border-dashed border-slate-300 dark:border-navy-700 text-center"
+          aria-label="Receita vazia"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-navy-900/10 dark:bg-white/10 text-navy-900 dark:text-cream-100 flex items-center justify-center">
+            <Plus className="w-6 h-6" strokeWidth={2} />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-slate-900 dark:text-cream-50">Receita vazia</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Busque pelo nome, princípio ativo ou apresentação para começar
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setMobileSection('composer');
+              if (window.innerWidth < 1024) { setMobileSearchOpen(true); return; }
+              searchInputRef.current?.focus();
+              searchInputRef.current?.select();
+              setShowSuggestions(true);
+            }}
+            className="btn-tactile-primary min-h-[44px] px-5 py-2 rounded-xl text-sm font-bold flex items-center gap-2 cursor-pointer active:scale-95"
+          >
+            <Plus className="w-4 h-4" strokeWidth={2.5} />
+            <span>Adicionar primeiro medicamento</span>
+          </button>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500">
+            Atalho: <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-navy-800 border border-slate-300 dark:border-navy-700 font-mono text-[9px] text-slate-600 dark:text-slate-300">Ctrl+K</kbd>
+          </p>
+        </section>
+      )}
       
       {/* Barra Rápida de Identificação do Paciente (Contexto Clínico Unificado) */}
       <section className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-white/10 shadow-tactile dark:shadow-tactile-navy space-y-3">
@@ -1252,7 +1288,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             <div ref={searchContainerRef} className="relative">
               <label htmlFor="med-search-input" className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 <span className="flex items-center gap-1.5">
-                  Buscar no catálogo (370+ fármacos)
+                  Buscar no catálogo ({UNIFIED_MEDICATIONS.length} fármacos)
                 </span>
                 <span className="text-[10px] font-semibold text-slate-400 hidden sm:inline-flex items-center gap-1">
                   Atalho: <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-navy-800 border border-slate-300 dark:border-navy-700 font-mono text-[9px] text-slate-600 dark:text-slate-300">Ctrl+K</kbd> ou <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-navy-800 border border-slate-300 dark:border-navy-700 font-mono text-[9px] text-slate-600 dark:text-slate-300">/</kbd>
@@ -1297,7 +1333,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     <span className="text-[10px] text-slate-400">Clique no nome para editar ou em + Inserir</span>
                   </div>
 
-                  {searchSuggestions.map(med => (
+                  {renderedSuggestions.map(med => (
                     <div
                       key={med.id}
                       className="w-full min-h-[50px] px-3 py-2 hover:bg-sky-50/60 dark:hover:bg-navy-800/80 flex items-center justify-between gap-2 transition group"
@@ -1328,7 +1364,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   ))}
 
                   <div className="p-2 text-center text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-50/50 dark:bg-navy-950/50">
-                    Fim do catálogo ({searchSuggestions.length} fármacos)
+                    {searchSuggestions.length > renderedSuggestions.length
+                      ? `Mostrando os primeiros ${renderedSuggestions.length} de ${searchSuggestions.length} fármacos — digite para refinar`
+                      : `Fim do catálogo (${searchSuggestions.length} fármacos)`}
                   </div>
                 </div>
               )}
