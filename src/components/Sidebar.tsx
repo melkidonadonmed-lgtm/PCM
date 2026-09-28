@@ -45,6 +45,8 @@ interface SidebarProps {
   onOpenDoctorModal?: () => void;
   onOpenPatientModal?: () => void;
   onOpenBackupModal?: () => void;
+  isInstallable?: boolean;
+  onInstallApp?: () => void;
   onClearPrescription?: () => void;
   onClearPatient?: () => void;
   onResetAll?: () => void;
@@ -68,6 +70,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenDoctorModal,
   onOpenPatientModal,
   onOpenBackupModal,
+  isInstallable = false,
+  onInstallApp,
   onClearPrescription,
   onClearPatient,
   onResetAll
@@ -489,6 +493,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span>Backup / Portabilidade</span>
                 </button>
               )}
+
+              {/* Instalação PWA Offline */}
+              {isInstallable && onInstallApp && (
+                <button
+                  type="button"
+                  onClick={onInstallApp}
+                  className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-300 hover:text-emerald-200 hover:bg-emerald-500/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none animate-pulse"
+                  title="Instalar PresCMed como aplicativo no computador ou celular"
+                >
+                  <Download className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>Instalar App Offline</span>
+                </button>
+              )}
             </div>
           )}
 
@@ -502,6 +519,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               aria-label="Backup e Portabilidade"
             >
               <Database className="w-5 h-5" />
+            </button>
+          )}
+
+          {/* Install PWA Icon Button in Collapsed Mode */}
+          {!isOpen && isInstallable && onInstallApp && (
+            <button
+              type="button"
+              onClick={onInstallApp}
+              className="w-11 h-11 mx-auto rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none shadow-tactile-sm animate-pulse"
+              title="Instalar PresCMed no dispositivo (100% Offline)"
+              aria-label="Instalar App Offline"
+            >
+              <Download className="w-5 h-5" />
             </button>
           )}
 

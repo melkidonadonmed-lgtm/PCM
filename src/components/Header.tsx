@@ -8,7 +8,8 @@ import {
   ChevronRight, 
   UserPlus,
   FileText,
-  Database
+  Database,
+  Download
 } from 'lucide-react';
 import { Patient } from '../types';
 
@@ -24,6 +25,8 @@ interface HeaderProps {
   onQuickWeightChange?: (newWeight: number) => void;
   onNavigateToEditor?: () => void;
   onOpenBackupModal?: () => void;
+  isInstallable?: boolean;
+  onInstallApp?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -37,7 +40,9 @@ export const Header: React.FC<HeaderProps> = ({
   selectedExamsCount = 0,
   onQuickWeightChange,
   onNavigateToEditor,
-  onOpenBackupModal
+  onOpenBackupModal,
+  isInstallable = false,
+  onInstallApp
 }) => {
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
   const hasPatient = Boolean(patient?.name?.trim());
@@ -195,6 +200,19 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Backup e Restauração de Dados"
             >
               <Database className="w-5 h-5" strokeWidth={1.75} />
+            </button>
+          )}
+
+          {isInstallable && onInstallApp && (
+            <button
+              type="button"
+              onClick={onInstallApp}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-tactile-sm active:scale-95 bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none animate-pulse"
+              title="Instalar PresCMed no dispositivo (Acesso rápido 100% offline)"
+              aria-label="Instalar Aplicativo PresCMed"
+            >
+              <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={2} />
+              <span className="hidden md:inline">Instalar App</span>
             </button>
           )}
 

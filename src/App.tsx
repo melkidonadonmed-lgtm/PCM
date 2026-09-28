@@ -10,6 +10,7 @@ import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
 import { ActiveTab, PrescriptionItem, Patient } from './types';
 import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
 import { useWorkContext } from './hooks/useWorkContext';
+import { usePwaInstall } from './hooks/usePwaInstall';
 
 // Carregamento sob demanda (code-splitting) dos módulos pesados de PDF, editor e modais
 const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
@@ -136,6 +137,9 @@ export default function App() {
     rqe: doctor.rqe
   });
 
+  // Capacidade de instalação do PWA
+  const { isInstallable, installApp } = usePwaInstall();
+
   // Manipuladores de ação
   const handleUpdatePatientWeight = (newWeight: number) => {
     setPatient(prev => ({ ...prev, weightKg: newWeight }));
@@ -184,6 +188,8 @@ export default function App() {
         onQuickWeightChange={handleUpdatePatientWeight}
         onNavigateToEditor={() => setActiveTab('editor')}
         onOpenBackupModal={() => setIsBackupModalOpen(true)}
+        isInstallable={isInstallable}
+        onInstallApp={installApp}
       />
 
       {/* Main Responsive Body Layout */}
@@ -218,6 +224,8 @@ export default function App() {
           onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
           onOpenPatientModal={() => setIsPatientModalOpen(true)}
           onOpenBackupModal={() => setIsBackupModalOpen(true)}
+          isInstallable={isInstallable}
+          onInstallApp={installApp}
           onClearPrescription={handleClearPrescription}
           onClearPatient={handleClearPatient}
           onResetAll={handleResetAll}
