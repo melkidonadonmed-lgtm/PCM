@@ -60,6 +60,7 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+          globIgnores: ['**/vendor-firebase-*.js'],
           cleanupOutdatedCaches: true,
           clientsClaim: true,
           skipWaiting: true,
@@ -126,6 +127,9 @@ export default defineConfig(() => {
             }
             if (id.includes('node_modules/@tiptap') || id.includes('node_modules/prosemirror-')) {
               return 'vendor-tiptap';
+            }
+            if (id.includes('node_modules/firebase') || id.includes('node_modules/@firebase')) {
+              return 'vendor-firebase';
             }
           },
         },

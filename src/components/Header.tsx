@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Menu, 
   Sun, 
@@ -9,9 +9,13 @@ import {
   UserPlus,
   FileText,
   Database,
-  Download
+  Download,
+  Cloud,
+  LogOut
 } from 'lucide-react';
 import { Patient } from '../types';
+import { cloudAuthService, type DoctorUserProfile } from '../services/cloud/cloudAuthService';
+import { cloudSyncManager, type SyncStatus } from '../services/cloud/cloudSyncManager';
 
 interface HeaderProps {
   darkMode: boolean;
@@ -28,6 +32,129 @@ interface HeaderProps {
   isInstallable?: boolean;
   onInstallApp?: () => void;
 }
+
+export const CloudAuthButton: React.FC = () => {
+  const [user, setUser] = useState<DoctorUserProfile | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+
+  useEffect(() => {
+    let unsubscribeAuth: (() => void) | undefined;
+    cloudAuthService.subscribe((profile) => {
+      setUser(profile);
+    }).then(unsub => {
+      unsubscribeAuth = unsub;
+    });
+
+    const unsubscribeSync = cloudSyncManager.subscribe((status) => {
+      setSyncStatus(status);
+    });
+
+    return () => {
+      if (unsubscribeAuth) unsubscribeAuth();
+      unsubscribeSync();
+    };
+  }, []);
+
+  const handleToggleAuth = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      if (user) {
+        await cloudAuthService.logout();
+      } else {
+        await cloudAuthService.loginWithGoogle();
+      }
+    } catch (error) {
+      console.error('Falha na autenticação Google:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (user) {
+    return (
+      <div 
+        className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-xl border text-xs shadow-tactile-sm transition-all bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)]"
+        title={`Conectado à nuvem: ${user.email || user.displayName} | Status: ${syncStatus}`}
+      >
+        {user.photoURL ? (
+          <img 
+            src={user.photoURL} 
+            alt={user.displayName || 'Médico'} 
+            className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center text-[10px] text-white font-bold flex-shrink-0">
+            {user.displayName ? user.displayName[0].toUpperCase() : 'M'}
+          </div>
+        )}
+        <div className="flex flex-col items-start leading-tight min-w-0">
+          <span className="font-semibold text-[11px] max-w-[85px] sm:max-w-[120px] truncate hidden xs:inline">
+            {user.displayName?.split(' ')[0] || 'Dr(a).'}
+          </span>
+          <div className="hidden sm:flex items-center gap-1 text-[9px]">
+            {syncStatus === 'syncing' && (
+              <span className="text-sky-500 font-medium flex items-center gap-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping" />
+                Sincronizando...
+              </span>
+            )}
+            {syncStatus === 'synced' && (
+              <span className="text-emerald-500 font-medium flex items-center gap-0.5" title="Modelos e postos sincronizados">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Sincronizado
+              </span>
+            )}
+            {syncStatus === 'offline' && (
+              <span className="text-amber-500 font-medium flex items-center gap-0.5" title="Operando localmente">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                Modo Local
+              </span>
+            )}
+            {syncStatus === 'error' && (
+              <span className="text-rose-500 font-medium flex items-center gap-0.5" title="Erro ao sincronizar na nuvem">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                Erro Sync
+              </span>
+            )}
+            {syncStatus === 'idle' && (
+              <span className="text-slate-400 font-normal">
+                Pronto
+              </span>
+            )}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleToggleAuth}
+          className="p-1 hover:text-rose-500 rounded transition-colors text-slate-400 cursor-pointer ml-0.5"
+          title="Desconectar da nuvem"
+          aria-label="Desconectar da Nuvem"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleToggleAuth}
+      disabled={loading}
+      className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-slate-600 dark:text-slate-300 hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+      title="Conectar Conta Google para sincronização em nuvem (opcional)"
+      aria-label="Conectar Nuvem"
+    >
+      <Cloud className={`w-4 h-4 text-sky-600 dark:text-sky-400 ${loading ? 'animate-pulse' : ''}`} strokeWidth={1.75} />
+      <span className="hidden lg:inline text-[11px] font-medium text-slate-500 dark:text-slate-400">
+        {loading ? 'Conectando...' : 'Nuvem'}
+      </span>
+    </button>
+  );
+};
 
 export const Header: React.FC<HeaderProps> = ({
   darkMode,
@@ -190,6 +317,8 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden md:inline">Editor de Laudos</span>
             </button>
           )}
+
+          <CloudAuthButton />
 
           {onOpenBackupModal && (
             <button

@@ -31,11 +31,13 @@ npm ci             # instalação reproduzível a partir do package-lock.json
 npm run dev        # dev server Vite na porta 3000, host 0.0.0.0
 npm run build      # build de produção em dist/
 npm run preview    # serve o build de produção
-npm run lint       # type-check: tsc --noEmit (única forma de verificação)
+npm run lint       # type-check: tsc --noEmit
+npm run test       # testes unitários e clínicos via Vitest
+npm run test:watch # modo contínuo de testes Vitest
 npm run clean      # remove dist/ e server.js
 ```
 
-**Testes:** não existe framework de testes configurado (sem Vitest/Jest/Playwright, sem arquivos de teste). A verificação disponível é `npm run lint` (TypeScript). Ao modificar lógica crítica (ex.: cálculo de doses), valide manualmente na UI via `npm run dev`.
+**Testes:** o projeto utiliza **Vitest** integrado ao Vite. A suíte cobre cálculos pediátricos (`doseCalculator.test.ts`), conformidade com a Portaria SVS/MS 344/98 (`sanitaryCompliancePortaria344.test.ts`) e consentimento de CID-10 conforme Resoluções CFM 1.658/2002 e 1.819/2007 (`cfmConsentCid10.test.ts`). Ao modificar lógica de cálculo ou conformidade sanitária, execute `npm run test` e `npm run lint`.
 
 Para alterações de UI, impressão ou PDF, use a skill
 `ui-pdf-validation`. Para qualquer alteração clínica, use
@@ -71,6 +73,11 @@ src/
     adultMeds.ts        # ~32 medicamentos adultos com posologia
     examCatalog.ts      # ~43 exames
     cidCatalog.ts       # Catálogo CID-10 (CIDItem: code, description, category, keywords)
+  services/             # Persistência IndexedDB e nuvem híbrida
+    db.ts               # Dexie.js v2 (workContexts e savedDocuments)
+    backupService.ts    # Portabilidade .pcm.json
+    cloud/              # Firebase Auth e Sincronização Zero-Knowledge lazy
+  __tests__/            # Testes Vitest (doses, Portaria 344/98 e CFM 1.658/2002)
   utils/
     doseCalculator.ts   # calculatePediatricDose() e generateScheduleTimes()
     pdfGenerator.ts     # generateMedicalPDF() — gera os 5 tipos de documento em PDF
