@@ -207,6 +207,35 @@ export interface WorkContext {
   updatedAt: number;
 }
 
+export type LogoPosition = 'top-left' | 'top-center' | 'top-right' | 'header-left' | 'header-right' | 'free';
+
+export interface DocumentHeaderConfig {
+  doctorName?: string;
+  doctorCrm?: string;
+  doctorSpecialty?: string;
+  clinicName?: string;
+  clinicAddress?: string;
+  badgeText?: string;
+  dateText?: string;
+  showHeader?: boolean;
+  showFooter?: boolean;
+  showPatientBanner?: boolean;
+  patientCustomText?: string;
+  footerDocName?: string;
+  footerCrm?: string;
+  footerSpecialty?: string;
+  footerSubtext?: string;
+}
+
+export interface DocumentLogoConfig {
+  dataUrl?: string;
+  position: LogoPosition;
+  x?: number; // percentual horizontal 0-100 na folha A4
+  y?: number; // percentual vertical 0-100 na folha A4
+  size: 'sm' | 'md' | 'lg' | 'xl' | number;
+  visible: boolean;
+}
+
 export interface SavedDocument {
   id: string;
   title: string;
@@ -214,6 +243,9 @@ export interface SavedDocument {
   contentHtml: string;
   contextId: string; // Vínculo com a UBS ou Policlínica ativa
   isTemplate: boolean; // Se é um modelo reutilizável
+  headerConfig?: DocumentHeaderConfig;
+  logoConfig?: DocumentLogoConfig;
+  typography?: 'serif' | 'sans' | 'inter';
   createdAt: number;
   updatedAt: number;
 }

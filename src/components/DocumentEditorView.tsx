@@ -31,10 +31,28 @@ import {
   RotateCcw,
   Loader2,
   Building2,
-  AlertCircle
+  Move,
+  Image as ImageIcon,
+  Save,
+  Plus,
+  Eye,
+  EyeOff,
+  Copy,
+  LayoutTemplate
 } from 'lucide-react';
-import { DoctorProfile, Patient, WorkContext, PrescriptionItem, WatermarkType } from '../types';
-import { db, SavedDocument, initializeDefaultTemplates } from '../services/db';
+import { 
+  DoctorProfile, 
+  Patient, 
+  WorkContext, 
+  PrescriptionItem, 
+  WatermarkType,
+  LogoPosition,
+  DocumentHeaderConfig,
+  DocumentLogoConfig,
+  SavedDocument
+} from '../types';
+import { db, initializeDefaultTemplates } from '../services/db';
+import { PRESET_LOGOS } from '../data/presetAssets';
 import LogoGeneratorModal from './LogoGeneratorModal';
 import WatermarkOverlay from './WatermarkOverlay';
 import WatermarkSelector from './WatermarkSelector';
@@ -60,6 +78,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   const [typography, setTypography] = useState<'serif' | 'sans' | 'inter'>('serif');
   const [logoUploading, setLogoUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   // Estados de Persistência Local-First & Auto-Save
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -68,6 +87,64 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const activeContextRef = useRef(activeContext);
   activeContextRef.current = activeContext;
+
+  // Estados do Modelo Ativo
+  const [currentModel, setCurrentModel] = useState<{
+    id: string | null;
+    title: string;
+    isPreset: boolean;
+  }>({
+    id: null,
+    title: 'Documento Livre (Rascunho)',
+    isPreset: false
+  });
+  const [isEditingModelTitle, setIsEditingModelTitle] = useState(false);
+  const [tempModelTitle, setTempModelTitle] = useState('');
+
+  // Estados do Cabeçalho e Rodapé Editáveis em Tempo Real
+  const buildDefaultHeader = useCallback((): DocumentHeaderConfig => {
+    const docClinic = activeContext?.clinicName || doctor?.clinicName?.trim() || 'Rede de Atenção à Saúde';
+    const docAddress = activeContext?.clinicAddress || doctor?.address?.trim() || 'Unidade Básica de Saúde';
+    const docCrm = activeContext?.doctorCredentials?.crm || doctor?.crm || '------';
+    const docCrmState = activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP';
+    const docRqe = activeContext?.doctorCredentials?.rqe || doctor?.rqe;
+    const docSpecialty = activeContext?.doctorCredentials?.specialty || doctor?.specialty || 'Clínica Médica';
+    const docName = doctor?.name || 'Dr(a). Médico(a)';
+    const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    return {
+      doctorName: docName,
+      doctorCrm: `CRM-${docCrmState} ${docCrm}${docRqe ? ` • RQE ${docRqe}` : ''}`,
+      doctorSpecialty: docSpecialty,
+      clinicName: docClinic,
+      clinicAddress: `${docAddress}${activeContext?.cnes && activeContext.documentFormatting?.showCnesOnHeader ? ` • CNES: ${activeContext.cnes}` : ''}`,
+      badgeText: 'DOCUMENTO CLÍNICO LIVRE',
+      dateText: today,
+      showHeader: true,
+      showFooter: true,
+      showPatientBanner: true,
+      patientCustomText: '',
+      footerDocName: docName,
+      footerCrm: `Médico(a) — CRM-${docCrmState} ${docCrm}${docRqe ? ` • RQE ${docRqe}` : ''}`,
+      footerSpecialty: docSpecialty,
+      footerSubtext: 'Emitido eletronicamente via PresCMed • Documento em conformidade com as resoluções do CFM'
+    };
+  }, [doctor, activeContext]);
+
+  const [headerConfig, setHeaderConfig] = useState<DocumentHeaderConfig>(buildDefaultHeader);
+
+  // Estados da Logo em Tempo Real (Posição Livre, Arrastável, Alinhamento, Tamanho)
+  const [logoConfig, setLogoConfig] = useState<DocumentLogoConfig>({
+    dataUrl: activeContext?.logoDataUrl || undefined,
+    position: (activeContext?.logoAlignment === 'center' ? 'top-center' : activeContext?.logoAlignment === 'right' ? 'top-right' : 'top-left'),
+    x: 4, // percentual horizontal na folha A4
+    y: 3, // percentual vertical na folha A4
+    size: 'md',
+    visible: true
+  });
+  const [isDraggingLogo, setIsDraggingLogo] = useState(false);
+  const [isLogoMenuOpen, setIsLogoMenuOpen] = useState(false);
+  const [logoSelected, setLogoSelected] = useState(false);
 
   // Estados do Criador de Logos, Drawer de Modelos & Modal de Salvar
   const [isLogoGeneratorOpen, setIsLogoGeneratorOpen] = useState(false);
@@ -130,7 +207,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     return parts.join(' | ') || '<strong>Paciente:</strong> Não identificado';
   }, []);
 
-  // Interpolação de tags dinâmicas: {{paciente_nome}}, {{paciente_idade}}, {{medicamentos_prescritos}}, {{data_atendimento}}
+  // Interpolação de tags dinâmicas
   const interpolateMedicalTags = useCallback((rawHtml: string): string => {
     const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
     const pName = patient?.name?.trim() || '______________________________';
@@ -180,8 +257,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     <p><strong>Recomendações Clínicas:</strong> Repouso, hidratação oral vigorosa (mínimo 2 litros de água/dia) e retorno imediato ao serviço se sinais de alarme ou piora respiratória.</p>
   `;
 
-  // Função para salvar rascunho com debounce de 800ms no IndexedDB
-  const triggerAutoSave = useCallback((editorInstance: any) => {
+  // Função para salvar rascunho com debounce no IndexedDB
+  const triggerAutoSave = useCallback((editorInstance: any, updatedHeader?: DocumentHeaderConfig, updatedLogo?: DocumentLogoConfig) => {
     if (!isDraftRestoredRef.current) return;
     setSaveStatus('saving');
 
@@ -189,18 +266,24 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       clearTimeout(saveTimerRef.current);
     }
 
+    const currentHeader = updatedHeader || headerConfig;
+    const currentLogo = updatedLogo || logoConfig;
+
     saveTimerRef.current = setTimeout(async () => {
       try {
-        const json = editorInstance.getJSON();
-        const html = editorInstance.getHTML();
+        const json = editorInstance?.getJSON?.() || null;
+        const html = editorInstance?.getHTML?.() || '';
         const now = Date.now();
         await db.savedDocuments.put({
           id: 'draft-current',
-          title: 'Rascunho Automático',
+          title: currentModel.title || 'Rascunho Automático',
           contentJson: json,
           contentHtml: html,
           contextId: activeContextRef.current?.id || 'global',
           isTemplate: false,
+          headerConfig: currentHeader,
+          logoConfig: currentLogo,
+          typography,
           createdAt: now,
           updatedAt: now
         });
@@ -212,8 +295,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         console.error('Falha no auto-save do rascunho:', err);
         setSaveStatus('idle');
       }
-    }, 800);
-  }, []);
+    }, 600);
+  }, [headerConfig, logoConfig, typography, currentModel.title]);
 
   const editor = useEditor({
     extensions: [
@@ -228,7 +311,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     content: '',
     editorProps: {
       attributes: {
-        class: 'outline-none focus:outline-none min-h-[480px] leading-relaxed text-sm sm:text-base selection:bg-sky-200 dark:selection:bg-sky-800'
+        class: 'outline-none focus:outline-none min-h-[460px] leading-relaxed text-sm sm:text-base selection:bg-sky-200 dark:selection:bg-sky-800'
       }
     },
     onUpdate: ({ editor: ed }) => {
@@ -251,12 +334,29 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             } else {
               editor.commands.setContent(draft.contentHtml);
             }
+            if (draft.headerConfig) {
+              setHeaderConfig(draft.headerConfig);
+            }
+            if (draft.logoConfig) {
+              setLogoConfig(draft.logoConfig);
+            }
+            if (draft.typography) {
+              setTypography(draft.typography);
+            }
+            if (draft.title && draft.title !== 'Rascunho Automático') {
+              setCurrentModel({
+                id: null,
+                title: draft.title,
+                isPreset: false
+              });
+            }
             setLastSavedTime(
               new Date(draft.updatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
             );
             setSaveStatus('saved');
           } else {
             editor.commands.setContent(initialContent);
+            setHeaderConfig(buildDefaultHeader());
             setSaveStatus('idle');
           }
         }
@@ -280,7 +380,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         clearTimeout(saveTimerRef.current);
       }
     };
-  }, [editor]);
+  }, [editor, buildDefaultHeader]);
 
   // Carregar lista de modelos salvos do IndexedDB
   const loadSavedTemplates = useCallback(async () => {
@@ -307,7 +407,63 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     loadSavedTemplates();
   }, [loadSavedTemplates]);
 
-  // Ação: Salvar como modelo personalizado
+  // Atualização de campos do cabeçalho em tempo real
+  const handleHeaderFieldChange = (field: keyof DocumentHeaderConfig, value: any) => {
+    setHeaderConfig(prev => {
+      const next = { ...prev, [field]: value };
+      if (editor) triggerAutoSave(editor, next, logoConfig);
+      return next;
+    });
+  };
+
+  // Restaurar dados do médico cadastrado no perfil
+  const handleResetHeaderFromProfile = () => {
+    const fresh = buildDefaultHeader();
+    setHeaderConfig(fresh);
+    if (editor) triggerAutoSave(editor, fresh, logoConfig);
+    showToast('Cabeçalho sincronizado com os dados do seu Perfil Médico!');
+  };
+
+  // Ação: Salvar alterações no modelo atual OU abrir modal se for novo
+  const handleSaveModelDirectly = async () => {
+    if (!editor) return;
+
+    if (currentModel.id && !currentModel.isPreset) {
+      // Salva diretamente no modelo ativo
+      try {
+        const now = Date.now();
+        const updatedDoc: SavedDocument = {
+          id: currentModel.id,
+          title: currentModel.title,
+          contentJson: editor.getJSON(),
+          contentHtml: editor.getHTML(),
+          contextId: activeContext?.id || 'global',
+          isTemplate: true,
+          headerConfig,
+          logoConfig,
+          typography,
+          createdAt: now,
+          updatedAt: now
+        };
+        await db.savedDocuments.put(updatedDoc);
+        await loadSavedTemplates();
+        setSaveStatus('saved');
+        setLastSavedTime(
+          new Date(now).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        );
+        showToast(`Modelo "${currentModel.title}" atualizado com sucesso!`);
+      } catch (err) {
+        console.error('Erro ao atualizar modelo existente:', err);
+        alert('Falha ao atualizar modelo no banco local.');
+      }
+    } else {
+      // É um preset ou documento novo sem ID: abre o modal com o título sugerido
+      setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? currentModel.title : '');
+      setIsSaveModelModalOpen(true);
+    }
+  };
+
+  // Ação: Salvar como modelo personalizado (cria novo)
   const handleSaveAsTemplate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editor || !newModelTitle.trim()) return;
@@ -324,12 +480,20 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         contentHtml: editor.getHTML(),
         contextId,
         isTemplate: true,
+        headerConfig,
+        logoConfig,
+        typography,
         createdAt: now,
         updatedAt: now
       };
 
       await db.savedDocuments.put(templateDoc);
       await loadSavedTemplates();
+      setCurrentModel({
+        id: tplId,
+        title: templateDoc.title,
+        isPreset: false
+      });
       setIsSaveModelModalOpen(false);
       setNewModelTitle('');
       setSaveAsGlobal(false);
@@ -343,14 +507,61 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   // Ação: Aplicar um modelo no editor
   const handleApplyTemplate = (tpl: SavedDocument) => {
     if (!editor) return;
+
     if (tpl.contentHtml) {
       editor.commands.setContent(interpolateMedicalTags(tpl.contentHtml));
     } else if (tpl.contentJson) {
       editor.commands.setContent(tpl.contentJson);
     }
+
+    if (tpl.headerConfig) {
+      setHeaderConfig({
+        ...buildDefaultHeader(),
+        ...tpl.headerConfig,
+        // Garante data de hoje se dateText estiver desatualizado
+        dateText: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+      });
+    } else {
+      // Se não tinha headerConfig salvo, define o badge com o título
+      setHeaderConfig(prev => ({
+        ...prev,
+        badgeText: tpl.title.toUpperCase().slice(0, 32)
+      }));
+    }
+
+    if (tpl.logoConfig) {
+      setLogoConfig(tpl.logoConfig);
+    }
+
+    if (tpl.typography) {
+      setTypography(tpl.typography);
+    }
+
+    setCurrentModel({
+      id: tpl.id,
+      title: tpl.title,
+      isPreset: false
+    });
+
     triggerAutoSave(editor);
     setIsModelsDrawerOpen(false);
     showToast(`Modelo "${tpl.title}" carregado na folha A4.`);
+  };
+
+  // Ação: Iniciar novo documento em branco
+  const handleStartNewDocument = () => {
+    if (!editor) return;
+    if (confirm('Deseja iniciar um novo documento em branco na folha A4?')) {
+      editor.commands.setContent('<p><br></p>');
+      setCurrentModel({
+        id: null,
+        title: 'Novo Documento Livre',
+        isPreset: false
+      });
+      setHeaderConfig(buildDefaultHeader());
+      triggerAutoSave(editor);
+      showToast('Folha A4 pronta para novo documento.');
+    }
   };
 
   // Ação: Excluir modelo
@@ -359,6 +570,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     try {
       await db.savedDocuments.delete(id);
       await loadSavedTemplates();
+      if (currentModel.id === id) {
+        setCurrentModel({
+          id: null,
+          title: 'Documento Livre (Rascunho)',
+          isPreset: false
+        });
+      }
       showToast('Modelo excluído.');
     } catch (err) {
       console.error('Erro ao excluir modelo:', err);
@@ -383,6 +601,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           updatedAt: Date.now()
         });
         await loadSavedTemplates();
+        if (currentModel.id === id) {
+          setCurrentModel(prev => ({ ...prev, title: editingTemplateTitle.trim() }));
+        }
       }
       setEditingTemplateId(null);
       setEditingTemplateTitle('');
@@ -392,17 +613,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     }
   };
 
-  // Ação: Limpar canvas e rascunho
-  const handleClearCanvas = async () => {
-    if (!editor) return;
-    if (confirm('Deseja limpar todo o texto da folha A4?')) {
-      editor.commands.clearContent();
-      triggerAutoSave(editor);
-      showToast('Canvas limpo.');
+  // Renomear modelo ativo diretamente na toolbar
+  const handleSaveCurrentModelTitle = () => {
+    if (tempModelTitle.trim()) {
+      setCurrentModel(prev => ({ ...prev, title: tempModelTitle.trim() }));
+      setIsEditingModelTitle(false);
+      if (editor) triggerAutoSave(editor);
+      showToast('Nome do modelo atualizado.');
     }
   };
 
-  // Modelos Rápidos de Fábrica
+  // Modelos Rápidos de Fábrica com Dados Completos
   const applyPresetTemplate = (
     type: 
       | 'laudo' 
@@ -421,8 +642,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     const medsList = formatPrescriptionItemsList(prescriptionItems);
 
     let templateHtml = '';
+    let presetTitle = '';
+    let badge = 'DOCUMENTO CLÍNICO LIVRE';
 
     if (type === 'laudo_com_receita') {
+      presetTitle = 'Laudo Médico com Prescrição Terapêutica';
+      badge = 'LAUDO COM RECEITA';
       templateHtml = `
         <p style="text-align: center;"><strong>LAUDO MÉDICO COM PRESCRIÇÃO TERAPÊUTICA</strong></p>
         <p><br></p>
@@ -436,6 +661,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <p><strong>Recomendações Clínicas:</strong> Manter a posologia prescrita com rigor de horários. Retorno ambulatorial programado para reavaliação de conduta e seguimento terapêutico.</p>
       `;
     } else if (type === 'relatorio_circunstanciado') {
+      presetTitle = 'Relatório Médico Circunstanciado';
+      badge = 'RELATÓRIO CIRCUNSTANCIADO';
       templateHtml = `
         <p style="text-align: center;"><strong>RELATÓRIO MÉDICO CIRCUNSTANCIADO</strong></p>
         <p><br></p>
@@ -451,6 +678,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <p><strong>4. Conclusão & Conduta:</strong> Paciente com benefício clínico comprovado ao esquema medicamentoso instituído, necessitando de continuidade do tratamento e reavaliações periódicas neste serviço.</p>
       `;
     } else if (type === 'declaracao_comparecimento') {
+      presetTitle = 'Declaração de Comparecimento com Receita';
+      badge = 'DECLARAÇÃO DE COMPARECIMENTO';
       templateHtml = `
         <p style="text-align: center;"><strong>DECLARAÇÃO DE COMPARECIMENTO E RECEITA MÉDICA</strong></p>
         <p><br></p>
@@ -462,6 +691,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <p>Apto(a) a retornar às suas atividades habituais após o atendimento, respeitadas as orientações posológicas e de repouso prescritas.</p>
       `;
     } else if (type === 'laudo') {
+      presetTitle = 'Laudo de Avaliação Clínica';
+      badge = 'LAUDO CLÍNICO';
       templateHtml = `
         <p style="text-align: center;"><strong>LAUDO MÉDICO DE AVALIAÇÃO CLÍNICA</strong></p>
         <p><br></p>
@@ -472,6 +703,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <p><strong>Conduta:</strong> Mantido plano terapêutico previamente instituído. Retorno programado com resultados de exames complementares.</p>
       `;
     } else if (type === 'risco') {
+      presetTitle = 'Parecer de Risco Cirúrgico Pré-Operatório';
+      badge = 'RISCO CIRÚRGICO';
       templateHtml = `
         <p style="text-align: center;"><strong>PARECER DE RISCO CIRÚRGICO PRÉ-OPERATÓRIO</strong></p>
         <p><br></p>
@@ -486,6 +719,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <p><strong>Recomendações:</strong> Manter medicação anti-hipertensiva habitual com mínimo gole de água pela manhã no dia da cirurgia. Monitorização hemodinâmica intraoperatória padrão.</p>
       `;
     } else if (type === 'parecer') {
+      presetTitle = 'Parecer Médico Especializado';
+      badge = 'PARECER ESPECIALIZADO';
       templateHtml = `
         <p style="text-align: center;"><strong>PARECER MÉDICO ESPECIALIZADO / CONTRA-REFERÊNCIA</strong></p>
         <p><br></p>
@@ -497,6 +732,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <p><strong>Recomendações e Ajustes Farmacológicos:</strong> Seguir acompanhamento regular na Atenção Primária com as orientações anexas. Programado novo retorno especializado caso haja refratariedade sintomática.</p>
       `;
     } else if (type === 'atestado') {
+      presetTitle = 'Atestado Médico de Aptidão Física';
+      badge = 'ATESTADO DE APTIDÃO';
       templateHtml = `
         <p style="text-align: center;"><strong>ATESTADO MÉDICO DE APTIDÃO FÍSICA</strong></p>
         <p><br></p>
@@ -505,25 +742,39 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <p>Válido pelo período regulamentar a contar da presente data.</p>
       `;
     } else {
+      presetTitle = 'Receita Ambulatorial Livre';
+      badge = 'RECEITA MÉDICA';
       templateHtml = initialContent;
     }
 
     editor.commands.setContent(interpolateMedicalTags(templateHtml));
+    setHeaderConfig(prev => ({
+      ...prev,
+      badgeText: badge
+    }));
+
+    setCurrentModel({
+      id: null,
+      title: presetTitle,
+      isPreset: true
+    });
+
     triggerAutoSave(editor);
     setIsModelsDrawerOpen(false);
-    showToast('Modelo de referência aplicado.');
+    showToast(`Modelo "${presetTitle}" carregado. Faça suas alterações e clique em "Salvar Alterações".`);
   };
 
   const handlePrint = () => {
     window.print();
   };
 
+  // Upload de arquivo de imagem para logotipo
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !activeContext || !onSaveContext) return;
+    if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG).');
+      alert('Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG, WebP).');
       return;
     }
 
@@ -531,17 +782,22 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     const reader = new FileReader();
     reader.onload = async () => {
       const dataUrl = reader.result as string;
-      try {
+      const updatedLogo: DocumentLogoConfig = {
+        ...logoConfig,
+        dataUrl,
+        visible: true
+      };
+      setLogoConfig(updatedLogo);
+      if (activeContext && onSaveContext) {
         await onSaveContext({
           ...activeContext,
           logoDataUrl: dataUrl
         });
-        showToast('Logotipo atualizado no local de atendimento.');
-      } catch (err) {
-        console.error('Erro ao salvar logotipo no IndexedDB:', err);
-      } finally {
-        setLogoUploading(false);
       }
+      if (editor) triggerAutoSave(editor, headerConfig, updatedLogo);
+      setLogoUploading(false);
+      setIsLogoMenuOpen(false);
+      showToast('Logotipo adicionado com sucesso! Você pode movê-lo para onde quiser.');
     };
     reader.onerror = () => {
       setLogoUploading(false);
@@ -550,25 +806,117 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const handleRemoveLogo = async () => {
-    if (!activeContext || !onSaveContext) return;
-    if (confirm('Deseja remover o logotipo deste local de atuação?')) {
+  // Aplicar logo pré-definida
+  const handleApplyPresetLogo = async (dataUrl: string, name: string) => {
+    const updatedLogo: DocumentLogoConfig = {
+      ...logoConfig,
+      dataUrl,
+      visible: true
+    };
+    setLogoConfig(updatedLogo);
+    if (activeContext && onSaveContext) {
       await onSaveContext({
         ...activeContext,
-        logoDataUrl: undefined
+        logoDataUrl: dataUrl
       });
+    }
+    if (editor) triggerAutoSave(editor, headerConfig, updatedLogo);
+    setIsLogoMenuOpen(false);
+    showToast(`Logotipo "${name}" aplicado!`);
+  };
+
+  // Mudar posição da logo
+  const handleChangeLogoPosition = (position: LogoPosition) => {
+    const updated: DocumentLogoConfig = {
+      ...logoConfig,
+      position,
+      visible: true
+    };
+    setLogoConfig(updated);
+    if (editor) triggerAutoSave(editor, headerConfig, updated);
+    showToast(
+      position === 'free' 
+        ? 'Modo Livre ativado: clique e arraste a logo para onde quiser na folha!' 
+        : `Posição da logo alterada.`
+    );
+  };
+
+  // Mudar tamanho da logo
+  const handleChangeLogoSize = (size: 'sm' | 'md' | 'lg' | 'xl') => {
+    const updated: DocumentLogoConfig = {
+      ...logoConfig,
+      size
+    };
+    setLogoConfig(updated);
+    if (editor) triggerAutoSave(editor, headerConfig, updated);
+  };
+
+  // Remover logotipo
+  const handleRemoveLogo = async () => {
+    if (confirm('Deseja remover o logotipo deste documento?')) {
+      const updated: DocumentLogoConfig = {
+        ...logoConfig,
+        dataUrl: undefined,
+        visible: false
+      };
+      setLogoConfig(updated);
+      if (activeContext && onSaveContext) {
+        await onSaveContext({
+          ...activeContext,
+          logoDataUrl: undefined
+        });
+      }
+      if (editor) triggerAutoSave(editor, headerConfig, updated);
       showToast('Logotipo removido.');
     }
   };
 
-  // Dados dinâmicos do contexto de trabalho institucional ativo
-  const docClinic = activeContext?.clinicName || doctor?.clinicName?.trim() || 'Rede de Atenção à Saúde';
-  const docAddress = activeContext?.clinicAddress || doctor?.address?.trim() || 'Unidade Básica de Saúde';
-  const docCrm = activeContext?.doctorCredentials?.crm || doctor?.crm || '------';
-  const docCrmState = activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP';
-  const docRqe = activeContext?.doctorCredentials?.rqe || doctor?.rqe;
-  const docSpecialty = activeContext?.doctorCredentials?.specialty || doctor?.specialty || 'Clínica Médica';
-  const docName = doctor?.name || 'Dr(a). Médico(a)';
+  // Handlers para Arrastar a Logo na Folha A4 (Drag and Drop em Tempo Real)
+  const handleLogoPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingLogo(true);
+    setLogoSelected(true);
+    try {
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {}
+  };
+
+  const handleLogoPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingLogo || !sheetRef.current) return;
+    const rect = sheetRef.current.getBoundingClientRect();
+    // Limita entre 1% e 85% para não estourar a folha A4
+    const x = Math.max(1, Math.min(85, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(1, Math.min(90, ((e.clientY - rect.top) / rect.height) * 100));
+
+    setLogoConfig(prev => ({
+      ...prev,
+      position: 'free',
+      x: Math.round(x * 10) / 10,
+      y: Math.round(y * 10) / 10
+    }));
+  };
+
+  const handleLogoPointerUp = (e: React.PointerEvent) => {
+    if (isDraggingLogo) {
+      setIsDraggingLogo(false);
+      try {
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {}
+      if (editor) triggerAutoSave(editor);
+    }
+  };
+
+  // Helper para tamanho da logo
+  const getLogoSizeClass = (size: DocumentLogoConfig['size']) => {
+    switch (size) {
+      case 'sm': return 'max-h-12 max-w-[120px]';
+      case 'md': return 'max-h-16 max-w-[170px]';
+      case 'lg': return 'max-h-24 max-w-[240px]';
+      case 'xl': return 'max-h-32 max-w-[300px]';
+      default: return 'max-h-16 max-w-[170px]';
+    }
+  };
 
   // Filtro de modelos salvos
   const filteredSavedTemplates = savedTemplates.filter(tpl => {
@@ -577,7 +925,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   });
 
   return (
-    <div className="flex flex-col gap-5 max-w-5xl mx-auto w-full pb-16">
+    <div className="flex flex-col gap-4 max-w-5xl mx-auto w-full pb-16" onClick={() => setLogoSelected(false)}>
       {/* Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-slate-700 animate-tab-fade no-print">
@@ -586,11 +934,144 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         </div>
       )}
 
-      {/* Barra de Ferramentas Superior Fixa / Elevada */}
+      {/* BARRA SUPERIOR: Contexto do Modelo Ativo & Ações Rápidas */}
+      <div className="no-print bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-2xl p-3 shadow-tactile-sm flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 flex-wrap flex-1 min-w-[260px]">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-xs">
+            <LayoutTemplate className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+            <span className="text-[var(--text-muted)] font-medium">Modelo:</span>
+            {isEditingModelTitle ? (
+              <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                <input
+                  type="text"
+                  value={tempModelTitle}
+                  onChange={e => setTempModelTitle(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleSaveCurrentModelTitle();
+                    if (e.key === 'Escape') setIsEditingModelTitle(false);
+                  }}
+                  autoFocus
+                  className="px-2 py-0.5 text-xs font-bold rounded border border-sky-500 bg-white dark:bg-slate-900 text-[var(--text-main)] outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveCurrentModelTitle}
+                  className="p-1 rounded bg-sky-600 text-white hover:bg-sky-700 cursor-pointer"
+                  title="Salvar título"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingModelTitle(false)}
+                  className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+                  title="Cancelar"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-sky-900 dark:text-sky-200 truncate max-w-[280px]">
+                  {currentModel.title}
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTempModelTitle(currentModel.title);
+                    setIsEditingModelTitle(true);
+                  }}
+                  className="p-1 hover:bg-sky-100 dark:hover:bg-sky-900/60 rounded-lg text-sky-700 dark:text-sky-300 cursor-pointer transition-colors"
+                  title="Renomear este modelo"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Indicador de Status Local-First */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-muted)]">
+            {saveStatus === 'saving' ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin text-sky-600" />
+                <span className="hidden sm:inline">Salvando em tempo real...</span>
+              </>
+            ) : saveStatus === 'saved' ? (
+              <>
+                <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                <span className="hidden sm:inline">Salvo {lastSavedTime ? `(${lastSavedTime})` : ''}</span>
+              </>
+            ) : (
+              <>
+                <Clock className="w-3 h-3 text-slate-400" />
+                <span className="hidden sm:inline">Edição em Tempo Real</span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Botões de Ação de Modelo */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Botão SALVAR ALTERAÇÕES (Salva e atualiza o modelo atual) */}
+          <button
+            type="button"
+            onClick={handleSaveModelDirectly}
+            className="h-9 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-btn transition-all active:scale-95"
+            title="Salvar e atualizar este modelo com todas as modificações atuais de texto, cabeçalho e logo"
+          >
+            <Save className="w-4 h-4" />
+            <span>Salvar Alterações</span>
+          </button>
+
+          {/* Botão Salvar como Novo Modelo */}
+          <button
+            type="button"
+            onClick={() => {
+              setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? `${currentModel.title} (Cópia)` : '');
+              setIsSaveModelModalOpen(true);
+            }}
+            className="h-9 px-3 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 text-sky-800 dark:text-sky-300 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm"
+            title="Criar um novo modelo salvo a partir deste documento"
+          >
+            <BookmarkPlus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Salvar como Novo</span>
+          </button>
+
+          {/* Botão Biblioteca de Modelos */}
+          <button
+            type="button"
+            onClick={() => setIsModelsDrawerOpen(true)}
+            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm"
+            title="Abrir biblioteca de modelos clínicos e laudos salvos"
+          >
+            <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+            <span>Modelos</span>
+            {savedTemplates.length > 0 && (
+              <span className="w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {savedTemplates.length}
+              </span>
+            )}
+          </button>
+
+          {/* Botão Novo em Branco */}
+          <button
+            type="button"
+            onClick={handleStartNewDocument}
+            className="h-9 w-9 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-sky-600 flex items-center justify-center cursor-pointer shadow-tactile-sm"
+            title="Iniciar novo documento em branco"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* BARRA DE FERRAMENTAS DO EDITOR (Fixa / Sticky) */}
       <div 
         className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 rounded-2xl p-2.5 sm:p-3 border backdrop-blur-md shadow-tactile-sm flex flex-wrap items-center justify-between gap-2.5 bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)]"
       >
-        {/* Agrupamento 1: Estilos Básicos de Formatação */}
+        {/* Agrupamento 1: Formatação Tiptap */}
         <div className="flex items-center gap-1 flex-wrap">
           <button
             type="button"
@@ -634,7 +1115,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Alinhar à Esquerda"
-            aria-label="Alinhar à Esquerda"
           >
             <AlignLeft className="w-4 h-4" />
           </button>
@@ -648,7 +1128,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Centralizar"
-            aria-label="Centralizar"
           >
             <AlignCenter className="w-4 h-4" />
           </button>
@@ -662,7 +1141,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Alinhar à Direita"
-            aria-label="Alinhar à Direita"
           >
             <AlignRight className="w-4 h-4" />
           </button>
@@ -676,7 +1154,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Justificar"
-            aria-label="Justificar"
           >
             <AlignJustify className="w-4 h-4" />
           </button>
@@ -693,7 +1170,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Lista com Marcadores"
-            aria-label="Marcadores"
           >
             <List className="w-4 h-4" />
           </button>
@@ -707,7 +1183,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Lista Numerada"
-            aria-label="Numeração"
           >
             <ListOrdered className="w-4 h-4" />
           </button>
@@ -721,7 +1196,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             disabled={!editor?.can().undo()}
             className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer"
             title="Desfazer (Ctrl+Z)"
-            aria-label="Desfazer"
           >
             <Undo className="w-4 h-4" />
           </button>
@@ -732,40 +1206,23 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             disabled={!editor?.can().redo()}
             className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer"
             title="Refazer (Ctrl+Y)"
-            aria-label="Refazer"
           >
             <Redo className="w-4 h-4" />
           </button>
-
-          {/* Indicador Tátil de Auto-Save Local-First */}
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-muted)] ml-1">
-            {saveStatus === 'saving' ? (
-              <>
-                <Loader2 className="w-3 h-3 animate-spin text-sky-600" />
-                <span className="hidden sm:inline">Salvando...</span>
-              </>
-            ) : saveStatus === 'saved' ? (
-              <>
-                <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                <span className="hidden sm:inline">Salvo {lastSavedTime ? `(${lastSavedTime})` : ''}</span>
-              </>
-            ) : (
-              <>
-                <Clock className="w-3 h-3 text-slate-400" />
-                <span className="hidden sm:inline">Local-First</span>
-              </>
-            )}
-          </div>
         </div>
 
-        {/* Agrupamento 2: Tipografia, Modelos, Salvar e Impressão */}
+        {/* Agrupamento 2: Tipografia, Importar Consulta, Logotipo & Impressão */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Seletor Tipográfico */}
           <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1 text-xs">
             <Type className="w-3.5 h-3.5 text-[var(--text-muted)]" />
             <select
               value={typography}
-              onChange={(e) => setTypography(e.target.value as any)}
+              onChange={(e) => {
+                const val = e.target.value as any;
+                setTypography(val);
+                if (editor) triggerAutoSave(editor);
+              }}
               className="bg-transparent font-medium cursor-pointer focus:outline-none text-xs"
               aria-label="Família Tipográfica da Folha A4"
             >
@@ -779,8 +1236,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handleImportActiveConsultation}
-            className="h-9 px-3 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all"
-            title="Importar dados do paciente e medicamentos prescritos nesta consulta para a folha A4"
+            className="h-9 px-3 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm"
+            title="Inserir dados do paciente e medicamentos prescritos nesta consulta na folha A4"
           >
             <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
             <span className="hidden sm:inline">Importar Consulta</span>
@@ -792,93 +1249,226 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             )}
           </button>
 
-          {/* Botão Biblioteca de Modelos (Drawer) */}
-          <button
-            type="button"
-            onClick={() => setIsModelsDrawerOpen(true)}
-            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm"
-            title="Abrir biblioteca de modelos clínicos e laudos salvos"
-          >
-            <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
-            <span>Modelos</span>
-            {savedTemplates.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
-                {savedTemplates.length}
-              </span>
-            )}
-          </button>
-
-          {/* Botão Salvar como Modelo */}
-          <button
-            type="button"
-            onClick={() => {
-              setNewModelTitle('');
-              setIsSaveModelModalOpen(true);
-            }}
-            className="h-9 px-3 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/60 dark:bg-sky-950/30 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-sky-800 dark:text-sky-300 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm"
-            title="Salvar o texto atual como modelo reutilizável no IndexedDB"
-          >
-            <BookmarkPlus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Salvar Modelo</span>
-          </button>
-
-          {/* Criador Procedural de Logotipos SVG */}
-          <button
-            type="button"
-            onClick={() => setIsLogoGeneratorOpen(true)}
-            className="h-9 px-3 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all"
-            title="Criador procedural de timbrados e brasões clínicos em SVG"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <span className="hidden md:inline">Criar Logo / Timbre SVG</span>
-            <span className="md:hidden">Criar SVG</span>
-          </button>
-
-          {/* Upload de Logotipo Institucional */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleLogoUpload}
-            accept="image/*"
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={logoUploading}
-            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm"
-            title="Fazer upload de brasão ou logotipo institucional"
-          >
-            <Upload className="w-3.5 h-3.5 text-sky-500" />
-            <span>{logoUploading ? 'Carregando...' : 'Logotipo'}</span>
-          </button>
-
-          {activeContext?.logoDataUrl && (
+          {/* MENU / CONTROLE DE LOGOTIPO (Mudar de lugar, carregar, redimensionar) */}
+          <div className="relative" onClick={e => e.stopPropagation()}>
             <button
               type="button"
-              onClick={handleRemoveLogo}
-              className="h-9 w-9 rounded-xl border border-red-200 dark:border-red-900/40 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center justify-center cursor-pointer shadow-tactile-sm"
-              title="Remover logotipo do contexto atual"
+              onClick={() => setIsLogoMenuOpen(prev => !prev)}
+              className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all ${
+                logoConfig.dataUrl && logoConfig.visible
+                  ? 'border-sky-400 bg-sky-50/80 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300'
+                  : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
+              }`}
+              title="Posicionar e gerenciar logotipo na folha A4"
             >
-              <Trash2 className="w-4 h-4" />
+              <ImageIcon className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+              <span>Logotipo</span>
+              {logoConfig.dataUrl && (
+                <span className="text-[10px] px-1.5 py-0.2 bg-sky-200 dark:bg-sky-800 rounded font-bold uppercase">
+                  {logoConfig.position === 'free' ? 'Livre' : logoConfig.position.replace('top-', '').replace('header-', '')}
+                </span>
+              )}
             </button>
-          )}
 
-          {/* Seletor de Marca d'Água Oficial (SUS 1/2/3 vias, Rondônia) */}
+            {/* Dropdown de Gestão do Logotipo */}
+            {isLogoMenuOpen && (
+              <div className="absolute right-0 top-11 w-80 bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-2xl shadow-tactile-lg p-4 z-50 flex flex-col gap-3 animate-tab-fade">
+                <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
+                  <h4 className="text-xs font-bold flex items-center gap-1.5">
+                    <ImageIcon className="w-4 h-4 text-sky-600" />
+                    <span>Configurar Logotipo / Timbre</span>
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => setIsLogoMenuOpen(false)}
+                    className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Opções de Posicionamento */}
+                <div>
+                  <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1.5">
+                    Posição na Folha A4:
+                  </label>
+                  <div className="grid grid-cols-3 gap-1.5 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => handleChangeLogoPosition('top-left')}
+                      className={`p-2 rounded-xl border flex flex-col items-center gap-1 cursor-pointer transition-all ${
+                        logoConfig.position === 'top-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                      }`}
+                    >
+                      <span className="text-sm">⇱</span>
+                      <span className="text-[10px]">Topo Esq.</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeLogoPosition('top-center')}
+                      className={`p-2 rounded-xl border flex flex-col items-center gap-1 cursor-pointer transition-all ${
+                        logoConfig.position === 'top-center' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                      }`}
+                    >
+                      <span className="text-sm">⬌</span>
+                      <span className="text-[10px]">Topo Centro</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeLogoPosition('top-right')}
+                      className={`p-2 rounded-xl border flex flex-col items-center gap-1 cursor-pointer transition-all ${
+                        logoConfig.position === 'top-right' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                      }`}
+                    >
+                      <span className="text-sm">⇲</span>
+                      <span className="text-[10px]">Topo Dir.</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeLogoPosition('header-left')}
+                      className={`p-2 rounded-xl border flex flex-col items-center gap-1 cursor-pointer transition-all ${
+                        logoConfig.position === 'header-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                      }`}
+                    >
+                      <span className="text-sm">🏢</span>
+                      <span className="text-[10px]">Header Esq.</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeLogoPosition('header-right')}
+                      className={`p-2 rounded-xl border flex flex-col items-center gap-1 cursor-pointer transition-all ${
+                        logoConfig.position === 'header-right' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                      }`}
+                    >
+                      <span className="text-sm">🏢</span>
+                      <span className="text-[10px]">Header Dir.</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeLogoPosition('free')}
+                      className={`p-2 rounded-xl border flex flex-col items-center gap-1 cursor-pointer transition-all ${
+                        logoConfig.position === 'free' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                      }`}
+                      title="Arrastar e soltar livremente em qualquer lugar da folha"
+                    >
+                      <Move className="w-4 h-4 text-sky-600" />
+                      <span className="text-[10px]">Modo Livre</span>
+                    </button>
+                  </div>
+                  {logoConfig.position === 'free' && (
+                    <p className="text-[10px] text-sky-700 dark:text-sky-300 mt-1.5 flex items-center gap-1">
+                      <Move className="w-3 h-3 shrink-0" />
+                      <span>Arraste a logo diretamente sobre o papel A4 para posicionar!</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Opções de Tamanho */}
+                <div>
+                  <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1.5">
+                    Tamanho do Logotipo:
+                  </label>
+                  <div className="grid grid-cols-4 gap-1 text-xs">
+                    {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => handleChangeLogoSize(sz)}
+                        className={`py-1.5 rounded-lg border text-center cursor-pointer transition-all ${
+                          logoConfig.size === sz ? 'border-sky-500 bg-sky-100 dark:bg-sky-900 font-bold text-sky-900 dark:text-sky-200' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                        }`}
+                      >
+                        {sz.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Ações de Imagem: Upload, Criar SVG, Preset, Remover */}
+                <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleLogoUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={logoUploading}
+                      className="flex-1 py-2 px-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-btn"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{logoUploading ? 'Carregando...' : 'Fazer Upload'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsLogoMenuOpen(false);
+                        setIsLogoGeneratorOpen(true);
+                      }}
+                      className="py-2 px-3 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                      title="Criar brasão vetorial SVG"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Criar SVG</span>
+                    </button>
+                  </div>
+
+                  {/* Logotipos Rápidos da Rede Pública */}
+                  <div>
+                    <span className="text-[10px] text-[var(--text-muted)] block mb-1">Brasões Rápidos:</span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.dataUrl, 'SEMUSA')}
+                        className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-sky-400 text-center truncate cursor-pointer"
+                        title="SEMUSA Porto Velho"
+                      >
+                        SEMUSA
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.dataUrl, 'SESAU')}
+                        className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-sky-400 text-center truncate cursor-pointer"
+                        title="SESAU Rondônia"
+                      >
+                        SESAU
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.dataUrl, 'SUS')}
+                        className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-sky-400 text-center truncate cursor-pointer"
+                        title="Sistema Único de Saúde"
+                      >
+                        SUS
+                      </button>
+                    </div>
+                  </div>
+
+                  {logoConfig.dataUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveLogo}
+                      className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remover Logotipo</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Seletor de Marca d'Água Oficial */}
           <WatermarkSelector 
             currentType={docWatermark} 
             onChange={handleWatermarkChange} 
           />
-
-          {/* Botão Limpar Canvas */}
-          <button
-            type="button"
-            onClick={handleClearCanvas}
-            className="h-9 w-9 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-red-50 dark:hover:bg-red-950/30 text-[var(--text-muted)] hover:text-red-500 flex items-center justify-center cursor-pointer shadow-tactile-sm"
-            title="Limpar folha A4"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
 
           {/* Botão de Impressão Direta A4 */}
           <button
@@ -893,9 +1483,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         </div>
       </div>
 
-      {/* Canvas A4 Tátil Milimétrico (210mm x 297mm) */}
+      {/* ÁREA DA FOLHA A4 TÁTIL MILIMÉTRICA (210mm x 297mm) */}
       <div className="flex justify-center w-full overflow-x-auto py-2">
         <div
+          ref={sheetRef}
           id="printable-a4-sheet"
           className={`a4-editor-canvas bg-white text-slate-900 rounded-lg shadow-2xl relative transition-all duration-200 ${
             typography === 'serif' ? 'font-serif-doc' : typography === 'inter' ? 'font-sans' : 'font-sans'
@@ -910,7 +1501,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08)'
+            boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08)',
+            position: 'relative'
           }}
         >
           {/* Marca d'Água Oficial em Camada Transparente */}
@@ -919,88 +1511,302 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             opacity={activeContext?.watermarkOpacity} 
           />
 
-          {/* Cabeçalho Hospitalar / Timbrado Oficial Regulamentar */}
-          <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10">
-            {activeContext?.logoDataUrl && (
-              <div className={`mb-3 flex ${
-                activeContext.logoAlignment === 'center' ? 'justify-center' :
-                activeContext.logoAlignment === 'right' ? 'justify-end' : 'justify-start'
-              }`}>
-                <img 
-                  src={activeContext.logoDataUrl} 
-                  alt="Logotipo da Instituição" 
-                  className="max-h-16 object-contain"
-                />
-              </div>
-            )}
+          {/* LOGOTIPO NO MODO LIVRE (Arrastável / Drag & Drop em qualquer coordenada) */}
+          {logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'free' && (
+            <div
+              onPointerDown={handleLogoPointerDown}
+              onPointerMove={handleLogoPointerMove}
+              onPointerUp={handleLogoPointerUp}
+              onClick={e => {
+                e.stopPropagation();
+                setLogoSelected(true);
+              }}
+              className={`absolute select-none z-30 group touch-none cursor-move transition-shadow ${
+                logoSelected ? 'ring-2 ring-sky-500 rounded p-1' : ''
+              }`}
+              style={{
+                left: `${logoConfig.x ?? 4}%`,
+                top: `${logoConfig.y ?? 3}%`,
+              }}
+            >
+              <img 
+                src={logoConfig.dataUrl} 
+                alt="Logotipo Institucional" 
+                className={`${getLogoSizeClass(logoConfig.size)} object-contain pointer-events-none drop-shadow-xs`}
+              />
 
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-8 h-8 rounded-lg bg-sky-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                    <ShieldCheck className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none">
-                      {docName}
-                    </h1>
-                    <p className="text-xs font-bold text-sky-800 font-sans mt-0.5">
-                      CRM-{docCrmState} {docCrm} {docRqe ? `• RQE ${docRqe}` : ''}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-xs font-semibold text-slate-700 font-sans">
-                  {docSpecialty}
-                </p>
-                <p className="text-[11px] text-slate-500 font-sans mt-0.5 leading-tight">
-                  {docClinic}
-                  {activeContext?.cnes && activeContext.documentFormatting?.showCnesOnHeader ? ` • CNES: ${activeContext.cnes}` : ''}
-                  {docAddress ? ` • ${docAddress}` : ''}
-                </p>
-              </div>
-
-              {/* Selo do Tipo de Documento */}
-              <div className="text-right flex flex-col items-end">
-                <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-sans">
-                  DOCUMENTO CLÍNICO LIVRE
-                </span>
-                <span className="text-[11px] text-slate-500 font-sans mt-1">
-                  {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-                </span>
+              {/* Controles Flutuantes da Logo (Visíveis na tela, ocultos na impressão) */}
+              <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-0 bg-slate-900 text-white rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-tactile-lg text-[10px] whitespace-nowrap">
+                <Move className="w-3 h-3 text-sky-400" />
+                <span>Arraste para onde quiser</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleChangeLogoPosition('top-center');
+                  }}
+                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[9px] cursor-pointer"
+                  title="Alinhar ao centro do topo"
+                >
+                  Centralizar
+                </button>
               </div>
             </div>
+          )}
 
-            {/* Identificação Rápida do Paciente */}
-            {patient?.name && (
-              <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between text-xs font-sans text-slate-700">
-                <span><strong>Paciente:</strong> {patient.name}</span>
-                {patient.documentNumber && <span><strong>Doc:</strong> {patient.documentNumber}</span>}
-                {patient.weightKg > 0 && <span><strong>Peso:</strong> {patient.weightKg} kg</span>}
+          {/* CABEÇALHO HOSPITALAR / TIMBRADO TOTALMENTE EDITÁVEL EM TEMPO REAL */}
+          {headerConfig.showHeader && (
+            <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition-all">
+              {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
+              <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
+                <span className="flex items-center gap-1 text-slate-600 font-semibold">
+                  <Pencil className="w-3 h-3 text-sky-600" />
+                  <span>Cabeçalho Editável em Tempo Real (clique em qualquer texto para editar)</span>
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResetHeaderFromProfile}
+                    className="hover:text-sky-700 font-medium flex items-center gap-1 cursor-pointer"
+                    title="Preencher com os dados do seu Perfil Médico cadastrado"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Puxar do Perfil</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleHeaderFieldChange('showHeader', false)}
+                    className="hover:text-amber-600 font-medium flex items-center gap-1 cursor-pointer"
+                    title="Ocultar cabeçalho (ideal se usar folha já timbrada)"
+                  >
+                    <EyeOff className="w-3 h-3" />
+                    <span>Ocultar Cabeçalho</span>
+                  </button>
+                </div>
               </div>
-            )}
-          </header>
 
-          {/* Área de Digitação Livre (Editor Tiptap) */}
-          <div className="flex-1 w-full text-slate-900 relative z-10">
+              {/* LOGOTIPO NO TOPO (Top-Left, Top-Center ou Top-Right) */}
+              {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'top-left' || logoConfig.position === 'top-center' || logoConfig.position === 'top-right') && (
+                <div className={`mb-3 flex relative group ${
+                  logoConfig.position === 'top-center' ? 'justify-center' :
+                  logoConfig.position === 'top-right' ? 'justify-end' : 'justify-start'
+                }`}>
+                  <div className="relative">
+                    <img 
+                      src={logoConfig.dataUrl} 
+                      alt="Logotipo da Instituição" 
+                      className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
+                    />
+                    {/* Alça rápida no-print para trocar posição ou tamanho */}
+                    <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-[9px] z-20">
+                      <button
+                        type="button"
+                        onClick={() => handleChangeLogoPosition('free')}
+                        className="hover:text-sky-300 flex items-center gap-0.5 cursor-pointer"
+                        title="Ativar modo livre e arrastar para qualquer lugar"
+                      >
+                        <Move className="w-2.5 h-2.5" />
+                        <span>Mover</span>
+                      </button>
+                      <span>•</span>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
+                        className="hover:text-sky-300 cursor-pointer"
+                      >
+                        Tamanho ({String(logoConfig.size).toUpperCase()})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-start justify-between gap-4">
+                {/* Lado Esquerdo: Identificação Médica e Institucional Editáveis Inline */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-2.5 mb-1">
+                    {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
+                    {logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-left' ? (
+                      <img 
+                        src={logoConfig.dataUrl} 
+                        alt="Logotipo" 
+                        className={`${getLogoSizeClass(logoConfig.size)} object-contain shrink-0`}
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-lg bg-sky-900 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                        <ShieldCheck className="w-5 h-5" />
+                      </div>
+                    )}
+
+                    <div className="flex-1 min-w-0">
+                      {/* Nome do Médico Editável */}
+                      <input
+                        type="text"
+                        value={headerConfig.doctorName || ''}
+                        onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
+                        placeholder="DR(A). MÉDICO(A)"
+                        className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                        title="Clique para editar o nome do médico"
+                      />
+
+                      {/* CRM e RQE Editáveis */}
+                      <input
+                        type="text"
+                        value={headerConfig.doctorCrm || ''}
+                        onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
+                        placeholder="CRM-SP 000000 • RQE 0000"
+                        className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                        title="Clique para editar CRM e RQE"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Especialidade Editável */}
+                  <input
+                    type="text"
+                    value={headerConfig.doctorSpecialty || ''}
+                    onChange={e => handleHeaderFieldChange('doctorSpecialty', e.target.value)}
+                    placeholder="Especialidade Médica (Ex: Clínica Médica)"
+                    className="text-xs font-semibold text-slate-700 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                    title="Clique para editar a especialidade"
+                  />
+
+                  {/* Nome da Instituição / Hospital / Clínica Editável */}
+                  <input
+                    type="text"
+                    value={headerConfig.clinicName || ''}
+                    onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
+                    placeholder="Nome da Instituição ou Clínica de Atendimento"
+                    className="text-[11px] font-medium text-slate-600 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                    title="Clique para editar a instituição ou clínica"
+                  />
+
+                  {/* Endereço / CNES Editável */}
+                  <input
+                    type="text"
+                    value={headerConfig.clinicAddress || ''}
+                    onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
+                    placeholder="Endereço e Informações de Contato"
+                    className="text-[10px] text-slate-500 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                    title="Clique para editar o endereço"
+                  />
+                </div>
+
+                {/* Lado Direito: Logo (header-right), Selo do Tipo de Documento & Data */}
+                <div className="text-right flex flex-col items-end shrink-0 max-w-[220px]">
+                  {logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-right' && (
+                    <img 
+                      src={logoConfig.dataUrl} 
+                      alt="Logotipo" 
+                      className={`${getLogoSizeClass(logoConfig.size)} object-contain mb-2`}
+                    />
+                  )}
+
+                  {/* Badge Editável do Tipo de Documento */}
+                  <input
+                    type="text"
+                    value={headerConfig.badgeText || ''}
+                    onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
+                    placeholder="TIPO DE DOCUMENTO"
+                    className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-sans text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition-all w-full max-w-[200px]"
+                    title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
+                  />
+
+                  {/* Data Editável */}
+                  <input
+                    type="text"
+                    value={headerConfig.dateText || ''}
+                    onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
+                    placeholder="Data de emissão"
+                    className="text-[11px] text-slate-500 font-sans mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition-all w-full"
+                    title="Clique para editar a data de emissão"
+                  />
+                </div>
+              </div>
+
+              {/* Identificação Rápida do Paciente (Se houver) */}
+              {headerConfig.showPatientBanner && (
+                <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs font-sans text-slate-700">
+                  {patient?.name ? (
+                    <>
+                      <span><strong>Paciente:</strong> {patient.name}</span>
+                      {patient.documentNumber && <span><strong>Doc:</strong> {patient.documentNumber}</span>}
+                      {patient.weightKg > 0 && <span><strong>Peso:</strong> {patient.weightKg} kg</span>}
+                    </>
+                  ) : (
+                    <input
+                      type="text"
+                      value={headerConfig.patientCustomText || ''}
+                      onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
+                      placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
+                      className="w-full text-xs text-slate-600 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none"
+                    />
+                  )}
+                </div>
+              )}
+            </header>
+          )}
+
+          {/* ÁREA PRINCIPAL DO EDITOR (Tiptap WYSIWYG em Tempo Real) */}
+          <div className="flex-1 w-full text-slate-900 relative z-10 py-1">
             <EditorContent editor={editor} />
           </div>
 
-          {/* Rodapé Clínico com Carimbo Regulamentar e Linha de Assinatura */}
-          <footer className="border-t border-slate-300 pt-6 mt-8 flex flex-col items-center justify-center text-center font-sans relative z-10">
-            <div className="w-72 border-b border-slate-400 mb-2" />
-            <p className="text-xs font-bold text-slate-900 uppercase">
-              {docName}
-            </p>
-            <p className="text-[11px] text-slate-600 font-semibold">
-              Médico(a) — CRM-{docCrmState} {docCrm} {docRqe ? `• RQE ${docRqe}` : ''}
-            </p>
-            <p className="text-[11px] text-slate-500 font-medium">
-              {docSpecialty}
-            </p>
-            <p className="text-[9px] text-slate-400 mt-2">
-              Emitido eletronicamente via PresCMed • Documento em conformidade com as resoluções do CFM
-            </p>
-          </footer>
+          {/* RODAPÉ CLÍNICO COM CARIMBO E ASSINATURA EDITÁVEIS */}
+          {headerConfig.showFooter && (
+            <footer className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center font-sans relative z-10 group">
+              <div className="w-72 border-b border-slate-400 mb-2" />
+
+              {/* Nome do Médico na Assinatura */}
+              <input
+                type="text"
+                value={headerConfig.footerDocName || headerConfig.doctorName || ''}
+                onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
+                placeholder="Dr(a). Médico(a)"
+                className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80"
+                title="Clique para editar o nome na assinatura"
+              />
+
+              {/* CRM na Assinatura */}
+              <input
+                type="text"
+                value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
+                onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
+                placeholder="Médico(a) — CRM-SP 00000"
+                className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80 mt-0.5"
+                title="Clique para editar CRM na assinatura"
+              />
+
+              {/* Especialidade na Assinatura */}
+              <input
+                type="text"
+                value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
+                onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
+                placeholder="Especialidade"
+                className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80"
+                title="Clique para editar a especialidade no carimbo"
+              />
+
+              {/* Subtexto Regulamentar CFM */}
+              <input
+                type="text"
+                value={headerConfig.footerSubtext || ''}
+                onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
+                className="text-[9px] text-slate-400 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-full max-w-md"
+              />
+
+              {/* Botão no-print para Ocultar Rodapé */}
+              <button
+                type="button"
+                onClick={() => handleHeaderFieldChange('showFooter', false)}
+                className="no-print opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
+                title="Ocultar rodapé de assinatura"
+              >
+                <EyeOff className="w-2.5 h-2.5" />
+                <span>Ocultar Rodapé</span>
+              </button>
+            </footer>
+          )}
         </div>
       </div>
 
@@ -1022,7 +1828,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   <span>Modelos Clínicos</span>
                 </h2>
                 <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                  Modelos salvos no IndexedDB e padrões regulamentares
+                  Modelos personalizados salvos e modelos de referência PresCMed
                 </p>
               </div>
               <button
@@ -1051,7 +1857,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 type="button"
                 onClick={() => {
                   setIsModelsDrawerOpen(false);
-                  setNewModelTitle('');
+                  setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? currentModel.title : '');
                   setIsSaveModelModalOpen(true);
                 }}
                 className="w-full py-2 px-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-tactile-btn cursor-pointer"
@@ -1083,7 +1889,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <BookmarkPlus className="w-6 h-6 mx-auto mb-1.5 text-slate-400 opacity-60" />
                         <p className="font-medium">Nenhum modelo personalizado salvo ainda.</p>
                         <p className="text-[11px] mt-1 opacity-80">
-                          Clique em &quot;Salvar Modelo&quot; para registrar seus laudos e receitas habituais.
+                          Clique em &quot;Salvar Alterações&quot; na barra superior para guardar qualquer modelo editado.
                         </p>
                       </>
                     )}
@@ -1172,7 +1978,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
                           >
                             <FileText className="w-3.5 h-3.5" />
-                            <span>Carregar na Folha</span>
+                            <span>Carregar e Editar na Folha</span>
                           </button>
                         </div>
                       </div>
@@ -1192,28 +1998,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   <div className="p-3 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 hover:border-sky-400 transition-all">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span className="px-1.5 py-0.5 rounded bg-sky-600 text-white text-[9px] font-extrabold uppercase">
-                        Consulta Ativa
-                      </span>
-                      <h4 className="text-xs font-bold text-[var(--text-main)]">
-                        Laudo com Prescrição Anexa
-                      </h4>
-                    </div>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Avaliação clínica estruturada acompanhada dos medicamentos prescritos na consulta atual.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => applyPresetTemplate('laudo_com_receita')}
-                      className="mt-2 text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Inserir este modelo</span>
-                    </button>
-                  </div>
-
-                  <div className="p-3 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 hover:border-sky-400 transition-all">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="px-1.5 py-0.5 rounded bg-sky-600 text-white text-[9px] font-extrabold uppercase">
                         SUS / Perícia
                       </span>
                       <h4 className="text-xs font-bold text-[var(--text-main)]">
@@ -1229,7 +2013,29 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       className="mt-2 text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Inserir este modelo</span>
+                      <span>Carregar e Personalizar</span>
+                    </button>
+                  </div>
+
+                  <div className="p-3 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 hover:border-sky-400 transition-all">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="px-1.5 py-0.5 rounded bg-sky-600 text-white text-[9px] font-extrabold uppercase">
+                        Consulta Ativa
+                      </span>
+                      <h4 className="text-xs font-bold text-[var(--text-main)]">
+                        Laudo com Prescrição Anexa
+                      </h4>
+                    </div>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                      Avaliação clínica estruturada acompanhada dos medicamentos prescritos na consulta atual.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => applyPresetTemplate('laudo_com_receita')}
+                      className="mt-2 text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Carregar e Personalizar</span>
                     </button>
                   </div>
 
@@ -1251,7 +2057,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       className="mt-2 text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Inserir este modelo</span>
+                      <span>Carregar e Personalizar</span>
                     </button>
                   </div>
 
@@ -1268,7 +2074,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Inserir este modelo</span>
+                      <span>Carregar e Personalizar</span>
                     </button>
                   </div>
 
@@ -1285,7 +2091,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Inserir este modelo</span>
+                      <span>Carregar e Personalizar</span>
                     </button>
                   </div>
 
@@ -1302,7 +2108,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Inserir este modelo</span>
+                      <span>Carregar e Personalizar</span>
                     </button>
                   </div>
 
@@ -1319,7 +2125,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Inserir este modelo</span>
+                      <span>Carregar e Personalizar</span>
                     </button>
                   </div>
 
@@ -1336,7 +2142,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Inserir este modelo</span>
+                      <span>Carregar e Personalizar</span>
                     </button>
                   </div>
                 </div>
@@ -1415,7 +2221,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   className="px-4 py-2 text-xs font-bold rounded-xl bg-sky-700 hover:bg-sky-800 disabled:opacity-50 text-white shadow-tactile-btn cursor-pointer flex items-center gap-1.5"
                 >
                   <Check className="w-3.5 h-3.5" />
-                  <span>Salvar no Banco Local</span>
+                  <span>Salvar Modelo</span>
                 </button>
               </div>
             </form>
@@ -1431,12 +2237,19 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           activeContext={activeContext}
           doctor={doctor}
           onApplyLogo={async (dataUrl) => {
+            const updatedLogo: DocumentLogoConfig = {
+              ...logoConfig,
+              dataUrl,
+              visible: true
+            };
+            setLogoConfig(updatedLogo);
             if (activeContext && onSaveContext) {
               await onSaveContext({
                 ...activeContext,
                 logoDataUrl: dataUrl
               });
             }
+            if (editor) triggerAutoSave(editor, headerConfig, updatedLogo);
             showToast('Logotipo vetorial SVG aplicado com sucesso!');
           }}
         />
