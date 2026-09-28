@@ -11,6 +11,7 @@ import { PatientModal } from './components/PatientModal';
 import { DoctorProfileModal } from './components/DoctorProfileModal';
 import { ActiveTab, PrescriptionItem, Patient } from './types';
 import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
+import { useWorkContext } from './hooks/useWorkContext';
 
 // Carregamento sob demanda (code-splitting) dos módulos pesados de PDF e impressão
 const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
@@ -119,6 +120,17 @@ export default function App() {
     startNewConsultation
   } = usePrescriptionSession();
 
+  // Governança institucional multi-esfera (Local-First via Dexie/IndexedDB)
+  const {
+    contexts: workContexts,
+    activeContext,
+    switchContext
+  } = useWorkContext({
+    crm: doctor.crm,
+    uf: doctor.crmState,
+    rqe: doctor.rqe
+  });
+
   // Manipuladores de ação
   const handleUpdatePatientWeight = (newWeight: number) => {
     setPatient(prev => ({ ...prev, weightKg: newWeight }));
@@ -193,6 +205,9 @@ export default function App() {
           patient={patient}
           prescriptionCount={prescriptionItems.length}
           selectedExamsCount={selectedExams.length}
+          contexts={workContexts}
+          activeContext={activeContext}
+          onSwitchContext={switchContext}
           onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
           onOpenPatientModal={() => setIsPatientModalOpen(true)}
           onClearPrescription={handleClearPrescription}
@@ -287,6 +302,7 @@ export default function App() {
                 examIndication={examIndication}
                 certificate={certificate}
                 referral={referral}
+                activeContext={activeContext}
                 initialDocType={printDocType}
                 onNavigateBack={() => setActiveTab('prescription')}
                 onBack={() => setActiveTab('prescription')}

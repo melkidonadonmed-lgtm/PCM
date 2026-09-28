@@ -21,8 +21,9 @@ import {
   UserPlus, 
   UserCheck 
 } from 'lucide-react';
-import { ActiveTab, DoctorProfile, Patient } from '../types';
+import { ActiveTab, DoctorProfile, Patient, WorkContext } from '../types';
 import { ConfirmationModal } from './ConfirmationModal';
+import { ContextSwitcher } from './ContextSwitcher';
 
 interface SidebarProps {
   darkMode: boolean;
@@ -36,6 +37,9 @@ interface SidebarProps {
   patient?: Patient;
   prescriptionCount?: number;
   selectedExamsCount?: number;
+  contexts?: WorkContext[];
+  activeContext?: WorkContext | null;
+  onSwitchContext?: (id: string) => void;
   onOpenDoctorModal?: () => void;
   onOpenPatientModal?: () => void;
   onClearPrescription?: () => void;
@@ -55,6 +59,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   patient,
   prescriptionCount = 0,
   selectedExamsCount = 0,
+  contexts = [],
+  activeContext = null,
+  onSwitchContext,
   onOpenDoctorModal,
   onOpenPatientModal,
   onClearPrescription,
@@ -294,6 +301,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <X className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Context Switcher (SUS Multi-Instituição) */}
+          {contexts && contexts.length > 0 && activeContext && onSwitchContext && (
+            <ContextSwitcher
+              contexts={contexts}
+              activeContext={activeContext}
+              onSwitchContext={onSwitchContext}
+              collapsed={!isOpen}
+            />
+          )}
 
           {/* Doctor Profile Badge */}
           {isOpen ? (

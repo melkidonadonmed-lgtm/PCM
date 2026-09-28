@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral } from '../types';
+import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext } from '../types';
 import { generateMedicalPDF } from '../utils/pdfGenerator';
 
 // Helper to convert any modern CSS color (oklch, oklab, lab, lch, color-mix, etc.) to standard #rrggbb or rgba for html2canvas compatibility
@@ -79,6 +79,7 @@ interface PrintPreviewProps {
   examIndication?: string;
   certificate?: MedicalCertificate;
   referral?: MedicalReferral;
+  activeContext?: WorkContext | null;
   initialDocType?: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral';
   onNavigateBack?: () => void;
   onBack?: () => void;
@@ -95,6 +96,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   exams = [],
   selectedExams = [],
   examIndication = '',
+  activeContext = null,
   certificate = {
     patientName: '',
     documentNumber: '',
@@ -149,11 +151,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   const patientAge = patient?.ageText?.trim() || patient?.birthDate?.trim() || '—';
 
   const docName = doctor?.name?.trim() || 'Dr(a). Médico(a)';
-  const docCrm = doctor?.crm?.trim() || '------';
-  const docCrmState = doctor?.crmState || 'SP';
-  const docSpecialty = doctor?.specialty || 'Clínica Médica';
-  const docClinic = doctor?.clinicName?.trim() || '';
-  const docAddress = doctor?.address?.trim() || '';
+  const docCrm = activeContext?.doctorCredentials?.crm || doctor?.crm?.trim() || '------';
+  const docCrmState = activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP';
+  const docSpecialty = activeContext?.doctorCredentials?.specialty || doctor?.specialty || 'Clínica Médica';
+  const docClinic = activeContext?.clinicName?.trim() || doctor?.clinicName?.trim() || '';
+  const docAddress = activeContext?.clinicAddress?.trim() || doctor?.address?.trim() || '';
   const docPhone = doctor?.phone?.trim() || '';
 
   const currentDate = new Date().toLocaleDateString('pt-BR', {

@@ -168,3 +168,34 @@ export type ActiveTab =
   | 'models'
   | 'print_preview' 
   | 'patients';
+
+// Tipagem para os Contextos de Atendimento (Multi-Instituição)
+export type InstitutionalSphere = 'municipal' | 'state' | 'private' | 'federal';
+
+export interface WorkContext {
+  id: string; // Ex: 'ctx-ubs-centro', 'ctx-policlinica-estadual'
+  name: string; // "UBS Dr. Hamilton - Município" ou "Policlínica Oswaldo Cruz - Estado"
+  sphere: InstitutionalSphere;
+  clinicName: string;
+  clinicAddress: string;
+  cnes?: string;
+  logoDataUrl?: string; // Armazenado no IndexedDB
+  logoAlignment: 'left' | 'center' | 'right';
+  regulatoryRules: {
+    restrictToRemume: boolean; // Trava medicamentos da Relação Municipal
+    requireSpecificReferralHeader: boolean;
+    standardPrescriptionViaCount: 1 | 2;
+  };
+  customHeaderMarkdown?: string;
+  customFooterMarkdown?: string;
+  doctorCredentials: {
+    crm: string;
+    uf: string;
+    rqe?: string;
+    specialty?: string;
+  };
+  isDefault?: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
