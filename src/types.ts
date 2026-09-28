@@ -236,6 +236,9 @@ export interface DocumentLogoConfig {
   visible: boolean;
 }
 
+export type DocumentOrientation = 'portrait' | 'landscape';
+export type DocumentViaLayout = '1-via' | '2-vias';
+
 export interface SavedDocument {
   id: string;
   title: string;
@@ -245,8 +248,24 @@ export interface SavedDocument {
   isTemplate: boolean; // Se é um modelo reutilizável
   headerConfig?: DocumentHeaderConfig;
   logoConfig?: DocumentLogoConfig;
-  typography?: 'serif' | 'sans' | 'inter';
+  typography?: string;
+  fontSize?: number;
+  orientation?: DocumentOrientation;
+  viaLayout?: DocumentViaLayout;
   createdAt: number;
   updatedAt: number;
+}
+
+export interface PrescriptionStyle {
+  id: string;
+  name: string;
+  fontFamilyId: string;
+  baseFontSize: number;
+  pageOrientation: DocumentOrientation;
+  viaLayout: DocumentViaLayout;
+  showHeader: boolean;
+  showFooter: boolean;
+  watermarkType: WatermarkType;
+  isCustom?: boolean;
 }
 

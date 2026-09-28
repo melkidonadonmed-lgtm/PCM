@@ -170,6 +170,13 @@ export default function App() {
     setActiveTab('prescription');
   };
 
+  const [editorInitialSyncTrigger, setEditorInitialSyncTrigger] = useState(0);
+
+  const handleNavigateToEditor = () => {
+    setEditorInitialSyncTrigger(prev => prev + 1);
+    setActiveTab('editor');
+  };
+
   return (
     <div 
       className="min-h-screen font-sans antialiased flex flex-col transition-colors duration-300"
@@ -186,7 +193,7 @@ export default function App() {
         prescriptionCount={prescriptionItems.length}
         selectedExamsCount={selectedExams.length}
         onQuickWeightChange={handleUpdatePatientWeight}
-        onNavigateToEditor={() => setActiveTab('editor')}
+        onNavigateToEditor={handleNavigateToEditor}
         onOpenBackupModal={() => setIsBackupModalOpen(true)}
         isInstallable={isInstallable}
         onInstallApp={installApp}
@@ -202,6 +209,10 @@ export default function App() {
           onSelectTab={(tab) => {
             if (tab === 'patients') {
               setIsPatientModalOpen(true);
+              return;
+            }
+            if (tab === 'editor') {
+              handleNavigateToEditor();
               return;
             }
             if (tab === 'certificate') {
@@ -247,7 +258,7 @@ export default function App() {
               onClearPrescription={handleClearPrescription}
               onNavigateToPrint={() => handleNavigateToPrint('prescription')}
               onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
-              onNavigateToEditor={() => setActiveTab('editor')}
+              onNavigateToEditor={handleNavigateToEditor}
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
               onOpenPatientModal={() => setIsPatientModalOpen(true)}
             />
@@ -318,6 +329,7 @@ export default function App() {
                 activeContext={activeContext}
                 onSaveContext={saveContext}
                 onNavigateToPrint={() => handleNavigateToPrint('prescription')}
+                editorInitialSyncTrigger={editorInitialSyncTrigger}
               />
             </Suspense>
           )}
@@ -359,6 +371,10 @@ export default function App() {
         activeTab={activeTab}
         sidebarOpen={sidebarOpen}
         onSelectTab={(tab) => {
+          if (tab === 'editor') {
+            handleNavigateToEditor();
+            return;
+          }
           if (tab === 'certificate') {
             setCertSubTab('certificate');
           } else if (tab === 'referral') {

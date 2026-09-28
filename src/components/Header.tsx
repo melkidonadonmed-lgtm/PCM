@@ -314,7 +314,7 @@ export const Header: React.FC<HeaderProps> = ({
               title="Abrir consulta no Editor Livre de Documentos A4"
             >
               <FileText className="w-4 h-4 text-sky-600 dark:text-sky-400" strokeWidth={1.75} />
-              <span className="hidden md:inline">Editor de Laudos</span>
+              <span className="hidden md:inline">Editor</span>
             </button>
           )}
 

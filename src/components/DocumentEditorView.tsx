@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useEditor, EditorContent, Mark } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
 import { 
   Bold, 
   Italic, 
+  Underline as UnderlineIcon,
   List, 
   ListOrdered, 
   AlignLeft, 
@@ -38,7 +39,10 @@ import {
   Eye,
   EyeOff,
   Copy,
-  LayoutTemplate
+  LayoutTemplate,
+  Scissors,
+  RefreshCw,
+  Layers
 } from 'lucide-react';
 import { 
   DoctorProfile, 
@@ -49,13 +53,137 @@ import {
   LogoPosition,
   DocumentHeaderConfig,
   DocumentLogoConfig,
-  SavedDocument
+  SavedDocument,
+  DocumentOrientation,
+  DocumentViaLayout,
+  PrescriptionStyle
 } from '../types';
 import { db, initializeDefaultTemplates } from '../services/db';
 import { PRESET_LOGOS } from '../data/presetAssets';
 import LogoGeneratorModal from './LogoGeneratorModal';
 import WatermarkOverlay from './WatermarkOverlay';
 import WatermarkSelector from './WatermarkSelector';
+
+export const DEFAULT_PRESCRIPTION_STYLES: PrescriptionStyle[] = [
+  {
+    id: 'padrao_simples',
+    name: 'Receita Simples Ambulatorial (1 Via • Retrato)',
+    fontFamilyId: 'jakarta',
+    baseFontSize: 11,
+    pageOrientation: 'portrait',
+    viaLayout: '1-via',
+    showHeader: true,
+    showFooter: true,
+    watermarkType: 'none'
+  },
+  {
+    id: 'especial_2vias',
+    name: 'Controle Especial 2 Vias (Portaria 344/98 • Paisagem)',
+    fontFamilyId: 'jakarta',
+    baseFontSize: 10,
+    pageOrientation: 'landscape',
+    viaLayout: '2-vias',
+    showHeader: true,
+    showFooter: true,
+    watermarkType: 'none'
+  },
+  {
+    id: 'sus',
+    name: 'Receita SUS / Atenção Básica (1 Via • Retrato)',
+    fontFamilyId: 'inter',
+    baseFontSize: 11,
+    pageOrientation: 'portrait',
+    viaLayout: '1-via',
+    showHeader: true,
+    showFooter: true,
+    watermarkType: 'sus_double'
+  },
+  {
+    id: 'classico',
+    name: 'Receita Clássica Nobre (Cormorant 12pt • Retrato)',
+    fontFamilyId: 'cormorant',
+    baseFontSize: 12,
+    pageOrientation: 'portrait',
+    viaLayout: '1-via',
+    showHeader: true,
+    showFooter: true,
+    watermarkType: 'none'
+  },
+  {
+    id: 'hospitalar',
+    name: 'Receita Hospitalar / Clínica (Jakarta 11pt • Retrato)',
+    fontFamilyId: 'jakarta',
+    baseFontSize: 11,
+    pageOrientation: 'portrait',
+    viaLayout: '1-via',
+    showHeader: true,
+    showFooter: true,
+    watermarkType: 'none'
+  },
+  {
+    id: 'pre_timbrado',
+    name: 'Papel Pré-Timbrado da Gráfica (Sem Cabeçalho/Rodapé)',
+    fontFamilyId: 'inter',
+    baseFontSize: 11,
+    pageOrientation: 'portrait',
+    viaLayout: '1-via',
+    showHeader: false,
+    showFooter: false,
+    watermarkType: 'none'
+  }
+];
+
+// Extensão Tiptap Customizada para Sublinhado (Ctrl+U)
+const CustomUnderline = Mark.create({
+  name: 'underline',
+  parseHTML() {
+    return [
+      { tag: 'u' },
+      {
+        style: 'text-decoration',
+        consuming: false,
+        getAttrs: (style: any) => (typeof style === 'string' && style.includes('underline') ? {} : false),
+      },
+    ];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['u', HTMLAttributes, 0];
+  },
+  addCommands() {
+    return {
+      toggleUnderline: () => ({ commands }: any) => {
+        return commands.toggleMark(this.name);
+      },
+    };
+  },
+  addKeyboardShortcuts() {
+    return {
+      'Mod-u': () => (this.editor as any).commands.toggleUnderline(),
+    };
+  },
+});
+
+export interface FontOption {
+  id: string;
+  name: string;
+  family: string;
+  category: 'Serif' | 'Sans' | 'Mono';
+}
+
+export const FONT_OPTIONS: FontOption[] = [
+  { id: 'cormorant', name: 'Cormorant Garamond (Clássica)', family: "'Cormorant Garamond', Georgia, serif", category: 'Serif' },
+  { id: 'jakarta', name: 'Plus Jakarta Sans (Hospitalar)', family: "'Plus Jakarta Sans', sans-serif", category: 'Sans' },
+  { id: 'roboto', name: 'Roboto (Google Docs)', family: "'Roboto', sans-serif", category: 'Sans' },
+  { id: 'inter', name: 'Inter (Técnica / Neutra)', family: "'Inter', sans-serif", category: 'Sans' },
+  { id: 'open-sans', name: 'Open Sans (Ambulatorial)', family: "'Open Sans', sans-serif", category: 'Sans' },
+  { id: 'merriweather', name: 'Merriweather (Editorial / Serif)', family: "'Merriweather', Georgia, serif", category: 'Serif' },
+  { id: 'lora', name: 'Lora (Elegante / Pericial)', family: "'Lora', Georgia, serif", category: 'Serif' },
+  { id: 'montserrat', name: 'Montserrat (Moderna)', family: "'Montserrat', sans-serif", category: 'Sans' },
+  { id: 'playfair', name: 'Playfair Display (Nobiliar)', family: "'Playfair Display', serif", category: 'Serif' },
+  { id: 'arial', name: 'Arial (Padrão Universal)', family: 'Arial, Helvetica, sans-serif', category: 'Sans' },
+  { id: 'times', name: 'Times New Roman (Pericial)', family: "'Times New Roman', Times, serif", category: 'Serif' },
+  { id: 'courier', name: 'Courier Prime (Máquina)', family: "'Courier Prime', 'Courier New', monospace", category: 'Mono' }
+];
 
 interface DocumentEditorViewProps {
   darkMode: boolean;
@@ -65,6 +193,7 @@ interface DocumentEditorViewProps {
   activeContext: WorkContext | null;
   onSaveContext?: (updatedContext: WorkContext) => Promise<void>;
   onNavigateToPrint?: () => void;
+  editorInitialSyncTrigger?: number;
 }
 
 export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
@@ -74,8 +203,20 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   prescriptionItems = [],
   activeContext,
   onSaveContext,
+  editorInitialSyncTrigger = 0,
 }) => {
-  const [typography, setTypography] = useState<'serif' | 'sans' | 'inter'>('serif');
+  // Tipografia, Tamanho e Orientação da Folha A4
+  const [fontFamilyId, setFontFamilyId] = useState<string>('cormorant');
+  const [baseFontSize, setBaseFontSize] = useState<number>(11);
+  const [pageOrientation, setPageOrientation] = useState<DocumentOrientation>('portrait');
+  const [viaLayout, setViaLayout] = useState<DocumentViaLayout>('1-via');
+  const [drawerTab, setDrawerTab] = useState<'padrao' | 'salvos' | 'estilos'>('padrao');
+  const [editorHtml, setEditorHtml] = useState<string>('');
+
+  const selectedFont = useMemo(() => {
+    return FONT_OPTIONS.find(f => f.id === fontFamilyId) || FONT_OPTIONS[0];
+  }, [fontFamilyId]);
+
   const [logoUploading, setLogoUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -162,6 +303,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     activeContext?.watermarkType || 'none'
   );
 
+  // Estados para Estilos de Receita Salvos pelo Médico
+  const [customStyles, setCustomStyles] = useState<PrescriptionStyle[]>(() => {
+    try {
+      const raw = localStorage.getItem('prescmed_custom_styles');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [isSaveStyleModalOpen, setIsSaveStyleModalOpen] = useState(false);
+  const [newStyleTitle, setNewStyleTitle] = useState('');
+
   useEffect(() => {
     if (activeContext?.watermarkType !== undefined) {
       setDocWatermark(activeContext.watermarkType);
@@ -184,6 +337,61 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     setTimeout(() => {
       setToastMessage(null);
     }, 3200);
+  };
+
+  const handleSaveCustomStyle = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStyleTitle.trim()) return;
+    const newStyle: PrescriptionStyle = {
+      id: 'style-' + Date.now(),
+      name: newStyleTitle.trim(),
+      fontFamilyId,
+      baseFontSize,
+      pageOrientation,
+      viaLayout,
+      showHeader: headerConfig.showHeader ?? true,
+      showFooter: headerConfig.showFooter ?? true,
+      watermarkType: docWatermark,
+      isCustom: true
+    };
+    const updated = [...customStyles, newStyle];
+    setCustomStyles(updated);
+    try {
+      localStorage.setItem('prescmed_custom_styles', JSON.stringify(updated));
+    } catch (err) {
+      console.error('Falha ao salvar estilo no localStorage:', err);
+    }
+    setIsSaveStyleModalOpen(false);
+    setNewStyleTitle('');
+    showToast(`Estilo "${newStyle.name}" salvo com sucesso!`);
+  };
+
+  const handleDeleteCustomStyle = (id: string, name: string) => {
+    if (!confirm(`Deseja remover o estilo personalizado "${name}"?`)) return;
+    const updated = customStyles.filter(s => s.id !== id);
+    setCustomStyles(updated);
+    try {
+      localStorage.setItem('prescmed_custom_styles', JSON.stringify(updated));
+    } catch (err) {
+      console.error(err);
+    }
+    showToast(`Estilo "${name}" removido.`);
+  };
+
+  const handleApplyStyle = (st: PrescriptionStyle) => {
+    setFontFamilyId(st.fontFamilyId);
+    setBaseFontSize(st.baseFontSize);
+    setPageOrientation(st.pageOrientation);
+    setViaLayout(st.viaLayout);
+    setHeaderConfig(prev => ({
+      ...prev,
+      showHeader: st.showHeader,
+      showFooter: st.showFooter,
+      badgeText: st.viaLayout === '2-vias' ? 'RECEITUÁRIO DE CONTROLE ESPECIAL' : prev.badgeText
+    }));
+    handleWatermarkChange(st.watermarkType);
+    if (editor) triggerAutoSave(editor);
+    showToast(`Estilo "${st.name}" aplicado!`);
   };
 
   // Formatador da lista de medicamentos prescritos na consulta ativa
@@ -221,32 +429,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       .replace(/\{\{data_atendimento\}\}/g, today);
   }, [patient, prescriptionItems, formatPrescriptionItemsList]);
 
-  // Ação: Inserir bloco estruturado da consulta ativa na posição do cursor
-  const handleImportActiveConsultation = () => {
-    if (!editor) return;
 
-    const pSummary = formatPatientSummary(patient);
-    const medsList = formatPrescriptionItemsList(prescriptionItems);
-    const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-
-    const consultationBlock = `
-      <div style="border-left: 3px solid #0284C7; padding-left: 12px; margin: 12px 0;">
-        <p><strong>[DADOS DA CONSULTA MÉDICA — ${today}]</strong></p>
-        <p>${pSummary}</p>
-        <p><br></p>
-        <p><strong>CONDUTA FARMACOLÓGICA PRESCRITA:</strong></p>
-        ${medsList}
-      </div>
-      <p><br></p>
-    `;
-
-    editor.chain().focus().insertContent(consultationBlock).run();
-    triggerAutoSave(editor);
-    showToast('Dados da consulta médica inseridos na folha A4.');
-  };
 
   const initialContent = `
-    <p><strong>PRESCRIÇÃO AMBULATORIAL / DOCUMENTO LIVRE</strong></p>
+    <p style="text-align: center;"><strong>RECEITUÁRIO MÉDICO</strong></p>
     <p><br></p>
     <p><strong>1. Amoxicilina 500mg</strong> ------------------------------------------------ 1 caixa</p>
     <p style="margin-left: 20px;">Tomar 1 cápsula por via oral a cada 8 horas durante 7 dias.</p>
@@ -283,7 +469,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           isTemplate: false,
           headerConfig: currentHeader,
           logoConfig: currentLogo,
-          typography,
+          typography: fontFamilyId,
+          fontSize: baseFontSize,
+          orientation: pageOrientation,
+          viaLayout: viaLayout,
           createdAt: now,
           updatedAt: now
         });
@@ -296,13 +485,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         setSaveStatus('idle');
       }
     }, 600);
-  }, [headerConfig, logoConfig, typography, currentModel.title]);
+  }, [headerConfig, logoConfig, fontFamilyId, baseFontSize, pageOrientation, viaLayout, currentModel.title]);
 
   const editor = useEditor({
     extensions: [
       StarterKit,
+      CustomUnderline,
       Placeholder.configure({
-        placeholder: 'Digite ou cole o texto do laudo, receita médica ou parecer clínico livre aqui...'
+        placeholder: 'Digite ou cole o texto da receita médica, laudo ou parecer clínico livre aqui...'
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph']
@@ -311,28 +501,125 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     content: '',
     editorProps: {
       attributes: {
-        class: 'outline-none focus:outline-none min-h-[460px] leading-relaxed text-sm sm:text-base selection:bg-sky-200 dark:selection:bg-sky-800'
+        class: 'outline-none focus:outline-none min-h-[460px] leading-relaxed text-inherit selection:bg-sky-200 dark:selection:bg-sky-800'
       }
     },
     onUpdate: ({ editor: ed }) => {
+      setEditorHtml(ed.getHTML());
       triggerAutoSave(ed);
     }
   });
 
-  // Carregar rascunho existente do IndexedDB na inicialização
+  // Construtor e carregador completo da receita médica em tempo real
+  const handleLoadActivePrescription = useCallback((showToastMsg = true) => {
+    if (!editor) return;
+
+    const isSpecial = prescriptionItems && prescriptionItems.some(i => i.isSpecialControl);
+    const pName = patient?.name?.trim() || '______________________________';
+    const pDoc = patient?.documentNumber ? ` • Doc: ${patient.documentNumber}` : '';
+    const pAge = patient?.ageText || (patient?.birthDate ? ` • Idade: ${patient.ageText || patient.birthDate}` : '');
+    const pWeight = patient?.weightKg > 0 ? ` • Peso: ${patient.weightKg} kg` : '';
+    const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    // Ajuste regulamentar inteligente: Se for controle especial, define 2 vias e paisagem!
+    if (isSpecial) {
+      setViaLayout('2-vias');
+      setPageOrientation('landscape');
+      setBaseFontSize(10);
+    }
+
+    const itemsHtml = prescriptionItems && prescriptionItems.length > 0
+      ? prescriptionItems.map((item, idx) => {
+          const route = item.route ? `(${item.route})` : '';
+          const presentation = item.presentation ? ` (${item.presentation})` : '';
+          const quantity = item.quantity ? ` ----------------- ${item.quantity}` : '';
+          const instructions = item.instructions || 'Conforme orientação médica.';
+          const times = item.scheduleTimes && item.scheduleTimes.length > 0
+            ? `<br><span style="font-size: 0.9em; color: #475569;">Horários recomendados: ${item.scheduleTimes.join(' — ')}</span>`
+            : '';
+
+          return `
+            <p><strong>${idx + 1}. ${item.name}${presentation}</strong> ${route}${quantity}</p>
+            <p style="margin-left: 20px;">${instructions}${times}</p>
+            <p><br></p>
+          `;
+        }).join('')
+      : `
+          <p><strong>1. </strong></p>
+          <p style="margin-left: 20px; color: #64748b;"><em>(Digite a posologia ou adicione medicamentos na consulta)</em></p>
+          <p><br></p>
+        `;
+
+    const newHtml = `
+      <p style="text-align: center;"><strong>${isSpecial ? 'RECEITUÁRIO DE CONTROLE ESPECIAL' : 'RECEITUÁRIO MÉDICO'}</strong></p>
+      <p><br></p>
+      <p><strong>Paciente:</strong> ${pName}${pDoc}${pAge}${pWeight}</p>
+      <p><br></p>
+      <p><strong>USO INTERNO / PRESCRIÇÃO:</strong></p>
+      <p><br></p>
+      ${itemsHtml}
+      <p><strong>Orientações Gerais:</strong> Seguir rigorosamente a posologia prescrita. Manter boa hidratação oral e retornar para reavaliação clínica se houver persistência dos sintomas.</p>
+    `;
+
+    editor.commands.setContent(newHtml);
+    setEditorHtml(newHtml);
+    setHeaderConfig(prev => ({
+      ...prev,
+      showHeader: true,
+      showFooter: true,
+      showPatientBanner: true,
+      badgeText: isSpecial ? 'RECEITUÁRIO DE CONTROLE ESPECIAL' : 'RECEITUÁRIO MÉDICO',
+      dateText: today
+    }));
+
+    setCurrentModel({
+      id: null,
+      title: isSpecial ? 'Receita de Controle Especial (Consulta)' : 'Receita Médica (Consulta)',
+      isPreset: false
+    });
+
+    isDraftRestoredRef.current = true;
+    triggerAutoSave(editor);
+    if (showToastMsg) {
+      showToast(isSpecial ? 'Receita Especial de 2 Vias carregada na folha!' : 'Receita médica da consulta carregada no editor!');
+    }
+  }, [editor, prescriptionItems, patient, triggerAutoSave]);
+
+  // Gatilho externo: Navegar para o Editor a partir da aba de prescrição
+  const lastTriggerRef = useRef(0);
+  useEffect(() => {
+    if (editor && editorInitialSyncTrigger && editorInitialSyncTrigger !== lastTriggerRef.current) {
+      lastTriggerRef.current = editorInitialSyncTrigger;
+      handleLoadActivePrescription(true);
+    }
+  }, [editor, editorInitialSyncTrigger, handleLoadActivePrescription]);
+
+  // Carregar rascunho existente do IndexedDB OU carregar consulta ativa na inicialização
   useEffect(() => {
     if (!editor) return;
 
     let isMounted = true;
     const restoreDraft = async () => {
+      // Se veio explicitamente pelo botão "Editor" (trigger > 0), prioriza a receita ativa imediatamente!
+      if (editorInitialSyncTrigger && editorInitialSyncTrigger > 0) {
+        lastTriggerRef.current = editorInitialSyncTrigger;
+        if (isMounted) {
+          handleLoadActivePrescription(false);
+          isDraftRestoredRef.current = true;
+        }
+        return;
+      }
+
       try {
         const draft = await db.savedDocuments.get('draft-current');
         if (isMounted) {
           if (draft && (draft.contentJson || draft.contentHtml)) {
             if (draft.contentJson) {
               editor.commands.setContent(draft.contentJson);
+              setEditorHtml(draft.contentHtml || '');
             } else {
               editor.commands.setContent(draft.contentHtml);
+              setEditorHtml(draft.contentHtml || '');
             }
             if (draft.headerConfig) {
               setHeaderConfig(draft.headerConfig);
@@ -341,7 +628,19 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               setLogoConfig(draft.logoConfig);
             }
             if (draft.typography) {
-              setTypography(draft.typography);
+              if (draft.typography === 'serif') setFontFamilyId('cormorant');
+              else if (draft.typography === 'sans') setFontFamilyId('jakarta');
+              else if (draft.typography === 'inter') setFontFamilyId('inter');
+              else setFontFamilyId(draft.typography);
+            }
+            if (draft.fontSize) {
+              setBaseFontSize(draft.fontSize);
+            }
+            if (draft.orientation) {
+              setPageOrientation(draft.orientation);
+            }
+            if (draft.viaLayout) {
+              setViaLayout(draft.viaLayout);
             }
             if (draft.title && draft.title !== 'Rascunho Automático') {
               setCurrentModel({
@@ -355,15 +654,22 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             );
             setSaveStatus('saved');
           } else {
-            editor.commands.setContent(initialContent);
-            setHeaderConfig(buildDefaultHeader());
-            setSaveStatus('idle');
+            // Se não houver rascunho e houver prescrição ativa, já carrega a prescrição!
+            if (prescriptionItems && prescriptionItems.length > 0) {
+              handleLoadActivePrescription(false);
+            } else {
+              editor.commands.setContent(initialContent);
+              setEditorHtml(initialContent);
+              setHeaderConfig(buildDefaultHeader());
+              setSaveStatus('idle');
+            }
           }
         }
       } catch (err) {
         console.error('Erro ao ler rascunho do IndexedDB:', err);
         if (isMounted) {
           editor.commands.setContent(initialContent);
+          setEditorHtml(initialContent);
         }
       } finally {
         if (isMounted) {
@@ -380,7 +686,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         clearTimeout(saveTimerRef.current);
       }
     };
-  }, [editor, buildDefaultHeader]);
+  }, [editor, buildDefaultHeader, editorInitialSyncTrigger, handleLoadActivePrescription, prescriptionItems, initialContent]);
 
   // Carregar lista de modelos salvos do IndexedDB
   const loadSavedTemplates = useCallback(async () => {
@@ -441,7 +747,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           isTemplate: true,
           headerConfig,
           logoConfig,
-          typography,
+          typography: fontFamilyId,
+          fontSize: baseFontSize,
+          orientation: pageOrientation,
+          viaLayout: viaLayout,
           createdAt: now,
           updatedAt: now
         };
@@ -482,7 +791,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         isTemplate: true,
         headerConfig,
         logoConfig,
-        typography,
+        typography: fontFamilyId,
+        fontSize: baseFontSize,
+        orientation: pageOrientation,
+        viaLayout: viaLayout,
         createdAt: now,
         updatedAt: now
       };
@@ -509,9 +821,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     if (!editor) return;
 
     if (tpl.contentHtml) {
-      editor.commands.setContent(interpolateMedicalTags(tpl.contentHtml));
+      const interpolated = interpolateMedicalTags(tpl.contentHtml);
+      editor.commands.setContent(interpolated);
+      setEditorHtml(interpolated);
     } else if (tpl.contentJson) {
       editor.commands.setContent(tpl.contentJson);
+      setEditorHtml(tpl.contentHtml || '');
     }
 
     if (tpl.headerConfig) {
@@ -534,7 +849,22 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     }
 
     if (tpl.typography) {
-      setTypography(tpl.typography);
+      if (tpl.typography === 'serif') setFontFamilyId('cormorant');
+      else if (tpl.typography === 'sans') setFontFamilyId('jakarta');
+      else if (tpl.typography === 'inter') setFontFamilyId('inter');
+      else setFontFamilyId(tpl.typography);
+    }
+
+    if (tpl.fontSize) {
+      setBaseFontSize(tpl.fontSize);
+    }
+
+    if (tpl.orientation) {
+      setPageOrientation(tpl.orientation);
+    }
+
+    if (tpl.viaLayout) {
+      setViaLayout(tpl.viaLayout);
     }
 
     setCurrentModel({
@@ -548,11 +878,54 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     showToast(`Modelo "${tpl.title}" carregado na folha A4.`);
   };
 
+  // Ação: Aplicar estilo visual de receita médica
+  const handleApplyStylePreset = (styleId: 'classico' | 'hospitalar' | 'sus' | 'especial_2vias' | 'pre_timbrado') => {
+    if (styleId === 'classico') {
+      setFontFamilyId('cormorant');
+      setBaseFontSize(12);
+      setPageOrientation('portrait');
+      setViaLayout('1-via');
+      setHeaderConfig(prev => ({ ...prev, showHeader: true, showFooter: true }));
+      setLogoConfig(prev => ({ ...prev, position: 'top-center', visible: true }));
+      showToast('Estilo Clássico Nobre aplicado!');
+    } else if (styleId === 'hospitalar') {
+      setFontFamilyId('jakarta');
+      setBaseFontSize(11);
+      setPageOrientation('portrait');
+      setViaLayout('1-via');
+      setHeaderConfig(prev => ({ ...prev, showHeader: true, showFooter: true }));
+      setLogoConfig(prev => ({ ...prev, position: 'top-left', visible: true }));
+      showToast('Estilo Hospitalar Moderno aplicado!');
+    } else if (styleId === 'sus') {
+      setFontFamilyId('inter');
+      setBaseFontSize(11);
+      setPageOrientation('portrait');
+      setViaLayout('1-via');
+      setHeaderConfig(prev => ({ ...prev, showHeader: true, showFooter: true }));
+      handleWatermarkChange('sus_double');
+      showToast("Estilo SUS / Atenção Básica aplicado!");
+    } else if (styleId === 'especial_2vias') {
+      setFontFamilyId('jakarta');
+      setBaseFontSize(10);
+      setPageOrientation('landscape');
+      setViaLayout('2-vias');
+      setHeaderConfig(prev => ({ ...prev, showHeader: true, showFooter: true, badgeText: 'RECEITUÁRIO DE CONTROLE ESPECIAL' }));
+      showToast('Estilo Receita Especial de 2 Vias (Paisagem) aplicado!');
+    } else if (styleId === 'pre_timbrado') {
+      setHeaderConfig(prev => ({ ...prev, showHeader: false, showFooter: false }));
+      setLogoConfig(prev => ({ ...prev, visible: false }));
+      showToast('Estilo Folha Pré-Timbrada: Cabeçalho e rodapé ocultados!');
+    }
+    setIsModelsDrawerOpen(false);
+    if (editor) triggerAutoSave(editor);
+  };
+
   // Ação: Iniciar novo documento em branco
   const handleStartNewDocument = () => {
     if (!editor) return;
     if (confirm('Deseja iniciar um novo documento em branco na folha A4?')) {
       editor.commands.setContent('<p><br></p>');
+      setEditorHtml('<p><br></p>');
       setCurrentModel({
         id: null,
         title: 'Novo Documento Livre',
@@ -628,6 +1001,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     type: 
       | 'laudo' 
       | 'receita' 
+      | 'receita_especial'
       | 'parecer' 
       | 'risco' 
       | 'atestado' 
@@ -645,7 +1019,27 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     let presetTitle = '';
     let badge = 'DOCUMENTO CLÍNICO LIVRE';
 
-    if (type === 'laudo_com_receita') {
+    if (type === 'receita_especial') {
+      presetTitle = 'Receituário de Controle Especial (Portaria 344/98)';
+      badge = 'RECEITUÁRIO DE CONTROLE ESPECIAL';
+      setViaLayout('2-vias');
+      setPageOrientation('landscape');
+      setBaseFontSize(10);
+      templateHtml = `
+        <p style="text-align: center;"><strong>RECEITUÁRIO DE CONTROLE ESPECIAL</strong></p>
+        <p><br></p>
+        <p><strong>Paciente:</strong> ${patientName} | <strong>Documento:</strong> ${patientDoc}</p>
+        <p><br></p>
+        <p><strong>PRESCRIÇÃO MEDICAMENTOSA (PORTARIA SVS/MS 344/98):</strong></p>
+        <p><strong>1. Clonazepam 2,5 mg/mL (Gotas)</strong> (Uso Oral) ---------------- 01 frasco (vinte mL)</p>
+        <p style="margin-left: 20px;">Pingar 05 (cinco) gotas por via oral às 21:00 horas se insônia severa.</p>
+        <p><br></p>
+        <p><strong>2. Sertralina 50 mg (Comprimidos)</strong> (Uso Oral) ------------ 60 comprimidos (sessenta)</p>
+        <p style="margin-left: 20px;">Tomar 01 (um) comprimido por via oral pela manhã, após o café, diariamente durante 60 dias.</p>
+        <p><br></p>
+        <p><strong>Orientações:</strong> Validade de 30 dias a contar da emissão. 1ª via retida na farmácia e 2ª via devolvida ao paciente orientada.</p>
+      `;
+    } else if (type === 'laudo_com_receita') {
       presetTitle = 'Laudo Médico com Prescrição Terapêutica';
       badge = 'LAUDO COM RECEITA';
       templateHtml = `
@@ -744,10 +1138,15 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     } else {
       presetTitle = 'Receita Ambulatorial Livre';
       badge = 'RECEITA MÉDICA';
+      setViaLayout('1-via');
+      setPageOrientation('portrait');
+      setBaseFontSize(12);
       templateHtml = initialContent;
     }
 
-    editor.commands.setContent(interpolateMedicalTags(templateHtml));
+    const interpolated = interpolateMedicalTags(templateHtml);
+    editor.commands.setContent(interpolated);
+    setEditorHtml(interpolated);
     setHeaderConfig(prev => ({
       ...prev,
       badgeText: badge
@@ -765,6 +1164,29 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   const handlePrint = () => {
+    // Injeta estilo dinâmico de orientação no documento
+    const styleId = 'prescmed-dynamic-print-style';
+    let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = styleId;
+      document.head.appendChild(styleEl);
+    }
+    styleEl.innerHTML = `
+      @page {
+        size: A4 ${pageOrientation};
+        margin: 6mm;
+      }
+    `;
+
+    if (pageOrientation === 'landscape') {
+      document.body.classList.add('print-landscape');
+      document.body.classList.remove('print-portrait');
+    } else {
+      document.body.classList.add('print-portrait');
+      document.body.classList.remove('print-landscape');
+    }
+
     window.print();
   };
 
@@ -925,7 +1347,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   });
 
   return (
-    <div className="flex flex-col gap-4 max-w-5xl mx-auto w-full pb-16" onClick={() => setLogoSelected(false)}>
+    <div className={`flex flex-col gap-4 mx-auto w-full pb-16 transition-all ${pageOrientation === 'landscape' ? 'max-w-[1240px]' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
       {/* Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-slate-700 animate-tab-fade no-print">
@@ -1071,8 +1493,66 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       <div 
         className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 rounded-2xl p-2.5 sm:p-3 border backdrop-blur-md shadow-tactile-sm flex flex-wrap items-center justify-between gap-2.5 bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)]"
       >
-        {/* Agrupamento 1: Formatação Tiptap */}
-        <div className="flex items-center gap-1 flex-wrap">
+        {/* Agrupamento 1: Formatação Tiptap & Estilo Docs */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Estilo do Parágrafo / Título */}
+          <select
+            value={
+              editor?.isActive('heading', { level: 1 }) ? 'h1' :
+              editor?.isActive('heading', { level: 2 }) ? 'h2' :
+              editor?.isActive('heading', { level: 3 }) ? 'h3' : 'p'
+            }
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === 'p') editor?.chain().focus().setParagraph().run();
+              else if (val === 'h1') editor?.chain().focus().toggleHeading({ level: 1 }).run();
+              else if (val === 'h2') editor?.chain().focus().toggleHeading({ level: 2 }).run();
+              else if (val === 'h3') editor?.chain().focus().toggleHeading({ level: 3 }).run();
+            }}
+            className="bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none"
+            title="Estilo de texto (Parágrafo ou Título)"
+          >
+            <option value="p">Texto Normal</option>
+            <option value="h1">Título 1 (Grande)</option>
+            <option value="h2">Título 2 (Médio)</option>
+            <option value="h3">Título 3 (Pequeno)</option>
+          </select>
+
+          {/* Ajuste Fino do Tamanho da Fonte (Docs Style: [-] 11 pt [+]) */}
+          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] px-1 py-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
+              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer"
+              title="Diminuir tamanho da fonte da folha (A-)"
+              aria-label="Diminuir fonte"
+            >
+              −
+            </button>
+            <select
+              value={baseFontSize}
+              onChange={(e) => setBaseFontSize(Number(e.target.value))}
+              className="bg-transparent px-1 py-0.5 font-bold text-center text-xs focus:outline-none cursor-pointer"
+              title="Tamanho da fonte em pontos (pt)"
+            >
+              {[8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28].map(sz => (
+                <option key={sz} value={sz}>{sz} pt</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setBaseFontSize(prev => Math.min(32, prev + 1))}
+              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer"
+              title="Aumentar tamanho da fonte da folha (A+)"
+              aria-label="Aumentar fonte"
+            >
+              +
+            </button>
+          </div>
+
+          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+          {/* Formatação básica: Negrito, Itálico, Sublinhado */}
           <button
             type="button"
             onClick={() => editor?.chain().focus().toggleBold().run()}
@@ -1103,7 +1583,22 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <Italic className="w-4 h-4" />
           </button>
 
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-1" />
+          <button
+            type="button"
+            onClick={() => (editor as any)?.chain().focus().toggleUnderline().run()}
+            disabled={!editor}
+            className={`p-2 rounded-xl transition-all cursor-pointer ${
+              (editor as any)?.isActive('underline') 
+                ? 'bg-sky-700 text-white shadow-tactile-sm' 
+                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+            }`}
+            title="Sublinhado (Ctrl+U)"
+            aria-label="Sublinhado"
+          >
+            <UnderlineIcon className="w-4 h-4" />
+          </button>
+
+          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
 
           {/* Alinhamento de Texto */}
           <button
@@ -1158,7 +1653,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <AlignJustify className="w-4 h-4" />
           </button>
 
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-1" />
+          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
 
           {/* Listas */}
           <button
@@ -1187,7 +1682,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <ListOrdered className="w-4 h-4" />
           </button>
 
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-1" />
+          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
 
           {/* Desfazer / Refazer */}
           <button
@@ -1211,37 +1706,167 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           </button>
         </div>
 
-        {/* Agrupamento 2: Tipografia, Importar Consulta, Logotipo & Impressão */}
+        {/* Agrupamento 2: Tipografia, Orientação, Vias, Cabeçalho, Carregar Consulta & Impressão */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Seletor Tipográfico */}
-          <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1 text-xs">
-            <Type className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+          {/* Seletor Rápido de Estilo de Receita Atual */}
+          <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
+            <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
             <select
-              value={typography}
+              value=""
               onChange={(e) => {
-                const val = e.target.value as any;
-                setTypography(val);
+                const val = e.target.value;
+                if (!val) return;
+                const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
+                if (found) handleApplyStyle(found);
+              }}
+              className="bg-transparent font-semibold cursor-pointer focus:outline-none text-xs max-w-[155px] truncate"
+              title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
+            >
+              <option value="" disabled>Selecionar estilo...</option>
+              <optgroup label="Estilos Padrão">
+                {DEFAULT_PRESCRIPTION_STYLES.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </optgroup>
+              {customStyles.length > 0 && (
+                <optgroup label="Meus Estilos Salvos">
+                  {customStyles.map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </optgroup>
+              )}
+            </select>
+            <button
+              type="button"
+              onClick={() => setIsSaveStyleModalOpen(true)}
+              className="p-1 rounded hover:bg-[var(--surface-hover)] text-sky-600 dark:text-sky-400 cursor-pointer"
+              title="Salvar configuração visual atual como novo estilo personalizado"
+            >
+              <BookmarkPlus className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Seletor Tipográfico Docs Style (12 fontes) */}
+          <div className="flex items-center gap-1.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1 text-xs">
+            <Type className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
+            <select
+              value={fontFamilyId}
+              onChange={(e) => {
+                setFontFamilyId(e.target.value);
                 if (editor) triggerAutoSave(editor);
               }}
-              className="bg-transparent font-medium cursor-pointer focus:outline-none text-xs"
+              className="bg-transparent font-semibold cursor-pointer focus:outline-none text-xs max-w-[170px] truncate"
               aria-label="Família Tipográfica da Folha A4"
+              title="Trocar fonte da receita médica estilo Google Docs"
             >
-              <option value="serif">Cormorant Garamond (Clássica)</option>
-              <option value="sans">Plus Jakarta Sans (Hospitalar)</option>
-              <option value="inter">Inter (Técnica)</option>
+              {FONT_OPTIONS.map(f => (
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
+              ))}
             </select>
           </div>
 
-          {/* Botão Importar Consulta Ativa */}
+          {/* Alternador de Orientação: Retrato / Paisagem */}
+          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setPageOrientation('portrait')}
+              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition-all cursor-pointer ${
+                pageOrientation === 'portrait' ? 'bg-sky-700 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+              title="Orientação Retrato (Vertical 210×297mm)"
+            >
+              <span>↕️</span>
+              <span className="hidden xl:inline">Retrato</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setPageOrientation('landscape')}
+              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition-all cursor-pointer ${
+                pageOrientation === 'landscape' ? 'bg-sky-700 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+              title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
+            >
+              <span>↔️</span>
+              <span className="hidden xl:inline">Paisagem</span>
+            </button>
+          </div>
+
+          {/* Alternador de Vias: 1 Via / 2 Vias na Mesma Folha */}
+          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setViaLayout('1-via')}
+              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition-all cursor-pointer ${
+                viaLayout === '1-via' ? 'bg-sky-700 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+              title="Folha Única (1 Via Padrão)"
+            >
+              <span>📄</span>
+              <span className="hidden xl:inline">1 Via</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setViaLayout('2-vias');
+                if (pageOrientation === 'portrait') {
+                  setPageOrientation('landscape');
+                  showToast('Modo 2 Vias ativado! Paisagem recomendada para imprimir as duas vias lado a lado.');
+                }
+              }}
+              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition-all cursor-pointer ${
+                viaLayout === '2-vias' ? 'bg-sky-700 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+              title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
+            >
+              <span>📑</span>
+              <span className="hidden xl:inline">2 Vias (Mesma Folha)</span>
+            </button>
+          </div>
+
+          {/* Alternador de Visibilidade do Cabeçalho */}
           <button
             type="button"
-            onClick={handleImportActiveConsultation}
-            className="h-9 px-3 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm"
-            title="Inserir dados do paciente e medicamentos prescritos nesta consulta na folha A4"
+            onClick={() => handleHeaderFieldChange('showHeader', !headerConfig.showHeader)}
+            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all ${
+              headerConfig.showHeader
+                ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
+                : 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
+            }`}
+            title={headerConfig.showHeader ? "Cabeçalho visível. Clique para ocultar (ideal para papel já timbrado)" : "Cabeçalho ocultado. Clique para restaurar"}
           >
-            <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-            <span className="hidden sm:inline">Importar Consulta</span>
-            <span className="sm:hidden">Importar</span>
+            {headerConfig.showHeader ? <Eye className="w-3.5 h-3.5 text-sky-600" /> : <EyeOff className="w-3.5 h-3.5 text-amber-500" />}
+            <span className="hidden sm:inline">Cabeçalho</span>
+            <span className="text-[10px] opacity-75">({headerConfig.showHeader ? 'Sim' : 'Não'})</span>
+          </button>
+
+          {/* Alternador de Visibilidade do Rodapé */}
+          <button
+            type="button"
+            onClick={() => handleHeaderFieldChange('showFooter', !headerConfig.showFooter)}
+            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all ${
+              headerConfig.showFooter
+                ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
+                : 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
+            }`}
+            title={headerConfig.showFooter ? "Rodapé de carimbo visível. Clique para ocultar" : "Rodapé ocultado. Clique para restaurar"}
+          >
+            {headerConfig.showFooter ? <Eye className="w-3.5 h-3.5 text-sky-600" /> : <EyeOff className="w-3.5 h-3.5 text-slate-400" />}
+            <span className="hidden sm:inline">Rodapé</span>
+            <span className="text-[10px] opacity-75">({headerConfig.showFooter ? 'Sim' : 'Não'})</span>
+          </button>
+
+          {/* Botão CARREGAR RECEITA ATUAL (Substitui o botão confuso Importar Consulta) */}
+          <button
+            type="button"
+            onClick={() => handleLoadActivePrescription(true)}
+            className="h-9 px-3 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all active:scale-95"
+            title="Preencher a folha A4 com os dados do paciente e medicamentos prescritos nesta consulta"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+            <span className="hidden sm:inline">Carregar Receita Atual</span>
+            <span className="sm:hidden">Receita</span>
             {prescriptionItems && prescriptionItems.length > 0 && (
               <span className="w-4 h-4 rounded-full bg-sky-600 text-white text-[10px] font-bold flex items-center justify-center">
                 {prescriptionItems.length}
@@ -1489,12 +2114,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           ref={sheetRef}
           id="printable-a4-sheet"
           className={`a4-editor-canvas bg-white text-slate-900 rounded-lg shadow-2xl relative transition-all duration-200 ${
-            typography === 'serif' ? 'font-serif-doc' : typography === 'inter' ? 'font-sans' : 'font-sans'
+            pageOrientation === 'landscape' ? 'canvas-landscape' : 'canvas-portrait'
           }`}
           style={{
-            width: '210mm',
-            minHeight: '297mm',
-            padding: '20mm',
+            width: pageOrientation === 'landscape' ? '297mm' : '210mm',
+            minHeight: pageOrientation === 'landscape' ? '210mm' : '297mm',
+            padding: pageOrientation === 'landscape' ? '10mm 14mm' : '20mm',
             boxSizing: 'border-box',
             backgroundColor: '#FFFFFF',
             color: '#0F172A',
@@ -1502,7 +2127,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             flexDirection: 'column',
             justifyContent: 'space-between',
             boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08)',
-            position: 'relative'
+            position: 'relative',
+            fontFamily: selectedFont.family,
+            fontSize: `${baseFontSize}pt`
           }}
         >
           {/* Marca d'Água Oficial em Camada Transparente */}
@@ -1554,258 +2181,603 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             </div>
           )}
 
-          {/* CABEÇALHO HOSPITALAR / TIMBRADO TOTALMENTE EDITÁVEL EM TEMPO REAL */}
-          {headerConfig.showHeader && (
-            <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition-all">
-              {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
-              <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
-                <span className="flex items-center gap-1 text-slate-600 font-semibold">
-                  <Pencil className="w-3 h-3 text-sky-600" />
-                  <span>Cabeçalho Editável em Tempo Real (clique em qualquer texto para editar)</span>
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleResetHeaderFromProfile}
-                    className="hover:text-sky-700 font-medium flex items-center gap-1 cursor-pointer"
-                    title="Preencher com os dados do seu Perfil Médico cadastrado"
-                  >
-                    <RotateCcw className="w-3 h-3" />
-                    <span>Puxar do Perfil</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleHeaderFieldChange('showHeader', false)}
-                    className="hover:text-amber-600 font-medium flex items-center gap-1 cursor-pointer"
-                    title="Ocultar cabeçalho (ideal se usar folha já timbrada)"
-                  >
-                    <EyeOff className="w-3 h-3" />
-                    <span>Ocultar Cabeçalho</span>
-                  </button>
-                </div>
+          {/* AVISO E RESTAURAÇÃO DE CABEÇALHO OCULTADO (no-print) */}
+          {!headerConfig.showHeader && (
+            <div className="no-print mb-4 p-2.5 rounded-xl border border-dashed border-amber-300 bg-amber-50/70 text-amber-800 text-xs flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <EyeOff className="w-4 h-4 text-amber-600 shrink-0" />
+                <span><strong>Cabeçalho Ocultado:</strong> A folha será impressa sem cabeçalho (ideal para papel timbrado físico).</span>
               </div>
-
-              {/* LOGOTIPO NO TOPO (Top-Left, Top-Center ou Top-Right) */}
-              {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'top-left' || logoConfig.position === 'top-center' || logoConfig.position === 'top-right') && (
-                <div className={`mb-3 flex relative group ${
-                  logoConfig.position === 'top-center' ? 'justify-center' :
-                  logoConfig.position === 'top-right' ? 'justify-end' : 'justify-start'
-                }`}>
-                  <div className="relative">
-                    <img 
-                      src={logoConfig.dataUrl} 
-                      alt="Logotipo da Instituição" 
-                      className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
-                    />
-                    {/* Alça rápida no-print para trocar posição ou tamanho */}
-                    <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-[9px] z-20">
-                      <button
-                        type="button"
-                        onClick={() => handleChangeLogoPosition('free')}
-                        className="hover:text-sky-300 flex items-center gap-0.5 cursor-pointer"
-                        title="Ativar modo livre e arrastar para qualquer lugar"
-                      >
-                        <Move className="w-2.5 h-2.5" />
-                        <span>Mover</span>
-                      </button>
-                      <span>•</span>
-                      <button
-                        type="button"
-                        onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
-                        className="hover:text-sky-300 cursor-pointer"
-                      >
-                        Tamanho ({String(logoConfig.size).toUpperCase()})
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-start justify-between gap-4">
-                {/* Lado Esquerdo: Identificação Médica e Institucional Editáveis Inline */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-2.5 mb-1">
-                    {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
-                    {logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-left' ? (
-                      <img 
-                        src={logoConfig.dataUrl} 
-                        alt="Logotipo" 
-                        className={`${getLogoSizeClass(logoConfig.size)} object-contain shrink-0`}
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-lg bg-sky-900 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                        <ShieldCheck className="w-5 h-5" />
-                      </div>
-                    )}
-
-                    <div className="flex-1 min-w-0">
-                      {/* Nome do Médico Editável */}
-                      <input
-                        type="text"
-                        value={headerConfig.doctorName || ''}
-                        onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
-                        placeholder="DR(A). MÉDICO(A)"
-                        className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
-                        title="Clique para editar o nome do médico"
-                      />
-
-                      {/* CRM e RQE Editáveis */}
-                      <input
-                        type="text"
-                        value={headerConfig.doctorCrm || ''}
-                        onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
-                        placeholder="CRM-SP 000000 • RQE 0000"
-                        className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
-                        title="Clique para editar CRM e RQE"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Especialidade Editável */}
-                  <input
-                    type="text"
-                    value={headerConfig.doctorSpecialty || ''}
-                    onChange={e => handleHeaderFieldChange('doctorSpecialty', e.target.value)}
-                    placeholder="Especialidade Médica (Ex: Clínica Médica)"
-                    className="text-xs font-semibold text-slate-700 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
-                    title="Clique para editar a especialidade"
-                  />
-
-                  {/* Nome da Instituição / Hospital / Clínica Editável */}
-                  <input
-                    type="text"
-                    value={headerConfig.clinicName || ''}
-                    onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
-                    placeholder="Nome da Instituição ou Clínica de Atendimento"
-                    className="text-[11px] font-medium text-slate-600 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
-                    title="Clique para editar a instituição ou clínica"
-                  />
-
-                  {/* Endereço / CNES Editável */}
-                  <input
-                    type="text"
-                    value={headerConfig.clinicAddress || ''}
-                    onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
-                    placeholder="Endereço e Informações de Contato"
-                    className="text-[10px] text-slate-500 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
-                    title="Clique para editar o endereço"
-                  />
-                </div>
-
-                {/* Lado Direito: Logo (header-right), Selo do Tipo de Documento & Data */}
-                <div className="text-right flex flex-col items-end shrink-0 max-w-[220px]">
-                  {logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-right' && (
-                    <img 
-                      src={logoConfig.dataUrl} 
-                      alt="Logotipo" 
-                      className={`${getLogoSizeClass(logoConfig.size)} object-contain mb-2`}
-                    />
-                  )}
-
-                  {/* Badge Editável do Tipo de Documento */}
-                  <input
-                    type="text"
-                    value={headerConfig.badgeText || ''}
-                    onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
-                    placeholder="TIPO DE DOCUMENTO"
-                    className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-sans text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition-all w-full max-w-[200px]"
-                    title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
-                  />
-
-                  {/* Data Editável */}
-                  <input
-                    type="text"
-                    value={headerConfig.dateText || ''}
-                    onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
-                    placeholder="Data de emissão"
-                    className="text-[11px] text-slate-500 font-sans mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition-all w-full"
-                    title="Clique para editar a data de emissão"
-                  />
-                </div>
-              </div>
-
-              {/* Identificação Rápida do Paciente (Se houver) */}
-              {headerConfig.showPatientBanner && (
-                <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs font-sans text-slate-700">
-                  {patient?.name ? (
-                    <>
-                      <span><strong>Paciente:</strong> {patient.name}</span>
-                      {patient.documentNumber && <span><strong>Doc:</strong> {patient.documentNumber}</span>}
-                      {patient.weightKg > 0 && <span><strong>Peso:</strong> {patient.weightKg} kg</span>}
-                    </>
-                  ) : (
-                    <input
-                      type="text"
-                      value={headerConfig.patientCustomText || ''}
-                      onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
-                      placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
-                      className="w-full text-xs text-slate-600 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none"
-                    />
-                  )}
-                </div>
-              )}
-            </header>
-          )}
-
-          {/* ÁREA PRINCIPAL DO EDITOR (Tiptap WYSIWYG em Tempo Real) */}
-          <div className="flex-1 w-full text-slate-900 relative z-10 py-1">
-            <EditorContent editor={editor} />
-          </div>
-
-          {/* RODAPÉ CLÍNICO COM CARIMBO E ASSINATURA EDITÁVEIS */}
-          {headerConfig.showFooter && (
-            <footer className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center font-sans relative z-10 group">
-              <div className="w-72 border-b border-slate-400 mb-2" />
-
-              {/* Nome do Médico na Assinatura */}
-              <input
-                type="text"
-                value={headerConfig.footerDocName || headerConfig.doctorName || ''}
-                onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
-                placeholder="Dr(a). Médico(a)"
-                className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80"
-                title="Clique para editar o nome na assinatura"
-              />
-
-              {/* CRM na Assinatura */}
-              <input
-                type="text"
-                value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
-                onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
-                placeholder="Médico(a) — CRM-SP 00000"
-                className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80 mt-0.5"
-                title="Clique para editar CRM na assinatura"
-              />
-
-              {/* Especialidade na Assinatura */}
-              <input
-                type="text"
-                value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
-                onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
-                placeholder="Especialidade"
-                className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80"
-                title="Clique para editar a especialidade no carimbo"
-              />
-
-              {/* Subtexto Regulamentar CFM */}
-              <input
-                type="text"
-                value={headerConfig.footerSubtext || ''}
-                onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
-                className="text-[9px] text-slate-400 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-full max-w-md"
-              />
-
-              {/* Botão no-print para Ocultar Rodapé */}
               <button
                 type="button"
-                onClick={() => handleHeaderFieldChange('showFooter', false)}
-                className="no-print opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
-                title="Ocultar rodapé de assinatura"
+                onClick={() => handleHeaderFieldChange('showHeader', true)}
+                className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
               >
-                <EyeOff className="w-2.5 h-2.5" />
-                <span>Ocultar Rodapé</span>
+                <Eye className="w-3.5 h-3.5" />
+                <span>Restaurar Cabeçalho</span>
               </button>
-            </footer>
+            </div>
+          )}
+
+          {/* LAYOUT 1 VIA (FOLHA ÚNICA PADRÃO) */}
+          {viaLayout === '1-via' && (
+            <>
+              {/* CABEÇALHO HOSPITALAR / TIMBRADO TOTALMENTE EDITÁVEL EM TEMPO REAL */}
+              {headerConfig.showHeader && (
+                <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition-all">
+                  {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
+                  <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
+                    <span className="flex items-center gap-1 text-slate-600 font-semibold">
+                      <Pencil className="w-3 h-3 text-sky-600" />
+                      <span>Cabeçalho Editável em Tempo Real (clique em qualquer texto para editar)</span>
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleResetHeaderFromProfile}
+                        className="hover:text-sky-700 font-medium flex items-center gap-1 cursor-pointer"
+                        title="Preencher com os dados do seu Perfil Médico cadastrado"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>Puxar do Perfil</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleHeaderFieldChange('showHeader', false)}
+                        className="hover:text-amber-600 font-medium flex items-center gap-1 cursor-pointer"
+                        title="Ocultar cabeçalho (ideal se usar folha já timbrada)"
+                      >
+                        <EyeOff className="w-3 h-3" />
+                        <span>Ocultar Cabeçalho</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* LOGOTIPO NO TOPO (Top-Left, Top-Center ou Top-Right) */}
+                  {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'top-left' || logoConfig.position === 'top-center' || logoConfig.position === 'top-right') && (
+                    <div className={`mb-3 flex relative group ${
+                      logoConfig.position === 'top-center' ? 'justify-center' :
+                      logoConfig.position === 'top-right' ? 'justify-end' : 'justify-start'
+                    }`}>
+                      <div className="relative">
+                        <img 
+                          src={logoConfig.dataUrl} 
+                          alt="Logotipo da Instituição" 
+                          className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
+                        />
+                        {/* Alça rápida no-print para trocar posição ou tamanho */}
+                        <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-[9px] z-20">
+                          <button
+                            type="button"
+                            onClick={() => handleChangeLogoPosition('free')}
+                            className="hover:text-sky-300 flex items-center gap-0.5 cursor-pointer"
+                            title="Ativar modo livre e arrastar para qualquer lugar"
+                          >
+                            <Move className="w-2.5 h-2.5" />
+                            <span>Mover</span>
+                          </button>
+                          <span>•</span>
+                          <button
+                            type="button"
+                            onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
+                            className="hover:text-sky-300 cursor-pointer"
+                          >
+                            Tamanho ({String(logoConfig.size).toUpperCase()})
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-start justify-between gap-4">
+                    {/* Lado Esquerdo: Identificação Médica e Institucional Editáveis Inline */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2.5 mb-1">
+                        {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
+                        {logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-left' ? (
+                          <img 
+                            src={logoConfig.dataUrl} 
+                            alt="Logotipo" 
+                            className={`${getLogoSizeClass(logoConfig.size)} object-contain shrink-0`}
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-lg bg-sky-900 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                            <ShieldCheck className="w-5 h-5" />
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          {/* Nome do Médico Editável */}
+                          <input
+                            type="text"
+                            value={headerConfig.doctorName || ''}
+                            onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
+                            placeholder="DR(A). MÉDICO(A)"
+                            className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                            title="Clique para editar o nome do médico"
+                          />
+
+                          {/* CRM e RQE Editáveis */}
+                          <input
+                            type="text"
+                            value={headerConfig.doctorCrm || ''}
+                            onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
+                            placeholder="CRM-SP 000000 • RQE 0000"
+                            className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                            title="Clique para editar CRM e RQE"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Especialidade Editável */}
+                      <input
+                        type="text"
+                        value={headerConfig.doctorSpecialty || ''}
+                        onChange={e => handleHeaderFieldChange('doctorSpecialty', e.target.value)}
+                        placeholder="Especialidade Médica (Ex: Clínica Médica)"
+                        className="text-xs font-semibold text-slate-700 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                        title="Clique para editar a especialidade"
+                      />
+
+                      {/* Nome da Instituição / Hospital / Clínica Editável */}
+                      <input
+                        type="text"
+                        value={headerConfig.clinicName || ''}
+                        onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
+                        placeholder="Nome da Instituição ou Clínica de Atendimento"
+                        className="text-[11px] font-medium text-slate-600 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                        title="Clique para editar a instituição ou clínica"
+                      />
+
+                      {/* Endereço / CNES Editável */}
+                      <input
+                        type="text"
+                        value={headerConfig.clinicAddress || ''}
+                        onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
+                        placeholder="Endereço e Informações de Contato"
+                        className="text-[10px] text-slate-500 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                        title="Clique para editar o endereço"
+                      />
+                    </div>
+
+                    {/* Lado Direito: Logo (header-right), Selo do Tipo de Documento & Data */}
+                    <div className="text-right flex flex-col items-end shrink-0 max-w-[220px]">
+                      {logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-right' && (
+                        <img 
+                          src={logoConfig.dataUrl} 
+                          alt="Logotipo" 
+                          className={`${getLogoSizeClass(logoConfig.size)} object-contain mb-2`}
+                        />
+                      )}
+
+                      {/* Badge Editável do Tipo de Documento */}
+                      <input
+                        type="text"
+                        value={headerConfig.badgeText || ''}
+                        onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
+                        placeholder="TIPO DE DOCUMENTO"
+                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-sans text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition-all w-full max-w-[200px]"
+                        title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
+                      />
+
+                      {/* Data Editável */}
+                      <input
+                        type="text"
+                        value={headerConfig.dateText || ''}
+                        onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
+                        placeholder="Data de emissão"
+                        className="text-[11px] text-slate-500 font-sans mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition-all w-full"
+                        title="Clique para editar a data de emissão"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Identificação Rápida do Paciente (Se houver) */}
+                  {headerConfig.showPatientBanner && (
+                    <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs font-sans text-slate-700">
+                      {patient?.name ? (
+                        <>
+                          <span><strong>Paciente:</strong> {patient.name}</span>
+                          {patient.documentNumber && <span><strong>Doc:</strong> {patient.documentNumber}</span>}
+                          {patient.weightKg > 0 && <span><strong>Peso:</strong> {patient.weightKg} kg</span>}
+                        </>
+                      ) : (
+                        <input
+                          type="text"
+                          value={headerConfig.patientCustomText || ''}
+                          onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
+                          placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
+                          className="w-full text-xs text-slate-600 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none"
+                        />
+                      )}
+                    </div>
+                  )}
+                </header>
+              )}
+
+              {/* ÁREA PRINCIPAL DO EDITOR (Tiptap WYSIWYG em Tempo Real) */}
+              <div className="flex-1 w-full text-slate-900 relative z-10 py-1">
+                <EditorContent editor={editor} />
+              </div>
+
+              {/* RODAPÉ CLÍNICO COM CARIMBO E ASSINATURA EDITÁVEIS */}
+              {headerConfig.showFooter && (
+                <footer className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center font-sans relative z-10 group">
+                  <div className="w-72 border-b border-slate-400 mb-2" />
+
+                  {/* Nome do Médico na Assinatura */}
+                  <input
+                    type="text"
+                    value={headerConfig.footerDocName || headerConfig.doctorName || ''}
+                    onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
+                    placeholder="Dr(a). Médico(a)"
+                    className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80"
+                    title="Clique para editar o nome na assinatura"
+                  />
+
+                  {/* CRM na Assinatura */}
+                  <input
+                    type="text"
+                    value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
+                    onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
+                    placeholder="Médico(a) — CRM-SP 00000"
+                    className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80 mt-0.5"
+                    title="Clique para editar CRM na assinatura"
+                  />
+
+                  {/* Especialidade na Assinatura */}
+                  <input
+                    type="text"
+                    value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
+                    onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
+                    placeholder="Especialidade"
+                    className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80"
+                    title="Clique para editar a especialidade no carimbo"
+                  />
+
+                  {/* Subtexto Regulamentar CFM */}
+                  <input
+                    type="text"
+                    value={headerConfig.footerSubtext || ''}
+                    onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
+                    className="text-[9px] text-slate-400 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-full max-w-md"
+                  />
+
+                  {/* Botão no-print para Ocultar Rodapé */}
+                  <button
+                    type="button"
+                    onClick={() => handleHeaderFieldChange('showFooter', false)}
+                    className="no-print opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
+                    title="Ocultar rodapé de assinatura"
+                  >
+                    <EyeOff className="w-2.5 h-2.5" />
+                    <span>Ocultar Rodapé</span>
+                  </button>
+                </footer>
+              )}
+            </>
+          )}
+
+          {/* LAYOUT 2 VIAS NA MESMA FOLHA (PORTARIA SVS/MS 344/98 & CONTROLE ESPECIAL) */}
+          {viaLayout === '2-vias' && (
+            <>
+              {pageOrientation === 'landscape' ? (
+                /* 2 VIAS LADO A LADO EM PAISAGEM (LAYOUT CLÁSSICO DE CONTROLE ESPECIAL) */
+                <div className="grid grid-cols-[1fr_auto_1fr] gap-6 flex-1 w-full relative z-10">
+                  {/* 1ª VIA: FARMÁCIA (RETENÇÃO) */}
+                  <div className="flex flex-col justify-between h-full pr-2">
+                    <div>
+                      {headerConfig.showHeader && (
+                        <header className="border-b-2 border-slate-900 pb-2 mb-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <input
+                                type="text"
+                                value={headerConfig.doctorName || ''}
+                                onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
+                                placeholder="DR(A). MÉDICO(A)"
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-none w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 -mx-1 outline-none"
+                              />
+                              <input
+                                type="text"
+                                value={headerConfig.doctorCrm || ''}
+                                onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
+                                placeholder="CRM-SP 000000"
+                                className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 -mx-1 outline-none"
+                              />
+                              <p className="text-[10px] text-slate-600 truncate">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
+                                1ª VIA — FARMÁCIA
+                              </span>
+                              <span className="text-[8px] text-slate-500 font-bold block mt-0.5">(RETENÇÃO)</span>
+                              <span className="text-[9px] text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
+                            </div>
+                          </div>
+                          {headerConfig.showPatientBanner && (
+                            <div className="mt-2 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between">
+                              <span><strong>Paciente:</strong> {patient?.name || headerConfig.patientCustomText || '_____________________'}</span>
+                              {patient?.documentNumber && <span>Doc: {patient.documentNumber}</span>}
+                            </div>
+                          )}
+                        </header>
+                      )}
+
+                      {/* Editor na 1ª Via */}
+                      <div className="text-slate-900 py-1">
+                        <EditorContent editor={editor} />
+                      </div>
+                    </div>
+
+                    {headerConfig.showFooter && (
+                      <div className="mt-3 pt-2">
+                        {/* Carimbo / Assinatura */}
+                        <div className="border-t border-slate-300 pt-1 flex flex-col items-center justify-center text-center">
+                          <div className="w-44 border-b border-slate-400 mb-0.5" />
+                          <p className="text-[10px] font-bold text-slate-900 uppercase">
+                            {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
+                          </p>
+                          <p className="text-[9px] text-slate-600 font-semibold">
+                            {headerConfig.footerCrm || headerConfig.doctorCrm || 'CRM'}
+                          </p>
+                        </div>
+
+                        {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
+                        <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
+                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              Identificação do Comprador
+                            </p>
+                            <div className="space-y-0.5">
+                              <p><strong>Nome:</strong> _________________________</p>
+                              <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                              <p><strong>Endereço:</strong> _____________________</p>
+                              <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                            </div>
+                          </div>
+
+                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              Identificação do Fornecedor
+                            </p>
+                            <div className="space-y-0.5">
+                              <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                              <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                              <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                              <p><strong>Quantidade Dispensada:</strong> __________</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* LINHA DE CORTE VERTICAL ✂ */}
+                  <div className="flex flex-col items-center justify-center relative border-l border-dashed border-slate-400 px-1 select-none">
+                    <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                      <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
+                      <span style={{ writingMode: 'vertical-rl' }}>✂ CORTE AQUI</span>
+                    </div>
+                  </div>
+
+                  {/* 2ª VIA: PACIENTE (ORIENTAÇÃO) */}
+                  <div className="flex flex-col justify-between h-full pl-2">
+                    <div>
+                      {headerConfig.showHeader && (
+                        <header className="border-b-2 border-slate-900 pb-2 mb-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-none">
+                                {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
+                              </h3>
+                              <p className="text-xs font-bold text-sky-800 font-sans mt-0.5">
+                                {headerConfig.doctorCrm || 'CRM'}
+                              </p>
+                              <p className="text-[10px] text-slate-600 truncate">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
+                                2ª VIA — PACIENTE
+                              </span>
+                              <span className="text-[8px] text-slate-500 font-bold block mt-0.5">(ORIENTAÇÃO)</span>
+                              <span className="text-[9px] text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
+                            </div>
+                          </div>
+                          {headerConfig.showPatientBanner && (
+                            <div className="mt-2 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between">
+                              <span><strong>Paciente:</strong> {patient?.name || headerConfig.patientCustomText || '_____________________'}</span>
+                              {patient?.documentNumber && <span>Doc: {patient.documentNumber}</span>}
+                            </div>
+                          )}
+                        </header>
+                      )}
+
+                      {/* Espelho em Tempo Real na 2ª Via */}
+                      <div 
+                        className="via-preview-content text-slate-900 py-1 leading-relaxed" 
+                        dangerouslySetInnerHTML={{ __html: editorHtml || editor?.getHTML() || '' }}
+                      />
+                    </div>
+
+                    {headerConfig.showFooter && (
+                      <div className="mt-3 pt-2">
+                        {/* Carimbo / Assinatura */}
+                        <div className="border-t border-slate-300 pt-1 flex flex-col items-center justify-center text-center">
+                          <div className="w-44 border-b border-slate-400 mb-0.5" />
+                          <p className="text-[10px] font-bold text-slate-900 uppercase">
+                            {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
+                          </p>
+                          <p className="text-[9px] text-slate-600 font-semibold">
+                            {headerConfig.footerCrm || headerConfig.doctorCrm || 'CRM'}
+                          </p>
+                        </div>
+
+                        {/* Orientação ao Paciente */}
+                        <div className="mt-2 pt-1 border-t border-slate-300 text-[9px] text-slate-600 italic text-center">
+                          <p><strong>Orientação ao Paciente:</strong> Receituário válido por 30 (trinta) dias a contar da data de emissão em todo o território nacional (Portaria SVS/MS nº 344/98).</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* 2 VIAS EMPILHADAS EM RETRATO (SUPERIOR E INFERIOR) */
+                <div className="flex flex-col justify-between h-full flex-1 w-full relative z-10 gap-3">
+                  {/* 1ª VIA: FARMÁCIA (SUPERIOR) */}
+                  <div className="flex-1 flex flex-col justify-between pb-2">
+                    <div>
+                      {headerConfig.showHeader && (
+                        <header className="border-b border-slate-900 pb-2 mb-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <input
+                                type="text"
+                                value={headerConfig.doctorName || ''}
+                                onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
+                                placeholder="DR(A). MÉDICO(A)"
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-none w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 -mx-1 outline-none"
+                              />
+                              <input
+                                type="text"
+                                value={headerConfig.doctorCrm || ''}
+                                onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
+                                placeholder="CRM-SP 000000"
+                                className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 -mx-1 outline-none"
+                              />
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
+                                1ª VIA — FARMÁCIA (RETENÇÃO)
+                              </span>
+                              <span className="text-[9px] text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
+                            </div>
+                          </div>
+                          {headerConfig.showPatientBanner && (
+                            <div className="mt-1 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between">
+                              <span><strong>Paciente:</strong> {patient?.name || headerConfig.patientCustomText || '_____________________'}</span>
+                              {patient?.documentNumber && <span>Doc: {patient.documentNumber}</span>}
+                            </div>
+                          )}
+                        </header>
+                      )}
+
+                      <div className="text-slate-900 py-1">
+                        <EditorContent editor={editor} />
+                      </div>
+                    </div>
+
+                    {headerConfig.showFooter && (
+                      <div className="mt-2 pt-1">
+                        <div className="border-t border-slate-300 pt-1 flex flex-col items-center justify-center text-center">
+                          <div className="w-40 border-b border-slate-400 mb-0.5" />
+                          <p className="text-[10px] font-bold text-slate-900 uppercase">
+                            {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
+                          </p>
+                        </div>
+                        <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
+                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              Identificação do Comprador
+                            </p>
+                            <p><strong>Nome:</strong> _________________________</p>
+                            <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                            <p><strong>Endereço:</strong> _____________________</p>
+                            <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                          </div>
+                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              Identificação do Fornecedor
+                            </p>
+                            <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                            <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                            <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                            <p><strong>Quantidade Dispensada:</strong> __________</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* LINHA DE CORTE HORIZONTAL ✂ */}
+                  <div className="relative border-t border-dashed border-slate-400 my-1 flex items-center justify-center select-none">
+                    <span className="absolute bg-white px-3 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                      <Scissors className="w-3 h-3 text-slate-500" />
+                      <span>✂ CORTE AQUI</span>
+                    </span>
+                  </div>
+
+                  {/* 2ª VIA: PACIENTE (INFERIOR) */}
+                  <div className="flex-1 flex flex-col justify-between pt-2">
+                    <div>
+                      {headerConfig.showHeader && (
+                        <header className="border-b border-slate-900 pb-2 mb-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-none">
+                                {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
+                              </h3>
+                              <p className="text-xs font-bold text-sky-800 font-sans mt-0.5">
+                                {headerConfig.doctorCrm || 'CRM'}
+                              </p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
+                                2ª VIA — PACIENTE (ORIENTAÇÃO)
+                              </span>
+                              <span className="text-[9px] text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
+                            </div>
+                          </div>
+                          {headerConfig.showPatientBanner && (
+                            <div className="mt-1 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between">
+                              <span><strong>Paciente:</strong> {patient?.name || headerConfig.patientCustomText || '_____________________'}</span>
+                              {patient?.documentNumber && <span>Doc: {patient.documentNumber}</span>}
+                            </div>
+                          )}
+                        </header>
+                      )}
+
+                      <div 
+                        className="via-preview-content text-slate-900 py-1 leading-relaxed" 
+                        dangerouslySetInnerHTML={{ __html: editorHtml || editor?.getHTML() || '' }}
+                      />
+                    </div>
+
+                    {headerConfig.showFooter && (
+                      <div className="mt-2 pt-1">
+                        <div className="border-t border-slate-300 pt-1 flex flex-col items-center justify-center text-center">
+                          <div className="w-40 border-b border-slate-400 mb-0.5" />
+                          <p className="text-[10px] font-bold text-slate-900 uppercase">
+                            {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
+                          </p>
+                        </div>
+                        <div className="mt-1 pt-1 border-t border-slate-300 text-[9px] text-slate-600 italic text-center">
+                          <p><strong>Orientação ao Paciente:</strong> Receituário válido por 30 dias a contar da emissão em todo o território nacional (Portaria SVS/MS nº 344/98).</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* AVISO E RESTAURAÇÃO DE RODAPÉ OCULTADO (no-print) */}
+          {!headerConfig.showFooter && (
+            <div className="no-print mt-4 p-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-600 text-xs flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <EyeOff className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                <span><strong>Rodapé Ocultado:</strong> Carimbo e assinatura não serão impressos.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleHeaderFieldChange('showFooter', true)}
+                className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Restaurar Rodapé</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -1825,10 +2797,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <div>
                 <h2 className="text-base font-bold flex items-center gap-2">
                   <FolderOpen className="w-5 h-5 text-amber-500" />
-                  <span>Modelos Clínicos</span>
+                  <span>Modelos & Estilos</span>
                 </h2>
                 <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                  Modelos personalizados salvos e modelos de referência PresCMed
+                  Modelos de referência, rascunhos salvos e formatos de prescrição
                 </p>
               </div>
               <button
@@ -1840,313 +2812,408 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               </button>
             </div>
 
-            {/* Barra de Busca e Ação de Criar */}
-            <div className="p-4 border-b border-[var(--border-subtle)] flex flex-col gap-2.5 bg-[var(--bg-app)]">
-              <div className="relative">
-                <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={templateSearch}
-                  onChange={(e) => setTemplateSearch(e.target.value)}
-                  placeholder="Buscar modelo salvo..."
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500"
-                />
-              </div>
-
+            {/* ABAS DO DRAWER */}
+            <div className="grid grid-cols-3 p-1.5 bg-[var(--bg-app)] border-b border-[var(--border-subtle)] gap-1">
               <button
                 type="button"
-                onClick={() => {
-                  setIsModelsDrawerOpen(false);
-                  setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? currentModel.title : '');
-                  setIsSaveModelModalOpen(true);
-                }}
-                className="w-full py-2 px-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-tactile-btn cursor-pointer"
+                onClick={() => setDrawerTab('padrao')}
+                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                  drawerTab === 'padrao'
+                    ? 'bg-sky-700 text-white shadow-tactile-sm'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                }`}
               >
-                <BookmarkPlus className="w-4 h-4" />
-                <span>Salvar Documento Atual como Modelo</span>
+                <span>📋</span>
+                <span className="truncate">Modelos Padrão (Gerais)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDrawerTab('salvos')}
+                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                  drawerTab === 'salvos'
+                    ? 'bg-sky-700 text-white shadow-tactile-sm'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                }`}
+              >
+                <span>💾</span>
+                <span className="truncate">Meus Modelos ({savedTemplates.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDrawerTab('estilos')}
+                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                  drawerTab === 'estilos'
+                    ? 'bg-sky-700 text-white shadow-tactile-sm'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                }`}
+              >
+                <span>🎨</span>
+                <span className="truncate">Estilos ({DEFAULT_PRESCRIPTION_STYLES.length + customStyles.length})</span>
               </button>
             </div>
 
-            {/* Lista com Rolagem */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-              {/* Seção 1: Meus Modelos Salvos no IndexedDB */}
-              <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
-                    <span>Meus Modelos Salvos</span>
-                    <span className="px-1.5 py-0.2 rounded-md bg-[var(--surface-hover)] text-[10px]">
-                      {filteredSavedTemplates.length}
-                    </span>
-                  </h3>
-                </div>
-
-                {filteredSavedTemplates.length === 0 ? (
-                  <div className="p-4 rounded-xl border border-dashed border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
-                    {templateSearch ? (
-                      'Nenhum modelo encontrado para esta busca.'
-                    ) : (
-                      <>
-                        <BookmarkPlus className="w-6 h-6 mx-auto mb-1.5 text-slate-400 opacity-60" />
-                        <p className="font-medium">Nenhum modelo personalizado salvo ainda.</p>
-                        <p className="text-[11px] mt-1 opacity-80">
-                          Clique em &quot;Salvar Alterações&quot; na barra superior para guardar qualquer modelo editado.
-                        </p>
-                      </>
-                    )}
+            {/* CONTEÚDO DAS ABAS */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+              {/* ABA 1: MODELOS PADRÃO DO SISTEMA */}
+              {drawerTab === 'padrao' && (
+                <div className="space-y-3">
+                  <div className="relative mb-2">
+                    <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={templateSearch}
+                      onChange={(e) => setTemplateSearch(e.target.value)}
+                      placeholder="Buscar modelo padrão..."
+                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500"
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    {filteredSavedTemplates.map((tpl) => (
+
+                  {/* Lista de Modelos Padrão */}
+                  {[
+                    {
+                      id: 'receita_especial',
+                      badge: 'Portaria 344/98 • 2 Vias',
+                      title: 'Receituário de Controle Especial (2 Vias)',
+                      desc: 'Receita C1/B1 para retenção da farmácia e orientação do paciente em paisagem lado a lado.',
+                      badgeColor: 'bg-amber-600'
+                    },
+                    {
+                      id: 'receita',
+                      badge: 'Ambulatorial',
+                      title: 'Receita Ambulatorial Livre Padrão',
+                      desc: 'Prescrição antibiótica e analgésica sintomática com espaçamento milimétrico.',
+                      badgeColor: 'bg-sky-600'
+                    },
+                    {
+                      id: 'relatorio_circunstanciado',
+                      badge: 'SUS / Perícia / INSS',
+                      title: 'Relatório Médico Circunstanciado',
+                      desc: 'Para perícia médica, regulação do SUS ou INSS com anamnese dirigida e terapêutica em curso.',
+                      badgeColor: 'bg-emerald-600'
+                    },
+                    {
+                      id: 'laudo_com_receita',
+                      badge: 'Consulta Ativa',
+                      title: 'Laudo com Prescrição Anexa',
+                      desc: 'Avaliação clínica estruturada acompanhada dos medicamentos prescritos na consulta atual.',
+                      badgeColor: 'bg-sky-600'
+                    },
+                    {
+                      id: 'declaracao_comparecimento',
+                      badge: 'Declaração',
+                      title: 'Declaração de Comparecimento com Receita',
+                      desc: 'Comprovação de horário de atendimento com prescrição dos fármacos indicados.',
+                      badgeColor: 'bg-indigo-600'
+                    },
+                    {
+                      id: 'laudo',
+                      badge: 'Clínico',
+                      title: 'Laudo de Avaliação Clínica',
+                      desc: 'Sumário de atendimento, hipótese diagnóstica e conduta terapêutica.',
+                      badgeColor: 'bg-slate-600'
+                    },
+                    {
+                      id: 'risco',
+                      badge: 'Cardiológico',
+                      title: 'Risco Cirúrgico Pré-Operatório',
+                      desc: 'Avaliação pré-anestésica com estratificação ASA e recomendações clínicas.',
+                      badgeColor: 'bg-rose-600'
+                    },
+                    {
+                      id: 'parecer',
+                      badge: 'Especialista',
+                      title: 'Parecer Especializado / Contra-Referência',
+                      desc: 'Resposta ao médico da Atenção Básica com plano terapêutico e seguimento.',
+                      badgeColor: 'bg-purple-600'
+                    },
+                    {
+                      id: 'atestado',
+                      badge: 'Aptidão',
+                      title: 'Atestado de Aptidão Física',
+                      desc: 'Declaração de aptidão para esportes e academia conforme diretrizes do CFM.',
+                      badgeColor: 'bg-teal-600'
+                    }
+                  ]
+                    .filter(m => !templateSearch || m.title.toLowerCase().includes(templateSearch.toLowerCase()) || m.desc.toLowerCase().includes(templateSearch.toLowerCase()))
+                    .map((item) => (
                       <div
-                        key={tpl.id}
-                        className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-300 dark:hover:border-sky-800 transition-all flex flex-col gap-2 group shadow-tactile-sm"
+                        key={item.id}
+                        className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition-all flex flex-col gap-1.5 shadow-tactile-sm"
                       >
-                        {editingTemplateId === tpl.id ? (
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={editingTemplateTitle}
-                              onChange={(e) => setEditingTemplateTitle(e.target.value)}
-                              className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-sky-500 bg-[var(--bg-app)] focus:outline-none"
-                              autoFocus
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleSaveRename(tpl.id)}
-                              className="p-1.5 rounded-lg bg-emerald-600 text-white text-xs hover:bg-emerald-700 cursor-pointer"
-                              title="Salvar novo título"
-                            >
-                              <Check className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setEditingTemplateId(null)}
-                              className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-xs hover:bg-[var(--surface-hover)] cursor-pointer"
-                              title="Cancelar"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <h4 className="text-xs font-bold text-[var(--text-main)] group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
-                                {tpl.title}
-                              </h4>
-                              <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)] mt-0.5">
-                                <span>
-                                  {new Date(tpl.updatedAt).toLocaleDateString('pt-BR')} às{' '}
-                                  {new Date(tpl.updatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                                {tpl.contextId && tpl.contextId !== 'global' ? (
-                                  <span className="px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold">
-                                    Local
-                                  </span>
-                                ) : (
-                                  <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium">
-                                    Global
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-1 shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => handleStartRename(tpl)}
-                                className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-sky-600 cursor-pointer"
-                                title="Renomear modelo"
-                              >
-                                <Pencil className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteTemplate(tpl.id, tpl.title)}
-                                className="p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-[var(--text-muted)] hover:text-red-500 cursor-pointer"
-                                title="Excluir modelo"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`px-1.5 py-0.5 rounded text-white text-[9px] font-extrabold uppercase ${item.badgeColor}`}>
+                            {item.badge}
+                          </span>
+                          <h4 className="text-xs font-bold text-[var(--text-main)]">
+                            {item.title}
+                          </h4>
+                        </div>
+                        <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                          {item.desc}
+                        </p>
+                        <div className="pt-1.5 border-t border-[var(--border-subtle)] flex items-center justify-between">
                           <button
                             type="button"
-                            onClick={() => handleApplyTemplate(tpl)}
+                            onClick={() => applyPresetTemplate(item.id as any)}
                             className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
                           >
                             <FileText className="w-3.5 h-3.5" />
-                            <span>Carregar e Editar na Folha</span>
+                            <span>Carregar e Personalizar</span>
                           </button>
                         </div>
                       </div>
                     ))}
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
 
-              {/* Seção 2: Modelos de Referência PresCMed */}
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2.5 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Modelos de Referência PresCMed</span>
-                </h3>
-
-                <div className="space-y-2">
-                  <div className="p-3 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 hover:border-sky-400 transition-all">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="px-1.5 py-0.5 rounded bg-sky-600 text-white text-[9px] font-extrabold uppercase">
-                        SUS / Perícia
-                      </span>
-                      <h4 className="text-xs font-bold text-[var(--text-main)]">
-                        Relatório Médico Circunstanciado
-                      </h4>
+              {/* ABA 2: MEUS MODELOS SALVOS */}
+              {drawerTab === 'salvos' && (
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-2">
+                    <div className="relative">
+                      <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={templateSearch}
+                        onChange={(e) => setTemplateSearch(e.target.value)}
+                        placeholder="Buscar em meus modelos salvos..."
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500"
+                      />
                     </div>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Para perícia médica, regulação do SUS ou INSS com anamnese dirigida e terapêutica em curso.
-                    </p>
+
                     <button
                       type="button"
-                      onClick={() => applyPresetTemplate('relatorio_circunstanciado')}
-                      className="mt-2 text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      onClick={() => {
+                        setIsModelsDrawerOpen(false);
+                        setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? currentModel.title : '');
+                        setIsSaveModelModalOpen(true);
+                      }}
+                      className="w-full py-2 px-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-tactile-btn cursor-pointer"
                     >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Carregar e Personalizar</span>
+                      <BookmarkPlus className="w-4 h-4" />
+                      <span>Salvar Documento Atual como Modelo</span>
                     </button>
                   </div>
 
-                  <div className="p-3 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 hover:border-sky-400 transition-all">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="px-1.5 py-0.5 rounded bg-sky-600 text-white text-[9px] font-extrabold uppercase">
-                        Consulta Ativa
-                      </span>
-                      <h4 className="text-xs font-bold text-[var(--text-main)]">
-                        Laudo com Prescrição Anexa
-                      </h4>
+                  {filteredSavedTemplates.length === 0 ? (
+                    <div className="p-4 rounded-xl border border-dashed border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
+                      {templateSearch ? (
+                        'Nenhum modelo encontrado para esta busca.'
+                      ) : (
+                        <>
+                          <BookmarkPlus className="w-6 h-6 mx-auto mb-1.5 text-slate-400 opacity-60" />
+                          <p className="font-medium">Nenhum modelo personalizado salvo ainda.</p>
+                          <p className="text-[11px] mt-1 opacity-80">
+                            Clique no botão acima para salvar a folha atual como um modelo reutilizável.
+                          </p>
+                        </>
+                      )}
                     </div>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Avaliação clínica estruturada acompanhada dos medicamentos prescritos na consulta atual.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => applyPresetTemplate('laudo_com_receita')}
-                      className="mt-2 text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Carregar e Personalizar</span>
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {filteredSavedTemplates.map((tpl) => (
+                        <div
+                          key={tpl.id}
+                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-300 dark:hover:border-sky-800 transition-all flex flex-col gap-2 group shadow-tactile-sm"
+                        >
+                          {editingTemplateId === tpl.id ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={editingTemplateTitle}
+                                onChange={(e) => setEditingTemplateTitle(e.target.value)}
+                                className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-sky-500 bg-[var(--bg-app)] focus:outline-none"
+                                autoFocus
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleSaveRename(tpl.id)}
+                                className="p-1.5 rounded-lg bg-emerald-600 text-white text-xs hover:bg-emerald-700 cursor-pointer"
+                                title="Salvar novo título"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingTemplateId(null)}
+                                className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-xs hover:bg-[var(--surface-hover)] cursor-pointer"
+                                title="Cancelar"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <h4 className="text-xs font-bold text-[var(--text-main)] group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
+                                  {tpl.title}
+                                </h4>
+                                <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)] mt-0.5">
+                                  <span>
+                                    {new Date(tpl.updatedAt).toLocaleDateString('pt-BR')} às{' '}
+                                    {new Date(tpl.updatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                  {tpl.contextId && tpl.contextId !== 'global' ? (
+                                    <span className="px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold">
+                                      Local
+                                    </span>
+                                  ) : (
+                                    <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium">
+                                      Global
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
 
-                  <div className="p-3 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 hover:border-sky-400 transition-all">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="px-1.5 py-0.5 rounded bg-sky-600 text-white text-[9px] font-extrabold uppercase">
-                        Declaração
-                      </span>
-                      <h4 className="text-xs font-bold text-[var(--text-main)]">
-                        Declaração de Comparecimento com Receita
-                      </h4>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartRename(tpl)}
+                                  className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-sky-600 cursor-pointer"
+                                  title="Renomear modelo"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTemplate(tpl.id, tpl.title)}
+                                  className="p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-[var(--text-muted)] hover:text-red-500 cursor-pointer"
+                                  title="Excluir modelo"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={() => handleApplyTemplate(tpl)}
+                              className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>Carregar e Editar na Folha</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Comprovação de horário de atendimento com prescrição dos fármacos indicados.
-                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* ABA 3: ESTILOS DE RECEITA (FORMATAÇÃO RÁPIDA & PERSONALIZADA) */}
+              {drawerTab === 'estilos' && (
+                <div className="space-y-4">
+                  <div className="p-3 rounded-xl bg-sky-50/70 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/60 flex items-center justify-between gap-2">
+                    <div className="text-xs text-[var(--text-secondary)]">
+                      <p className="font-bold text-sky-900 dark:text-sky-200">Personalize e Salve seu Estilo</p>
+                      <p className="text-[11px] text-[var(--text-muted)]">Guarde fonte, orientação e formato de vias atual</p>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => applyPresetTemplate('declaracao_comparecimento')}
-                      className="mt-2 text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      onClick={() => {
+                        setIsModelsDrawerOpen(false);
+                        setIsSaveStyleModalOpen(true);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold flex items-center gap-1 shadow-tactile-sm cursor-pointer whitespace-nowrap"
                     >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Carregar e Personalizar</span>
+                      <BookmarkPlus className="w-3.5 h-3.5" />
+                      <span>Salvar Atual</span>
                     </button>
                   </div>
 
-                  <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-amber-400 transition-all">
-                    <h4 className="text-xs font-bold text-[var(--text-main)]">
-                      Laudo de Avaliação Clínica
-                    </h4>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Sumário de atendimento, hipótese diagnóstica e conduta terapêutica.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => applyPresetTemplate('laudo')}
-                      className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Carregar e Personalizar</span>
-                    </button>
-                  </div>
+                  {/* Meus Estilos Salvos */}
+                  {customStyles.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center justify-between">
+                        <span>💾 Meus Estilos Personalizados</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 font-bold">
+                          {customStyles.length}
+                        </span>
+                      </h4>
+                      {customStyles.map(st => (
+                        <div
+                          key={st.id}
+                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition-all flex flex-col gap-2 shadow-tactile-sm"
+                        >
+                          <div className="flex items-center justify-between">
+                            <h5 className="text-xs font-bold text-[var(--text-main)] truncate">{st.name}</h5>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCustomStyle(st.id, st.name)}
+                              className="p-1 rounded text-slate-400 hover:text-rose-500 cursor-pointer"
+                              title="Excluir estilo"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)] flex-wrap">
+                            <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-semibold">{st.fontFamilyId} • {st.baseFontSize}pt</span>
+                            <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-semibold">{st.pageOrientation === 'landscape' ? 'Paisagem' : 'Retrato'} • {st.viaLayout}</span>
+                            {!st.showHeader && <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 font-bold">Sem Cabeçalho</span>}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleApplyStyle(st);
+                              setIsModelsDrawerOpen(false);
+                            }}
+                            className="w-full py-1.5 px-3 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold cursor-pointer shadow-tactile-btn transition-colors"
+                          >
+                            Aplicar Este Estilo
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                  <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-amber-400 transition-all">
-                    <h4 className="text-xs font-bold text-[var(--text-main)]">
-                      Risco Cirúrgico Pré-Operatório
+                  {/* Estilos Padrão do Sistema */}
+                  <div className="space-y-2.5">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                      📋 Estilos Padrão de Fábrica
                     </h4>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Avaliação pré-anestésica com estratificação ASA e recomendações clínicas.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => applyPresetTemplate('risco')}
-                      className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Carregar e Personalizar</span>
-                    </button>
-                  </div>
-
-                  <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-amber-400 transition-all">
-                    <h4 className="text-xs font-bold text-[var(--text-main)]">
-                      Parecer Especializado / Contra-Referência
-                    </h4>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Resposta ao médico da Atenção Básica com plano terapêutico e seguimento.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => applyPresetTemplate('parecer')}
-                      className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Carregar e Personalizar</span>
-                    </button>
-                  </div>
-
-                  <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-amber-400 transition-all">
-                    <h4 className="text-xs font-bold text-[var(--text-main)]">
-                      Atestado de Aptidão Física
-                    </h4>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Declaração de aptidão para esportes e academia conforme diretrizes do CFM.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => applyPresetTemplate('atestado')}
-                      className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Carregar e Personalizar</span>
-                    </button>
-                  </div>
-
-                  <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-amber-400 transition-all">
-                    <h4 className="text-xs font-bold text-[var(--text-main)]">
-                      Receita Ambulatorial Livre Padrão
-                    </h4>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Prescrição antibiótica e analgésica sintomática com espaçamento milimétrico.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => applyPresetTemplate('receita')}
-                      className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Carregar e Personalizar</span>
-                    </button>
+                    {DEFAULT_PRESCRIPTION_STYLES.map(st => (
+                      <div
+                        key={st.id}
+                        className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition-all"
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <h5 className="text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5">
+                            <span>{st.viaLayout === '2-vias' ? '📑' : st.watermarkType !== 'none' ? '⚕️' : '📄'}</span>
+                            <span>{st.name}</span>
+                          </h5>
+                          <span className="text-[10px] px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 font-bold">
+                            {st.baseFontSize}pt • {st.pageOrientation === 'landscape' ? 'Paisagem' : 'Retrato'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                          {st.id === 'especial_2vias'
+                            ? 'Orientação Paisagem (297×210mm) com 2 vias na mesma folha e linha de corte ✂ para retenção na farmácia (Portaria 344/98).'
+                            : st.id === 'sus'
+                            ? 'Configuração oficial para UBS/UPA com tipografia Inter e marca d’água do SUS.'
+                            : st.id === 'classico'
+                            ? 'Tipografia serifada Cormorant Garamond nobre para consultórios e clínicas privadas.'
+                            : st.id === 'pre_timbrado'
+                            ? 'Oculta o cabeçalho e rodapé digitais para imprimir perfeitamente em papel pré-impresso de gráfica.'
+                            : 'Formato padrão para prescrições ambulatoriais com tipografia limpa e moderna.'}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleApplyStyle(st);
+                            setIsModelsDrawerOpen(false);
+                          }}
+                          className="mt-2.5 w-full py-1.5 px-3 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold cursor-pointer shadow-tactile-btn transition-colors"
+                        >
+                          Aplicar Estilo
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -2222,6 +3289,77 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Salvar Modelo</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Salvar como Estilo de Receita Personalizado */}
+      {isSaveStyleModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs no-print animate-tab-fade">
+          <div className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
+              <div className="flex items-center gap-2">
+                <BookmarkPlus className="w-5 h-5 text-sky-600" />
+                <h3 className="text-base font-bold">Salvar Estilo da Receita</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsSaveStyleModalOpen(false)}
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCustomStyle} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-bold mb-1.5 text-[var(--text-secondary)]">
+                  Nome do Estilo Visual
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newStyleTitle}
+                  onChange={(e) => setNewStyleTitle(e.target.value)}
+                  placeholder="Ex: Minha Clínica • 2 Vias Azul"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-sky-500 font-medium"
+                  autoFocus
+                />
+              </div>
+
+              {/* Resumo da Configuração Atual do Estilo */}
+              <div className="p-3 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs space-y-1.5">
+                <span className="font-bold text-[var(--text-secondary)] block text-[11px] uppercase tracking-wider">
+                  Configurações que serão salvas:
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-[var(--text-muted)]">
+                  <div>• Tipografia: <strong className="text-[var(--text-main)] capitalize">{fontFamilyId}</strong></div>
+                  <div>• Tamanho: <strong className="text-[var(--text-main)]">{baseFontSize} pt</strong></div>
+                  <div>• Orientação: <strong className="text-[var(--text-main)]">{pageOrientation === 'landscape' ? 'Paisagem' : 'Retrato'}</strong></div>
+                  <div>• Formato: <strong className="text-[var(--text-main)]">{viaLayout === '2-vias' ? '2 Vias (Mesma Folha)' : '1 Via'}</strong></div>
+                  <div>• Cabeçalho: <strong className="text-[var(--text-main)]">{headerConfig.showHeader ? 'Visível' : 'Oculto'}</strong></div>
+                  <div>• Rodapé: <strong className="text-[var(--text-main)]">{headerConfig.showFooter ? 'Visível' : 'Oculto'}</strong></div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsSaveStyleModalOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newStyleTitle.trim()}
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-sky-700 hover:bg-sky-800 disabled:opacity-50 text-white shadow-tactile-btn cursor-pointer flex items-center gap-1.5"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Salvar Estilo</span>
                 </button>
               </div>
             </form>

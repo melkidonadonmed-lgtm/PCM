@@ -1228,10 +1228,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       type="button"
                       onClick={onNavigateToEditor}
                       className="px-3.5 py-2 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 text-xs font-bold shadow-tactile-sm flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
-                      title="Abrir esta prescrição no Editor Livre para laudo ou relatório"
+                      title="Editar esta receita diretamente no Editor"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Abrir no Editor</span>
+                      <span>Editor</span>
                     </button>
                   )}
 
@@ -1364,10 +1364,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 type="button"
                 onClick={onNavigateToEditor}
                 className="w-full py-2.5 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-tactile-sm transition active:scale-95 cursor-pointer"
-                title="Abrir no Editor Livre de Documentos"
+                title="Abrir receita no Editor para editar em tempo real, mudar estilo e imprimir"
               >
                 <FileText className="w-4 h-4" />
-                <span>Editor de Laudos</span>
+                <span>Editor</span>
               </button>
             )}
 

@@ -184,9 +184,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'editor' as ActiveTab,
-      label: 'Editor Livre / Laudos',
-      fullLabel: 'Editor Livre de Documentos A4',
-      shortLabel: 'Editor A4',
+      label: 'Editor',
+      fullLabel: 'Editor de Prescrições e Documentos',
+      shortLabel: 'Editor',
       icon: FileText
     },
     {
