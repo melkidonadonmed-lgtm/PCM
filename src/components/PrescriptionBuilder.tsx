@@ -41,6 +41,7 @@ interface PrescriptionBuilderProps {
   onClearPrescription?: () => void;
   onNavigateToPrint: () => void;
   onNavigateToPediatricCalc: () => void;
+  onNavigateToEditor?: () => void;
   onOpenDoctorModal: () => void;
   onOpenPatientModal: () => void;
 }
@@ -55,6 +56,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   onClearPrescription,
   onNavigateToPrint,
   onNavigateToPediatricCalc,
+  onNavigateToEditor,
   onOpenPatientModal
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -1220,14 +1222,28 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={onNavigateToPrint}
-                  className="px-4 py-2 rounded-xl bg-navy-800 dark:bg-navy-700 hover:bg-navy-900 text-white text-xs font-bold shadow-tactile-btn flex items-center gap-2 transition active:scale-95 cursor-pointer"
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  <span>Visualizar PDF A4</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  {onNavigateToEditor && (
+                    <button
+                      type="button"
+                      onClick={onNavigateToEditor}
+                      className="px-3.5 py-2 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 text-xs font-bold shadow-tactile-sm flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+                      title="Abrir esta prescrição no Editor Livre para laudo ou relatório"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Abrir no Editor</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={onNavigateToPrint}
+                    className="px-4 py-2 rounded-xl bg-navy-800 dark:bg-navy-700 hover:bg-navy-900 text-white text-xs font-bold shadow-tactile-btn flex items-center gap-2 transition active:scale-95 cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Visualizar PDF A4</span>
+                  </button>
+                </div>
               </div>
             )}
           </section>
@@ -1333,15 +1349,27 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <button
               type="button"
               onClick={onNavigateToPrint}
               className="btn-tactile-primary w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
             >
               <Printer className="w-4 h-4" />
-              <span>Imprimir / PDF A4</span>
+              <span>Imprimir / PDF</span>
             </button>
+
+            {onNavigateToEditor && (
+              <button
+                type="button"
+                onClick={onNavigateToEditor}
+                className="w-full py-2.5 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-tactile-sm transition active:scale-95 cursor-pointer"
+                title="Abrir no Editor Livre de Documentos"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Editor de Laudos</span>
+              </button>
+            )}
 
             <button
               type="button"
@@ -1350,7 +1378,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-tactile-btn transition active:scale-95 cursor-pointer"
             >
               <Send className="w-4 h-4" strokeWidth={2} />
-              <span>Enviar no WhatsApp</span>
+              <span>WhatsApp</span>
             </button>
           </div>
         </div>

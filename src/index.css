@@ -962,7 +962,7 @@ p, .text-pretty {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm;
+    margin: 0;
   }
 
   *, *::before, *::after {
@@ -972,21 +972,37 @@ p, .text-pretty {
     text-shadow: none !important;
   }
 
-  html, body {
-    background: #FFFFFF !important;
-    color: #0F172A !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    min-width: 100% !important;
-    -webkit-text-size-adjust: 100% !important;
+  body * {
+    visibility: hidden;
   }
 
-  .no-print,
-  header,
-  nav,
+  .a4-editor-canvas,
+  .a4-editor-canvas *,
+  #printable-a4-sheet,
+  #printable-a4-sheet * {
+    visibility: visible;
+  }
+
+  .a4-editor-canvas {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding: 15mm 20mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #0F172A !important;
+  }
+
+  /* Oculta barras de ferramentas, sidebar, header e botões do sistema */
+  header:not(.a4-editor-canvas header),
   aside,
-  footer,
+  nav,
+  .editor-toolbar,
+  .no-print,
   #prescmed-header,
   #sidebar-nav,
   #prescmed-sidebar,
@@ -1000,11 +1016,10 @@ p, .text-pretty {
     display: block !important;
   }
 
-  #printable-a4-sheet,
-  .print-page {
+  #printable-a4-sheet.print-page {
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 277mm !important; /* 297mm A4 portrait height minus 20mm margins */
+    min-height: 277mm !important; /* 297mm A4 portrait height minus margins */
     height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;

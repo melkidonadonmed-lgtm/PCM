@@ -5,8 +5,9 @@ import {
   Moon, 
   Scale, 
   User, 
-  ChevronRight,
-  UserPlus
+  ChevronRight, 
+  UserPlus,
+  FileText
 } from 'lucide-react';
 import { Patient } from '../types';
 
@@ -20,6 +21,7 @@ interface HeaderProps {
   prescriptionCount?: number;
   selectedExamsCount?: number;
   onQuickWeightChange?: (newWeight: number) => void;
+  onNavigateToEditor?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,7 +33,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenPatientModal,
   prescriptionCount = 0,
   selectedExamsCount = 0,
-  onQuickWeightChange
+  onQuickWeightChange,
+  onNavigateToEditor
 }) => {
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
   const hasPatient = Boolean(patient?.name?.trim());
@@ -166,8 +169,20 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Right side: Dark/Light Mode Toggle */}
+        {/* Right side: Editor Shortcut & Dark/Light Mode Toggle */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {onNavigateToEditor && (
+            <button
+              type="button"
+              onClick={onNavigateToEditor}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              title="Abrir consulta no Editor Livre de Documentos A4"
+            >
+              <FileText className="w-4 h-4 text-sky-600 dark:text-sky-400" strokeWidth={1.75} />
+              <span className="hidden md:inline">Editor de Laudos</span>
+            </button>
+          )}
+
           <button
             type="button"
             id="btn-toggle-theme"

@@ -7,15 +7,15 @@ import { PrescriptionBuilder } from './components/PrescriptionBuilder';
 import { ExamRequester } from './components/ExamRequester';
 import { CertificateAndReferral } from './components/CertificateAndReferral';
 import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
-import { PatientModal } from './components/PatientModal';
-import { DoctorProfileModal } from './components/DoctorProfileModal';
 import { ActiveTab, PrescriptionItem, Patient } from './types';
 import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
 import { useWorkContext } from './hooks/useWorkContext';
 
-// Carregamento sob demanda (code-splitting) dos módulos pesados de PDF, impressão e editor rico
+// Carregamento sob demanda (code-splitting) dos módulos pesados de PDF, editor e modais
 const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
 const DocumentEditorView = React.lazy(() => import('./components/DocumentEditorView'));
+const PatientModal = React.lazy(() => import('./components/PatientModal'));
+const DoctorProfileModal = React.lazy(() => import('./components/DoctorProfileModal'));
 
 export default function App() {
   // Tema visual (Claro como padrão oficial do sistema)
@@ -179,6 +179,7 @@ export default function App() {
         prescriptionCount={prescriptionItems.length}
         selectedExamsCount={selectedExams.length}
         onQuickWeightChange={handleUpdatePatientWeight}
+        onNavigateToEditor={() => setActiveTab('editor')}
       />
 
       {/* Main Responsive Body Layout */}
@@ -233,6 +234,7 @@ export default function App() {
               onClearPrescription={handleClearPrescription}
               onNavigateToPrint={() => handleNavigateToPrint('prescription')}
               onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
+              onNavigateToEditor={() => setActiveTab('editor')}
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
               onOpenPatientModal={() => setIsPatientModalOpen(true)}
             />
@@ -299,6 +301,7 @@ export default function App() {
                 darkMode={darkMode}
                 doctor={doctor}
                 patient={patient}
+                prescriptionItems={prescriptionItems}
                 activeContext={activeContext}
                 onSaveContext={saveContext}
                 onNavigateToPrint={() => handleNavigateToPrint('prescription')}
@@ -357,22 +360,28 @@ export default function App() {
 
       {/* Modals */}
       {isPatientModalOpen && (
-        <PatientModal
-          darkMode={darkMode}
-          patient={patient}
-          onSavePatient={setPatient}
-          onClearPatient={handleClearPatient}
-          onClose={() => setIsPatientModalOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <PatientModal
+            darkMode={darkMode}
+            patient={patient}
+            onSavePatient={setPatient}
+            onClearPatient={handleClearPatient}
+            onClose={() => setIsPatientModalOpen(false)}
+          />
+        </Suspense>
       )}
 
       {isDoctorModalOpen && (
-        <DoctorProfileModal
-          darkMode={darkMode}
-          doctor={doctor}
-          onSaveDoctor={setDoctor}
-          onClose={() => setIsDoctorModalOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <DoctorProfileModal
+            darkMode={darkMode}
+            doctor={doctor}
+            onSaveDoctor={setDoctor}
+            onClose={() => setIsDoctorModalOpen(false)}
+            activeContext={activeContext}
+            onSaveContext={saveContext}
+          />
+        </Suspense>
       )}
     </div>
   );

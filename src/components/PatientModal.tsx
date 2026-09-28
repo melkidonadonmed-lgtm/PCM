@@ -324,3 +324,5 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     </div>
   );
 };
+
+export default PatientModal;

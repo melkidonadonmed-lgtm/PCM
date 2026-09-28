@@ -1,13 +1,20 @@
 import Dexie, { type Table } from 'dexie';
-import { WorkContext } from '../types';
+import { WorkContext, SavedDocument } from '../types';
+
+export type { SavedDocument };
 
 export class PresCMedDatabase extends Dexie {
   workContexts!: Table<WorkContext, string>;
+  savedDocuments!: Table<SavedDocument, string>;
 
   constructor() {
     super('PresCMed_DB');
     this.version(1).stores({
       workContexts: 'id, name, sphere, isDefault, updatedAt'
+    });
+    this.version(2).stores({
+      workContexts: 'id, name, sphere, isDefault, updatedAt',
+      savedDocuments: 'id, title, contextId, isTemplate, updatedAt'
     });
   }
 }

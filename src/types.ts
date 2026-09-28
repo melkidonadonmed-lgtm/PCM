@@ -203,3 +203,14 @@ export interface WorkContext {
   updatedAt: number;
 }
 
+export interface SavedDocument {
+  id: string;
+  title: string;
+  contentJson: any; // Estado do documento Tiptap
+  contentHtml: string;
+  contextId: string; // Vínculo com a UBS ou Policlínica ativa
+  isTemplate: boolean; // Se é um modelo reutilizável
+  createdAt: number;
+  updatedAt: number;
+}
+

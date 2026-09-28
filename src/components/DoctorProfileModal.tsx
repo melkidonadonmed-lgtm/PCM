@@ -1,21 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UserCheck, Check, X, Shield, Eraser, Building2, Phone, MapPin } from 'lucide-react';
-import { DoctorProfile } from '../types';
+import { UserCheck, Check, X, Shield, Eraser, Building2, Phone, MapPin, Sparkles } from 'lucide-react';
+import { DoctorProfile, WorkContext } from '../types';
+
+const LogoGeneratorModal = React.lazy(() => import('./LogoGeneratorModal'));
 
 interface DoctorProfileModalProps {
   darkMode: boolean;
   doctor: DoctorProfile;
   onSaveDoctor: (doctor: DoctorProfile) => void;
   onClose: () => void;
+  activeContext?: WorkContext | null;
+  onSaveContext?: (updatedContext: WorkContext) => Promise<void>;
 }
 
 export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
   darkMode,
   doctor,
   onSaveDoctor,
-  onClose
+  onClose,
+  activeContext,
+  onSaveContext
 }) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<DoctorProfile>({
     name: doctor?.name || '',
@@ -305,6 +312,34 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             )}
           </div>
 
+          {/* Timbrado e Logotipo Institucional */}
+          <div className="p-3.5 rounded-xl border flex items-center justify-between bg-slate-50 dark:bg-navy-950 border-slate-200 dark:border-navy-800">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  Timbrado e Logotipo Clínico (SVG)
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  {activeContext?.logoDataUrl 
+                    ? `Logotipo ativo no contexto: ${activeContext.name}`
+                    : 'Personalize o brasão médico ou logotipo do consultório/UBS'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsLogoModalOpen(true)}
+              className="px-3 py-1.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span>{activeContext?.logoDataUrl ? 'Editar Logo SVG' : 'Criar Logo / Timbre SVG'}</span>
+            </button>
+          </div>
+
           {/* Assinatura & Carimbo */}
           <div className="p-3 rounded-xl border flex items-center justify-between bg-slate-50 dark:bg-navy-950 border-slate-200 dark:border-navy-800">
             <div className="flex items-center gap-2.5">
@@ -346,6 +381,28 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           </div>
         </form>
       </div>
+
+      {/* Modal Criador Procedural de Logotipos SVG */}
+      {isLogoModalOpen && (
+        <React.Suspense fallback={null}>
+          <LogoGeneratorModal
+            isOpen={isLogoModalOpen}
+            onClose={() => setIsLogoModalOpen(false)}
+            activeContext={activeContext || null}
+            doctor={formData}
+            onApplyLogo={async (dataUrl) => {
+              if (activeContext && onSaveContext) {
+                await onSaveContext({
+                  ...activeContext,
+                  logoDataUrl: dataUrl
+                });
+              }
+            }}
+          />
+        </React.Suspense>
+      )}
     </div>
   );
 };
+
+export default DoctorProfileModal;
