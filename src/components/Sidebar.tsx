@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { 
   FileEdit, 
+  FileText,
   Calculator, 
   FlaskConical, 
   Award, 
@@ -173,6 +174,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Protocolos Clínicos',
       shortLabel: 'Protocolos',
       icon: HeartPulse
+    },
+    {
+      id: 'editor' as ActiveTab,
+      label: 'Editor Livre / Laudos',
+      fullLabel: 'Editor Livre de Documentos A4',
+      shortLabel: 'Editor A4',
+      icon: FileText
     },
     {
       id: 'print_preview' as ActiveTab,

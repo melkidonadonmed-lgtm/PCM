@@ -34,6 +34,9 @@ export default defineConfig(() => {
             if (id.includes('node_modules/dexie')) {
               return 'vendor-dexie';
             }
+            if (id.includes('node_modules/@tiptap') || id.includes('node_modules/prosemirror-')) {
+              return 'vendor-tiptap';
+            }
           }
         }
       }

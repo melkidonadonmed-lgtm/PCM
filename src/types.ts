@@ -104,6 +104,7 @@ export interface MedicalCertificate {
   cid10Description: string;
   observations: string;
   cityDateText?: string;
+  date?: string;
 }
 
 export interface MedicalReferral {
@@ -165,6 +166,7 @@ export type ActiveTab =
   | 'certificate' 
   | 'referral' 
   | 'protocols'
+  | 'editor'
   | 'models'
   | 'print_preview' 
   | 'patients';
@@ -173,18 +175,20 @@ export type ActiveTab =
 export type InstitutionalSphere = 'municipal' | 'state' | 'private' | 'federal';
 
 export interface WorkContext {
-  id: string; // Ex: 'ctx-ubs-centro', 'ctx-policlinica-estadual'
+  id: string; // ex: 'ctx-ubs-centro', 'ctx-policlinica-estadual'
   name: string; // "UBS Dr. Hamilton - Município" ou "Policlínica Oswaldo Cruz - Estado"
   sphere: InstitutionalSphere;
   clinicName: string;
   clinicAddress: string;
   cnes?: string;
-  logoDataUrl?: string; // Armazenado no IndexedDB
+  logoDataUrl?: string; // Imagem do Brasão/Logo (Base64 no IndexedDB)
   logoAlignment: 'left' | 'center' | 'right';
-  regulatoryRules: {
-    restrictToRemume: boolean; // Trava medicamentos da Relação Municipal
-    requireSpecificReferralHeader: boolean;
-    standardPrescriptionViaCount: 1 | 2;
+  documentFormatting: {
+    headerType: 'standard' | 'minimal' | 'custom_logo';
+    prescriptionViaCount: 1 | 2; // Ex: UBS 1 via simples; Policlínica 2 vias padrão
+    showCnesOnHeader: boolean;
+    referralModel: 'sus_regulation' | 'direct_ambulatory'; // Modelo de encaminhamento
+    examHeaderTitle: string; // Ex: "SECRETARIA MUNICIPAL DE SAÚDE" vs "GOVERNO DO ESTADO"
   };
   customHeaderMarkdown?: string;
   customFooterMarkdown?: string;

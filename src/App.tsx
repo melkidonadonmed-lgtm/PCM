@@ -13,8 +13,9 @@ import { ActiveTab, PrescriptionItem, Patient } from './types';
 import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
 import { useWorkContext } from './hooks/useWorkContext';
 
-// Carregamento sob demanda (code-splitting) dos módulos pesados de PDF e impressão
+// Carregamento sob demanda (code-splitting) dos módulos pesados de PDF, impressão e editor rico
 const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
+const DocumentEditorView = React.lazy(() => import('./components/DocumentEditorView'));
 
 export default function App() {
   // Tema visual (Claro como padrão oficial do sistema)
@@ -124,7 +125,8 @@ export default function App() {
   const {
     contexts: workContexts,
     activeContext,
-    switchContext
+    switchContext,
+    saveContext
   } = useWorkContext({
     crm: doctor.crm,
     uf: doctor.crmState,
@@ -278,9 +280,30 @@ export default function App() {
             <ClinicalProtocolsView
               darkMode={darkMode}
               patient={patient}
+              onUpdatePatientWeight={handleUpdatePatientWeight}
               onAddPrescriptionItem={handleAddPrescriptionItem}
               onNavigateToPrescription={() => setActiveTab('prescription')}
             />
+          )}
+
+          {activeTab === 'editor' && (
+            <Suspense fallback={
+              <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
+                <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+                <span className="font-medium text-slate-600 dark:text-slate-300">
+                  Carregando processador de texto clínico e canvas A4...
+                </span>
+              </div>
+            }>
+              <DocumentEditorView
+                darkMode={darkMode}
+                doctor={doctor}
+                patient={patient}
+                activeContext={activeContext}
+                onSaveContext={saveContext}
+                onNavigateToPrint={() => handleNavigateToPrint('prescription')}
+              />
+            </Suspense>
           )}
 
           {activeTab === 'print_preview' && (

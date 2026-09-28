@@ -20,15 +20,18 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
         // Inicializa com os dados do perfil do médico
         const ubsContext: WorkContext = {
           id: 'ctx-ubs',
-          name: 'UBS Municipal (Atenção Básica)',
+          name: 'UBS Municipal (Atenção Primária)',
           sphere: 'municipal',
-          clinicName: 'Unidade Básica de Saúde',
-          clinicAddress: 'Secretaria Municipal de Saúde',
+          clinicName: 'Secretaria Municipal de Saúde — UBS',
+          clinicAddress: 'Rede Municipal de Atenção Básica',
+          cnes: '',
           logoAlignment: 'left',
-          regulatoryRules: {
-            restrictToRemume: true,
-            requireSpecificReferralHeader: true,
-            standardPrescriptionViaCount: 1
+          documentFormatting: {
+            headerType: 'standard',
+            prescriptionViaCount: 1,
+            showCnesOnHeader: true,
+            referralModel: 'sus_regulation',
+            examHeaderTitle: 'SOLICITAÇÃO DE EXAMES — REDE MUNICIPAL'
           },
           doctorCredentials: { ...doctorProfile },
           isDefault: true,
@@ -37,15 +40,18 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
         };
         const polContext: WorkContext = {
           id: 'ctx-policlinica',
-          name: 'Policlínica / Hospital Estadual',
+          name: 'Policlínica Estadual / Especialidades',
           sphere: 'state',
-          clinicName: 'Policlínica Estadual de Especialidades',
-          clinicAddress: 'Secretaria de Estado da Saúde',
+          clinicName: 'Secretaria de Estado da Saúde — Policlínica',
+          clinicAddress: 'Complexo Regulador Estadual',
+          cnes: '',
           logoAlignment: 'center',
-          regulatoryRules: {
-            restrictToRemume: false,
-            requireSpecificReferralHeader: true,
-            standardPrescriptionViaCount: 2
+          documentFormatting: {
+            headerType: 'custom_logo',
+            prescriptionViaCount: 2,
+            showCnesOnHeader: true,
+            referralModel: 'sus_regulation',
+            examHeaderTitle: 'REQUISIÇÃO DE EXAMES E PROCEDIMENTOS — REDE ESTADUAL'
           },
           doctorCredentials: { ...doctorProfile },
           isDefault: false,

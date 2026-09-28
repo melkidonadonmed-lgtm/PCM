@@ -50,8 +50,8 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
       {!collapsed && (
         <div className="mt-1 flex items-center justify-between text-[10px] text-[var(--text-muted)]">
           <span className="truncate max-w-[170px]">{activeContext.clinicName}</span>
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--bg-app)] border border-[var(--border-subtle)]">
-            {activeContext.regulatoryRules.restrictToRemume ? 'REMUME' : 'RENAME'}
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)]">
+            {activeContext.documentFormatting?.prescriptionViaCount || 1} {activeContext.documentFormatting?.prescriptionViaCount === 1 ? 'VIA' : 'VIAS'}
           </span>
         </div>
       )}

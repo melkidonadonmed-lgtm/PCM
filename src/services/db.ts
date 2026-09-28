@@ -20,16 +20,19 @@ export async function initializeDefaultContexts(defaultDoctor: { crm: string; uf
   if (count === 0) {
     const defaultContexts: WorkContext[] = [
       {
-        id: 'ctx-ubs-padrao',
-        name: 'UBS Municipal (Atenção Básica)',
+        id: 'ctx-ubs',
+        name: 'UBS Municipal (Atenção Primária)',
         sphere: 'municipal',
-        clinicName: 'Unidade Básica de Saúde da Família',
-        clinicAddress: 'Rede de Atenção Primária à Saúde',
+        clinicName: 'Secretaria Municipal de Saúde — UBS',
+        clinicAddress: 'Rede Municipal de Atenção Básica',
+        cnes: '',
         logoAlignment: 'left',
-        regulatoryRules: {
-          restrictToRemume: true,
-          requireSpecificReferralHeader: true,
-          standardPrescriptionViaCount: 1
+        documentFormatting: {
+          headerType: 'standard',
+          prescriptionViaCount: 1,
+          showCnesOnHeader: true,
+          referralModel: 'sus_regulation',
+          examHeaderTitle: 'SOLICITAÇÃO DE EXAMES — REDE MUNICIPAL'
         },
         doctorCredentials: { ...defaultDoctor },
         isDefault: true,
@@ -37,16 +40,19 @@ export async function initializeDefaultContexts(defaultDoctor: { crm: string; uf
         updatedAt: Date.now()
       },
       {
-        id: 'ctx-policlinica-padrao',
+        id: 'ctx-policlinica',
         name: 'Policlínica Estadual / Especialidades',
         sphere: 'state',
-        clinicName: 'Centro de Especialidades Médicas do Estado',
-        clinicAddress: 'Rede de Atenção Especializada',
+        clinicName: 'Secretaria de Estado da Saúde — Policlínica',
+        clinicAddress: 'Complexo Regulador Estadual',
+        cnes: '',
         logoAlignment: 'center',
-        regulatoryRules: {
-          restrictToRemume: false,
-          requireSpecificReferralHeader: true,
-          standardPrescriptionViaCount: 2
+        documentFormatting: {
+          headerType: 'custom_logo',
+          prescriptionViaCount: 2,
+          showCnesOnHeader: true,
+          referralModel: 'sus_regulation',
+          examHeaderTitle: 'REQUISIÇÃO DE EXAMES E PROCEDIMENTOS — REDE ESTADUAL'
         },
         doctorCredentials: { ...defaultDoctor },
         isDefault: false,

@@ -526,6 +526,20 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
         >
           {/* Top Medical Letterhead / Header (Grid Row 1) */}
           <header id="print-header" className="print-header print-avoid-break w-full">
+            {/* Logotipo da Instituição (Base64) se cadastrado no contexto */}
+            {activeContext?.logoDataUrl && (
+              <div className={`mb-3 flex ${
+                activeContext.logoAlignment === 'center' ? 'justify-center' :
+                activeContext.logoAlignment === 'right' ? 'justify-end' : 'justify-start'
+              }`}>
+                <img 
+                  src={activeContext.logoDataUrl} 
+                  alt="Logotipo Institucional" 
+                  className="max-h-16 object-contain"
+                />
+              </div>
+            )}
+
             <div 
               className="pb-4 sm:pb-5 flex flex-col sm:flex-row sm:items-start justify-between gap-3 print-avoid-break"
               style={{ borderBottom: '2px solid #0F172A' }}
@@ -551,7 +565,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                   {docSpecialty}
                 </p>
                 <p className="text-xs sm:text-xs mt-1 leading-normal font-sans" style={{ color: '#64748B' }}>
-                  {docClinic} • {docAddress} • {docPhone}
+                  {docClinic}
+                  {activeContext?.cnes && activeContext.documentFormatting?.showCnesOnHeader ? ` • CNES: ${activeContext.cnes}` : ''}
+                  {docAddress ? ` • ${docAddress}` : ''}
+                  {docPhone ? ` • ${docPhone}` : ''}
                 </p>
               </div>
 
@@ -568,14 +585,23 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                     border: '1px solid #CBD5E1'
                   }}
                 >
-                  {docType === 'prescription' && 'RECEITUÁRIO MÉDICO'}
+                  {docType === 'prescription' && (
+                    activeContext?.documentFormatting?.prescriptionViaCount === 2 
+                      ? 'RECEITUÁRIO MÉDICO (2 VIAS)' 
+                      : 'RECEITUÁRIO MÉDICO'
+                  )}
                   {docType === 'special_prescription' && 'RECEITA CONTROLE ESPECIAL'}
-                  {docType === 'exams' && 'SOLICITAÇÃO DE EXAMES'}
+                  {docType === 'exams' && (activeContext?.documentFormatting?.examHeaderTitle || 'SOLICITAÇÃO DE EXAMES')}
                   {docType === 'certificate' && 'ATESTADO MÉDICO'}
                   {docType === 'referral' && 'ENCAMINHAMENTO MÉDICO'}
                 </span>
                 {docType === 'special_prescription' && (
                   <span className="text-[9px] sm:text-[10px] font-bold block uppercase tracking-wide font-sans" style={{ color: '#991B1B' }}>
+                    1ª Via: Farmácia / 2ª Via: Paciente
+                  </span>
+                )}
+                {docType === 'prescription' && activeContext?.documentFormatting?.prescriptionViaCount === 2 && (
+                  <span className="text-[9px] sm:text-[10px] font-bold block uppercase tracking-wide font-sans" style={{ color: '#1E4F7A' }}>
                     1ª Via: Farmácia / 2ª Via: Paciente
                   </span>
                 )}
@@ -1054,3 +1080,5 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     </div>
   );
 };
+
+export default PrintPreview;
