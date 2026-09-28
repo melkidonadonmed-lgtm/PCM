@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { MobileBottomNav } from './components/MobileBottomNav';
@@ -7,54 +7,22 @@ import { PrescriptionBuilder } from './components/PrescriptionBuilder';
 import { ExamRequester } from './components/ExamRequester';
 import { CertificateAndReferral } from './components/CertificateAndReferral';
 import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
-import { PrintPreview } from './components/PrintPreview';
 import { PatientModal } from './components/PatientModal';
 import { DoctorProfileModal } from './components/DoctorProfileModal';
-import { 
-  ActiveTab, 
-  DoctorProfile, 
-  Patient, 
-  PrescriptionItem, 
-  ExamItem, 
-  MedicalCertificate, 
-  MedicalReferral 
-} from './types';
+import { ActiveTab, PrescriptionItem, Patient } from './types';
+import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
 
-const DEFAULT_DOCTOR: DoctorProfile = {
-  name: '',
-  crm: '',
-  crmState: 'SP',
-  specialty: 'Clínica Médica',
-  rqe: '',
-  clinicName: '',
-  address: '',
-  cityState: '',
-  phone: '',
-  email: '',
-  showSignature: true,
-  stampText: ''
-};
-
-const DEFAULT_PATIENT: Patient = {
-  id: '',
-  name: '',
-  weightKg: 0,
-  birthDate: '',
-  ageText: '',
-  gender: 'male',
-  documentNumber: '',
-  phone: '',
-  allergies: []
-};
+// Carregamento sob demanda (code-splitting) dos módulos pesados de PDF e impressão
+const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
 
 export default function App() {
-  // Theme state (Tema Claro como padrão preferido pelo usuário)
+  // Tema visual (Claro como padrão oficial do sistema)
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('prescmed_theme');
     return saved !== null ? saved === 'dark' : false;
   });
 
-  // Responsive sidebar open state
+  // Estado responsivo da barra lateral
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth >= 1024;
@@ -62,8 +30,17 @@ export default function App() {
     return false;
   });
 
-  // Keep sidebar in sync with the desktop/mobile breakpoint (covers cases where the
-  // initial width check races with the viewport still settling on first paint)
+  // Sincronização do tema no DOM e localStorage
+  useEffect(() => {
+    localStorage.setItem('prescmed_theme', darkMode ? 'dark' : 'light');
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // Sincronização da barra lateral com o breakpoint desktop/mobile
   useEffect(() => {
     const DESKTOP_BREAKPOINT = 1024;
     let wasDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
@@ -81,10 +58,10 @@ export default function App() {
     return () => window.removeEventListener('resize', handleBreakpointChange);
   }, []);
 
-  // Auto-close sidebar on mobile scroll
+  // Fechamento automático da barra lateral ao rolar no mobile
   useEffect(() => {
     let lastScrollY = window.scrollY;
-    
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       if (currentScrollY > 30 && (currentScrollY > lastScrollY + 5 || window.innerWidth < 1024)) {
@@ -107,7 +84,7 @@ export default function App() {
     };
   }, []);
 
-  // Navigation state
+  // Navegação entre abas
   const [activeTab, setActiveTab] = useState<ActiveTab>('prescription');
   const [certSubTab, setCertSubTab] = useState<'certificate' | 'referral'>('certificate');
   const [printDocType, setPrintDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>('prescription');
@@ -119,218 +96,56 @@ export default function App() {
     setActiveTab('print_preview');
   };
 
-  // Modals state
+  // Modais
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
 
-  // Doctor profile state
-  const [doctor, setDoctor] = useState<DoctorProfile>(() => {
-    try {
-      const saved = localStorage.getItem('prescmed_doctor');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') {
-          return { ...DEFAULT_DOCTOR, ...parsed };
-        }
-      }
-    } catch (e) {
-      console.error('Error loading doctor from localStorage:', e);
-    }
-    return DEFAULT_DOCTOR;
-  });
+  // Hook desacoplado de sessão clínica e persistência
+  const {
+    doctor,
+    setDoctor,
+    patient,
+    setPatient,
+    prescriptionItems,
+    setPrescriptionItems,
+    selectedExams,
+    setSelectedExams,
+    examIndication,
+    setExamIndication,
+    certificate,
+    setCertificate,
+    referral,
+    setReferral,
+    startNewConsultation
+  } = usePrescriptionSession();
 
-  // Patient state (starts clean)
-  const [patient, setPatient] = useState<Patient>(() => {
-    try {
-      const saved = localStorage.getItem('prescmed_patient');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') {
-          return { ...DEFAULT_PATIENT, ...parsed };
-        }
-      }
-    } catch (e) {
-      console.error('Error loading patient from localStorage:', e);
-    }
-    return DEFAULT_PATIENT;
-  });
-
-  // Prescription items state (starts clean)
-  const [prescriptionItems, setPrescriptionItems] = useState<PrescriptionItem[]>(() => {
-    const saved = localStorage.getItem('prescmed_prescription');
-    if (saved) {
-      try { 
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
-      } catch (e) {}
-    }
-    return [];
-  });
-
-  // Selected exams state
-  const [selectedExams, setSelectedExams] = useState<ExamItem[]>(() => {
-    const saved = localStorage.getItem('prescmed_exams');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    return [];
-  });
-
-  // Clinical indication for exams
-  const [examIndication, setExamIndication] = useState<string>(() => {
-    return localStorage.getItem('prescmed_exam_indication') || 'Investigação clínica de rotina e controle metabólico.';
-  });
-
-  // Medical certificate state
-  const [certificate, setCertificate] = useState<MedicalCertificate>(() => {
-    const saved = localStorage.getItem('prescmed_certificate');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0];
-    return {
-      id: 'cert-1',
-      patientName: '',
-      documentType: 'CPF',
-      documentNumber: '',
-      daysOff: 2,
-      startDate: today,
-      endDate: tomorrow,
-      periodText: 'por motivo de doença e necessidade de repouso',
-      includeCID: true,
-      cid10Code: 'J00',
-      cid10Description: 'Nasofaringite aguda (resfriado comum)',
-      observations: 'Paciente necessita de repouso e hidratação domiciliar durante o período estipulado.',
-      cityDateText: (doctor.cityState || 'Brasil') + ', ' + new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })
-    };
-  });
-
-  // Medical referral state
-  const [referral, setReferral] = useState<MedicalReferral>(() => {
-    const saved = localStorage.getItem('prescmed_referral');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    return {
-      id: 'ref-1',
-      patientName: '',
-      documentNumber: '',
-      destinationSpecialty: 'Cardiologia Ambulatorial',
-      destinationInstitution: 'Ambulatório de Especialidades',
-      priority: 'prioritario',
-      reason: 'Investigação diagnóstica e acompanhamento especializado.',
-      clinicalSummary: 'Paciente com indicação de avaliação especializada.',
-      relevantExams: '',
-      hypothesisCID: '',
-      date: new Date().toISOString().split('T')[0]
-    };
-  });
-
-  // Sync to localStorage
-  useEffect(() => {
-    localStorage.setItem('prescmed_theme', darkMode ? 'dark' : 'light');
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  useEffect(() => {
-    localStorage.setItem('prescmed_doctor', JSON.stringify(doctor));
-  }, [doctor]);
-
-  useEffect(() => {
-    localStorage.setItem('prescmed_patient', JSON.stringify(patient));
-    setCertificate(prev => ({
-      ...prev,
-      patientName: patient.name || '',
-      documentNumber: patient.documentNumber || ''
-    }));
-    setReferral(prev => ({
-      ...prev,
-      patientName: patient.name || '',
-      documentNumber: patient.documentNumber || ''
-    }));
-  }, [patient]);
-
-  useEffect(() => {
-    localStorage.setItem('prescmed_prescription', JSON.stringify(prescriptionItems));
-  }, [prescriptionItems]);
-
-  useEffect(() => {
-    localStorage.setItem('prescmed_exams', JSON.stringify(selectedExams));
-  }, [selectedExams]);
-
-  useEffect(() => {
-    localStorage.setItem('prescmed_exam_indication', examIndication);
-  }, [examIndication]);
-
-  useEffect(() => {
-    localStorage.setItem('prescmed_certificate', JSON.stringify(certificate));
-  }, [certificate]);
-
-  useEffect(() => {
-    localStorage.setItem('prescmed_referral', JSON.stringify(referral));
-  }, [referral]);
-
-  // Handler to update patient weight from anywhere
+  // Manipuladores de ação
   const handleUpdatePatientWeight = (newWeight: number) => {
     setPatient(prev => ({ ...prev, weightKg: newWeight }));
   };
 
-  // Handler to toggle weight calculation mode
   const handleToggleWeightCalc = (enabled: boolean) => {
     setPatient(prev => ({ ...prev, weightCalcEnabled: enabled }));
   };
 
-  // Add prescription item handler
   const handleAddPrescriptionItem = (newItem: PrescriptionItem) => {
     setPrescriptionItems(prev => [...prev, newItem]);
   };
 
-  // Clear prescription items (zerar receita)
   const handleClearPrescription = () => {
     setPrescriptionItems([]);
-    localStorage.removeItem('prescmed_prescription');
   };
 
-  // Clear patient data (limpar dados do paciente globalmente)
   const handleClearPatient = () => {
     const emptyPatient: Patient = {
-      id: 'patient-' + Date.now(),
-      name: '',
-      weightKg: 0,
-      birthDate: '',
-      ageText: '',
-      gender: 'male',
-      documentNumber: '',
-      phone: '',
-      allergies: [],
-      motherName: '',
-      notes: ''
+      ...DEFAULT_PATIENT,
+      id: 'patient-' + Date.now()
     };
     setPatient(emptyPatient);
-    setCertificate(prev => ({
-      ...prev,
-      patientName: '',
-      documentNumber: ''
-    }));
-    setReferral(prev => ({
-      ...prev,
-      patientName: '',
-      documentNumber: ''
-    }));
-    localStorage.setItem('prescmed_patient', JSON.stringify(emptyPatient));
   };
 
-  // Reset entire consultation (Zerar tudo: paciente + receitas + exames + documentos)
   const handleResetAll = () => {
-    handleClearPatient();
-    handleClearPrescription();
-    setSelectedExams([]);
-    localStorage.removeItem('prescmed_exams');
+    startNewConsultation();
     setActiveTab('prescription');
   };
 
@@ -454,23 +269,32 @@ export default function App() {
           )}
 
           {activeTab === 'print_preview' && (
-            <PrintPreview
-              darkMode={darkMode}
-              doctor={doctor}
-              patient={patient}
-              prescriptionItems={prescriptionItems}
-              exams={selectedExams}
-              selectedExams={selectedExams}
-              examIndication={examIndication}
-              certificate={certificate}
-              referral={referral}
-              initialDocType={printDocType}
-              onNavigateBack={() => setActiveTab('prescription')}
-              onBack={() => setActiveTab('prescription')}
-              onClearPrescription={handleClearPrescription}
-              onResetAll={handleResetAll}
-              onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
-            />
+            <Suspense fallback={
+              <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
+                <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+                <span className="font-medium text-slate-600 dark:text-slate-300">
+                  Carregando visualização médica e módulos de exportação...
+                </span>
+              </div>
+            }>
+              <PrintPreview
+                darkMode={darkMode}
+                doctor={doctor}
+                patient={patient}
+                prescriptionItems={prescriptionItems}
+                exams={selectedExams}
+                selectedExams={selectedExams}
+                examIndication={examIndication}
+                certificate={certificate}
+                referral={referral}
+                initialDocType={printDocType}
+                onNavigateBack={() => setActiveTab('prescription')}
+                onBack={() => setActiveTab('prescription')}
+                onClearPrescription={handleClearPrescription}
+                onResetAll={handleResetAll}
+                onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
+              />
+            </Suspense>
           )}
         </main>
       </div>

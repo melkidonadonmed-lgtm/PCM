@@ -537,7 +537,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                     <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={1.75} />
                   </div>
                   <div>
-                    <h1 className="font-extrabold text-lg sm:text-2xl tracking-tight uppercase leading-none font-sans" style={{ color: '#0F172A' }}>
+                    <h1 className="font-bold text-xl sm:text-2xl tracking-tight uppercase leading-none font-serif-doc" style={{ color: '#0F172A' }}>
                       {docName}
                     </h1>
                     <p className="text-xs sm:text-sm font-bold font-sans mt-0.5" style={{ color: '#1E4F7A' }}>
@@ -631,7 +631,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <main id="print-content" className="print-body w-full min-h-0 flex-1 flex flex-col justify-start">
               {/* 1. PRESCRIPTION CONTENT */}
               {(docType === 'prescription' || docType === 'special_prescription') && (
-                <div className="space-y-6 sm:space-y-8 font-serif" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+                <div className="space-y-6 sm:space-y-8 font-serif font-serif-doc" style={{ fontFamily: 'var(--font-serif-doc)' }}>
                   {prescriptionItems.length === 0 ? (
                     <div className="py-16 text-center italic text-base text-slate-400 font-serif">
                       Nenhum medicamento adicionado nesta prescrição.
@@ -757,7 +757,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
               {/* 2. EXAMS CONTENT */}
               {docType === 'exams' && (
-                <div className="space-y-6 font-serif" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+                <div className="space-y-6 font-serif font-serif-doc" style={{ fontFamily: 'var(--font-serif-doc)' }}>
                   {examIndication && (
                     <div 
                       className="p-4 rounded-xl text-xs sm:text-sm font-sans"
@@ -797,9 +797,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
               {/* 3. ATESTADO MÉDICO CONTENT */}
               {docType === 'certificate' && (
-                <div className="py-4 sm:py-8 px-1 sm:px-4 space-y-6 sm:space-y-8 font-serif text-justify leading-relaxed sm:leading-loose" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+                <div className="py-4 sm:py-8 px-1 sm:px-4 space-y-6 sm:space-y-8 font-serif font-serif-doc text-justify leading-relaxed sm:leading-loose" style={{ fontFamily: 'var(--font-serif-doc)' }}>
                   <h2 
-                    className="text-center font-bold text-xl sm:text-2xl uppercase tracking-widest pb-3 font-sans"
+                    className="text-center font-bold text-xl sm:text-2xl uppercase tracking-widest pb-3 font-serif-doc"
                     style={{ color: '#0F172A', borderBottom: '1.5px solid #CBD5E1' }}
                   >
                     ATESTADO MÉDICO
@@ -842,9 +842,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
               {/* 4. ENCAMINHAMENTO CONTENT */}
               {docType === 'referral' && (
-                <div className="space-y-5 sm:space-y-6 text-sm font-serif" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+                <div className="space-y-5 sm:space-y-6 text-sm font-serif font-serif-doc" style={{ fontFamily: 'var(--font-serif-doc)' }}>
                   <h2 
-                    className="text-center font-bold text-lg sm:text-xl uppercase tracking-widest pb-3 font-sans"
+                    className="text-center font-bold text-lg sm:text-xl uppercase tracking-widest pb-3 font-serif-doc"
                     style={{ color: '#0F172A', borderBottom: '1.5px solid #CBD5E1' }}
                   >
                     GUIA DE ENCAMINHAMENTO & REFERÊNCIA

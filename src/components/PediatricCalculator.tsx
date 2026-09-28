@@ -116,40 +116,28 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
               <span 
-                className="p-2 rounded-xl text-white flex-shrink-0"
-                style={{
-                  backgroundColor: darkMode ? '#155730' : '#15803D',
-                  border: '1px solid rgba(255, 255, 255, 0.12)'
-                }}
+                className="p-2 rounded-xl text-white flex-shrink-0 bg-emerald-700 dark:bg-emerald-800 border border-white/12"
               >
                 <Calculator className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
               </span>
-              <h2 className="text-lg sm:text-xl font-bold tracking-tight" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--text-main)]">
                 Calculadora de Doses Pediátricas
               </h2>
             </div>
-            <p className="text-xs sm:text-sm font-medium leading-relaxed" style={{ color: darkMode ? '#8E9CAE' : '#64748B' }}>
+            <p className="text-xs sm:text-sm font-medium leading-relaxed text-[var(--text-muted)]">
               Ajuste o peso de <span className="text-sky-700 dark:text-sky-400 font-semibold">{patientName}</span> para recalcular doses em mg, volume (mL) e gotas instantaneamente com teto de segurança.
             </p>
           </div>
 
           {/* Right: Interactive Weight Stepper & Display (Ergonomic & Touch-friendly) */}
           <div 
-            className="flex items-center justify-between sm:justify-center gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-2xl border w-full lg:w-auto flex-shrink-0 tactile-flat"
-            style={{
-              backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-            }}
+            className="flex items-center justify-between sm:justify-center gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-2xl border w-full lg:w-auto flex-shrink-0 tactile-flat bg-[var(--surface-inset)] border-[var(--border-subtle)]"
           >
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.max(1, +(patientWeight - 1).toFixed(1)))}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95"
-                style={{
-                  backgroundColor: darkMode ? 'var(--surface-card)' : 'var(--surface-card)',
-                  color: darkMode ? '#F4F7FC' : '#0B132B'
-                }}
+                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)]"
                 title="Diminuir 1 kg"
               >
                 -1
@@ -157,11 +145,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.max(1, +(patientWeight - 0.5).toFixed(1)))}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95"
-                style={{
-                  backgroundColor: darkMode ? 'var(--surface-card)' : 'var(--surface-card)',
-                  color: darkMode ? '#94A3B8' : '#526071'
-                }}
+                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)]"
                 title="Diminuir 0.5 kg"
               >
                 -0.5
@@ -180,8 +164,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   step="0.5"
                   value={patientWeight}
                   onChange={(e) => onUpdatePatientWeight(parseFloat(e.target.value) || 1)}
-                  className="w-16 sm:w-20 font-black text-2xl text-center bg-transparent border-b-2 border-emerald-600 dark:border-emerald-500 focus:outline-none focus:border-sky-500"
-                  style={{ color: darkMode ? '#388EE6' : '#0F5E94' }}
+                  className="w-16 sm:w-20 font-black text-2xl text-center bg-transparent border-b-2 border-emerald-600 dark:border-emerald-500 focus:outline-none focus:border-sky-500 text-sky-700 dark:text-sky-400"
                 />
                 <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400">kg</span>
               </div>
@@ -191,11 +174,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.min(120, +(patientWeight + 0.5).toFixed(1)))}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95"
-                style={{
-                  backgroundColor: darkMode ? 'var(--surface-card)' : 'var(--surface-card)',
-                  color: darkMode ? '#94A3B8' : '#526071'
-                }}
+                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)]"
                 title="Aumentar 0.5 kg"
               >
                 +0.5
@@ -203,11 +182,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.min(120, +(patientWeight + 1).toFixed(1)))}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95"
-                style={{
-                  backgroundColor: darkMode ? 'var(--surface-card)' : 'var(--surface-card)',
-                  color: darkMode ? '#F4F7FC' : '#0B132B'
-                }}
+                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)]"
                 title="Aumentar 1 kg"
               >
                 +1

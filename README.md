@@ -1,20 +1,36 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# PresCMed
 
-# Run and deploy your AI Studio app
+SPA React/TypeScript para prescrições, documentos médicos, cálculos
+pediátricos e geração de PDF em pt-BR.
 
-This contains everything you need to run your app locally.
+## Ambiente local
 
-View your app in AI Studio: https://ai.studio/apps/dfe45827-fc12-4e92-b691-b05bbab32c2d
+- Local recomendado neste Windows: `C:\Users\melki\Projetos\PCM`
+- Pré-requisitos: Node.js LTS, npm e Git
+- Gerenciador adotado: npm (`package-lock.json`)
 
-## Run Locally
+```powershell
+npm ci
+npm run dev
+```
 
-**Prerequisites:**  Node.js
+O servidor de desenvolvimento usa `http://localhost:3000`.
 
+## Validação
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+```powershell
+npm run lint
+npm run build
+```
+
+Não há suíte automatizada de testes. Alterações de UI e PDF devem ser
+verificadas no navegador, em tema claro/escuro e nos fluxos de impressão.
+
+## Dados e segurança clínica
+
+O aplicativo é client-side e persiste dados no `localStorage`. Não use dados
+reais de pacientes durante o desenvolvimento e não adicione telemetria ou
+transmissão desses dados sem requisito explícito.
+
+As variáveis de `.env.example` são remanescentes do template e não são usadas
+pelo código atual. Nunca faça commit de arquivos `.env`.

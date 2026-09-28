@@ -307,11 +307,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
               <div className="flex items-center gap-3">
                 <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm"
-                  style={{
-                    backgroundColor: darkMode ? '#1E4F7A' : '#0F6292',
-                    border: '1px solid rgba(255, 255, 255, 0.12)'
-                  }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-sky-700 dark:bg-sky-800 border border-white/12"
                 >
                   <Award className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
                 </div>
@@ -603,11 +599,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
               <div className="flex items-center gap-3">
                 <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm"
-                  style={{
-                    backgroundColor: darkMode ? '#155730' : '#15803D',
-                    border: '1px solid rgba(255, 255, 255, 0.12)'
-                  }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-emerald-700 dark:bg-emerald-800 border border-white/12"
                 >
                   <Share2 className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
                 </div>
@@ -784,11 +776,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             {/* Integrated CID-10 Finder for Referral / Encaminhamento */}
             <div 
-              className="p-4 sm:p-5 rounded-2xl border space-y-3.5"
-              style={{
-                backgroundColor: darkMode ? '#0E1713' : '#F4FBF7',
-                borderColor: darkMode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(21, 128, 61, 0.18)'
-              }}
+              className="p-4 sm:p-5 rounded-2xl border space-y-3.5 bg-[var(--surface-inset)] border-emerald-500/20"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b pb-2.5" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
                 <div className="flex items-center gap-2">

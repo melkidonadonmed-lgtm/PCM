@@ -20,7 +20,6 @@ interface MobileBottomNavProps {
 }
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
-  darkMode,
   activeTab,
   sidebarOpen = false,
   onSelectTab,
@@ -37,7 +36,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     },
     {
       id: 'pediatric_calc' as ActiveTab,
-      label: 'Calculadoras',
+      label: 'Calculadora',
       icon: Calculator
     },
     {
@@ -57,16 +56,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     }
   ];
 
-  // Solicitação de Exames e Encaminhamentos não têm slot fixo na barra (só cabem 5-6
-  // itens sem espremer o alvo de toque) — ficam acessíveis em 1 toque a mais via "Mais",
-  // que abre o menu lateral completo com os 7 destinos rotulados.
+  // Solicitação de Exames e Encaminhamentos acessíveis via "Mais"
   const isMoreActive = activeTab === 'exams' || activeTab === 'referral';
 
   return (
     <nav
       id="mobile-bottom-nav"
       aria-label="Navegação Inferior Mobile"
-      className="md:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-around px-2 border-t backdrop-blur-md no-print pb-safe isolate panel-navy panel-projected-top"
+      className="md:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-1 xs:px-2 border-t backdrop-blur-md no-print pb-safe isolate panel-navy panel-projected-top overflow-x-hidden"
       style={{
         borderColor: 'var(--surface-panel-border)'
       }}
@@ -80,7 +77,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             key={item.id}
             id={`mobile-nav-${item.id}`}
             onClick={() => onSelectTab(item.id)}
-            className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] h-12 px-3 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
+            className={`flex flex-col items-center justify-center flex-1 max-w-[68px] min-w-0 min-h-[48px] h-12 px-0.5 xs:px-1 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
               isActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
             }`}
             style={
@@ -96,13 +93,13 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 strokeWidth={1.75}
               />
               {item.badge && (
-                <span className="absolute -top-1 -right-2.5 min-w-[18px] h-4 px-1 rounded-full font-extrabold text-[9px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15">
+                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[8px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15">
                   {item.badge}
                 </span>
               )}
             </div>
             <span
-              className="text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors"
+              className="text-[9px] xs:text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-full text-center"
               style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
             >
               {item.label}
@@ -120,7 +117,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         aria-expanded={sidebarOpen}
         aria-controls="prescmed-sidebar"
         aria-label="Mais opções: Exames, Encaminhamentos e menu completo"
-        className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] h-12 px-3 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
+        className={`flex flex-col items-center justify-center flex-1 max-w-[68px] min-w-0 min-h-[48px] h-12 px-0.5 xs:px-1 rounded-xl transition-all cursor-pointer relative active:scale-95 ${
           isMoreActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
         }`}
         style={
@@ -136,13 +133,13 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             strokeWidth={1.75}
           />
           {selectedExamsCount > 0 && (
-            <span className="absolute -top-1 -right-2.5 min-w-[18px] h-4 px-1 rounded-full font-extrabold text-[9px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15">
+            <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[8px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15">
               {selectedExamsCount}
             </span>
           )}
         </div>
         <span
-          className="text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors"
+          className="text-[9px] xs:text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-full text-center"
           style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
         >
           Mais

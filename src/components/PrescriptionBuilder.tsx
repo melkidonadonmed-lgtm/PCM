@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { PrescriptionItem, Patient, DoctorProfile } from '../types';
 import { generateScheduleTimes } from '../utils/doseCalculator';
-import { generateMedicalPDF } from '../utils/pdfGenerator';
+import { searchUnifiedMedicationsFuzzy } from '../utils/fuzzySearch';
 import { UNIFIED_MEDICATIONS, UnifiedMedication, CATEGORY_LABELS } from '../data/medicationDatabase';
 
 interface PrescriptionBuilderProps {
@@ -323,28 +323,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     }
   ];
 
-  // Filter medications based on search and category
+  // Filter medications based on intelligent fuzzy search and category
   const filteredMedications = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    return UNIFIED_MEDICATIONS.filter(med => {
-      const matchCat = activeCategory === 'all' || med.category === activeCategory;
-      if (!matchCat) return false;
-      if (!term) return true;
-      return (
-        med.name.toLowerCase().includes(term) ||
-        med.activeIngredient.toLowerCase().includes(term)
-      );
-    });
+    return searchUnifiedMedicationsFuzzy(UNIFIED_MEDICATIONS, searchTerm, activeCategory);
   }, [searchTerm, activeCategory]);
 
   // Autocomplete suggestions (top 8)
   const searchSuggestions = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
+    const term = searchTerm.trim();
     if (!term || term.length < 2) return [];
-    return UNIFIED_MEDICATIONS.filter(med =>
-      med.name.toLowerCase().includes(term) ||
-      med.activeIngredient.toLowerCase().includes(term)
-    ).slice(0, 8);
+    return searchUnifiedMedicationsFuzzy(UNIFIED_MEDICATIONS, term, 'all').slice(0, 8);
   }, [searchTerm]);
 
   // Select medication from database into the composer form

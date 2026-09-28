@@ -40,10 +40,8 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header 
       id="prescmed-header" 
-      className="sticky top-0 z-50 w-full border-b backdrop-blur-md transition-colors no-print isolate"
+      className="sticky top-0 z-50 w-full border-b backdrop-blur-md transition-colors no-print isolate bg-[var(--surface-card)] border-[var(--border-subtle)]"
       style={{
-        backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-        borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#E3D7BD',
         boxShadow: darkMode 
           ? '0 12px 28px -5px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.08)'
           : '0 4px 20px -2px rgba(20, 32, 50, 0.07), inset 0 1px 0 rgba(255,255,255,0.95)'
@@ -56,12 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-sidebar"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
-            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
-            style={{
-              backgroundColor: darkMode ? '#141E2C' : '#F5EFE6',
-              color: darkMode ? '#FDFBF7' : '#142032',
-              border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E3D7BD'
-            }}
+            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)]"
           >
             <Menu className="w-5 h-5" strokeWidth={1.75} />
           </button>
@@ -71,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div 
               className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] sm:min-w-[40px] rounded-xl flex items-center justify-center relative overflow-hidden flex-shrink-0 border"
               style={{
-                backgroundColor: '#142032',
+                backgroundColor: 'var(--nav-bg, #142032)',
                 borderColor: darkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(20, 32, 50, 0.25)',
                 boxShadow: '0 4px 12px rgba(10, 17, 28, 0.35), inset 0 1px 0 rgba(255,255,255,0.18)'
               }}
@@ -111,11 +104,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="header-patient-chip"
             role="button"
             tabIndex={0}
-            className="flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer group w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[360px] min-h-[44px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
-            style={{
-              backgroundColor: darkMode ? '#141E2C' : '#F8F4EC',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#E3D7BD'
-            }}
+            className="flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer group w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[360px] min-h-[44px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none bg-[var(--bg-app)] border-[var(--border-subtle)]"
             title="Clique para definir ou editar os dados do paciente"
           >
             <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 border ${
@@ -147,11 +136,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Quick Weight Input in Header */}
           <div 
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border shadow-tactile-sm transition-all"
-            style={{
-              backgroundColor: darkMode ? '#141E2C' : '#F8F4EC',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#E3D7BD'
-            }}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border shadow-tactile-sm transition-all bg-[var(--bg-app)] border-[var(--border-subtle)]"
           >
             <Scale className="w-4 h-4 text-navy-900 dark:text-cream-200 flex-shrink-0" strokeWidth={1.75} />
             <div className="flex flex-col items-start">
@@ -188,12 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
-            style={{
-              backgroundColor: darkMode ? '#141E2C' : '#F8F4EC',
-              border: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #E3D7BD',
-              color: darkMode ? '#FDFBF7' : '#142032'
-            }}
+            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)]"
             title={darkMode ? 'Ativar Modo Claro (Baunilha & Navy)' : 'Ativar Modo Escuro (Obsidian & Creme)'}
           >
             {darkMode ? (

@@ -21,12 +21,13 @@ O projeto foi gerado a partir de um template do **Google AI Studio** (ver `metad
 - **Tailwind CSS v4** via `@tailwindcss/vite` (sem `tailwind.config.js`; a configuração é feita em CSS com `@import "tailwindcss"` e `@theme`/variáveis em `src/index.css`).
 - **lucide-react** para ícones, **motion** para animações.
 - **jspdf + jspdf-autotable** para geração de PDF e **html2canvas** para captura de tela dos documentos no preview.
-- Gerenciador de pacotes: há `bun.lock` (Bun), mas os comandos `npm` também funcionam.
+- Gerenciador de pacotes: **npm**, com `package-lock.json`. O `bun.lock` é
+  legado e não exige a instalação do Bun.
 
 ## Comandos
 
 ```bash
-npm install        # ou: bun install
+npm ci             # instalação reproduzível a partir do package-lock.json
 npm run dev        # dev server Vite na porta 3000, host 0.0.0.0
 npm run build      # build de produção em dist/
 npm run preview    # serve o build de produção
@@ -35,6 +36,11 @@ npm run clean      # remove dist/ e server.js
 ```
 
 **Testes:** não existe framework de testes configurado (sem Vitest/Jest/Playwright, sem arquivos de teste). A verificação disponível é `npm run lint` (TypeScript). Ao modificar lógica crítica (ex.: cálculo de doses), valide manualmente na UI via `npm run dev`.
+
+Para alterações de UI, impressão ou PDF, use a skill
+`ui-pdf-validation`. Para qualquer alteração clínica, use
+`clinical-change-safety` e solicite revisão do agente
+`prescmed-clinical-reviewer`.
 
 ## Estrutura do código
 
