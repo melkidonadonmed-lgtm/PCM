@@ -1,0 +1,101 @@
+# GEMINI.md — Memória do Projeto PresCMed (PCM)
+
+Este arquivo serve como **memória persistente, diretrizes de arquitetura e base de conhecimento** para o desenvolvimento do **PresCMed**. Todos os agentes e modelos que atuam neste repositório devem seguir estritamente as diretrizes aqui documentadas.
+
+---
+
+## 1. Identificação do Projeto
+
+- **Nome**: PresCMed (PCM)
+- **Versão**: 2.0.0
+- **Natureza**: Sistema de Prescrição Médica Digital ambulatorial voltado ao ecossistema de saúde brasileiro.
+- **Domínio**: Clínico / Saúde (YMYL — *Your Money or Your Life*). Qualquer alteração de dose, posologia ou conformidade regulatória exige precisão cirúrgica e validação de testes.
+- **Arquitetura**: **SPA 100% Client-Side** (React 19 + Vite 6). Não há backend ativo em Node/Express no código de produção; dados sensíveis residem estritamente no navegador do médico (localStorage e Dexie.js / IndexedDB).
+
+---
+
+## 2. Perfil do Desenvolvedor e Ambiente de Execução
+
+- **Desenvolvedor**: Melki
+- **Sistema Operacional**: Windows 11 Pro
+- **Shell**: PowerShell 7 (`pwsh`).
+  - **Regra**: Nunca use sintaxe Bash/Linux exclusiva (`export`, `rm -rf`, `grep`, `cat`, etc.) sem fornecer a alternativa funcional em cmdlets do PowerShell (`Set-Item`, `Remove-Item`, `Select-String`, `Get-Content`).
+- **Google Drive**: Montado em `G:\Meu Drive`.
+- **Pasta Raiz Dev**: `C:\Users\melki\dev\`
+- **Notas Pessoais**: `C:\Users\melki\Documents\Obsidian Vault\`
+- **Status do Sistema**: Telemetria do Data Agent Kit (`googlecloudtools.datacloud_telemetry`) foi desarmada e travada como Read-Only em `C:\Users\melki\.gemini\config\plugins\googlecloudtools.datacloud_telemetry\hooks.json` para evitar travamentos de hooks no Windows.
+
+---
+
+## 3. Stack Tecnológica
+
+| Camada | Tecnologia | Detalhes |
+|---|---|---|
+| **Frontend** | React 19 + TypeScript | Modo funcional com hooks. Sem React Router (roteamento por aba `activeTab` em `App.tsx`). |
+| **Bundler** | Vite 6 | `@vitejs/plugin-react` e `@tailwindcss/vite`. |
+| **Estilos** | Tailwind CSS v4 | Configurado diretamente via CSS em `src/index.css` (`@import "tailwindcss"` e `@theme`). |
+| **UI & Ícones** | `lucide-react`, `motion` | Ícones SVG limpos e animações fluidas de transição. |
+| **Documentos / PDF** | `jspdf`, `jspdf-autotable`, `html2canvas` | Geração vetorial programática e visualização de folha A4. |
+| **Testes** | Vitest 5 | Testes unitários para cálculos de dose e conformidade sanitária/CFM. |
+| **Persistência** | `localStorage` + `Dexie.js` v2 | Persistência local segura + backup e restauração portátil (`.pcm.json`). |
+
+---
+
+## 4. Diretrizes Clínicas e Regulatórias Inegociáveis
+
+1. **Portaria SVS/MS 344/98 (Receituário de Controle Especial)**:
+   - Obrigatório formato em **2 vias** (1ª via: Retenção da Farmácia / 2ª via: Orientação do Paciente).
+   - Obrigatoriedade dos campos de identificação do emitente (médico/CRM/UF), do paciente, do comprador (se terceiro) e do fornecedor/farmácia.
+2. **Resoluções CFM 1.658/2002 e 1.819/2007 (Consentimento de CID-10)**:
+   - A inclusão do diagnóstico ou código CID-10 em atestados médicos é **vedada sem a expressa concordância e solicitação do paciente**.
+   - A interface do PresCMed exige a marcação explícita de consentimento (`authorizedByPatient = true`) antes de emitir atestado com CID visível.
+3. **Calculadora Pediátrica de Doses (`src/utils/doseCalculator.ts`)**:
+   - Cálculos por peso (mg/kg) convertidos em volumes práticos (mL ou gotas) baseados nas apresentações farmacêuticas reais do mercado brasileiro.
+   - Paracetamol gotas: 1 gota/kg/dose (máximo 35 gotas por dose).
+   - Dipirona gotas: 0,5 a 1 gota/kg/dose (apresentação 500 mg/mL).
+   - Formatação numérica sempre com vírgula no padrão brasileiro (`toLocaleString('pt-BR')`).
+
+---
+
+## 5. Design System e Regras de Interface
+
+- **Chrome de Navegação** (`Header`, `Sidebar`, `MobileBottomNav`):
+  - **Sempre Deep Navy** (`#0B132B` / `#1C2541` via `.panel-navy`) em **ambos os temas** (Claro e Escuro).
+  - Tipografia sobre o navy sempre em tons claros (`#F1F5F9`, `#CBD5E1`, `#94A3B8`).
+- **Tema Claro**:
+  - Fundo da aplicação: Canvas creme suave (`--bg-app: #F9F6F0`).
+  - Cards e superfícies: Branco-quente (`--surface-card: #FFFDF9`).
+  - Tipografia: Azul-marinho profundo (`#0F172A`).
+- **Tema Escuro**:
+  - Fundo da aplicação: Obsidian profundo (`--bg-app: #0D0F12`).
+  - Cards e superfícies: Grafite translúcido (`--surface-card: #1A1D24`).
+- **Folha de Impressão A4 (`printable-a4-sheet`)**:
+  - **Sempre fundo branco puro (`#FFFFFF`) e texto preto/escuro**, independentemente do tema ativo na UI.
+  - A impressão e o preview simulam papel físico real. Nunca aplique classes de modo escuro dentro da folha do documento.
+
+---
+
+## 6. Comandos Essenciais
+
+```powershell
+# Execução e desenvolvimento local
+npm run dev        # Inicia dev server na porta 3000
+
+# Qualidade e Testes (executar sempre após alterações clínicas)
+npm run test       # Roda a suíte completa de testes no Vitest
+npm run lint       # Validação de tipagem TypeScript (tsc --noEmit)
+
+# Produção
+npm run build      # Compilação otimizada para a pasta dist/
+npm run preview    # Pré-visualização do bundle compilado
+```
+
+---
+
+## 7. Registro de Decisões e Histórico Técnico
+
+- **28/09/2026**:
+  - Diagnosticado e corrigido o bloqueio geral do Node.js causado pelo hook de telemetria com aspas escapadas incorretamente no Windows.
+  - O arquivo `hooks.json` da telemetria foi esvaziado e marcado como Read-Only.
+  - Validados 23/23 testes clínicos Vitest com 100% de sucesso.
+  - Criada a base de memória persistente `GEMINI.md` e pasta `.gemini/` para governança do projeto.

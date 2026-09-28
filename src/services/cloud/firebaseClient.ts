@@ -10,14 +10,14 @@ export interface FirebaseInstances {
 
 let cachedInstances: FirebaseInstances | null = null;
 
-// Configuração fornecida pelas variáveis de ambiente Vite (com fallback para o projeto GCP ativo)
+// Configuração fornecida pelas variáveis de ambiente Vite (com fallback para o web app oficial do PresCMed no GCP)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyBCfBlswVUaiTqzrMmgSHgHg9ObftC2afQ',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'agent-md-506215.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'agent-md-506215',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'agent-md-506215.firebasestorage.app',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || ''
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '1044179901556',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:1044179901556:web:2a498365b31e97a3e24521'
 };
 
 /**
