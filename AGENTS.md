@@ -68,6 +68,7 @@ src/
     PrintPreview.tsx                               # Preview de impressão + exportação PDF
     PatientModal.tsx, DoctorProfileModal.tsx       # Edição de paciente e médico
     CidSearchBar.tsx                               # Busca de CID-10
+    Icon.tsx                                       # Componente canônico de ícones (Google Material Symbols)
   data/                 # Catálogos estáticos (dados clínicos em pt-BR)
     pediatricMeds.ts    # ~54 medicamentos pediátricos com dose mg/kg
     adultMeds.ts        # ~32 medicamentos adultos com posologia
@@ -99,6 +100,7 @@ src/
 - **Tipos:** centralizados em `src/types.ts`; adicione novos tipos de domínio lá. `tsconfig` não é estrito e permite `allowJs`, mas escreva código tipado.
 - **Path alias:** `@/*` mapeia para a raiz do projeto (pouco usado; os imports existentes são relativos — prefira relativos dentro de `src/`).
 - **Formatação numérica:** doses e volumes usam locale pt-BR (`toLocaleString('pt-BR')`, vírgula decimal) nos textos de prescrição.
+- **Sistema de Ícones Canônico (Anti-Mutação):** Utilize preferencialmente o componente canônico `<Icon name="..." />` (`src/components/Icon.tsx`) baseado no Google Material Design Icons (`material-symbols`). Nunca invente nomes de ícones ou introduza novas bibliotecas. O componente dispõe de mapa de aliases clínicos e tipagem estrita para garantir uniformidade visual entre todas as telas.
 
 ## Variáveis de ambiente
 

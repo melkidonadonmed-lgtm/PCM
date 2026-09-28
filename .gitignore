@@ -5,6 +5,7 @@ coverage/
 .DS_Store
 *.log
 .playwright-mcp/
-.gemini/
 .env*
 !.env.example
+.github/skills/
+.gemini/skills/

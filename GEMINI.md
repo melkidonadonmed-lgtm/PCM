@@ -34,7 +34,7 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 | **Frontend** | React 19 + TypeScript | Modo funcional com hooks. Sem React Router (roteamento por aba `activeTab` em `App.tsx`). |
 | **Bundler** | Vite 6 | `@vitejs/plugin-react` e `@tailwindcss/vite`. |
 | **Estilos** | Tailwind CSS v4 | Configurado diretamente via CSS em `src/index.css` (`@import "tailwindcss"` e `@theme`). |
-| **UI & Ícones** | `lucide-react`, `motion` | Ícones SVG limpos e animações fluidas de transição. |
+| **UI & Ícones** | Google Material Symbols (`material-symbols`), `lucide-react`, `motion` | Sistema canônico `<Icon />` com Google Material Design Icons offline + suporte legado Lucide. |
 | **Documentos / PDF** | `jspdf`, `jspdf-autotable`, `html2canvas` | Geração vetorial programática e visualização de folha A4. |
 | **Testes** | Vitest 5 | Testes unitários para cálculos de dose e conformidade sanitária/CFM. |
 | **Persistência** | `localStorage` + `Dexie.js` v2 | Persistência local segura + backup e restauração portátil (`.pcm.json`). |
@@ -73,6 +73,12 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
   - **Sempre fundo branco puro (`#FFFFFF`) e texto preto/escuro**, independentemente do tema ativo na UI.
   - A impressão e o preview simulam papel físico real. Nunca aplique classes de modo escuro dentro da folha do documento.
 
+### 5.1 Sistema Canônico de Ícones (Google Material Design Icons / Anti-Mutação)
+- **Pacote**: `material-symbols` (Google Material Design Icons oficial, 100% offline via woff2 empacotado no PWA).
+- **Componente**: `<Icon name="..." />` (`src/components/Icon.tsx`).
+- **Prevenção de Mutação**: Qualquer novo componente, tela ou funcionalidade gerada por IA deve usar o `<Icon />`. O componente possui resolução de aliases clínicos em português (`receita`, `medicamento`, `gotas`, `vacina`, `estetoscopio`, `balanca`, `exame`, `atestado`, etc.) e tipagem estrita com autocompletação para os símbolos do Google.
+- **Proibição**: Não invente ícones arbitrários ou instale pacotes paralelos.
+
 ---
 
 ## 6. Comandos Essenciais
@@ -99,3 +105,4 @@ npm run preview    # Pré-visualização do bundle compilado
   - O arquivo `hooks.json` da telemetria foi esvaziado e marcado como Read-Only.
   - Validados 23/23 testes clínicos Vitest com 100% de sucesso.
   - Criada a base de memória persistente `GEMINI.md` e pasta `.gemini/` para governança do projeto.
+  - **Google Material Design Icons Integrado**: Instalado `material-symbols` com suporte offline, ajustado Workbox para precache de woff2 (5 MB) e criado componente canônico anti-mutação `<Icon />` com mapa de aliases clínicos e 29/29 testes Vitest aprovados.
