@@ -1,5 +1,7 @@
 import Dexie, { type Table } from 'dexie';
 import { WorkContext, SavedDocument } from '../types';
+import { PRESET_LOGOS } from '../data/presetAssets';
+import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
 
 export type { SavedDocument };
 
@@ -28,15 +30,18 @@ export async function initializeDefaultContexts(defaultDoctor: { crm: string; uf
     const defaultContexts: WorkContext[] = [
       {
         id: 'ctx-ubs',
-        name: 'UBS Municipal (Atenção Primária)',
+        name: 'USF Osvaldo Piana (SEMUSA - Porto Velho)',
         sphere: 'municipal',
-        clinicName: 'Secretaria Municipal de Saúde — UBS',
-        clinicAddress: 'Rede Municipal de Atenção Básica',
-        cnes: '',
+        clinicName: 'UNIDADE DE SAÚDE DA FAMÍLIA OSVALDO PIANA',
+        clinicAddress: 'Av. Campos Sales, 858 - Areal, Porto Velho - RO, 76804-358',
+        cnes: '2678942',
+        logoDataUrl: PRESET_LOGOS.semusa.dataUrl,
         logoAlignment: 'left',
+        watermarkType: 'sus_double',
+        watermarkOpacity: 0.08,
         documentFormatting: {
-          headerType: 'standard',
-          prescriptionViaCount: 1,
+          headerType: 'custom_logo',
+          prescriptionViaCount: 2,
           showCnesOnHeader: true,
           referralModel: 'sus_regulation',
           examHeaderTitle: 'SOLICITAÇÃO DE EXAMES — REDE MUNICIPAL'
@@ -48,12 +53,15 @@ export async function initializeDefaultContexts(defaultDoctor: { crm: string; uf
       },
       {
         id: 'ctx-policlinica',
-        name: 'Policlínica Estadual / Especialidades',
+        name: 'Policlínica Oswaldo Cruz - POC (SESAU - RO)',
         sphere: 'state',
-        clinicName: 'Secretaria de Estado da Saúde — Policlínica',
-        clinicAddress: 'Complexo Regulador Estadual',
-        cnes: '',
+        clinicName: 'POC - Policlínica Oswaldo Cruz',
+        clinicAddress: 'Av. Gov. Jorge Teixeira, 3862 - Industrial, Porto Velho - RO, Tel: (69) 3216-5462',
+        cnes: '2678950',
+        logoDataUrl: PRESET_LOGOS.sesau_ro.dataUrl,
         logoAlignment: 'center',
+        watermarkType: 'sus_double',
+        watermarkOpacity: 0.08,
         documentFormatting: {
           headerType: 'custom_logo',
           prescriptionViaCount: 2,
@@ -65,8 +73,40 @@ export async function initializeDefaultContexts(defaultDoctor: { crm: string; uf
         isDefault: false,
         createdAt: Date.now(),
         updatedAt: Date.now()
+      },
+      {
+        id: 'ctx-consultorio',
+        name: 'Consultório / Clínica Particular',
+        sphere: 'private',
+        clinicName: 'Consultório Médico Particular',
+        clinicAddress: 'Atendimento Clínico Ambulatorial',
+        cnes: '',
+        logoDataUrl: PRESET_LOGOS.sus.dataUrl,
+        logoAlignment: 'right',
+        watermarkType: 'none',
+        watermarkOpacity: 0.08,
+        documentFormatting: {
+          headerType: 'standard',
+          prescriptionViaCount: 1,
+          showCnesOnHeader: false,
+          referralModel: 'direct_ambulatory',
+          examHeaderTitle: 'SOLICITAÇÃO DE EXAMES COMPLEMENTARES'
+        },
+        doctorCredentials: { ...defaultDoctor },
+        isDefault: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
       }
     ];
     await db.workContexts.bulkAdd(defaultContexts);
   }
 }
+
+// Inicializa modelos clínicos padrão salvos no Dexie
+export async function initializeDefaultTemplates() {
+  const count = await db.savedDocuments.count();
+  if (count === 0) {
+    await db.savedDocuments.bulkAdd(PRESET_CLINICAL_TEMPLATES);
+  }
+}
+

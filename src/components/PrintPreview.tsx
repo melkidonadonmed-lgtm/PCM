@@ -22,8 +22,10 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext } from '../types';
+import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext, WatermarkType } from '../types';
 import { generateMedicalPDF } from '../utils/pdfGenerator';
+import WatermarkOverlay from './WatermarkOverlay';
+import WatermarkSelector from './WatermarkSelector';
 
 // Helper to convert any modern CSS color (oklch, oklab, lab, lch, color-mix, etc.) to standard #rrggbb or rgba for html2canvas compatibility
 const convertColorToRgb = (color: string): string => {
@@ -135,6 +137,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
   const [fitToMobile, setFitToMobile] = useState(true);
+  const [docWatermark, setDocWatermark] = useState<WatermarkType>(
+    activeContext?.watermarkType || 'none'
+  );
   
   const printSheetRef = useRef<HTMLDivElement>(null);
 
@@ -144,6 +149,13 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       setDocType(initialDocType);
     }
   }, [initialDocType]);
+
+  // Sync docWatermark when activeContext changes
+  useEffect(() => {
+    if (activeContext?.watermarkType !== undefined) {
+      setDocWatermark(activeContext.watermarkType);
+    }
+  }, [activeContext?.watermarkType]);
 
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : null;
   const patientName = patient?.name?.trim() || certificate?.patientName?.trim() || referral?.patientName?.trim() || 'Não identificado';
@@ -491,21 +503,29 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           </button>
         </div>
 
-        {/* View Zoom Toggle for Mobile */}
-        <button
-          type="button"
-          onClick={() => setFitToMobile(!fitToMobile)}
-          className="sm:hidden px-3 py-2 min-h-[44px] rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 tactile-btn-secondary"
-          style={{
-            backgroundColor: 'var(--surface-card)',
-            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)',
-            color: darkMode ? '#388EE6' : '#0F5E94'
-          }}
-          title={fitToMobile ? 'Modo Tamanho Real' : 'Modo Ajustar à Tela'}
-        >
-          {fitToMobile ? <Maximize2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} /> : <Minimize2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />}
-          <span>{fitToMobile ? 'Zoom' : 'Ajustar'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Seletor de Marca d'Água Oficial */}
+          <WatermarkSelector 
+            currentType={docWatermark} 
+            onChange={setDocWatermark} 
+          />
+
+          {/* View Zoom Toggle for Mobile */}
+          <button
+            type="button"
+            onClick={() => setFitToMobile(!fitToMobile)}
+            className="sm:hidden px-3 py-2 min-h-[44px] rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 tactile-btn-secondary"
+            style={{
+              backgroundColor: 'var(--surface-card)',
+              borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)',
+              color: darkMode ? '#388EE6' : '#0F5E94'
+            }}
+            title={fitToMobile ? 'Modo Tamanho Real' : 'Modo Ajustar à Tela'}
+          >
+            {fitToMobile ? <Maximize2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} /> : <Minimize2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />}
+            <span>{fitToMobile ? 'Zoom' : 'Ajustar'}</span>
+          </button>
+        </div>
       </div>
 
       {/* A4 Paper Container Wrapper */}
@@ -524,8 +544,14 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             rowGap: '1.5rem'
           }}
         >
+          {/* Marca d'Água Oficial em Camada Transparente */}
+          <WatermarkOverlay 
+            type={docWatermark} 
+            opacity={activeContext?.watermarkOpacity} 
+          />
+
           {/* Top Medical Letterhead / Header (Grid Row 1) */}
-          <header id="print-header" className="print-header print-avoid-break w-full">
+          <header id="print-header" className="print-header print-avoid-break w-full relative z-10">
             {/* Logotipo da Instituição (Base64) se cadastrado no contexto */}
             {activeContext?.logoDataUrl && (
               <div className={`mb-3 flex ${
@@ -656,7 +682,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           </header>
 
           {/* DOCUMENT BODY CONTENT (Grid Row 2 - Flex 1fr) */}
-          <main id="print-content" className="print-body w-full min-h-0 flex-1 flex flex-col justify-start">
+          <main id="print-content" className="print-body w-full min-h-0 flex-1 flex flex-col justify-start relative z-10">
               {/* 1. PRESCRIPTION CONTENT */}
               {(docType === 'prescription' || docType === 'special_prescription') && (
                 <div className="space-y-6 sm:space-y-8 font-serif font-serif-doc" style={{ fontFamily: 'var(--font-serif-doc)' }}>
@@ -961,7 +987,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           {/* Bottom Footer & Signature (Grid Row 3) */}
           <footer 
             id="print-footer"
-            className="print-footer print-avoid-break w-full mt-auto pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6"
+            className="print-footer print-avoid-break w-full mt-auto pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 relative z-10"
             style={{ borderTop: '2px solid #0F172A' }}
           >
             {/* Left: Validation QR Code & Security Stamp */}

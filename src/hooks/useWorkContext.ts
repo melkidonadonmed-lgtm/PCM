@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { db } from '../services/db';
+import { db, initializeDefaultTemplates } from '../services/db';
 import { WorkContext } from '../types';
+import { PRESET_LOGOS } from '../data/presetAssets';
 
 const ACTIVE_CONTEXT_KEY = 'pcm_active_context_id';
 
@@ -13,22 +14,28 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
   const loadContexts = useCallback(async () => {
     try {
       await db.open();
+      // Assegura que modelos clínicos padrão estejam semeados
+      await initializeDefaultTemplates();
+
       let allContexts = await db.workContexts.toArray();
       
       if (allContexts.length === 0) {
         await db.workContexts.clear();
-        // Inicializa com os dados do perfil do médico
+        // Inicializa com os dados do perfil do médico e logos oficiais
         const ubsContext: WorkContext = {
           id: 'ctx-ubs',
-          name: 'UBS Municipal (Atenção Primária)',
+          name: 'USF Osvaldo Piana (SEMUSA - Porto Velho)',
           sphere: 'municipal',
-          clinicName: 'Secretaria Municipal de Saúde — UBS',
-          clinicAddress: 'Rede Municipal de Atenção Básica',
-          cnes: '',
+          clinicName: 'UNIDADE DE SAÚDE DA FAMÍLIA OSVALDO PIANA',
+          clinicAddress: 'Av. Campos Sales, 858 - Areal, Porto Velho - RO, 76804-358',
+          cnes: '2678942',
+          logoDataUrl: PRESET_LOGOS.semusa.dataUrl,
           logoAlignment: 'left',
+          watermarkType: 'sus_double',
+          watermarkOpacity: 0.08,
           documentFormatting: {
-            headerType: 'standard',
-            prescriptionViaCount: 1,
+            headerType: 'custom_logo',
+            prescriptionViaCount: 2,
             showCnesOnHeader: true,
             referralModel: 'sus_regulation',
             examHeaderTitle: 'SOLICITAÇÃO DE EXAMES — REDE MUNICIPAL'
@@ -40,12 +47,15 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
         };
         const polContext: WorkContext = {
           id: 'ctx-policlinica',
-          name: 'Policlínica Estadual / Especialidades',
+          name: 'Policlínica Oswaldo Cruz - POC (SESAU - RO)',
           sphere: 'state',
-          clinicName: 'Secretaria de Estado da Saúde — Policlínica',
-          clinicAddress: 'Complexo Regulador Estadual',
-          cnes: '',
+          clinicName: 'POC - Policlínica Oswaldo Cruz',
+          clinicAddress: 'Av. Gov. Jorge Teixeira, 3862 - Industrial, Porto Velho - RO, Tel: (69) 3216-5462',
+          cnes: '2678950',
+          logoDataUrl: PRESET_LOGOS.sesau_ro.dataUrl,
           logoAlignment: 'center',
+          watermarkType: 'sus_double',
+          watermarkOpacity: 0.08,
           documentFormatting: {
             headerType: 'custom_logo',
             prescriptionViaCount: 2,
@@ -58,8 +68,31 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
           createdAt: Date.now(),
           updatedAt: Date.now()
         };
-        await db.workContexts.bulkAdd([ubsContext, polContext]);
-        allContexts = [ubsContext, polContext];
+        const consultorioContext: WorkContext = {
+          id: 'ctx-consultorio',
+          name: 'Consultório Particular',
+          sphere: 'private',
+          clinicName: 'Consultório Médico Particular',
+          clinicAddress: 'Atendimento Ambulatorial Privado',
+          cnes: '',
+          logoDataUrl: PRESET_LOGOS.sus.dataUrl,
+          logoAlignment: 'right',
+          watermarkType: 'none',
+          watermarkOpacity: 0.08,
+          documentFormatting: {
+            headerType: 'standard',
+            prescriptionViaCount: 1,
+            showCnesOnHeader: false,
+            referralModel: 'direct_ambulatory',
+            examHeaderTitle: 'SOLICITAÇÃO DE EXAMES COMPLEMENTARES'
+          },
+          doctorCredentials: { ...doctorProfile },
+          isDefault: false,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+        await db.workContexts.bulkAdd([ubsContext, polContext, consultorioContext]);
+        allContexts = [ubsContext, polContext, consultorioContext];
       }
 
       setContexts(allContexts);

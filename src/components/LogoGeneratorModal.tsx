@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { WorkContext, DoctorProfile } from '../types';
 import { db } from '../services/db';
+import { PRESET_LOGOS, PresetLogoItem } from '../data/presetAssets';
 
 export type CentralSymbol = 'asclepius' | 'cross' | 'stethoscope' | 'ecg_heart' | 'monogram';
 export type FrameStyle = 'double_circle' | 'shield' | 'hexagon' | 'none';
@@ -113,6 +114,29 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
   const [textLayout, setTextLayout] = useState<TextLayout>('curved');
   const [previewDarkBg, setPreviewDarkBg] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
+  const [activeModalTab, setActiveModalTab] = useState<'presets' | 'generator'>('presets');
+  const [selectedPresetId, setSelectedPresetId] = useState<string>('semusa');
+
+  const handleApplyPreset = async (preset: PresetLogoItem) => {
+    setIsApplying(true);
+    try {
+      if (activeContext) {
+        await db.workContexts.update(activeContext.id, {
+          logoDataUrl: preset.dataUrl,
+          updatedAt: Date.now()
+        });
+      }
+      if (onApplyLogo) {
+        await onApplyLogo(preset.dataUrl);
+      }
+      onClose();
+    } catch (err) {
+      console.error('Erro ao salvar logotipo predefinido:', err);
+      alert('Falha ao aplicar logotipo.');
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -196,10 +220,10 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             </div>
             <div>
               <h2 id="logo-modal-title" className="text-base sm:text-lg font-bold">
-                Criador Procedural de Timbrados e Brasões em SVG
+                Logos Institucionais e Timbrados Oficiais
               </h2>
               <p className="text-xs text-[var(--text-muted)]">
-                Vetorização limpa e offline de alta precisão para cabeçalhos médicos
+                Selecione os logos oficiais de Rondônia/SUS ou crie um timbre vetorial SVG personalizado
               </p>
             </div>
           </div>
@@ -212,7 +236,110 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
           </button>
         </div>
 
-        {/* Modal Body: Left Controls / Right Real-Time Preview */}
+        {/* Navigation Tabs: Presets vs Generator */}
+        <div className="px-4 sm:px-6 py-2 border-b border-[var(--border-subtle)] flex items-center gap-2 bg-[var(--surface-inset)]">
+          <button
+            type="button"
+            onClick={() => setActiveModalTab('presets')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeModalTab === 'presets'
+                ? 'bg-sky-600 text-white shadow-tactile-sm'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+            }`}
+          >
+            <Shield className="w-3.5 h-3.5" />
+            <span>Logos Oficiais Salvos (SEMUSA / SESAU / SUS)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveModalTab('generator')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeModalTab === 'generator'
+                ? 'bg-sky-600 text-white shadow-tactile-sm'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Criador Procedural SVG</span>
+          </button>
+        </div>
+
+        {activeModalTab === 'presets' ? (
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar space-y-4">
+            <div className="bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800 rounded-xl p-3.5 text-xs text-sky-800 dark:text-sky-300">
+              <p className="font-bold">Logos Oficiais Salvos da Instituição</p>
+              <p className="text-[11px] mt-0.5 opacity-90">
+                Selecione o logotipo oficial correspondente ao local de atuação. A imagem é gravada localmente no IndexedDB e exibida automaticamente nos receituários e documentos A4.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.values(PRESET_LOGOS).map((logo) => {
+                const isSelected = selectedPresetId === logo.id;
+                return (
+                  <div
+                    key={logo.id}
+                    onClick={() => setSelectedPresetId(logo.id)}
+                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                      isSelected
+                        ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 shadow-tactile-sm ring-1 ring-sky-500'
+                        : 'border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)]'
+                    }`}
+                  >
+                    <div>
+                      <div className="h-28 w-full bg-white rounded-xl border border-slate-200 flex items-center justify-center p-3 shadow-inner overflow-hidden mb-3">
+                        <img
+                          src={logo.dataUrl}
+                          alt={logo.name}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h3 className="text-sm font-bold text-[var(--text-main)]">
+                            {logo.name}
+                          </h3>
+                          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                            {logo.description}
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 shrink-0">
+                          {logo.sphere === 'municipal' ? 'Municipal' : logo.sphere === 'state' ? 'Estadual' : 'Federal'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-subtle)]">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApplyPreset(logo);
+                        }}
+                        disabled={isApplying}
+                        className="btn-tactile-primary flex-1 py-2 px-3 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Aplicar ao Contexto</span>
+                      </button>
+                      <a
+                        href={logo.dataUrl}
+                        download={`${logo.id}.png`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-2 rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] text-xs text-[var(--text-muted)] flex items-center justify-center cursor-pointer"
+                        title="Baixar arquivo de imagem"
+                      >
+                        <Download className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+        /* Modal Body: Left Controls / Right Real-Time Preview */
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 custom-scrollbar">
           
           {/* Controls Column (7 cols) */}
@@ -846,8 +973,8 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
               </button>
             </div>
           </div>
-
         </div>
+        )}
 
         {/* Modal Footer */}
         <div className="p-4 sm:p-5 border-t border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-app)]">
@@ -871,7 +998,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             </button>
             <button
               type="button"
-              onClick={handleApply}
+              onClick={activeModalTab === 'presets' ? () => handleApplyPreset(PRESET_LOGOS[selectedPresetId]) : handleApply}
               disabled={isApplying}
               className="btn-tactile-primary px-5 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-tactile-btn disabled:opacity-50"
             >
@@ -880,7 +1007,9 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
               ) : (
                 <Check className="w-3.5 h-3.5" />
               )}
-              <span>Aplicar ao Contexto Atual</span>
+              <span>
+                {activeModalTab === 'presets' ? 'Aplicar Logo Selecionado' : 'Aplicar Timbre SVG'}
+              </span>
             </button>
           </div>
         </div>

@@ -33,9 +33,11 @@ import {
   Building2,
   AlertCircle
 } from 'lucide-react';
-import { DoctorProfile, Patient, WorkContext, PrescriptionItem } from '../types';
-import { db, SavedDocument } from '../services/db';
+import { DoctorProfile, Patient, WorkContext, PrescriptionItem, WatermarkType } from '../types';
+import { db, SavedDocument, initializeDefaultTemplates } from '../services/db';
 import LogoGeneratorModal from './LogoGeneratorModal';
+import WatermarkOverlay from './WatermarkOverlay';
+import WatermarkSelector from './WatermarkSelector';
 
 interface DocumentEditorViewProps {
   darkMode: boolean;
@@ -78,6 +80,27 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
   const [editingTemplateTitle, setEditingTemplateTitle] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [docWatermark, setDocWatermark] = useState<WatermarkType>(
+    activeContext?.watermarkType || 'none'
+  );
+
+  useEffect(() => {
+    if (activeContext?.watermarkType !== undefined) {
+      setDocWatermark(activeContext.watermarkType);
+    }
+  }, [activeContext?.watermarkType]);
+
+  const handleWatermarkChange = async (newType: WatermarkType) => {
+    setDocWatermark(newType);
+    if (activeContext && onSaveContext) {
+      await onSaveContext({
+        ...activeContext,
+        watermarkType: newType
+      });
+      showToast("Marca d'água atualizada!");
+    }
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -262,10 +285,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   // Carregar lista de modelos salvos do IndexedDB
   const loadSavedTemplates = useCallback(async () => {
     try {
-      const allDocs = await db.savedDocuments.toArray();
-      const templates = allDocs
+      let allDocs = await db.savedDocuments.toArray();
+      let templates = allDocs
         .filter(doc => doc.isTemplate)
         .sort((a, b) => b.updatedAt - a.updatedAt);
+
+      if (templates.length === 0) {
+        await initializeDefaultTemplates();
+        allDocs = await db.savedDocuments.toArray();
+        templates = allDocs
+          .filter(doc => doc.isTemplate)
+          .sort((a, b) => b.updatedAt - a.updatedAt);
+      }
       setSavedTemplates(templates);
     } catch (err) {
       console.error('Erro ao carregar modelos do Dexie:', err);
@@ -833,6 +864,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             </button>
           )}
 
+          {/* Seletor de Marca d'Água Oficial (SUS 1/2/3 vias, Rondônia) */}
+          <WatermarkSelector 
+            currentType={docWatermark} 
+            onChange={handleWatermarkChange} 
+          />
+
           {/* Botão Limpar Canvas */}
           <button
             type="button"
@@ -876,8 +913,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08)'
           }}
         >
+          {/* Marca d'Água Oficial em Camada Transparente */}
+          <WatermarkOverlay 
+            type={docWatermark} 
+            opacity={activeContext?.watermarkOpacity} 
+          />
+
           {/* Cabeçalho Hospitalar / Timbrado Oficial Regulamentar */}
-          <header className="border-b-2 border-slate-900 pb-4 mb-6">
+          <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10">
             {activeContext?.logoDataUrl && (
               <div className={`mb-3 flex ${
                 activeContext.logoAlignment === 'center' ? 'justify-center' :
@@ -938,12 +981,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           </header>
 
           {/* Área de Digitação Livre (Editor Tiptap) */}
-          <div className="flex-1 w-full text-slate-900">
+          <div className="flex-1 w-full text-slate-900 relative z-10">
             <EditorContent editor={editor} />
           </div>
 
           {/* Rodapé Clínico com Carimbo Regulamentar e Linha de Assinatura */}
-          <footer className="border-t border-slate-300 pt-6 mt-8 flex flex-col items-center justify-center text-center font-sans">
+          <footer className="border-t border-slate-300 pt-6 mt-8 flex flex-col items-center justify-center text-center font-sans relative z-10">
             <div className="w-72 border-b border-slate-400 mb-2" />
             <p className="text-xs font-bold text-slate-900 uppercase">
               {docName}

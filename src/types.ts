@@ -174,6 +174,8 @@ export type ActiveTab =
 // Tipagem para os Contextos de Atendimento (Multi-Instituição)
 export type InstitutionalSphere = 'municipal' | 'state' | 'private' | 'federal';
 
+export type WatermarkType = 'none' | 'sus_single' | 'sus_double' | 'sus_triple' | 'rondonia' | 'custom';
+
 export interface WorkContext {
   id: string; // ex: 'ctx-ubs-centro', 'ctx-policlinica-estadual'
   name: string; // "UBS Dr. Hamilton - Município" ou "Policlínica Oswaldo Cruz - Estado"
@@ -183,6 +185,8 @@ export interface WorkContext {
   cnes?: string;
   logoDataUrl?: string; // Imagem do Brasão/Logo (Base64 no IndexedDB)
   logoAlignment: 'left' | 'center' | 'right';
+  watermarkType?: WatermarkType;
+  watermarkOpacity?: number; // 0.05 a 0.20 (padrão 0.09)
   documentFormatting: {
     headerType: 'standard' | 'minimal' | 'custom_logo';
     prescriptionViaCount: 1 | 2; // Ex: UBS 1 via simples; Policlínica 2 vias padrão
