@@ -20,7 +20,8 @@ import {
   Sun, 
   Moon, 
   UserPlus, 
-  UserCheck 
+  UserCheck,
+  Database
 } from 'lucide-react';
 import { ActiveTab, DoctorProfile, Patient, WorkContext } from '../types';
 import { ConfirmationModal } from './ConfirmationModal';
@@ -43,6 +44,7 @@ interface SidebarProps {
   onSwitchContext?: (id: string) => void;
   onOpenDoctorModal?: () => void;
   onOpenPatientModal?: () => void;
+  onOpenBackupModal?: () => void;
   onClearPrescription?: () => void;
   onClearPatient?: () => void;
   onResetAll?: () => void;
@@ -65,6 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSwitchContext,
   onOpenDoctorModal,
   onOpenPatientModal,
+  onOpenBackupModal,
   onClearPrescription,
   onClearPatient,
   onResetAll
@@ -473,7 +476,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <RotateCcw className="w-4 h-4 shrink-0 text-sky-300 dark:text-cream-200" />
                 <span>Novo Atendimento Completo</span>
               </button>
+
+              {/* Backup & Portabilidade */}
+              {onOpenBackupModal && (
+                <button
+                  type="button"
+                  onClick={onOpenBackupModal}
+                  className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-amber-300 hover:text-amber-200 hover:bg-amber-500/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
+                  title="Exportar ou restaurar arquivo de backup (.pcm.json)"
+                >
+                  <Database className="w-4 h-4 shrink-0 text-amber-400" />
+                  <span>Backup / Portabilidade</span>
+                </button>
+              )}
             </div>
+          )}
+
+          {/* Backup Icon Button in Collapsed Mode */}
+          {!isOpen && onOpenBackupModal && (
+            <button
+              type="button"
+              onClick={onOpenBackupModal}
+              className="w-11 h-11 mx-auto rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 outline-none shadow-tactile-sm"
+              title="Backup / Portabilidade (.pcm.json)"
+              aria-label="Backup e Portabilidade"
+            >
+              <Database className="w-5 h-5" />
+            </button>
           )}
 
           {/* Toggle Collapse on Desktop */}

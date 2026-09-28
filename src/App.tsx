@@ -16,6 +16,7 @@ const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
 const DocumentEditorView = React.lazy(() => import('./components/DocumentEditorView'));
 const PatientModal = React.lazy(() => import('./components/PatientModal'));
 const DoctorProfileModal = React.lazy(() => import('./components/DoctorProfileModal'));
+const BackupModal = React.lazy(() => import('./components/BackupModal'));
 
 export default function App() {
   // Tema visual (Claro como padrão oficial do sistema)
@@ -101,6 +102,7 @@ export default function App() {
   // Modais
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
+  const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
 
   // Hook desacoplado de sessão clínica e persistência
   const {
@@ -126,7 +128,8 @@ export default function App() {
     contexts: workContexts,
     activeContext,
     switchContext,
-    saveContext
+    saveContext,
+    loadContexts
   } = useWorkContext({
     crm: doctor.crm,
     uf: doctor.crmState,
@@ -180,6 +183,7 @@ export default function App() {
         selectedExamsCount={selectedExams.length}
         onQuickWeightChange={handleUpdatePatientWeight}
         onNavigateToEditor={() => setActiveTab('editor')}
+        onOpenBackupModal={() => setIsBackupModalOpen(true)}
       />
 
       {/* Main Responsive Body Layout */}
@@ -213,6 +217,7 @@ export default function App() {
           onSwitchContext={switchContext}
           onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
           onOpenPatientModal={() => setIsPatientModalOpen(true)}
+          onOpenBackupModal={() => setIsBackupModalOpen(true)}
           onClearPrescription={handleClearPrescription}
           onClearPatient={handleClearPatient}
           onResetAll={handleResetAll}
@@ -380,6 +385,19 @@ export default function App() {
             onClose={() => setIsDoctorModalOpen(false)}
             activeContext={activeContext}
             onSaveContext={saveContext}
+          />
+        </Suspense>
+      )}
+
+      {isBackupModalOpen && (
+        <Suspense fallback={null}>
+          <BackupModal
+            isOpen={isBackupModalOpen}
+            darkMode={darkMode}
+            doctor={doctor}
+            onUpdateDoctor={setDoctor}
+            onBackupRestored={loadContexts}
+            onClose={() => setIsBackupModalOpen(false)}
           />
         </Suspense>
       )}

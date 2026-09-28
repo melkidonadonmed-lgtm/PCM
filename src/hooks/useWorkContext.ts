@@ -99,6 +99,7 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
     activeContext,
     switchContext,
     saveContext,
+    loadContexts,
     loading
   };
 }

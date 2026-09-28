@@ -7,7 +7,8 @@ import {
   User, 
   ChevronRight, 
   UserPlus,
-  FileText
+  FileText,
+  Database
 } from 'lucide-react';
 import { Patient } from '../types';
 
@@ -22,6 +23,7 @@ interface HeaderProps {
   selectedExamsCount?: number;
   onQuickWeightChange?: (newWeight: number) => void;
   onNavigateToEditor?: () => void;
+  onOpenBackupModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -34,7 +36,8 @@ export const Header: React.FC<HeaderProps> = ({
   prescriptionCount = 0,
   selectedExamsCount = 0,
   onQuickWeightChange,
-  onNavigateToEditor
+  onNavigateToEditor,
+  onOpenBackupModal
 }) => {
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
   const hasPatient = Boolean(patient?.name?.trim());
@@ -180,6 +183,18 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <FileText className="w-4 h-4 text-sky-600 dark:text-sky-400" strokeWidth={1.75} />
               <span className="hidden md:inline">Editor de Laudos</span>
+            </button>
+          )}
+
+          {onOpenBackupModal && (
+            <button
+              type="button"
+              onClick={onOpenBackupModal}
+              className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-amber-500 outline-none bg-[var(--bg-app)] text-amber-600 dark:text-amber-400 border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+              title="Portabilidade de Dados: Backup & Restauração (.pcm.json)"
+              aria-label="Backup e Restauração de Dados"
+            >
+              <Database className="w-5 h-5" strokeWidth={1.75} />
             </button>
           )}
 
