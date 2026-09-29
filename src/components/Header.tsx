@@ -222,15 +222,15 @@ export const Header: React.FC<HeaderProps> = ({
                   PRO
                 </span>
               </div>
-              <p className="text-[11px] hidden md:block font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] hidden xl:block font-medium text-slate-500 dark:text-slate-400">
                 Prescrições Rápidas & Doses Pediátricas Inteligentes
               </p>
             </div>
           </div>
         </div>
 
-        {/* Middle: Active Patient & Weight Quick Badge */}
-        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1 justify-center sm:justify-start">
+        {/* Middle: Active Patient Chip com Peso Integrado */}
+        <div className="flex items-center gap-2 min-w-0 flex-1 justify-center sm:justify-start">
           <div 
             onClick={onOpenPatientModal}
             onKeyDown={(e) => {
@@ -242,15 +242,19 @@ export const Header: React.FC<HeaderProps> = ({
             id="header-patient-chip"
             role="button"
             tabIndex={0}
-            className="flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer group w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[360px] min-h-[44px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none bg-[var(--bg-app)] border-[var(--border-subtle)]"
-            title="Clique para definir ou editar os dados do paciente"
+            className={`flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer group w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[360px] min-h-[44px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none ${
+              hasPatient 
+                ? 'bg-emerald-500/5 dark:bg-emerald-950/20 border-emerald-500/30 text-emerald-900 dark:text-emerald-200' 
+                : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)]'
+            }`}
+            title="Clique para identificar o paciente, peso e histórico clínico"
           >
             <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 border ${
               hasPatient 
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' 
+                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40' 
                 : 'bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border-navy-900/20 dark:border-cream-100/25'
             }`}>
-              {hasPatient ? <User className="w-4 h-4" strokeWidth={1.75} /> : <UserPlus className="w-4 h-4" strokeWidth={1.75} />}
+              {hasPatient ? <User className="w-4 h-4" strokeWidth={2} /> : <UserPlus className="w-4 h-4" strokeWidth={1.75} />}
             </div>
             <div className="text-left overflow-hidden min-w-0 flex-1">
               <div className="text-[11px] sm:text-xs font-bold truncate text-navy-900 dark:text-cream-50 flex items-center justify-between gap-1">
@@ -261,7 +265,9 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="text-[10px] font-semibold flex items-center gap-1.5 truncate">
                 {patientWeight > 0 ? (
-                  <span className="text-navy-900 dark:text-cream-100 font-bold">{patientWeight} kg</span>
+                  <span className="text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-500/10 px-1 rounded">
+                    ⚖️ {patientWeight} kg
+                  </span>
                 ) : (
                   <span className="text-slate-400">Toque para preencher</span>
                 )}
@@ -271,77 +277,34 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Quick Weight Input in Header */}
-          <div 
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border shadow-tactile-sm transition-all bg-[var(--bg-app)] border-[var(--border-subtle)]"
-          >
-            <Scale className="w-4 h-4 text-navy-900 dark:text-cream-200 flex-shrink-0" strokeWidth={1.75} />
-            <div className="flex flex-col items-start">
-              <label htmlFor="header-input-weight" className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                Peso
-              </label>
-              <div className="flex items-center gap-1">
-                <input
-                  id="header-input-weight"
-                  type="number"
-                  step="0.1"
-                  min="0.5"
-                  max="200"
-                  value={patientWeight > 0 ? patientWeight : ''}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value);
-                    if (onQuickWeightChange) {
-                      onQuickWeightChange(isNaN(val) ? 0 : val);
-                    }
-                  }}
-                  placeholder="--"
-                  className="w-14 text-xs font-black outline-none bg-transparent text-navy-900 dark:text-cream-50"
-                />
-                <span className="text-[10px] font-bold text-slate-400">kg</span>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Right side: Editor Shortcut & Dark/Light Mode Toggle */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Right side: Atalhos Essenciais & Alternador de Tema */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           {onNavigateToEditor && (
             <button
               type="button"
               onClick={onNavigateToEditor}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
-              title="Abrir consulta no Editor Livre de Documentos A4"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              title="Abrir Editor Livre de Documentos A4"
             >
               <FileText className="w-4 h-4 text-sky-600 dark:text-sky-400" strokeWidth={1.75} />
-              <span className="hidden md:inline">Editor</span>
+              <span>Editor</span>
             </button>
           )}
 
           <CloudAuthButton />
 
-          {onOpenBackupModal && (
-            <button
-              type="button"
-              onClick={onOpenBackupModal}
-              className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-amber-500 outline-none bg-[var(--bg-app)] text-amber-600 dark:text-amber-400 border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
-              title="Portabilidade de Dados: Backup & Restauração (.pcm.json)"
-              aria-label="Backup e Restauração de Dados"
-            >
-              <Database className="w-5 h-5" strokeWidth={1.75} />
-            </button>
-          )}
-
           {isInstallable && onInstallApp && (
             <button
               type="button"
               onClick={onInstallApp}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-tactile-sm active:scale-95 bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none animate-pulse"
-              title="Instalar PresCMed no dispositivo (Acesso rápido 100% offline)"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-tactile-sm active:scale-95 bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
+              title="Instalar PresCMed como aplicativo offline"
               aria-label="Instalar Aplicativo PresCMed"
             >
               <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={2} />
-              <span className="hidden md:inline">Instalar App</span>
+              <span>Instalar</span>
             </button>
           )}
 
@@ -350,8 +313,8 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)]"
-            title={darkMode ? 'Ativar Modo Claro (Baunilha & Navy)' : 'Ativar Modo Escuro (Obsidian & Creme)'}
+            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            title={darkMode ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
           >
             {darkMode ? (
               <Sun className="w-5 h-5 text-cream-200 animate-spin-slow" strokeWidth={1.75} />

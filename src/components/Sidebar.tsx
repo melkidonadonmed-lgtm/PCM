@@ -140,7 +140,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  const primaryNavItems = [
+  // Grupo 1: Atendimento Clínico
+  const clinicalNavItems = [
     {
       id: 'prescription' as ActiveTab,
       label: 'Receitas Médicas',
@@ -157,16 +158,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'exams' as ActiveTab,
-      label: 'Exames',
-      fullLabel: 'Solicitação de Exames',
+      label: 'Solicitação de Exames',
       shortLabel: 'Exames',
       icon: FlaskConical,
       badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
-    },
+    }
+  ];
+
+  // Grupo 2: Documentos & Emissão
+  const documentsNavItems = [
     {
       id: 'certificate' as ActiveTab,
-      label: 'Atestados',
-      fullLabel: 'Atestados (padrão CFM)',
+      label: 'Atestados Médicos',
+      fullLabel: 'Atestados Médicos (CFM)',
       shortLabel: 'Atestado',
       icon: Award
     },
@@ -177,21 +181,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Share2
     },
     {
+      id: 'editor' as ActiveTab,
+      label: 'Editor de Prescrições',
+      fullLabel: 'Editor de Prescrições e Documentos',
+      shortLabel: 'Editor',
+      icon: FileText
+    },
+    {
       id: 'protocols' as ActiveTab,
       label: 'Protocolos Clínicos',
       shortLabel: 'Protocolos',
       icon: HeartPulse
     },
     {
-      id: 'editor' as ActiveTab,
-      label: 'Editor',
-      fullLabel: 'Editor de Prescrições e Documentos',
-      shortLabel: 'Editor',
-      icon: FileText
-    },
-    {
       id: 'print_preview' as ActiveTab,
-      label: 'Exportar & Baixar PDF',
+      label: 'Exportar & Imprimir PDF',
       shortLabel: 'Exportar',
       icon: Download
     }
@@ -327,7 +331,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           )}
 
-          {/* Doctor Profile Badge */}
+          {/* Doctor Profile Badge Compacto */}
           {isOpen ? (
             <div
               onClick={onOpenDoctorModal}
@@ -339,11 +343,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className="p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group active:scale-95 shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none min-h-[44px]"
+              className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-500 outline-none flex items-center justify-between gap-2"
               title="Clique para editar CRM e dados profissionais"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 dark:border-white/25 flex items-center justify-center font-black text-xs shadow-tactile-btn shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div className="w-8 h-8 rounded-lg bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 flex items-center justify-center font-black text-xs shrink-0 shadow-tactile-sm">
                   CRM
                 </div>
                 <div className="overflow-hidden min-w-0 flex-1">
@@ -357,12 +361,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </p>
                 </div>
               </div>
-              <button 
-                type="button"
-                className="mt-2 w-full py-1.5 min-h-[36px] text-[10px] font-bold text-cream-100 hover:text-white dark:text-navy-900 dark:hover:text-navy-950 text-center rounded-lg bg-white/10 hover:bg-white/20 dark:bg-cream-100 dark:hover:bg-white border border-white/10 dark:border-white/20 transition cursor-pointer shadow-tactile-sm"
-              >
-                Editar Perfil Médico
-              </button>
+              <Pencil className="w-3.5 h-3.5 text-slate-400 group-hover:text-cream-100 transition-colors shrink-0" />
             </div>
           ) : (
             <button
@@ -374,7 +373,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenDoctorModal?.();
                 }
               }}
-              className="w-11 h-11 mx-auto rounded-xl bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 dark:border-white/25 hover:bg-navy-900 dark:hover:bg-white font-black text-xs flex items-center justify-center shadow-tactile-btn transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+              className="w-11 h-11 mx-auto rounded-xl bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 dark:border-white/25 hover:bg-navy-900 font-black text-xs flex items-center justify-center shadow-tactile-btn transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title={hasDoctor ? `Dr(a). ${doctor?.name} (CRM: ${doctor?.crm}/${doctor?.crmState})` : 'Configurar CRM / Perfil Médico'}
               aria-label="Perfil do Médico"
             >
@@ -382,16 +381,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           )}
 
-          {/* Navigation Items */}
-          <div className={isOpen ? 'w-full' : 'w-full flex flex-col items-center'}>
-            {isOpen && (
-              <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 px-2 mb-1.5">
-                Navegação Principal
-              </p>
-            )}
-            <nav className={isOpen ? 'space-y-1' : 'space-y-2 w-full flex flex-col items-center'}>
-              {primaryNavItems.map(renderNavButton)}
-            </nav>
+          {/* Navegação por Grupos */}
+          <div className={isOpen ? 'w-full space-y-4' : 'w-full flex flex-col items-center space-y-3'}>
+            {/* Grupo 1: Atendimento Clínico */}
+            <div>
+              {isOpen && (
+                <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 px-2 mb-1.5 flex items-center justify-between">
+                  <span>Atendimento Clínico</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                </p>
+              )}
+              <nav className={isOpen ? 'space-y-1' : 'space-y-1.5 w-full flex flex-col items-center'}>
+                {clinicalNavItems.map(renderNavButton)}
+              </nav>
+            </div>
+
+            {/* Grupo 2: Documentos & Emissão */}
+            <div>
+              {isOpen && (
+                <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 px-2 mb-1.5">
+                  Documentos & Emissão
+                </p>
+              )}
+              <nav className={isOpen ? 'space-y-1' : 'space-y-1.5 w-full flex flex-col items-center'}>
+                {documentsNavItems.map(renderNavButton)}
+              </nav>
+            </div>
           </div>
 
           {/* Active Patient Badge */}
@@ -406,12 +421,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group active:scale-95 shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none min-h-[44px]"
+              className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-500 outline-none flex items-center justify-between gap-2"
               title="Clique para editar paciente"
             >
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
-                  <Users className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-xs shrink-0">
+                  <Users className="w-4 h-4" />
                 </div>
                 <div className="overflow-hidden min-w-0 flex-1">
                   <p className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400">
@@ -425,6 +440,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </p>
                 </div>
               </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
             </div>
           ) : (
             <button
@@ -446,50 +462,55 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Quick Actions (Limpeza / Novo Atendimento) */}
           {isOpen && (
-            <div className="space-y-1.5 pt-2 border-t border-white/10">
-              <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 px-2 mb-1">
-                Ações Rápidas
+            <div className="space-y-2 pt-2 border-t border-white/10">
+              <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 px-2">
+                Ações da Consulta
               </p>
               
-              {/* Zerar Receita */}
-              <button
-                type="button"
-                onClick={handleTriggerClearPrescription}
-                className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
-              >
-                <Trash2 className="w-4 h-4 shrink-0 text-rose-400/80" />
-                <span>Zerar Receita Atual</span>
-              </button>
-
-              {/* Limpar Paciente */}
-              <button
-                type="button"
-                onClick={handleTriggerClearPatient}
-                className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
-              >
-                <UserX className="w-4 h-4 shrink-0 text-rose-400/80" />
-                <span>Limpar Paciente</span>
-              </button>
-
               {/* Novo Atendimento */}
               <button
                 type="button"
                 onClick={handleTriggerResetAll}
-                className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-sky-300 hover:text-sky-200 hover:bg-sky-500/10 dark:text-cream-100 dark:hover:text-white dark:hover:bg-white/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+                className="w-full min-h-[40px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-sky-950 bg-sky-200 hover:bg-sky-100 dark:bg-sky-900 dark:text-sky-100 dark:hover:bg-sky-800 transition cursor-pointer shadow-tactile-sm active:scale-95 outline-none"
+                title="Iniciar uma nova consulta do zero"
               >
-                <RotateCcw className="w-4 h-4 shrink-0 text-sky-300 dark:text-cream-200" />
-                <span>Novo Atendimento Completo</span>
+                <RotateCcw className="w-4 h-4 shrink-0" />
+                <span>Novo Atendimento</span>
               </button>
+
+              <div className="grid grid-cols-2 gap-1.5">
+                {/* Zerar Receita */}
+                <button
+                  type="button"
+                  onClick={handleTriggerClearPrescription}
+                  className="py-2 px-2 rounded-xl border border-white/10 text-slate-300 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer flex items-center justify-center gap-1.5 text-[11px] font-semibold"
+                  title="Zerar medicamentos da receita atual"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-rose-400/80" />
+                  <span className="truncate">Zerar Receita</span>
+                </button>
+
+                {/* Limpar Paciente */}
+                <button
+                  type="button"
+                  onClick={handleTriggerClearPatient}
+                  className="py-2 px-2 rounded-xl border border-white/10 text-slate-300 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer flex items-center justify-center gap-1.5 text-[11px] font-semibold"
+                  title="Limpar dados cadastrais do paciente"
+                >
+                  <UserX className="w-3.5 h-3.5 text-rose-400/80" />
+                  <span className="truncate">Limpar Paciente</span>
+                </button>
+              </div>
 
               {/* Backup & Portabilidade */}
               {onOpenBackupModal && (
                 <button
                   type="button"
                   onClick={onOpenBackupModal}
-                  className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-amber-300 hover:text-amber-200 hover:bg-amber-500/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
+                  className="w-full py-2 px-3 rounded-xl border border-white/10 text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition cursor-pointer flex items-center justify-center gap-2 text-xs font-semibold"
                   title="Exportar ou restaurar arquivo de backup (.pcm.json)"
                 >
-                  <Database className="w-4 h-4 shrink-0 text-amber-400" />
+                  <Database className="w-4 h-4 text-amber-400" />
                   <span>Backup / Portabilidade</span>
                 </button>
               )}
@@ -499,10 +520,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={onInstallApp}
-                  className="w-full min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-300 hover:text-emerald-200 hover:bg-emerald-500/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none animate-pulse"
+                  className="w-full py-2 px-3 rounded-xl border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/15 transition cursor-pointer flex items-center justify-center gap-2 text-xs font-bold"
                   title="Instalar PresCMed como aplicativo no computador ou celular"
                 >
-                  <Download className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <Download className="w-4 h-4 text-emerald-400" />
                   <span>Instalar App Offline</span>
                 </button>
               )}

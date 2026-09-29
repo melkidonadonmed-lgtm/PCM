@@ -552,17 +552,31 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
           {/* Top Medical Letterhead / Header (Grid Row 1) */}
           <header id="print-header" className="print-header print-avoid-break w-full relative z-10">
-            {/* Logotipo da Instituição (Base64) se cadastrado no contexto */}
-            {activeContext?.logoDataUrl && (
-              <div className={`mb-3 flex ${
-                activeContext.logoAlignment === 'center' ? 'justify-center' :
-                activeContext.logoAlignment === 'right' ? 'justify-end' : 'justify-start'
+            {/* Logotipos da Instituição se cadastrados no contexto (Suporte a Timbrado Duplo) */}
+            {(activeContext?.logoDataUrl || activeContext?.secondaryLogoDataUrl) && (
+              <div className={`mb-3 flex items-center ${
+                activeContext?.logoDataUrl && activeContext?.secondaryLogoDataUrl
+                  ? 'justify-between'
+                  : activeContext?.logoAlignment === 'center'
+                  ? 'justify-center'
+                  : activeContext?.logoAlignment === 'right'
+                  ? 'justify-end'
+                  : 'justify-start'
               }`}>
-                <img 
-                  src={activeContext.logoDataUrl} 
-                  alt="Logotipo Institucional" 
-                  className="max-h-16 object-contain"
-                />
+                {activeContext?.logoDataUrl && (
+                  <img 
+                    src={activeContext.logoDataUrl} 
+                    alt="Logotipo Institucional" 
+                    className="max-h-16 object-contain"
+                  />
+                )}
+                {activeContext?.secondaryLogoDataUrl && (
+                  <img 
+                    src={activeContext.secondaryLogoDataUrl} 
+                    alt="Logotipo Secundário" 
+                    className="max-h-16 object-contain"
+                  />
+                )}
               </div>
             )}
 

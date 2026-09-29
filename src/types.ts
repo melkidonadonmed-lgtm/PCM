@@ -185,6 +185,8 @@ export interface WorkContext {
   cnes?: string;
   logoDataUrl?: string; // Imagem do Brasão/Logo (Base64 no IndexedDB)
   logoAlignment: 'left' | 'center' | 'right';
+  secondaryLogoDataUrl?: string; // Segundo Brasão/Logo (ex: SUS à direita ou Brasão Municipal)
+  secondaryLogoAlignment?: 'left' | 'center' | 'right';
   watermarkType?: WatermarkType;
   watermarkOpacity?: number; // 0.05 a 0.20 (padrão 0.09)
   documentFormatting: {
@@ -228,12 +230,17 @@ export interface DocumentHeaderConfig {
 }
 
 export interface DocumentLogoConfig {
-  dataUrl?: string;
+  dataUrl?: string; // Logotipo Principal / Esquerdo
   position: LogoPosition;
   x?: number; // percentual horizontal 0-100 na folha A4
   y?: number; // percentual vertical 0-100 na folha A4
   size: 'sm' | 'md' | 'lg' | 'xl' | number;
   visible: boolean;
+  // Suporte a Timbrado Duplo (Logotipo Secundário / Direito)
+  secondaryDataUrl?: string;
+  secondaryPosition?: LogoPosition;
+  secondarySize?: 'sm' | 'md' | 'lg' | 'xl' | number;
+  secondaryVisible?: boolean;
 }
 
 export type DocumentOrientation = 'portrait' | 'landscape';

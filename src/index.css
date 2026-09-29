@@ -711,15 +711,16 @@ body {
   border-top-color: transparent;
 }
 
-.tactile-btn-secondary {
+.tactile-btn-secondary,
+.btn-tactile-secondary {
   border: 1px solid var(--border-subtle);
   box-shadow: var(--rim-light-top), var(--elevation-z1);
   background-color: var(--surface-card);
   color: var(--text-main);
   border-radius: 12px;
   font-weight: 600;
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 42px;
+  min-width: 42px;
   touch-action: manipulation;
   user-select: none;
   isolation: isolate;
@@ -730,7 +731,8 @@ body {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .tactile-btn-secondary:hover:not(:disabled) {
+  .tactile-btn-secondary:hover:not(:disabled),
+  .btn-tactile-secondary:hover:not(:disabled) {
     transform: translate3d(0, -1px, 0);
     border-color: var(--border-medium);
     background-color: var(--surface-hover);
@@ -738,9 +740,43 @@ body {
   }
 }
 
-.tactile-btn-secondary:active:not(:disabled) {
+.tactile-btn-secondary:active:not(:disabled),
+.btn-tactile-secondary:active:not(:disabled) {
   transform: translate3d(0, 1px, 0) scale(0.98);
   box-shadow: var(--shadow-pressed);
+}
+
+/* Botão Ícone Quadrado Acessível Padronizado (42x42px) */
+.btn-tactile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  box-shadow: var(--elevation-z1);
+  transition: transform 0.14s cubic-bezier(0.2, 0, 0, 1), 
+              background-color 0.18s ease,
+              border-color 0.18s ease;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-tactile-icon:hover:not(:disabled) {
+    background-color: var(--surface-hover);
+    border-color: var(--border-medium);
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+.btn-tactile-icon:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 /* 5. Z-3 Floating Elements / Popovers / Sticky Bars (Sobreposição de Camadas) */
@@ -964,6 +1000,34 @@ p, .text-pretty {
   outline: none;
   font-size: inherit;
   line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.a4-editor-canvas .ProseMirror-separator {
+  display: none !important;
+}
+
+.a4-editor-canvas .via-preview-content p:empty,
+.a4-editor-canvas .ProseMirror p:empty {
+  min-height: 1.6em;
+}
+
+.a4-editor-canvas .via-preview-content p:empty::before,
+.a4-editor-canvas .ProseMirror p:empty::before {
+  content: "\00a0";
+  display: inline-block;
+}
+
+/* Em modo 2 vias (paisagem e retrato), garante flexibilidade e simetria perfeita */
+.a4-editor-canvas.vias-2 .ProseMirror,
+.a4-editor-canvas.vias-2 .via-preview-content {
+  min-height: 180px !important;
+}
+
+.a4-editor-canvas.canvas-landscape.vias-2 .ProseMirror,
+.a4-editor-canvas.canvas-landscape.vias-2 .via-preview-content {
+  min-height: 220px !important;
 }
 
 .a4-editor-canvas .ProseMirror h1,

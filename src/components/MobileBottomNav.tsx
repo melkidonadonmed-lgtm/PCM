@@ -2,8 +2,8 @@ import React from 'react';
 import {
   Pill,
   Calculator,
+  FlaskConical,
   FileText,
-  ClipboardList,
   Download,
   Menu
 } from 'lucide-react';
@@ -30,24 +30,25 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   const items = [
     {
       id: 'prescription' as ActiveTab,
-      label: 'Prescrição',
+      label: 'Receitas',
       icon: Pill,
       badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
     },
     {
       id: 'pediatric_calc' as ActiveTab,
-      label: 'Calculadora',
+      label: 'Doses',
       icon: Calculator
     },
     {
-      id: 'certificate' as ActiveTab,
-      label: 'Documentos',
-      icon: FileText
+      id: 'exams' as ActiveTab,
+      label: 'Exames',
+      icon: FlaskConical,
+      badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
     },
     {
-      id: 'protocols' as ActiveTab,
-      label: 'Protocolos',
-      icon: ClipboardList
+      id: 'editor' as ActiveTab,
+      label: 'Editor',
+      icon: FileText
     },
     {
       id: 'print_preview' as ActiveTab,
@@ -56,8 +57,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     }
   ];
 
-  // Solicitação de Exames e Encaminhamentos acessíveis via "Mais"
-  const isMoreActive = activeTab === 'exams' || activeTab === 'referral';
+  // Itens secundários (Atestados, Encaminhamentos, Protocolos) acessíveis via "Mais"
+  const isMoreActive = activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'protocols';
 
   return (
     <nav
