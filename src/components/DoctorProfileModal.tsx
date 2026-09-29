@@ -40,9 +40,15 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
     stampText: doctor?.stampText || ''
   });
 
-  // Acessibilidade WCAG 2.1: Foco inicial e listener da tecla Escape
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Acessibilidade WCAG 2.1: Foco inicial executado apenas na montagem
   useEffect(() => {
     nameInputRef.current?.focus();
+  }, []);
+
+  // Listener da tecla Escape desacoplado do foco
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
@@ -63,6 +69,25 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
     'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
   ];
 
+  const handleFillSample = () => {
+    setFormData({
+      name: 'Dr. Melki Donadon',
+      crm: '123456',
+      crmState: 'SP',
+      specialty: 'Clínica Médica',
+      rqe: '67890',
+      clinicName: formData.clinicName || 'USF Osvaldo Piana (SEMUSA)',
+      address: formData.address || 'Av. Campos Sales, 858 - Areal',
+      cityState: formData.cityState || 'Porto Velho - RO',
+      phone: formData.phone || '(69) 99999-9999',
+      email: formData.email || '',
+      showSignature: true,
+      signatureText: '',
+      stampText: ''
+    });
+    setValidationError(null);
+  };
+
   const handleClear = () => {
     setFormData({
       name: '',
@@ -79,11 +104,48 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       signatureText: '',
       stampText: ''
     });
+    setValidationError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSaveDoctor(formData);
+    const trimmedName = formData.name.trim();
+    const trimmedCrm = formData.crm.trim();
+
+    if (!trimmedName || !trimmedCrm) {
+      setValidationError('Por favor, preencha o Nome Completo e o Número do CRM do médico.');
+      if (!trimmedName) {
+        nameInputRef.current?.focus();
+      } else {
+        document.getElementById('doc-input-crm')?.focus();
+      }
+      return;
+    }
+
+    setValidationError(null);
+    const cleanedData: DoctorProfile = {
+      ...formData,
+      name: trimmedName,
+      crm: trimmedCrm
+    };
+
+    onSaveDoctor(cleanedData);
+
+    if (activeContext && onSaveContext) {
+      try {
+        await onSaveContext({
+          ...activeContext,
+          doctorCredentials: {
+            crm: trimmedCrm,
+            uf: cleanedData.crmState,
+            rqe: cleanedData.rqe?.trim() || ''
+          }
+        });
+      } catch (err) {
+        console.warn('Erro ao atualizar credenciais no contexto ativo:', err);
+      }
+    }
+
     onClose();
   };
 
@@ -137,20 +199,43 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-5 space-y-4 max-h-[78vh] overflow-y-auto custom-scrollbar">
           
+          {/* Mensagem de Validação Clara */}
+          {validationError && (
+            <div 
+              role="alert" 
+              className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 text-xs font-semibold flex items-center gap-2 animate-tab-fade"
+            >
+              <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+              <span>{validationError}</span>
+            </div>
+          )}
+
           {/* Identificação Principal (Essencial) */}
           <div className="space-y-3 p-3.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800">
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold tracking-wider text-sky-700 dark:text-sky-400">
                 Identificação Obrigatória
               </span>
-              <button 
-                type="button"
-                onClick={handleClear}
-                className="text-[11px] font-semibold text-rose-700 hover:text-rose-800 flex items-center gap-1"
-              >
-                <Eraser className="w-3.5 h-3.5" />
-                <span>Limpar campos</span>
-              </button>
+              <div className="flex items-center gap-2.5">
+                <button 
+                  type="button"
+                  onClick={handleFillSample}
+                  className="text-[11px] font-semibold text-sky-700 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 flex items-center gap-1 cursor-pointer transition"
+                  title="Preencher com dados de exemplo (Dr. Melki Donadon / CRM 123456-SP)"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                  <span>Usar exemplo</span>
+                </button>
+                <span className="text-slate-300 dark:text-slate-700">•</span>
+                <button 
+                  type="button"
+                  onClick={handleClear}
+                  className="text-[11px] font-semibold text-rose-700 hover:text-rose-800 flex items-center gap-1 cursor-pointer transition"
+                >
+                  <Eraser className="w-3.5 h-3.5" />
+                  <span>Limpar</span>
+                </button>
+              </div>
             </div>
 
             <div>

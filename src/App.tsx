@@ -131,20 +131,30 @@ export default function App() {
   } = usePrescriptionSession();
 
   // Governança institucional multi-esfera (Local-First via Dexie/IndexedDB)
+  const doctorCredentials = React.useMemo(() => ({
+    crm: doctor.crm,
+    uf: doctor.crmState,
+    rqe: doctor.rqe
+  }), [doctor.crm, doctor.crmState, doctor.rqe]);
+
   const {
     contexts: workContexts,
     activeContext,
     switchContext,
     saveContext,
     loadContexts
-  } = useWorkContext({
-    crm: doctor.crm,
-    uf: doctor.crmState,
-    rqe: doctor.rqe
-  });
+  } = useWorkContext(doctorCredentials);
 
   // Capacidade de instalação do PWA
   const { isInstallable, installApp } = usePwaInstall();
+
+  // Callbacks estáveis para modais
+  const handleOpenDoctorModal = React.useCallback(() => setIsDoctorModalOpen(true), []);
+  const handleCloseDoctorModal = React.useCallback(() => setIsDoctorModalOpen(false), []);
+  const handleOpenPatientModal = React.useCallback(() => setIsPatientModalOpen(true), []);
+  const handleClosePatientModal = React.useCallback(() => setIsPatientModalOpen(false), []);
+  const handleOpenBackupModal = React.useCallback(() => setIsBackupModalOpen(true), []);
+  const handleCloseBackupModal = React.useCallback(() => setIsBackupModalOpen(false), []);
 
   // Manipuladores de ação
   const handleUpdatePatientWeight = (newWeight: number) => {
@@ -250,7 +260,7 @@ export default function App() {
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         onGoHome={handleGoHome}
         patient={patient}
-        onOpenPatientModal={() => setIsPatientModalOpen(true)}
+        onOpenPatientModal={handleOpenPatientModal}
         onNavigateToEditor={handleNavigateToEditor}
         isInstallable={isInstallable}
         onInstallApp={installApp}
@@ -265,7 +275,7 @@ export default function App() {
           activeTab={activeTab}
           onSelectTab={(tab) => {
             if (tab === 'patients') {
-              setIsPatientModalOpen(true);
+              handleOpenPatientModal();
               return;
             }
             if (tab === 'editor') {
@@ -289,9 +299,9 @@ export default function App() {
           contexts={workContexts}
           activeContext={activeContext}
           onSwitchContext={switchContext}
-          onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
-          onOpenPatientModal={() => setIsPatientModalOpen(true)}
-          onOpenBackupModal={() => setIsBackupModalOpen(true)}
+          onOpenDoctorModal={handleOpenDoctorModal}
+          onOpenPatientModal={handleOpenPatientModal}
+          onOpenBackupModal={handleOpenBackupModal}
           isInstallable={isInstallable}
           onInstallApp={installApp}
           onClearPrescription={handleClearPrescription}
@@ -317,11 +327,11 @@ export default function App() {
               onNavigateToPrint={() => handleNavigateToPrint('prescription')}
               onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
               onNavigateToEditor={handleNavigateToEditor}
-              onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
-              onOpenPatientModal={() => setIsPatientModalOpen(true)}
+              onOpenDoctorModal={handleOpenDoctorModal}
+              onOpenPatientModal={handleOpenPatientModal}
               medicamentoPendente={medicamentoPendente}
               onConsumirMedicamentoPendente={() => setMedicamentoPendente(null)}
-              onAbrirPerfilMedico={() => setIsDoctorModalOpen(true)}
+              onAbrirPerfilMedico={handleOpenDoctorModal}
             />
           )}
 
@@ -391,6 +401,7 @@ export default function App() {
                 activeContext={activeContext}
                 onSaveContext={saveContext}
                 onNavigateToPrint={() => handleNavigateToPrint('prescription')}
+                onOpenDoctorModal={handleOpenDoctorModal}
                 editorInitialSyncTrigger={editorInitialSyncTrigger}
               />
             </Suspense>
@@ -421,8 +432,8 @@ export default function App() {
                 onBack={() => setActiveTab('prescription')}
                 onClearPrescription={handleClearPrescription}
                 onResetAll={handleResetAll}
-                onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
-                onAbrirPerfilMedico={() => setIsDoctorModalOpen(true)}
+                onOpenDoctorModal={handleOpenDoctorModal}
+                onAbrirPerfilMedico={handleOpenDoctorModal}
               />
             </Suspense>
           )}
@@ -458,7 +469,7 @@ export default function App() {
             patient={patient}
             onSavePatient={setPatient}
             onClearPatient={handleClearPatient}
-            onClose={() => setIsPatientModalOpen(false)}
+            onClose={handleClosePatientModal}
           />
         </Suspense>
       )}
@@ -469,7 +480,7 @@ export default function App() {
             darkMode={darkMode}
             doctor={doctor}
             onSaveDoctor={setDoctor}
-            onClose={() => setIsDoctorModalOpen(false)}
+            onClose={handleCloseDoctorModal}
             activeContext={activeContext}
             onSaveContext={saveContext}
           />
@@ -484,7 +495,7 @@ export default function App() {
             doctor={doctor}
             onUpdateDoctor={setDoctor}
             onBackupRestored={loadContexts}
-            onClose={() => setIsBackupModalOpen(false)}
+            onClose={handleCloseBackupModal}
           />
         </Suspense>
       )}

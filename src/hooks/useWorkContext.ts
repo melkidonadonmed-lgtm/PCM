@@ -6,6 +6,7 @@ import { PRESET_LOGOS } from '../data/presetAssets';
 const ACTIVE_CONTEXT_KEY = 'pcm_active_context_id';
 
 export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: string }) {
+  const { crm = '', uf = 'SP', rqe = '' } = doctorProfile || {};
   const [contexts, setContexts] = useState<WorkContext[]>([]);
   const [activeContext, setActiveContext] = useState<WorkContext | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,7 +41,7 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
             referralModel: 'sus_regulation',
             examHeaderTitle: 'SOLICITAÇÃO DE EXAMES — REDE MUNICIPAL'
           },
-          doctorCredentials: { ...doctorProfile },
+          doctorCredentials: { crm, uf, rqe },
           isDefault: true,
           createdAt: Date.now(),
           updatedAt: Date.now()
@@ -63,7 +64,7 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
             referralModel: 'sus_regulation',
             examHeaderTitle: 'REQUISIÇÃO DE EXAMES E PROCEDIMENTOS — REDE ESTADUAL'
           },
-          doctorCredentials: { ...doctorProfile },
+          doctorCredentials: { crm, uf, rqe },
           isDefault: false,
           createdAt: Date.now(),
           updatedAt: Date.now()
@@ -86,7 +87,7 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
             referralModel: 'direct_ambulatory',
             examHeaderTitle: 'SOLICITAÇÃO DE EXAMES COMPLEMENTARES'
           },
-          doctorCredentials: { ...doctorProfile },
+          doctorCredentials: { crm, uf, rqe },
           isDefault: false,
           createdAt: Date.now(),
           updatedAt: Date.now()
@@ -95,18 +96,31 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
         allContexts = [ubsContext, polContext, consultorioContext];
       }
 
-      setContexts(allContexts);
+      setContexts(prev => {
+        if (
+          prev.length === allContexts.length &&
+          prev.every((c, idx) => c.id === allContexts[idx]?.id && c.updatedAt === allContexts[idx]?.updatedAt)
+        ) {
+          return prev;
+        }
+        return allContexts;
+      });
 
       // Define o ativo
       const savedActiveId = localStorage.getItem(ACTIVE_CONTEXT_KEY);
       const matched = allContexts.find(c => c.id === savedActiveId) || allContexts.find(c => c.isDefault) || allContexts[0];
-      setActiveContext(matched || null);
+      setActiveContext(prev => {
+        if (prev && matched && prev.id === matched.id && prev.updatedAt === matched.updatedAt) {
+          return prev;
+        }
+        return matched || null;
+      });
     } catch (err) {
       console.error('Erro ao carregar WorkContexts do IndexedDB:', err);
     } finally {
       setLoading(false);
     }
-  }, [doctorProfile]);
+  }, [crm, uf, rqe]);
 
   useEffect(() => {
     loadContexts();

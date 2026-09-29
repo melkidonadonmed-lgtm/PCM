@@ -1420,7 +1420,20 @@
    ESTADOS DE FORMULÁRIO & VALIDAÇÃO DINÂMICA (@layer utilities)
    ========================================================================== */
 @layer utilities {
-  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]), textarea):placeholder-shown {
+  /* Isola inputs e formulários dentro da folha física A4 (.a4-editor-canvas e #printable-a4-sheet) */
+  :is(.a4-editor-canvas, #printable-a4-sheet) :is(input, textarea):placeholder-shown {
+    background-color: transparent !important;
+  }
+
+  :is(.a4-editor-canvas, #printable-a4-sheet) ::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  :is(.a4-editor-canvas, #printable-a4-sheet) :is(input, textarea) {
+    color: #0f172a !important;
+  }
+
+  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]), textarea):not(:is(.a4-editor-canvas, #printable-a4-sheet) *):placeholder-shown {
     background-color: var(--surface-inset);
   }
 
@@ -1434,3 +1447,4 @@
     border-color: #BE123C;
   }
 }
+

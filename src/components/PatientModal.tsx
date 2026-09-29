@@ -34,9 +34,13 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     notes: patient?.notes || ''
   });
 
-  // Acessibilidade WCAG 2.1: Foco inicial e listener da tecla Escape
+  // Acessibilidade WCAG 2.1: Foco inicial executado apenas na montagem
   useEffect(() => {
     nameInputRef.current?.focus();
+  }, []);
+
+  // Listener da tecla Escape desacoplado do foco
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();

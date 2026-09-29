@@ -194,6 +194,7 @@ interface DocumentEditorViewProps {
   activeContext: WorkContext | null;
   onSaveContext?: (updatedContext: WorkContext) => Promise<void>;
   onNavigateToPrint?: () => void;
+  onOpenDoctorModal?: () => void;
   editorInitialSyncTrigger?: number;
 }
 
@@ -204,6 +205,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   prescriptionItems = [],
   activeContext,
   onSaveContext,
+  onOpenDoctorModal,
   editorInitialSyncTrigger = 0,
 }) => {
   // Tipografia, Tamanho e Orientação da Folha A4
@@ -1187,7 +1189,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   const handlePrint = () => {
-    if (!medicoConfigurado(doctor)) return;
+    if (!medicoConfigurado(doctor)) {
+      if (onOpenDoctorModal) {
+        onOpenDoctorModal();
+      }
+      showToast('Configure o nome e CRM do médico emitente para imprimir ou gerar PDF.');
+      return;
+    }
     // Injeta estilo dinâmico de orientação no documento
     const styleId = 'prescmed-dynamic-print-style';
     let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
@@ -1622,14 +1630,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               else if (val === 'h2') editor?.chain().focus().toggleHeading({ level: 2 }).run();
               else if (val === 'h3') editor?.chain().focus().toggleHeading({ level: 3 }).run();
             }}
-            className="bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            className="bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
             title="Estilo de texto (Parágrafo ou Título)"
             aria-label="Estilo de texto"
           >
-            <option value="p">Texto Normal</option>
-            <option value="h1">Título 1 (Grande)</option>
-            <option value="h2">Título 2 (Médio)</option>
-            <option value="h3">Título 3 (Pequeno)</option>
+            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="p">Texto Normal</option>
+            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h1">Título 1 (Grande)</option>
+            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h2">Título 2 (Médio)</option>
+            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h3">Título 3 (Pequeno)</option>
           </select>
 
           {/* Ajuste Fino do Tamanho da Fonte (Docs Style: [-] 11 pt [+]) */}
@@ -1637,7 +1645,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <button
               type="button"
               onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
-              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
               title="Diminuir tamanho da fonte da folha (A-)"
               aria-label="Diminuir fonte"
             >
@@ -1646,18 +1654,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <select
               value={baseFontSize}
               onChange={(e) => setBaseFontSize(Number(e.target.value))}
-              className="bg-transparent px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer"
+              className="bg-transparent text-[var(--text-main)] px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer"
               title="Tamanho da fonte em pontos (pt)"
               aria-label="Tamanho da fonte em pontos (pt)"
             >
               {[8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28].map(sz => (
-                <option key={sz} value={sz}>{sz} pt</option>
+                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={sz} value={sz}>{sz} pt</option>
               ))}
             </select>
             <button
               type="button"
               onClick={() => setBaseFontSize(prev => Math.min(32, prev + 1))}
-              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
               title="Aumentar tamanho da fonte da folha (A+)"
               aria-label="Aumentar fonte"
             >
@@ -1842,20 +1850,20 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
                 if (found) handleApplyStyle(found);
               }}
-              className="bg-transparent font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[155px] truncate"
+              className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[155px] truncate"
               title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
               aria-label="Selecionar estilo visual da receita"
             >
-              <option value="" disabled>Selecionar estilo...</option>
-              <optgroup label="Estilos Padrão">
+              <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="" disabled>Selecionar estilo...</option>
+              <optgroup label="Estilos Padrão" className="bg-[var(--surface-card)] text-[var(--text-main)]">
                 {DEFAULT_PRESCRIPTION_STYLES.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
                 ))}
               </optgroup>
               {customStyles.length > 0 && (
-                <optgroup label="Meus Estilos Salvos">
+                <optgroup label="Meus Estilos Salvos" className="bg-[var(--surface-card)] text-[var(--text-main)]">
                   {customStyles.map(s => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
+                    <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </optgroup>
               )}
@@ -1879,12 +1887,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 setFontFamilyId(e.target.value);
                 if (editor) triggerAutoSave(editor);
               }}
-              className="bg-transparent font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[170px] truncate"
+              className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[170px] truncate"
               aria-label="Família Tipográfica da Folha A4"
               title="Trocar fonte da receita médica estilo Google Docs"
             >
               {FONT_OPTIONS.map(f => (
-                <option key={f.id} value={f.id}>
+                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={f.id} value={f.id}>
                   {f.name}
                 </option>
               ))}
@@ -2310,12 +2318,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handlePrint}
-            disabled={!medicoConfigurado(doctor)}
-            className="btn-tactile-primary h-9 px-4 text-xs font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Configure nome e CRM do médico para emitir documentos'}
+            className={`btn-tactile-primary h-9 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer ${
+              !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
+            }`}
+            title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Imprimir A4</span>
+            {!medicoConfigurado(doctor) && (
+              <span className="text-[10px] px-1.5 py-0.2 bg-amber-400 text-slate-950 rounded font-bold">
+                Configurar
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -2629,7 +2643,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           value={headerConfig.patientCustomText || ''}
                           onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
                           placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
-                          className="w-full text-xs text-slate-600 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition"
+                          className="w-full text-xs text-slate-700 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition placeholder:text-slate-400"
                         />
                       )}
                     </div>
