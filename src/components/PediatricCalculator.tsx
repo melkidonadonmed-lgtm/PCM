@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { 
   Calculator, 
   Search, 
@@ -28,6 +28,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
   onAddPrescriptionItem,
   onNavigateToPrescription
 }) => {
+  const weightInputRef = useRef<HTMLInputElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [addedMedsMap, setAddedMedsMap] = useState<{ [id: string]: boolean }>({});
@@ -69,7 +70,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
 
     let doseText = '';
     if (med.unitType === 'drops' && calc.calculatedDrops !== undefined) {
-      doseText = `${calc.calculatedDrops} gotas (${calc.volumeText})`;
+      doseText = `${calc.dropsText} (${calc.volumeText})`;
     } else if (med.unitType === 'fixed') {
       doseText = med.doseCustomLabel || 'Conforme orientação';
     } else {
@@ -131,13 +132,38 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
 
           {/* Right: Interactive Weight Stepper & Display (Ergonomic & Touch-friendly) */}
           <div 
-            className="flex items-center justify-between sm:justify-center gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-2xl border w-full lg:w-auto flex-shrink-0 tactile-flat bg-[var(--surface-inset)] border-[var(--border-subtle)]"
+            className="flex flex-col sm:flex-row items-center justify-between sm:justify-center gap-2 p-2 sm:p-2.5 rounded-2xl border w-full lg:w-auto flex-shrink-0 tactile-flat bg-[var(--surface-inset)] border-[var(--border-subtle)]"
           >
-            <div className="flex items-center gap-1">
+            {/* Bloco do Peso com Rótulo Associado */}
+            <div className="w-full sm:w-auto sm:order-2 px-3 text-center sm:min-w-[110px]">
+              <label 
+                htmlFor="peso-paciente"
+                className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block cursor-pointer"
+              >
+                Peso atual (kg)
+              </label>
+              <div className="flex items-baseline justify-center gap-1">
+                <input
+                  id="peso-paciente"
+                  ref={weightInputRef}
+                  type="number"
+                  min="0.5"
+                  max="120"
+                  step="0.5"
+                  value={patientWeight}
+                  onChange={(e) => onUpdatePatientWeight(parseFloat(e.target.value) || 1)}
+                  className="w-16 sm:w-20 font-black text-2xl text-center bg-transparent border-b-2 border-emerald-600 dark:border-emerald-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-sky-500 text-sky-700 dark:text-sky-400 rounded"
+                />
+                <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400">kg</span>
+              </div>
+            </div>
+
+            {/* Grade de 4 colunas em mobile; itens em linha via sm:contents em telas sm+ */}
+            <div className="grid grid-cols-4 gap-1.5 w-full sm:w-auto sm:contents">
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.max(1, +(patientWeight - 1).toFixed(1)))}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)]"
+                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] sm:order-1 focus-visible:ring-2 focus-visible:ring-sky-500"
                 title="Diminuir 1 kg"
               >
                 -1
@@ -145,36 +171,15 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.max(1, +(patientWeight - 0.5).toFixed(1)))}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)]"
+                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] sm:order-1 focus-visible:ring-2 focus-visible:ring-sky-500"
                 title="Diminuir 0.5 kg"
               >
                 -0.5
               </button>
-            </div>
-
-            <div className="px-3 text-center min-w-[90px] sm:min-w-[110px]">
-              <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
-                PESO ATUAL
-              </span>
-              <div className="flex items-baseline justify-center gap-1">
-                <input
-                  type="number"
-                  min="0.5"
-                  max="120"
-                  step="0.5"
-                  value={patientWeight}
-                  onChange={(e) => onUpdatePatientWeight(parseFloat(e.target.value) || 1)}
-                  className="w-16 sm:w-20 font-black text-2xl text-center bg-transparent border-b-2 border-emerald-600 dark:border-emerald-500 focus:outline-none focus:border-sky-500 text-sky-700 dark:text-sky-400"
-                />
-                <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400">kg</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.min(120, +(patientWeight + 0.5).toFixed(1)))}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)]"
+                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] sm:order-3 focus-visible:ring-2 focus-visible:ring-sky-500"
                 title="Aumentar 0.5 kg"
               >
                 +0.5
@@ -182,7 +187,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.min(120, +(patientWeight + 1).toFixed(1)))}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition-all cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)]"
+                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] sm:order-3 focus-visible:ring-2 focus-visible:ring-sky-500"
                 title="Aumentar 1 kg"
               >
                 +1
@@ -192,8 +197,8 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         </div>
 
         {/* Quick Weight Range Presets */}
-        <div className="mt-3.5 pt-3.5 border-t flex items-center gap-2 overflow-x-auto pb-1 max-w-full" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)' }}>
-          <span className="text-xs font-bold whitespace-nowrap text-slate-400 flex items-center gap-1 flex-shrink-0">
+        <div className="mt-3.5 pt-3.5 border-t flex items-center gap-2 overflow-x-auto pb-1 max-w-full custom-scrollbar fade-scroll-x" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)' }}>
+          <span className="text-xs font-bold whitespace-nowrap text-[var(--text-muted)] dark:text-slate-400 flex items-center gap-1 flex-shrink-0">
             <Scale className="w-4 h-4 text-sky-500" strokeWidth={2} /> Faixas:
           </span>
           {weightPresets.map((p) => (
@@ -201,7 +206,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               key={p.label}
               type="button"
               onClick={() => onUpdatePatientWeight(p.weight)}
-              className={`text-xs px-3.5 py-2 min-h-[44px] rounded-xl border font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 active:scale-95 ${
+              className={`text-xs px-3.5 py-2 min-h-[44px] rounded-xl border font-bold whitespace-nowrap transition cursor-pointer flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                 patientWeight === p.weight
                   ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-600/25'
                   : darkMode
@@ -219,20 +224,21 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400" strokeWidth={1.75} />
           <input
             type="text"
             placeholder="Buscar medicamento ou apresentação (ex: Paracetamol, Amoxicilina, Dipirona, Ondansetrona)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 min-h-[44px] rounded-xl text-xs font-medium focus:outline-none transition-all tactile-input"
+            className="w-full pl-10 pr-4 py-3 min-h-[44px] rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition tactile-input"
           />
         </div>
 
         {/* View Prescription Action Button */}
         <button
+          type="button"
           onClick={onNavigateToPrescription}
-          className="tactile-btn-primary px-5 py-3 min-h-[44px] flex items-center justify-center gap-2 text-xs font-bold cursor-pointer whitespace-nowrap active:scale-95"
+          className="tactile-btn-primary px-5 py-3 min-h-[44px] flex items-center justify-center gap-2 text-xs font-bold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
         >
           <span>Ir para Receita</span>
           <ArrowRight className="w-4 h-4" strokeWidth={2.2} />
@@ -246,8 +252,9 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           return (
             <button
               key={cat}
+              type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer border active:scale-95 ${
+              className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                 isSelected
                   ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
                   : darkMode
@@ -260,6 +267,32 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           );
         })}
       </div>
+
+      {/* Aviso de peso obrigatório acima da lista */}
+      {patientWeight <= 0 && (
+        <div 
+          id="aviso-peso-obrigatorio"
+          role="alert"
+          className="p-3.5 sm:p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300"
+        >
+          <div className="flex items-center gap-2.5">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+            <span className="text-xs sm:text-sm font-semibold">
+              Informe o peso do paciente para calcular as doses.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              weightInputRef.current?.focus();
+              weightInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+            className="btn-tactile-secondary px-3.5 py-1.5 min-h-[36px] text-xs font-bold whitespace-nowrap cursor-pointer self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-amber-500"
+          >
+            Definir peso
+          </button>
+        </div>
+      )}
 
       {/* Medications Table / Cards Container */}
       <div 
@@ -286,7 +319,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                 style={{
                   backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
                   borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-                  color: darkMode ? '#8E9CAE' : '#64748B'
+                  color: 'var(--text-muted)'
                 }}
               >
                 <th className="py-3 px-4">Medicamento / Apresentação</th>
@@ -314,44 +347,50 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                         {med.name}
                       </div>
                       <div className="text-[11px] text-sky-700 dark:text-sky-400 font-medium">{med.presentation}</div>
-                      <span className="inline-block mt-0.5 text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-slate-500/10 text-slate-500 dark:text-slate-400">
+                      <span className="inline-block mt-0.5 text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-slate-500/10 text-[var(--text-muted)] dark:text-slate-400">
                         {med.category}
                       </span>
                     </td>
                     <td className="py-3 px-3 font-semibold" style={{ color: darkMode ? '#CBD5E1' : '#334155' }}>
                       {med.concentrationMgPerMl > 0 ? `${med.concentrationMgPerMl} mg/mL` : '-'}
                     </td>
-                    <td className="py-3 px-3" style={{ color: darkMode ? '#8E9CAE' : '#64748B' }}>
+                    <td className="py-3 px-3" style={{ color: 'var(--text-muted)' }}>
                       {med.standardDoseMgKg > 0 ? `${med.standardDoseMgKg} mg/kg` : 'Dose Fixa'}
                       {med.maxDoseMg > 0 && (
                         <div className="text-[10px] text-amber-700 dark:text-amber-400">Máx {med.maxDoseMg} mg</div>
                       )}
                     </td>
                     <td className="py-3 px-3 bg-emerald-500/[0.04] border-x border-emerald-500/10">
-                      <div className="font-black text-sm text-sky-700 dark:text-sky-400">
-                        {calc.rawDoseText}
-                      </div>
-                      {calc.isMaxDoseReached && (
-                        <span className="text-[9px] font-bold text-amber-700 dark:text-amber-400 flex items-center gap-0.5">
-                          <AlertTriangle className="w-2.5 h-2.5" strokeWidth={1.75} /> Teto Máx
-                        </span>
+                      {patientWeight > 0 ? (
+                        <>
+                          <div className="font-black text-sm text-sky-700 dark:text-sky-400">
+                            {calc.rawDoseText}
+                          </div>
+                          {calc.isMaxDoseReached && (
+                            <span className="text-[9px] font-bold text-amber-700 dark:text-amber-400 flex items-center gap-0.5">
+                              <AlertTriangle className="w-2.5 h-2.5" strokeWidth={1.75} /> Teto Máx
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="font-semibold text-sm text-[var(--text-muted)] dark:text-slate-400">—</span>
                       )}
                     </td>
                     <td className="py-3 px-3 bg-emerald-500/[0.04]">
                       <span className="font-black text-sm text-emerald-700 dark:text-emerald-400">
-                        {calc.volumeText}
+                        {patientWeight > 0 ? calc.volumeText : '—'}
                       </span>
                     </td>
                     <td className="py-3 px-3 bg-emerald-500/[0.04] border-r border-emerald-500/10">
-                      <span className={`font-black text-sm ${calc.dropsText !== '-' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-400'}`}>
-                        {calc.dropsText}
+                      <span className={`font-black text-sm ${patientWeight > 0 && calc.dropsText !== '-' ? 'text-amber-700 dark:text-amber-400' : 'text-[var(--text-muted)] dark:text-slate-400'}`}>
+                        {patientWeight > 0 ? calc.dropsText : '—'}
                       </span>
                     </td>
                     <td className="py-3 px-4 max-w-xs">
                       <div className="font-medium text-xs line-clamp-2" style={{ color: darkMode ? '#CBD5E1' : '#475569' }}>
                         {med.frequency}
                       </div>
-                      <div className="text-[10px] text-slate-400 line-clamp-1 italic mt-0.5">
+                      <div className="text-[10px] text-[var(--text-muted)] dark:text-slate-400 line-clamp-1 italic mt-0.5">
                         {med.observations}
                       </div>
                     </td>
@@ -359,10 +398,12 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAddMedication(med)}
-                        className={`px-3 py-1.5 rounded-xl font-semibold text-xs transition-all cursor-pointer flex items-center gap-1.5 ml-auto ${
+                        disabled={patientWeight <= 0}
+                        aria-describedby={patientWeight <= 0 ? "aviso-peso-obrigatorio" : undefined}
+                        className={`px-3 py-1.5 rounded-xl font-semibold text-xs transition flex items-center gap-1.5 ml-auto focus-visible:ring-2 focus-visible:ring-sky-500 ${
                           isAdded
-                            ? 'bg-emerald-700 text-white'
-                            : 'tactile-btn-primary'
+                            ? 'bg-emerald-700 text-white border border-emerald-600'
+                            : 'btn-tactile-secondary cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed'
                         }`}
                       >
                         {isAdded ? (
@@ -398,7 +439,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20">
+                    <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded bg-slate-500/10 text-[var(--text-muted)] dark:text-slate-400 border border-slate-500/20">
                       {med.category}
                     </span>
                     <h4 className="font-bold text-sm mt-1" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
@@ -410,11 +451,15 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddMedication(med)}
-                    className={`px-3 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 ${
-                      isAdded ? 'bg-emerald-700 text-white' : 'tactile-btn-primary'
+                    disabled={patientWeight <= 0}
+                    aria-describedby={patientWeight <= 0 ? "aviso-peso-obrigatorio" : undefined}
+                    className={`px-3 py-1.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                      isAdded
+                        ? 'bg-emerald-700 text-white border border-emerald-600'
+                        : 'btn-tactile-secondary cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed'
                     }`}
                   >
-                    {isAdded ? <Check className="w-4 h-4" strokeWidth={1.75} /> : <Plus className="w-4 h-4" strokeWidth={1.75} />}
+                    {isAdded ? <Check className="w-3.5 h-3.5" strokeWidth={1.75} /> : <Plus className="w-3.5 h-3.5" strokeWidth={1.75} />}
                     <span>{isAdded ? 'Adicionado' : 'Prescrever'}</span>
                   </button>
                 </div>
@@ -428,27 +473,31 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                   }}
                 >
                   <div className="text-center">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase block">Dose (mg)</span>
-                    <span className="text-xs font-bold text-sky-700 dark:text-sky-400">{calc.rawDoseText}</span>
+                    <span className="text-[9px] font-bold text-[var(--text-muted)] dark:text-slate-400 uppercase block">Dose (mg)</span>
+                    <span className="text-xs font-bold text-sky-700 dark:text-sky-400">
+                      {patientWeight > 0 ? calc.rawDoseText : '—'}
+                    </span>
                   </div>
                   <div className="text-center border-x" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase block">Volume (mL)</span>
-                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{calc.volumeText}</span>
+                    <span className="text-[9px] font-bold text-[var(--text-muted)] dark:text-slate-400 uppercase block">Volume (mL)</span>
+                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                      {patientWeight > 0 ? calc.volumeText : '—'}
+                    </span>
                   </div>
                   <div className="text-center">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase block">Gotas</span>
-                    <span className={`text-xs font-bold ${calc.dropsText !== '-' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-400'}`}>
-                      {calc.dropsText}
+                    <span className="text-[9px] font-bold text-[var(--text-muted)] dark:text-slate-400 uppercase block">Gotas</span>
+                    <span className={`text-xs font-bold ${patientWeight > 0 && calc.dropsText !== '-' ? 'text-amber-700 dark:text-amber-400' : 'text-[var(--text-muted)] dark:text-slate-400'}`}>
+                      {patientWeight > 0 ? calc.dropsText : '—'}
                     </span>
                   </div>
                 </div>
 
                 <div className="text-xs space-y-1">
                   <div className="font-semibold flex items-center gap-1.5" style={{ color: darkMode ? '#CBD5E1' : '#334155' }}>
-                    <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" strokeWidth={1.75} />
+                    <Clock className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 flex-shrink-0" strokeWidth={1.75} />
                     <span>{med.frequency}</span>
                   </div>
-                  <div className="text-[11px] text-slate-400 italic">
+                  <div className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 italic">
                     {med.observations}
                   </div>
                 </div>

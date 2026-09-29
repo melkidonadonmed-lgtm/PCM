@@ -24,6 +24,8 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext, WatermarkType } from '../types';
 import { generateMedicalPDF } from '../utils/pdfGenerator';
+import { medicoConfigurado } from '../utils/medicoConfigurado';
+import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
 import WatermarkOverlay from './WatermarkOverlay';
 import WatermarkSelector from './WatermarkSelector';
 
@@ -88,6 +90,7 @@ interface PrintPreviewProps {
   onClearPrescription?: () => void;
   onResetAll?: () => void;
   onOpenDoctorModal?: () => void;
+  onAbrirPerfilMedico?: () => void;
 }
 
 export const PrintPreview: React.FC<PrintPreviewProps> = ({
@@ -128,14 +131,20 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   onNavigateBack,
   onBack,
   onClearPrescription,
-  onResetAll
+  onResetAll,
+  onOpenDoctorModal,
+  onAbrirPerfilMedico
 }) => {
   const effectiveExams = exams.length > 0 ? exams : selectedExams;
   const handleBack = onNavigateBack || onBack || (() => {});
+  const handleAbrirPerfil = onAbrirPerfilMedico || onOpenDoctorModal;
+  const isConfigured = medicoConfigurado(doctor);
+
   const [docType, setDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>(initialDocType);
   const [copiedLink, setCopiedLink] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
   const [fitToMobile, setFitToMobile] = useState(true);
   const [docWatermark, setDocWatermark] = useState<WatermarkType>(
     activeContext?.watermarkType || 'none'
@@ -158,14 +167,23 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   }, [activeContext?.watermarkType]);
 
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : null;
-  const patientName = patient?.name?.trim() || certificate?.patientName?.trim() || referral?.patientName?.trim() || 'Não identificado';
+  const rawPatientName = patient?.name?.trim() || certificate?.patientName?.trim() || referral?.patientName?.trim();
+  const patientName = rawPatientName || (isConfigured ? 'Não identificado' : EXEMPLO_PACIENTE.name);
   const patientDoc = patient?.documentNumber?.trim() || certificate?.documentNumber?.trim() || referral?.documentNumber?.trim() || '—';
   const patientAge = patient?.ageText?.trim() || patient?.birthDate?.trim() || '—';
 
-  const docName = doctor?.name?.trim() || 'Dr(a). Médico(a)';
-  const docCrm = activeContext?.doctorCredentials?.crm || doctor?.crm?.trim() || '------';
-  const docCrmState = activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP';
-  const docSpecialty = activeContext?.doctorCredentials?.specialty || doctor?.specialty || 'Clínica Médica';
+  const docName = isConfigured
+    ? (doctor?.name?.trim() || 'Dr(a). Médico(a)')
+    : EXEMPLO_MEDICO.name;
+  const docCrm = isConfigured
+    ? (activeContext?.doctorCredentials?.crm || doctor?.crm?.trim() || '------')
+    : EXEMPLO_MEDICO.crm;
+  const docCrmState = isConfigured
+    ? (activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP')
+    : EXEMPLO_MEDICO.crmState;
+  const docSpecialty = isConfigured
+    ? (activeContext?.doctorCredentials?.specialty || doctor?.specialty || 'Clínica Médica')
+    : EXEMPLO_MEDICO.specialty;
   const docClinic = activeContext?.clinicName?.trim() || doctor?.clinicName?.trim() || '';
   const docAddress = activeContext?.clinicAddress?.trim() || doctor?.address?.trim() || '';
   const docPhone = doctor?.phone?.trim() || '';
@@ -191,8 +209,13 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
    * Generates a high-precision A4 PDF directly using jsPDF and jspdf-autotable.
    */
   const handleExportPDF = async () => {
+    if (!medicoConfigurado(doctor)) {
+      return;
+    }
+
     try {
       setIsExportingPdf(true);
+      setPdfError(null);
 
       const pdf = generateMedicalPDF({
         docType,
@@ -212,8 +235,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       pdf.save(filename);
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Erro ao exportar PDF via jsPDF & autoTable:', err);
+      const message = err instanceof Error ? err.message : 'Erro ao exportar PDF.';
+      setPdfError(message);
     } finally {
       setIsExportingPdf(false);
     }
@@ -221,6 +246,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
   // Formatted text builder for WhatsApp and Clipboard
   const getFormattedDocumentText = (): string => {
+    if (!medicoConfigurado(doctor)) return '';
+
     const dateStr = new Date().toLocaleDateString('pt-BR');
     const docLine = docName !== 'Dr(a). Médico(a)' ? `👨‍⚕️ *${docName}* — CRM ${docCrm}/${docCrmState}\n` : '👨‍⚕️ *Documento Médico*\n';
     const patientLine = patientName !== 'Não identificado' ? `👤 *Paciente:* ${patientName}${patientWeight ? ` (${patientWeight} kg)` : ''}\n` : '';
@@ -276,6 +303,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   };
 
   const handleSendWhatsApp = () => {
+    if (!medicoConfigurado(doctor)) return;
     const text = getFormattedDocumentText();
     if (!text) {
       alert('Nenhum dado para enviar.');
@@ -286,6 +314,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   };
 
   const handleCopyFormattedText = () => {
+    if (!medicoConfigurado(doctor)) return;
     const text = getFormattedDocumentText();
     if (!text) return;
     navigator.clipboard.writeText(text);
@@ -294,6 +323,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   };
 
   const handleShare = async () => {
+    if (!medicoConfigurado(doctor)) return;
     const text = getFormattedDocumentText();
     if (navigator.share && text) {
       try {
@@ -307,6 +337,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     } else {
       handleCopyFormattedText();
     }
+  };
+
+  const handlePrint = () => {
+    if (!medicoConfigurado(doctor)) return;
+    window.print();
   };
 
   const handleCopyValidation = () => {
@@ -336,7 +371,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleBack}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border flex items-center justify-center text-slate-400 hover:text-slate-100 cursor-pointer transition-all active:scale-95 tactile-btn-secondary"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border flex items-center justify-center text-[var(--text-muted)] hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 cursor-pointer transition active:scale-95 tactile-btn-secondary focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             style={{
               backgroundColor: 'var(--surface-inset)'
             }}
@@ -351,76 +386,115 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                 A4 • Margens 10mm
               </span>
             </h2>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
+            <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 font-medium mt-0.5">
               Documento formatado em alta fidelidade com fontes serifadas e espaçamento legal.
             </p>
           </div>
         </div>
 
         {/* Action CTAs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 max-w-full custom-scrollbar">
-          {/* Copiar Texto */}
-          <button
-            type="button"
-            onClick={handleCopyFormattedText}
-            className="btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer shadow-tactile-sm"
-            title="Copiar texto formatado para prontuário/PEP"
-          >
-            {copiedLink ? (
-              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" strokeWidth={2} />
-            ) : (
-              <Copy className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
-            )}
-            <span>{copiedLink ? 'Copiado!' : 'Copiar Texto'}</span>
-          </button>
+        <div className="flex flex-col items-stretch md:items-end gap-2.5 max-w-full">
+          {!isConfigured && (
+            <div 
+              role="status" 
+              className="w-full flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold border bg-amber-500/10 text-amber-900 dark:text-amber-200 border-amber-500/25"
+            >
+              <span>Configure nome e CRM do médico para emitir documentos.</span>
+              {handleAbrirPerfil && (
+                <button
+                  type="button"
+                  onClick={handleAbrirPerfil}
+                  className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shrink-0 cursor-pointer active:scale-95 transition shadow-xs focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
+                >
+                  Configurar médico
+                </button>
+              )}
+            </div>
+          )}
 
-          {/* Imprimir Navegador */}
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer shadow-tactile-sm"
-            title="Imprimir direto pelo navegador (Ctrl+P)"
-          >
-            <Printer className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
-            <span>Imprimir</span>
-          </button>
+          {pdfError && (
+            <div 
+              role="alert" 
+              className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-semibold border bg-rose-500/10 text-rose-900 dark:text-rose-200 border-rose-500/25"
+            >
+              <span>{pdfError}</span>
+              <button 
+                type="button" 
+                onClick={() => setPdfError(null)}
+                className="text-rose-700 dark:text-rose-300 font-bold hover:underline shrink-0 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+              >
+                Fechar
+              </button>
+            </div>
+          )}
 
-          {/* Enviar no WhatsApp */}
-          <button
-            type="button"
-            onClick={handleSendWhatsApp}
-            className="btn-tactile-clinical h-10 sm:h-11 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition-all active:scale-95 cursor-pointer"
-            title="Enviar o documento diretamente para o WhatsApp do paciente ou familiar"
-          >
-            <Send className="w-4 h-4 shrink-0" strokeWidth={2} />
-            <span>Enviar no WhatsApp</span>
-          </button>
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 max-w-full custom-scrollbar">
+            {/* Copiar Texto */}
+            <button
+              type="button"
+              onClick={handleCopyFormattedText}
+              disabled={!isConfigured}
+              className="btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shrink-0 whitespace-nowrap transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              title={!isConfigured ? 'Configure nome e CRM do médico para emitir documentos' : 'Copiar texto formatado para prontuário/PEP'}
+            >
+              {copiedLink ? (
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" strokeWidth={2} />
+              ) : (
+                <Copy className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
+              )}
+              <span>{copiedLink ? 'Copiado!' : 'Copiar Texto'}</span>
+            </button>
 
-          {/* Baixar PDF (Ação Principal) */}
-          <button
-            type="button"
-            onClick={handleExportPDF}
-            disabled={isExportingPdf}
-            className="btn-tactile-primary h-10 sm:h-11 px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-            title="Gerar e baixar arquivo PDF padrão A4 (10mm)"
-          >
-            {isExportingPdf ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin text-white shrink-0" />
-                <span>Gerando PDF...</span>
-              </>
-            ) : exportSuccess ? (
-              <>
-                <Check className="w-4 h-4 text-emerald-300 shrink-0" strokeWidth={2.5} />
-                <span>Baixado com Sucesso!</span>
-              </>
-            ) : (
-              <>
-                <Download className="w-4 h-4 shrink-0" strokeWidth={2} />
-                <span>Baixar PDF</span>
-              </>
-            )}
-          </button>
+            {/* Imprimir Navegador */}
+            <button
+              type="button"
+              onClick={handlePrint}
+              disabled={!isConfigured}
+              className="btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              title={!isConfigured ? 'Configure nome e CRM do médico para emitir documentos' : 'Imprimir direto pelo navegador (Ctrl+P)'}
+            >
+              <Printer className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
+              <span>Imprimir</span>
+            </button>
+
+            {/* Enviar no WhatsApp */}
+            <button
+              type="button"
+              onClick={handleSendWhatsApp}
+              disabled={!isConfigured}
+              className="btn-tactile-clinical h-10 sm:h-11 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              title={!isConfigured ? 'Configure nome e CRM do médico para emitir documentos' : 'Enviar o documento diretamente para o WhatsApp do paciente ou familiar'}
+            >
+              <Send className="w-4 h-4 shrink-0" strokeWidth={2} />
+              <span>Enviar no WhatsApp</span>
+            </button>
+
+            {/* Baixar PDF (Ação Principal) */}
+            <button
+              type="button"
+              onClick={handleExportPDF}
+              disabled={isExportingPdf || !isConfigured}
+              className="btn-tactile-primary h-10 sm:h-11 px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              title={!isConfigured ? 'Configure nome e CRM do médico para emitir documentos' : 'Gerar e baixar arquivo PDF padrão A4 (10mm)'}
+            >
+              {isExportingPdf ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-white shrink-0" />
+                  <span>Gerando PDF...</span>
+                </>
+              ) : exportSuccess ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-300 shrink-0" strokeWidth={2.5} />
+                  <span>Baixado com Sucesso!</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 shrink-0" strokeWidth={2} />
+                  <span>Baixar PDF</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -430,7 +504,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('prescription')}
-            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               docType === 'prescription'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
                 : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
@@ -443,7 +517,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('special_prescription')}
-            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               docType === 'special_prescription'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
                 : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
@@ -456,7 +530,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('exams')}
-            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               docType === 'exams'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
                 : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
@@ -469,7 +543,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('certificate')}
-            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               docType === 'certificate'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
                 : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
@@ -482,7 +556,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('referral')}
-            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               docType === 'referral'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
                 : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
@@ -504,7 +578,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setFitToMobile(!fitToMobile)}
-            className="sm:hidden px-3 py-2 min-h-[40px] rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 btn-tactile-secondary"
+            className="sm:hidden px-3 py-2 min-h-[40px] rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 btn-tactile-secondary transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             style={{
               backgroundColor: 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
@@ -523,7 +597,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
         <div 
           ref={printSheetRef}
           id="printable-a4-sheet"
-          className={`print-page paper-sheet-floating w-full p-6 sm:p-10 md:p-12 rounded-xl relative transition-all duration-200 ${
+          className={`print-page paper-sheet-floating w-full p-6 sm:p-10 md:p-12 rounded-xl relative transition duration-200 ${
+            !isConfigured ? 'no-print' : ''
+          } ${
             fitToMobile ? 'max-w-full sm:max-w-[780px] min-h-[950px] sm:min-h-[1100px]' : 'min-w-[650px] max-w-[780px] min-h-[1100px]'
           }`}
           style={{
@@ -534,6 +610,21 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             rowGap: '1.5rem'
           }}
         >
+          {/* Marca d'Água de Exemplo quando médico não configurado */}
+          {!isConfigured && (
+            <div 
+              aria-hidden="true" 
+              className="pointer-events-none select-none absolute inset-0 z-30 flex items-center justify-center overflow-hidden"
+            >
+              <span 
+                className="text-6xl sm:text-8xl md:text-9xl font-black uppercase tracking-widest font-sans transform -rotate-45"
+                style={{ color: '#94A3B8', opacity: 0.22 }}
+              >
+                EXEMPLO
+              </span>
+            </div>
+          )}
+
           {/* Marca d'Água Oficial em Camada Transparente */}
           <WatermarkOverlay 
             type={docWatermark} 
@@ -691,7 +782,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               {(docType === 'prescription' || docType === 'special_prescription') && (
                 <div className="space-y-6 sm:space-y-8 font-serif font-serif-doc" style={{ fontFamily: 'var(--font-serif-doc)' }}>
                   {prescriptionItems.length === 0 ? (
-                    <div className="py-16 text-center italic text-base text-slate-400 font-serif">
+                    <div className="py-16 text-center italic text-base text-slate-500 font-serif">
                       Nenhum medicamento adicionado nesta prescrição.
                     </div>
                   ) : (
@@ -837,7 +928,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                   </div>
 
                   {effectiveExams.length === 0 ? (
-                    <div className="py-16 text-center italic text-base text-slate-400 font-serif">
+                    <div className="py-16 text-center italic text-base text-slate-500 font-serif">
                       Nenhum exame selecionado neste pedido.
                     </div>
                   ) : (
@@ -1062,7 +1153,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <div className="text-xs sm:text-sm font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
               Documento Pronto para Download
             </div>
-            <div className="text-[11px] text-slate-400">
+            <div className="text-[11px] text-[var(--text-muted)] dark:text-slate-400">
               Formato A4 com margens de 10mm e fontes serifadas de alta legibilidade.
             </div>
           </div>
@@ -1072,21 +1163,24 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleShare}
-            className="tactile-btn-secondary px-3.5 py-2.5 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+            disabled={!isConfigured}
+            className="tactile-btn-secondary px-3.5 py-2.5 text-xs font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             style={{
               backgroundColor: 'var(--surface-inset)',
               color: darkMode ? '#CBD5E1' : '#334155'
             }}
+            title={!isConfigured ? 'Configure nome e CRM do médico para emitir documentos' : 'Compartilhar documento'}
           >
-            {copiedLink ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={1.75} /> : <Share2 className="w-4 h-4 text-slate-400" strokeWidth={1.75} />}
+            {copiedLink ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={1.75} /> : <Share2 className="w-4 h-4 text-[var(--text-muted)] dark:text-slate-400" strokeWidth={1.75} />}
             <span>Compartilhar</span>
           </button>
 
           <button
             type="button"
             onClick={handleExportPDF}
-            disabled={isExportingPdf}
-            className="tactile-btn-primary px-5 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            disabled={isExportingPdf || !isConfigured}
+            className="tactile-btn-primary px-5 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            title={!isConfigured ? 'Configure nome e CRM do médico para emitir documentos' : 'Baixar arquivo PDF'}
           >
             {isExportingPdf ? (
               <>

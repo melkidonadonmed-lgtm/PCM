@@ -2,27 +2,29 @@
 
 ## Visão geral do projeto
 
-**PresCMed** é um sistema de prescrição médica digital em português (pt-BR), voltado ao contexto brasileiro. Funcionalidades principais:
+**PresCMed** é um sistema de prescrição médica digital em português (pt-BR), voltado ao contexto clínico e ambulatorial brasileiro. Funcionalidades principais:
 
-- Prescrição médica com calculadora automática de doses pediátricas por peso (mg/kg → mL/gotas).
-- Solicitação de exames laboratoriais e de imagem.
-- Emissão de atestados médicos e encaminhamentos (com referências à legislação CFM, ex.: Res. CFM 1.658/2002 para inclusão de CID).
-- Geração de PDF dos documentos (receituário simples, receituário de controle especial, exames, atestado, encaminhamento).
-- Visualização de impressão (`PrintPreview`) e protocolos clínicos pediátricos.
+- Prescrição médica estruturada com busca inteligente de fármacos, categorias SUS/RENAME e kits de plantão.
+- Calculadora pediátrica unificada de doses por peso (mg/kg → mL/gotas), com regra estrita "sem peso, sem dose".
+- Solicitação de exames laboratoriais e diagnósticos por imagem.
+- Emissão de atestados médicos e encaminhamentos (com conformidade ética e legal CFM, ex.: Res. CFM 1.658/2002 para consentimento de CID-10).
+- Editor visual de laudos e documentos clínicos.
+- Geração de PDF vetorial dos documentos (receituário simples, receituário de controle especial em 2 vias — Portaria 344/98, exames, atestado, encaminhamento).
+- Visualização de impressão física (`PrintPreview`) e protocolos clínicos por patologia.
 
-O projeto foi gerado a partir de um template do **Google AI Studio** (ver `metadata.json` e `README.md`), mas o código atual é uma **SPA 100% client-side**: não há backend implementado. As dependências `@google/genai`, `express` e `dotenv` estão declaradas no `package.json`, porém **não são usadas em nenhum arquivo de `src/`** — não crie código assumindo que exista um servidor ou chamadas à API Gemini. O script `clean` remove `server.js`, que não existe no repositório.
+O projeto foi gerado a partir de um template do **Google AI Studio** (ver `metadata.json` e `README.md`), mas o código atual é uma **SPA 100% client-side**: não há backend implementado em produção. As dependências `@google/genai`, `express`, `dotenv` e `motion` estão declaradas no `package.json`, porém **não são importadas em nenhum arquivo de `src/`** — não crie código assumindo que exista um servidor, chamadas ativas à API Gemini ou animações via `motion`. O script `clean` remove `server.js`, que não existe no repositório.
 
-**Atenção:** este é um app do domínio médico (YMYL). As doses pediátricas usam regras clínicas específicas do Brasil (ex.: paracetamol gotas = 1 gota/kg/dose). Qualquer alteração em lógica de cálculo de doses (`src/utils/doseCalculator.ts`) ou nos catálogos de medicamentos (`src/data/`) exige revisão cuidadosa.
+**Atenção:** este é um app do domínio médico (YMYL). As doses pediátricas usam regras clínicas específicas do Brasil (ex.: paracetamol gotas = 1 gota/kg/dose). Qualquer alteração em lógica de cálculo de doses (`src/utils/doseCalculator.ts`), kits de plantão (`src/data/clinicalKits.ts`) ou catálogos farmacêuticos (`src/data/`) exige revisão cuidadosa e execução dos testes.
 
 ## Stack tecnológica
 
-- **React 19 + TypeScript ~5.8** (modo estrito parcial — `tsconfig.json` não habilita `strict`).
-- **Vite 6** como bundler e dev server (`@vitejs/plugin-react`).
-- **Tailwind CSS v4** via `@tailwindcss/vite` (sem `tailwind.config.js`; a configuração é feita em CSS com `@import "tailwindcss"` e `@theme`/variáveis em `src/index.css`).
-- **lucide-react** para ícones, **motion** para animações.
+- **React 19 + TypeScript ~5.8** (modo funcional com hooks; modo estrito parcial — `tsconfig.json` não habilita `strict`).
+- **Vite 6** como bundler e dev server (`@vitejs/plugin-react` e `@tailwindcss/vite`).
+- **Tailwind CSS v4** via `@tailwindcss/vite` (configuração declarada diretamente no CSS com `@import "tailwindcss"`, `@theme`, `@utility` e `@layer` em `src/index.css`).
+- **Ícones**: Componente canônico `<Icon />` com Google Material Design Symbols (`material-symbols` 100% offline via woff2) e `lucide-react`.
 - **jspdf + jspdf-autotable** para geração de PDF e **html2canvas** para captura de tela dos documentos no preview.
-- Gerenciador de pacotes: **npm**, com `package-lock.json`. O `bun.lock` é
-  legado e não exige a instalação do Bun.
+- **Dexie.js v2** para persistência estruturada IndexedDB de contextos e documentos salvos.
+- Gerenciador de pacotes: **npm**, com `package-lock.json`. O `bun.lock` é legado e não exige a instalação do Bun.
 
 ## Comandos
 
@@ -32,87 +34,163 @@ npm run dev        # dev server Vite na porta 3000, host 0.0.0.0
 npm run build      # build de produção em dist/
 npm run preview    # serve o build de produção
 npm run lint       # type-check: tsc --noEmit
-npm run test       # testes unitários e clínicos via Vitest
+npm run test       # testes unitários, clínicos e snapshots via Vitest
 npm run test:watch # modo contínuo de testes Vitest
+npm run design:lint # linter de conformidade DESIGN.md (Google Labs)
 npm run clean      # remove dist/ e server.js
 ```
 
-**Testes:** o projeto utiliza **Vitest** integrado ao Vite. A suíte cobre cálculos pediátricos (`doseCalculator.test.ts`), conformidade com a Portaria SVS/MS 344/98 (`sanitaryCompliancePortaria344.test.ts`) e consentimento de CID-10 conforme Resoluções CFM 1.658/2002 e 1.819/2007 (`cfmConsentCid10.test.ts`). Ao modificar lógica de cálculo ou conformidade sanitária, execute `npm run test` e `npm run lint`.
+**Testes:** o projeto utiliza **Vitest** integrado ao Vite. A suíte cobre:
+- Cálculos pediátricos e formatação segura (`doseCalculator.test.ts`).
+- Kits clínicos de plantão e montagem de prescrição com snapshots (`clinicalKits.test.ts`).
+- Conformidade sanitária com a Portaria SVS/MS 344/98 para controle especial em 2 vias (`sanitaryCompliancePortaria344.test.ts`).
+- Consentimento explícito de CID-10 conforme Resoluções CFM 1.658/2002 e 1.819/2007 (`cfmConsentCid10.test.ts`).
+- Resolução de símbolos e aliases do componente canônico de ícones (`iconComponent.test.ts`).
 
-Para alterações de UI, impressão ou PDF, use a skill
-`ui-pdf-validation`. Para qualquer alteração clínica, use
-`clinical-change-safety` e solicite revisão do agente
-`prescmed-clinical-reviewer`.
+Ao modificar lógica de cálculo, kits ou conformidade sanitária, execute obrigatoriamente `npm run test`, `npm run lint` e `npm run design:lint`.
+
+Para alterações de UI, impressão ou PDF, use a skill `ui-pdf-validation`. Para qualquer alteração clínica, use `clinical-change-safety` e solicite revisão do agente `prescmed-clinical-reviewer`.
 
 ## Estrutura do código
 
 ```
-index.html              # Entry HTML (monta #root, carrega /src/main.tsx)
-vite.config.ts          # Plugins React + Tailwind; alias '@' → raiz do projeto
+index.html                     # Entry HTML com script inline de tema e fontes
+vite.config.ts                 # Plugins React + Tailwind; alias '@' → raiz do projeto
 src/
-  main.tsx              # Bootstrap React (StrictMode)
-  App.tsx               # Estado global da aplicação + roteamento por abas
-  types.ts              # Todas as interfaces de domínio (DoctorProfile, Patient,
-                        #   PediatricMedication, PrescriptionItem, ExamItem,
-                        #   MedicalCertificate, MedicalReferral, ClinicalProtocol, ActiveTab)
-  index.css             # Tailwind v4 + design system em CSS custom properties
-                        #   (Light: canvas creme #F9F6F0 + painéis deep navy;
-                        #   Dark: obsidian #0D0F12 + grafite; sombras/luz "optical physics")
-  components/           # Um componente por funcionalidade (todos funcionais)
-    Header.tsx, Sidebar.tsx, MobileBottomNav.tsx   # Navegação e layout
-    PrescriptionBuilder.tsx                        # Construtor de receituário
-    PediatricCalculator.tsx                        # Calculadora de dose por peso
-    ExamRequester.tsx                              # Solicitação de exames
-    CertificateAndReferral.tsx                     # Atestados e encaminhamentos
-    ClinicalProtocolsView.tsx                      # Protocolos clínicos
-    PrintPreview.tsx                               # Preview de impressão + exportação PDF
-    PatientModal.tsx, DoctorProfileModal.tsx       # Edição de paciente e médico
-    CidSearchBar.tsx                               # Busca de CID-10
-    Icon.tsx                                       # Componente canônico de ícones (Google Material Symbols)
-  data/                 # Catálogos estáticos (dados clínicos em pt-BR)
-    pediatricMeds.ts    # ~54 medicamentos pediátricos com dose mg/kg
-    adultMeds.ts        # ~32 medicamentos adultos com posologia
-    examCatalog.ts      # ~43 exames
-    cidCatalog.ts       # Catálogo CID-10 (CIDItem: code, description, category, keywords)
-  services/             # Persistência IndexedDB e nuvem híbrida
-    db.ts               # Dexie.js v2 (workContexts e savedDocuments)
-    backupService.ts    # Portabilidade .pcm.json
-    cloud/              # Firebase Auth e Sincronização Zero-Knowledge lazy
-  __tests__/            # Testes Vitest (doses, Portaria 344/98 e CFM 1.658/2002)
+  main.tsx                     # Bootstrap React (StrictMode)
+  App.tsx                      # Estado global da aplicação + roteamento por abas (activeTab)
+  types.ts                     # Interfaces de domínio (DoctorProfile, Patient, PrescriptionItem, etc.)
+  index.css                    # Tailwind v4, tokens CSS, componentes em @layer e utilitários @utility
+  components/
+    Header.tsx                 # Header superior (fundo claro no Light, botão Início, perfil e nuvem)
+    Sidebar.tsx                # Menu lateral de navegação e kits clínicos de plantão (deep navy contínuo)
+    MobileBottomNav.tsx        # Barra de navegação inferior mobile com 5 destinos (Receitas, Doses, Exames, Editor, Mais)
+    PrescriptionBuilder.tsx    # Construtor de receitas (busca, formulário de prescrição, lista e prévia A4)
+    AcoesDaReceita.tsx         # Barra de ações única da receita (Imprimir/PDF, Editor, WhatsApp, Copiar)
+    PediatricCalculator.tsx    # Calculadora pediátrica dedicada por peso (mg/kg → mL/gotas)
+    ExamRequester.tsx          # Solicitação de exames laboratoriais e diagnósticos por imagem
+    CertificateAndReferral.tsx # Emissão de atestados médicos e encaminhamentos com conformidade CFM
+    ClinicalProtocolsView.tsx  # Protocolos de conduta clínica e catálogo por classes terapêuticas SUS/RENAME
+    DocumentEditorView.tsx     # Editor visual avançado para laudos e documentos médicos livres
+    PrintPreview.tsx           # Pré-visualização de impressão física e exportação de PDF vetorial
+    PatientModal.tsx           # Modal de edição rápida e cadastro de dados do paciente
+    DoctorProfileModal.tsx     # Modal de configuração do médico emitente (nome, CRM/UF, clínica)
+    CidSearchBar.tsx           # Campo de busca preditiva de diagnósticos e códigos CID-10
+    BackupModal.tsx            # Modal de exportação e restauração de backups portáteis (.pcm.json)
+    ConfirmationModal.tsx      # Modal genérico de confirmação para ações destrutivas ou de descarte
+    ContextSwitcher.tsx        # Seletor rápido de postos de trabalho e contextos clínicos do médico
+    LogoGeneratorModal.tsx     # Utilitário para personalização de cabeçalho e monograma de receituário
+    PuxarParaAtualizar.tsx     # Gesto tátil de pull-to-refresh para atualização em dispositivos móveis
+    WatermarkOverlay.tsx       # Camada visual de marca d'água no preview de documentos
+    WatermarkSelector.tsx      # Seletor de marcas d'água predefinidas e personalizadas
+    Icon.tsx                   # Componente canônico anti-mutação baseado no Google Material Symbols
+  data/
+    pediatricMeds.ts           # Catálogo de fármacos pediátricos com faixas de dosagem (mg/kg)
+    adultMeds.ts               # Catálogo de apresentações e posologias para uso adulto
+    examCatalog.ts             # Catálogo de exames laboratoriais e procedimentos diagnósticos
+    cidCatalog.ts              # Base de códigos e descrições CID-10 com termos de busca
+    clinicalKits.ts            # Kits clínicos de plantão ambulatorial (amigdalite, GECA, IVAS, ITU, etc.)
+    clinicalProtocols.ts       # Protocolos patológicos com doses de emergência e cálculo de hidratação
+    medicationDatabase.ts      # Base unificada de medicamentos categorizada por classe SUS/RENAME
+    exemplos.ts                # Dados fictícios de exemplo (Melki Donadon / Seu Melki) para prévia e placeholders
+    presetAssets.ts            # Ativos visuais e marcas d'água predefinidas
+    presetClinicalTemplates.ts # Modelos estruturados de documentos e atestados clínicos
+  hooks/
+    usePrescriptionSession.ts  # Gerenciamento de sessão, rascunhos e ciclo de vida da receita
+    usePwaInstall.ts           # Detecção de suporte e acionamento de instalação como Progressive Web App
+    useWorkContext.ts          # Controle de posto de trabalho ativo e alternância de contexto
+  services/
+    db.ts                      # Banco IndexedDB local estruturado via Dexie.js v2
+    storageService.ts          # Camada de persistência segura com fallback tipado para localStorage
+    backupService.ts           # Geração e importação de backups integrais em formato .pcm.json
+    cloud/
+      cloudAuthService.ts      # Autenticação Google e controle de estado do médico na nuvem
+      cloudSyncManager.ts      # Orquestrador de sincronização Zero-Knowledge lazy
+      firebaseClient.ts        # Inicialização dos serviços Firebase/Firestore
   utils/
-    doseCalculator.ts   # calculatePediatricDose() e generateScheduleTimes()
-    pdfGenerator.ts     # generateMedicalPDF() — gera os 5 tipos de documento em PDF
+    doseCalculator.ts          # Motor de cálculo pediátrico, volumes, gotas e horários de tomada
+    fuzzySearch.ts             # Algoritmo de busca textual fonética/aproximada para medicamentos e CIDs
+    medicoConfigurado.ts       # Validador de obrigatoriedade de identificação médica (nome e CRM)
+    montarItensDoKit.ts        # Montagem inteligente e cálculo por peso de kits clínicos de plantão
+    pdfGenerator.ts            # Gerador vetorial de PDF com suporte aos 5 tipos de documentos e 2 vias
+  __tests__/
+    doseCalculator.test.ts     # Testes da calculadora de dose por peso e regras de arredondamento
+    clinicalKits.test.ts       # Testes de montagem de kits clínicos de plantão com snapshots
+    cfmConsentCid10.test.ts    # Testes de validação de consentimento de CID em atestados (CFM 1.658/2002)
+    sanitaryCompliancePortaria344.test.ts # Testes de emissão em 2 vias para Portaria 344/98
+    iconComponent.test.ts      # Testes de tipagem, aliases clínicos e renderização de ícones
 ```
 
 ## Arquitetura em tempo de execução
 
-- **SPA sem roteador:** a navegação é feita por estado (`activeTab: ActiveTab`) em `App.tsx`, que renderiza condicionalmente cada view. Não há react-router nem URLs por tela.
-- **Estado centralizado em `App.tsx`:** médico, paciente, itens da prescrição, exames, atestado e encaminhamento vivem em `useState` no App e são passados por props (prop drilling — os componentes recebem `darkMode`, dados e callbacks como `onUpdatePatient`, `onNavigateToPrint`). Siga esse padrão; não introduza gerenciador de estado global.
-- **Persistência em `localStorage`:** chaves `prescmed_theme`, `prescmed_doctor`, `prescmed_patient`, `prescmed_prescription`, `prescmed_exams`, sincronizadas via `useEffect`. Leituras usam try/catch com fallback para defaults.
-- **Tema claro/escuro:** booleano `darkMode` no App; aplica/remove a classe `dark` no `<html>`. Componentes recebem `darkMode` como prop e alternam classes manualmente (o app não depende apenas do seletor `dark:` do Tailwind). Paleta Light: canvas creme (`--bg-app: #F9F6F0`), cards branco-quente (`--surface-card: #FFFDF9`), texto navy. Paleta Dark: obsidian (`--bg-app: #0D0F12`), superfícies grafite (`--surface-card: #1A1D24`). **Chrome de navegação (Header, Sidebar, MobileBottomNav) é sempre deep navy nos dois temas** — usa os tokens `--surface-panel*` e as classes `.panel-navy`/`.panel-navy-inset`; textos sobre o navy são sempre claros (#F1F5F9/#CBD5E1/#94A3B8). Prefira os tokens `var(--*)` de `index.css` a cores hardcoded ao criar novos estilos.
-- **Geração de documentos:** `PrintPreview.tsx` renderiza o documento formatado e usa `html2canvas` para captura; `pdfGenerator.ts` monta PDFs programaticamente com jsPDF/autoTable. A folha A4 do documento (`printable-a4-sheet` e todo o conteúdo médico) é **sempre branca com texto escuro, nos dois temas** — nunca aplique o tema da app dentro da folha. Há um helper de conversão de cores (oklch/oklab → rgb) porque o html2canvas não suporta cores modernas do CSS — mantenha isso em mente ao criar estilos que aparecem em documentos exportados.
+- **SPA sem roteador:** A navegação ocorre por estado centralizado (`activeTab: ActiveTab`) em `App.tsx` (valores: `'prescription'`, `'pediatric_calc'`, `'exams'`, `'editor'`, `'certificate'`, `'referral'`, `'protocols'`, `'print_preview'`). Não há react-router nem alteração de rota via URL.
+- **Estado centralizado em `App.tsx`:** Médico, paciente, medicamentos prescritos, exames selecionados, atestado e encaminhamento residem em `useState` no App e são transmitidos via props. Mantenha esse padrão determinístico; não adicione gerenciadores globais externos (Redux/Zustand).
+- **Persistência em `localStorage`:** O sistema utiliza 11 chaves oficiais sincronizadas via `storageService` e `useEffect`:
+  1. `prescmed_theme`: Tema visual (`'light'` ou `'dark'`).
+  2. `prescmed_doctor`: Perfil cadastrado do médico (`DoctorProfile`).
+  3. `prescmed_patient`: Dados do paciente atual (`Patient`).
+  4. `prescmed_prescription`: Lista de medicamentos da receita ativa (`PrescriptionItem[]`).
+  5. `prescmed_exams`: Lista de exames solicitados (`ExamItem[]`).
+  6. `prescmed_exam_indication`: Indicação clínica da solicitação de exames.
+  7. `prescmed_certificate`: Dados do atestado médico ativo.
+  8. `prescmed_referral`: Dados do encaminhamento ativo.
+  9. `prescmed_show_kits`: Preferência de exibição da gaveta de kits clínicos na sidebar.
+  10. `prescmed_custom_styles`: Estilos e personalizações visuais de impressão.
+  11. `prescmed_cloud_auth_active`: Flag de sessão ativa para sincronização na nuvem.
+  - Prefixo de arquivos: `prescmed_backup_` (nomenclatura padrão de backups `.pcm.json`).
+  - *Nota:* A chave legada `prescmed_show_pedia_calc` não existe mais no sistema.
+- **Tema claro/escuro e layout:**
+  - Script inline no `<head>` de `index.html` avalia `prescmed_theme` antes da pintura da tela para prevenir FOUC (flash de tema).
+  - Tema Claro: Canvas creme/slate cirúrgico (`--bg-app: #F9F6F0` / `#F8FAFC`), superfícies e cards brancos (`--surface-card: #FFFFFF` / `#FFFDF9`).
+  - Tema Escuro: Fundo obsidian (`--bg-app: #0D0F12`), superfícies grafite translúcidas (`--surface-card: #1A1D24`).
+  - **Header claro no tema claro**: `Header.tsx` adota superfície de cartão `bg-[var(--surface-card)]` (claro no tema claro, escuro no tema escuro), integrando-se ao canvas de trabalho. O logo é um botão "Início" funcional (retorna à aba Receitas e rola para o topo) sem tagline textual decorativa.
+  - **Sidebar e MobileBottomNav contínuos em Deep Navy**: Ambos mantêm acabamento azul-marinho profundo (`.panel-navy`) com tipografia clara em ambos os temas.
+  - **Navegação Mobile (`MobileBottomNav`)**: Visível abaixo de `lg` (1024px) com exatamente 5 destinos (Receitas, Doses, Exames, Editor, Mais). O botão "Mais" abre a `Sidebar` completa em modo gaveta/diálogo acessível. A funcionalidade de exportar/backup reside na Sidebar.
+  - Gesto tátil de puxar para atualizar (`PuxarParaAtualizar.tsx`) integrado para telas de toque.
+- **Página Principal de Receituário (`PrescriptionBuilder.tsx`):**
+  - Composta por busca rápida de medicamentos, formulário "Prescrição", lista "Medicamentos prescritos" e bancada com prévia de impressão A4.
+  - Barra de ações única consolidada em `AcoesDaReceita.tsx`: Imprimir/PDF (ação primária), Editor e WhatsApp (ações secundárias) e Copiar texto (ação terciária).
+  - A antiga calculadora rápida inline foi removida; o botão "Calcular dose pelo peso" direciona para a aba Doses (`PediatricCalculator.tsx` + `src/utils/doseCalculator.ts`, a única calculadora do sistema).
+- **Kits de Plantão e Protocolos:**
+  - Kits ambulatoriais de plantão acessíveis na sidebar (`src/data/clinicalKits.ts`), montados por `src/utils/montarItensDoKit.ts` e validados por snapshots em `clinicalKits.test.ts`.
+  - Protocolos clínicos (`ClinicalProtocolsView.tsx`) dispõem de condutas patológicas e catálogo farmacêutico agrupado por classe terapêutica SUS/RENAME, com ação "Usar na receita" para transferência direta.
+- **Geração e Impressão de Documentos:**
+  - `PrintPreview.tsx` renderiza os documentos na folha física A4.
+  - `pdfGenerator.ts` gera PDFs programaticamente via jsPDF/autoTable.
+  - A folha A4 (`printable-a4-sheet`) simula papel físico real de alta gramatura: é **sempre branca (#FFFFFF) com tipografia grafite/preta nos dois temas**. Jamais aplique classes de modo escuro dentro da folha do documento.
 
 ## Convenções de código
 
-- **Idioma:** UI, dados clínicos e textos de documentos em **português (pt-BR)**; comentários de código misturam português e inglês. Novos textos de UI devem ser em pt-BR.
-- **Componentes:** funcionais com hooks, exportação nomeada (`export function X` / `export const X`), um componente principal por arquivo em PascalCase.
-- **Estilo:** Tailwind utility classes inline; design tokens como CSS custom properties em `src/index.css` (ex.: `--bg-app`, `--surface-card`). Breakpoint de referência para "mobile": `lg` (1024px) — a sidebar fecha automaticamente abaixo dele.
-- **Tipos:** centralizados em `src/types.ts`; adicione novos tipos de domínio lá. `tsconfig` não é estrito e permite `allowJs`, mas escreva código tipado.
-- **Path alias:** `@/*` mapeia para a raiz do projeto (pouco usado; os imports existentes são relativos — prefira relativos dentro de `src/`).
-- **Formatação numérica:** doses e volumes usam locale pt-BR (`toLocaleString('pt-BR')`, vírgula decimal) nos textos de prescrição.
-- **Sistema de Ícones Canônico (Anti-Mutação):** Utilize preferencialmente o componente canônico `<Icon name="..." />` (`src/components/Icon.tsx`) baseado no Google Material Design Icons (`material-symbols`). Nunca invente nomes de ícones ou introduza novas bibliotecas. O componente dispõe de mapa de aliases clínicos e tipagem estrita para garantir uniformidade visual entre todas as telas.
+- **Idioma:** UI, termos médicos, alertas e documentos exclusivamente em **português do Brasil (pt-BR)**.
+- **Componentes:** Estrutura funcional com hooks React, exportações nomeadas (`export const X: React.FC<...>`), um componente por arquivo em PascalCase.
+- **Regras Clínicas e Emissão de Documentos:**
+  - **Exigência de Médico Configurado:** Emissão de documentos (impressão, PDF, envio por WhatsApp e cópia de texto) exige validação prévia de nome e CRM do médico (`src/utils/medicoConfigurado.ts`).
+  - **Dados de Exemplo Restritos:** Registros de exemplo em `src/data/exemplos.ts` (médico "Melki Donadon", paciente "Seu Melki") são utilizados exclusivamente como placeholder e na prévia A4 com marca d'água "EXEMPLO"; nunca aparecem em documentos emitidos.
+  - **Sem peso, sem dose:** A calculadora pediátrica e os protocolos de urgência bloqueiam doses e volumes calculados caso o peso do paciente não esteja cadastrado.
+  - **Formatação Numérica Rigorosa:** Doses em miligramas utilizam vírgula decimal e **sem separador de milhar** (ex.: "7,5 mg", "1000 mg", evitando que "1.000 mg" seja interpretado erroneamente como 1 mg); concordância gramatical estrita para unidades ("1 gota" no singular, "X gotas" no plural).
+  - **Sem horários inventados:** `scheduleTimes` só é preenchido quando o intervalo vem de dado estruturado (catálogo pediátrico ou protocolo). Itens digitados no formulário e itens de kits usam `scheduleInterval: 'Conforme posologia'` e `scheduleTimes: []`, para o PDF e a folha A4 não imprimirem "Horários sugeridos" que contradigam a posologia escrita.
+  - **Kits de plantão pendentes de revisão clínica:** as doses pediátricas fixas de `src/utils/montarItensDoKit.ts` (paracetamol limitado a 35 gotas, amoxicilina e prednisolona sem dose máxima) e os kits com apresentações de adulto sem restrição de faixa etária aguardam revisão humana qualificada. Não os altere sem fonte clínica.
+- **Regras de CSS e Estilização (Tailwind CSS v4):**
+  - **Arquitetura em Camadas:** Classes de componentes devem ser declaradas dentro de `@layer components`.
+  - **Sombras e Física Tátil:** Declaradas via `@utility` (ex.: `@utility shadow-tactile-*`), garantindo composição harmônica com anéis de foco do Tailwind (`focus-visible:ring-*`).
+  - **Proibição de CSS Fora de Camada:** Nunca escreva CSS solto fora de camadas, pois ele anula a especificidade dos utilitários do framework e quebra anéis de foco.
+  - **Campos e Formulários:** Placeholders recebem a variável `--text-placeholder`. Campos vazios no estado `:placeholder-shown` recebem fundo côncavo `--surface-inset`.
+  - **Acessibilidade:** Suporte global obrigatório a `prefers-reduced-motion` para anular transições e animações quando solicitado pelo sistema.
+- **Sistema Canônico de Ícones (Anti-Mutação):**
+  - Utilize sempre o componente canônico `<Icon name="..." />` (`src/components/Icon.tsx`).
+  - Baseado no Google Material Design Symbols (`material-symbols`), com mapa de aliases clínicos em pt-BR e empacotamento offline via woff2. Não utilize pacotes de ícones alternativos.
 
 ## Variáveis de ambiente
 
-- `.env.example` documenta `GEMINI_API_KEY` e `APP_URL`, herdadas do template AI Studio — **não são usadas pelo código atual**. `.env*` é ignorado pelo git (exceto `.env.example`).
-- `vite.config.ts` respeita `DISABLE_HMR=true` (usado pelo AI Studio para desligar HMR/watch durante edições de agente). Não remova essa lógica.
+- `.env.example` documenta `GEMINI_API_KEY` e `APP_URL`, herdadas do template AI Studio — **não são usadas pelo código atual**. O git ignora `.env*`.
+- `vite.config.ts` respeita `DISABLE_HMR=true` para suporte a ambientes headless.
 
 ## Considerações de segurança e privacidade
 
-- O app manipula dados sensíveis de pacientes (nome, CPF/RG, peso, alergias) **somente no navegador** via localStorage — não há envio a servidor. Não introduza telemetria ou chamadas de rede com esses dados sem necessidade explícita.
-- Não commite arquivos `.env` nem dados reais de pacientes/médicos.
-- Atestados com CID exigem consentimento do paciente (Res. CFM 1.658/2002) — a UI já sinaliza isso; preserve os avisos legais ao alterar `CertificateAndReferral.tsx` ou `pdfGenerator.ts`.
+- **Soberania de Dados Locais:** Dados de pacientes e médicos residem no dispositivo via IndexedDB (`Dexie.js`) e `localStorage`. Não há telemetria nem transmissão de dados sensíveis para servidores terceiros sem ação explícita do usuário.
+- **Sigilo Diagnóstico (CFM 1.658/2002 e 1.819/2007):** A inclusão de código ou descrição CID-10 em atestados médicos depende de consentimento explícito e assinalado pelo paciente (`authorizedByPatient = true`).
+- **Controle Sanitário (Portaria SVS/MS 344/98):** Receituários de medicamentos controlados devem ser emitidos estritamente em formato de 2 vias (1ª via Farmácia / 2ª via Paciente) com todos os campos de identificação regulamentares.
 
 ## Deploy
 
-O build (`npm run build`) gera estáticos em `dist/`, servíveis por qualquer host estático. O `metadata.json` indica origem no Google AI Studio (deploy típico via Cloud Run pela plataforma), mas não há configuração de deploy no repositório.
+O comando `npm run build` compila a aplicação para estáticos otimizados na pasta `dist/`, servíveis por servidores Nginx, Cloud Run ou qualquer host estático com suporte a SPA.

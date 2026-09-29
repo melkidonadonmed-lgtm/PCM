@@ -96,11 +96,10 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-lg rounded-2xl border overflow-hidden shadow-tactile-lg animate-in fade-in zoom-in-95 duration-200"
+        className="w-full max-w-lg rounded-2xl border overflow-hidden shadow-tactile-lg animate-tab-fade"
         style={{
           backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : '#E3D7BD',
-          boxShadow: darkMode ? '0 24px 50px -8px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -8px rgba(20,32,50,0.18), inset 0 1px 0 rgba(255,255,255,0.95)'
+          borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : '#E3D7BD'
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -120,7 +119,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
               <h3 id="doctor-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-white">
                 Perfil Profissional do Médico
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] text-[var(--text-muted)] dark:text-slate-400">
                 Nome, CRM e dados essenciais para o cabeçalho dos documentos
               </p>
             </div>
@@ -129,7 +128,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition-all"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             <X className="w-5 h-5" strokeWidth={2} />
           </button>
@@ -141,13 +140,13 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           {/* Identificação Principal (Essencial) */}
           <div className="space-y-3 p-3.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-sky-600 dark:text-sky-400">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-sky-700 dark:text-sky-400">
                 Identificação Obrigatória
               </span>
               <button 
                 type="button"
                 onClick={handleClear}
-                className="text-[11px] font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1"
+                className="text-[11px] font-semibold text-rose-700 hover:text-rose-800 flex items-center gap-1"
               >
                 <Eraser className="w-3.5 h-3.5" />
                 <span>Limpar campos</span>
@@ -165,8 +164,8 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Ex: Dr. Melki Donadon"
-                className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold focus:ring-2 focus:ring-sky-500 outline-none transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100"
+                placeholder="Ex.: Melki Donadon"
+                className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100"
               />
             </div>
 
@@ -181,8 +180,8 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   required
                   value={formData.crm}
                   onChange={(e) => setFormData({ ...formData, crm: e.target.value })}
-                  placeholder="Ex: 12345"
-                  className="w-full px-3.5 py-2 rounded-xl border text-sm font-bold text-sky-600 dark:text-sky-400 focus:ring-2 focus:ring-sky-500 outline-none transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700"
+                  placeholder="Ex.: 123456"
+                  className="w-full px-3.5 py-2 rounded-xl border text-sm font-bold text-sky-700 dark:text-sky-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700"
                 />
               </div>
 
@@ -194,7 +193,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   id="doc-input-state"
                   value={formData.crmState}
                   onChange={(e) => setFormData({ ...formData, crmState: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border text-sm font-bold focus:ring-2 focus:ring-sky-500 outline-none transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl border text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 cursor-pointer"
                 >
                   {states.map(st => (
                     <option key={st} value={st}>{st}</option>
@@ -214,7 +213,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   value={formData.specialty}
                   onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
                   placeholder="Ex: Clínica Médica / Pediatria"
-                  className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:ring-2 focus:ring-sky-500 outline-none transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100"
+                  className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
@@ -228,7 +227,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   value={formData.rqe || ''}
                   onChange={(e) => setFormData({ ...formData, rqe: e.target.value })}
                   placeholder="Ex: 67890"
-                  className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:ring-2 focus:ring-sky-500 outline-none transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100"
+                  className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100"
                 />
               </div>
             </div>
@@ -239,19 +238,19 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <button
               type="button"
               onClick={() => setShowAdvancedClinic(!showAdvancedClinic)}
-              className="w-full py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-between transition-all bg-slate-100 dark:bg-navy-900 hover:bg-slate-200 dark:hover:bg-navy-800 border-slate-300 dark:border-navy-700 text-slate-700 dark:text-slate-300"
+              className="w-full py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-between transition bg-slate-100 dark:bg-navy-900 hover:bg-slate-200 dark:hover:bg-navy-800 border-slate-300 dark:border-navy-700 text-slate-700 dark:text-slate-300 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             >
               <span className="flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-slate-500" />
                 <span>Dados de Consultório / Unidade (Opcional)</span>
               </span>
-              <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">
+              <span className="text-[10px] font-bold text-sky-700 dark:text-sky-400">
                 {showAdvancedClinic ? 'Ocultar' : 'Exibir campos'}
               </span>
             </button>
 
             {showAdvancedClinic && (
-              <div className="mt-2.5 space-y-2.5 p-3 rounded-xl border bg-white dark:bg-navy-950 border-slate-200 dark:border-navy-800 animate-in fade-in duration-150">
+              <div className="mt-2.5 space-y-2.5 p-3 rounded-xl border bg-white dark:bg-navy-950 border-slate-200 dark:border-navy-800 animate-tab-fade">
                 <div>
                   <label htmlFor="doc-input-clinic" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
                     Nome da Unidade / Consultório
@@ -262,7 +261,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                     value={formData.clinicName || ''}
                     onChange={(e) => setFormData({ ...formData, clinicName: e.target.value })}
                     placeholder="Ex: USF Hamilton Gondim / Consultório Particular"
-                    className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500"
+                    className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   />
                 </div>
 
@@ -277,7 +276,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                       value={formData.cityState || ''}
                       onChange={(e) => setFormData({ ...formData, cityState: e.target.value })}
                       placeholder="Ex: Porto Velho - RO"
-                      className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500"
+                      className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                     />
                   </div>
                   <div className="col-span-5">
@@ -290,7 +289,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                       value={formData.phone || ''}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="Ex: (69) 99999-9999"
-                      className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500"
+                      className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                     />
                   </div>
                 </div>
@@ -305,7 +304,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                     value={formData.address || ''}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     placeholder="Ex: Av. 7 de Setembro, 1200 - Sala 04"
-                    className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500"
+                    className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   />
                 </div>
               </div>
@@ -333,7 +332,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <button
               type="button"
               onClick={() => setIsLogoModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all"
+              className="px-3 py-1.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
               <span>{activeContext?.logoDataUrl ? 'Editar Logo SVG' : 'Criar Logo / Timbre SVG'}</span>
@@ -344,21 +343,21 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           <div className="p-3 rounded-xl border flex items-center justify-between bg-slate-50 dark:bg-navy-950 border-slate-200 dark:border-navy-800">
             <div className="flex items-center gap-2.5">
               <Shield className="w-4 h-4 text-emerald-500" />
-              <div>
+              <label htmlFor="doc-input-show-sig" className="cursor-pointer">
                 <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Exibir Linha de Assinatura e Carimbo
                 </p>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400">
                   Inclui campo formal no rodapé das folhas A4
                 </p>
-              </div>
+              </label>
             </div>
             <input
               type="checkbox"
               id="doc-input-show-sig"
               checked={formData.showSignature}
               onChange={(e) => setFormData({ ...formData, showSignature: e.target.checked })}
-              className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
+              className="w-4 h-4 rounded text-sky-700 focus:ring-sky-500 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             />
           </div>
 
@@ -367,13 +366,13 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-100 dark:hover:bg-navy-800 text-slate-600 dark:text-slate-300 transition active:scale-95"
+              className="px-4 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-100 dark:hover:bg-navy-800 text-slate-600 dark:text-slate-300 transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="btn-tactile-primary px-6 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="btn-tactile-primary px-6 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             >
               <Check className="w-4 h-4" />
               <span>Salvar Perfil</span>

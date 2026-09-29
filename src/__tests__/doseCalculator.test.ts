@@ -99,6 +99,57 @@ describe('Calculadora de Doses Pediátricas por Peso (YMYL / Segurança Clínica
       expect(result.formattedPrescriptionText).toContain('2 gotas ao dia');
     });
   });
+
+  describe('Formatação de Doses e Textos Clínicos em pt-BR (Vírgula decimal e Concordância de Gotas)', () => {
+    it('deve formatar mg com vírgula decimal para doses >= 1 mg com fração (ex: 7,5 mg)', () => {
+      // Paracetamol gotas (15 mg/kg): para 0.5 kg -> 0.5 * 15 = 7.5 mg -> '7,5 mg'
+      const paracetamol = getMed('paracetamol-gotas');
+      const result = calculatePediatricDose(paracetamol, 0.5);
+      expect(result.rawDoseText).toBe('7,5 mg');
+
+      // Ondansetrona solução oral (0.15 mg/kg): para 10 kg -> 10 * 0.15 = 1.5 mg -> '1,5 mg'
+      const ondansetrona = getMed('ondansetrona-solucao');
+      const resultOndan = calculatePediatricDose(ondansetrona, 10);
+      expect(resultOndan.rawDoseText).toBe('1,5 mg');
+    });
+
+    it('deve formatar mg com duas casas decimais e vírgula para doses < 1 mg (ex: 0,30 mg e 0,75 mg)', () => {
+      // Ondansetrona solução oral (0.15 mg/kg): para 2 kg -> 2 * 0.15 = 0.30 mg -> '0,30 mg'
+      const ondansetrona = getMed('ondansetrona-solucao');
+      const result2kg = calculatePediatricDose(ondansetrona, 2);
+      expect(result2kg.rawDoseText).toBe('0,30 mg');
+
+      // Ondansetrona solução oral (0.15 mg/kg): para 5 kg -> 5 * 0.15 = 0.75 mg -> '0,75 mg'
+      const result5kg = calculatePediatricDose(ondansetrona, 5);
+      expect(result5kg.rawDoseText).toBe('0,75 mg');
+    });
+
+    it('não deve agrupar milhares no texto de mg (1000 mg, nunca "1.000 mg")', () => {
+      // Paracetamol gotas: 100 kg x 15 mg/kg = 1500 mg, limitado ao máximo de 1000 mg
+      const paracetamol = getMed('paracetamol-gotas');
+      const result = calculatePediatricDose(paracetamol, 100);
+      expect(result.isMaxDoseReached).toBe(true);
+      expect(result.rawDoseText).toBe('1000 mg');
+    });
+
+    it('deve usar singular "1 gota" em dropsText e na instrução para dose unitária', () => {
+      // Paracetamol gotas (1 gota/kg): para 1 kg -> 1 gota
+      const paracetamol = getMed('paracetamol-gotas');
+      const result = calculatePediatricDose(paracetamol, 1);
+      expect(result.calculatedDrops).toBe(1);
+      expect(result.dropsText).toBe('1 gota');
+      expect(result.formattedPrescriptionText).toContain('Dar 1 gota (0,05 mL)');
+    });
+
+    it('deve usar plural "gotas" em dropsText e na instrução para doses maiores que 1 gota', () => {
+      // Paracetamol gotas (1 gota/kg): para 10 kg -> 10 gotas
+      const paracetamol = getMed('paracetamol-gotas');
+      const result = calculatePediatricDose(paracetamol, 10);
+      expect(result.calculatedDrops).toBe(10);
+      expect(result.dropsText).toBe('10 gotas');
+      expect(result.formattedPrescriptionText).toContain('Dar 10 gotas (0,5 mL)');
+    });
+  });
 });
 
 describe('Gerador de Horários de Posologia (generateScheduleTimes)', () => {

@@ -20,8 +20,8 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
   return (
     <div className={`px-3 py-2 border-b border-[var(--border-subtle)] ${collapsed ? 'text-center' : ''}`}>
       {!collapsed && (
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1 mb-1">
-          <ShieldCheck size={12} className="text-emerald-500" /> Local de Atuação (SUS)
+        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1 mb-1">
+          <ShieldCheck size={12} className="text-emerald-400" /> Local de Atuação (SUS)
         </span>
       )}
       
@@ -30,7 +30,7 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
           value={activeContext.id}
           onChange={(e) => onSwitchContext(e.target.value)}
           aria-label="Selecionar local de atuação institucional"
-          className="w-full text-xs font-semibold rounded-lg bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] py-1.5 pl-2 pr-7 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--accent-sky)] truncate shadow-sm"
+          className="w-full text-xs font-semibold rounded-lg bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] py-1.5 pl-2 pr-7 appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 truncate shadow-sm"
         >
           {contexts.map((ctx) => (
             <option key={ctx.id} value={ctx.id}>
@@ -42,13 +42,13 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
         {!collapsed && (
           <ChevronDown
             size={14}
-            className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]"
+            className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
           />
         )}
       </div>
 
       {!collapsed && (
-        <div className="mt-1 flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+        <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
           <span className="truncate max-w-[170px]">{activeContext.clinicName}</span>
           <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)]">
             {activeContext.documentFormatting?.prescriptionViaCount || 1} {activeContext.documentFormatting?.prescriptionViaCount === 1 ? 'VIA' : 'VIAS'}
