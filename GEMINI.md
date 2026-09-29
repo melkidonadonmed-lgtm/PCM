@@ -122,3 +122,8 @@ npm run preview     # Pré-visualização do bundle compilado
     - `Sidebar.tsx`: Posicionamento `top-16` e `h-[calc(100dvh-4rem)]`, botões de toque padronizados em 44x44px com tooltips flutuantes imediatos (`group-hover:opacity-100`) para navegação, CRM e utilitários.
     - `PrescriptionBuilder.tsx`: Formulário de prescrição rápida descongestionado com cabeçalho limpo "SUS / RENAME", busca rápida com atalho `Ctrl+K`, grid proporcional de 2 colunas e atalhos de posologia em pílulas táteis discretas.
     - Validação: `npm run design:lint` (0 erros / 0 avisos), `npm run lint` (0 erros), `npm run test` (29/29 testes aprovados) e `npm run build` (sucesso).
+  - **Upload GitHub & Deploy Google Cloud Run**:
+    - Push concluído com sucesso para o branch `main` no repositório GitHub (`melkidonadonmed-lgtm/PCM.git`). Commits: `50d7f45` (redesign e DESIGN.md) e `033a7cf` (`.gcloudignore`).
+    - Build e Deploy executados com sucesso via Google Cloud Build (`agent-md-506215`), gerando a imagem Docker no Artifact Registry (`southamerica-east1-docker.pkg.dev/agent-md-506215/prescmed-repo/prescmed:033a7cf`).
+    - Serviço ativo e validado no Google Cloud Run (São Paulo - `southamerica-east1`): `https://prescmed-1044179901556.southamerica-east1.run.app` (HTTP 200 OK com PWA e assets cacheados com sucesso).
+
