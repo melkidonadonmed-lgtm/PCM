@@ -91,14 +91,24 @@ export function calculatePediatricDose(
   }
 
   // Format texts
-  const mgText = targetMg >= 1 ? `${Math.round(targetMg * 10) / 10} mg` : `${targetMg.toFixed(2)} mg`;
+  // Vírgula decimal sem separador de milhar: "1.000 mg" seria lido como 1 mg.
+  const mgFormatted =
+    targetMg >= 1
+      ? (Math.round(targetMg * 10) / 10).toLocaleString('pt-BR', { useGrouping: false })
+      : Number(targetMg.toFixed(2)).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+          useGrouping: false,
+        });
+  const mgText = `${mgFormatted} mg`;
   const mlText = volumeMl >= 1 ? `${(Math.round(volumeMl * 10) / 10).toLocaleString('pt-BR')} mL` : `${(Math.round(volumeMl * 100) / 100).toLocaleString('pt-BR')} mL`;
-  const dropsText = calculatedDrops !== undefined ? `${calculatedDrops} gotas` : '-';
+  const dropsUnit = calculatedDrops === 1 ? 'gota' : 'gotas';
+  const dropsText = calculatedDrops !== undefined ? `${calculatedDrops} ${dropsUnit}` : '-';
 
   // Build high-fidelity prescription text
   let posologyDetail = '';
   if (med.unitType === 'drops' && calculatedDrops !== undefined) {
-    posologyDetail = `Dar ${calculatedDrops} gotas (${mlText})`;
+    posologyDetail = `Dar ${calculatedDrops} ${dropsUnit} (${mlText})`;
   } else {
     posologyDetail = `Administrar ${mlText} (${mgText})`;
   }

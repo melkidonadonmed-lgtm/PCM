@@ -192,7 +192,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-2xl bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl border border-[var(--border-subtle)] shadow-tactile-lg overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200"
+        className="w-full max-w-2xl bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl border border-[var(--border-subtle)] shadow-tactile-lg overflow-hidden flex flex-col max-h-[92vh] animate-tab-fade"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -213,7 +213,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             <X className="w-5 h-5" />
           </button>
@@ -253,7 +253,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                 type="button"
                 onClick={handleExport}
                 disabled={isExporting}
-                className="btn-tactile-primary w-full sm:w-auto px-5 py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-tactile-btn cursor-pointer transition active:scale-95 disabled:opacity-50"
+                className="btn-tactile-primary w-full sm:w-auto px-5 py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-tactile-btn cursor-pointer transition active:scale-95 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
                 {isExporting ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -298,7 +298,11 @@ export const BackupModal: React.FC<BackupModalProps> = ({
               onDragLeave={() => setIsDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`p-6 rounded-2xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 ${
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
+              tabIndex={0}
+              role="button"
+              aria-label="Selecionar arquivo de backup"
+              className={`p-6 rounded-2xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                 isDragOver 
                   ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30' 
                   : selectedFile
@@ -338,7 +342,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
             {/* Prévia dos Dados a Importar e Estratégia */}
             {parsedBackup && (
-              <div className="p-4 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/30 dark:bg-sky-950/20 space-y-3 animate-in fade-in duration-150">
+              <div className="p-4 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/30 dark:bg-sky-950/20 space-y-3 animate-tab-fade">
                 <div className="flex items-center justify-between text-xs pb-2 border-b border-sky-100 dark:border-sky-900/40">
                   <span className="font-bold text-sky-900 dark:text-sky-300 flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-sky-600" />
@@ -413,7 +417,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                     type="button"
                     onClick={handleExecuteImport}
                     disabled={isImporting}
-                    className={`px-5 py-2.5 text-xs font-bold rounded-xl flex items-center gap-2 shadow-tactile-btn cursor-pointer transition active:scale-95 disabled:opacity-50 text-white ${
+                    className={`px-5 py-2.5 text-xs font-bold rounded-xl flex items-center gap-2 shadow-tactile-btn cursor-pointer transition active:scale-95 disabled:opacity-50 text-white focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                       importStrategy === 'replace'
                         ? 'bg-rose-600 hover:bg-rose-700'
                         : 'bg-emerald-600 hover:bg-emerald-700'
@@ -444,7 +448,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             Fechar
           </button>

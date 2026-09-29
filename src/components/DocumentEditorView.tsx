@@ -60,6 +60,7 @@ import {
 } from '../types';
 import { db, initializeDefaultTemplates } from '../services/db';
 import { PRESET_LOGOS } from '../data/presetAssets';
+import { medicoConfigurado } from '../utils/medicoConfigurado';
 import LogoGeneratorModal from './LogoGeneratorModal';
 import WatermarkOverlay from './WatermarkOverlay';
 import WatermarkSelector from './WatermarkSelector';
@@ -509,7 +510,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     content: '',
     editorProps: {
       attributes: {
-        class: 'outline-none focus:outline-none min-h-[200px] leading-relaxed text-inherit selection:bg-sky-200 dark:selection:bg-sky-800'
+        class: 'min-h-[200px] leading-relaxed text-inherit selection:bg-sky-200 dark:selection:bg-sky-800'
       }
     },
     onUpdate: ({ editor: ed }) => {
@@ -1186,6 +1187,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   const handlePrint = () => {
+    if (!medicoConfigurado(doctor)) return;
     // Injeta estilo dinâmico de orientação no documento
     const styleId = 'prescmed-dynamic-print-style';
     let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
@@ -1458,7 +1460,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   });
 
   return (
-    <div className={`flex flex-col gap-4 mx-auto w-full pb-16 transition-all ${pageOrientation === 'landscape' ? 'max-w-[1240px]' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
+    <div className={`flex flex-col gap-4 mx-auto w-full pb-16 transition ${pageOrientation === 'landscape' ? 'max-w-[1240px]' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
       {/* Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-slate-700 animate-tab-fade no-print">
@@ -1551,7 +1553,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handleSaveModelDirectly}
-            className="h-9 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-btn transition-all active:scale-95"
+            className="h-9 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-btn transition active:scale-95 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
             title="Salvar e atualizar este modelo com todas as modificações atuais de texto, cabeçalho e logo"
           >
             <Save className="w-4 h-4" />
@@ -1620,8 +1622,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               else if (val === 'h2') editor?.chain().focus().toggleHeading({ level: 2 }).run();
               else if (val === 'h3') editor?.chain().focus().toggleHeading({ level: 3 }).run();
             }}
-            className="bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none"
+            className="bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
             title="Estilo de texto (Parágrafo ou Título)"
+            aria-label="Estilo de texto"
           >
             <option value="p">Texto Normal</option>
             <option value="h1">Título 1 (Grande)</option>
@@ -1634,7 +1637,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <button
               type="button"
               onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
-              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer"
+              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title="Diminuir tamanho da fonte da folha (A-)"
               aria-label="Diminuir fonte"
             >
@@ -1643,8 +1646,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <select
               value={baseFontSize}
               onChange={(e) => setBaseFontSize(Number(e.target.value))}
-              className="bg-transparent px-1 py-0.5 font-bold text-center text-xs focus:outline-none cursor-pointer"
+              className="bg-transparent px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer"
               title="Tamanho da fonte em pontos (pt)"
+              aria-label="Tamanho da fonte em pontos (pt)"
             >
               {[8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28].map(sz => (
                 <option key={sz} value={sz}>{sz} pt</option>
@@ -1653,7 +1657,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <button
               type="button"
               onClick={() => setBaseFontSize(prev => Math.min(32, prev + 1))}
-              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer"
+              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title="Aumentar tamanho da fonte da folha (A+)"
               aria-label="Aumentar fonte"
             >
@@ -1668,7 +1672,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={() => editor?.chain().focus().toggleBold().run()}
             disabled={!editor}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               editor?.isActive('bold') 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -1683,7 +1687,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={() => editor?.chain().focus().toggleItalic().run()}
             disabled={!editor}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               editor?.isActive('italic') 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -1698,7 +1702,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={() => (editor as any)?.chain().focus().toggleUnderline().run()}
             disabled={!editor}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               (editor as any)?.isActive('underline') 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -1715,12 +1719,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               editor?.isActive({ textAlign: 'left' }) 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Alinhar à Esquerda"
+            aria-label="Alinhar à Esquerda"
           >
             <AlignLeft className="w-4 h-4" />
           </button>
@@ -1728,12 +1733,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               editor?.isActive({ textAlign: 'center' }) 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Centralizar"
+            aria-label="Centralizar"
           >
             <AlignCenter className="w-4 h-4" />
           </button>
@@ -1741,12 +1747,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               editor?.isActive({ textAlign: 'right' }) 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Alinhar à Direita"
+            aria-label="Alinhar à Direita"
           >
             <AlignRight className="w-4 h-4" />
           </button>
@@ -1754,12 +1761,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               editor?.isActive({ textAlign: 'justify' }) 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Justificar"
+            aria-label="Justificar"
           >
             <AlignJustify className="w-4 h-4" />
           </button>
@@ -1770,12 +1778,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => editor?.chain().focus().toggleBulletList().run()}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               editor?.isActive('bulletList') 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Lista com Marcadores"
+            aria-label="Lista com Marcadores"
           >
             <List className="w-4 h-4" />
           </button>
@@ -1783,12 +1792,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
+            className={`p-2 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               editor?.isActive('orderedList') 
                 ? 'bg-sky-700 text-white shadow-tactile-sm' 
                 : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Lista Numerada"
+            aria-label="Lista Numerada"
           >
             <ListOrdered className="w-4 h-4" />
           </button>
@@ -1800,8 +1810,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={() => editor?.chain().focus().undo().run()}
             disabled={!editor?.can().undo()}
-            className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer"
+            className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
             title="Desfazer (Ctrl+Z)"
+            aria-label="Desfazer"
           >
             <Undo className="w-4 h-4" />
           </button>
@@ -1810,8 +1821,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={() => editor?.chain().focus().redo().run()}
             disabled={!editor?.can().redo()}
-            className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer"
+            className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
             title="Refazer (Ctrl+Y)"
+            aria-label="Refazer"
           >
             <Redo className="w-4 h-4" />
           </button>
@@ -1830,8 +1842,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
                 if (found) handleApplyStyle(found);
               }}
-              className="bg-transparent font-semibold cursor-pointer focus:outline-none text-xs max-w-[155px] truncate"
+              className="bg-transparent font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[155px] truncate"
               title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
+              aria-label="Selecionar estilo visual da receita"
             >
               <option value="" disabled>Selecionar estilo...</option>
               <optgroup label="Estilos Padrão">
@@ -1850,7 +1863,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <button
               type="button"
               onClick={() => setIsSaveStyleModalOpen(true)}
-              className="p-1 rounded hover:bg-[var(--surface-hover)] text-sky-600 dark:text-sky-400 cursor-pointer"
+              className="p-1 rounded hover:bg-[var(--surface-hover)] text-sky-600 dark:text-sky-400 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title="Salvar configuração visual atual como novo estilo personalizado"
             >
               <BookmarkPlus className="w-3.5 h-3.5" />
@@ -1866,7 +1879,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 setFontFamilyId(e.target.value);
                 if (editor) triggerAutoSave(editor);
               }}
-              className="bg-transparent font-semibold cursor-pointer focus:outline-none text-xs max-w-[170px] truncate"
+              className="bg-transparent font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[170px] truncate"
               aria-label="Família Tipográfica da Folha A4"
               title="Trocar fonte da receita médica estilo Google Docs"
             >
@@ -1883,7 +1896,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <button
               type="button"
               onClick={() => setPageOrientation('portrait')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition-all cursor-pointer ${
+              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 pageOrientation === 'portrait' ? 'bg-sky-700 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
               title="Orientação Retrato (Vertical 210×297mm)"
@@ -1894,7 +1907,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <button
               type="button"
               onClick={() => setPageOrientation('landscape')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition-all cursor-pointer ${
+              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 pageOrientation === 'landscape' ? 'bg-sky-700 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
               title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
@@ -1909,7 +1922,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <button
               type="button"
               onClick={() => setViaLayout('1-via')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition-all cursor-pointer ${
+              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 viaLayout === '1-via' ? 'bg-sky-700 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
               title="Folha Única (1 Via Padrão)"
@@ -1926,7 +1939,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   showToast('Modo 2 Vias ativado! Paisagem recomendada para imprimir as duas vias lado a lado.');
                 }
               }}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition-all cursor-pointer ${
+              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 viaLayout === '2-vias' ? 'bg-sky-700 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
               title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
@@ -1940,7 +1953,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => handleHeaderFieldChange('showHeader', !headerConfig.showHeader)}
-            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all ${
+            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               headerConfig.showHeader
                 ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
                 : 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
@@ -1956,7 +1969,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => handleHeaderFieldChange('showFooter', !headerConfig.showFooter)}
-            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all ${
+            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               headerConfig.showFooter
                 ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
                 : 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
@@ -1972,7 +1985,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => handleLoadActivePrescription(true)}
-            className="h-9 px-3 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all active:scale-95"
+            className="h-9 px-3 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             title="Preencher a folha A4 com os dados do paciente e medicamentos prescritos nesta consulta"
           >
             <RotateCcw className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
@@ -1990,7 +2003,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <button
               type="button"
               onClick={() => setIsLogoMenuOpen(prev => !prev)}
-              className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition-all ${
+              className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 (logoConfig.dataUrl && logoConfig.visible) || (logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false)
                   ? 'border-sky-400 bg-sky-50/80 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 font-bold'
                   : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
@@ -2028,7 +2041,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setActiveLogoTab('left')}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                       activeLogoTab === 'left'
                         ? 'bg-sky-600 text-white shadow-tactile-sm'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -2043,7 +2056,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setActiveLogoTab('right')}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                       activeLogoTab === 'right'
                         ? 'bg-sky-600 text-white shadow-tactile-sm'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -2068,7 +2081,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <button
                           type="button"
                           onClick={() => handleChangeLogoPosition('header-left')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition-all ${
+                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                             logoConfig.position === 'header-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                           }`}
                         >
@@ -2078,7 +2091,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <button
                           type="button"
                           onClick={() => handleChangeLogoPosition('top-left')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition-all ${
+                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                             logoConfig.position === 'top-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                           }`}
                         >
@@ -2088,7 +2101,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <button
                           type="button"
                           onClick={() => handleChangeLogoPosition('top-center')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition-all ${
+                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                             logoConfig.position === 'top-center' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                           }`}
                         >
@@ -2109,7 +2122,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             key={sz}
                             type="button"
                             onClick={() => handleChangeLogoSize(sz)}
-                            className={`py-1 rounded-lg border text-center cursor-pointer transition-all ${
+                            className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                               logoConfig.size === sz ? 'border-sky-500 bg-sky-100 dark:bg-sky-900 font-bold text-sky-900 dark:text-sky-200' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                             }`}
                           >
@@ -2213,7 +2226,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             key={sz}
                             type="button"
                             onClick={() => handleChangeSecondaryLogoSize(sz)}
-                            className={`py-1 rounded-lg border text-center cursor-pointer transition-all ${
+                            className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                               (logoConfig.secondarySize || 'md') === sz ? 'border-sky-500 bg-sky-100 dark:bg-sky-900 font-bold text-sky-900 dark:text-sky-200' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                             }`}
                           >
@@ -2297,8 +2310,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handlePrint}
-            className="btn-tactile-primary h-9 px-4 text-xs font-bold flex items-center gap-2"
-            title="Imprimir folha A4 milimétrica ou salvar como PDF"
+            disabled={!medicoConfigurado(doctor)}
+            className="btn-tactile-primary h-9 px-4 text-xs font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Configure nome e CRM do médico para emitir documentos'}
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Imprimir A4</span>
@@ -2311,7 +2325,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <div
           ref={sheetRef}
           id="printable-a4-sheet"
-          className={`a4-editor-canvas bg-white text-slate-900 rounded-lg shadow-2xl relative transition-all duration-200 ${
+          className={`a4-editor-canvas bg-white text-slate-900 rounded-lg shadow-2xl relative transition duration-200 ${
             pageOrientation === 'landscape' ? 'canvas-landscape' : 'canvas-portrait'
           } ${viaLayout === '2-vias' ? 'vias-2' : ''}`}
           style={{
@@ -2402,7 +2416,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <>
               {/* CABEÇALHO HOSPITALAR / TIMBRADO TOTALMENTE EDITÁVEL EM TEMPO REAL */}
               {headerConfig.showHeader && (
-                <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition-all">
+                <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition">
                   {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
                   <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
                     <span className="flex items-center gap-1 text-slate-600 font-semibold">
@@ -2502,7 +2516,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             value={headerConfig.doctorName || ''}
                             onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                             placeholder="DR(A). MÉDICO(A)"
-                            className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                            className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
                             title="Clique para editar o nome do médico"
                           />
 
@@ -2512,7 +2526,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             value={headerConfig.doctorCrm || ''}
                             onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
                             placeholder="CRM-SP 000000 • RQE 0000"
-                            className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                            className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
                             title="Clique para editar CRM e RQE"
                           />
                         </div>
@@ -2524,7 +2538,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.doctorSpecialty || ''}
                         onChange={e => handleHeaderFieldChange('doctorSpecialty', e.target.value)}
                         placeholder="Especialidade Médica (Ex: Clínica Médica)"
-                        className="text-xs font-semibold text-slate-700 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                        className="text-xs font-semibold text-slate-700 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
                         title="Clique para editar a especialidade"
                       />
 
@@ -2534,7 +2548,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.clinicName || ''}
                         onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
                         placeholder="Nome da Instituição ou Clínica de Atendimento"
-                        className="text-[11px] font-medium text-slate-600 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                        className="text-[11px] font-medium text-slate-600 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
                         title="Clique para editar a instituição ou clínica"
                       />
 
@@ -2544,7 +2558,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.clinicAddress || ''}
                         onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
                         placeholder="Endereço e Informações de Contato"
-                        className="text-[10px] text-slate-500 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition-all"
+                        className="text-[10px] text-slate-500 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
                         title="Clique para editar o endereço"
                       />
                     </div>
@@ -2582,7 +2596,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.badgeText || ''}
                         onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
                         placeholder="TIPO DE DOCUMENTO"
-                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-sans text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition-all w-full max-w-[200px]"
+                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-sans text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition w-full max-w-[200px]"
                         title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
                       />
 
@@ -2592,7 +2606,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.dateText || ''}
                         onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
                         placeholder="Data de emissão"
-                        className="text-[11px] text-slate-500 font-sans mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition-all w-full"
+                        className="text-[11px] text-slate-500 font-sans mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
                         title="Clique para editar a data de emissão"
                       />
                     </div>
@@ -2610,10 +2624,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       ) : (
                         <input
                           type="text"
+                          id="editor-patient-custom-text"
+                          aria-label="Identificação do paciente"
                           value={headerConfig.patientCustomText || ''}
                           onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
                           placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
-                          className="w-full text-xs text-slate-600 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none"
+                          className="w-full text-xs text-slate-600 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition"
                         />
                       )}
                     </div>
@@ -2637,7 +2653,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     value={headerConfig.footerDocName || headerConfig.doctorName || ''}
                     onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
                     placeholder="Dr(a). Médico(a)"
-                    className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80"
+                    className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 min-h-6 flex items-center justify-center"
                     title="Clique para editar o nome na assinatura"
                   />
 
@@ -2647,7 +2663,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
                     onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
                     placeholder="Médico(a) — CRM-SP 00000"
-                    className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80 mt-0.5"
+                    className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 mt-0.5 min-h-6 flex items-center justify-center"
                     title="Clique para editar CRM na assinatura"
                   />
 
@@ -2657,16 +2673,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
                     onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
                     placeholder="Especialidade"
-                    className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-80"
+                    className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 min-h-6 flex items-center justify-center"
                     title="Clique para editar a especialidade no carimbo"
                   />
 
                   {/* Subtexto Regulamentar CFM */}
                   <input
                     type="text"
+                    id="editor-footer-subtext"
+                    aria-label="Subtexto regulamentar CFM"
                     value={headerConfig.footerSubtext || ''}
                     onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
-                    className="text-[9px] text-slate-400 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 rounded px-1 outline-none transition-all w-full max-w-md"
+                    className="text-[9px] text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-md min-h-6"
                   />
 
                   {/* Botão no-print para Ocultar Rodapé */}
@@ -2702,14 +2720,16 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 value={headerConfig.doctorName || ''}
                                 onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                                 placeholder="DR(A). MÉDICO(A)"
-                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 -mx-1 outline-none h-5 flex items-center"
+                                aria-label="Nome do médico emitente (1ª via)"
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                               />
                               <input
                                 type="text"
                                 value={headerConfig.doctorCrm || ''}
                                 onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
                                 placeholder="CRM-SP 000000"
-                                className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 -mx-1 outline-none h-4 flex items-center"
+                                aria-label="CRM do médico emitente (1ª via)"
+                                className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                               />
                               <p className="text-[10px] text-slate-600 truncate mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
@@ -2896,14 +2916,16 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 value={headerConfig.doctorName || ''}
                                 onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                                 placeholder="DR(A). MÉDICO(A)"
-                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 -mx-1 outline-none h-5 flex items-center"
+                                aria-label="Nome do médico emitente (1ª via paisagem)"
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                               />
                               <input
                                 type="text"
                                 value={headerConfig.doctorCrm || ''}
                                 onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
                                 placeholder="CRM-SP 000000"
-                                className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 -mx-1 outline-none h-4 flex items-center"
+                                aria-label="CRM do médico emitente (1ª via paisagem)"
+                                className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                               />
                             </div>
                             <div className="text-right shrink-0">
@@ -3091,7 +3113,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => setIsModelsDrawerOpen(false)}
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                aria-label="Fechar modelos e estilos"
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -3102,7 +3125,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => setDrawerTab('padrao')}
-                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   drawerTab === 'padrao'
                     ? 'bg-sky-700 text-white shadow-tactile-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
@@ -3114,7 +3137,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => setDrawerTab('salvos')}
-                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   drawerTab === 'salvos'
                     ? 'bg-sky-700 text-white shadow-tactile-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
@@ -3126,7 +3149,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => setDrawerTab('estilos')}
-                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   drawerTab === 'estilos'
                     ? 'bg-sky-700 text-white shadow-tactile-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
@@ -3149,7 +3172,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       value={templateSearch}
                       onChange={(e) => setTemplateSearch(e.target.value)}
                       placeholder="Buscar modelo padrão..."
-                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500"
+                      aria-label="Buscar modelo padrão"
+                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 transition"
                     />
                   </div>
 
@@ -3223,7 +3247,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     .map((item) => (
                       <div
                         key={item.id}
-                        className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition-all flex flex-col gap-1.5 shadow-tactile-sm"
+                        className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition flex flex-col gap-1.5 shadow-tactile-sm"
                       >
                         <div className="flex items-center gap-1.5">
                           <span className={`px-1.5 py-0.5 rounded text-white text-[9px] font-extrabold uppercase ${item.badgeColor}`}>
@@ -3240,7 +3264,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           <button
                             type="button"
                             onClick={() => applyPresetTemplate(item.id as any)}
-                            className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+                            className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded-md px-1 py-0.5"
                           >
                             <FileText className="w-3.5 h-3.5" />
                             <span>Carregar e Personalizar</span>
@@ -3262,7 +3286,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={templateSearch}
                         onChange={(e) => setTemplateSearch(e.target.value)}
                         placeholder="Buscar em meus modelos salvos..."
-                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500"
+                        aria-label="Buscar em meus modelos salvos"
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 transition"
                       />
                     </div>
 
@@ -3273,7 +3298,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? currentModel.title : '');
                         setIsSaveModelModalOpen(true);
                       }}
-                      className="w-full py-2 px-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-tactile-btn cursor-pointer"
+                      className="w-full py-2 px-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-tactile-btn cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
                     >
                       <BookmarkPlus className="w-4 h-4" />
                       <span>Salvar Documento Atual como Modelo</span>
@@ -3299,7 +3324,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       {filteredSavedTemplates.map((tpl) => (
                         <div
                           key={tpl.id}
-                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-300 dark:hover:border-sky-800 transition-all flex flex-col gap-2 group shadow-tactile-sm"
+                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-300 dark:hover:border-sky-800 transition flex flex-col gap-2 group shadow-tactile-sm"
                         >
                           {editingTemplateId === tpl.id ? (
                             <div className="flex items-center gap-2">
@@ -3307,13 +3332,15 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 type="text"
                                 value={editingTemplateTitle}
                                 onChange={(e) => setEditingTemplateTitle(e.target.value)}
-                                className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-sky-500 bg-[var(--bg-app)] focus:outline-none"
+                                aria-label="Editar título do modelo"
+                                className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-sky-500 bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                                 autoFocus
                               />
                               <button
                                 type="button"
                                 onClick={() => handleSaveRename(tpl.id)}
-                                className="p-1.5 rounded-lg bg-emerald-600 text-white text-xs hover:bg-emerald-700 cursor-pointer"
+                                aria-label="Salvar novo título"
+                                className="p-1.5 rounded-lg bg-emerald-700 text-white text-xs hover:bg-emerald-800 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
                                 title="Salvar novo título"
                               >
                                 <Check className="w-3.5 h-3.5" />
@@ -3321,7 +3348,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               <button
                                 type="button"
                                 onClick={() => setEditingTemplateId(null)}
-                                className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-xs hover:bg-[var(--surface-hover)] cursor-pointer"
+                                aria-label="Cancelar edição do título"
+                                className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-xs hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
                                 title="Cancelar"
                               >
                                 <X className="w-3.5 h-3.5" />
@@ -3354,7 +3382,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => handleStartRename(tpl)}
-                                  className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-sky-600 cursor-pointer"
+                                  aria-label="Renomear modelo"
+                                  className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-sky-600 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
                                   title="Renomear modelo"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
@@ -3362,7 +3391,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteTemplate(tpl.id, tpl.title)}
-                                  className="p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-[var(--text-muted)] hover:text-red-500 cursor-pointer"
+                                  aria-label="Excluir modelo"
+                                  className="p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-[var(--text-muted)] hover:text-red-500 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none transition"
                                   title="Excluir modelo"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -3375,7 +3405,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             <button
                               type="button"
                               onClick={() => handleApplyTemplate(tpl)}
-                              className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+                              className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded-md px-1 py-0.5"
                             >
                               <FileText className="w-3.5 h-3.5" />
                               <span>Carregar e Editar na Folha</span>
@@ -3402,7 +3432,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         setIsModelsDrawerOpen(false);
                         setIsSaveStyleModalOpen(true);
                       }}
-                      className="px-3 py-1.5 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold flex items-center gap-1 shadow-tactile-sm cursor-pointer whitespace-nowrap"
+                      className="px-3 py-1.5 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold flex items-center gap-1 shadow-tactile-sm cursor-pointer whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
                     >
                       <BookmarkPlus className="w-3.5 h-3.5" />
                       <span>Salvar Atual</span>
@@ -3421,14 +3451,15 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       {customStyles.map(st => (
                         <div
                           key={st.id}
-                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition-all flex flex-col gap-2 shadow-tactile-sm"
+                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition flex flex-col gap-2 shadow-tactile-sm"
                         >
                           <div className="flex items-center justify-between">
                             <h5 className="text-xs font-bold text-[var(--text-main)] truncate">{st.name}</h5>
                             <button
                               type="button"
                               onClick={() => handleDeleteCustomStyle(st.id, st.name)}
-                              className="p-1 rounded text-slate-400 hover:text-rose-500 cursor-pointer"
+                              aria-label="Excluir estilo"
+                              className="p-1 rounded text-slate-400 hover:text-rose-500 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none transition"
                               title="Excluir estilo"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -3445,7 +3476,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               handleApplyStyle(st);
                               setIsModelsDrawerOpen(false);
                             }}
-                            className="w-full py-1.5 px-3 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold cursor-pointer shadow-tactile-btn transition-colors"
+                            className="w-full py-1.5 px-3 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold cursor-pointer shadow-tactile-btn transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                           >
                             Aplicar Este Estilo
                           </button>
@@ -3462,7 +3493,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     {DEFAULT_PRESCRIPTION_STYLES.map(st => (
                       <div
                         key={st.id}
-                        className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition-all"
+                        className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition"
                       >
                         <div className="flex items-center justify-between mb-1">
                           <h5 className="text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5">
@@ -3490,7 +3521,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             handleApplyStyle(st);
                             setIsModelsDrawerOpen(false);
                           }}
-                          className="mt-2.5 w-full py-1.5 px-3 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold cursor-pointer shadow-tactile-btn transition-colors"
+                          className="mt-2.5 w-full py-1.5 px-3 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold cursor-pointer shadow-tactile-btn transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                         >
                           Aplicar Estilo
                         </button>
@@ -3516,7 +3547,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => setIsSaveModelModalOpen(false)}
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                aria-label="Fechar modal de salvar modelo"
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -3524,16 +3556,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
             <form onSubmit={handleSaveAsTemplate} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-bold mb-1.5 text-[var(--text-secondary)]">
+                <label htmlFor="save-model-title" className="block text-xs font-bold mb-1.5 text-[var(--text-secondary)]">
                   Nome do Modelo Clínico
                 </label>
                 <input
+                  id="save-model-title"
                   type="text"
                   required
                   value={newModelTitle}
                   onChange={(e) => setNewModelTitle(e.target.value)}
                   placeholder="Ex: Laudo Cardiológico - Policlínica"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-sky-500 font-medium"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 font-medium transition"
                   autoFocus
                 />
               </div>
@@ -3563,14 +3596,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsSaveModelModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={!newModelTitle.trim()}
-                  className="px-4 py-2 text-xs font-bold rounded-xl bg-sky-700 hover:bg-sky-800 disabled:opacity-50 text-white shadow-tactile-btn cursor-pointer flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-sky-700 hover:bg-sky-800 disabled:opacity-50 text-white shadow-tactile-btn cursor-pointer flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Salvar Modelo</span>
@@ -3593,7 +3626,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => setIsSaveStyleModalOpen(false)}
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                aria-label="Fechar modal de salvar estilo"
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -3601,16 +3635,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
             <form onSubmit={handleSaveCustomStyle} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-bold mb-1.5 text-[var(--text-secondary)]">
+                <label htmlFor="save-style-title" className="block text-xs font-bold mb-1.5 text-[var(--text-secondary)]">
                   Nome do Estilo Visual
                 </label>
                 <input
+                  id="save-style-title"
                   type="text"
                   required
                   value={newStyleTitle}
                   onChange={(e) => setNewStyleTitle(e.target.value)}
                   placeholder="Ex: Minha Clínica • 2 Vias Azul"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-sky-500 font-medium"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 font-medium transition"
                   autoFocus
                 />
               </div>
@@ -3634,14 +3669,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsSaveStyleModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={!newStyleTitle.trim()}
-                  className="px-4 py-2 text-xs font-bold rounded-xl bg-sky-700 hover:bg-sky-800 disabled:opacity-50 text-white shadow-tactile-btn cursor-pointer flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-sky-700 hover:bg-sky-800 disabled:opacity-50 text-white shadow-tactile-btn cursor-pointer flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Salvar Estilo</span>

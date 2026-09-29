@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral } from '../types';
+import { medicoConfigurado } from './medicoConfigurado';
 
 export interface PDFExportOptions {
   docType: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral';
@@ -34,6 +35,10 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     certificate,
     referral
   } = options;
+
+  if (!medicoConfigurado(doctor)) {
+    throw new Error('Médico não configurado: documento não emitido.');
+  }
 
   const pdf = new jsPDF({
     orientation: 'portrait',

@@ -83,7 +83,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-md rounded-2xl border overflow-hidden shadow-tactile-lg isolate transition-all"
+        className="w-full max-w-md rounded-2xl border overflow-hidden shadow-tactile-lg isolate transition"
         style={{
           backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
           borderColor: darkMode ? 'rgba(255,255,255,0.12)' : '#E3D7BD',
@@ -111,7 +111,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de dados do paciente"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition-all"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
           >
             <X className="w-5 h-5" strokeWidth={1.75} />
           </button>
@@ -120,7 +120,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-5 space-y-3.5">
           <div>
-            <label htmlFor="patient-modal-name" className="block text-xs font-bold uppercase text-slate-400 mb-1">
+            <label htmlFor="patient-modal-name" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
               Nome do Paciente ou Identificação
             </label>
             <input
@@ -131,13 +131,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               enterKeyHint="next"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ex: Maria Silva, Leito 04, Visita Domiciliar..."
-              className="w-full p-3 min-h-[44px] rounded-xl border text-xs font-semibold focus:outline-none tactile-input"
-              style={{
-                backgroundColor: 'var(--surface-inset)',
-                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)',
-                color: darkMode ? '#F4F7FC' : '#0B132B'
-              }}
+              placeholder="Ex.: Seu Melki"
+              className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-semibold focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
             />
           </div>
 
@@ -157,7 +152,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               <span className="text-xs font-bold block" style={{ color: darkMode ? '#F4F7FC' : '#0B132B' }}>
                 Cálculo de Dose por Peso (Pediátrico)
               </span>
-              <span className="text-[11px] text-slate-400 block">
+              <span className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 block">
                 {formData.weightCalcEnabled ? 'Ativado: calcula gotas e mL/kg automaticamente' : 'Desativado: modo adulto / doses padrão'}
               </span>
             </div>
@@ -166,8 +161,9 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               type="button"
               role="switch"
               aria-checked={formData.weightCalcEnabled}
+              aria-label="Ativar cálculo pediátrico de dose por peso"
               onClick={() => setFormData({ ...formData, weightCalcEnabled: !formData.weightCalcEnabled })}
-              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none ${
                 formData.weightCalcEnabled ? 'bg-emerald-600' : 'bg-slate-400 dark:bg-slate-700'
               }`}
             >
@@ -182,7 +178,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="patient-modal-weight" className="block text-xs font-bold uppercase text-slate-400 mb-1">
+              <label htmlFor="patient-modal-weight" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
                 Peso (kg) {formData.weightCalcEnabled ? '*' : '(opcional)'}
               </label>
               <div className="relative">
@@ -198,18 +194,14 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                   value={formData.weightKg || ''}
                   onChange={(e) => setFormData({ ...formData, weightKg: parseFloat(e.target.value) || 0 })}
                   placeholder={formData.weightCalcEnabled ? "Ex: 14.5" : "Opcional"}
-                  className="w-full p-3 min-h-[44px] rounded-xl border text-xs font-bold focus:outline-none tactile-input text-emerald-700 dark:text-emerald-400"
-                  style={{
-                    backgroundColor: 'var(--surface-inset)',
-                    borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)'
-                  }}
+                  className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-bold focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-emerald-700 dark:text-emerald-400 transition"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">kg</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--text-muted)] dark:text-slate-400">kg</span>
               </div>
             </div>
 
             <div>
-              <label htmlFor="patient-modal-age" className="block text-xs font-bold uppercase text-slate-400 mb-1">
+              <label htmlFor="patient-modal-age" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
                 Idade / Nasc.
               </label>
               <input
@@ -219,19 +211,14 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.birthDate || formData.ageText || ''}
                 onChange={(e) => setFormData({ ...formData, birthDate: e.target.value, ageText: e.target.value })}
                 placeholder="Ex: 35 anos ou 2 anos..."
-                className="w-full p-3 min-h-[44px] rounded-xl border text-xs font-medium focus:outline-none tactile-input"
-                style={{
-                  backgroundColor: 'var(--surface-inset)',
-                  borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)',
-                  color: darkMode ? '#F4F7FC' : '#0B132B'
-                }}
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="patient-modal-doc" className="block text-xs font-bold uppercase text-slate-400 mb-1">
+              <label htmlFor="patient-modal-doc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
                 Documento (CPF / RG / Certidão)
               </label>
               <input
@@ -241,17 +228,12 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.documentNumber || ''}
                 onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
                 placeholder="Ex: 542.189.708-44"
-                className="w-full p-3 min-h-[44px] rounded-xl border text-xs font-medium focus:outline-none tactile-input"
-                style={{
-                  backgroundColor: 'var(--surface-inset)',
-                  borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)',
-                  color: darkMode ? '#F4F7FC' : '#0B132B'
-                }}
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
             </div>
 
             <div>
-              <label htmlFor="patient-modal-phone" className="block text-xs font-bold uppercase text-slate-400 mb-1">
+              <label htmlFor="patient-modal-phone" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
                 Telefone / Responsável
               </label>
               <input
@@ -263,18 +245,13 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="(11) 98765-4321"
-                className="w-full p-3 min-h-[44px] rounded-xl border text-xs font-medium focus:outline-none tactile-input"
-                style={{
-                  backgroundColor: 'var(--surface-inset)',
-                  borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)',
-                  color: darkMode ? '#F4F7FC' : '#0B132B'
-                }}
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="patient-modal-allergies" className="block text-xs font-bold uppercase text-slate-400 mb-1">
+            <label htmlFor="patient-modal-allergies" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
               Alergias Conhecidas (Medicamentosas ou Alimentares)
             </label>
             <input
@@ -284,11 +261,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               value={formData.allergies?.join(', ') || ''}
               onChange={(e) => setFormData({ ...formData, allergies: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
               placeholder="Ex: Penicilina, Dipirona, AINEs, Frutos do mar..."
-              className="w-full p-3 min-h-[44px] rounded-xl border text-xs font-medium focus:outline-none tactile-input text-rose-700 dark:text-rose-400"
-              style={{
-                backgroundColor: 'var(--surface-inset)',
-                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)'
-              }}
+              className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-rose-700 dark:text-rose-400 transition"
             />
           </div>
 
@@ -296,7 +269,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             <button
               type="button"
               onClick={handleClear}
-              className="px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold text-navy-900 dark:text-slate-300 hover:bg-navy-900/10 dark:hover:bg-white/10 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              className="px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold text-navy-900 dark:text-slate-300 hover:bg-navy-900/10 dark:hover:bg-white/10 transition flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title="Limpar todos os campos para digitar novo paciente"
             >
               <Eraser className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -306,13 +279,13 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 cursor-pointer active:scale-95 transition-all"
+                className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="btn-tactile-primary px-5 py-2.5 min-h-[44px] text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95"
+                className="btn-tactile-primary px-5 py-2.5 min-h-[44px] text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
               >
                 <Check className="w-4 h-4" strokeWidth={2} />
                 <span>Salvar Paciente</span>

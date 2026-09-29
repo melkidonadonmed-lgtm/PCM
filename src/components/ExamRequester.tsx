@@ -158,7 +158,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               key={pkg.id}
               type="button"
               onClick={() => applyPackage(pkg)}
-              className="p-3 rounded-xl border text-left transition-all cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 flex flex-col justify-between group tactile-flat"
+              className="p-3 rounded-xl border text-left transition cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 flex flex-col justify-between group tactile-flat focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               style={{
                 backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
                 borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
@@ -173,7 +173,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     {pkg.badge}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 line-clamp-2">
+                <p className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 line-clamp-2">
                   {pkg.description}
                 </p>
               </div>
@@ -193,15 +193,16 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
-        <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1.5">
+        <label htmlFor="exam-clinical-indication" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1.5">
           Indicação Clínica / Hipótese Diagnóstica (Para o Laboratório / Convênio)
         </label>
         <input
+          id="exam-clinical-indication"
           type="text"
           value={clinicalIndication}
           onChange={(e) => onUpdateClinicalIndication(e.target.value)}
           placeholder="Ex: Investigação de síndrome febril aguda a esclarecer, controle de rotina, etc."
-          className="w-full p-3 rounded-xl text-xs font-medium focus:outline-none tactile-input"
+          className="w-full p-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
         />
       </div>
 
@@ -212,13 +213,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           {/* Search and Category Filters */}
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400" strokeWidth={1.75} />
               <input
                 type="text"
                 placeholder="Buscar exame (ex: Hemograma, PCR, Dengue, Ureia, Raio-X, ECG)..."
+                aria-label="Buscar exame no catálogo"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-xs font-medium focus:outline-none tactile-input"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
               />
             </div>
 
@@ -226,13 +228,15 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <input
                 type="text"
                 placeholder="Adicionar exame avulso..."
+                aria-label="Nome do exame avulso"
                 value={customExamName}
                 onChange={(e) => setCustomExamName(e.target.value)}
-                className="p-2.5 rounded-xl text-xs font-medium focus:outline-none tactile-input w-44"
+                className="p-2.5 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input w-44"
               />
               <button
                 type="submit"
-                className="tactile-btn-primary px-4 py-2.5 rounded-xl text-xs font-bold"
+                aria-label="Adicionar exame avulso"
+                className="tactile-btn-primary px-4 py-2.5 rounded-xl text-xs font-bold focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 +
               </button>
@@ -246,7 +250,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 ${
+                className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   selectedCategory === cat
                     ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
                     : darkMode
@@ -261,7 +265,10 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
 
           {/* Exams Grid */}
           <div 
-            className="tactile-card p-3 rounded-2xl max-h-[520px] overflow-y-auto space-y-1.5 divide-y"
+            tabIndex={0}
+            role="region"
+            aria-label="Lista de exames"
+            className="tactile-card p-3 rounded-2xl max-h-[520px] overflow-y-auto space-y-1.5 divide-y focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             style={{
               backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
@@ -273,8 +280,17 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               return (
                 <div
                   key={exam.id}
+                  role="checkbox"
+                  aria-checked={selected}
+                  tabIndex={0}
                   onClick={() => toggleExam(exam)}
-                  className={`pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all ${
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault();
+                      toggleExam(exam);
+                    }
+                  }}
+                  className={`pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                     selected 
                       ? 'bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/30 dark:border-blue-400/30' 
                       : 'hover:bg-slate-500/5'
@@ -282,7 +298,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <div 
-                      className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center transition-all ${
+                      className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center transition ${
                         selected ? 'bg-navy-900 dark:bg-blue-600 border-navy-900 dark:border-blue-500 text-white' : 'border-slate-400'
                       }`}
                     >
@@ -292,7 +308,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                       <div className="font-semibold text-xs truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                         {exam.name}
                       </div>
-                      <span className="text-[10px] text-slate-400 font-medium">{exam.category}</span>
+                      <span className="text-[10px] text-[var(--text-muted)] dark:text-slate-400 font-medium">{exam.category}</span>
                     </div>
                   </div>
 
@@ -323,8 +339,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             {selectedExams.length > 0 && (
               <button
                 type="button"
-                onClick={() => onUpdateSelectedExams([])}
-                className="text-[11px] font-semibold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer"
+                onClick={() => updateExams([])}
+                className="text-[11px] font-semibold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none rounded-md px-1 py-0.5"
               >
                 Limpar
               </button>
@@ -332,7 +348,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           </div>
 
           {selectedExams.length === 0 ? (
-            <div className="p-6 text-center text-slate-400 text-xs">
+            <div className="p-6 text-center text-[var(--text-muted)] dark:text-slate-400 text-xs">
               Nenhum exame selecionado ainda. Clique nos exames ao lado ou em um dos pacotes para incluir.
             </div>
           ) : (
@@ -350,13 +366,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     <div className="text-xs font-semibold truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                       {index + 1}. {exam.name}
                     </div>
-                    <span className="text-[9px] text-slate-500 dark:text-slate-400 font-medium">{exam.category}</span>
+                    <span className="text-[9px] text-[var(--text-muted)] dark:text-slate-400 font-medium">{exam.category}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => toggleExam(exam)}
-                    className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"
+                    className="text-[var(--text-muted)] hover:text-rose-600 dark:text-slate-400 p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none rounded-md"
                     title="Remover"
+                    aria-label={`Remover exame ${exam.name}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
                   </button>
@@ -370,7 +387,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <button
                 type="button"
                 onClick={onNavigateToPrint}
-                className="btn-tactile-primary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer"
+                className="btn-tactile-primary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 <Download className="w-4 h-4" strokeWidth={1.75} />
                 <span>Gerar & Baixar PDF</span>

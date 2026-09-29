@@ -7,7 +7,11 @@ import { PrescriptionBuilder } from './components/PrescriptionBuilder';
 import { ExamRequester } from './components/ExamRequester';
 import { CertificateAndReferral } from './components/CertificateAndReferral';
 import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
+import { PuxarParaAtualizar } from './components/PuxarParaAtualizar';
 import { ActiveTab, PrescriptionItem, Patient } from './types';
+import { ClinicalKit } from './data/clinicalKits';
+import { montarItensDoKit } from './utils/montarItensDoKit';
+import { UnifiedMedication } from './data/medicationDatabase';
 import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
 import { useWorkContext } from './hooks/useWorkContext';
 import { usePwaInstall } from './hooks/usePwaInstall';
@@ -62,20 +66,22 @@ export default function App() {
     return () => window.removeEventListener('resize', handleBreakpointChange);
   }, []);
 
-  // Fechamento automático da barra lateral ao rolar no mobile
+  // Fechamento automático da barra lateral ao rolar (apenas abaixo de lg / mobile)
   useEffect(() => {
     let lastScrollY = window.scrollY;
 
     const handleScroll = () => {
+      if (window.innerWidth >= 1024) return;
       const currentScrollY = window.scrollY;
-      if (currentScrollY > 30 && (currentScrollY > lastScrollY + 5 || window.innerWidth < 1024)) {
+      if (currentScrollY > 30 && currentScrollY > lastScrollY + 5) {
         setSidebarOpen(false);
       }
       lastScrollY = currentScrollY;
     };
 
     const handleTouchMove = () => {
-      if (window.scrollY > 20 && window.innerWidth < 1024) {
+      if (window.innerWidth >= 1024) return;
+      if (window.scrollY > 20) {
         setSidebarOpen(false);
       }
     };
@@ -177,24 +183,75 @@ export default function App() {
     setActiveTab('editor');
   };
 
+  // Medicamento pendente vindo de outras telas (ex: Protocolos)
+  const [medicamentoPendente, setMedicamentoPendente] = useState<UnifiedMedication | null>(null);
+
+  // Toast de notificação de kit aplicado
+  const [kitToast, setKitToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!kitToast) return;
+    const timer = setTimeout(() => {
+      setKitToast(null);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [kitToast]);
+
+  const handleGoHome = () => {
+    setActiveTab('prescription');
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      }
+    }
+  };
+
+  const handleAplicarKit = (kit: ClinicalKit) => {
+    const novosItens = montarItensDoKit(kit, patient);
+    setPrescriptionItems(prev => [...prev, ...novosItens]);
+    setActiveTab('prescription');
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setKitToast(`Kit ${kit.name} adicionado à receita.`);
+  };
+
+  const handleUsarMedicamento = (med: UnifiedMedication) => {
+    setMedicamentoPendente(med);
+    setActiveTab('prescription');
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
     <div 
       className="min-h-screen font-sans antialiased flex flex-col transition-colors duration-300"
       style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-main)' }}
     >
+      {/* Puxar para atualizar (pull to refresh) desativado com menu ou modal aberto */}
+      <PuxarParaAtualizar
+        desativado={
+          (sidebarOpen && (typeof window !== 'undefined' ? window.innerWidth < 1024 : false)) ||
+          isPatientModalOpen ||
+          isDoctorModalOpen ||
+          isBackupModalOpen
+        }
+      />
+
       {/* Top Application Header */}
       <Header
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
-        sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        onGoHome={handleGoHome}
         patient={patient}
         onOpenPatientModal={() => setIsPatientModalOpen(true)}
-        prescriptionCount={prescriptionItems.length}
-        selectedExamsCount={selectedExams.length}
-        onQuickWeightChange={handleUpdatePatientWeight}
         onNavigateToEditor={handleNavigateToEditor}
-        onOpenBackupModal={() => setIsBackupModalOpen(true)}
         isInstallable={isInstallable}
         onInstallApp={installApp}
       />
@@ -240,6 +297,7 @@ export default function App() {
           onClearPrescription={handleClearPrescription}
           onClearPatient={handleClearPatient}
           onResetAll={handleResetAll}
+          onAplicarKit={handleAplicarKit}
         />
 
         {/* Main Content Area */}
@@ -261,6 +319,9 @@ export default function App() {
               onNavigateToEditor={handleNavigateToEditor}
               onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
               onOpenPatientModal={() => setIsPatientModalOpen(true)}
+              medicamentoPendente={medicamentoPendente}
+              onConsumirMedicamentoPendente={() => setMedicamentoPendente(null)}
+              onAbrirPerfilMedico={() => setIsDoctorModalOpen(true)}
             />
           )}
 
@@ -309,6 +370,7 @@ export default function App() {
               onUpdatePatientWeight={handleUpdatePatientWeight}
               onAddPrescriptionItem={handleAddPrescriptionItem}
               onNavigateToPrescription={() => setActiveTab('prescription')}
+              onUsarMedicamento={handleUsarMedicamento}
             />
           )}
 
@@ -360,6 +422,7 @@ export default function App() {
                 onClearPrescription={handleClearPrescription}
                 onResetAll={handleResetAll}
                 onOpenDoctorModal={() => setIsDoctorModalOpen(true)}
+                onAbrirPerfilMedico={() => setIsDoctorModalOpen(true)}
               />
             </Suspense>
           )}
@@ -424,6 +487,18 @@ export default function App() {
             onClose={() => setIsBackupModalOpen(false)}
           />
         </Suspense>
+      )}
+
+      {/* Toast de Confirmação de Kit Adicionado */}
+      {kitToast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 text-white text-xs font-semibold shadow-tactile-lg border border-slate-700/50"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+          <span>{kitToast}</span>
+        </div>
       )}
     </div>
   );
