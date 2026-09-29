@@ -363,7 +363,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleCopyFormattedText}
-            className="h-10 sm:h-11 px-3.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-100/80 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
+            className="btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer shadow-tactile-sm"
             title="Copiar texto formatado para prontuário/PEP"
           >
             {copiedLink ? (
@@ -378,7 +378,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => window.print()}
-            className="h-10 sm:h-11 px-3.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-100/80 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer"
+            className="btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold hidden md:flex items-center gap-2 shrink-0 whitespace-nowrap transition-all active:scale-95 cursor-pointer shadow-tactile-sm"
             title="Imprimir direto pelo navegador (Ctrl+P)"
           >
             <Printer className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
@@ -389,7 +389,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={handleSendWhatsApp}
-            className="h-10 sm:h-11 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition-all active:scale-95 cursor-pointer"
+            className="btn-tactile-clinical h-10 sm:h-11 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition-all active:scale-95 cursor-pointer"
             title="Enviar o documento diretamente para o WhatsApp do paciente ou familiar"
           >
             <Send className="w-4 h-4 shrink-0" strokeWidth={2} />
@@ -401,17 +401,17 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             type="button"
             onClick={handleExportPDF}
             disabled={isExportingPdf}
-            className="h-10 sm:h-11 px-5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white dark:bg-cream-100 dark:hover:bg-white dark:text-navy-950 text-xs sm:text-sm font-black flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn border border-white/20 dark:border-navy-900/30 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="btn-tactile-primary h-10 sm:h-11 px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             title="Gerar e baixar arquivo PDF padrão A4 (10mm)"
           >
             {isExportingPdf ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-white dark:text-navy-950 shrink-0" />
+                <Loader2 className="w-4 h-4 animate-spin text-white shrink-0" />
                 <span>Gerando PDF...</span>
               </>
             ) : exportSuccess ? (
               <>
-                <Check className="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" strokeWidth={2.5} />
+                <Check className="w-4 h-4 text-emerald-300 shrink-0" strokeWidth={2.5} />
                 <span>Baixado com Sucesso!</span>
               </>
             ) : (
@@ -430,12 +430,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('prescription')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
               docType === 'prescription'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
-                : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
             }`}
           >
             <FileText className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -445,12 +443,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('special_prescription')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
               docType === 'special_prescription'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
-                : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
             }`}
           >
             <Layers className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -460,12 +456,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('exams')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
               docType === 'exams'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
-                : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
             }`}
           >
             <FlaskConical className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -475,12 +469,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('certificate')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
               docType === 'certificate'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
-                : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
             }`}
           >
             <Award className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -490,12 +482,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setDocType('referral')}
-            className={`text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
               docType === 'referral'
-                ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
-                : darkMode
-                ? 'bg-navy-800/60 text-slate-300 border-white/10 hover:bg-navy-700'
-                : 'bg-white text-slate-700 border-cream-300/80 hover:bg-cream-100'
+                ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
             }`}
           >
             <Share2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -514,10 +504,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setFitToMobile(!fitToMobile)}
-            className="sm:hidden px-3 py-2 min-h-[44px] rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 tactile-btn-secondary"
+            className="sm:hidden px-3 py-2 min-h-[40px] rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 btn-tactile-secondary"
             style={{
               backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)',
+              borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
               color: darkMode ? '#388EE6' : '#0F5E94'
             }}
             title={fitToMobile ? 'Modo Tamanho Real' : 'Modo Ajustar à Tela'}
@@ -529,11 +519,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       </div>
 
       {/* A4 Paper Container Wrapper */}
-      <div className="flex justify-center p-2 sm:p-5 bg-slate-900/20 rounded-2xl overflow-x-auto">
+      <div className="flex justify-center p-3 sm:p-8 bg-slate-900/5 dark:bg-slate-950/40 rounded-2xl overflow-x-auto border border-slate-200/50 dark:border-slate-800/50 shadow-tactile-inset dark:shadow-tactile-inset-dark">
         <div 
           ref={printSheetRef}
           id="printable-a4-sheet"
-          className={`print-page w-full shadow-lg p-6 sm:p-10 md:p-12 rounded-xl relative transition-all duration-200 ${
+          className={`print-page paper-sheet-floating w-full p-6 sm:p-10 md:p-12 rounded-xl relative transition-all duration-200 ${
             fitToMobile ? 'max-w-full sm:max-w-[780px] min-h-[950px] sm:min-h-[1100px]' : 'min-w-[650px] max-w-[780px] min-h-[1100px]'
           }`}
           style={{

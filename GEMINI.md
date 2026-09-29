@@ -88,12 +88,13 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 npm run dev        # Inicia dev server na porta 3000
 
 # Qualidade e Testes (executar sempre após alterações clínicas)
-npm run test       # Roda a suíte completa de testes no Vitest
-npm run lint       # Validação de tipagem TypeScript (tsc --noEmit)
+npm run test        # Roda a suíte completa de testes no Vitest
+npm run lint        # Validação de tipagem TypeScript (tsc --noEmit)
+npm run design:lint # Validação de conformidade da especificação DESIGN.md (Google Labs)
 
 # Produção
-npm run build      # Compilação otimizada para a pasta dist/
-npm run preview    # Pré-visualização do bundle compilado
+npm run build       # Compilação otimizada para a pasta dist/
+npm run preview     # Pré-visualização do bundle compilado
 ```
 
 ---
@@ -106,3 +107,18 @@ npm run preview    # Pré-visualização do bundle compilado
   - Validados 23/23 testes clínicos Vitest com 100% de sucesso.
   - Criada a base de memória persistente `GEMINI.md` e pasta `.gemini/` para governança do projeto.
   - **Google Material Design Icons Integrado**: Instalado `material-symbols` com suporte offline, ajustado Workbox para precache de woff2 (5 MB) e criado componente canônico anti-mutação `<Icon />` com mapa de aliases clínicos e 29/29 testes Vitest aprovados.
+- **29/09/2026**:
+  - **Google Labs DESIGN.md Integrado**: Adicionado arquivo canônico [`DESIGN.md`](./DESIGN.md) segundo a especificação oficial de design tokens e rationale para coding agents do Google Labs (`@google/design.md`).
+  - Adicionado script `npm run design:lint` no `package.json`, validado com 0 erros e 0 avisos.
+  - **Redesenho Minimalista, Simétrico e Tátil (Opção A — Cirúrgico Minimalista)**:
+    - Paleta canônica: Branco `#F8FAFC`, Slate `#334155` e Navy Equilibrado `#1E3A8A` / `#0F172A` no Light; Deep Slate acetinado `#0F172A` / `#1E293B` no Dark (eliminando pretos profundos e cegueira de contraste).
+    - Simetria estrita: Header (68px) e Sidebar colapsada (68px) com alinhamento visual idêntico; chip de paciente remodelado com status tátil integrado; botão CRM integrado sem quebra de paleta.
+    - Física tátil e descongestionamento: Padronizados botões em 3 estilos canônicos (`.btn-tactile-primary`, `.btn-tactile-clinical`, `.btn-tactile-secondary`), inputs em microcavidade côncava e bancada da folha A4 flutuante (`.paper-sheet-floating`).
+    - Eliminação completa de classes legadas (`dark:bg-cream-100`, `shadow-tactile-cream`, `tactile-btn-success`).
+    - Validação total: `npm run design:lint` (0 erros / 0 avisos), `npm run lint` (tsc limpo), `npm run test` (29/29 testes Vitest aprovados) e `npm run build` (dist gerado com sucesso).
+  - **MODO A — Execução Direta (Refinamento Prático & Simetria 64px)**:
+    - `src/index.css`: Tokens canônicos `--canvas`, `--surface`, `--border`, `--text-primary`, `--primary`, `--clinical` no `:root` e `.dark`, mais utilitários `.tactile-btn`, `.card-surface`, `.folha-a4-shadow`.
+    - `Header.tsx`: Altura fixada em `h-16` (64px) com alinhamento vertical rigoroso.
+    - `Sidebar.tsx`: Posicionamento `top-16` e `h-[calc(100dvh-4rem)]`, botões de toque padronizados em 44x44px com tooltips flutuantes imediatos (`group-hover:opacity-100`) para navegação, CRM e utilitários.
+    - `PrescriptionBuilder.tsx`: Formulário de prescrição rápida descongestionado com cabeçalho limpo "SUS / RENAME", busca rápida com atalho `Ctrl+K`, grid proporcional de 2 colunas e atalhos de posologia em pílulas táteis discretas.
+    - Validação: `npm run design:lint` (0 erros / 0 avisos), `npm run lint` (0 erros), `npm run test` (29/29 testes aprovados) e `npm run build` (sucesso).

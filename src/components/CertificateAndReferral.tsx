@@ -267,7 +267,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
           onClick={() => handleSwitchTab('certificate')}
           className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 ${
             currentSubTab === 'certificate'
-              ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
               : darkMode
               ? 'text-slate-400 hover:text-white'
               : 'text-slate-600 hover:text-slate-900'
@@ -282,7 +282,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
           onClick={() => handleSwitchTab('referral')}
           className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 ${
             currentSubTab === 'referral'
-              ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
               : darkMode
               ? 'text-slate-400 hover:text-white'
               : 'text-slate-600 hover:text-slate-900'
@@ -325,7 +325,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={handleSendCertificateWhatsApp}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
+                  className="btn-tactile-clinical text-xs flex items-center justify-center gap-1.5"
                   title="Enviar o atestado médico diretamente pelo WhatsApp"
                 >
                   <Send className="w-4 h-4" strokeWidth={2} />
@@ -335,7 +335,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigateToPrint('certificate')}
-                  className="tactile-btn-success px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
+                  className="btn-tactile-primary text-xs flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
                   <span>Visualizar & Baixar PDF</span>
@@ -617,7 +617,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={handleSendReferralWhatsApp}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-tactile-btn"
+                  className="btn-tactile-clinical text-xs flex items-center justify-center gap-1.5"
                   title="Enviar a guia de encaminhamento diretamente pelo WhatsApp"
                 >
                   <Send className="w-4 h-4" strokeWidth={2} />
@@ -627,7 +627,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigateToPrint('referral')}
-                  className="tactile-btn-success px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform"
+                  className="btn-tactile-primary text-xs flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
                   <span>Visualizar & Baixar PDF</span>

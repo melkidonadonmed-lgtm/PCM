@@ -268,7 +268,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   onClick={() => setSelectedCategory(cat)}
                   className={`text-[11px] px-2.5 py-1 rounded-lg font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     selectedCategory === cat
-                      ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 font-bold shadow-tactile-navy dark:shadow-tactile-cream'
+                      ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white font-bold shadow-tactile-navy dark:shadow-tactile-blue'
                       : darkMode
                       ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
                       : 'bg-white text-slate-600 hover:bg-slate-200/70 border border-slate-200'

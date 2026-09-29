@@ -2297,7 +2297,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handlePrint}
-            className="h-9 px-4 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-cream-100 dark:hover:bg-white text-white dark:text-navy-950 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-tactile-btn transition-transform active:scale-95"
+            className="btn-tactile-primary h-9 px-4 text-xs font-bold flex items-center gap-2"
             title="Imprimir folha A4 milimétrica ou salvar como PDF"
           >
             <Printer className="w-3.5 h-3.5" />

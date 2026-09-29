@@ -213,29 +213,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
           type="button"
           onClick={() => onSelectTab(item.id)}
           aria-current={isActive ? 'page' : undefined}
-          className={`w-full h-14 mx-auto rounded-xl flex flex-col items-center justify-center gap-0.5 px-1 transition-all cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none relative ${
+          className={`w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition-all cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none relative ${
             isActive
-              ? 'bg-navy-950 text-cream-50 border border-white/20 shadow-tactile-navy dark:bg-cream-100 dark:text-navy-950 dark:border-white/30 dark:shadow-tactile-cream font-extrabold'
+              ? 'bg-blue-600/30 text-white border border-blue-400/30 shadow-tactile-sm font-bold'
               : 'text-slate-300 hover:bg-white/10 hover:text-white'
           }`}
           title={item.fullLabel || item.label}
         >
           <Icon
             className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
-              isActive ? 'text-cream-50 dark:text-navy-950' : 'text-slate-400 group-hover:text-cream-100 dark:group-hover:text-cream-300'
+              isActive ? 'text-sky-300' : 'text-slate-400 group-hover:text-slate-200'
             }`}
             strokeWidth={isActive ? 2.2 : 1.75}
           />
-          <span className={`text-[8px] font-bold leading-none truncate max-w-full ${
-            isActive ? 'text-cream-50 dark:text-navy-950' : 'text-slate-400 group-hover:text-cream-100'
-          }`}>
-            {item.shortLabel}
-          </span>
           {item.badge && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-white/25 text-white dark:bg-navy-950 dark:text-cream-100 text-[9px] font-black flex items-center justify-center shadow-sm border border-white/20 dark:border-navy-800">
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-blue-500 text-white text-[9px] font-black flex items-center justify-center shadow-sm border border-white/20">
               {item.badge}
             </span>
           )}
+          {/* Tooltip Tátil Flutuante */}
+          <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+            {item.label}
+          </span>
         </button>
       );
     }
@@ -247,9 +246,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => onSelectTab(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`w-full min-h-[44px] flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none ${
+        className={`w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
           isActive
-            ? 'bg-navy-950 text-cream-50 border border-white/20 shadow-tactile-navy dark:bg-cream-100 dark:text-navy-950 dark:border-white/30 dark:shadow-tactile-cream font-extrabold'
+            ? 'bg-blue-600/30 text-white border border-blue-400/30 shadow-tactile-sm font-bold'
             : 'text-slate-300 hover:bg-white/5 hover:text-white'
         }`}
         title={item.label}
@@ -257,7 +256,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex items-center gap-2.5 min-w-0">
           <Icon 
             className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
-              isActive ? 'text-cream-50 dark:text-navy-950' : 'text-slate-400 group-hover:text-cream-100 dark:group-hover:text-cream-300'
+              isActive ? 'text-sky-300' : 'text-slate-400 group-hover:text-slate-200'
             }`} 
             strokeWidth={isActive ? 2.2 : 1.75} 
           />
@@ -268,7 +267,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {item.badge && (
           <span 
             className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full flex-shrink-0 ml-1.5 ${
-              isActive ? 'bg-white/20 text-cream-50 dark:bg-navy-900 dark:text-cream-100' : 'bg-white/10 text-slate-300'
+              isActive ? 'bg-blue-500/30 text-sky-200 border border-blue-400/30' : 'bg-white/10 text-slate-300'
             }`}
           >
             {item.badge}
@@ -292,19 +291,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <aside
         id="prescmed-sidebar"
         aria-label="Menu Lateral de Navegação"
-        className={`fixed lg:sticky top-[68px] sm:top-[72px] left-0 h-[calc(100dvh-68px)] sm:h-[calc(100dvh-72px)] z-40 flex flex-col flex-shrink-0 transition-all duration-300 no-print rounded-r-2xl lg:rounded-2xl border ${
-          isOpen ? 'w-64 sm:w-72 shadow-tactile-navy' : 'w-0 lg:w-[72px] overflow-hidden'
+        className={`fixed lg:sticky top-16 left-0 h-[calc(100dvh-4rem)] z-40 flex flex-col flex-shrink-0 transition-all duration-300 no-print rounded-r-2xl lg:rounded-2xl border ${
+          isOpen ? 'w-64 sm:w-72 shadow-tactile-navy' : 'w-0 lg:w-[68px] overflow-hidden'
         }`}
         style={{
-          backgroundColor: darkMode ? '#0A0F18' : '#142032',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.1)',
+          backgroundColor: darkMode ? '#0B1120' : '#0F172A',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
           boxShadow: darkMode
-            ? '0 16px 36px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.08)'
-            : '0 14px 32px rgba(10, 17, 28, 0.35), inset 0 1px 0 rgba(255,255,255,0.15)'
+            ? '0 12px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)'
+            : '0 10px 25px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255,255,255,0.1)'
         }}
       >
         <div className={`overflow-y-auto flex-1 custom-scrollbar ${
-          isOpen ? 'p-3 space-y-4' : 'py-3 px-2 space-y-3 flex flex-col items-center'
+          isOpen ? 'p-3 space-y-4' : 'py-3 px-1.5 space-y-3 flex flex-col items-center'
         }`}>
           
           {/* Mobile Header with Close Button */}
@@ -347,11 +346,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               title="Clique para editar CRM e dados profissionais"
             >
               <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <div className="w-8 h-8 rounded-lg bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 flex items-center justify-center font-black text-xs shrink-0 shadow-tactile-sm">
+                <div className="w-8 h-8 rounded-lg bg-white/10 text-sky-200 border border-white/15 flex items-center justify-center font-bold text-[11px] shrink-0 shadow-tactile-sm">
                   CRM
                 </div>
                 <div className="overflow-hidden min-w-0 flex-1">
-                  <p className="text-xs font-bold truncate text-cream-50">
+                  <p className="text-xs font-bold truncate text-white">
                     {hasDoctor ? doctor?.name : 'Configurar Médico'}
                   </p>
                   <p className="text-[10px] text-slate-400 font-medium truncate">
@@ -361,7 +360,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </p>
                 </div>
               </div>
-              <Pencil className="w-3.5 h-3.5 text-slate-400 group-hover:text-cream-100 transition-colors shrink-0" />
+              <Pencil className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors shrink-0" />
             </div>
           ) : (
             <button
@@ -373,11 +372,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenDoctorModal?.();
                 }
               }}
-              className="w-11 h-11 mx-auto rounded-xl bg-navy-950 text-cream-100 border border-white/15 dark:bg-cream-100 dark:text-navy-950 dark:border-white/25 hover:bg-navy-900 font-black text-xs flex items-center justify-center shadow-tactile-btn transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="w-11 h-11 mx-auto rounded-xl bg-white/10 text-sky-200 border border-white/15 hover:bg-white/15 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none relative group"
               title={hasDoctor ? `Dr(a). ${doctor?.name} (CRM: ${doctor?.crm}/${doctor?.crmState})` : 'Configurar CRM / Perfil Médico'}
               aria-label="Perfil do Médico"
             >
-              CRM
+              <span>CRM</span>
+              {/* Tooltip Tátil Flutuante */}
+              <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+                {hasDoctor ? `Dr(a). ${doctor?.name}` : 'Configurar CRM'}
+              </span>
             </button>
           )}
 
@@ -471,7 +474,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 type="button"
                 onClick={handleTriggerResetAll}
-                className="w-full min-h-[40px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-sky-950 bg-sky-200 hover:bg-sky-100 dark:bg-sky-900 dark:text-sky-100 dark:hover:bg-sky-800 transition cursor-pointer shadow-tactile-sm active:scale-95 outline-none"
+                className="w-full min-h-[40px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-sky-200 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/20 transition cursor-pointer shadow-tactile-sm active:scale-95 outline-none"
                 title="Iniciar uma nova consulta do zero"
               >
                 <RotateCcw className="w-4 h-4 shrink-0" />
@@ -535,11 +538,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={onOpenBackupModal}
-              className="w-11 h-11 mx-auto rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 outline-none shadow-tactile-sm"
+              className="w-11 h-11 mx-auto rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 outline-none shadow-tactile-sm relative group"
               title="Backup / Portabilidade (.pcm.json)"
               aria-label="Backup e Portabilidade"
             >
               <Database className="w-5 h-5" />
+              {/* Tooltip Tátil Flutuante */}
+              <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+                Backup (.pcm.json)
+              </span>
             </button>
           )}
 
@@ -548,11 +555,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={onInstallApp}
-              className="w-11 h-11 mx-auto rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none shadow-tactile-sm animate-pulse"
+              className="w-11 h-11 mx-auto rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none shadow-tactile-sm animate-pulse relative group"
               title="Instalar PresCMed no dispositivo (100% Offline)"
               aria-label="Instalar App Offline"
             >
               <Download className="w-5 h-5" />
+              {/* Tooltip Tátil Flutuante */}
+              <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+                Instalar App Offline
+              </span>
             </button>
           )}
 

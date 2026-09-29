@@ -67,7 +67,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
               isDanger 
                 ? 'bg-rose-500/15 text-rose-500 border-rose-500/30' 
-                : 'bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border-navy-900/20 dark:border-cream-100/25'
+                : 'bg-blue-600/10 text-blue-800 dark:bg-blue-500/20 dark:text-blue-300 border-blue-500/20 dark:border-blue-400/30'
             }`}
           >
             <AlertTriangle className="w-6 h-6" />
@@ -76,7 +76,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <div className="flex-1 min-w-0">
             <h3 
               id="confirm-modal-title" 
-              className="text-base font-bold text-navy-900 dark:text-cream-50"
+              className="text-base font-bold text-navy-900 dark:text-white"
             >
               {title}
             </h3>
@@ -113,7 +113,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             className={`min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl shadow-tactile-btn flex items-center gap-2 cursor-pointer transition-all active:scale-95 ${
               isDanger 
                 ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white' 
-                : 'bg-navy-900 hover:bg-navy-950 text-white dark:bg-cream-100 dark:hover:bg-white dark:text-navy-950'
+                : 'bg-navy-900 hover:bg-navy-950 text-white dark:bg-blue-600 dark:hover:bg-blue-500 dark:text-white'
             }`}
           >
             <Check className="w-4 h-4" />

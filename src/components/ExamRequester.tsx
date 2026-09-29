@@ -117,12 +117,12 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <h2 className="text-base sm:text-lg font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                 Solicitação de Exames Complementares
               </h2>
-              <span className="text-[11px] px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border border-navy-900/20 dark:border-cream-100/25 font-semibold">
+              <span className="text-[11px] px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-blue-500/20 dark:text-blue-300 border border-navy-900/20 dark:border-blue-400/30 font-semibold">
                 {selectedExams.length} selecionado(s)
               </span>
             </div>
             <p className="text-xs font-medium mt-0.5" style={{ color: darkMode ? '#8E9CAE' : '#64748B' }}>
-              Paciente: <span className="text-navy-900 dark:text-cream-100 font-semibold">{patient?.name?.trim() || 'Não identificado'}</span> • Selecione exames individuais ou painéis rápidos.
+              Paciente: <span className="text-navy-900 dark:text-blue-400 font-semibold">{patient?.name?.trim() || 'Não identificado'}</span> • Selecione exames individuais ou painéis rápidos.
             </p>
           </div>
         </div>
@@ -131,7 +131,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           type="button"
           onClick={onNavigateToPrint}
           disabled={selectedExams.length === 0}
-          className="tactile-btn-success px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          className="btn-tactile-primary text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
         >
           <Download className="w-4 h-4" strokeWidth={1.75} />
           <span>Visualizar & Baixar PDF ({selectedExams.length})</span>
@@ -147,7 +147,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         }}
       >
         <div className="flex items-center gap-1.5 mb-2.5">
-          <Sparkles className="w-4 h-4 text-navy-900 dark:text-cream-200" strokeWidth={1.75} />
+          <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" strokeWidth={1.75} />
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
             Painéis & Pacotes Clínicos:
           </span>
@@ -248,7 +248,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 onClick={() => setSelectedCategory(cat)}
                 className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap border transition-all cursor-pointer active:scale-95 ${
                   selectedCategory === cat
-                    ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                    ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
                     : darkMode
                     ? 'bg-slate-800/80 text-slate-300 border-slate-700/80 hover:bg-slate-700'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -276,14 +276,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   onClick={() => toggleExam(exam)}
                   className={`pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all ${
                     selected 
-                      ? 'bg-navy-900/10 dark:bg-cream-100/10 border border-navy-900/30 dark:border-cream-100/30' 
+                      ? 'bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/30 dark:border-blue-400/30' 
                       : 'hover:bg-slate-500/5'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <div 
                       className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center transition-all ${
-                        selected ? 'bg-navy-900 dark:bg-cream-100 border-navy-900 dark:border-cream-100 text-white dark:text-navy-950' : 'border-slate-400'
+                        selected ? 'bg-navy-900 dark:bg-blue-600 border-navy-900 dark:border-blue-500 text-white' : 'border-slate-400'
                       }`}
                     >
                       {selected && <Check className="w-3 h-3 stroke-[2.5]" />}
@@ -350,7 +350,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     <div className="text-xs font-semibold truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                       {index + 1}. {exam.name}
                     </div>
-                    <span className="text-[9px] text-navy-900 dark:text-cream-100 font-medium">{exam.category}</span>
+                    <span className="text-[9px] text-slate-500 dark:text-slate-400 font-medium">{exam.category}</span>
                   </div>
                   <button
                     type="button"
@@ -370,7 +370,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <button
                 type="button"
                 onClick={onNavigateToPrint}
-                className="tactile-btn-success w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer"
+                className="btn-tactile-primary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Download className="w-4 h-4" strokeWidth={1.75} />
                 <span>Gerar & Baixar PDF</span>

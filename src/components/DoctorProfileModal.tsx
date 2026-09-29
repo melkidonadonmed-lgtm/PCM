@@ -108,16 +108,16 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
         <div 
           className="p-4 border-b flex items-center justify-between" 
           style={{ 
-            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : '#E3D7BD',
-            backgroundColor: darkMode ? '#141E2C' : '#F8F4EC'
+            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
+            backgroundColor: darkMode ? '#1E293B' : '#F8FAFC'
           }}
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-cream-100/15 text-navy-900 dark:text-cream-100 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-blue-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
               <UserCheck className="w-4 h-4" strokeWidth={2} />
             </div>
             <div>
-              <h3 id="doctor-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-cream-50">
+              <h3 id="doctor-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-white">
                 Perfil Profissional do Médico
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">

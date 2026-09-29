@@ -185,14 +185,14 @@ export const Header: React.FC<HeaderProps> = ({
           : '0 4px 20px -2px rgba(20, 32, 50, 0.07), inset 0 1px 0 rgba(255,255,255,0.95)'
       }}
     >
-      <div className="w-full max-w-screen-2xl container mx-auto h-[68px] sm:h-[72px] px-2.5 sm:px-4 md:px-6 lg:px-8 flex items-center justify-between gap-2">
+      <div className="w-full max-w-screen-2xl container mx-auto h-16 px-2.5 sm:px-4 md:px-6 lg:px-8 flex items-center justify-between gap-2">
         {/* Left side: Menu trigger & Sculpted Logo */}
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           <button
             id="btn-toggle-sidebar"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
-            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)]"
+            className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
           >
             <Menu className="w-5 h-5" strokeWidth={1.75} />
           </button>
@@ -200,11 +200,11 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-2 sm:gap-2.5">
             {/* Brand Emblem */}
             <div 
-              className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] sm:min-w-[40px] rounded-xl flex items-center justify-center relative overflow-hidden flex-shrink-0 border"
+              className="w-9 h-9 min-w-[36px] rounded-xl flex items-center justify-center relative overflow-hidden flex-shrink-0 border"
               style={{
-                backgroundColor: 'var(--nav-bg, #142032)',
-                borderColor: darkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(20, 32, 50, 0.25)',
-                boxShadow: '0 4px 12px rgba(10, 17, 28, 0.35), inset 0 1px 0 rgba(255,255,255,0.18)'
+                backgroundColor: 'var(--nav-bg, #0F172A)',
+                borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.15)',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255,255,255,0.15)'
               }}
             >
               <img 
@@ -215,10 +215,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             <div className="hidden sm:block">
               <div className="flex items-center gap-1 sm:gap-1.5">
-                <span className="font-extrabold text-base sm:text-lg tracking-tight text-navy-900 dark:text-cream-50">
-                  PresC<span className="text-navy-700 dark:text-cream-300 font-black">Med</span>
+                <span className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white">
+                  PresC<span className="text-blue-600 dark:text-blue-400 font-black">Med</span>
                 </span>
-                <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-extrabold tracking-wider bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border border-navy-900/20 dark:border-cream-100/25">
+                <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-extrabold tracking-wider bg-blue-600/10 text-blue-700 dark:bg-blue-400/15 dark:text-blue-300 border border-blue-600/20 dark:border-blue-400/25">
                   PRO
                 </span>
               </div>
@@ -242,22 +242,22 @@ export const Header: React.FC<HeaderProps> = ({
             id="header-patient-chip"
             role="button"
             tabIndex={0}
-            className={`flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer group w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[360px] min-h-[44px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none ${
+            className={`flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer group w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[360px] min-h-[40px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               hasPatient 
                 ? 'bg-emerald-500/5 dark:bg-emerald-950/20 border-emerald-500/30 text-emerald-900 dark:text-emerald-200' 
-                : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)]'
+                : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
             }`}
             title="Clique para identificar o paciente, peso e histórico clínico"
           >
-            <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 border ${
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 border ${
               hasPatient 
                 ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40' 
-                : 'bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border-navy-900/20 dark:border-cream-100/25'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
             }`}>
               {hasPatient ? <User className="w-4 h-4" strokeWidth={2} /> : <UserPlus className="w-4 h-4" strokeWidth={1.75} />}
             </div>
             <div className="text-left overflow-hidden min-w-0 flex-1">
-              <div className="text-[11px] sm:text-xs font-bold truncate text-navy-900 dark:text-cream-50 flex items-center justify-between gap-1">
+              <div className="text-[11px] sm:text-xs font-bold truncate text-slate-900 dark:text-white flex items-center justify-between gap-1">
                 <span className="truncate">
                   {hasPatient ? patientName : 'Identificar Paciente'}
                 </span>
@@ -269,7 +269,7 @@ export const Header: React.FC<HeaderProps> = ({
                     ⚖️ {patientWeight} kg
                   </span>
                 ) : (
-                  <span className="text-slate-400">Toque para preencher</span>
+                  <span className="text-slate-400 font-normal">Toque para preencher</span>
                 )}
                 {patient?.ageText && (
                   <span className="text-slate-500 dark:text-slate-400 hidden xs:inline">• {patient.ageText}</span>
@@ -313,13 +313,13 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
             title={darkMode ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
           >
             {darkMode ? (
-              <Sun className="w-5 h-5 text-cream-200 animate-spin-slow" strokeWidth={1.75} />
+              <Sun className="w-5 h-5 text-amber-400" strokeWidth={1.75} />
             ) : (
-              <Moon className="w-5 h-5 text-navy-900" strokeWidth={1.75} />
+              <Moon className="w-5 h-5 text-slate-800" strokeWidth={1.75} />
             )}
           </button>
         </div>

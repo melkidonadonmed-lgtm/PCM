@@ -236,7 +236,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               onClick={() => setSelectedCategory(cat)}
               className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap transition-all cursor-pointer border active:scale-95 ${
                 isSelected
-                  ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 border-navy-800 dark:border-white/30 shadow-tactile-navy dark:shadow-tactile-cream'
+                  ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
                   : darkMode
                   ? 'bg-slate-800/80 text-slate-300 border-slate-700/80 hover:bg-slate-700 hover:text-white'
                   : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'

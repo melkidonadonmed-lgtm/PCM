@@ -27,6 +27,7 @@ import { PrescriptionItem, Patient, DoctorProfile } from '../types';
 import { generateScheduleTimes } from '../utils/doseCalculator';
 import { searchUnifiedMedicationsFuzzy } from '../utils/fuzzySearch';
 import { UNIFIED_MEDICATIONS, UnifiedMedication, CATEGORY_LABELS } from '../data/medicationDatabase';
+import { Icon } from './Icon';
 
 interface PrescriptionBuilderProps {
   darkMode: boolean;
@@ -667,26 +668,23 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         {/* LEFT COLUMN: Composer, Calculator, Search and Quick Picks */}
         <div className={`xl:col-span-7 space-y-5 ${mobileSection === 'preview' ? 'hidden md:block' : 'block'}`}>
           
-          {/* Card 1: Busca Rápida de Medicamentos (370+ RENAME / SUS / Referência) - TOPO PRIORITÁRIO */}
-          <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy space-y-4">
-            <div className="flex items-center justify-between flex-wrap gap-2">
+          {/* Card 1: Busca Rápida de Medicamentos - TOPO PRIORITÁRIO */}
+          <section className="card-surface rounded-2xl p-4 sm:p-5 mb-4 space-y-4">
+            {/* Cabeçalho Limpo: Sem frases longas redundantes */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-navy-800 text-cream-50 dark:bg-navy-700 dark:text-cream-50 flex items-center justify-center font-bold border border-slate-200 dark:border-navy-600 shrink-0">
-                  <Search className="w-4 h-4 text-amber-400" strokeWidth={1.75} />
-                </div>
-                <div>
-                  <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-cream-50">
-                    Prescrição Rápida de Medicamentos
-                  </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                    Catálogo com 370+ fármacos do SUS, RENAME e Referência (Adulto & Pediátrico)
-                  </p>
-                </div>
+                <Icon name="medication" className="text-blue-600 dark:text-blue-400 text-[22px]" />
+                <h2 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">
+                  Prescrição Rápida
+                </h2>
               </div>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-slate-200/80 dark:border-slate-700">
+                SUS / RENAME
+              </span>
             </div>
 
             {/* Category Filter Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 custom-scrollbar fade-scroll-x">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
               {[
                 { id: 'all', label: 'Todos' },
                 { id: 'analgesicos', label: 'Sintomáticos & AINEs' },
@@ -701,10 +699,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   key={cat.id}
                   type="button"
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition active:scale-95 cursor-pointer shadow-tactile-sm ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold shrink-0 transition active:scale-95 cursor-pointer ${
                     activeCategory === cat.id
-                      ? 'bg-navy-800 dark:bg-navy-700 text-white'
-                      : 'bg-slate-100 dark:bg-navy-800 hover:bg-slate-200 dark:hover:bg-navy-700 text-slate-700 dark:text-slate-300'
+                      ? 'bg-blue-600 text-white shadow-tactile-sm'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
                   {cat.label}
@@ -712,18 +710,18 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               ))}
             </div>
 
-            {/* Search Input with Instant Autocomplete */}
-            <div className="relative">
-              <label htmlFor="med-search-input" className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-4 h-4 rounded-full bg-navy-800 dark:bg-cream-100 text-white dark:text-navy-950 text-[9px] font-black flex items-center justify-center shrink-0">1</span>
-                  Buscar Fármaco, Princípio Ativo ou Nome Comercial
+            {/* 1. Campo de Busca Instantânea com Atalho de Teclado */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="med-search-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+                  Fármaco ou Princípio Ativo
+                </label>
+                <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">
+                  Atalho: <kbd className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">Ctrl+K</kbd> ou <kbd className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">/</kbd>
                 </span>
-                <span className="text-[10px] font-semibold text-slate-400 hidden sm:inline-flex items-center gap-1">
-                  Atalho: <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-navy-800 border border-slate-300 dark:border-navy-700 font-mono text-[9px] text-slate-600 dark:text-slate-300">Ctrl+K</kbd> ou <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-navy-800 border border-slate-300 dark:border-navy-700 font-mono text-[9px] text-slate-600 dark:text-slate-300">/</kbd>
-                </span>
-              </label>
+              </div>
               <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   ref={searchInputRef}
                   id="med-search-input"
@@ -734,53 +732,55 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     setShowSuggestions(true);
                   }}
                   onFocus={() => setShowSuggestions(true)}
-                  placeholder="Ex: Dipirona (Novalgina), Losartana, Amoxicilina, Omeprazol, Sertralina..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-300 dark:border-navy-700 text-sm font-semibold focus:ring-2 focus:ring-sky-500 outline-none text-slate-900 dark:text-slate-100"
+                  placeholder="Ex: Dipirona 500mg, Amoxicilina 500mg, Losartana..."
+                  className="w-full pl-9 pr-14 py-2.5 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-tactile-sm font-semibold"
                 />
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                {searchTerm && (
+                {searchTerm ? (
                   <button
                     type="button"
                     onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer p-1"
                   >
                     <X className="w-4 h-4" />
                   </button>
+                ) : (
+                  <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800 hidden sm:block">
+                    Ctrl+K
+                  </kbd>
+                )}
+
+                {/* Suggestions Dropdown (Instant, No Blocker) */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-xl tactile-dropdown z-30 divide-y divide-slate-100 dark:divide-slate-800">
+                    {searchSuggestions.map(med => (
+                      <div
+                        key={med.id}
+                        onClick={() => handleSelectMedication(med)}
+                        className="p-3 hover:bg-blue-50 dark:hover:bg-slate-800/80 cursor-pointer flex items-center justify-between gap-2 transition"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                            {med.name}
+                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                            {med.defaultPosology}
+                          </p>
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 shrink-0">
+                          {med.route}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
-
-              {/* Suggestions Dropdown (Instant, No Blocker) */}
-              {showSuggestions && searchSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile-navy z-30 divide-y divide-slate-100 dark:divide-navy-800">
-                  {searchSuggestions.map(med => (
-                    <div
-                      key={med.id}
-                      onClick={() => handleSelectMedication(med)}
-                      className="p-3 hover:bg-sky-50 dark:hover:bg-navy-800 cursor-pointer flex items-center justify-between gap-2 transition"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-900 dark:text-cream-50 truncate">
-                          {med.name}
-                        </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                          {med.defaultPosology}
-                        </p>
-                      </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-slate-100 dark:bg-navy-800 text-sky-600 dark:text-sky-400 shrink-0">
-                        {med.route}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Form de Edição e Adição Direta */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 space-y-3">
+            <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 space-y-3.5">
               <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  <span className="w-4 h-4 rounded-full bg-navy-800 dark:bg-cream-100 text-white dark:text-navy-950 text-[9px] font-black flex items-center justify-center shrink-0">2</span>
-                  Confirme o Medicamento *
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                  Fármaco Selecionado *
                 </label>
                 <div className="relative">
                   <input
@@ -788,10 +788,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     value={selectedMedName}
                     onChange={(e) => setSelectedMedName(e.target.value)}
                     placeholder="Preenchido ao escolher acima — ou digite livremente aqui"
-                    className={`w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-navy-900 border text-sm font-bold text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500/50 outline-none transition-colors ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-tactile-sm ${
                       selectedMedName.trim()
-                        ? 'border-emerald-400 dark:border-emerald-500/60'
-                        : 'border-slate-300 dark:border-navy-700'
+                        ? 'border-emerald-500/60'
+                        : 'border-slate-200 dark:border-slate-800'
                     }`}
                   />
                   {selectedMedName.trim() && (
@@ -800,15 +800,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                <div className="sm:col-span-4">
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+              {/* Grid: 2 Colunas para Via e Apresentação */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
                     Via de Administração
                   </label>
                   <select
                     value={selectedRoute}
                     onChange={(e) => setSelectedRoute(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-blue-500 shadow-tactile-sm"
                   >
                     <option value="Uso Oral">Uso Oral</option>
                     <option value="Uso Tópico">Uso Tópico</option>
@@ -824,8 +825,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   </select>
                 </div>
 
-                <div className="sm:col-span-4">
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
                     Quantidade / Apresentação
                   </label>
                   <input
@@ -833,57 +834,56 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     value={selectedQuantity}
                     onChange={(e) => setSelectedQuantity(e.target.value)}
                     placeholder="Ex: 1 caixa, 2 frascos"
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-blue-500 shadow-tactile-sm"
                   />
-                </div>
-
-                <div className="sm:col-span-4 flex items-center pt-5">
-                  <label className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedIsSpecial}
-                      onChange={(e) => setSelectedIsSpecial(e.target.checked)}
-                      className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500"
-                    />
-                    <span>Receita de Controle Especial</span>
-                  </label>
                 </div>
               </div>
 
+              {/* Posologia & Orientações */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                  Instruções de Uso / Posologia *
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                  Posologia e Orientações ao Paciente *
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={selectedPosology}
                   onChange={(e) => setSelectedPosology(e.target.value)}
-                  placeholder="Ex: Tomar 1 comprimido via oral de 8 em 8 horas após as refeições por 5 dias..."
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-xs font-medium outline-none text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500/50"
+                  placeholder="Ex: Tomar 1 comprimido por via oral a cada 8 horas se dor ou febre por até 5 dias..."
+                  className="w-full p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-medium outline-none text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-blue-500 shadow-tactile-sm resize-none"
                 />
               </div>
 
-              {/* Posology Shortcuts */}
+              {/* Atalhos Rápidos Discretos */}
               <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                <span className="text-[10px] font-bold text-slate-400 mr-1">Atalhos de Posologia:</span>
+                <span className="text-[11px] text-slate-400 mr-1">Atalhos:</span>
                 {posologyShortcuts.map((ps, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setSelectedPosology(ps.text)}
-                    className="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-navy-800 hover:bg-cream-200 dark:hover:bg-navy-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                    className="text-xs px-2.5 py-1 rounded-full bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition active:scale-95 cursor-pointer shadow-tactile-sm"
                   >
                     {ps.label}
                   </button>
                 ))}
               </div>
 
-              {/* Add Button */}
-              <div className="pt-2 flex justify-end">
+              {/* Rodapé: Checkbox e Ação Primária */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
+                <label className="inline-flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                  <input
+                    type="checkbox"
+                    checked={selectedIsSpecial}
+                    onChange={(e) => setSelectedIsSpecial(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-0 cursor-pointer"
+                  />
+                  <span>Receita de Controle Especial (Notificação C)</span>
+                </label>
+
                 <button
                   type="button"
                   onClick={handleAddMedicationToPrescription}
-                  className="btn-tactile-primary w-full sm:w-auto min-h-[44px] px-6 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
+                  className="btn-tactile-primary w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs inline-flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" strokeWidth={2} />
                   <span>Adicionar à Receita</span>
@@ -893,7 +893,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           </section>
 
           {/* Card 2: Kits Rápidos de Plantão & Visita Domiciliar (Com Toggle Recolhível) */}
-          <section className="rounded-2xl bg-white dark:bg-navy-900 border border-cream-300/80 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy overflow-hidden transition-all">
+          <section className="rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy overflow-hidden transition-all">
             {/* Header Accordion Bar */}
             <div 
               onClick={toggleKits}
@@ -906,18 +906,18 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               role="button"
               tabIndex={0}
               aria-expanded={showKits}
-              className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-navy-800/60 transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+              className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-navy-800/60 transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-blue-400 outline-none"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-navy-900/10 dark:bg-cream-100/15 text-navy-900 dark:text-cream-100 flex items-center justify-center font-bold border border-navy-900/20 dark:border-cream-100/25 shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-navy-900/10 dark:bg-blue-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold border border-navy-900/20 dark:border-blue-400/30 shrink-0">
                   <Sparkles className="w-4 h-4" strokeWidth={1.75} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-cream-50">
+                    <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-white">
                       Kits Rápidos de Plantão & Visita Domiciliar
                     </h3>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 border border-navy-900/20 dark:border-cream-100/25">
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-blue-500/20 dark:text-blue-300 border border-navy-900/20 dark:border-blue-400/30">
                       {clinicalKits.length} Kits
                     </span>
                   </div>
@@ -951,15 +951,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                         e.stopPropagation();
                         handleApplyClinicalKit(kit);
                       }}
-                      className="p-3 rounded-xl border bg-slate-50 dark:bg-navy-800 hover:border-navy-800/50 dark:hover:border-cream-100/50 border-slate-200 dark:border-navy-700 text-left transition active:scale-95 cursor-pointer shadow-tactile-sm group flex flex-col justify-between"
+                      className="p-3 rounded-xl border bg-slate-50 dark:bg-navy-800 hover:border-navy-800/50 dark:hover:border-blue-400/50 border-slate-200 dark:border-navy-700 text-left transition active:scale-95 cursor-pointer shadow-tactile-sm group flex flex-col justify-between"
                       title="Clique para adicionar todo o combo de medicamentos à receita"
                     >
                       <div>
                         <div className="flex items-center justify-between gap-1 mb-1">
-                          <span className="text-xs font-bold text-navy-900 dark:text-cream-50 truncate group-hover:text-navy-700 dark:group-hover:text-cream-200">
+                          <span className="text-xs font-bold text-navy-900 dark:text-white truncate group-hover:text-navy-700 dark:group-hover:text-blue-300">
                             {kit.name}
                           </span>
-                          <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-navy-900/10 text-navy-900 dark:bg-cream-100/15 dark:text-cream-100 shrink-0">
+                          <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-navy-900/10 text-navy-900 dark:bg-blue-500/20 dark:text-blue-300 shrink-0">
                             {kit.items.length} fármacos
                           </span>
                         </div>
@@ -967,7 +967,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           {kit.description}
                         </p>
                       </div>
-                      <div className="mt-2 pt-1.5 border-t border-slate-200 dark:border-navy-700/60 flex items-center justify-between text-[10px] font-bold text-navy-900 dark:text-cream-100">
+                      <div className="mt-2 pt-1.5 border-t border-slate-200 dark:border-navy-700/60 flex items-center justify-between text-[10px] font-bold text-navy-900 dark:text-blue-300">
                         <span>{kit.badge}</span>
                         <span className="group-hover:translate-x-0.5 transition-transform">Inserir Kit +</span>
                       </div>
@@ -979,7 +979,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           </section>
 
           {/* Card 3: Assistente de Doses Pediátricas Inteligente (Gotas / mL - Com Toggle Recolhível) */}
-          <section className="rounded-2xl border transition-all bg-white dark:bg-navy-900 border-cream-300/80 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy overflow-hidden">
+          <section className="rounded-2xl border transition-all bg-white dark:bg-navy-900 border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy overflow-hidden">
             {/* Header Accordion Bar */}
             <div 
               onClick={togglePediaCalc}
@@ -992,14 +992,14 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               role="button"
               tabIndex={0}
               aria-expanded={showPediaCalc}
-              className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-navy-800/60 transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-cream-100 outline-none"
+              className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-navy-800/60 transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 dark:focus-visible:ring-blue-400 outline-none"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-navy-900/10 dark:bg-cream-100/15 text-navy-900 dark:text-cream-100 flex items-center justify-center font-bold border border-navy-900/20 dark:border-cream-100/25 shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-navy-900/10 dark:bg-blue-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold border border-navy-900/20 dark:border-blue-400/30 shrink-0">
                   <Calculator className="w-4 h-4" strokeWidth={1.75} />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-cream-50">
+                  <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 dark:text-white">
                     Calculadora Pediátrica Rápida (Gotas / mL)
                   </h3>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
@@ -1018,7 +1018,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     e.stopPropagation();
                     onOpenPatientModal();
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-navy-900/10 hover:bg-navy-900/20 dark:bg-cream-100/15 dark:hover:bg-cream-100/25 border border-navy-900/20 dark:border-cream-100/25 text-navy-900 dark:text-cream-100 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                  className="px-3 py-1.5 rounded-xl bg-navy-900/10 hover:bg-navy-900/20 dark:bg-blue-500/20 dark:hover:bg-blue-500/30 border border-navy-900/20 dark:border-blue-400/30 text-navy-900 dark:text-blue-300 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
                   title="Clique para alterar o peso do paciente"
                 >
                   <Scale className="w-3.5 h-3.5" strokeWidth={1.75} />
@@ -1052,12 +1052,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       onClick={() => handleCalculatePedia(drug.id)}
                       className={`p-2.5 rounded-xl border text-left transition-all active:scale-95 cursor-pointer shadow-tactile-sm ${
                         selectedPediaDrugKey === drug.id
-                          ? 'bg-navy-900 text-white dark:bg-cream-100 dark:text-navy-950 shadow-tactile-navy dark:shadow-tactile-cream border border-navy-800 dark:border-white/30 font-bold'
-                          : 'bg-slate-50 dark:bg-navy-800 hover:border-navy-800/40 dark:hover:border-cream-200/40 border-slate-200 dark:border-navy-700 text-slate-800 dark:text-slate-100'
+                          ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white shadow-tactile-navy dark:shadow-tactile-blue border border-navy-800 dark:border-blue-400/30 font-bold'
+                          : 'bg-slate-50 dark:bg-navy-800 hover:border-navy-800/40 dark:hover:border-blue-400/40 border-slate-200 dark:border-navy-700 text-slate-800 dark:text-slate-100'
                       }`}
                     >
                       <p className="text-xs font-bold truncate">{drug.name}</p>
-                      <p className={`text-[10px] truncate ${selectedPediaDrugKey === drug.id ? 'text-cream-200 dark:text-navy-800 font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
+                      <p className={`text-[10px] truncate ${selectedPediaDrugKey === drug.id ? 'text-sky-200 dark:text-blue-100 font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
                         {drug.sub}
                       </p>
                     </button>
@@ -1069,10 +1069,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <div className="space-y-0.5 min-w-0 flex-1">
                     {calculatedPediaResult ? (
                       <>
-                        <p className="text-xs font-bold text-slate-900 dark:text-cream-50">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">
                           {calculatedPediaResult.name}
                         </p>
-                        <p className="text-[11px] text-navy-900 dark:text-cream-100 font-semibold">
+                        <p className="text-[11px] text-navy-900 dark:text-blue-400 font-semibold">
                           Dose para {patientWeight} kg: {calculatedPediaResult.calculatedDrops ? `${calculatedPediaResult.calculatedDrops} gotas` : `${calculatedPediaResult.calculatedMl} mL`}
                           <span className="text-slate-500 dark:text-slate-400 font-normal ml-1">
                             ({calculatedPediaResult.instructions})
@@ -1111,7 +1111,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           <section className="p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-cream-50">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                   Medicamentos Prescritos
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-navy-800 dark:bg-navy-700 text-white">
@@ -1147,7 +1147,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                         <span className="w-5 h-5 rounded-full bg-navy-800 dark:bg-navy-700 text-white text-[10px] font-black flex items-center justify-center shrink-0">
                           {idx + 1}
                         </span>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-cream-50 truncate">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
                           {it.name}
                         </h4>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300">
@@ -1200,12 +1200,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
             {/* Quick Actions Footer */}
             {items.length > 0 && (
-              <div className="pt-3 border-t border-slate-200 dark:border-navy-800 flex items-center justify-between flex-wrap gap-2">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={handleSendWhatsApp}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-tactile-btn transition active:scale-95 cursor-pointer"
+                    className="btn-tactile-clinical px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-btn"
                     title="Enviar a receita completa diretamente para o WhatsApp do paciente"
                   >
                     <Send className="w-3.5 h-3.5" strokeWidth={2} />
@@ -1215,7 +1215,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <button
                     type="button"
                     onClick={handleCopyText}
-                    className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-800 hover:bg-slate-50 dark:hover:bg-navy-700 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                    className="btn-tactile-secondary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
                   >
                     {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedSuccess ? 'Copiado!' : 'Copiar Texto'}</span>
@@ -1227,10 +1227,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     <button
                       type="button"
                       onClick={onNavigateToEditor}
-                      className="px-3.5 py-2 rounded-xl border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 text-xs font-bold shadow-tactile-sm flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+                      className="btn-tactile-secondary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
                       title="Editar esta receita diretamente no Editor"
                     >
-                      <FileText className="w-3.5 h-3.5" />
+                      <FileText className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                       <span>Editor</span>
                     </button>
                   )}
@@ -1238,7 +1238,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <button
                     type="button"
                     onClick={onNavigateToPrint}
-                    className="px-4 py-2 rounded-xl bg-navy-800 dark:bg-navy-700 hover:bg-navy-900 text-white text-xs font-bold shadow-tactile-btn flex items-center gap-2 transition active:scale-95 cursor-pointer"
+                    className="btn-tactile-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition active:scale-95 cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5" />
                     <span>Visualizar PDF A4</span>
@@ -1261,7 +1261,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             <button
               type="button"
               onClick={onNavigateToPrint}
-              className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>Abrir tela cheia</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -1269,7 +1269,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           </div>
 
           {/* Printable Simulated A4 Sheet */}
-          <div className="prescription-sheet p-6 sm:p-7 rounded-2xl bg-white text-slate-900 border border-slate-300 shadow-tactile-lg min-h-[560px] flex flex-col justify-between text-left relative overflow-hidden transition-all">
+          <div className="prescription-sheet paper-sheet-floating p-6 sm:p-8 rounded-2xl min-h-[560px] flex flex-col justify-between text-left relative overflow-hidden transition-all">
             <div>
               {/* Document Header */}
               <div className="border-b-2 border-slate-900 pb-3 mb-4 text-center">

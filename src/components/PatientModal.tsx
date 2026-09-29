@@ -95,15 +95,15 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         <div 
           className="p-4 border-b flex items-center justify-between" 
           style={{ 
-            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : '#E3D7BD',
-            backgroundColor: darkMode ? '#141E2C' : '#F8F4EC'
+            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
+            backgroundColor: darkMode ? '#1E293B' : '#F8FAFC'
           }}
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-cream-100/15 text-navy-900 dark:text-cream-100 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-blue-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
               <User className="w-4 h-4" strokeWidth={2} />
             </div>
-            <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-cream-50">
+            <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-white">
               Dados do Paciente
             </h3>
           </div>
@@ -292,11 +292,11 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             />
           </div>
 
-          <div className="pt-3 border-t flex items-center justify-between gap-2" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : '#E3D7BD' }}>
+          <div className="pt-3 border-t flex items-center justify-between gap-2" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
             <button
               type="button"
               onClick={handleClear}
-              className="px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold text-navy-900 dark:text-cream-100 hover:bg-navy-900/10 dark:hover:bg-cream-100/10 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              className="px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold text-navy-900 dark:text-slate-300 hover:bg-navy-900/10 dark:hover:bg-white/10 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
               title="Limpar todos os campos para digitar novo paciente"
             >
               <Eraser className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
