@@ -18,6 +18,10 @@
 - `npm run lint`: `tsc --noEmit` limpo (Exit code: 0).
 - `npm run design:lint`: 0 erros / 0 avisos no linter de DESIGN.md (Exit code: 0).
 - `npm run build`: Vite build bem-sucedido com 38 entries PWA geradas (Exit code: 0).
+- `git push origin main`: Commit `0842e39` enviado para `melkidonadonmed-lgtm/PCM.git` (Exit code: 0).
+- `gcloud builds submit`: Imagem compilada e enviada para o Artifact Registry (Exit code: 0).
+- `gcloud run deploy`: Revisão `prescmed-00026-2dp` ativa em São Paulo (`southamerica-east1`) com HTTP 200 OK (Exit code: 0).
 
 ### Próxima Ação Recomendada
-- Validar visualmente a impressão de receita de controle especial em impressora física ou spooler PDF e prosseguir com a publicação.
+- Monitorar a utilização da aplicação em produção e validar a impressão física da receita especial em 2 vias paisagem.
+

@@ -24,4 +24,5 @@ Sistema 100% validado para o fluxo ambulatorial e de emergência:
 ---
 
 ## Próximo Ponto de Entrada
-- Deploy contínuo da versão atualizada para o Google Cloud Run ou testes e2e com médicos em ambiente de homologação.
+- Deploy concluído com sucesso no Cloud Run (revisão `prescmed-00026-2dp`, tag `0842e39`) servindo 100% do tráfego em https://prescmed-1044179901556.southamerica-east1.run.app.
+- Acompanhar feedback de uso clínico e métricas de telemetria no console GCP.
