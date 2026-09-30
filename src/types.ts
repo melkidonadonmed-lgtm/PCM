@@ -167,7 +167,6 @@ export type ActiveTab =
   | 'referral' 
   | 'protocols'
   | 'editor'
-  | 'models'
   | 'print_preview' 
   | 'patients';
 

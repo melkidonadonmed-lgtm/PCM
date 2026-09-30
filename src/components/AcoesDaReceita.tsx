@@ -56,26 +56,47 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
 
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Botão Primário: Imprimir / PDF */}
-          <button
-            type="button"
-            onClick={onNavigateToPrint}
-            className="btn-tactile-primary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Imprimir / PDF</span>
-          </button>
-
-          {/* Botão Secundário: Editor (condicional) */}
-          {onNavigateToEditor && (
+          {/* Botão Primário: Visualizar (Editor A4 em tamanho real e editável) */}
+          {onNavigateToEditor ? (
             <button
               type="button"
               onClick={onNavigateToEditor}
-              className="btn-tactile-secondary px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-sky-500"
-              title="Abrir receita no Editor"
+              disabled={itemsCount === 0}
+              className="btn-tactile-primary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
+              title="Abrir a folha A4 oficial no Editor para conferir, editar ou imprimir"
             >
-              <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>Editor</span>
+              <FileText className="w-4 h-4" />
+              <span>Visualizar</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onNavigateToPrint}
+              disabled={isActionDisabled}
+              aria-describedby={isDisabledSemMedico ? avisoId : undefined}
+              className="btn-tactile-primary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Imprimir / PDF</span>
+            </button>
+          )}
+
+          {/* Botão Secundário: Imprimir Direto (dispara impressão ou visualização de envio imediato) */}
+          {onNavigateToEditor && (
+            <button
+              type="button"
+              onClick={onNavigateToPrint}
+              disabled={isActionDisabled}
+              aria-describedby={isDisabledSemMedico ? avisoId : undefined}
+              className="btn-tactile-secondary px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 dark:text-slate-300"
+              title={
+                isDisabledSemMedico
+                  ? 'Configure nome e CRM do médico para emitir documentos.'
+                  : 'Imprimir ou salvar PDF imediatamente sem passar pela edição'
+              }
+            >
+              <Printer className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+              <span>Imprimir Direto</span>
             </button>
           )}
 

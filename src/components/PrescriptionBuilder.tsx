@@ -730,10 +730,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
             <button
               type="button"
-              onClick={onNavigateToPrint}
+              onClick={onNavigateToEditor || onNavigateToPrint}
               className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer rounded-md focus-visible:ring-2 focus-visible:ring-sky-500"
+              title="Abrir folha oficial no Editor para conferir ou editar livremente"
             >
-              <span>Abrir tela cheia</span>
+              <span>Visualizar & Editar (A4)</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

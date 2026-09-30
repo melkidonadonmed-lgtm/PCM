@@ -42,7 +42,8 @@ import {
   LayoutTemplate,
   Scissors,
   RefreshCw,
-  Layers
+  Layers,
+  ChevronLeft
 } from 'lucide-react';
 import { 
   DoctorProfile, 
@@ -196,6 +197,7 @@ interface DocumentEditorViewProps {
   onNavigateToPrint?: () => void;
   onOpenDoctorModal?: () => void;
   editorInitialSyncTrigger?: number;
+  onNavigateBack?: () => void;
 }
 
 export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
@@ -207,6 +209,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   onSaveContext,
   onOpenDoctorModal,
   editorInitialSyncTrigger = 0,
+  onNavigateBack,
 }) => {
   // Tipografia, Tamanho e Orientação da Folha A4
   const [fontFamilyId, setFontFamilyId] = useState<string>('cormorant');
@@ -625,9 +628,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
     let isMounted = true;
     const restoreDraft = async () => {
-      // Se veio explicitamente pelo botão "Editor" (trigger > 0), prioriza a receita ativa imediatamente!
-      if (editorInitialSyncTrigger && editorInitialSyncTrigger > 0) {
-        lastTriggerRef.current = editorInitialSyncTrigger;
+      // Prioridade clínica máxima: se houver itens prescritos na consulta ativa ou gatilho de sincronização, carrega a receita atual
+      if ((prescriptionItems && prescriptionItems.length > 0) || (editorInitialSyncTrigger && editorInitialSyncTrigger > 0)) {
+        if (editorInitialSyncTrigger) {
+          lastTriggerRef.current = editorInitialSyncTrigger;
+        }
         if (isMounted) {
           handleLoadActivePrescription(false);
           isDraftRestoredRef.current = true;
@@ -1480,6 +1485,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       {/* BARRA SUPERIOR: Contexto do Modelo Ativo & Ações Rápidas */}
       <div className="no-print bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-2xl p-3 shadow-tactile-sm flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap flex-1 min-w-[260px]">
+          {onNavigateBack && (
+            <button
+              type="button"
+              onClick={onNavigateBack}
+              className="h-8 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              title="Voltar à tela de montagem de receitas"
+            >
+              <ChevronLeft className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+              <span>Receitas</span>
+            </button>
+          )}
+
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-xs">
             <LayoutTemplate className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
             <span className="text-[var(--text-muted)] font-medium">Modelo:</span>
@@ -1612,10 +1629,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
       {/* BARRA DE FERRAMENTAS DO EDITOR (Fixa / Sticky) */}
       <div 
-        className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 rounded-2xl p-2.5 sm:p-3 border backdrop-blur-md shadow-tactile-sm flex flex-wrap items-center justify-between gap-2.5 bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)]"
+        className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 rounded-2xl p-2.5 sm:p-3 border backdrop-blur-md shadow-tactile-sm flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-2.5 bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)]"
       >
         {/* Agrupamento 1: Formatação Tiptap & Estilo Docs */}
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 xl:pb-0 scrollbar-none touch-pan-x flex-nowrap shrink-0">
           {/* Estilo do Parágrafo / Título */}
           <select
             value={
@@ -1838,7 +1855,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         </div>
 
         {/* Agrupamento 2: Tipografia, Orientação, Vias, Cabeçalho, Carregar Consulta & Impressão */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0 scrollbar-none touch-pan-x flex-nowrap shrink-0">
           {/* Seletor Rápido de Estilo de Receita Atual */}
           <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
             <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300">Estilo:</span>

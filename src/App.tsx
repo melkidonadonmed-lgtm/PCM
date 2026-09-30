@@ -15,10 +15,19 @@ import { UnifiedMedication } from './data/medicationDatabase';
 import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
 import { useWorkContext } from './hooks/useWorkContext';
 import { usePwaInstall } from './hooks/usePwaInstall';
+import { AsyncErrorBoundary } from './components/AsyncErrorBoundary';
 
-// Carregamento sob demanda (code-splitting) dos módulos pesados de PDF, editor e modais
+// Carregamento sob demanda com retry resiliente contra falhas de rede ou cache antigo
+const loadDocumentEditor = () =>
+  import('./components/DocumentEditorView').catch((err) => {
+    console.warn('[PresCMed] Tentando carregar Editor novamente após falha inicial:', err);
+    return new Promise<{ default: React.ComponentType<any> }>((resolve) =>
+      setTimeout(() => resolve(import('./components/DocumentEditorView')), 400)
+    );
+  });
+
+const DocumentEditorView = React.lazy(loadDocumentEditor);
 const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
-const DocumentEditorView = React.lazy(() => import('./components/DocumentEditorView'));
 const PatientModal = React.lazy(() => import('./components/PatientModal'));
 const DoctorProfileModal = React.lazy(() => import('./components/DoctorProfileModal'));
 const BackupModal = React.lazy(() => import('./components/BackupModal'));
@@ -92,6 +101,21 @@ export default function App() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('touchmove', handleTouchMove);
     };
+  }, []);
+
+  // Pré-carregamento silencioso do Editor de Documentos em background após inicialização
+  useEffect(() => {
+    const triggerPreload = () => {
+      loadDocumentEditor().catch(() => {});
+    };
+
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(triggerPreload, { timeout: 2500 });
+      } else {
+        setTimeout(triggerPreload, 1200);
+      }
+    }
   }, []);
 
   // Navegação entre abas
@@ -382,57 +406,62 @@ export default function App() {
           )}
 
           {activeTab === 'editor' && (
-            <Suspense fallback={
-              <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
-                <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
-                <span className="font-medium text-slate-600 dark:text-slate-300">
-                  Carregando processador de texto clínico e canvas A4...
-                </span>
-              </div>
-            }>
-              <DocumentEditorView
-                darkMode={darkMode}
-                doctor={doctor}
-                patient={patient}
-                prescriptionItems={prescriptionItems}
-                activeContext={activeContext}
-                onSaveContext={saveContext}
-                onNavigateToPrint={() => handleNavigateToPrint('prescription')}
-                onOpenDoctorModal={handleOpenDoctorModal}
-                editorInitialSyncTrigger={editorInitialSyncTrigger}
-              />
-            </Suspense>
+            <AsyncErrorBoundary moduleName="o Editor de Prescrições e Documentos">
+              <Suspense fallback={
+                <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
+                  <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="font-medium text-slate-600 dark:text-slate-300">
+                    Carregando processador de texto clínico e canvas A4...
+                  </span>
+                </div>
+              }>
+                <DocumentEditorView
+                  darkMode={darkMode}
+                  doctor={doctor}
+                  patient={patient}
+                  prescriptionItems={prescriptionItems}
+                  activeContext={activeContext}
+                  onSaveContext={saveContext}
+                  onNavigateToPrint={() => handleNavigateToPrint('prescription')}
+                  onOpenDoctorModal={handleOpenDoctorModal}
+                  editorInitialSyncTrigger={editorInitialSyncTrigger}
+                  onNavigateBack={() => setActiveTab('prescription')}
+                />
+              </Suspense>
+            </AsyncErrorBoundary>
           )}
 
           {activeTab === 'print_preview' && (
-            <Suspense fallback={
-              <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
-                <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
-                <span className="font-medium text-slate-600 dark:text-slate-300">
-                  Carregando visualização médica e módulos de exportação...
-                </span>
-              </div>
-            }>
-              <PrintPreview
-                darkMode={darkMode}
-                doctor={doctor}
-                patient={patient}
-                prescriptionItems={prescriptionItems}
-                exams={selectedExams}
-                selectedExams={selectedExams}
-                examIndication={examIndication}
-                certificate={certificate}
-                referral={referral}
-                activeContext={activeContext}
-                initialDocType={printDocType}
-                onNavigateBack={() => setActiveTab('prescription')}
-                onBack={() => setActiveTab('prescription')}
-                onClearPrescription={handleClearPrescription}
-                onResetAll={handleResetAll}
-                onOpenDoctorModal={handleOpenDoctorModal}
-                onAbrirPerfilMedico={handleOpenDoctorModal}
-              />
-            </Suspense>
+            <AsyncErrorBoundary moduleName="a Prévia de Impressão">
+              <Suspense fallback={
+                <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
+                  <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="font-medium text-slate-600 dark:text-slate-300">
+                    Carregando visualização médica e módulos de exportação...
+                  </span>
+                </div>
+              }>
+                <PrintPreview
+                  darkMode={darkMode}
+                  doctor={doctor}
+                  patient={patient}
+                  prescriptionItems={prescriptionItems}
+                  exams={selectedExams}
+                  selectedExams={selectedExams}
+                  examIndication={examIndication}
+                  certificate={certificate}
+                  referral={referral}
+                  activeContext={activeContext}
+                  initialDocType={printDocType}
+                  onNavigateBack={() => setActiveTab('prescription')}
+                  onBack={() => setActiveTab('prescription')}
+                  onClearPrescription={handleClearPrescription}
+                  onResetAll={handleResetAll}
+                  onOpenDoctorModal={handleOpenDoctorModal}
+                  onAbrirPerfilMedico={handleOpenDoctorModal}
+                />
+              </Suspense>
+            </AsyncErrorBoundary>
           )}
         </main>
       </div>

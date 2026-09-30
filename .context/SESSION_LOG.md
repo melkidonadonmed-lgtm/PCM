@@ -1,27 +1,23 @@
 # PresCMed — SESSION LOG (.context)
 
-## Turno: 2026-09-30 — Auditoria, 2 Vias Paisagem e Sincronização
+## Turno: 2026-09-30 — Unificação da Visualização no Editor e Blindagem de Chunks
 
 ### Arquivos Modificados / Criados
-- `src/App.tsx`: Refatoração do `handleClearPatient` para resetar integralmente a consulta e repasse de `onClearPatient` para `PrescriptionBuilder`.
-- `src/components/PrescriptionBuilder.tsx`: Adição do Card de Identificação Rápida do Paciente e botão de reset seguro da consulta.
-- `src/utils/pdfGenerator.ts`: Criação do método `generateSpecialPrescriptionLandscapePDF` para geração vetorial de A4 Paisagem (297×210 mm) com 2 vias lado a lado e linha central de corte.
-- `src/components/PrintPreview.tsx`: Renderização da folha A4 paisagem com 2 vias e injeção de CSS `@page { size: landscape; }`.
-- `src/components/MobileBottomNav.tsx`: Migração completa para o componente canônico `<Icon name="..." />` com Material Symbols.
-- `AGENTS.md`: Remoção de referências ao catálogo legado `adultMeds.ts`.
-- `src/__tests__/sanitaryCompliancePortaria344.test.ts`: Teste automatizado validando dimensões e propriedades do PDF paisagem de 2 vias.
-- `src/__tests__/patientAutofillAndClear.test.ts`: Novo teste unitário validando sincronização entre documentos e limpeza de consulta sem contaminação.
-- `.context/CURRENT_STATE.md`: Criado conforme diretriz de governança unificada.
+- `src/components/AsyncErrorBoundary.tsx`: Novo componente para contenção de falhas e retry de módulos assíncronos.
+- `src/App.tsx`: Adição do pré-carregamento em background (`requestIdleCallback`), retry no loader do Editor e envelopamento de `DocumentEditorView` e `PrintPreview` com `AsyncErrorBoundary`.
+- `src/components/AcoesDaReceita.tsx`: Reestruturação das ações — botão primário "Visualizar" abre o Editor; botão secundário "Imprimir Direto" abre a emissão rápida.
+- `src/components/PrescriptionBuilder.tsx`: Botão da folha A4 atualizado para "Visualizar & Editar (A4)" apontando para o Editor.
+- `src/components/DocumentEditorView.tsx`: Sincronização clínica prioritária da receita da consulta ativa, botão de retorno rápido "Receitas" e rolagem horizontal suave no mobile (`touch-pan-x`).
+- `src/types.ts`: Remoção da rota órfã `models` do union `ActiveTab`.
+- `src/__tests__/editorRoutingAndActions.test.ts`: Novo teste unitário validando rotas canônicas sem órfãs, despacho de ações e formatação de sincronização.
+- `.context/CURRENT_STATE.md`: Atualizado com as decisões de arquitetura e usabilidade.
+- `.context/SESSION_LOG.md`: Histórico delta do turno atualizado.
 
 ### Comandos Validados
-- `npm run test`: 51/51 testes Vitest aprovados (Exit code: 0).
-- `npm run lint`: `tsc --noEmit` limpo (Exit code: 0).
-- `npm run design:lint`: 0 erros / 0 avisos no linter de DESIGN.md (Exit code: 0).
-- `npm run build`: Vite build bem-sucedido com 38 entries PWA geradas (Exit code: 0).
-- `git push origin main`: Commit `0842e39` enviado para `melkidonadonmed-lgtm/PCM.git` (Exit code: 0).
-- `gcloud builds submit`: Imagem compilada e enviada para o Artifact Registry (Exit code: 0).
-- `gcloud run deploy`: Revisão `prescmed-00026-2dp` ativa em São Paulo (`southamerica-east1`) com HTTP 200 OK (Exit code: 0).
+- `npm run lint`: `tsc --noEmit` aprovado com 0 erros (Exit code: 0).
+- `npm run design:lint`: 0 erros / 0 avisos no linter DESIGN.md (Exit code: 0).
+- `npm test`: 54/54 testes Vitest aprovados (Exit code: 0).
+- `npm run build`: Bundle de produção gerado com sucesso em `dist/` (Exit code: 0).
 
 ### Próxima Ação Recomendada
-- Monitorar a utilização da aplicação em produção e validar a impressão física da receita especial em 2 vias paisagem.
-
+- Validar a experiência de uso no dispositivo do usuário e, se desejado, realizar deploy da nova revisão no Google Cloud Run.
