@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Download, 
   QrCode, 
@@ -18,13 +18,15 @@ import {
   FileCheck,
   Send,
   Copy,
-  Printer
+  Printer,
+  ArrowRight
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext, WatermarkType } from '../types';
 import { generateMedicalPDF } from '../utils/pdfGenerator';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
+import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
 import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
 import WatermarkOverlay from './WatermarkOverlay';
 import WatermarkSelector from './WatermarkSelector';
@@ -140,7 +142,26 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   const handleAbrirPerfil = onAbrirPerfilMedico || onOpenDoctorModal;
   const isConfigured = medicoConfigurado(doctor);
 
-  const [docType, setDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>(initialDocType);
+  // Segregação sanitária automática: medicamentos simples vs antibióticos / controle especial (2 vias)
+  const specialPrescriptionItems = useMemo(
+    () => prescriptionItems.filter(i => isSpecialControlOrAntibiotic(i)),
+    [prescriptionItems]
+  );
+  const simplePrescriptionItems = useMemo(
+    () => prescriptionItems.filter(i => !isSpecialControlOrAntibiotic(i)),
+    [prescriptionItems]
+  );
+
+  // Inicialização inteligente: se o médico clicou em emitir e todos os medicamentos forem especiais, abre direto na aba de 2 vias
+  const resolvedInitialDocType = useMemo(() => {
+    if (initialDocType && initialDocType !== 'prescription') return initialDocType;
+    if (specialPrescriptionItems.length > 0 && simplePrescriptionItems.length === 0) {
+      return 'special_prescription';
+    }
+    return initialDocType || 'prescription';
+  }, [initialDocType, specialPrescriptionItems.length, simplePrescriptionItems.length]);
+
+  const [docType, setDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>(resolvedInitialDocType);
   const [copiedLink, setCopiedLink] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
@@ -155,9 +176,26 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   // Sync docType when initialDocType prop changes
   useEffect(() => {
     if (initialDocType) {
-      setDocType(initialDocType);
+      if (initialDocType === 'prescription' && specialPrescriptionItems.length > 0 && simplePrescriptionItems.length === 0) {
+        setDocType('special_prescription');
+      } else {
+        setDocType(initialDocType);
+      }
     }
-  }, [initialDocType]);
+  }, [initialDocType, specialPrescriptionItems.length, simplePrescriptionItems.length]);
+
+  // Itens efetivos exibidos e exportados de acordo com a aba selecionada (nunca misturando na mesma folha)
+  const effectivePrescriptionItems = useMemo(() => {
+    if (docType === 'special_prescription') {
+      return specialPrescriptionItems.length > 0 ? specialPrescriptionItems : prescriptionItems;
+    }
+    if (docType === 'prescription') {
+      return simplePrescriptionItems.length > 0
+        ? simplePrescriptionItems
+        : (specialPrescriptionItems.length > 0 ? [] : prescriptionItems);
+    }
+    return prescriptionItems;
+  }, [docType, specialPrescriptionItems, simplePrescriptionItems, prescriptionItems]);
 
   // Sync docWatermark when activeContext changes
   useEffect(() => {
@@ -221,7 +259,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
         docType,
         doctor,
         patient,
-        prescriptionItems,
+        prescriptionItems: effectivePrescriptionItems,
         exams: effectiveExams,
         examIndication,
         certificate,
@@ -254,9 +292,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     const header = `📋 *DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}📅 *Data:* ${dateStr}\n------------------------------------\n`;
 
     if (docType === 'prescription' || docType === 'special_prescription') {
-      if (prescriptionItems.length === 0) return '';
-      let text = `${header}💊 *PRESCRIÇÃO TERAPÊUTICA:*\n`;
-      prescriptionItems.forEach((it, idx) => {
+      if (effectivePrescriptionItems.length === 0) return '';
+      const docLabel = docType === 'special_prescription'
+        ? 'RECEITUÁRIO DE CONTROLE ESPECIAL (2 VIAS • PORTARIA 344/98 & RDC 20/2011)'
+        : 'RECEITUÁRIO MÉDICO';
+      let text = `${header}💊 *${docLabel}:*\n`;
+      effectivePrescriptionItems.forEach((it, idx) => {
         text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
       });
       text += `\n------------------------------------\n⚠️ _Siga as instruções médicas e os horários informados._`;
@@ -350,7 +391,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  const itemsByRoute = prescriptionItems.reduce((acc, item) => {
+  const itemsByRoute = effectivePrescriptionItems.reduce((acc, item) => {
     const route = (item.route || 'Oral').toUpperCase();
     if (!acc[route]) acc[route] = [];
     acc[route].push(item);
@@ -511,7 +552,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             }`}
           >
             <FileText className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
-            <span>Receita Padrão ({prescriptionItems.length})</span>
+            <span>Receita Simples ({simplePrescriptionItems.length})</span>
           </button>
 
           <button
@@ -524,7 +565,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             }`}
           >
             <Layers className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
-            <span>Controle Especial (2 Vias)</span>
+            <span>Controle Especial • 2 Vias ({specialPrescriptionItems.length})</span>
           </button>
 
           <button
@@ -696,8 +737,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
                     {/* Medicamentos Prescritos (Foco em Nome e Quantidade para Dispensação) */}
                     <div className="space-y-2 font-serif-doc">
-                      {prescriptionItems.length === 0 ? (
-                        <p className="text-xs text-slate-400 italic py-4 text-center">Nenhum medicamento adicionado.</p>
+                      {effectivePrescriptionItems.length === 0 ? (
+                        <p className="text-xs text-slate-400 italic py-4 text-center">Nenhum antimicrobiano ou medicamento de controle especial prescrito.</p>
                       ) : (
                         (Object.entries(itemsByRoute) as [string, PrescriptionItem[]][]).map(([route, items]) => (
                           <div key={route} className="space-y-1.5">
@@ -806,8 +847,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
                     {/* Medicamentos Prescritos com Posologia Completa */}
                     <div className="space-y-2.5 font-serif-doc">
-                      {prescriptionItems.length === 0 ? (
-                        <p className="text-xs text-slate-400 italic py-4 text-center">Nenhum medicamento adicionado.</p>
+                      {effectivePrescriptionItems.length === 0 ? (
+                        <p className="text-xs text-slate-400 italic py-4 text-center">Nenhum antimicrobiano ou medicamento de controle especial prescrito.</p>
                       ) : (
                         (Object.entries(itemsByRoute) as [string, PrescriptionItem[]][]).map(([route, items]) => (
                           <div key={route} className="space-y-2">
@@ -1006,9 +1047,23 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               {/* 1. PRESCRIPTION CONTENT */}
               {docType === 'prescription' && (
                 <div className="space-y-6 sm:space-y-8 font-serif font-serif-doc" style={{ fontFamily: 'var(--font-serif-doc)' }}>
-                  {prescriptionItems.length === 0 ? (
-                    <div className="py-16 text-center italic text-base text-slate-500 font-serif">
-                      Nenhum medicamento adicionado nesta prescrição.
+                  {effectivePrescriptionItems.length === 0 ? (
+                    <div className="py-16 text-center space-y-3">
+                      <p className="italic text-base text-slate-500 font-serif">
+                        {specialPrescriptionItems.length > 0
+                          ? 'Todos os medicamentos desta consulta são antimicrobianos ou controlados (2 Vias).'
+                          : 'Nenhum medicamento adicionado nesta prescrição.'}
+                      </p>
+                      {specialPrescriptionItems.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setDocType('special_prescription')}
+                          className="px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-800 text-xs font-bold text-sky-700 dark:text-sky-300 hover:bg-sky-100 inline-flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                        >
+                          <span>Ver na aba Controle Especial (2 Vias)</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   ) : (
                     (Object.entries(itemsByRoute) as [string, PrescriptionItem[]][]).map(([route, items]) => {

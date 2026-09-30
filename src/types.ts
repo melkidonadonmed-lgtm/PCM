@@ -275,3 +275,5 @@ export interface PrescriptionStyle {
   isCustom?: boolean;
 }
 
+export type { UnifiedMedication } from './data/medicationDatabase';
+

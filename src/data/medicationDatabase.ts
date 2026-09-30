@@ -25,7 +25,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Dipirona monoidratada',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 6 em 6 horas em caso de dor ou febre.'
   },
   {
@@ -34,7 +34,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Dipirona monoidratada',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 ou 20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 6 em 6 horas se dor ou febre intensa.'
   },
   {
@@ -66,7 +66,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Paracetamol',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 6 em 6 horas em caso de dor ou febre (máx 4g/dia).'
   },
   {
@@ -75,7 +75,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Paracetamol',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 6 em 6 horas se dor ou febre.'
   },
   {
@@ -126,7 +126,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Ibuprofeno',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas após refeições por 3 a 5 dias.'
   },
   {
@@ -135,7 +135,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Ibuprofeno',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (16 cápsulas)',
+    defaultQuantity: '16 cápsulas',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 3 a 5 dias.'
   },
   {
@@ -186,7 +186,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cetoprofeno',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 3 a 5 dias.'
   },
   {
@@ -195,7 +195,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cetoprofeno',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 comprimidos)',
+    defaultQuantity: '10 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia por 3 a 5 dias.'
   },
   {
@@ -227,7 +227,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Diclofenaco sódico',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 3 a 5 dias.'
   },
   {
@@ -236,7 +236,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Diclofenaco sódico',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 ou 20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia após refeição.'
   },
   {
@@ -245,7 +245,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Diclofenaco potássico',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 drágeas)',
+    defaultQuantity: '20 drágeas',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 3 dias.'
   },
   {
@@ -277,7 +277,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Meloxicam',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 comprimidos)',
+    defaultQuantity: '10 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia após o almoço por 5 a 7 dias.'
   },
   {
@@ -286,7 +286,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Meloxicam',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 comprimidos)',
+    defaultQuantity: '10 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia.'
   },
   {
@@ -295,7 +295,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Nimesulida',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (12 comprimidos)',
+    defaultQuantity: '12 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 12 em 12 horas após refeições por no máx 5 dias (Adultos e ≥ 12 anos).'
   },
   {
@@ -313,7 +313,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Celecoxibe',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 cápsulas)',
+    defaultQuantity: '10 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral 1 a 2 vezes ao dia por 5 a 7 dias.'
   },
   {
@@ -322,7 +322,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Etoricoxibe',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (7 comprimidos)',
+    defaultQuantity: '7 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia por até 5 dias.'
   },
   {
@@ -331,7 +331,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Naproxeno',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 ou 20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 3 a 5 dias.'
   },
   {
@@ -340,7 +340,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Tenoxicam',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 comprimidos)',
+    defaultQuantity: '10 comprimidos',
     defaultPosology: 'Tomar 1 comprimido (ou 1 ampola IV/IM) 1 vez ao dia por 5 dias.'
   },
   {
@@ -349,7 +349,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Piroxicam',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (15 cápsulas)',
+    defaultQuantity: '15 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral 1 vez ao dia junto à refeição.'
   },
   {
@@ -358,7 +358,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Ácido mefenâmico',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (24 comprimidos)',
+    defaultQuantity: '24 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas durante o período de dor.'
   },
   {
@@ -367,7 +367,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Clonixinato de lisina + ciclobenzaprina',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (15 comprimidos)',
+    defaultQuantity: '15 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 3 a 5 dias.'
   },
   {
@@ -376,7 +376,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Butilbrometo de escopolamina + dipirona',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 a 2 comprimidos via oral de 8 em 8 horas se dor em cólica.'
   },
   {
@@ -394,7 +394,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Dipirona + citrato de orfenadrina + cafeína',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (24 comprimidos)',
+    defaultQuantity: '24 comprimidos',
     defaultPosology: 'Tomar 1 a 2 comprimidos (ou 30 a 60 gotas) de 6 em 6 horas se dor muscular.'
   },
   {
@@ -403,7 +403,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Paracetamol + carisoprodol + diclofenaco + cafeína',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 12 em 12 horas por no máx 5 dias.'
   },
   {
@@ -412,7 +412,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Dipirona + mucato de isometepteno + cafeína',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 drágeas)',
+    defaultQuantity: '20 drágeas',
     defaultPosology: 'Tomar 1 a 2 drágeas (ou 30 a 60 gotas) de 6 em 6 horas se cefaleia.'
   },
   {
@@ -421,7 +421,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Dimenidrinato + cloridrato de piridoxina',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido (ou 20 a 40 gotas) de 6 em 6 horas se náuseas ou vômitos.'
   },
   {
@@ -430,7 +430,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de metoclopramida',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas 30 min antes das refeições.'
   },
   {
@@ -439,7 +439,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de ondansetrona',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 comprimidos)',
+    defaultQuantity: '10 comprimidos',
     defaultPosology: 'Dissolver 1 comprimido sobre a língua de 8 em 8 horas se náuseas/vômitos.'
   },
   {
@@ -471,7 +471,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de tramadol',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 ou 20 cápsulas)',
+    defaultQuantity: '20 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral de 6 em 6 horas se dor moderada (máx 400mg/dia).',
     isSpecialControl: true
   },
@@ -491,7 +491,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Fosfato de codeína',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 4 em 4 horas ou 6 em 6 horas se dor moderada.',
     isSpecialControl: true
   },
@@ -501,7 +501,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Fosfato de codeína + paracetamol',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (12 ou 24 comprimidos)',
+    defaultQuantity: '24 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 6 em 6 horas se dor moderada.',
     isSpecialControl: true
   },
@@ -511,7 +511,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Sulfato de morfina',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (50 comprimidos)',
+    defaultQuantity: '50 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 4 em 4 horas com resgate se dor oncológica.',
     isSpecialControl: true
   },
@@ -521,7 +521,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Prednisona',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 ou 20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 a 2 comprimidos pela manhã por 5 dias com desmame subsequente.'
   },
   {
@@ -559,7 +559,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Dexametasona',
     route: 'Uso Oral',
     category: 'analgesicos',
-    defaultQuantity: '1 caixa (10 comprimidos)',
+    defaultQuantity: '10 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã por 3 dias.'
   },
   {
@@ -613,7 +613,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Amoxicilina tri-hidratada',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '2 caixas (30 cápsulas)',
+    defaultQuantity: '30 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral de 8 em 8 horas durante 7 a 10 dias.'
   },
   {
@@ -622,7 +622,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Amoxicilina tri-hidratada',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (14 ou 20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas durante 7 a 10 dias.'
   },
   {
@@ -661,7 +661,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Amoxicilina + clavulanato de potássio',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (14 ou 20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas durante 7 a 10 dias.'
   },
   {
@@ -670,7 +670,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Amoxicilina + clavulanato de potássio',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '2 caixas (21 comprimidos)',
+    defaultQuantity: '21 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 7 a 10 dias.'
   },
   {
@@ -709,7 +709,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cefalexina monoidratada',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '2 caixas (28 cápsulas)',
+    defaultQuantity: '28 cápsulas',
     defaultPosology: 'Tomar 1 comprimido via oral de 6 em 6 horas durante 7 a 10 dias.'
   },
   {
@@ -747,7 +747,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Azitromicina di-hidratada',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (5 comprimidos)',
+    defaultQuantity: '5 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia durante 5 dias (ou dose única de 1g para DST).'
   },
   {
@@ -771,7 +771,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Claritromicina',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (14 comprimidos)',
+    defaultQuantity: '14 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 10 dias.'
   },
   {
@@ -780,7 +780,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de ciprofloxacino',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (14 comprimidos)',
+    defaultQuantity: '14 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 14 dias.'
   },
   {
@@ -789,7 +789,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Levofloxacino hemi-hidratado',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (7 ou 10 comprimidos)',
+    defaultQuantity: '10 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia por 7 a 10 dias.'
   },
   {
@@ -798,7 +798,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Sulfametoxazol + trimetoprima',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (10 ou 20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas por 7 a 14 dias.'
   },
   {
@@ -822,7 +822,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Nitrofurantoína',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (28 cápsulas)',
+    defaultQuantity: '28 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral de 6 em 6 horas junto às refeições por 5 dias.'
   },
   {
@@ -840,7 +840,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Metronidazol',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (24 comprimidos)',
+    defaultQuantity: '24 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas por 7 dias (PROIBIDO ÁLCOOL).'
   },
   {
@@ -849,7 +849,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de clindamicina',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '2 caixas (32 cápsulas)',
+    defaultQuantity: '32 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral de 6 em 6 horas por 7 a 10 dias.'
   },
   {
@@ -858,7 +858,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Hiclato de doxiciclina',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (15 comprimidos)',
+    defaultQuantity: '15 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas após refeições por 7 a 14 dias.'
   },
   {
@@ -885,7 +885,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Fluconazol',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (1 ou 2 cápsulas)',
+    defaultQuantity: '2 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral em dose única (ou 1x por semana conforme indicação).'
   },
   {
@@ -903,7 +903,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Albendazol',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (1 ou 3 comprimidos)',
+    defaultQuantity: '3 comprimidos',
     defaultPosology: 'Mastigar 1 comprimido em dose única à noite (ou 3 dias consecutivos se Giardíase).'
   },
   {
@@ -912,7 +912,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Ivermectina',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (2 ou 4 comprimidos)',
+    defaultQuantity: '4 comprimidos',
     defaultPosology: 'Tomar 1 comprimido para cada 30kg de peso corporal em dose única em jejum.'
   },
   {
@@ -921,7 +921,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Nitazoxanida',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (6 comprimidos)',
+    defaultQuantity: '6 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas com alimentos por 3 dias.'
   },
   {
@@ -930,7 +930,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Aciclovir',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (25 ou 30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 4 em 4 horas (5x ao dia) por 5 a 7 dias.'
   },
   {
@@ -939,7 +939,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Fosfato de oseltamivir',
     route: 'Uso Oral',
     category: 'antibioticos',
-    defaultQuantity: '1 caixa (10 cápsulas)',
+    defaultQuantity: '10 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral de 12 em 12 horas durante 5 dias consecutivos.'
   },
 
@@ -952,7 +952,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Losartana potássica',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '2 caixas (60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã (ou de 12/12h se necessário).'
   },
   {
@@ -961,7 +961,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Losartana potássica',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -970,7 +970,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Losartana potássica + hidroclorotiazida',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -979,7 +979,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Maleato de enalapril',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '2 caixas (60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas (ou 1x ao dia).'
   },
   {
@@ -988,7 +988,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Captopril',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '2 caixas (60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 8/8h ou 12/12h 1 hora antes das refeições.'
   },
   {
@@ -997,7 +997,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Besilato de anlodipino',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia à noite.'
   },
   {
@@ -1006,7 +1006,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Besilato de anlodipino',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia à noite.'
   },
   {
@@ -1015,7 +1015,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Hidroclorotiazida',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -1024,7 +1024,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Clortalidona',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -1033,7 +1033,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Furosemida',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (20 ou 30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 a 2 comprimidos via oral pela manhã em jejum.'
   },
   {
@@ -1051,7 +1051,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Espironolactona',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -1060,7 +1060,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Succinato de metoprolol',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -1069,7 +1069,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Atenolol',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -1078,7 +1078,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Carvedilol',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '2 caixas (60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas junto às refeições.'
   },
   {
@@ -1087,7 +1087,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de propranolol',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 ou 60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas.'
   },
   {
@@ -1096,7 +1096,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Metildopa',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '2 caixas (60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 8 em 8 horas (1ª escolha na hipertensão gestacional).'
   },
   {
@@ -1105,7 +1105,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Sinvastatina',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia à noite ao deitar.'
   },
   {
@@ -1114,7 +1114,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Atorvastatina cálcica',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia à noite.'
   },
   {
@@ -1123,7 +1123,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Rosuvastatina cálcica',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia.'
   },
   {
@@ -1132,7 +1132,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Ácido acetilsalicílico',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral após o almoço para profilaxia cardiovascular.'
   },
   {
@@ -1141,7 +1141,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Bissulfato de clopidogrel',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (28 comprimidos)',
+    defaultQuantity: '28 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia.'
   },
   {
@@ -1150,7 +1150,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Varfarina sódica',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar dose titulada para manter RNI alvo entre 2,0 e 3,0.'
   },
   {
@@ -1159,7 +1159,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Rivaroxabana',
     route: 'Uso Oral',
     category: 'cardio',
-    defaultQuantity: '1 caixa (28 comprimidos)',
+    defaultQuantity: '28 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia com alimentos.'
   },
 
@@ -1172,7 +1172,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de metformina',
     route: 'Uso Oral',
     category: 'diabetes',
-    defaultQuantity: '2 caixas (60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 2 vezes ao dia junto às principais refeições.'
   },
   {
@@ -1181,7 +1181,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de metformina',
     route: 'Uso Oral',
     category: 'diabetes',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 a 2 comprimidos ao jantar.'
   },
   {
@@ -1190,7 +1190,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Gliclazida',
     route: 'Uso Oral',
     category: 'diabetes',
-    defaultQuantity: '1 caixa (30 ou 60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 a 2 comprimidos via oral pela manhã antes do café.'
   },
   {
@@ -1199,7 +1199,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Glibenclamida',
     route: 'Uso Oral',
     category: 'diabetes',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral antes do café da manhã.'
   },
   {
@@ -1208,7 +1208,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Dapagliflozina',
     route: 'Uso Oral',
     category: 'diabetes',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -1217,7 +1217,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Empagliflozina',
     route: 'Uso Oral',
     category: 'diabetes',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.'
   },
   {
@@ -1226,7 +1226,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Vildagliptina',
     route: 'Uso Oral',
     category: 'diabetes',
-    defaultQuantity: '1 caixa (56 comprimidos)',
+    defaultQuantity: '56 comprimidos',
     defaultPosology: 'Tomar 1 comprimido 2 vezes ao dia.'
   },
   {
@@ -1253,7 +1253,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Levotiroxina sódica',
     route: 'Uso Oral',
     category: 'diabetes',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido em jejum absoluto com água, 30 a 60 minutos antes do café da manhã.'
   },
 
@@ -1312,7 +1312,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Budesonida',
     route: 'Uso Inalatória',
     category: 'respiratorio',
-    defaultQuantity: '1 caixa (5 ou 20 flaconetes)',
+    defaultQuantity: '20 flaconetes',
     defaultPosology: 'Fazer inalação com 1 flaconete (2mL) 1 a 2 vezes ao dia.'
   },
   {
@@ -1330,7 +1330,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Loratadina',
     route: 'Uso Oral',
     category: 'respiratorio',
-    defaultQuantity: '1 caixa (12 comprimidos)',
+    defaultQuantity: '12 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia por 5 a 7 dias.'
   },
   {
@@ -1353,7 +1353,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Desloratadina',
     route: 'Uso Oral',
     category: 'respiratorio',
-    defaultQuantity: '1 caixa (10 ou 30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia.'
   },
   {
@@ -1362,7 +1362,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Dicloridrato de cetirizina',
     route: 'Uso Oral',
     category: 'respiratorio',
-    defaultQuantity: '1 caixa (12 comprimidos)',
+    defaultQuantity: '12 comprimidos',
     defaultPosology: 'Tomar 1 comprimido (ou 20 gotas) 1 vez ao dia à noite.'
   },
   {
@@ -1371,7 +1371,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Maleato de dexclorfeniramina',
     route: 'Uso Oral',
     category: 'respiratorio',
-    defaultQuantity: '1 caixa (20 comprimidos)',
+    defaultQuantity: '20 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral de 8 em 8 horas.'
   },
   {
@@ -1394,7 +1394,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de hidroxizina',
     route: 'Uso Oral',
     category: 'respiratorio',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 8/8h ou à noite ao deitar.'
   },
   {
@@ -1403,7 +1403,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Acetilcisteína',
     route: 'Uso Oral',
     category: 'respiratorio',
-    defaultQuantity: '1 caixa (16 envelopes)',
+    defaultQuantity: '16 envelopes',
     defaultPosology: 'Dissolver 1 sachê em meio copo de água 1 vez ao dia (600mg) ou de 8/8h (200mg).'
   },
   {
@@ -1425,7 +1425,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Omeprazol magnésico',
     route: 'Uso Oral',
     category: 'gastro',
-    defaultQuantity: '2 caixas (56 cápsulas)',
+    defaultQuantity: '56 cápsulas',
     defaultPosology: 'Tomar 1 cápsula pela manhã em jejum 30 minutos antes do café por 4 a 8 semanas.'
   },
   {
@@ -1434,7 +1434,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Pantoprazol sódico',
     route: 'Uso Oral',
     category: 'gastro',
-    defaultQuantity: '1 caixa (28 comprimidos)',
+    defaultQuantity: '28 comprimidos',
     defaultPosology: 'Tomar 1 comprimido pela manhã em jejum 30 min antes do café.'
   },
   {
@@ -1443,7 +1443,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Domperidona',
     route: 'Uso Oral',
     category: 'gastro',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido 15 a 30 minutos antes das refeições (máx 3x/dia).'
   },
   {
@@ -1489,7 +1489,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Racecadotrila',
     route: 'Uso Oral',
     category: 'gastro',
-    defaultQuantity: '1 caixa (9 cápsulas)',
+    defaultQuantity: '9 cápsulas',
     defaultPosology: 'Tomar 1 cápsula de 8 em 8 horas antes das refeições até normalizar o trânsito.'
   },
   {
@@ -1498,7 +1498,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Racecadotrila',
     route: 'Uso Oral',
     category: 'gastro',
-    defaultQuantity: '1 caixa (16 sachês)',
+    defaultQuantity: '16 sachês',
     defaultPosology: 'Dar 1,5mg/kg/dose dissolvido em água de 8 em 8 horas por até 5 dias.',
     isPediatric: true,
     pediatricDoseMgKg: 1.5,
@@ -1521,7 +1521,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Sulfato ferroso',
     route: 'Uso Oral',
     category: 'gastro',
-    defaultQuantity: '2 caixas (60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 a 2 comprimidos ao dia 1 hora antes do almoço com suco cítrico.'
   },
   {
@@ -1548,7 +1548,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de fluoxetina',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 cápsulas)',
+    defaultQuantity: '30 cápsulas',
     defaultPosology: 'Tomar 1 cápsula pela manhã após o café da manhã.',
     isSpecialControl: true
   },
@@ -1558,7 +1558,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de sertralina',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral pela manhã (ou à noite).',
     isSpecialControl: true
   },
@@ -1568,7 +1568,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Oxalato de escitalopram',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia pela manhã.',
     isSpecialControl: true
   },
@@ -1578,7 +1578,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de amitriptilina',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral à noite ao deitar.',
     isSpecialControl: true
   },
@@ -1588,7 +1588,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Diazepam',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido à noite ou se crise de ansiedade aguda.',
     isSpecialControl: true
   },
@@ -1598,7 +1598,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Clonazepam',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido via oral à noite ao deitar.',
     isSpecialControl: true
   },
@@ -1618,7 +1618,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Hemitartarato de zolpidem',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (20 ou 30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido imediatamente antes de deitar na cama (indutor do sono).',
     isSpecialControl: true
   },
@@ -1628,7 +1628,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Pregabalina',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 cápsulas)',
+    defaultQuantity: '30 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral 1 a 2 vezes ao dia.',
     isSpecialControl: true
   },
@@ -1638,7 +1638,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Carbamazepina',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 12 em 12 horas ou 8 em 8 horas.',
     isSpecialControl: true
   },
@@ -1648,7 +1648,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Haloperidol',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido de 8/8h ou 12/12h conforme indicação.',
     isSpecialControl: true
   },
@@ -1658,7 +1658,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Risperidona',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido à noite ao deitar (ou 12/12h).',
     isSpecialControl: true
   },
@@ -1668,7 +1668,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Hemifumarato de quetiapina',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 comprimidos)',
+    defaultQuantity: '30 comprimidos',
     defaultPosology: 'Tomar 1 comprimido à noite ao deitar.',
     isSpecialControl: true
   },
@@ -1678,7 +1678,7 @@ export const UNIFIED_MEDICATIONS: UnifiedMedication[] = [
     activeIngredient: 'Cloridrato de metilfenidato',
     route: 'Uso Oral',
     category: 'snc',
-    defaultQuantity: '1 caixa (30 ou 60 comprimidos)',
+    defaultQuantity: '60 comprimidos',
     defaultPosology: 'Tomar 1 comprimido 1 a 2 vezes ao dia (manhã e almoço).',
     isSpecialControl: true
   }

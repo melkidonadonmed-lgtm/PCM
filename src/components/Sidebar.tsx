@@ -122,6 +122,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
+  // Fechamento pelo teclado (Escape) no modo mobile
+  useEffect(() => {
+    if (!isOpen || isDesktop) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isDesktop, onClose]);
+
   // Estado do Modal de Confirmação HITL para Ações Destrutivas
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -242,6 +254,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
+  const handleNavClick = (tabId: ActiveTab) => {
+    onSelectTab(tabId);
+    if (!isDesktop) {
+      onClose?.();
+    }
+  };
+
+  const handleOpenDoctor = () => {
+    onOpenDoctorModal?.();
+    if (!isDesktop) onClose?.();
+  };
+
+  const handleOpenPatient = () => {
+    onOpenPatientModal?.();
+    if (!isDesktop) onClose?.();
+  };
+
+  const handleOpenBackup = () => {
+    onOpenBackupModal?.();
+    if (!isDesktop) onClose?.();
+  };
+
+  const handleAplicarKitWithClose = (kit: ClinicalKit) => {
+    onAplicarKit?.(kit);
+    if (!isDesktop) onClose?.();
+  };
+
   const renderNavButton = (item: { id: ActiveTab; label: string; fullLabel?: string; shortLabel: string; icon: React.ElementType; badge?: string }) => {
     const Icon = item.icon;
     const isActive = activeTab === item.id;
@@ -252,7 +291,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           key={item.id}
           id={`nav-btn-${item.id}`}
           type="button"
-          onClick={() => onSelectTab(item.id)}
+          onClick={() => handleNavClick(item.id)}
           aria-current={isActive ? 'page' : undefined}
           className={`w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative ${
             isActive
@@ -285,7 +324,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         key={item.id}
         id={`nav-btn-${item.id}`}
         type="button"
-        onClick={() => onSelectTab(item.id)}
+        onClick={() => handleNavClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
         className={`w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
           isActive
@@ -321,48 +360,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Overlay Backdrop on Mobile */}
-      {isOpen && (
-        <div 
-          onClick={onClose || onToggleOpen}
-          aria-label="Fechar menu lateral"
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-xs lg:hidden transition-opacity cursor-pointer"
-        />
-      )}
+      <div 
+        onClick={onClose || onToggleOpen}
+        aria-label="Fechar menu lateral"
+        className={`fixed inset-0 z-50 bg-black/70 backdrop-blur-xs lg:hidden transition-opacity duration-300 cursor-pointer ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
 
       <aside
         id="prescmed-sidebar"
         aria-label="Menu Lateral de Navegação"
-        inert={!isOpen && !isDesktop}
-        className={`fixed lg:sticky top-16 left-0 h-[calc(100dvh-4rem)] z-40 flex flex-col flex-shrink-0 transition-[width] duration-300 no-print rounded-r-2xl lg:rounded-2xl ${
+        aria-hidden={!isOpen && !isDesktop}
+        inert={!isOpen && !isDesktop ? true : undefined}
+        className={`fixed top-0 left-0 h-dvh z-50 w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform transition-transform duration-300 ease-out ${
+          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full pointer-events-none'
+        } lg:pointer-events-auto lg:sticky lg:top-16 lg:h-[calc(100dvh-4rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl lg:transition-[width] lg:duration-200 lg:ease-in-out ${
           isOpen
-            ? 'w-64 sm:w-72 shadow-tactile-navy border'
-            : isDesktop
-            ? 'w-[68px] overflow-hidden border'
-            : 'w-0 overflow-hidden border-0'
+            ? 'lg:w-64 sm:lg:w-72 shadow-tactile-navy border'
+            : 'lg:w-[68px] overflow-hidden border'
         }`}
         style={{
           backgroundColor: darkMode ? '#0B1120' : '#0F172A',
-          borderColor: (!isOpen && !isDesktop) ? 'transparent' : 'rgba(255, 255, 255, 0.08)',
-          boxShadow: (!isOpen && !isDesktop)
-            ? 'none'
+          borderColor: (!isOpen && isDesktop) ? 'rgba(255, 255, 255, 0.08)' : (isOpen ? 'rgba(255, 255, 255, 0.12)' : 'transparent'),
+          boxShadow: !isDesktop
+            ? (isOpen ? '0 20px 40px rgba(0,0,0,0.7), 4px 0 24px rgba(0,0,0,0.5)' : 'none')
             : darkMode
             ? '0 12px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)'
             : '0 10px 25px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255,255,255,0.1)'
         }}
       >
-        <div className={`overflow-y-auto flex-1 custom-scrollbar ${
-          isOpen ? 'p-3 space-y-4' : 'py-3 px-1.5 space-y-3 flex flex-col items-center'
+        <div className={`overflow-y-auto overscroll-contain flex-1 custom-scrollbar ${
+          isOpen ? 'p-3 space-y-4 pb-14 sm:pb-8' : 'py-3 px-1.5 space-y-3 flex flex-col items-center'
         }`}>
           
           {/* Mobile Header with Close Button */}
-          <div className="flex items-center justify-between pb-2 border-b border-white/10 lg:hidden">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-300">
-              Menu de Navegação
-            </span>
+          <div className="flex items-center justify-between pb-3 pt-1 border-b border-white/10 lg:hidden">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-200">
+                Menu PresCMed
+              </span>
+            </div>
             <button
+              type="button"
               onClick={onClose || onToggleOpen}
               aria-label="Fechar menu lateral"
-              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg flex items-center justify-center text-slate-300 hover:text-white cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -381,11 +425,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Doctor Profile Badge Compacto */}
           {isOpen ? (
             <div
-              onClick={onOpenDoctorModal}
+              onClick={handleOpenDoctor}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenDoctorModal?.();
+                  handleOpenDoctor();
                 }
               }}
               role="button"
@@ -413,11 +457,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <button
               type="button"
-              onClick={onOpenDoctorModal}
+              onClick={handleOpenDoctor}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenDoctorModal?.();
+                  handleOpenDoctor();
                 }
               }}
               className="w-11 h-11 mx-auto rounded-xl bg-white/10 text-sky-200 border border-white/15 hover:bg-white/15 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
@@ -476,7 +520,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <button
                         key={kit.id}
                         type="button"
-                        onClick={() => onAplicarKit?.(kit)}
+                        onClick={() => handleAplicarKitWithClose(kit)}
                         className="w-full text-left p-2 rounded-xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.08] hover:border-amber-400/30 transition cursor-pointer group active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                         title={`Aplicar kit: ${kit.name} (${kit.badge})`}
                       >
@@ -534,11 +578,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Active Patient Badge */}
           {isOpen ? (
             <div
-              onClick={onOpenPatientModal}
+              onClick={handleOpenPatient}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenPatientModal?.();
+                  handleOpenPatient();
                 }
               }}
               role="button"
@@ -567,11 +611,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <button
               type="button"
-              onClick={onOpenPatientModal}
+              onClick={handleOpenPatient}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenPatientModal?.();
+                  handleOpenPatient();
                 }
               }}
               className="w-11 h-11 mx-auto rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none shadow-tactile-sm"
@@ -628,7 +672,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {onOpenBackupModal && (
                 <button
                   type="button"
-                  onClick={onOpenBackupModal}
+                  onClick={handleOpenBackup}
                   className="w-full py-2 px-3 rounded-xl border border-white/10 text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition cursor-pointer flex items-center justify-center gap-2 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                   title="Exportar ou restaurar arquivo de backup (.pcm.json)"
                 >
@@ -655,7 +699,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!isOpen && onOpenBackupModal && (
             <button
               type="button"
-              onClick={onOpenBackupModal}
+              onClick={handleOpenBackup}
               className="w-11 h-11 mx-auto rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400 outline-none shadow-tactile-sm relative group"
               title="Backup / Portabilidade (.pcm.json)"
               aria-label="Backup e Portabilidade"

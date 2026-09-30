@@ -12,6 +12,7 @@ import {
 import { PEDIATRIC_MEDICATIONS } from '../data/pediatricMeds';
 import { PediatricMedication, PrescriptionItem, Patient } from '../types';
 import { calculatePediatricDose } from '../utils/doseCalculator';
+import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
 
 interface PediatricCalculatorProps {
   darkMode: boolean;
@@ -90,6 +91,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       durationDays: med.defaultDays || 5,
       instructions: calc.formattedPrescriptionText,
       isContinuous: false,
+      isSpecialControl: Boolean((med as any).isSpecialControl) || isSpecialControlOrAntibiotic(med.name) || med.category.toLowerCase().includes('antibiótico') || med.category.toLowerCase().includes('antibiotico'),
       calculatedFromWeight: patientWeight
     };
 

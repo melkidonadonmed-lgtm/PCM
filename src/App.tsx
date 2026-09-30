@@ -75,33 +75,18 @@ export default function App() {
     return () => window.removeEventListener('resize', handleBreakpointChange);
   }, []);
 
-  // Fechamento automático da barra lateral ao rolar (apenas abaixo de lg / mobile)
+  // Trava a rolagem da página de fundo (body) enquanto o menu lateral mobile estiver aberto
   useEffect(() => {
-    let lastScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      if (window.innerWidth >= 1024) return;
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > 30 && currentScrollY > lastScrollY + 5) {
-        setSidebarOpen(false);
-      }
-      lastScrollY = currentScrollY;
-    };
-
-    const handleTouchMove = () => {
-      if (window.innerWidth >= 1024) return;
-      if (window.scrollY > 20) {
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, []);
+    if (typeof window === 'undefined') return;
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile && sidebarOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [sidebarOpen]);
 
   // Pré-carregamento silencioso do Editor de Documentos em background após inicialização
   useEffect(() => {
@@ -355,7 +340,7 @@ export default function App() {
               onToggleWeightCalc={handleToggleWeightCalc}
               onClearPrescription={handleClearPrescription}
               onClearPatient={handleClearPatient}
-              onNavigateToPrint={() => handleNavigateToPrint('prescription')}
+              onNavigateToPrint={(type) => handleNavigateToPrint(type || 'prescription')}
               onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
               onNavigateToEditor={handleNavigateToEditor}
               onNavigateToCertificate={handleNavigateToCertificate}

@@ -62,6 +62,7 @@ import {
 import { db, initializeDefaultTemplates } from '../services/db';
 import { PRESET_LOGOS } from '../data/presetAssets';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
+import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
 import LogoGeneratorModal from './LogoGeneratorModal';
 import WatermarkOverlay from './WatermarkOverlay';
 import WatermarkSelector from './WatermarkSelector';
@@ -413,10 +414,16 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     if (!items || items.length === 0) {
       return '<p><em>(Nenhum medicamento registrado na aba de prescrição)</em></p>';
     }
-    return items.map((item, idx) => `
-      <p><strong>${idx + 1}. ${item.name}${item.presentation ? ` (${item.presentation})` : ''}</strong> (${item.route}) -------------------- ${item.quantity}</p>
-      <p style="margin-left: 20px;">${item.instructions}</p>
-    `).join('<p><br></p>');
+    return items.map((item, idx) => {
+      const presLower = (item.presentation || '').toLowerCase();
+      const qtdLower = (item.quantity || '').toLowerCase();
+      const showPres = item.presentation && presLower !== qtdLower && !presLower.includes('caixa') && presLower !== 'uso oral' && !qtdLower.includes(presLower);
+      const presLabel = showPres ? ` (${item.presentation})` : '';
+      return `
+        <p><strong>${idx + 1}. ${item.name}${presLabel}</strong> (${item.route}) -------------------- ${item.quantity}</p>
+        <p style="margin-left: 20px;">${item.instructions}</p>
+      `;
+    }).join('<p><br></p>');
   }, []);
 
   // Formatador do sumário do paciente
@@ -534,11 +541,43 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     }
   }, [editorHtml, editor]);
 
-  // Construtor e carregador completo da receita médica em tempo real
-  const handleLoadActivePrescription = useCallback((showToastMsg = true) => {
+  const [activeLoadedRecipeType, setActiveLoadedRecipeType] = useState<'special' | 'simple' | null>(null);
+
+  const specialPrescriptionItems = useMemo(
+    () => (prescriptionItems || []).filter(i => isSpecialControlOrAntibiotic(i)),
+    [prescriptionItems]
+  );
+  const simplePrescriptionItems = useMemo(
+    () => (prescriptionItems || []).filter(i => !isSpecialControlOrAntibiotic(i)),
+    [prescriptionItems]
+  );
+  const hasBothPrescriptionTypesInEditor = specialPrescriptionItems.length > 0 && simplePrescriptionItems.length > 0;
+
+  // Construtor e carregador completo da receita médica em tempo real com segregação inteligente
+  const handleLoadActivePrescription = useCallback((showToastMsg = true, targetMode: 'auto' | 'special' | 'simple' = 'auto') => {
     if (!editor) return;
 
-    const isSpecial = prescriptionItems && prescriptionItems.some(i => i.isSpecialControl);
+    const allItems = prescriptionItems || [];
+    const specialItems = allItems.filter(i => isSpecialControlOrAntibiotic(i));
+    const simpleItems = allItems.filter(i => !isSpecialControlOrAntibiotic(i));
+
+    let effectiveMode: 'special' | 'simple' = 'simple';
+    if (targetMode === 'special') {
+      effectiveMode = 'special';
+    } else if (targetMode === 'simple') {
+      effectiveMode = 'simple';
+    } else {
+      // Prioridade sanitária: se houver antimicrobianos ou substâncias controladas, abre em 2 vias
+      effectiveMode = specialItems.length > 0 ? 'special' : 'simple';
+    }
+
+    const isSpecial = effectiveMode === 'special';
+    const itemsToLoad = isSpecial
+      ? (specialItems.length > 0 ? specialItems : allItems)
+      : (simpleItems.length > 0 ? simpleItems : allItems);
+
+    setActiveLoadedRecipeType(isSpecial ? 'special' : 'simple');
+
     const pName = patient?.name?.trim() || '______________________________';
     const pDoc = patient?.documentNumber ? ` • Doc: ${patient.documentNumber}` : '';
     const pAge = patient?.ageText || (patient?.birthDate ? ` • Idade: ${patient.ageText || patient.birthDate}` : '');
@@ -550,12 +589,19 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       setViaLayout('2-vias');
       setPageOrientation('landscape');
       setBaseFontSize(10);
+    } else {
+      setViaLayout('1-via');
+      setPageOrientation('portrait');
+      setBaseFontSize(11);
     }
 
-    const itemsHtml = prescriptionItems && prescriptionItems.length > 0
-      ? prescriptionItems.map((item, idx) => {
+    const itemsHtml = itemsToLoad && itemsToLoad.length > 0
+      ? itemsToLoad.map((item, idx) => {
           const route = item.route ? `(${item.route})` : '';
-          const presentation = item.presentation ? ` (${item.presentation})` : '';
+          const presLower = (item.presentation || '').toLowerCase();
+          const qtdLower = (item.quantity || '').toLowerCase();
+          const showPres = item.presentation && presLower !== qtdLower && !presLower.includes('caixa') && presLower !== 'uso oral' && !qtdLower.includes(presLower);
+          const presentation = showPres ? ` (${item.presentation})` : '';
           const quantity = item.quantity ? ` ----------------- ${item.quantity}` : '';
           const instructions = item.instructions || 'Conforme orientação médica.';
           const times = item.scheduleTimes && item.scheduleTimes.length > 0
@@ -609,7 +655,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     isDraftRestoredRef.current = true;
     triggerAutoSave(editor);
     if (showToastMsg) {
-      showToast(isSpecial ? 'Receita Especial de 2 Vias carregada na folha!' : 'Receita médica da consulta carregada no editor!');
+      showToast(isSpecial ? 'Receita de Controle Especial (2 Vias • Paisagem) carregada no editor!' : 'Receita médica comum (1 Via • Retrato) carregada no editor!');
     }
   }, [editor, prescriptionItems, patient, headerConfig.showPatientBanner, triggerAutoSave]);
 
@@ -2350,6 +2396,45 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* SELETOR RÁPIDO ENTRE RECEITAS QUANDO HOUVER ITENS SIMPLES E ESPECIAIS NA MESMA CONSULTA */}
+      {hasBothPrescriptionTypesInEditor && (
+        <div className="no-print p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-tactile-sm">
+          <div className="flex items-center gap-2 text-xs text-amber-900 dark:text-amber-200">
+            <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <div>
+              <span className="font-bold">Segregação Sanitária:</span>
+              <span className="ml-1 text-[11px] opacity-90">
+                Esta consulta possui antimicrobianos/controlados e medicamentos comuns. Alterne a folha:
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => handleLoadActivePrescription(true, 'special')}
+              className={`flex-1 sm:flex-initial h-8 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 shadow-tactile-sm ${
+                activeLoadedRecipeType === 'special'
+                  ? 'bg-amber-600 text-white border border-amber-700'
+                  : 'bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 hover:bg-amber-50'
+              }`}
+            >
+              <span>📑 Controle Especial ({specialPrescriptionItems.length} • 2 Vias)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleLoadActivePrescription(true, 'simple')}
+              className={`flex-1 sm:flex-initial h-8 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 shadow-tactile-sm ${
+                activeLoadedRecipeType === 'simple'
+                  ? 'bg-sky-600 text-white border border-sky-700'
+                  : 'bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800 hover:bg-sky-50'
+              }`}
+            >
+              <span>📋 Receita Simples ({simplePrescriptionItems.length} • 1 Via)</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ÁREA DA FOLHA A4 TÁTIL MILIMÉTRICA (210mm x 297mm) */}
       <div className="flex justify-center w-full overflow-x-auto py-2">

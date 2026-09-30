@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral } from '../types';
 import { medicoConfigurado } from './medicoConfigurado';
+import { isSpecialControlOrAntibiotic } from './isSpecialControlOrAntibiotic';
 
 export interface PDFExportOptions {
   docType: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral';
@@ -26,6 +27,8 @@ const numberToWordsPtBr = (num: number): string => {
 
 const generateSpecialPrescriptionLandscapePDF = (options: PDFExportOptions): jsPDF => {
   const { doctor, patient, prescriptionItems } = options;
+  const specialItems = (prescriptionItems || []).filter(i => isSpecialControlOrAntibiotic(i));
+  const effectiveItems = specialItems.length > 0 ? specialItems : (prescriptionItems || []);
 
   const pdf = new jsPDF({
     orientation: 'landscape',
@@ -160,14 +163,14 @@ const generateSpecialPrescriptionLandscapePDF = (options: PDFExportOptions): jsP
     let currentY = (pdf as any).lastAutoTable.finalY + 3;
 
     // Prescrição de Medicamentos
-    if (prescriptionItems.length === 0) {
+    if (effectiveItems.length === 0) {
       pdf.setFont('times', 'italic');
       pdf.setFontSize(9);
       pdf.setTextColor(148, 163, 184);
-      pdf.text('Nenhum medicamento adicionado.', startX + (colWidth / 2), currentY + 15, { align: 'center' });
+      pdf.text('Nenhum medicamento de controle especial ou antimicrobiano.', startX + (colWidth / 2), currentY + 15, { align: 'center' });
       currentY += 25;
     } else {
-      const itemsByRoute = prescriptionItems.reduce((acc, item) => {
+      const itemsByRoute = effectiveItems.reduce((acc, item) => {
         const route = (item.route || 'Oral').toUpperCase();
         if (!acc[route]) acc[route] = [];
         acc[route].push(item);
@@ -189,7 +192,11 @@ const generateSpecialPrescriptionLandscapePDF = (options: PDFExportOptions): jsP
 
         const rows: any[] = [];
         items.forEach((item, idx) => {
-          const headline = `${idx + 1}) ${item.name.toUpperCase()} (${item.presentation}) -------- ${item.quantity}`;
+          const presLower = (item.presentation || '').toLowerCase();
+          const qtdLower = (item.quantity || '').toLowerCase();
+          const showPres = item.presentation && presLower !== qtdLower && !presLower.includes('caixa') && presLower !== 'uso oral' && !qtdLower.includes(presLower);
+          const presLabel = showPres ? ` (${item.presentation})` : '';
+          const headline = `${idx + 1}) ${item.name.toUpperCase()}${presLabel} -------- ${item.quantity}`;
           let posologyText = item.instructions;
           if (isSecondCopy && item.scheduleTimes && item.scheduleTimes.length > 0) {
             posologyText += ` [Horários: ${item.scheduleTimes.join(' • ')}]`;
@@ -563,15 +570,19 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
   const renderDocumentContent = (isSecondCopy = false) => {
     let currentY = renderHeader(pdf, isSecondCopy);
 
-    // 1. PRESCRIPTION (Standard Ambulatorial)
+    // 1. PRESCRIPTION (Standard Ambulatorial - 1 Via Simples)
     if (docType === 'prescription') {
-      if (prescriptionItems.length === 0) {
+      const simpleItems = (prescriptionItems || []).filter(i => !isSpecialControlOrAntibiotic(i));
+      const hasSpecial = (prescriptionItems || []).some(i => isSpecialControlOrAntibiotic(i));
+      const effectiveItems = simpleItems.length > 0 ? simpleItems : (hasSpecial ? [] : prescriptionItems);
+
+      if (effectiveItems.length === 0) {
         pdf.setFont('times', 'italic');
         pdf.setFontSize(11);
         pdf.setTextColor(148, 163, 184);
-        pdf.text('Nenhum medicamento adicionado nesta prescrição.', pageWidth / 2, currentY + 30, { align: 'center' });
+        pdf.text('Nenhum medicamento simples nesta prescrição.', pageWidth / 2, currentY + 30, { align: 'center' });
       } else {
-        const itemsByRoute = prescriptionItems.reduce((acc, item) => {
+        const itemsByRoute = effectiveItems.reduce((acc, item) => {
           const route = (item.route || 'Oral').toUpperCase();
           if (!acc[route]) acc[route] = [];
           acc[route].push(item);
@@ -594,7 +605,11 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
           // Items Table via autoTable
           const rows: any[] = [];
           items.forEach((item, idx) => {
-            const headline = `${idx + 1})  ${item.name.toUpperCase()}  (${item.presentation})  -------------  ${item.quantity}`;
+            const presLower = (item.presentation || '').toLowerCase();
+            const qtdLower = (item.quantity || '').toLowerCase();
+            const showPres = item.presentation && presLower !== qtdLower && !presLower.includes('caixa') && presLower !== 'uso oral' && !qtdLower.includes(presLower);
+            const presLabel = showPres ? ` (${item.presentation})` : '';
+            const headline = `${idx + 1})  ${item.name.toUpperCase()}${presLabel}  -------------  ${item.quantity}`;
             let posology = item.instructions;
             if (item.scheduleTimes && item.scheduleTimes.length > 0) {
               posology += `\nHorários sugeridos: [ ${item.scheduleTimes.join(' • ')} ]`;

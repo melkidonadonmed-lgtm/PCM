@@ -141,5 +141,39 @@ npm run preview     # Pré-visualização do bundle compilado
     - **Correção de Crash no Tiptap (2 Vias)**: No `DocumentEditorView`, eliminado o segundo `<EditorContent editor={editor} />` na 2ª via da folha de controle especial, substituindo-o por renderização direta em HTML estático para evitar colisão do DOM do ProseMirror.
     - **Correção de Ícone no MobileBottomNav**: Corrigido alias `editor: 'edit_document'` em `Icon.tsx`, sanando o vazamento de ligadura tipográfica `"OR"`.
     - **Qualidade & Deploy Cloud Run**: 55/55 testes aprovados no Vitest, `design:lint` e `tsc` limpos. Nova revisão `prescmed-00036-9dl` ativa no Google Cloud Run (`https://prescmed-1044179901556.southamerica-east1.run.app`).
+  - **Correção da Sidebar Mobile, Drawer GPU & Blindagem de Toque**:
+    - **Eliminação do Colapso Acidental**: Removidos listeners agressivos de `touchmove` e `scroll` em `window` que fechavam a sidebar ao menor movimento do dedo.
+    - **Drawer Mobile via GPU Transform**: Substituída a animação de largura (`transition-[width]`) que causava reflow contínuo e quebra de layout por animação nativa acelerada por GPU (`transform: translateX(-100%)` -> `translateX(0)`) com largura estável (`w-72 sm:w-80 max-w-[85vw]`).
+    - **Trava de Rolagem e Isolamento**: Fundo (`body`) travado com `overflow: hidden` durante o menu aberto; área interna com `overscroll-contain` e `pb-14` para rolagem confortável até as ações inferiores.
+    - **Altura Total e Z-Index Harmonizado**: No mobile, drawer atua em `top-0 h-dvh z-50` com backdrop `z-50`, eliminando conflitos de sobreposição com `MobileBottomNav`.
+  - **Segregação Sanitária Automática de Antibióticos e 2 Vias (RDC 20/2011 & Portaria 344/98)**:
+    - **Detecção Proativa Multicamadas**: Implementado utilitário determinístico `isSpecialControlOrAntibiotic.ts` com varredura por limites de palavra (`\b`) para todas as classes de antimicrobianos e substâncias controladas.
+    - **Automação no Construtor de Receitas (`PrescriptionBuilder.tsx`)**:
+      - Seleção ou digitação de antibióticos ativa automaticamente o checkbox e badge "2 Vias Ativo".
+      - Detecção de consultas mistas (simples + controlados) com banner informativo de segregação sanitária.
+      - Adicionadas abas de alternância direta na bancada de prévia A4: "Receita Simples" vs "Controle Especial • 2 Vias" com advertências de retenção na farmácia.
+      - Ações de Imprimir/PDF, WhatsApp e Copiar direcionam e segregam automaticamente os blocos de texto.
+    - **Editor de Documentos (`DocumentEditorView.tsx`)**:
+      - Carregamento automático de receitas com antibióticos no layout de 2 Vias em Paisagem (A4) com cabeçalho "RECEITUÁRIO DE CONTROLE ESPECIAL".
+      - Seletor rápido de alternância no topo do editor quando houver itens mistos.
+    - **Impressão Física e PDF Vetorial (`PrintPreview.tsx` e `pdfGenerator.ts`)**:
+      - Segregação física estrita: aba e PDF de Receita Simples listam apenas medicamentos comuns; aba e PDF de Controle Especial emitem folha de 2 vias com retenção de farmácia.
+      - Inicialização inteligente no preview: se a consulta tiver apenas antibióticos, abre imediatamente na aba de 2 Vias.
+    - **Qualidade & Testes**: Criada suíte dedicada `specialControlAntibiotic.test.ts` (6 testes); base Vitest expandida para 61/61 testes aprovados (100% de sucesso); `tsc` e `design:lint` 100% limpos.
+  - **Modo Rápido de Prescrição e Quantidade Total de Comprimidos (Sem Caixa/Frasco)**:
+    - **Demanda Clínica**: Eliminação de dispensação em "caixa/frasco" para comprimidos, passando a definir e calcular a quantidade total exata a dispensar (ex.: 15 comprimidos, 14 comprimidos, 30 comprimidos), alinhada ao modelo do Google Forms ambulatorial.
+    - **Limpeza do Catálogo Farmacêutico (`medicationDatabase.ts`)**: 111 entradas com "1 caixa (X comprimidos)" convertidas diretamente para "X comprimidos/cápsulas/sachês", eliminando termos de caixas residuais.
+    - **Utilitário de Prescrição Rápida (`src/utils/prescricaoRapida.ts`)**:
+      - Lógica de tomadas diárias para horários clínicos: `4/4h`, `6/6h`, `8/8h`, `12/12h`, `24h`, `manha`, `noite`, `DU` e `SOS`.
+      - Cálculo automático da quantidade total de comprimidos: `dose * tomadasPorDia * dias` (ou 30 para uso contínuo, 1 para DU).
+      - Pluralização gramatical precisa em pt-BR (`formatarUnidadeDose`).
+      - Geração determinística de posologia médica textual pronta para a receita.
+    - **UI do Construtor de Receitas (`PrescriptionBuilder.tsx`)**:
+      - Card "Modo Rápido de Prescrição" com 4 controles integrados: Dose por tomada, Apresentação (comp, caps, gotas, mL, sachê, jato, ampola), Horários/Frequência e Duração (3d, 5d, 7d, 10d, 14d, 30d ou Uso Contínuo).
+      - Input de "Quantidade total a dispensar" com botões táteis de 1 toque: `10 comp`, `14 comp`, `15 comp`, `20 comp`, `30 comp`, `60 comp`.
+      - Dedução automática da forma farmacêutica ao buscar ou selecionar fármacos.
+    - **Blindagem no PDF e Editor Livre (`pdfGenerator.ts` e `DocumentEditorView.tsx`)**:
+      - Remoção de repetições redundantes de apresentação entre parênteses quando for idêntica ou contida na quantidade total.
+    - **Validação Total**: Suíte `prescricaoRapida.test.ts` adicionada (7 testes); total de 68/68 testes Vitest aprovados; `tsc`, `design:lint` e `build` 100% limpos.
 
 

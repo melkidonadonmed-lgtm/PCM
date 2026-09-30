@@ -7,12 +7,20 @@ import {
   ChevronDown,
   Search,
   X,
-  ArrowRight
+  ArrowRight,
+  FileText
 } from 'lucide-react';
 import { PrescriptionItem, Patient, DoctorProfile } from '../types';
 import { searchUnifiedMedicationsFuzzy } from '../utils/fuzzySearch';
 import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../data/medicationDatabase';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
+import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
+import {
+  calcularPrescricaoRapida,
+  FrequenciaHorario,
+  UnidadeDose,
+  formatarUnidadeDose
+} from '../utils/prescricaoRapida';
 import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
 import { Icon } from './Icon';
 import { AcoesDaReceita } from './AcoesDaReceita';
@@ -29,7 +37,7 @@ interface PrescriptionBuilderProps {
   onToggleWeightCalc?: (enabled: boolean) => void;
   onClearPrescription?: () => void;
   onClearPatient?: () => void;
-  onNavigateToPrint: () => void;
+  onNavigateToPrint: (docType?: 'prescription' | 'special_prescription') => void;
   onNavigateToPediatricCalc?: () => void;
   onNavigateToEditor?: () => void;
   onNavigateToCertificate?: () => void;
@@ -73,9 +81,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   // Active form fields for adding/editing
   const [selectedMedName, setSelectedMedName] = useState('');
   const [selectedRoute, setSelectedRoute] = useState('Uso Oral');
-  const [selectedQuantity, setSelectedQuantity] = useState('1 caixa');
+  const [selectedQuantity, setSelectedQuantity] = useState('30 comprimidos');
   const [selectedPosology, setSelectedPosology] = useState('');
   const [selectedIsSpecial, setSelectedIsSpecial] = useState(false);
+
+  // Estados do Construtor Rápido de Prescrição (Dose, Unidade, Frequência, Duração)
+  const [doseAmount, setDoseAmount] = useState<number>(1);
+  const [doseUnit, setDoseUnit] = useState<UnidadeDose>('comprimido');
+  const [doseFrequency, setDoseFrequency] = useState<FrequenciaHorario>('8/8h');
+  const [doseDays, setDoseDays] = useState<number>(5);
+  const [isContinuousDose, setIsContinuousDose] = useState<boolean>(false);
 
   // Feedbacks
   const [copiedSuccess, setCopiedSuccess] = useState(false);
@@ -89,6 +104,42 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
   const hasWeight = patientWeight > 0;
   const patientName = patient?.name?.trim() || '';
+
+  // Classificação sanitária automática: medicamentos simples vs antibióticos / controle especial (2 vias)
+  const specialItems = useMemo(() => items.filter(i => isSpecialControlOrAntibiotic(i)), [items]);
+  const simpleItems = useMemo(() => items.filter(i => !isSpecialControlOrAntibiotic(i)), [items]);
+  const hasBothPrescriptionTypes = specialItems.length > 0 && simpleItems.length > 0;
+
+  // Alternância da folha na bancada de prévia A4
+  const [previewTab, setPreviewTab] = useState<'auto' | 'simple' | 'special'>('auto');
+
+  // Tipo ativo da folha na prévia
+  const activePreviewType = useMemo<'simple' | 'special'>(() => {
+    if (previewTab === 'special') return 'special';
+    if (previewTab === 'simple') return 'simple';
+    // Se tiver apenas antibióticos/especiais, exibe direto a folha de 2 vias
+    if (specialItems.length > 0 && simpleItems.length === 0) return 'special';
+    return 'simple';
+  }, [previewTab, specialItems.length, simpleItems.length]);
+
+  // Itens exibidos na folha de prévia A4
+  const itemsInPreview = useMemo(() => {
+    if (activePreviewType === 'special') {
+      return specialItems.length > 0 ? specialItems : items;
+    }
+    if (hasBothPrescriptionTypes) {
+      return simpleItems;
+    }
+    return items;
+  }, [activePreviewType, specialItems, simpleItems, hasBothPrescriptionTypes, items]);
+
+  const handlePrintClick = () => {
+    if (activePreviewType === 'special') {
+      onNavigateToPrint('special_prescription');
+    } else {
+      onNavigateToPrint('prescription');
+    }
+  };
 
   const isDoctorConfigured = medicoConfigurado(doctor);
   const handleAbrirPerfilMedico = onAbrirPerfilMedico || onOpenDoctorModal;
@@ -162,16 +213,65 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     return searchUnifiedMedicationsFuzzy(UNIFIED_MEDICATIONS, term, 'all').slice(0, 8);
   }, [searchTerm]);
 
+  // Aplica o cálculo rápido da posologia e quantidade total de comprimidos
+  const handleAtualizarConstrutor = (
+    novoDose: number,
+    novoUnit: UnidadeDose,
+    novoFreq: FrequenciaHorario,
+    novoDays: number,
+    novoContinuo: boolean,
+    viaAtual: string = selectedRoute
+  ) => {
+    setDoseAmount(novoDose);
+    setDoseUnit(novoUnit);
+    setDoseFrequency(novoFreq);
+    setDoseDays(novoDays);
+    setIsContinuousDose(novoContinuo);
+
+    const res = calcularPrescricaoRapida({
+      dose: novoDose,
+      unidade: novoUnit,
+      frequencia: novoFreq,
+      diasTratamento: novoDays,
+      usoContinuo: novoContinuo,
+      via: viaAtual
+    });
+
+    setSelectedPosology(res.posologiaTexto);
+    setSelectedQuantity(res.quantidadeTotalTexto);
+  };
+
   // Handler reutilizado para selecionar medicamento da base ou de tela externa
   const handleSelectMedication = (med: UnifiedMedication) => {
     setSelectedMedName(med.name);
     setSelectedRoute(med.route);
-    setSelectedQuantity(med.defaultQuantity);
+    const qtdInicial = med.defaultQuantity || '30 comprimidos';
+    setSelectedQuantity(qtdInicial);
     setSelectedPosology(med.defaultPosology);
-    setSelectedIsSpecial(Boolean(med.isSpecialControl));
+    setSelectedIsSpecial(isSpecialControlOrAntibiotic(med));
+
+    // Deduzir forma da dose para o modo ágil de prescrição
+    const lower = med.name.toLowerCase();
+    let unit: UnidadeDose = 'comprimido';
+    if (lower.includes('cáps') || lower.includes('caps')) unit = 'cápsula';
+    else if (lower.includes('gotas') || lower.includes('gota')) unit = 'gota';
+    else if (lower.includes('xarope') || lower.includes('suspens') || lower.includes('/ml')) unit = 'mL';
+    else if (lower.includes('sachê') || lower.includes('sache') || lower.includes('envelope')) unit = 'sachê';
+    else if (lower.includes('ampola')) unit = 'ampola';
+    else if (lower.includes('spray') || lower.includes('jato')) unit = 'jato';
+    else if (lower.includes('pomada') || lower.includes('creme') || lower.includes('gel')) unit = 'aplicação';
+    setDoseUnit(unit);
+
     setSearchTerm('');
     setShowSuggestions(false);
   };
+
+  // Detecção proativa: se o médico digita ou cola um nome de antibiótico ou substância controlada, ativa 2 vias automaticamente
+  useEffect(() => {
+    if (selectedMedName.trim() && isSpecialControlOrAntibiotic(selectedMedName)) {
+      setSelectedIsSpecial(true);
+    }
+  }, [selectedMedName]);
 
   // Consumir medicamento pendente vindo de outra tela
   useEffect(() => {
@@ -192,32 +292,40 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       return;
     }
 
+    const isSpecial = selectedIsSpecial || isSpecialControlOrAntibiotic(selectedMedName);
+
     const newItem: PrescriptionItem = {
       id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       name: selectedMedName.trim(),
-      presentation: selectedQuantity || 'Uso oral',
+      presentation: doseUnit || 'comprimido',
       route: selectedRoute,
-      quantity: selectedQuantity.trim() || '1 unidade',
-      doseCalculatedText: '',
+      quantity: selectedQuantity.trim() || '30 comprimidos',
+      doseCalculatedText: `${doseAmount} ${formatarUnidadeDose(doseUnit, doseAmount)}`,
       frequencyText: selectedPosology.trim(),
-      // Intervalo desconhecido: não gerar horários, para o documento não imprimir
-      // uma grade que contradiga a posologia escrita.
-      scheduleInterval: 'Conforme posologia',
+      scheduleInterval: doseFrequency,
       scheduleTimes: [],
       instructions: selectedPosology.trim(),
-      isContinuous: selectedPosology.toLowerCase().includes('contínuo'),
-      isSpecialControl: selectedIsSpecial
+      isContinuous: isContinuousDose || selectedPosology.toLowerCase().includes('contínuo'),
+      isSpecialControl: isSpecial
     };
 
     onUpdateItems([...items, newItem]);
+    if (isSpecial) {
+      setPreviewTab('special');
+    }
     setItemAddedToast(true);
     setTimeout(() => setItemAddedToast(false), 2000);
 
-    // Reset fields for next entry
+    // Reset fields for next entry (sem caixa ou frasco desnecessário)
     setSelectedMedName('');
-    setSelectedQuantity('1 caixa');
+    setSelectedQuantity('30 comprimidos');
     setSelectedPosology('');
     setSelectedIsSpecial(false);
+    setDoseAmount(1);
+    setDoseUnit('comprimido');
+    setDoseFrequency('8/8h');
+    setDoseDays(5);
+    setIsContinuousDose(false);
   };
 
   // Remove item
@@ -239,7 +347,25 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   // Copy prescription text
   const handleCopyText = () => {
     if (items.length === 0 || !medicoConfigurado(doctor)) return;
-    const text = items.map((it, idx) => `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n`).join('\n');
+    let text = '';
+    if (hasBothPrescriptionTypes) {
+      text += '📋 RECEITUÁRIO MÉDICO (Receita Simples)\n------------------------------------\n';
+      simpleItems.forEach((it, idx) => {
+        text += `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n\n`;
+      });
+      text += '📑 RECEITUÁRIO DE CONTROLE ESPECIAL (2 Vias • Retenção na Farmácia)\n------------------------------------\n';
+      specialItems.forEach((it, idx) => {
+        text += `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n\n`;
+      });
+    } else {
+      const headerLabel = items.every(i => isSpecialControlOrAntibiotic(i))
+        ? '📑 RECEITUÁRIO DE CONTROLE ESPECIAL (2 Vias • Retenção na Farmácia)\n------------------------------------\n'
+        : '📋 RECEITUÁRIO MÉDICO\n------------------------------------\n';
+      text += headerLabel;
+      items.forEach((it, idx) => {
+        text += `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n\n`;
+      });
+    }
     navigator.clipboard.writeText(text);
     setCopiedSuccess(true);
     setTimeout(() => setCopiedSuccess(false), 2000);
@@ -258,11 +384,26 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
     let text = `📋 *RECEITUÁRIO MÉDICO DIGITAL*\n${doctorLine}${patientLine}${dateLine}------------------------------------\n`;
 
-    items.forEach((it, idx) => {
-      text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
-    });
+    if (hasBothPrescriptionTypes) {
+      text += `\n💊 *RECEITUÁRIO MÉDICO (Receita Simples):*\n`;
+      simpleItems.forEach((it, idx) => {
+        text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
+      });
+      text += `\n📑 *RECEITUÁRIO DE CONTROLE ESPECIAL (2 Vias • Retenção na Farmácia):*\n`;
+      specialItems.forEach((it, idx) => {
+        text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
+      });
+    } else {
+      const isAllSpecial = items.every(i => isSpecialControlOrAntibiotic(i));
+      text += isAllSpecial
+        ? `\n📑 *RECEITUÁRIO DE CONTROLE ESPECIAL (2 Vias • Portaria 344/98 & RDC 20/2011):*\n`
+        : `\n💊 *PRESCRIÇÃO:*\n`;
+      items.forEach((it, idx) => {
+        text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
+      });
+    }
 
-    text += `\n------------------------------------\n⚠️ _Documento de orientação terapêutica emitido pelo médico. Siga as orientações e horários informados._`;
+    text += `\n------------------------------------\n⚠️ _Documento de orientação terapêutica emitido pelo médico. Siga as orientações e horários informados. Para medicamentos controlados e antibióticos, a 1ª via fica retida na farmácia._`;
     return text;
   };
 
@@ -582,7 +723,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </div>
               </div>
 
-              {/* Grid: 2 Colunas para Via e Apresentação */}
+              {/* Grid: 2 Colunas para Via e Quantidade Total */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="presc-route-select" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
@@ -591,7 +732,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <select
                     id="presc-route-select"
                     value={selectedRoute}
-                    onChange={(e) => setSelectedRoute(e.target.value)}
+                    onChange={(e) => {
+                      const novaVia = e.target.value;
+                      setSelectedRoute(novaVia);
+                      handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, doseDays, isContinuousDose, novaVia);
+                    }}
                     className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm cursor-pointer"
                   >
                     <option value="Uso Oral">Uso Oral</option>
@@ -609,17 +754,172 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="presc-quantity-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                    Quantidade / Apresentação
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="presc-quantity-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+                      Quantidade total a dispensar *
+                    </label>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">
+                      Sem caixa • Total exato
+                    </span>
+                  </div>
                   <input
                     id="presc-quantity-input"
                     type="text"
                     value={selectedQuantity}
                     onChange={(e) => setSelectedQuantity(e.target.value)}
-                    placeholder="Ex.: 1 caixa, 2 frascos"
+                    placeholder="Ex.: 30 comprimidos, 20 cápsulas, 1 frasco..."
                     className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm"
                   />
+                  {/* Atalhos Rápidos Táteis de Quantidade de Comprimidos */}
+                  <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Comprimidos:</span>
+                    {['10 comp', '14 comp', '15 comp', '20 comp', '30 comp', '60 comp'].map((qtdLabel) => {
+                      const qtdValor = qtdLabel.replace('comp', 'comprimidos');
+                      const isAtivo = selectedQuantity.toLowerCase().includes(qtdLabel.replace(' comp', '')) && selectedQuantity.toLowerCase().includes('comp');
+                      return (
+                        <button
+                          key={qtdLabel}
+                          type="button"
+                          onClick={() => setSelectedQuantity(qtdValor)}
+                          className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition cursor-pointer ${
+                            isAtivo
+                              ? 'bg-blue-600 text-white shadow-tactile-sm'
+                              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400'
+                          }`}
+                        >
+                          {qtdLabel}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* MODO RÁPIDO DE PRESCRIÇÃO (Dose • Unidade • Horários • Dias) */}
+              <div className="p-3 rounded-xl bg-blue-50/50 dark:bg-slate-900/60 border border-blue-100 dark:border-slate-800/80 space-y-2.5">
+                <div className="flex items-center justify-between pb-1.5 border-b border-blue-100/60 dark:border-slate-800/60">
+                  <div className="flex items-center gap-1.5">
+                    <Icon name="medication" className="text-blue-600 dark:text-blue-400 text-[16px]" />
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      Modo Rápido de Prescrição
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
+                    Calcula Posologia & Quantidade
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {/* 1. Quantidade por dose */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                      Dose por tomada
+                    </label>
+                    <div className="flex items-center">
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="0.5"
+                        value={doseAmount}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value) || 1;
+                          handleAtualizarConstrutor(val, doseUnit, doseFrequency, doseDays, isContinuousDose);
+                        }}
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 2. Apresentação / Unidade */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                      Apresentação
+                    </label>
+                    <select
+                      value={doseUnit}
+                      onChange={(e) => {
+                        const val = e.target.value as UnidadeDose;
+                        handleAtualizarConstrutor(doseAmount, val, doseFrequency, doseDays, isContinuousDose);
+                      }}
+                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+                    >
+                      <option value="comprimido">comp (comprimido)</option>
+                      <option value="cápsula">caps (cápsula)</option>
+                      <option value="gota">gotas</option>
+                      <option value="mL">mL</option>
+                      <option value="sachê">sachê</option>
+                      <option value="jato">jatos</option>
+                      <option value="ampola">ampola</option>
+                      <option value="aplicação">aplicação</option>
+                    </select>
+                  </div>
+
+                  {/* 3. Horários / Frequência */}
+                  <div className="col-span-2 sm:col-span-2">
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                      Horários / Frequência
+                    </label>
+                    <select
+                      value={doseFrequency}
+                      onChange={(e) => {
+                        const val = e.target.value as FrequenciaHorario;
+                        handleAtualizarConstrutor(doseAmount, doseUnit, val, doseDays, isContinuousDose);
+                      }}
+                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+                    >
+                      <option value="8/8h">8/8h (a cada 8 horas • 3x/dia)</option>
+                      <option value="12/12h">12/12h (a cada 12 horas • 2x/dia)</option>
+                      <option value="6/6h">6/6h (a cada 6 horas • 4x/dia)</option>
+                      <option value="4/4h">4/4h (a cada 4 horas • 6x/dia)</option>
+                      <option value="24h">24h (1x ao dia)</option>
+                      <option value="manha">Manhã (1x ao dia, pela manhã)</option>
+                      <option value="noite">Noite (1x ao dia, ao deitar)</option>
+                      <option value="DU">DU (Dose Única)</option>
+                      <option value="SOS">S.O.S (se dor ou febre)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Linha 2 do Modo Rápido: Duração / Dias e Uso Contínuo */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                      Duração:
+                    </span>
+                    {[3, 5, 7, 10, 14, 30].map((dias) => (
+                      <button
+                        key={dias}
+                        type="button"
+                        onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, dias, false)}
+                        className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition cursor-pointer ${
+                          !isContinuousDose && doseDays === dias
+                            ? 'bg-blue-600 text-white shadow-tactile-sm'
+                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400'
+                        }`}
+                      >
+                        {dias} dias
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, 0, true)}
+                      className={`text-[10px] px-2.5 py-0.5 rounded-md font-bold transition cursor-pointer ${
+                        isContinuousDose
+                          ? 'bg-emerald-600 text-white shadow-tactile-sm'
+                          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-emerald-400'
+                      }`}
+                    >
+                      Uso Contínuo
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, doseDays, isContinuousDose)}
+                    className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                  >
+                    Recalcular
+                  </button>
                 </div>
               </div>
 
@@ -629,6 +929,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <label htmlFor="presc-posology-textarea" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                     Posologia e orientações ao paciente *
                   </label>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                    Gerada pelo modo rápido • 100% editável
+                  </span>
                 </div>
                 <textarea
                   id="presc-posology-textarea"
@@ -682,7 +985,14 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     onChange={(e) => setSelectedIsSpecial(e.target.checked)}
                     className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-0 cursor-pointer"
                   />
-                  <span>Receita de Controle Especial (Portaria 344/98)</span>
+                  <span className="flex items-center gap-1.5 flex-wrap">
+                    <span>Receita de 2 Vias (Controle Especial / Antibiótico)</span>
+                    {selectedIsSpecial && (
+                      <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.2 rounded">
+                        2 Vias Ativo
+                      </span>
+                    )}
+                  </span>
                 </label>
 
                 {onNavigateToPediatricCalc && (
@@ -710,6 +1020,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-navy-800 dark:bg-navy-700 text-white">
                   {items.length}
                 </span>
+                {specialItems.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                    {specialItems.length} em 2 Vias
+                  </span>
+                )}
               </div>
 
               {items.length > 0 && (
@@ -724,70 +1039,87 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               )}
             </div>
 
+            {/* Aviso de Segregação Sanitária Automática quando houver itens comuns e antimicrobianos/controlados */}
+            {hasBothPrescriptionTypes && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2.5">
+                <Icon name="shield" className="text-amber-600 dark:text-amber-400 text-base shrink-0 mt-0.5" />
+                <div className="space-y-0.5 flex-1 min-w-0">
+                  <p className="font-bold">Segregação Sanitária Automática (Portaria 344/98 e RDC 20/2011)</p>
+                  <p className="text-[11px] leading-relaxed text-amber-800 dark:text-amber-300 font-medium">
+                    Esta consulta contém {simpleItems.length} {simpleItems.length === 1 ? 'medicamento comum' : 'medicamentos comuns'} (Receita Simples) e {specialItems.length} {specialItems.length === 1 ? 'antimicrobiano/controlado' : 'antimicrobianos/controlados'} (Controle Especial • 2 Vias). Eles serão emitidos em folhas separadas no Editor e no PDF para garantir a retenção na farmácia.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {items.length === 0 ? (
               <div className="p-8 text-center rounded-xl bg-slate-50 dark:bg-navy-950 border border-dashed border-slate-300 dark:border-navy-800 text-[var(--text-muted)] dark:text-slate-400 text-xs italic">
                 Nenhum medicamento adicionado ainda. Use a busca acima ou clique nos atalhos.
               </div>
             ) : (
               <div className="space-y-2.5">
-                {items.map((it, idx) => (
-                  <div
-                    key={it.id}
-                    className="p-3.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 flex items-start justify-between gap-3 shadow-tactile-sm"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="w-5 h-5 rounded-full bg-navy-800 dark:bg-navy-700 text-white text-[10px] font-black flex items-center justify-center shrink-0">
-                          {idx + 1}
-                        </span>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                          {it.name}
-                        </h4>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300">
-                          {it.route} • {it.quantity}
-                        </span>
-                        {it.isSpecialControl && (
-                          <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                            Controle Especial
+                {items.map((it, idx) => {
+                  const isSpecial = isSpecialControlOrAntibiotic(it);
+                  return (
+                    <div
+                      key={it.id}
+                      className="p-3.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 flex items-start justify-between gap-3 shadow-tactile-sm"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="w-5 h-5 rounded-full bg-navy-800 dark:bg-navy-700 text-white text-[10px] font-black flex items-center justify-center shrink-0">
+                            {idx + 1}
                           </span>
-                        )}
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                            {it.name}
+                          </h4>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300">
+                            {it.route} • {it.quantity}
+                          </span>
+                          {isSpecial && (
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                              <Icon name="security" className="text-[11px]" />
+                              <span>2 Vias (Controle Especial / Antibiótico)</span>
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-700 dark:text-slate-300 pl-7 leading-relaxed font-medium">
+                          {it.instructions}
+                        </p>
                       </div>
-                      <p className="text-xs text-slate-700 dark:text-slate-300 pl-7 leading-relaxed font-medium">
-                        {it.instructions}
-                      </p>
-                    </div>
 
-                    {/* Action buttons (Move Up, Move Down, Delete) */}
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleMoveItem(idx, 'up')}
-                        disabled={idx === 0}
-                        className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500"
-                        title="Mover para cima"
-                      >
-                        <ChevronUp className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleMoveItem(idx, 'down')}
-                        disabled={idx === items.length - 1}
-                        className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500"
-                        title="Mover para baixo"
-                      >
-                        <ChevronDown className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(it.id)}
-                        className="p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500"
-                        title="Remover medicamento"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {/* Action buttons (Move Up, Move Down, Delete) */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleMoveItem(idx, 'up')}
+                          disabled={idx === 0}
+                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500"
+                          title="Mover para cima"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleMoveItem(idx, 'down')}
+                          disabled={idx === items.length - 1}
+                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500"
+                          title="Mover para baixo"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(it.id)}
+                          className="p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500"
+                          title="Remover medicamento"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -797,7 +1129,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 <AcoesDaReceita
                   itemsCount={items.length}
                   isMedicoConfigurado={isDoctorConfigured}
-                  onNavigateToPrint={onNavigateToPrint}
+                  onNavigateToPrint={handlePrintClick}
                   onNavigateToEditor={onNavigateToEditor}
                   onSendWhatsApp={handleSendWhatsApp}
                   onCopyText={handleCopyText}
@@ -820,7 +1152,13 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
             <button
               type="button"
-              onClick={onNavigateToEditor || onNavigateToPrint}
+              onClick={() => {
+                if (onNavigateToEditor) {
+                  onNavigateToEditor();
+                } else {
+                  handlePrintClick();
+                }
+              }}
               className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer rounded-md focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir folha oficial no Editor para conferir ou editar livremente"
             >
@@ -845,6 +1183,36 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   Configurar médico
                 </button>
               )}
+            </div>
+          )}
+
+          {/* Abas de Alternância da Folha A4 na Prévia quando houver prescrição mista */}
+          {hasBothPrescriptionTypes && (
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/80 dark:bg-navy-900 border border-slate-300 dark:border-navy-700 w-full overflow-x-auto shadow-tactile-sm">
+              <button
+                type="button"
+                onClick={() => setPreviewTab('simple')}
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                  activePreviewType === 'simple'
+                    ? 'bg-white dark:bg-navy-800 text-blue-700 dark:text-blue-300 shadow-tactile-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 shrink-0" />
+                <span>Receita Simples ({simpleItems.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewTab('special')}
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                  activePreviewType === 'special'
+                    ? 'bg-amber-600 text-white shadow-tactile-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Icon name="security" className="text-[14px] shrink-0" />
+                <span>Controle Especial • 2 Vias ({specialItems.length})</span>
+              </button>
             </div>
           )}
 
@@ -896,21 +1264,44 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </div>
               </div>
 
-              {/* Document Title */}
+              {/* Document Title & Badge */}
               <div className="text-center mb-4">
-                <h3 className="serif-title text-sm font-bold uppercase tracking-widest text-slate-800 border-b border-slate-200 pb-1 inline-block">
-                  Receituário Médico
-                </h3>
+                {activePreviewType === 'special' ? (
+                  <>
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                        2ª Via: Paciente • 1ª Via: Retenção na Farmácia
+                      </span>
+                    </div>
+                    <h3 className="serif-title text-sm font-bold uppercase tracking-widest text-slate-900 border-b border-slate-200 pb-1 inline-block">
+                      Receituário de Controle Especial
+                    </h3>
+                    <p className="text-[10px] text-sky-900 font-bold uppercase tracking-wider mt-1">
+                      Portaria SVS/MS 344/98 • RDC Anvisa 20/2011 (Antimicrobianos)
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="serif-title text-sm font-bold uppercase tracking-widest text-slate-800 border-b border-slate-200 pb-1 inline-block">
+                      Receituário Médico
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-semibold mt-0.5">
+                      Receituário Simples • Uso Ambulatorial
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Prescription Body Items */}
-              {items.length === 0 ? (
+              {itemsInPreview.length === 0 ? (
                 <div className="py-16 text-center text-slate-500 italic text-xs">
-                  Nenhum medicamento inserido na receita.
+                  {activePreviewType === 'special'
+                    ? 'Nenhum medicamento sob controle especial ou antimicrobiano nesta prescrição.'
+                    : 'Nenhum medicamento simples nesta prescrição.'}
                 </div>
               ) : (
                 <div className="space-y-4 text-xs text-slate-800 leading-relaxed">
-                  {items.map((it, idx) => (
+                  {itemsInPreview.map((it, idx) => (
                     <div key={it.id} className="mb-3">
                       <div className="flex justify-between items-baseline font-bold text-slate-900">
                         <span>{idx + 1}. {it.name} ({it.route})</span>
@@ -921,6 +1312,17 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       </p>
                     </div>
                   ))}
+
+                  {/* Advertências Sanitárias em caso de Controle Especial */}
+                  {activePreviewType === 'special' && (
+                    <div className="mt-4 p-2 rounded bg-amber-50/80 border border-amber-200 text-[9px] text-amber-950 space-y-0.5">
+                      <span className="font-bold uppercase block text-amber-900">
+                        ⚠️ Orientações e Retenção de Receita (Portaria 344/98 & RDC 20/2011)
+                      </span>
+                      <p>• 1ª Via: Retenção obrigatória na farmácia / drogaria.</p>
+                      <p>• 2ª Via: Orientação médica do paciente.</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -949,7 +1351,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             <AcoesDaReceita
               itemsCount={items.length}
               isMedicoConfigurado={isDoctorConfigured}
-              onNavigateToPrint={onNavigateToPrint}
+              onNavigateToPrint={handlePrintClick}
               onNavigateToEditor={onNavigateToEditor}
               onSendWhatsApp={handleSendWhatsApp}
               onCopyText={handleCopyText}
