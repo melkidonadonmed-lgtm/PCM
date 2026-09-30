@@ -226,6 +226,7 @@ export const ICON_ALIASES: Record<string, string> = {
   trash: 'delete',
   lixeira: 'delete',
   editar: 'edit_document',
+  editor: 'edit_document',
   edit: 'edit_document',
   pencil: 'edit_document',
   borracha: 'ink_eraser',

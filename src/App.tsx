@@ -213,6 +213,16 @@ export default function App() {
     setActiveTab('editor');
   };
 
+  const handleNavigateToCertificate = () => {
+    setCertSubTab('certificate');
+    setActiveTab('certificate');
+  };
+
+  const handleNavigateToReferral = () => {
+    setCertSubTab('referral');
+    setActiveTab('referral');
+  };
+
   // Medicamento pendente vindo de outras telas (ex: Protocolos)
   const [medicamentoPendente, setMedicamentoPendente] = useState<UnifiedMedication | null>(null);
 
@@ -348,6 +358,8 @@ export default function App() {
               onNavigateToPrint={() => handleNavigateToPrint('prescription')}
               onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
               onNavigateToEditor={handleNavigateToEditor}
+              onNavigateToCertificate={handleNavigateToCertificate}
+              onNavigateToReferral={handleNavigateToReferral}
               onOpenDoctorModal={handleOpenDoctorModal}
               onOpenPatientModal={handleOpenPatientModal}
               medicamentoPendente={medicamentoPendente}

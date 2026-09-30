@@ -2975,9 +2975,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         </header>
                       )}
 
-                      <div className="text-slate-900 py-1">
-                        <EditorContent editor={editor} />
-                      </div>
+                      <div 
+                        className="text-slate-900 py-1 font-inherit text-inherit leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: editorDomHtml || editorHtml }}
+                      />
                     </div>
 
                     {headerConfig.showFooter && (

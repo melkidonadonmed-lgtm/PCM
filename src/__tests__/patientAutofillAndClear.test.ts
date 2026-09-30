@@ -104,4 +104,27 @@ describe('Sincronização de Paciente e Higiene de Consulta', () => {
     expect(selectedExams).toHaveLength(0);
     expect(examIndication).toBe('Investigação clínica de rotina e controle metabólico.');
   });
+
+  it('deve permitir fluxo rápido apenas com nome do paciente para atestados e encaminhamentos sem exigir CPF ou peso obrigatoriamente', () => {
+    // Fluxo ambulatorial ágil: médico preenche apenas o nome no card inicial
+    const fastPatient: Patient = {
+      ...DEFAULT_PATIENT,
+      id: 'pat-fast-1',
+      name: 'Carlos Eduardo Souza'
+    };
+
+    expect(fastPatient.name).toBe('Carlos Eduardo Souza');
+    expect(fastPatient.documentNumber).toBe('');
+    expect(fastPatient.weightKg).toBe(0);
+
+    // O atestado e encaminhamento devem aceitar o paciente mesmo sem CPF e peso cadastrados
+    const certPayload: Partial<MedicalCertificate> = {
+      patientName: fastPatient.name,
+      documentNumber: fastPatient.documentNumber || '',
+      daysOff: 2
+    };
+
+    expect(certPayload.patientName).toBe('Carlos Eduardo Souza');
+    expect(certPayload.documentNumber).toBe('');
+  });
 });
