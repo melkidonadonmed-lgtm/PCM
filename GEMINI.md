@@ -133,5 +133,13 @@ npm run preview     # Pré-visualização do bundle compilado
     - Implementada higiene de consulta estrita (`startNewConsultation()`) para resetar simultaneamente receitas, exames, atestados e laudos ao trocar ou limpar o paciente.
     - `MobileBottomNav` migrado 100% para o componente canônico `<Icon name="..." />` com Material Symbols offline.
     - Base de testes Vitest expandida para 51/51 testes aprovados com 100% de sucesso.
+  - **Otimização Ergonômica do Card do Paciente, Posologia Compacta & Correção do Editor**:
+    - **Card de Identificação do Paciente**: Nome do paciente mantido prioritário e limpo na primeira linha; inclusão de atalhos diretos e discretos para emitir **Atestado**, **Encaminhamento** ou abrir no **Editor Livre** com o paciente vinculado imediatamente.
+    - **Campos Extras Retráteis**: CPF e Peso agora são colapsáveis com botão toggle sutil (`+ CPF e Peso` / `Ocultar CPF/Peso`), reduzindo a altura do card de ~160px para ~80px.
+    - **Posologia Compacta e Ação Imediata no Viewport**: O bloco de 7 pílulas de atalho foi substituído por um `<select>` de linha única com atalhos frequentes, economizando mais de 90px verticais.
+    - **Botão "Inserir na Receita" Visível sem Rolagem**: A ação primária de inserção foi reposicionada imediatamente abaixo da posologia e atalhos, permanecendo 100% visível na dobra inicial da tela tanto no mobile quanto no desktop.
+    - **Correção de Crash no Tiptap (2 Vias)**: No `DocumentEditorView`, eliminado o segundo `<EditorContent editor={editor} />` na 2ª via da folha de controle especial, substituindo-o por renderização direta em HTML estático para evitar colisão do DOM do ProseMirror.
+    - **Correção de Ícone no MobileBottomNav**: Corrigido alias `editor: 'edit_document'` em `Icon.tsx`, sanando o vazamento de ligadura tipográfica `"OR"`.
+    - **Qualidade & Deploy Cloud Run**: 55/55 testes aprovados no Vitest, `design:lint` e `tsc` limpos. Nova revisão `prescmed-00036-9dl` ativa no Google Cloud Run (`https://prescmed-1044179901556.southamerica-east1.run.app`).
 
 
