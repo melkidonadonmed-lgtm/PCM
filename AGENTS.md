@@ -86,12 +86,11 @@ src/
     Icon.tsx                   # Componente canônico anti-mutação baseado no Google Material Symbols
   data/
     pediatricMeds.ts           # Catálogo de fármacos pediátricos com faixas de dosagem (mg/kg)
-    adultMeds.ts               # Catálogo de apresentações e posologias para uso adulto
     examCatalog.ts             # Catálogo de exames laboratoriais e procedimentos diagnósticos
     cidCatalog.ts              # Base de códigos e descrições CID-10 com termos de busca
     clinicalKits.ts            # Kits clínicos de plantão ambulatorial (amigdalite, GECA, IVAS, ITU, etc.)
     clinicalProtocols.ts       # Protocolos patológicos com doses de emergência e cálculo de hidratação
-    medicationDatabase.ts      # Base unificada de medicamentos categorizada por classe SUS/RENAME
+    medicationDatabase.ts      # Base unificada de medicamentos (adulto e pediátrico) categorizada por classe SUS/RENAME
     exemplos.ts                # Dados fictícios de exemplo (Melki Donadon / Seu Melki) para prévia e placeholders
     presetAssets.ts            # Ativos visuais e marcas d'água predefinidas
     presetClinicalTemplates.ts # Modelos estruturados de documentos e atestados clínicos

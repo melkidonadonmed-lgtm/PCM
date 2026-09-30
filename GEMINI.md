@@ -126,4 +126,12 @@ npm run preview     # Pré-visualização do bundle compilado
     - Push concluído com sucesso para o branch `main` no repositório GitHub (`melkidonadonmed-lgtm/PCM.git`). Commits: `50d7f45` (redesign e DESIGN.md) e `033a7cf` (`.gcloudignore`).
     - Build e Deploy executados com sucesso via Google Cloud Build (`agent-md-506215`), gerando a imagem Docker no Artifact Registry (`southamerica-east1-docker.pkg.dev/agent-md-506215/prescmed-repo/prescmed:033a7cf`).
     - Serviço ativo e validado no Google Cloud Run (São Paulo - `southamerica-east1`): `https://prescmed-1044179901556.southamerica-east1.run.app` (HTTP 200 OK com PWA e assets cacheados com sucesso).
+- **30/09/2026**:
+  - **Auditoria, Emissão em Paisagem e Sincronização**:
+    - Receita de Controle Especial (Portaria SVS/MS 344/98) adaptada para folha única A4 Paisagem (297×210 mm) com 2 vias lado a lado (1ª Via Farmácia com dados do comprador/fornecedor, linha de corte central e 2ª Via Paciente).
+    - Card de Identificação Rápida do Paciente adicionado no topo da receita com propagação instantânea para todos os documentos e atalho para a calculadora pediátrica.
+    - Implementada higiene de consulta estrita (`startNewConsultation()`) para resetar simultaneamente receitas, exames, atestados e laudos ao trocar ou limpar o paciente.
+    - `MobileBottomNav` migrado 100% para o componente canônico `<Icon name="..." />` com Material Symbols offline.
+    - Base de testes Vitest expandida para 51/51 testes aprovados com 100% de sucesso.
+
 

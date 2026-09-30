@@ -24,6 +24,322 @@ const numberToWordsPtBr = (num: number): string => {
   return words[num] || String(num);
 };
 
+const generateSpecialPrescriptionLandscapePDF = (options: PDFExportOptions): jsPDF => {
+  const { doctor, patient, prescriptionItems } = options;
+
+  const pdf = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4',
+    compress: true
+  });
+
+  const pageWidth = 297;
+  const pageHeight = 210;
+  const colWidth = 133;
+  const via1X = 10;
+  const via2X = 154;
+  const dividerX = 148.5;
+
+  const patientName = patient?.name?.trim() || 'Não identificado';
+  const patientDoc = patient?.documentNumber?.trim() || '—';
+  const patientWeight = patient?.weightKg && patient.weightKg > 0 ? `${patient.weightKg} kg` : '—';
+  const patientAge = patient?.ageText?.trim() || patient?.birthDate?.trim() || '—';
+
+  const docName = doctor?.name?.trim() || 'Dr(a). Médico(a)';
+  const docCrm = doctor?.crm?.trim() || '------';
+  const docCrmState = doctor?.crmState || 'SP';
+  const docSpecialty = doctor?.specialty || 'Clínica Médica';
+  const docClinic = doctor?.clinicName?.trim() || '';
+  const docAddress = doctor?.address?.trim() || '';
+  const docPhone = doctor?.phone?.trim() || '';
+  const currentDate = new Date().toLocaleDateString('pt-BR');
+
+  // Renderiza uma via completa (isSecondCopy = false -> 1ª Via Farmácia; true -> 2ª Via Paciente)
+  const renderSingleVia = (startX: number, isSecondCopy: boolean) => {
+    let y = 8;
+
+    // Símbolo Rx
+    pdf.setFillColor(30, 79, 122);
+    pdf.roundedRect(startX, y, 7, 7, 1.5, 1.5, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.text('Rx', startX + 1.6, y + 4.8);
+
+    // Identificação do Médico
+    pdf.setTextColor(15, 23, 42);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.text(docName.toUpperCase(), startX + 9, y + 3.8);
+
+    pdf.setTextColor(30, 79, 122);
+    pdf.setFontSize(7.5);
+    pdf.setFont('helvetica', 'bold');
+    const rqeText = doctor?.rqe ? ` • RQE ${doctor.rqe}` : '';
+    pdf.text(`CRM-${docCrmState} ${docCrm}${rqeText}`, startX + 9, y + 7);
+
+    pdf.setTextColor(71, 85, 105);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(7);
+    pdf.text(docSpecialty, startX, y + 11.5);
+    if (docClinic || docAddress || docPhone) {
+      pdf.setTextColor(100, 116, 139);
+      pdf.setFontSize(6);
+      const contactLine = `${docClinic}${docAddress ? ' • ' + docAddress : ''}${docPhone ? ' • Tel: ' + docPhone : ''}`;
+      pdf.text(contactLine.slice(0, 75), startX, y + 14.8);
+    }
+
+    // Badge do Tipo de Documento no topo direito da via
+    const badgeW = 48;
+    const badgeX = startX + colWidth - badgeW;
+    pdf.setFillColor(241, 245, 249);
+    pdf.setDrawColor(203, 213, 225);
+    pdf.roundedRect(badgeX, y, badgeW, 6.5, 1, 1, 'FD');
+
+    pdf.setTextColor(15, 23, 42);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(6.5);
+    pdf.text('RECEITA CONTROLE ESPECIAL', badgeX + (badgeW / 2), y + 4.2, { align: 'center' });
+
+    // Subtítulo da Via
+    pdf.setFontSize(6);
+    if (!isSecondCopy) {
+      pdf.setTextColor(153, 27, 27); // Vermelho escuro
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('1ª VIA: FARMÁCIA (RETENÇÃO)', badgeX + (badgeW / 2), y + 10, { align: 'center' });
+    } else {
+      pdf.setTextColor(3, 105, 161); // Azul clínico
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('2ª VIA: PACIENTE (ORIENTAÇÃO)', badgeX + (badgeW / 2), y + 10, { align: 'center' });
+    }
+
+    pdf.setTextColor(100, 116, 139);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(6);
+    pdf.text(`Data: ${currentDate}`, badgeX + badgeW, y + 14.5, { align: 'right' });
+
+    // Linha divisória sob cabeçalho
+    pdf.setDrawColor(15, 23, 42);
+    pdf.setLineWidth(0.35);
+    pdf.line(startX, y + 16.5, startX + colWidth, y + 16.5);
+
+    // Box do Paciente compacto via autoTable
+    autoTable(pdf, {
+      startY: y + 18,
+      margin: { left: startX, right: pageWidth - (startX + colWidth) },
+      theme: 'grid',
+      head: [['PACIENTE', 'DOC (RG/CPF)', 'PESO', 'IDADE']],
+      body: [[patientName.toUpperCase(), patientDoc, patientWeight, patientAge]],
+      headStyles: {
+        fillColor: [248, 250, 252],
+        textColor: [100, 116, 139],
+        fontSize: 6,
+        fontStyle: 'bold',
+        lineWidth: 0.15,
+        lineColor: [203, 213, 225],
+        cellPadding: 1
+      },
+      bodyStyles: {
+        fillColor: [255, 255, 255],
+        textColor: [15, 23, 42],
+        fontSize: 7,
+        fontStyle: 'bold',
+        lineWidth: 0.15,
+        lineColor: [203, 213, 225],
+        cellPadding: 1.2
+      },
+      columnStyles: {
+        0: { cellWidth: 55 },
+        1: { cellWidth: 32 },
+        2: { cellWidth: 20, textColor: [3, 105, 161] },
+        3: { cellWidth: 26 }
+      }
+    });
+
+    let currentY = (pdf as any).lastAutoTable.finalY + 3;
+
+    // Prescrição de Medicamentos
+    if (prescriptionItems.length === 0) {
+      pdf.setFont('times', 'italic');
+      pdf.setFontSize(9);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text('Nenhum medicamento adicionado.', startX + (colWidth / 2), currentY + 15, { align: 'center' });
+      currentY += 25;
+    } else {
+      const itemsByRoute = prescriptionItems.reduce((acc, item) => {
+        const route = (item.route || 'Oral').toUpperCase();
+        if (!acc[route]) acc[route] = [];
+        acc[route].push(item);
+        return acc;
+      }, {} as { [route: string]: PrescriptionItem[] });
+
+      Object.entries(itemsByRoute).forEach(([route, items]) => {
+        // Faixa da Rota
+        pdf.setFillColor(241, 245, 249);
+        pdf.setDrawColor(203, 213, 225);
+        pdf.roundedRect(startX, currentY, colWidth, 4.5, 0.8, 0.8, 'FD');
+
+        pdf.setTextColor(7, 89, 133);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(6.5);
+        pdf.text(`USO ${route}`, startX + 2, currentY + 3.2);
+
+        currentY += 5.8;
+
+        const rows: any[] = [];
+        items.forEach((item, idx) => {
+          const headline = `${idx + 1}) ${item.name.toUpperCase()} (${item.presentation}) -------- ${item.quantity}`;
+          let posologyText = item.instructions;
+          if (isSecondCopy && item.scheduleTimes && item.scheduleTimes.length > 0) {
+            posologyText += ` [Horários: ${item.scheduleTimes.join(' • ')}]`;
+          }
+          if (isSecondCopy && item.durationDays) {
+            posologyText += ` (Duração: ${item.durationDays} dias)`;
+          }
+          rows.push([headline, posologyText]);
+        });
+
+        autoTable(pdf, {
+          startY: currentY,
+          margin: { left: startX, right: pageWidth - (startX + colWidth) },
+          body: rows.map(r => [
+            {
+              content: !isSecondCopy 
+                ? `${r[0]}\n${r[1]}` 
+                : `${r[0]}\nPosologia: ${r[1]}`,
+              styles: { font: 'times', fontSize: 8, cellPadding: { top: 1.5, bottom: 1.5, left: 2, right: 2 } }
+            }
+          ]),
+          theme: 'plain',
+          styles: {
+            textColor: [15, 23, 42],
+            lineColor: [226, 232, 240],
+            lineWidth: 0.1
+          },
+          columnStyles: {
+            0: { cellWidth: colWidth }
+          }
+        });
+
+        currentY = (pdf as any).lastAutoTable.finalY + 2.5;
+      });
+    }
+
+    // Parte Inferior: Específica de cada Via
+    if (!isSecondCopy) {
+      // 1ª VIA: Box Comprador e Fornecedor (Portaria 344/98)
+      const boxStartY = Math.max(currentY + 2, pageHeight - 68);
+
+      autoTable(pdf, {
+        startY: boxStartY,
+        margin: { left: startX, right: pageWidth - (startX + colWidth) },
+        theme: 'grid',
+        head: [['IDENTIFICAÇÃO DO COMPRADOR', 'IDENTIFICAÇÃO DO FORNECEDOR']],
+        body: [
+          [
+            'Nome: ________________________________\nRG/Órgão: ___________  CPF: ___________\nEndereço: _____________________________\nCidade/UF: ____________  Tel: __________',
+            'Farmácia/Drogaria: ____________________\nFarmacêutico: _________________________\nData: ___/___/______   Lote: ___________\nQtd Dispensada: _______________________'
+          ]
+        ],
+        headStyles: {
+          fillColor: [248, 250, 252],
+          textColor: [15, 23, 42],
+          fontSize: 5.5,
+          fontStyle: 'bold',
+          lineWidth: 0.15,
+          lineColor: [203, 213, 225],
+          cellPadding: 1
+        },
+        bodyStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [51, 65, 85],
+          fontSize: 5.5,
+          lineWidth: 0.15,
+          lineColor: [203, 213, 225],
+          cellPadding: 1.5
+        },
+        columnStyles: {
+          0: { cellWidth: colWidth / 2 },
+          1: { cellWidth: colWidth / 2 }
+        }
+      });
+    } else {
+      // 2ª VIA: Advertências Sanitárias e Cuidados ao Paciente
+      const alertStartY = Math.max(currentY + 2, pageHeight - 62);
+      pdf.setFillColor(254, 242, 242);
+      pdf.setDrawColor(254, 202, 202);
+      pdf.roundedRect(startX, alertStartY, colWidth, 18, 1, 1, 'FD');
+
+      pdf.setTextColor(153, 27, 27);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(6.5);
+      pdf.text('⚠️ ORIENTAÇÕES SANITÁRIAS & ADVERTÊNCIAS (PORTARIA 344/98)', startX + 3, alertStartY + 4);
+
+      pdf.setTextColor(71, 85, 105);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(6);
+      pdf.text('• Medicamento sujeito a controle especial. Uso estritamente individual conforme prescrito.', startX + 3, alertStartY + 8);
+      pdf.text('• Não altere as doses nem interrompa o tratamento sem prévia avaliação médica.', startX + 3, alertStartY + 11.5);
+      pdf.text('• Mantenha este produto fora do alcance de crianças e animais domésticos em local protegido.', startX + 3, alertStartY + 15);
+    }
+
+    // Assinatura e Rodapé da Via
+    const footerY = pageHeight - 16;
+    pdf.setDrawColor(15, 23, 42);
+    pdf.setLineWidth(0.3);
+    pdf.line(startX, footerY - 2, startX + colWidth, footerY - 2);
+
+    const sigW = 60;
+    const sigX = startX + colWidth - sigW;
+
+    pdf.setTextColor(51, 65, 85);
+    pdf.setFont('times', 'italic');
+    pdf.setFontSize(7);
+    pdf.text(`${doctor?.cityState || 'Brasil'}, ${currentDate}`, startX, footerY + 2.5);
+
+    pdf.setDrawColor(15, 23, 42);
+    pdf.setLineWidth(0.25);
+    pdf.line(sigX, footerY + 6, startX + colWidth, footerY + 6);
+
+    pdf.setTextColor(15, 23, 42);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(7);
+    pdf.text(docName.toUpperCase(), sigX + (sigW / 2), footerY + 9.5, { align: 'center' });
+
+    pdf.setTextColor(3, 105, 161);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(6.5);
+    pdf.text(`CRM-${docCrmState} ${docCrm}`, sigX + (sigW / 2), footerY + 12.5, { align: 'center' });
+  };
+
+  // Renderiza 1ª Via (Farmácia) à esquerda
+  renderSingleVia(via1X, false);
+
+  // Linha de Corte Central Tracejada
+  pdf.setDrawColor(148, 163, 184);
+  pdf.setLineWidth(0.35);
+  pdf.setLineDashPattern([2, 2], 0);
+  pdf.line(dividerX, 8, dividerX, pageHeight - 8);
+  pdf.setLineDashPattern([], 0); // Reset dash
+
+  // Ícone/Texto de corte no centro da linha divisória
+  pdf.setFillColor(255, 255, 255);
+  pdf.rect(dividerX - 2.5, 95, 5, 20, 'F');
+  pdf.setTextColor(100, 116, 139);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(8);
+  pdf.text('✂', dividerX, 102, { align: 'center' });
+  pdf.setFontSize(5.5);
+  pdf.text('Corte', dividerX, 107, { align: 'center' });
+  pdf.text('aqui', dividerX, 111, { align: 'center' });
+
+  // Renderiza 2ª Via (Paciente) à direita
+  renderSingleVia(via2X, true);
+
+  return pdf;
+};
+
 export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
   const {
     docType,
@@ -38,6 +354,11 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
 
   if (!medicoConfigurado(doctor)) {
     throw new Error('Médico não configurado: documento não emitido.');
+  }
+
+  // Se for Receita de Controle Especial, gerar folha única em modo Paisagem com 2 vias lado a lado (Portaria 344/98)
+  if (docType === 'special_prescription') {
+    return generateSpecialPrescriptionLandscapePDF(options);
   }
 
   const pdf = new jsPDF({
@@ -106,8 +427,7 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
 
     // Document Title Badge on Top Right
     let badgeText = 'RECEITUÁRIO MÉDICO';
-    if (docType === 'special_prescription') badgeText = 'RECEITA CONTROLE ESPECIAL';
-    else if (docType === 'exams') badgeText = 'SOLICITAÇÃO DE EXAMES';
+    if (docType === 'exams') badgeText = 'SOLICITAÇÃO DE EXAMES';
     else if (docType === 'certificate') badgeText = 'ATESTADO MÉDICO';
     else if (docType === 'referral') badgeText = 'ENCAMINHAMENTO MÉDICO';
 
@@ -122,18 +442,10 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
     doc.setFontSize(7.5);
     doc.text(badgeText, badgeX + (badgeWidth / 2), y + 5.5, { align: 'center' });
 
-    if (docType === 'special_prescription') {
-      doc.setTextColor(153, 27, 27); // #991B1B
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      const viaText = isSecondCopy ? '2ª VIA: PACIENTE' : '1ª VIA: FARMÁCIA / RETENÇÃO';
-      doc.text(viaText, badgeX + (badgeWidth / 2), y + 12.5, { align: 'center' });
-    }
-
     doc.setTextColor(100, 116, 139);
     doc.setFontSize(7.5);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, badgeX + badgeWidth, y + (docType === 'special_prescription' ? 17 : 13), { align: 'right' });
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, badgeX + badgeWidth, y + 13, { align: 'right' });
 
     // Top Divider Line
     doc.setDrawColor(15, 23, 42);
@@ -251,8 +563,8 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
   const renderDocumentContent = (isSecondCopy = false) => {
     let currentY = renderHeader(pdf, isSecondCopy);
 
-    // 1. PRESCRIPTIONS (Standard & Special Control)
-    if (docType === 'prescription' || docType === 'special_prescription') {
+    // 1. PRESCRIPTION (Standard Ambulatorial)
+    if (docType === 'prescription') {
       if (prescriptionItems.length === 0) {
         pdf.setFont('times', 'italic');
         pdf.setFontSize(11);
@@ -317,46 +629,6 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
           });
 
           currentY = (pdf as any).lastAutoTable.finalY + 4;
-        });
-      }
-
-      // If Special Prescription, add Buyer & Supplier Box
-      if (docType === 'special_prescription') {
-        const remainingSpace = pageHeight - currentY - 40;
-        const boxY = Math.max(currentY + 2, pageHeight - 65);
-
-        autoTable(pdf, {
-          startY: boxY,
-          margin: { left: marginX, right: marginX },
-          theme: 'grid',
-          head: [
-            ['IDENTIFICAÇÃO DO COMPRADOR', 'IDENTIFICAÇÃO DO FORNECEDOR']
-          ],
-          body: [
-            [
-              'Nome: _____________________________________\nRG: __________________  CPF: ________________\nEndereço: __________________________________\nCidade/UF: _____________  Tel: _______________',
-              'Farmácia/Drogaria: _________________________\nAssinatura do Farmacêutico: __________________\nData: ____/____/________   Lote: ____________\nQuantidade Dispensada: _____________________'
-            ]
-          ],
-          headStyles: {
-            fillColor: [248, 250, 252],
-            textColor: [15, 23, 42],
-            fontSize: 7,
-            fontStyle: 'bold',
-            lineWidth: 0.2,
-            lineColor: [203, 213, 225]
-          },
-          bodyStyles: {
-            fillColor: [255, 255, 255],
-            textColor: [51, 65, 85],
-            fontSize: 7,
-            lineWidth: 0.2,
-            lineColor: [203, 213, 225]
-          },
-          columnStyles: {
-            0: { cellWidth: contentWidth / 2 },
-            1: { cellWidth: contentWidth / 2 }
-          }
         });
       }
     }
@@ -574,12 +846,6 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
 
   // Render 1st page
   renderDocumentContent(false);
-
-  // If special control prescription, add 2nd page (Paciente)
-  if (docType === 'special_prescription') {
-    pdf.addPage('a4', 'portrait');
-    renderDocumentContent(true);
-  }
 
   return pdf;
 };

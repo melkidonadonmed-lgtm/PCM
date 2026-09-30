@@ -28,6 +28,7 @@ interface PrescriptionBuilderProps {
   weightCalcEnabled?: boolean;
   onToggleWeightCalc?: (enabled: boolean) => void;
   onClearPrescription?: () => void;
+  onClearPatient?: () => void;
   onNavigateToPrint: () => void;
   onNavigateToPediatricCalc?: () => void;
   onNavigateToEditor?: () => void;
@@ -42,15 +43,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   darkMode: _darkMode,
   doctor,
   patient,
-  onUpdatePatient: _onUpdatePatient,
+  onUpdatePatient,
   items,
   onUpdateItems,
   onClearPrescription,
+  onClearPatient,
   onNavigateToPrint,
   onNavigateToPediatricCalc,
   onNavigateToEditor,
   onOpenDoctorModal,
-  onOpenPatientModal: _onOpenPatientModal,
+  onOpenPatientModal,
   medicamentoPendente,
   onConsumirMedicamentoPendente,
   onAbrirPerfilMedico
@@ -300,6 +302,105 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         {/* LEFT COLUMN: Composer, Search and Prescribed Items */}
         <div className={`xl:col-span-7 space-y-5 ${mobileSection === 'preview' ? 'hidden md:block' : 'block'}`}>
           
+          {/* Card: Identificação Rápida do Paciente (Sincronizado) */}
+          <section className="card-surface rounded-2xl p-4 sm:p-5 space-y-3.5 border border-slate-200/80 dark:border-slate-800/80">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/80 dark:border-slate-800/80">
+              <div className="flex items-center gap-2">
+                <Icon name="person" className="text-blue-600 dark:text-blue-400 text-[20px]" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Identificação do Paciente
+                </h2>
+                {patientName && (
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                    Sincronizado
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {patientName && onClearPatient && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Deseja limpar os dados deste paciente e reiniciar a consulta atual para segurança clínica?')) {
+                        onClearPatient();
+                      }
+                    }}
+                    className="text-xs text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1 cursor-pointer transition p-1 rounded focus-visible:ring-2 focus-visible:ring-rose-500"
+                    title="Limpar paciente e reiniciar consulta"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Limpar Atendimento</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onOpenPatientModal}
+                  className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer p-1 rounded focus-visible:ring-2 focus-visible:ring-sky-500"
+                  title="Abrir cadastro clínico detalhado"
+                >
+                  <span>Cadastro completo</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <div className="sm:col-span-6">
+                <label htmlFor="quick-patient-name" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                  Nome do Paciente *
+                </label>
+                <input
+                  id="quick-patient-name"
+                  type="text"
+                  value={patient.name || ''}
+                  onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
+                  placeholder="Nome completo do paciente"
+                  className="w-full px-3 py-2 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <label htmlFor="quick-patient-doc" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                  CPF / RG
+                </label>
+                <input
+                  id="quick-patient-doc"
+                  type="text"
+                  value={patient.documentNumber || ''}
+                  onChange={(e) => onUpdatePatient({ ...patient, documentNumber: e.target.value })}
+                  placeholder="000.000.000-00"
+                  className="w-full px-3 py-2 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Peso (kg)
+                  </label>
+                  {onNavigateToPediatricCalc && (
+                    <button
+                      type="button"
+                      onClick={onNavigateToPediatricCalc}
+                      className="text-[10px] text-blue-600 dark:text-blue-400 font-bold hover:underline"
+                    >
+                      Dose
+                    </button>
+                  )}
+                </div>
+                <input
+                  id="quick-patient-weight"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={patient.weightKg > 0 ? patient.weightKg : ''}
+                  onChange={(e) => onUpdatePatient({ ...patient, weightKg: parseFloat(e.target.value) || 0 })}
+                  placeholder="Ex.: 14.5"
+                  className="w-full px-3 py-2 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+                />
+              </div>
+            </div>
+          </section>
+
           {/* Card: Prescrição */}
           <section className="card-surface rounded-2xl p-4 sm:p-5 mb-4 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-slate-800/80">

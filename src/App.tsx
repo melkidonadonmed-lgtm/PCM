@@ -174,11 +174,7 @@ export default function App() {
   };
 
   const handleClearPatient = () => {
-    const emptyPatient: Patient = {
-      ...DEFAULT_PATIENT,
-      id: 'patient-' + Date.now()
-    };
-    setPatient(emptyPatient);
+    startNewConsultation();
   };
 
   const handleResetAll = () => {
@@ -324,6 +320,7 @@ export default function App() {
               weightCalcEnabled={patient.weightCalcEnabled}
               onToggleWeightCalc={handleToggleWeightCalc}
               onClearPrescription={handleClearPrescription}
+              onClearPatient={handleClearPatient}
               onNavigateToPrint={() => handleNavigateToPrint('prescription')}
               onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
               onNavigateToEditor={handleNavigateToEditor}

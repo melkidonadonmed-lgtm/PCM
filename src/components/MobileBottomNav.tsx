@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Pill,
-  Calculator,
-  FlaskConical,
-  FileText,
-  Menu
-} from 'lucide-react';
+import { Icon } from './Icon';
 import { ActiveTab } from '../types';
 
 interface MobileBottomNavProps {
@@ -30,24 +24,24 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     {
       id: 'prescription' as ActiveTab,
       label: 'Receitas',
-      icon: Pill,
+      iconName: 'receita',
       badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
     },
     {
       id: 'pediatric_calc' as ActiveTab,
       label: 'Doses',
-      icon: Calculator
+      iconName: 'balanca'
     },
     {
       id: 'exams' as ActiveTab,
       label: 'Exames',
-      icon: FlaskConical,
+      iconName: 'exame',
       badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
     },
     {
       id: 'editor' as ActiveTab,
       label: 'Editor',
-      icon: FileText
+      iconName: 'editor'
     }
   ];
 
@@ -64,7 +58,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       }}
     >
       {items.map((item) => {
-        const IconComponent = item.icon;
         const isActive = activeTab === item.id;
 
         return (
@@ -82,10 +75,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             }
           >
             <div className="relative">
-              <IconComponent
-                className="w-5 h-5 icon-sculpted transition-colors"
+              <Icon
+                name={item.iconName as any}
+                className="text-[20px] transition-colors"
                 style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
-                strokeWidth={1.75}
               />
               {item.badge && (
                 <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[8px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15">
@@ -122,10 +115,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         }
       >
         <div className="relative">
-          <Menu
-            className="w-5 h-5 icon-sculpted transition-colors"
+          <Icon
+            name="menu"
+            className="text-[20px] transition-colors"
             style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
-            strokeWidth={1.75}
           />
         </div>
         <span

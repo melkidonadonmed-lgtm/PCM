@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
 import { PrescriptionItem } from '../types';
+import { generateMedicalPDF } from '../utils/pdfGenerator';
 
 describe('Conformidade Sanitária: Portaria SVS/MS nº 344/98 e RDC 784/2023 (Controle Especial)', () => {
   it('deve identificar corretamente medicamentos sujeitos a controle especial (Lista C1 e B1)', () => {
@@ -115,5 +116,97 @@ describe('Conformidade Sanitária: Portaria SVS/MS nº 344/98 e RDC 784/2023 (Co
       expect(field).toBeDefined();
       expect(typeof field).toBe('string');
     });
+  });
+
+  it('deve gerar PDF em modo Paisagem (297x210 mm) com folha única de 2 vias para Controle Especial', () => {
+    const mockDoctor = {
+      name: 'Dra. Gabriela Silveira',
+      crm: '123456',
+      crmState: 'SP',
+      specialty: 'Psiquiatria',
+      rqe: '7890',
+      clinicName: 'Clínica Integrada',
+      address: 'Av. Paulista, 1000',
+      cityState: 'São Paulo - SP',
+      phone: '(11) 99999-9999',
+      email: 'dra.gabriela@email.com',
+      showSignature: true,
+      stampText: ''
+    };
+
+    const mockPatient = {
+      id: 'pat-1',
+      name: 'Carlos Eduardo Souza',
+      weightKg: 72,
+      birthDate: '1985-06-15',
+      ageText: '41 anos',
+      gender: 'male' as const,
+      documentNumber: '123.456.789-00',
+      phone: '(11) 98888-7777',
+      allergies: []
+    };
+
+    const specialItems: PrescriptionItem[] = [
+      {
+        id: 'item-clona',
+        name: 'Clonazepam 2 mg',
+        presentation: '2 mg comprimidos',
+        quantity: '1 caixa',
+        doseCalculatedText: '1 comprimido',
+        frequencyText: 'à noite',
+        scheduleInterval: '24/24h',
+        scheduleTimes: ['22:00'],
+        instructions: 'Tomar 1 comprimido via oral à noite ao deitar',
+        durationDays: 30,
+        route: 'Oral',
+        isContinuous: true,
+        isSpecialControl: true
+      }
+    ];
+
+    const pdfSpecial = generateMedicalPDF({
+      docType: 'special_prescription',
+      doctor: mockDoctor,
+      patient: mockPatient,
+      prescriptionItems: specialItems,
+      exams: [],
+      examIndication: '',
+      certificate: {
+        id: 'c1',
+        patientName: 'Carlos Eduardo Souza',
+        documentNumber: '123.456.789-00',
+        daysOff: 2,
+        startDate: '2026-09-30',
+        endDate: '2026-10-02',
+        periodText: '',
+        includeCID: false,
+        cid10Code: '',
+        cid10Description: '',
+        observations: '',
+        cityDateText: ''
+      },
+      referral: {
+        id: 'r1',
+        patientName: 'Carlos Eduardo Souza',
+        documentNumber: '123.456.789-00',
+        destinationSpecialty: 'Neurologia',
+        destinationInstitution: '',
+        priority: 'prioritario',
+        reason: '',
+        clinicalSummary: '',
+        relevantExams: '',
+        hypothesisCID: '',
+        date: '2026-09-30'
+      }
+    });
+
+    // Validar dimensões de modo Paisagem (A4: 297mm largura x 210mm altura)
+    const width = Math.round(pdfSpecial.internal.pageSize.getWidth());
+    const height = Math.round(pdfSpecial.internal.pageSize.getHeight());
+
+    expect(width).toBe(297);
+    expect(height).toBe(210);
+    // Folha única econômica com as duas vias lado a lado
+    expect(pdfSpecial.getNumberOfPages()).toBe(1);
   });
 });

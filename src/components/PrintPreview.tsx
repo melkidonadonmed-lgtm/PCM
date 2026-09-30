@@ -592,22 +592,42 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
         </div>
       </div>
 
+      {/* Estilo dinâmico para impressão física @media print em Paisagem para Receita de Controle Especial */}
+      {docType === 'special_prescription' && (
+        <style>{`
+          @media print {
+            @page {
+              size: landscape;
+              margin: 8mm;
+            }
+            #printable-a4-sheet {
+              width: 297mm !important;
+              min-height: 195mm !important;
+              max-width: none !important;
+              padding: 6mm 8mm !important;
+            }
+          }
+        `}</style>
+      )}
+
       {/* A4 Paper Container Wrapper */}
       <div className="flex justify-center p-3 sm:p-8 bg-slate-900/5 dark:bg-slate-950/40 rounded-2xl overflow-x-auto border border-slate-200/50 dark:border-slate-800/50 shadow-tactile-inset dark:shadow-tactile-inset-dark">
         <div 
           ref={printSheetRef}
           id="printable-a4-sheet"
-          className={`print-page paper-sheet-floating w-full p-6 sm:p-10 md:p-12 rounded-xl relative transition duration-200 ${
+          className={`print-page paper-sheet-floating w-full p-4 sm:p-8 md:p-10 rounded-xl relative transition duration-200 ${
             !isConfigured ? 'no-print' : ''
           } ${
-            fitToMobile ? 'max-w-full sm:max-w-[780px] min-h-[950px] sm:min-h-[1100px]' : 'min-w-[650px] max-w-[780px] min-h-[1100px]'
+            docType === 'special_prescription'
+              ? (fitToMobile ? 'max-w-full sm:max-w-[1120px] min-h-[720px]' : 'min-w-[850px] max-w-[1120px] min-h-[740px]')
+              : (fitToMobile ? 'max-w-full sm:max-w-[780px] min-h-[950px] sm:min-h-[1100px]' : 'min-w-[650px] max-w-[780px] min-h-[1100px]')
           }`}
           style={{
             backgroundColor: '#FFFFFF',
             color: '#0F172A',
             display: 'grid',
-            gridTemplateRows: 'auto 1fr auto',
-            rowGap: '1.5rem'
+            gridTemplateRows: docType === 'special_prescription' ? '1fr' : 'auto 1fr auto',
+            rowGap: docType === 'special_prescription' ? '0' : '1.5rem'
           }}
         >
           {/* Marca d'Água de Exemplo quando médico não configurado */}
@@ -631,8 +651,219 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             opacity={activeContext?.watermarkOpacity} 
           />
 
-          {/* Top Medical Letterhead / Header (Grid Row 1) */}
-          <header id="print-header" className="print-header print-avoid-break w-full relative z-10">
+          {/* LAYOUT 1: RECEITA DE CONTROLE ESPECIAL EM 2 VIAS HORIZONTAL (PAISAGEM • PORTARIA 344/98) */}
+          {docType === 'special_prescription' ? (
+            <div className="w-full relative z-10 flex flex-col justify-between flex-1 py-1">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] print:grid-cols-[1fr_auto_1fr] gap-4 sm:gap-6 flex-1 w-full">
+                {/* 1ª VIA: FARMÁCIA (RETENÇÃO) */}
+                <div className="flex flex-col justify-between h-full pr-1 sm:pr-2 border-b md:border-b-0 pb-6 md:pb-0">
+                  <div className="space-y-3">
+                    {/* Cabeçalho Médico Compacto */}
+                    <div className="pb-2 border-b border-slate-900 flex justify-between items-start gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="w-5 h-5 rounded bg-sky-900 text-white font-bold text-[10px] flex items-center justify-center">
+                            Rx
+                          </span>
+                          <h2 className="font-bold text-xs sm:text-sm uppercase leading-tight font-serif-doc text-slate-950">
+                            {docName}
+                          </h2>
+                        </div>
+                        <p className="text-[10px] font-bold text-sky-900">
+                          CRM-{docCrmState} {docCrm} {doctor?.rqe ? `• RQE ${doctor.rqe}` : ''}
+                        </p>
+                        <p className="text-[9px] text-slate-600 font-medium">
+                          {docSpecialty} {docClinic ? `• ${docClinic}` : ''}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[8px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-900 border border-slate-300 block">
+                          CONTROLE ESPECIAL
+                        </span>
+                        <span className="text-[8px] font-bold text-rose-800 uppercase block mt-0.5">
+                          1ª VIA: FARMÁCIA (RETENÇÃO)
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Dados do Paciente */}
+                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-[10px] text-slate-800 grid grid-cols-2 gap-1.5">
+                      <div><span className="font-bold text-slate-500">Paciente:</span> <span className="font-bold text-slate-900">{patientName}</span></div>
+                      <div><span className="font-bold text-slate-500">Doc:</span> {patientDoc}</div>
+                      <div><span className="font-bold text-slate-500">Peso:</span> {patientWeight ? `${patientWeight} kg` : '—'}</div>
+                      <div><span className="font-bold text-slate-500">Idade:</span> {patientAge}</div>
+                    </div>
+
+                    {/* Medicamentos Prescritos (Foco em Nome e Quantidade para Dispensação) */}
+                    <div className="space-y-2 font-serif-doc">
+                      {prescriptionItems.length === 0 ? (
+                        <p className="text-xs text-slate-400 italic py-4 text-center">Nenhum medicamento adicionado.</p>
+                      ) : (
+                        (Object.entries(itemsByRoute) as [string, PrescriptionItem[]][]).map(([route, items]) => (
+                          <div key={route} className="space-y-1.5">
+                            <span className="text-[9px] font-bold uppercase text-sky-900 border-b border-slate-200 block pb-0.5">
+                              USO {route.replace(/^USO\s+/i, '')}
+                            </span>
+                            {items.map((it, idx) => (
+                              <div key={it.id} className="text-[11px] leading-tight flex justify-between gap-1">
+                                <span className="font-bold text-slate-950">{idx + 1}) {it.name.toUpperCase()} ({it.presentation})</span>
+                                <span className="font-semibold text-slate-800 shrink-0">----- {it.quantity}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Parte Inferior 1ª Via: Boxes Comprador / Fornecedor e Assinatura */}
+                  <div className="mt-4 pt-2 border-t border-slate-200 space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[8px] text-slate-700 font-sans">
+                      <div className="p-1.5 rounded border border-slate-300 bg-slate-50/70 space-y-1">
+                        <span className="font-bold text-[8px] uppercase block border-b border-slate-200 text-slate-900">
+                          IDENTIFICAÇÃO DO COMPRADOR
+                        </span>
+                        <div>Nome: _______________________________</div>
+                        <div className="flex justify-between"><span>RG: __________</span> <span>CPF: _________</span></div>
+                        <div>Endereço: ___________________________</div>
+                        <div className="flex justify-between"><span>Cidade/UF: _______</span> <span>Tel: ________</span></div>
+                      </div>
+                      <div className="p-1.5 rounded border border-slate-300 bg-slate-50/70 space-y-1">
+                        <span className="font-bold text-[8px] uppercase block border-b border-slate-200 text-slate-900">
+                          IDENTIFICAÇÃO DO FORNECEDOR
+                        </span>
+                        <div>Farmácia/Drogaria: __________________</div>
+                        <div className="pt-2 text-center border-t border-dotted border-slate-300 mt-1">
+                          <span className="text-[7px] text-slate-500">Assinatura do Farmacêutico / Data</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-end pt-1">
+                      <span className="text-[9px] text-slate-600 font-serif italic">
+                        {doctor?.cityState || 'Brasil'}, {currentDate}
+                      </span>
+                      <div className="text-center pt-1 border-t border-slate-900 min-w-[140px]">
+                        <span className="text-[10px] font-bold uppercase block text-slate-950">{docName}</span>
+                        <span className="text-[8px] text-sky-900 font-semibold block">CRM-{docCrmState} {docCrm}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DIVISOR CENTRAL COM LINHA DE CORTE */}
+                <div className="hidden md:flex print:flex flex-col items-center justify-between py-2 relative select-none">
+                  <div className="w-0.5 h-full border-l-2 border-dashed border-slate-300 dark:border-slate-400 absolute left-1/2 -translate-x-1/2" />
+                  <div className="z-10 bg-white p-1 rounded-full border border-slate-300 text-slate-500 text-[11px] shadow-xs">
+                    ✂
+                  </div>
+                  <div className="z-10 bg-white px-1.5 py-4 rounded border border-slate-200 text-[8px] font-mono text-slate-500 uppercase tracking-widest [writing-mode:vertical-lr] rotate-180">
+                    Linha de corte • Portaria 344/98
+                  </div>
+                  <div className="z-10 bg-white p-1 rounded-full border border-slate-300 text-slate-500 text-[11px] shadow-xs">
+                    ✂
+                  </div>
+                </div>
+
+                {/* 2ª VIA: PACIENTE (ORIENTAÇÃO) */}
+                <div className="flex flex-col justify-between h-full pl-1 sm:pl-2">
+                  <div className="space-y-3">
+                    {/* Cabeçalho Médico Compacto */}
+                    <div className="pb-2 border-b border-slate-900 flex justify-between items-start gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="w-5 h-5 rounded bg-sky-900 text-white font-bold text-[10px] flex items-center justify-center">
+                            Rx
+                          </span>
+                          <h2 className="font-bold text-xs sm:text-sm uppercase leading-tight font-serif-doc text-slate-950">
+                            {docName}
+                          </h2>
+                        </div>
+                        <p className="text-[10px] font-bold text-sky-900">
+                          CRM-{docCrmState} {docCrm} {doctor?.rqe ? `• RQE ${doctor.rqe}` : ''}
+                        </p>
+                        <p className="text-[9px] text-slate-600 font-medium">
+                          {docSpecialty} {docClinic ? `• ${docClinic}` : ''}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[8px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-900 border border-slate-300 block">
+                          CONTROLE ESPECIAL
+                        </span>
+                        <span className="text-[8px] font-bold text-sky-900 uppercase block mt-0.5">
+                          2ª VIA: PACIENTE (ORIENTAÇÃO)
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Dados do Paciente */}
+                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-[10px] text-slate-800 grid grid-cols-2 gap-1.5">
+                      <div><span className="font-bold text-slate-500">Paciente:</span> <span className="font-bold text-slate-900">{patientName}</span></div>
+                      <div><span className="font-bold text-slate-500">Doc:</span> {patientDoc}</div>
+                      <div><span className="font-bold text-slate-500">Peso:</span> {patientWeight ? `${patientWeight} kg` : '—'}</div>
+                      <div><span className="font-bold text-slate-500">Idade:</span> {patientAge}</div>
+                    </div>
+
+                    {/* Medicamentos Prescritos com Posologia Completa */}
+                    <div className="space-y-2.5 font-serif-doc">
+                      {prescriptionItems.length === 0 ? (
+                        <p className="text-xs text-slate-400 italic py-4 text-center">Nenhum medicamento adicionado.</p>
+                      ) : (
+                        (Object.entries(itemsByRoute) as [string, PrescriptionItem[]][]).map(([route, items]) => (
+                          <div key={route} className="space-y-2">
+                            <span className="text-[9px] font-bold uppercase text-sky-900 border-b border-slate-200 block pb-0.5">
+                              USO {route.replace(/^USO\s+/i, '')}
+                            </span>
+                            {items.map((it, idx) => (
+                              <div key={it.id} className="text-[11px] leading-tight space-y-1">
+                                <div className="flex justify-between font-bold text-slate-950">
+                                  <span>{idx + 1}) {it.name.toUpperCase()} ({it.presentation})</span>
+                                  <span className="font-semibold text-slate-700">----- {it.quantity}</span>
+                                </div>
+                                <p className="pl-3 text-[10px] text-slate-800 leading-relaxed font-serif">
+                                  Posologia: {it.instructions}
+                                </p>
+                                {it.scheduleTimes && it.scheduleTimes.length > 0 && (
+                                  <p className="pl-3 text-[9px] text-sky-800 font-sans font-semibold">
+                                    Horários sugeridos: {it.scheduleTimes.join(' • ')}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Parte Inferior 2ª Via: Advertências Sanitárias e Assinatura */}
+                  <div className="mt-4 pt-2 border-t border-slate-200 space-y-2">
+                    <div className="p-2 rounded bg-rose-50 border border-rose-200 text-[8px] text-rose-950 space-y-0.5">
+                      <span className="font-bold uppercase block text-rose-900">
+                        ⚠️ Orientações e Advertências Sanitárias (Portaria 344/98)
+                      </span>
+                      <p>• Medicamento sujeito a controle especial. Uso estritamente individual conforme prescrito.</p>
+                      <p>• Mantenha fora do alcance de crianças em local seguro e protegido de luz/umidade.</p>
+                    </div>
+
+                    <div className="flex justify-between items-end pt-1">
+                      <div className="text-[8px] text-slate-500 font-sans">
+                        <span className="block font-bold text-emerald-800">Assinatura Eletrônica CFM Válida</span>
+                        <span>prescmed.digital</span>
+                      </div>
+                      <div className="text-center pt-1 border-t border-slate-900 min-w-[140px]">
+                        <span className="text-[10px] font-bold uppercase block text-slate-950">{docName}</span>
+                        <span className="text-[8px] text-sky-900 font-semibold block">CRM-{docCrmState} {docCrm}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Top Medical Letterhead / Header (Grid Row 1) */}
+              <header id="print-header" className="print-header print-avoid-break w-full relative z-10">
             {/* Logotipos da Instituição se cadastrados no contexto (Suporte a Timbrado Duplo) */}
             {(activeContext?.logoDataUrl || activeContext?.secondaryLogoDataUrl) && (
               <div className={`mb-3 flex items-center ${
@@ -711,16 +942,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                       ? 'RECEITUÁRIO MÉDICO (2 VIAS)' 
                       : 'RECEITUÁRIO MÉDICO'
                   )}
-                  {docType === 'special_prescription' && 'RECEITA CONTROLE ESPECIAL'}
                   {docType === 'exams' && (activeContext?.documentFormatting?.examHeaderTitle || 'SOLICITAÇÃO DE EXAMES')}
                   {docType === 'certificate' && 'ATESTADO MÉDICO'}
                   {docType === 'referral' && 'ENCAMINHAMENTO MÉDICO'}
                 </span>
-                {docType === 'special_prescription' && (
-                  <span className="text-[9px] sm:text-[10px] font-bold block uppercase tracking-wide font-sans" style={{ color: '#991B1B' }}>
-                    1ª Via: Farmácia / 2ª Via: Paciente
-                  </span>
-                )}
                 {docType === 'prescription' && activeContext?.documentFormatting?.prescriptionViaCount === 2 && (
                   <span className="text-[9px] sm:text-[10px] font-bold block uppercase tracking-wide font-sans" style={{ color: '#1E4F7A' }}>
                     1ª Via: Farmácia / 2ª Via: Paciente
@@ -779,7 +1004,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           {/* DOCUMENT BODY CONTENT (Grid Row 2 - Flex 1fr) */}
           <main id="print-content" className="print-body w-full min-h-0 flex-1 flex flex-col justify-start relative z-10">
               {/* 1. PRESCRIPTION CONTENT */}
-              {(docType === 'prescription' || docType === 'special_prescription') && (
+              {docType === 'prescription' && (
                 <div className="space-y-6 sm:space-y-8 font-serif font-serif-doc" style={{ fontFamily: 'var(--font-serif-doc)' }}>
                   {prescriptionItems.length === 0 ? (
                     <div className="py-16 text-center italic text-base text-slate-500 font-serif">
@@ -847,59 +1072,6 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                       </div>
                     );
                   })
-                  )}
-
-                  {/* Special Control Prescription: Buyer & Supplier Regulatory Fields */}
-                  {docType === 'special_prescription' && (
-                    <div 
-                      className="mt-8 pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm font-sans print-avoid-break"
-                      style={{
-                        borderTop: '1.5px solid #CBD5E1',
-                        color: '#334155'
-                      }}
-                    >
-                      <div 
-                        className="p-3.5 rounded-lg space-y-2"
-                        style={{
-                          backgroundColor: '#F8FAFC',
-                          border: '1px solid #CBD5E1'
-                        }}
-                      >
-                        <span className="font-bold uppercase block pb-1 text-xs tracking-wider" style={{ color: '#0F172A', borderBottom: '1px solid #E2E8F0' }}>
-                          IDENTIFICAÇÃO DO COMPRADOR
-                        </span>
-                        <div className="space-y-1.5 text-xs font-medium">
-                          <div>Nome: _________________________________________</div>
-                          <div className="flex justify-between">
-                            <span>RG/Órgão: ________________</span>
-                            <span>CPF: __________________</span>
-                          </div>
-                          <div>Endereço: _______________________________________</div>
-                          <div className="flex justify-between">
-                            <span>Cidade/UF: _______________</span>
-                            <span>Tel: __________________</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div 
-                        className="p-3.5 rounded-lg space-y-2"
-                        style={{
-                          backgroundColor: '#F8FAFC',
-                          border: '1px solid #CBD5E1'
-                        }}
-                      >
-                        <span className="font-bold uppercase block pb-1 text-xs tracking-wider" style={{ color: '#0F172A', borderBottom: '1px solid #E2E8F0' }}>
-                          IDENTIFICAÇÃO DO FORNECEDOR
-                        </span>
-                        <div className="space-y-1.5 text-xs font-medium">
-                          <div>Farmácia/Drogaria: ____________________________</div>
-                          <div className="pt-3 text-center mt-2" style={{ borderTop: '1px dotted #94A3B8' }}>
-                            <span className="block text-[10px] text-slate-500 font-medium">Assinatura do Farmacêutico / Data</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   )}
                 </div>
               )}
@@ -1128,8 +1300,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               </div>
             </div>
           </footer>
-        </div>
-      </div>
+        </>
+      )}
+    </div>
+  </div>
 
       {/* Bottom Sticky Action Bar */}
       <div 
