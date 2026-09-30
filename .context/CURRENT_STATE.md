@@ -27,4 +27,5 @@ Sistema otimizado com fluxo contínuo e desobstruído:
 ---
 
 ## Próximo Ponto de Entrada
-- Testar a interação do médico no Editor com diferentes volumes de medicamentos e validar a exportação/impressão direta a partir da folha A4.
+- Deploy concluído com sucesso no Google Cloud Run (revisão `prescmed-00031-f9q`, tag `9b86d53`) servindo 100% do tráfego em https://prescmed-1044179901556.southamerica-east1.run.app (HTTP 200 OK comprovado).
+- Validar a abertura instantânea do Editor no celular ou tablet acessando a URL pública em produção.

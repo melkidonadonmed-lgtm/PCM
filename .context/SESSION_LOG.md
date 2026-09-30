@@ -18,6 +18,9 @@
 - `npm run design:lint`: 0 erros / 0 avisos no linter DESIGN.md (Exit code: 0).
 - `npm test`: 54/54 testes Vitest aprovados (Exit code: 0).
 - `npm run build`: Bundle de produção gerado com sucesso em `dist/` (Exit code: 0).
+- `git push origin main`: Commit `9b86d53` enviado para `melkidonadonmed-lgtm/PCM.git` (Exit code: 0).
+- `gcloud builds submit`: Imagem Docker compilada e tagueada com sucesso (Exit code: 0).
+- `gcloud run deploy`: Revisão `prescmed-00031-f9q` ativa em São Paulo (`southamerica-east1`) servindo 100% do tráfego com HTTP 200 OK (Exit code: 0).
 
 ### Próxima Ação Recomendada
-- Validar a experiência de uso no dispositivo do usuário e, se desejado, realizar deploy da nova revisão no Google Cloud Run.
+- Acessar a aplicação no smartphone ou navegador para experimentar o fluxo direto de "Visualizar" no Editor com carregamento em 0 ms.
