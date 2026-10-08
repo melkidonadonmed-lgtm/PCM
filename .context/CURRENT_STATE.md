@@ -28,13 +28,19 @@ O fluxo de emissão e edição de receitas médicas foi completamente reformulad
 
 ---
 
+## Status de Implantação e Nuvem
+- **GitHub (`origin/main`):** Commit `b70d676` enviado com sucesso.
+- **Google Cloud Run:** Revisão `prescmed-00048-t5h` implantada com sucesso na região `southamerica-east1` (HTTP 200 OK).
+  - URL Ativa: `https://prescmed-1044179901556.southamerica-east1.run.app`
+- **Persistência na Nuvem (Firestore):**
+  - Identificado e sanado bug de `Unsupported field value: undefined` com a função `sanitizeForFirestore` recursiva em `cloudSyncManager.ts`.
+  - Conformidade total com LGPD e sigilo médico mantida (somente postos de trabalho e templates reutilizáveis vão para a nuvem; prontuários e rascunhos de pacientes permanecem estritamente no IndexedDB local).
+
+---
+
 ## Débitos Técnicos e Blockers
-- **Nenhum blocker ativo.** 74/74 testes unitários e clínicos aprovados com 100% de sucesso (`ExitCode: 0`).
+- **Nenhum blocker ativo.** 76/76 testes unitários e clínicos aprovados com 100% de sucesso (`ExitCode: 0`).
 - **Tipagem estrita:** `tsc --noEmit` limpo com 0 erros (`ExitCode: 0`).
 - **Design System:** Conformidade com DESIGN.md 100% validada (`ExitCode: 0`).
 - **Bundle compilado:** `npm run build` gerado sem falhas (`ExitCode: 0`).
 
----
-
-## Próximo Ponto de Entrada
-- Disponível para testes pelo usuário no navegador e commit no repositório.

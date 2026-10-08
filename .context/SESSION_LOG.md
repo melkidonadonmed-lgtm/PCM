@@ -21,16 +21,20 @@
   - Botão **`Salvar na Receita`** e botão **`Voltar à Receita`** conectados à sincronização bidirecional com a consulta ativa (`syncWithActivePrescription`).
 - `src/App.tsx`:
   - Conexão da prop `onUpdatePrescriptionItems={setPrescriptionItems}` no `DocumentEditorView`.
-- `src/__tests__/editorRoutingAndActions.test.ts`:
-  - Atualização do teste de governança de botões para validar a emissão primária direta com Imprimir/PDF.
+- `src/services/cloud/cloudSyncManager.ts`:
+  - Implementada função recursiva `sanitizeForFirestore` para higienizar dados antes do `batch.set(docRef, payload, { merge: true })`, prevenindo que propriedades `undefined` do Dexie/IndexedDB quebrem o SDK do Firestore.
+- `src/__tests__/cloudSyncSanitize.test.ts` (Novo):
+  - 2 testes unitários garantindo que nenhum campo `undefined` atinja o lote do Firestore.
 - `.context/ANALISE_CALIBRACAO_SKILLS.md` (Novo):
   - Análise técnica crítica sobre a descalibração do score de 97,5% emitido por avaliadores estáticos e proposta de critérios corretivos.
 
 ### Comandos Validados
-- `npm test`: 11 arquivos de teste aprovados (74 testes, ExitCode: 0).
+- `npm test`: 12 arquivos de teste aprovados (76 testes, ExitCode: 0).
 - `npm run lint`: `tsc --noEmit` aprovado com 0 erros (ExitCode: 0).
 - `npm run design:lint`: 0 erros / 0 avisos (ExitCode: 0).
 - `npm run build`: Build de produção gerado com sucesso em 5.00s (ExitCode: 0).
+- `git push origin main`: Commit `b70d676` enviado com sucesso para o GitHub.
+- `pwsh -File .\deploy-cloudrun.ps1`: Revisão `prescmed-00048-t5h` implantada com sucesso no Google Cloud Run (HTTP 200 OK).
 
 ---
 
