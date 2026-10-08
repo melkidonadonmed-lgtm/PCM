@@ -193,8 +193,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  // Grupo 1: Atendimento Clínico
-  const clinicalNavItems = [
+  // Grupo 1: Atendimento Clínico Principal (4 Hubs Canônicos)
+  const coreHubNavItems = [
     {
       id: 'prescription' as ActiveTab,
       label: 'Receitas Médicas',
@@ -203,6 +203,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
     },
     {
+      id: 'documents' as ActiveTab,
+      label: 'Central de Documentos',
+      fullLabel: 'Central de Documentos (Atestados, Encaminhamentos e Exames)',
+      shortLabel: 'Documentos',
+      icon: Award,
+      badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
+    },
+    {
+      id: 'editor' as ActiveTab,
+      label: 'Editor A4 & Timbrados',
+      fullLabel: 'Editor de Prescrições e Laudos A4',
+      shortLabel: 'Editor',
+      icon: FileText
+    },
+    {
+      id: 'print_preview' as ActiveTab,
+      label: 'Exportar & Imprimir PDF',
+      shortLabel: 'Exportar',
+      icon: Download
+    }
+  ];
+
+  // Grupo 2: Ferramentas Clínicas & Apoio Diagnóstico
+  const clinicalToolsNavItems = [
+    {
       id: 'pediatric_calc' as ActiveTab,
       label: 'Calculadora Pediátrica',
       shortLabel: 'Doses',
@@ -210,47 +235,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
     },
     {
-      id: 'exams' as ActiveTab,
-      label: 'Solicitação de Exames',
-      shortLabel: 'Exames',
-      icon: FlaskConical,
-      badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
-    }
-  ];
-
-  // Grupo 2: Documentos & Emissão
-  const documentsNavItems = [
-    {
-      id: 'certificate' as ActiveTab,
-      label: 'Atestados Médicos',
-      fullLabel: 'Atestados Médicos (CFM)',
-      shortLabel: 'Atestado',
-      icon: Award
-    },
-    {
-      id: 'referral' as ActiveTab,
-      label: 'Encaminhamentos',
-      shortLabel: 'Encam.',
-      icon: Share2
-    },
-    {
-      id: 'editor' as ActiveTab,
-      label: 'Editor de Prescrições',
-      fullLabel: 'Editor de Prescrições e Documentos',
-      shortLabel: 'Editor',
-      icon: FileText
-    },
-    {
       id: 'protocols' as ActiveTab,
       label: 'Protocolos Clínicos',
       shortLabel: 'Protocolos',
       icon: HeartPulse
-    },
-    {
-      id: 'print_preview' as ActiveTab,
-      label: 'Exportar & Imprimir PDF',
-      shortLabel: 'Exportar',
-      icon: Download
     }
   ];
 
@@ -283,7 +271,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const renderNavButton = (item: { id: ActiveTab; label: string; fullLabel?: string; shortLabel: string; icon: React.ElementType; badge?: string }) => {
     const Icon = item.icon;
-    const isActive = activeTab === item.id;
+    const isActive = item.id === 'documents'
+      ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
+      : activeTab === item.id;
 
     if (!isOpen) {
       return (
@@ -478,16 +468,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Navegação por Grupos */}
           <div className={isOpen ? 'w-full space-y-4' : 'w-full flex flex-col items-center space-y-3'}>
-            {/* Grupo 1: Atendimento Clínico */}
+            {/* Grupo 1: Atendimento Clínico Principal (4 Hubs) */}
             <div>
               {isOpen && (
                 <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-300 px-2 mb-1.5 flex items-center justify-between">
                   <span>Atendimento Clínico</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                </p>
+              )}
+              <nav className={isOpen ? 'space-y-1' : 'space-y-1.5 w-full flex flex-col items-center'}>
+                {coreHubNavItems.map(renderNavButton)}
+              </nav>
+            </div>
+
+            {/* Grupo 2: Ferramentas & Apoio Clínico */}
+            <div>
+              {isOpen && (
+                <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-300 px-2 mb-1.5 flex items-center justify-between">
+                  <span>Ferramentas de Apoio</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 </p>
               )}
               <nav className={isOpen ? 'space-y-1' : 'space-y-1.5 w-full flex flex-col items-center'}>
-                {clinicalNavItems.map(renderNavButton)}
+                {clinicalToolsNavItems.map(renderNavButton)}
               </nav>
             </div>
 
@@ -561,18 +564,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
               </button>
             )}
-
-            {/* Grupo 2: Documentos & Emissão */}
-            <div>
-              {isOpen && (
-                <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-300 px-2 mb-1.5">
-                  Documentos & Emissão
-                </p>
-              )}
-              <nav className={isOpen ? 'space-y-1' : 'space-y-1.5 w-full flex flex-col items-center'}>
-                {documentsNavItems.map(renderNavButton)}
-              </nav>
-            </div>
           </div>
 
           {/* Active Patient Badge */}

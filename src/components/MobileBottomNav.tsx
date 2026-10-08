@@ -28,15 +28,15 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
     },
     {
+      id: 'documents' as ActiveTab,
+      label: 'Documentos',
+      iconName: 'documentos',
+      badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
+    },
+    {
       id: 'pediatric_calc' as ActiveTab,
       label: 'Doses',
       iconName: 'balanca'
-    },
-    {
-      id: 'exams' as ActiveTab,
-      label: 'Exames',
-      iconName: 'exame',
-      badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
     },
     {
       id: 'editor' as ActiveTab,
@@ -45,8 +45,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     }
   ];
 
-  // Itens secundários (Atestados, Encaminhamentos, Protocolos e Exportar) acessíveis via "Mais"
-  const isMoreActive = activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'protocols' || activeTab === 'print_preview';
+  // Itens secundários (Protocolos e Exportar) acessíveis via "Mais"
+  const isMoreActive = activeTab === 'protocols' || activeTab === 'print_preview';
 
   return (
     <nav
@@ -58,7 +58,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       }}
     >
       {items.map((item) => {
-        const isActive = activeTab === item.id;
+        const isActive = item.id === 'documents'
+          ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
+          : activeTab === item.id;
 
         return (
           <button

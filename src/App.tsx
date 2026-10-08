@@ -4,8 +4,7 @@ import { Sidebar } from './components/Sidebar';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { PediatricCalculator } from './components/PediatricCalculator';
 import { PrescriptionBuilder } from './components/PrescriptionBuilder';
-import { ExamRequester } from './components/ExamRequester';
-import { CertificateAndReferral } from './components/CertificateAndReferral';
+import { ClinicalDocumentsHub, DocumentsSubTab } from './components/ClinicalDocumentsHub';
 import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
 import { PuxarParaAtualizar } from './components/PuxarParaAtualizar';
 import { ActiveTab, PrescriptionItem, Patient } from './types';
@@ -105,7 +104,7 @@ export default function App() {
 
   // Navegação entre abas
   const [activeTab, setActiveTab] = useState<ActiveTab>('prescription');
-  const [certSubTab, setCertSubTab] = useState<'certificate' | 'referral'>('certificate');
+  const [documentsSubTab, setDocumentsSubTab] = useState<DocumentsSubTab>('certificate');
   const [printDocType, setPrintDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>('prescription');
 
   const handleNavigateToPrint = (type?: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral') => {
@@ -199,13 +198,18 @@ export default function App() {
   };
 
   const handleNavigateToCertificate = () => {
-    setCertSubTab('certificate');
-    setActiveTab('certificate');
+    setDocumentsSubTab('certificate');
+    setActiveTab('documents');
   };
 
   const handleNavigateToReferral = () => {
-    setCertSubTab('referral');
-    setActiveTab('referral');
+    setDocumentsSubTab('referral');
+    setActiveTab('documents');
+  };
+
+  const handleNavigateToExams = () => {
+    setDocumentsSubTab('exams');
+    setActiveTab('documents');
   };
 
   // Medicamento pendente vindo de outras telas (ex: Protocolos)
@@ -298,9 +302,19 @@ export default function App() {
               return;
             }
             if (tab === 'certificate') {
-              setCertSubTab('certificate');
-            } else if (tab === 'referral') {
-              setCertSubTab('referral');
+              setDocumentsSubTab('certificate');
+              setActiveTab('documents');
+              return;
+            }
+            if (tab === 'referral') {
+              setDocumentsSubTab('referral');
+              setActiveTab('documents');
+              return;
+            }
+            if (tab === 'exams') {
+              setDocumentsSubTab('exams');
+              setActiveTab('documents');
+              return;
             }
             setActiveTab(tab);
           }}
@@ -363,21 +377,8 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'exams' && (
-            <ExamRequester
-              darkMode={darkMode}
-              patient={patient}
-              selectedExams={selectedExams}
-              onUpdateSelectedExams={setSelectedExams}
-              onUpdateExams={setSelectedExams}
-              clinicalIndication={examIndication}
-              onUpdateClinicalIndication={setExamIndication}
-              onNavigateToPrint={() => handleNavigateToPrint('exams')}
-            />
-          )}
-
-          {(activeTab === 'certificate' || activeTab === 'referral') && (
-            <CertificateAndReferral
+          {(activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams') && (
+            <ClinicalDocumentsHub
               darkMode={darkMode}
               patient={patient}
               onUpdatePatient={setPatient}
@@ -386,7 +387,15 @@ export default function App() {
               onUpdateCertificate={setCertificate}
               referral={referral}
               onUpdateReferral={setReferral}
-              initialSubTab={certSubTab}
+              selectedExams={selectedExams}
+              onUpdateSelectedExams={setSelectedExams}
+              clinicalIndication={examIndication}
+              onUpdateClinicalIndication={setExamIndication}
+              initialSubTab={
+                activeTab === 'certificate' ? 'certificate' :
+                activeTab === 'referral' ? 'referral' :
+                activeTab === 'exams' ? 'exams' : documentsSubTab
+              }
               onNavigateToPrint={(type) => handleNavigateToPrint(type)}
             />
           )}
@@ -473,9 +482,19 @@ export default function App() {
             return;
           }
           if (tab === 'certificate') {
-            setCertSubTab('certificate');
-          } else if (tab === 'referral') {
-            setCertSubTab('referral');
+            setDocumentsSubTab('certificate');
+            setActiveTab('documents');
+            return;
+          }
+          if (tab === 'referral') {
+            setDocumentsSubTab('referral');
+            setActiveTab('documents');
+            return;
+          }
+          if (tab === 'exams') {
+            setDocumentsSubTab('exams');
+            setActiveTab('documents');
+            return;
           }
           setActiveTab(tab);
         }}

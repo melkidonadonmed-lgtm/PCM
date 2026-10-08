@@ -6,6 +6,7 @@ describe('Governança de Rotas e Navegação do Editor', () => {
     const validTabs: ActiveTab[] = [
       'prescription',
       'pediatric_calc',
+      'documents',
       'exams',
       'certificate',
       'referral',

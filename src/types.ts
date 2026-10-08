@@ -162,6 +162,7 @@ export interface PathologyProtocol {
 export type ActiveTab = 
   | 'prescription' 
   | 'pediatric_calc' 
+  | 'documents'
   | 'exams' 
   | 'certificate' 
   | 'referral' 

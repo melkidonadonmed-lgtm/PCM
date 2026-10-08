@@ -7,7 +7,8 @@ import {
   Scale, 
   AlertTriangle, 
   ArrowRight,
-  Clock
+  Clock,
+  X
 } from 'lucide-react';
 import { PEDIATRIC_MEDICATIONS } from '../data/pediatricMeds';
 import { PediatricMedication, PrescriptionItem, Patient } from '../types';
@@ -20,6 +21,8 @@ interface PediatricCalculatorProps {
   onUpdatePatientWeight: (weight: number) => void;
   onAddPrescriptionItem: (item: PrescriptionItem) => void;
   onNavigateToPrescription: () => void;
+  isDrawer?: boolean;
+  onClose?: () => void;
 }
 
 export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
@@ -27,7 +30,9 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
   patient,
   onUpdatePatientWeight,
   onAddPrescriptionItem,
-  onNavigateToPrescription
+  onNavigateToPrescription,
+  isDrawer = false,
+  onClose
 }) => {
   const weightInputRef = useRef<HTMLInputElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,9 +119,20 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
+        {isDrawer && onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            title="Fechar calculadora"
+            aria-label="Fechar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
           {/* Left: Info */}
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 pr-6">
             <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
               <span 
                 className="p-2 rounded-xl text-white flex-shrink-0 bg-emerald-700 dark:bg-emerald-800 border border-white/12"
@@ -128,7 +144,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               </h2>
             </div>
             <p className="text-xs sm:text-sm font-medium leading-relaxed text-[var(--text-muted)]">
-              Ajuste o peso de <span className="text-sky-700 dark:text-sky-400 font-semibold">{patientName}</span> para recalcular doses em mg, volume (mL) e gotas instantaneamente com teto de segurança.
+              Ajuste o peso de <span className="text-blue-600 dark:text-blue-400 font-semibold">{patientName}</span> para recalcular doses em mg, volume (mL) e gotas instantaneamente com teto de segurança.
             </p>
           </div>
 
@@ -239,10 +255,10 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         {/* View Prescription Action Button */}
         <button
           type="button"
-          onClick={onNavigateToPrescription}
+          onClick={isDrawer && onClose ? onClose : onNavigateToPrescription}
           className="tactile-btn-primary px-5 py-3 min-h-[44px] flex items-center justify-center gap-2 text-xs font-bold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
         >
-          <span>Ir para Receita</span>
+          <span>{isDrawer ? 'Concluir e Voltar à Receita' : 'Ir para Receita'}</span>
           <ArrowRight className="w-4 h-4" strokeWidth={2.2} />
         </button>
       </div>

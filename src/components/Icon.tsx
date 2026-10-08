@@ -178,6 +178,8 @@ export const ICON_ALIASES: Record<string, string> = {
   award: 'workspace_premium',
   encaminhamento: 'send',
   referral: 'send',
+  documentos: 'description',
+  documents: 'description',
   comparecimento: 'event_available',
   imprimir: 'print',
   printer: 'print',

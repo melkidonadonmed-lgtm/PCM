@@ -104,11 +104,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       >
         <div className="flex items-center gap-3">
           <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white"
-            style={{
-              backgroundColor: darkMode ? '#854D0E' : '#B45309',
-              border: '1px solid rgba(255, 255, 255, 0.12)'
-            }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-blue-600 border border-white/12 shadow-sm"
           >
             <FlaskConical className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
           </div>
@@ -177,7 +173,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   {pkg.description}
                 </p>
               </div>
-              <div className="mt-2 text-[11px] font-semibold text-sky-700 dark:text-sky-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+              <div className="mt-2 text-[11px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                 <Plus className="w-3 h-3" strokeWidth={1.75} /> Incluir {pkg.examIds.length} exames
               </div>
             </button>

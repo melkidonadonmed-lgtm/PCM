@@ -36,6 +36,7 @@ interface CertificateAndReferralProps {
   initialSubTab?: 'certificate' | 'referral';
   onSelectSubTab?: (tab: 'certificate' | 'referral') => void;
   onNavigateToPrint: (docType?: 'certificate' | 'referral') => void;
+  hideSubNav?: boolean;
 }
 
 export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
@@ -50,7 +51,8 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
   activeSubTab,
   initialSubTab,
   onSelectSubTab,
-  onNavigateToPrint
+  onNavigateToPrint,
+  hideSubNav = false
 }) => {
   const [internalSubTab, setInternalSubTab] = useState<'certificate' | 'referral'>(initialSubTab || activeSubTab || 'certificate');
   const currentSubTab = activeSubTab || internalSubTab;
@@ -257,44 +259,46 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
   return (
     <div id="certificate-and-referral-section" className="space-y-4 sm:space-y-5">
-      {/* Subtabs Switcher */}
-      <div 
-        className="tactile-card p-1.5 rounded-2xl flex items-center gap-1.5 max-w-sm mx-auto"
-        style={{
-          backgroundColor: darkMode ? 'var(--surface-card)' : 'var(--surface-card)',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(11, 19, 43, 0.08)'
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => handleSwitchTab('certificate')}
-          className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-            currentSubTab === 'certificate'
-              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
-              : darkMode
-              ? 'text-slate-400 hover:text-white'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
+      {/* Subtabs Switcher (apenas quando não estiver sob o ClinicalDocumentsHub) */}
+      {!hideSubNav && (
+        <div 
+          className="tactile-card p-1.5 rounded-2xl flex items-center gap-1.5 max-w-sm mx-auto"
+          style={{
+            backgroundColor: darkMode ? 'var(--surface-card)' : 'var(--surface-card)',
+            borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(11, 19, 43, 0.08)'
+          }}
         >
-          <Award className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
-          <span>Atestado Médico</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => handleSwitchTab('certificate')}
+            className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+              currentSubTab === 'certificate'
+                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
+                : darkMode
+                ? 'text-slate-400 hover:text-white'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Award className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
+            <span>Atestado Médico</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => handleSwitchTab('referral')}
-          className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-            currentSubTab === 'referral'
-              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
-              : darkMode
-              ? 'text-slate-400 hover:text-white'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Share2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
-          <span>Encaminhamento</span>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => handleSwitchTab('referral')}
+            className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+              currentSubTab === 'referral'
+                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
+                : darkMode
+                ? 'text-slate-400 hover:text-white'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Share2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
+            <span>Encaminhamento</span>
+          </button>
+        </div>
+      )}
 
       {/* ATESTADO MÉDICO FORM */}
       {currentSubTab === 'certificate' && (
@@ -310,7 +314,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
               <div className="flex items-center gap-3">
                 <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-sky-700 dark:bg-sky-800 border border-white/12"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-navy-900 dark:bg-blue-600 border border-white/12"
                 >
                   <Award className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
                 </div>

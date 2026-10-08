@@ -24,6 +24,7 @@ import {
 import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
 import { Icon } from './Icon';
 import { AcoesDaReceita } from './AcoesDaReceita';
+import { PediatricCalculator } from './PediatricCalculator';
 
 interface PrescriptionBuilderProps {
   darkMode: boolean;
@@ -95,6 +96,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   // Feedbacks
   const [copiedSuccess, setCopiedSuccess] = useState(false);
   const [itemAddedToast, setItemAddedToast] = useState(false);
+  const [isPediatricDrawerOpen, setIsPediatricDrawerOpen] = useState(false);
 
   // Controle de expansão de dados extras do paciente (CPF e Peso)
   const [showExtraPatientFields, setShowExtraPatientFields] = useState(() => {
@@ -165,9 +167,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     ? patientName
     : (!isDoctorConfigured ? EXEMPLO_PACIENTE.name : 'Não identificado');
 
-  // Atalho de Teclado Global: '/' ou 'Ctrl+K' / 'Cmd+K' para focar na busca rápida de fármacos
+  // Atalhos de Teclado Globais: '/', 'Ctrl+K' para busca, e 'Escape' para fechar o Drawer
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Escape fecha o Drawer da Calculadora se estiver aberto
+      if (e.key === 'Escape' && isPediatricDrawerOpen) {
+        e.preventDefault();
+        setIsPediatricDrawerOpen(false);
+        return;
+      }
+
       const activeTag = (document.activeElement?.tagName || '').toLowerCase();
       const isEditing = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
 
@@ -193,7 +202,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, []);
+  }, [isPediatricDrawerOpen]);
 
   // Quick Posology text shortcuts
   const posologyShortcuts = [
@@ -539,6 +548,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   Emitir com este paciente:
                 </span>
                 <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setIsPediatricDrawerOpen(true)}
+                    className="text-xs px-2.5 py-1 rounded-lg bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300/80 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 hover:border-emerald-400 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                    title="Abrir Calculadora Pediátrica em painel lateral sem sair da receita"
+                  >
+                    <Icon name="balanca" className="text-[14px] text-emerald-600 dark:text-emerald-400" />
+                    <span>Dose Pediátrica</span>
+                  </button>
                   {onNavigateToCertificate && (
                     <button
                       type="button"
@@ -597,15 +615,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                         Peso (kg)
                       </label>
-                      {onNavigateToPediatricCalc && (
-                        <button
-                          type="button"
-                          onClick={onNavigateToPediatricCalc}
-                          className="text-[10px] text-blue-600 dark:text-blue-400 font-bold hover:underline"
-                        >
-                          Dose Pediátrica
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsPediatricDrawerOpen(true)}
+                        className="text-[11px] text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                        title="Abrir Calculadora Pediátrica lateral"
+                      >
+                        <Icon name="balanca" className="text-[12px]" />
+                        <span>Calculadora</span>
+                      </button>
                     </div>
                     <input
                       id="quick-patient-weight"
@@ -632,6 +650,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   Prescrição
                 </h2>
               </div>
+              <button
+                type="button"
+                onClick={() => setIsPediatricDrawerOpen(true)}
+                className="text-xs px-2.5 py-1 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300/80 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100/70 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                title="Abrir Calculadora Pediátrica em painel lateral sem sair da receita"
+              >
+                <Icon name="balanca" className="text-[14px] text-emerald-600 dark:text-emerald-400" />
+                <span>Dose Pediátrica</span>
+              </button>
             </div>
 
             {/* Campo de Busca Instantânea com Atalho de Teclado */}
@@ -1372,6 +1399,55 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         >
           <Check className="w-4 h-4" />
           <span>Medicamento inserido na receita com sucesso!</span>
+        </div>
+      )}
+
+      {/* Drawer Lateral Flutuante da Calculadora Pediátrica */}
+      {isPediatricDrawerOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setIsPediatricDrawerOpen(false)}
+        >
+          <div 
+            className="w-full max-w-3xl h-full bg-[var(--surface-card)] shadow-2xl border-l border-[var(--border-subtle)] flex flex-col animate-in slide-in-from-right duration-300 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header do Drawer */}
+            <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-elevated)] shrink-0">
+              <div className="flex items-center gap-2.5">
+                <Icon name="balanca" className="text-emerald-600 dark:text-emerald-400 text-[22px]" />
+                <div>
+                  <h3 className="font-bold text-sm text-[var(--text-main)]">Calculadora Pediátrica Integrada</h3>
+                  <p className="text-[11px] text-[var(--text-muted)]">Prescreva doses calculadas direto na receita do paciente</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsPediatricDrawerOpen(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="Fechar calculadora"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Corpo do Drawer com rolagem */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar space-y-4">
+              <PediatricCalculator
+                darkMode={_darkMode}
+                patient={patient}
+                onUpdatePatientWeight={(newWeight) => onUpdatePatient({ ...patient, weightKg: newWeight })}
+                onAddPrescriptionItem={(item) => {
+                  onUpdateItems([...items, item]);
+                  setItemAddedToast(true);
+                  setTimeout(() => setItemAddedToast(false), 2500);
+                }}
+                onNavigateToPrescription={() => setIsPediatricDrawerOpen(false)}
+                isDrawer={true}
+                onClose={() => setIsPediatricDrawerOpen(false)}
+              />
+            </div>
+          </div>
         </div>
       )}
 

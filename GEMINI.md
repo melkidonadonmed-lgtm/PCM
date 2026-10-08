@@ -85,7 +85,7 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 
 ```powershell
 # Execução e desenvolvimento local
-npm run dev        # Inicia dev server na porta 3000
+npm run dev        # Inicia dev server na porta 3001 (porta canônica dedicada)
 
 # Qualidade e Testes (executar sempre após alterações clínicas)
 npm run test        # Roda a suíte completa de testes no Vitest
@@ -175,5 +175,23 @@ npm run preview     # Pré-visualização do bundle compilado
     - **Blindagem no PDF e Editor Livre (`pdfGenerator.ts` e `DocumentEditorView.tsx`)**:
       - Remoção de repetições redundantes de apresentação entre parênteses quando for idêntica ou contida na quantidade total.
     - **Validação Total**: Suíte `prescricaoRapida.test.ts` adicionada (7 testes); total de 68/68 testes Vitest aprovados; `tsc`, `design:lint` e `build` 100% limpos.
+- **08/10/2026**:
+  - **Unificação da Central de Documentos Clínicos em Ilhas Táteis (`ClinicalDocumentsHub.tsx`)**:
+    - Agrupamento unificado dos módulos clínicos sob 3 pílulas táteis minerais: `[ 🏅 Atestado Médico ]`, `[ ↗️ Encaminhamento ]`, `[ 🧪 Pedidos de Exames ]`.
+    - Eliminação completa de sub-abas redundantes via prop `hideSubNav={true}` em `CertificateAndReferral.tsx`, garantindo hierarquia visual plana e intuitiva sem dois níveis concorrentes de abas.
+    - Sanitização de inline styles legados e cores antigas (`#854D0E`, `bg-sky-700`) para a paleta canônica Slate Navy e mineral (`bg-navy-900`, `dark:bg-blue-600`).
+  - **Calculadora Pediátrica em Drawer Lateral Integrado à Receita**:
+    - **Análise Crítica de Back-End vs. Client-Side**: Mantida 100% no cliente para garantir funcionamento offline em postos de saúde e consultórios (PWA), latência 0ms e conformidade estrita com LGPD (sem transferência desnecessária de dados de menores de idade para servidores).
+    - **Solução Ergonômica de Navegação**: Criação do modo Drawer lateral (`isDrawer={true}`, `onClose`) em `PediatricCalculator.tsx`.
+    - **Fluxo Contínuo de Prescrição**: No `PrescriptionBuilder.tsx`, inclusão de botões táteis no Card de Identificação do Paciente, ao lado do campo Peso e no cabeçalho da Prescrição para abrir a Calculadora Pediátrica em painel lateral flutuante.
+    - **Inserção em 1 Toque**: Medicamento com dose calculada por peso (mg, mL e gotas) é inserido diretamente na receita do paciente no fundo, com feedback tátil de sucesso, sem o médico sair do atendimento.
+  - **Refinamento Estético no Editor Livre (`DocumentEditorView.tsx`)**:
+    - Sanitização dos menus suspensos de logotipo esquerdo e direito, removendo classes residuais `sky-700` e aplicando o Design System Tátil Mineral.
+  - **Validação Determinística**:
+    - Nova suíte `pediatricDrawerAndDocumentsHub.test.ts` adicionada.
+    - 71/71 testes unitários aprovados no Vitest (100% de sucesso).
+    - Tipagem TypeScript (`tsc --noEmit`) 100% limpa.
+    - Auditoria de Design Tokens (`npm run design:lint`) com 0 erros e 0 avisos.
+    - Build de produção (`vite build`) gerado com sucesso em 5.16s.
 
 
