@@ -25,34 +25,26 @@ describe('Governança de Rotas e Navegação do Editor', () => {
     expect(hasOrphanModels).toBe(false);
   });
 
-  it('deve priorizar a abertura direta no Editor na ação primária de visualização da receita', () => {
+  it('deve priorizar a emissão direta com Imprimir/PDF na ação primária e Editor na ação secundária', () => {
+    let printOpened = false;
     let editorOpened = false;
-    let directPrintOpened = false;
+
+    const mockNavigateToPrint = () => {
+      printOpened = true;
+    };
 
     const mockNavigateToEditor = () => {
       editorOpened = true;
     };
 
-    const mockNavigateToPrint = () => {
-      directPrintOpened = true;
-    };
-
-    // Simula a lógica de despacho de ações da receita
-    const handlePrimaryAction = (hasEditor: boolean) => {
-      if (hasEditor) {
-        mockNavigateToEditor();
-      } else {
-        mockNavigateToPrint();
-      }
-    };
-
-    handlePrimaryAction(true);
-    expect(editorOpened).toBe(true);
-    expect(directPrintOpened).toBe(false);
-
-    // Teste da ação secundária de impressão rápida direta
+    // Ação primária canônica: Imprimir / Gerar PDF
     mockNavigateToPrint();
-    expect(directPrintOpened).toBe(true);
+    expect(printOpened).toBe(true);
+    expect(editorOpened).toBe(false);
+
+    // Ação secundária especializada: Editor de Folha A4
+    mockNavigateToEditor();
+    expect(editorOpened).toBe(true);
   });
 
   it('deve formatar a sincronização clínica em tempo real dos medicamentos para o canvas A4 do Editor', () => {

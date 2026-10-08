@@ -63,6 +63,7 @@ import { db, initializeDefaultTemplates } from '../services/db';
 import { PRESET_LOGOS } from '../data/presetAssets';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
+import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import LogoGeneratorModal from './LogoGeneratorModal';
 import WatermarkOverlay from './WatermarkOverlay';
 import WatermarkSelector from './WatermarkSelector';
@@ -193,6 +194,7 @@ interface DocumentEditorViewProps {
   doctor: DoctorProfile;
   patient: Patient;
   prescriptionItems?: PrescriptionItem[];
+  onUpdatePrescriptionItems?: (items: PrescriptionItem[]) => void;
   activeContext: WorkContext | null;
   onSaveContext?: (updatedContext: WorkContext) => Promise<void>;
   onNavigateToPrint?: () => void;
@@ -206,6 +208,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   doctor,
   patient,
   prescriptionItems = [],
+  onUpdatePrescriptionItems,
   activeContext,
   onSaveContext,
   onOpenDoctorModal,
@@ -806,9 +809,30 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     showToast('Cabeçalho sincronizado com os dados do seu Perfil Médico!');
   };
 
-  // Ação: Salvar alterações no modelo atual OU abrir modal se for novo
+  // Sincronização inteligente do HTML do Editor de volta para os medicamentos da consulta ativa
+  const syncWithActivePrescription = useCallback(() => {
+    if (!editor || !onUpdatePrescriptionItems) return;
+    try {
+      const currentHtml = editor.getHTML();
+      if (!currentHtml || !currentHtml.trim()) return;
+      const parsedItems = parsePrescriptionHtmlToItems(currentHtml, prescriptionItems);
+      if (parsedItems && parsedItems.length > 0) {
+        onUpdatePrescriptionItems(parsedItems);
+      }
+    } catch (err) {
+      console.warn('[PresCMed] Falha ao sincronizar HTML do editor com a receita ativa:', err);
+    }
+  }, [editor, onUpdatePrescriptionItems, prescriptionItems]);
+
+  // Ação: Salvar alterações na receita da consulta E no modelo
   const handleSaveModelDirectly = async () => {
     if (!editor) return;
+
+    // 1. Sincroniza sempre com a receita da consulta ativa
+    syncWithActivePrescription();
+
+    // 2. Dispara auto-save do rascunho
+    triggerAutoSave(editor);
 
     if (currentModel.id && !currentModel.isPreset) {
       // Salva diretamente no modelo ativo
@@ -836,15 +860,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         setLastSavedTime(
           new Date(now).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
         );
-        showToast(`Modelo "${currentModel.title}" atualizado com sucesso!`);
+        showToast(`Receita e modelo "${currentModel.title}" atualizados com sucesso!`);
       } catch (err) {
         console.error('Erro ao atualizar modelo existente:', err);
         alert('Falha ao atualizar modelo no banco local.');
       }
     } else {
-      // É um preset ou documento novo sem ID: abre o modal com o título sugerido
-      setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? currentModel.title : '');
-      setIsSaveModelModalOpen(true);
+      // Documento da consulta ou rascunho sem ID: confirma salvamento e sincronização com a receita
+      setSaveStatus('saved');
+      setLastSavedTime(
+        new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      );
+      showToast('Receita médica salva e sincronizada com a consulta!');
     }
   };
 
@@ -1534,12 +1561,15 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           {onNavigateBack && (
             <button
               type="button"
-              onClick={onNavigateBack}
+              onClick={() => {
+                syncWithActivePrescription();
+                onNavigateBack();
+              }}
               className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
-              title="Voltar à tela de montagem de receitas"
+              title="Sincronizar e voltar à tela de montagem de receitas"
             >
               <ChevronLeft className="w-4 h-4 text-[var(--text-muted)]" />
-              <span>Voltar</span>
+              <span>Voltar à Receita</span>
             </button>
           )}
 
@@ -1619,17 +1649,35 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           </div>
         </div>
 
-        {/* Botões de Ação de Modelo */}
+        {/* Botões de Ação de Impressão e Modelo */}
         <div className="flex items-center gap-2 flex-wrap shrink-0">
-          {/* Botão SALVAR ALTERAÇÕES (Salva e atualiza o modelo atual) */}
+          {/* Botão de Impressão Direta A4 Superior (Alta visibilidade) */}
+          <button
+            type="button"
+            onClick={handlePrint}
+            className={`btn-tactile-primary h-9 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
+              !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
+            }`}
+            title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
+          >
+            <Printer className="w-4 h-4" />
+            <span>Imprimir A4 / PDF</span>
+            {!medicoConfigurado(doctor) && (
+              <span className="text-[10px] px-1.5 py-0.2 bg-amber-400 text-slate-950 rounded font-bold">
+                Configurar
+              </span>
+            )}
+          </button>
+
+          {/* Botão SALVAR NA RECEITA (Salva documento e sincroniza diretamente com a consulta ativa) */}
           <button
             type="button"
             onClick={handleSaveModelDirectly}
             className="h-9 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none shrink-0 whitespace-nowrap"
-            title="Salvar e atualizar este modelo com todas as modificações atuais de texto, cabeçalho e logo"
+            title="Salvar alterações no documento e sincronizar diretamente com a receita ativa da consulta"
           >
             <Save className="w-4 h-4" />
-            <span>Salvar Alterações</span>
+            <span>Salvar na Receita</span>
           </button>
 
           {/* Botão Salvar como Novo Modelo */}

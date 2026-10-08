@@ -426,6 +426,7 @@ export default function App() {
                   doctor={doctor}
                   patient={patient}
                   prescriptionItems={prescriptionItems}
+                  onUpdatePrescriptionItems={setPrescriptionItems}
                   activeContext={activeContext}
                   onSaveContext={saveContext}
                   onNavigateToPrint={() => handleNavigateToPrint('prescription')}

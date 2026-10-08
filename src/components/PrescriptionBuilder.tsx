@@ -8,7 +8,8 @@ import {
   Search,
   X,
   ArrowRight,
-  FileText
+  FileText,
+  Pencil
 } from 'lucide-react';
 import { PrescriptionItem, Patient, DoctorProfile } from '../types';
 import { searchUnifiedMedicationsFuzzy } from '../utils/fuzzySearch';
@@ -92,6 +93,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const [doseFrequency, setDoseFrequency] = useState<FrequenciaHorario>('8/8h');
   const [doseDays, setDoseDays] = useState<number>(5);
   const [isContinuousDose, setIsContinuousDose] = useState<boolean>(false);
+
+  // Estado para edição direta de medicamento existente na receita
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   // Feedbacks
   const [copiedSuccess, setCopiedSuccess] = useState(false);
@@ -290,7 +294,45 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     }
   }, [medicamentoPendente, onConsumirMedicamentoPendente]);
 
-  // Add Item to Prescription
+  // Iniciar edição direta de um medicamento já inserido na receita
+  const handleStartEdit = (item: PrescriptionItem) => {
+    setEditingItemId(item.id);
+    setSelectedMedName(item.name);
+    setSelectedRoute(item.route);
+    setSelectedQuantity(item.quantity);
+    setSelectedPosology(item.instructions);
+    setSelectedIsSpecial(Boolean(item.isSpecialControl));
+
+    const lower = item.name.toLowerCase();
+    let unit: UnidadeDose = 'comprimido';
+    if (lower.includes('cáps') || lower.includes('caps')) unit = 'cápsula';
+    else if (lower.includes('gotas') || lower.includes('gota')) unit = 'gota';
+    else if (lower.includes('xarope') || lower.includes('suspens') || lower.includes('/ml')) unit = 'mL';
+    else if (lower.includes('sachê') || lower.includes('sache') || lower.includes('envelope')) unit = 'sachê';
+    else if (lower.includes('ampola')) unit = 'ampola';
+    else if (lower.includes('spray') || lower.includes('jato')) unit = 'jato';
+    else if (lower.includes('pomada') || lower.includes('creme') || lower.includes('gel')) unit = 'aplicação';
+    setDoseUnit(unit);
+
+    if (searchInputRef.current) {
+      searchInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+    setSelectedMedName('');
+    setSelectedQuantity('30 comprimidos');
+    setSelectedPosology('');
+    setSelectedIsSpecial(false);
+    setDoseAmount(1);
+    setDoseUnit('comprimido');
+    setDoseFrequency('8/8h');
+    setDoseDays(5);
+    setIsContinuousDose(false);
+  };
+
+  // Add Item to Prescription or Update existing item
   const handleAddMedicationToPrescription = () => {
     if (!selectedMedName.trim()) {
       alert('Por favor, selecione ou digite o nome do medicamento.');
@@ -302,6 +344,47 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     }
 
     const isSpecial = selectedIsSpecial || isSpecialControlOrAntibiotic(selectedMedName);
+
+    if (editingItemId) {
+      const updatedItems = items.map(it => {
+        if (it.id === editingItemId) {
+          return {
+            ...it,
+            name: selectedMedName.trim(),
+            presentation: doseUnit || it.presentation || 'comprimido',
+            route: selectedRoute,
+            quantity: selectedQuantity.trim() || '30 comprimidos',
+            doseCalculatedText: `${doseAmount} ${formatarUnidadeDose(doseUnit, doseAmount)}`,
+            frequencyText: selectedPosology.trim(),
+            scheduleInterval: doseFrequency,
+            instructions: selectedPosology.trim(),
+            isContinuous: isContinuousDose || selectedPosology.toLowerCase().includes('contínuo'),
+            isSpecialControl: isSpecial
+          };
+        }
+        return it;
+      });
+
+      onUpdateItems(updatedItems);
+      setEditingItemId(null);
+      if (isSpecial) {
+        setPreviewTab('special');
+      }
+      setItemAddedToast(true);
+      setTimeout(() => setItemAddedToast(false), 2000);
+
+      // Reset fields
+      setSelectedMedName('');
+      setSelectedQuantity('30 comprimidos');
+      setSelectedPosology('');
+      setSelectedIsSpecial(false);
+      setDoseAmount(1);
+      setDoseUnit('comprimido');
+      setDoseFrequency('8/8h');
+      setDoseDays(5);
+      setIsContinuousDose(false);
+      return;
+    }
 
     const newItem: PrescriptionItem = {
       id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
@@ -641,7 +724,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
           </section>
 
-          {/* Card: Prescrição */}
+            {/* Card: Prescrição */}
           <section className="card-surface rounded-2xl p-4 sm:p-5 mb-4 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
               <div className="flex items-center gap-2.5">
@@ -660,6 +743,25 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 <span>Dose Pediátrica</span>
               </button>
             </div>
+
+            {/* Banner de Edição Direta Ativa */}
+            {editingItemId && (
+              <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-300 dark:border-sky-800 flex items-center justify-between gap-3 text-xs text-sky-900 dark:text-sky-200 shadow-tactile-sm animate-in fade-in duration-150">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Pencil className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+                  <span className="font-semibold truncate">
+                    Modo de Edição: <strong>{selectedMedName || 'Medicamento'}</strong>. Altere os campos e salve a alteração.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="px-2.5 py-1 rounded-lg border border-sky-300 dark:border-sky-700 bg-white dark:bg-slate-900 hover:bg-sky-100 dark:hover:bg-sky-900 font-bold text-xs shrink-0 cursor-pointer shadow-tactile-sm"
+                >
+                  Cancelar
+                </button>
+              </div>
+            )}
 
             {/* Campo de Busca Instantânea com Atalho de Teclado */}
             <div>
@@ -991,16 +1093,40 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </select>
               </div>
 
-              {/* Ação Primária: Inserir na Receita no mesmo campo de visão */}
-              <div className="pt-0.5">
+              {/* Ação Primária: Inserir ou Salvar Alterações na Receita */}
+              <div className="pt-0.5 flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleAddMedicationToPrescription}
-                  className="btn-tactile-primary w-full py-2.5 px-4 rounded-xl font-bold text-xs inline-flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500"
+                  className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs inline-flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                    editingItemId
+                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                      : 'btn-tactile-primary'
+                  }`}
+                  title={editingItemId ? 'Salvar alterações feitas neste medicamento' : 'Inserir este medicamento na receita'}
                 >
-                  <Plus className="w-4 h-4" strokeWidth={2.5} />
-                  <span>Inserir na Receita</span>
+                  {editingItemId ? (
+                    <>
+                      <Check className="w-4 h-4" strokeWidth={2.5} />
+                      <span>Salvar Alterações no Medicamento</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" strokeWidth={2.5} />
+                      <span>Inserir na Receita</span>
+                    </>
+                  )}
                 </button>
+                {editingItemId && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="py-2.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer shadow-tactile-sm transition"
+                    title="Cancelar edição e voltar ao modo de inserção"
+                  >
+                    Cancelar
+                  </button>
+                )}
               </div>
 
               {/* Opções Auxiliares: Controle Especial e Cálculo de Dose Pediátrica */}
@@ -1090,11 +1216,17 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   return (
                     <div
                       key={it.id}
-                      className="p-3.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-navy-800 flex items-start justify-between gap-3 shadow-tactile-sm"
+                      className={`p-3.5 rounded-xl border flex items-start justify-between gap-3 shadow-tactile-sm transition ${
+                        editingItemId === it.id
+                          ? 'bg-sky-50/70 dark:bg-sky-950/40 border-sky-400 dark:border-sky-600 ring-2 ring-sky-400/40'
+                          : 'bg-slate-50 dark:bg-navy-950 border-slate-200 dark:border-navy-800'
+                      }`}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="w-5 h-5 rounded-full bg-navy-800 dark:bg-navy-700 text-white text-[10px] font-black flex items-center justify-center shrink-0">
+                          <span className={`w-5 h-5 rounded-full text-white text-[10px] font-black flex items-center justify-center shrink-0 ${
+                            editingItemId === it.id ? 'bg-sky-600' : 'bg-navy-800 dark:bg-navy-700'
+                          }`}>
                             {idx + 1}
                           </span>
                           <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
@@ -1103,6 +1235,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300">
                             {it.route} • {it.quantity}
                           </span>
+                          {editingItemId === it.id && (
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-sky-500 text-white flex items-center gap-1 animate-pulse">
+                              <Pencil className="w-2.5 h-2.5" />
+                              <span>Em Edição</span>
+                            </span>
+                          )}
                           {isSpecial && (
                             <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
                               <Icon name="security" className="text-[11px]" />
@@ -1115,13 +1253,26 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                         </p>
                       </div>
 
-                      {/* Action buttons (Move Up, Move Down, Delete) */}
+                      {/* Action buttons (Edit, Move Up, Move Down, Delete) */}
                       <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEdit(it)}
+                          className={`p-1 rounded-lg transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
+                            editingItemId === it.id
+                              ? 'bg-sky-600 text-white shadow-tactile-sm'
+                              : 'hover:bg-slate-200 dark:hover:bg-navy-800 text-slate-600 dark:text-slate-400'
+                          }`}
+                          title="Editar este medicamento diretamente"
+                          aria-label={`Editar ${it.name}`}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
                         <button
                           type="button"
                           onClick={() => handleMoveItem(idx, 'up')}
                           disabled={idx === 0}
-                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500"
+                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
                           title="Mover para cima"
                         >
                           <ChevronUp className="w-4 h-4" />
@@ -1130,7 +1281,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           type="button"
                           onClick={() => handleMoveItem(idx, 'down')}
                           disabled={idx === items.length - 1}
-                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500"
+                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
                           title="Mover para baixo"
                         >
                           <ChevronDown className="w-4 h-4" />
@@ -1138,7 +1289,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(it.id)}
-                          className="p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500"
+                          className="p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
                           title="Remover medicamento"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1189,7 +1340,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer rounded-md focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir folha oficial no Editor para conferir ou editar livremente"
             >
-              <span>Visualizar & Editar (A4)</span>
+              <FileText className="w-3.5 h-3.5" />
+              <span>Editor de Folha A4</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

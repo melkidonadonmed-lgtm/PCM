@@ -12,6 +12,29 @@ interface SyncableEntity {
   _deleted?: boolean;
 }
 
+/**
+ * Remove recursivamente campos `undefined` para prevenir exceções do Firestore SDK
+ * (Unsupported field value: undefined).
+ */
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === undefined || data === null) {
+    return data;
+  }
+  if (typeof data !== 'object') {
+    return data;
+  }
+  if (Array.isArray(data)) {
+    return data.map(item => sanitizeForFirestore(item)) as unknown as T;
+  }
+  const clean: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data as Record<string, any>)) {
+    if (value !== undefined) {
+      clean[key] = sanitizeForFirestore(value);
+    }
+  }
+  return clean as T;
+}
+
 class CloudSyncManager {
   private isSyncing = false;
   private currentStatus: SyncStatus = 'idle';
@@ -243,7 +266,7 @@ class CloudSyncManager {
           ...localItem,
           updatedAt: localTime || Date.now()
         };
-        batch.set(docRef, payload, { merge: true });
+        batch.set(docRef, sanitizeForFirestore(payload), { merge: true });
         hasCloudWrites = true;
       }
     }
