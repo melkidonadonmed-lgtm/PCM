@@ -21,6 +21,8 @@
 - `npm run lint`: `tsc --noEmit` aprovado com 0 erros (ExitCode: 0).
 - `npm run design:lint`: 0 erros / 0 avisos (ExitCode: 0).
 - `npm run build`: Build de produção gerado com sucesso em 5.27s (ExitCode: 0).
+- `git push origin main`: Commit `79c923a` enviado com sucesso para o GitHub.
+- `pwsh -File .\deploy-cloudrun.ps1`: Revisão `prescmed-00053-grm` implantada com sucesso no Google Cloud Run (HTTP 200 OK).
 
 ---
 

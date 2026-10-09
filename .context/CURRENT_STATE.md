@@ -19,9 +19,10 @@ O ecossistema ambulatorial do PresCMed recebeu expansão robusta voltada ao Sist
 ---
 
 ## Status de Implantação e Nuvem
-- **GitHub (`origin/main`):** Pronto para push.
-- **Google Cloud Run:** Em processo de deploy para nova revisão na região `southamerica-east1`.
+- **GitHub (`origin/main`):** Commit `79c923a` enviado com sucesso.
+- **Google Cloud Run:** Revisão `prescmed-00053-grm` implantada com sucesso na região `southamerica-east1` (HTTP 200 OK).
   - URL Ativa: `https://prescmed-1044179901556.southamerica-east1.run.app`
+  - Alias Direto: `https://prescmed-syqnqsm4iq-rj.a.run.app`
 
 ---
 
