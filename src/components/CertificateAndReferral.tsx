@@ -36,6 +36,7 @@ interface CertificateAndReferralProps {
   initialSubTab?: 'certificate' | 'referral';
   onSelectSubTab?: (tab: 'certificate' | 'referral') => void;
   onNavigateToPrint: (docType?: 'certificate' | 'referral') => void;
+  onNavigateToEditorWithHtml?: (html: string, title: string, type?: 'referral' | 'certificate') => void;
   hideSubNav?: boolean;
 }
 
@@ -52,6 +53,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
   initialSubTab,
   onSelectSubTab,
   onNavigateToPrint,
+  onNavigateToEditorWithHtml,
   hideSubNav = false
 }) => {
   const [internalSubTab, setInternalSubTab] = useState<'certificate' | 'referral'>(initialSubTab || activeSubTab || 'certificate');
@@ -255,6 +257,77 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
+  const handleOpenCertificateInEditor = () => {
+    const pName = certificate.patientName?.trim() || patient?.name?.trim() || '______________________________';
+    const pDoc = certificate.documentNumber || patient?.documentNumber || '____________________';
+    const days = certificate.daysOff || 1;
+    const daysText = days === 1 ? '1 (um) dia' : `${days} dias`;
+    const period = certificate.periodText || 'por motivo de doença e necessidade de repouso';
+    const today = certificate.date || new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const cidText = certificate.includeCID && certificate.cid10Code 
+      ? `<p><strong>Diagnóstico (CID-10):</strong> ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''} <em>(Expressamente autorizado pelo paciente)</em></p><p></p>`
+      : '';
+    const obsText = certificate.observations ? `<p><strong>Observações:</strong> ${certificate.observations}</p><p></p>` : '';
+
+    const certHtml = `
+      <p style="text-align: center;"><strong>ATESTADO MÉDICO</strong></p>
+      <p></p>
+      <p style="text-align: justify; line-height: 1.8;">
+        Atesto para os devidos fins que o(a) paciente <strong>${pName}</strong>, inscrito(a) no documento nº <strong>${pDoc}</strong>, foi submetido(a) a atendimento médico nesta data e deve permanecer afastado(a) de suas atividades laborais e habituais pelo período de <strong>${daysText}</strong>, a contar desta data, ${period}.
+      </p>
+      <p></p>
+      ${cidText}
+      ${obsText}
+      <p style="text-align: right; margin-top: 25px;">${today}.</p>
+    `;
+
+    if (onNavigateToEditorWithHtml) {
+      onNavigateToEditorWithHtml(certHtml, 'Atestado Médico', 'certificate');
+    }
+  };
+
+  const handleOpenReferralInEditor = () => {
+    const pName = referral.patientName?.trim() || patient?.name?.trim() || '______________________________';
+    const pDoc = referral.documentNumber || patient?.documentNumber || '____________________';
+    const pAge = patient?.ageText || (patient?.birthDate ? patient.birthDate : '');
+    const priorityLabel = (referral.priority || 'eletivo').toUpperCase();
+    const specialty = referral.destinationSpecialty || 'Especialidade Médica';
+    const institution = referral.destinationInstitution || 'Serviço de Referência / Atenção Especializada';
+    const reason = referral.reason || 'Avaliação e conduta especializada.';
+    const summary = referral.clinicalSummary || 'Quadro clínico em investigação.';
+    const exams = referral.relevantExams || 'Sem exames complementares anexados.';
+    const cid = referral.hypothesisCID || 'A esclarecer.';
+
+    const referralHtml = `
+      <p style="text-align: center;"><strong>GUIA DE ENCAMINHAMENTO MÉDICO</strong></p>
+      <p style="text-align: center; font-size: 0.9em; color: #475569;"><strong>PRIORIDADE: [ ${priorityLabel} ]</strong></p>
+      <p></p>
+      <p><strong>Ao Serviço / Colega:</strong> ${specialty}</p>
+      <p><strong>Instituição de Destino:</strong> ${institution}</p>
+      <p></p>
+      <p><strong>Paciente:</strong> ${pName} &nbsp;|&nbsp; <strong>Doc:</strong> ${pDoc}${pAge ? ` &nbsp;|&nbsp; <strong>Idade:</strong> ${pAge}` : ''}</p>
+      <p></p>
+      <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 12px 0;" />
+      <p><strong>1. Motivo do Encaminhamento:</strong></p>
+      <p style="margin-left: 15px; color: #1e293b;">${reason}</p>
+      <p></p>
+      <p><strong>2. História Clínica & Exame Físico Relevante:</strong></p>
+      <p style="margin-left: 15px; color: #1e293b;">${summary}</p>
+      <p></p>
+      <p><strong>3. Exames Complementares Realizados:</strong></p>
+      <p style="margin-left: 15px; color: #1e293b;">${exams}</p>
+      <p></p>
+      <p><strong>4. Hipótese Diagnóstica (CID-10):</strong></p>
+      <p style="margin-left: 15px; color: #1e293b;">${cid}</p>
+      <p></p>
+      <p>Agradeço a atenção e coloco-me à disposição para discussão do caso.</p>
+    `;
+
+    if (onNavigateToEditorWithHtml) {
+      onNavigateToEditorWithHtml(referralHtml, `Encaminhamento - ${specialty}`, 'referral');
+    }
+  };
+
   const currentSpecialtySuggestions = specialtyCidSuggestions[referral.destinationSpecialty] || [];
 
   return (
@@ -339,6 +412,18 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   <Send className="w-4 h-4" strokeWidth={2} />
                   <span>Enviar no WhatsApp</span>
                 </button>
+
+                {onNavigateToEditorWithHtml && (
+                  <button
+                    type="button"
+                    onClick={handleOpenCertificateInEditor}
+                    className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                    title="Editar e personalizar o atestado no Editor de Folha A4"
+                  >
+                    <FileText className="w-4 h-4 text-sky-600" />
+                    <span>Editar no Editor A4</span>
+                  </button>
+                )}
 
                 <button
                   type="button"
@@ -648,6 +733,18 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   <Send className="w-4 h-4" strokeWidth={2} />
                   <span>Enviar no WhatsApp</span>
                 </button>
+
+                {onNavigateToEditorWithHtml && (
+                  <button
+                    type="button"
+                    onClick={handleOpenReferralInEditor}
+                    className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                    title="Editar e personalizar o encaminhamento no Editor de Folha A4"
+                  >
+                    <FileText className="w-4 h-4 text-sky-600" />
+                    <span>Editar no Editor A4</span>
+                  </button>
+                )}
 
                 <button
                   type="button"

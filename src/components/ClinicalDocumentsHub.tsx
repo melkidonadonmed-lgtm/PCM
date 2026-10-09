@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { Award, Share2, FlaskConical } from 'lucide-react';
-import { MedicalCertificate, MedicalReferral, ExamItem, Patient, DoctorProfile } from '../types';
+import { Award, Share2, FlaskConical, FileText } from 'lucide-react';
+import { MedicalCertificate, MedicalReferral, ExamItem, Patient, DoctorProfile, WorkContext } from '../types';
 import { CertificateAndReferral } from './CertificateAndReferral';
 import { ExamRequester } from './ExamRequester';
+import { SusDocumentsFiller } from './SusDocumentsFiller';
 
-export type DocumentsSubTab = 'certificate' | 'referral' | 'exams';
+export type DocumentsSubTab = 'certificate' | 'referral' | 'exams' | 'sus';
 
 interface ClinicalDocumentsHubProps {
   darkMode: boolean;
   patient: Patient;
   onUpdatePatient?: (patient: Patient) => void;
   doctor: DoctorProfile;
+  activeContext?: WorkContext | null;
   certificate: MedicalCertificate;
   onUpdateCertificate: (cert: MedicalCertificate) => void;
   referral: MedicalReferral;
@@ -21,6 +23,7 @@ interface ClinicalDocumentsHubProps {
   onUpdateClinicalIndication: (text: string) => void;
   initialSubTab?: DocumentsSubTab;
   onNavigateToPrint: (docType?: 'certificate' | 'referral' | 'exams') => void;
+  onNavigateToEditorWithHtml?: (html: string, title: string, type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom') => void;
 }
 
 export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
@@ -28,6 +31,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
   patient,
   onUpdatePatient,
   doctor,
+  activeContext,
   certificate,
   onUpdateCertificate,
   referral,
@@ -37,7 +41,8 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
   clinicalIndication,
   onUpdateClinicalIndication,
   initialSubTab = 'certificate',
-  onNavigateToPrint
+  onNavigateToPrint,
+  onNavigateToEditorWithHtml
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<DocumentsSubTab>(initialSubTab);
 
@@ -48,10 +53,11 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
     }
   }, [initialSubTab]);
 
-  const tabsList: { id: DocumentsSubTab; label: string; icon: typeof Award }[] = [
+  const tabsList: { id: DocumentsSubTab; label: string; icon: typeof Award; badge?: string }[] = [
     { id: 'certificate', label: 'Atestado Médico', icon: Award },
     { id: 'referral', label: 'Encaminhamento', icon: Share2 },
-    { id: 'exams', label: 'Pedidos de Exames', icon: FlaskConical }
+    { id: 'exams', label: 'Pedidos de Exames', icon: FlaskConical },
+    { id: 'sus', label: 'Documentos SUS', icon: FileText, badge: '9' }
   ];
 
   const handleTabKeyDown = (e: React.KeyboardEvent, currentId: DocumentsSubTab) => {
@@ -183,6 +189,29 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
               </span>
             )}
           </button>
+
+          {/* Pílula: Documentos Oficiais do SUS */}
+          <button
+            id="clinical-doc-tab-sus"
+            type="button"
+            role="tab"
+            aria-selected={activeSubTab === 'sus'}
+            aria-controls="clinical-doc-panel-sus"
+            tabIndex={activeSubTab === 'sus' ? 0 : -1}
+            onClick={() => setActiveSubTab('sus')}
+            onKeyDown={(e) => handleTabKeyDown(e, 'sus')}
+            className={`min-h-[42px] px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+              activeSubTab === 'sus'
+                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+            }`}
+          >
+            <FileText className="w-4 h-4 shrink-0" strokeWidth={1.75} />
+            <span>Documentos SUS</span>
+            <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30">
+              9
+            </span>
+          </button>
         </nav>
       </div>
 
@@ -207,6 +236,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
             activeSubTab={activeSubTab}
             onSelectSubTab={(tab) => setActiveSubTab(tab)}
             onNavigateToPrint={(docType) => onNavigateToPrint(docType)}
+            onNavigateToEditorWithHtml={onNavigateToEditorWithHtml}
             hideSubNav={true}
           />
         )}
@@ -220,6 +250,18 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
             onUpdateExams={onUpdateSelectedExams}
             clinicalIndication={clinicalIndication}
             onUpdateClinicalIndication={onUpdateClinicalIndication}
+            onNavigateToPrint={() => onNavigateToPrint('exams')}
+          />
+        )}
+
+        {activeSubTab === 'sus' && (
+          <SusDocumentsFiller
+            darkMode={darkMode}
+            patient={patient}
+            onUpdatePatient={onUpdatePatient}
+            doctor={doctor}
+            activeContext={activeContext}
+            onNavigateToEditorWithHtml={onNavigateToEditorWithHtml}
             onNavigateToPrint={() => onNavigateToPrint('exams')}
           />
         )}

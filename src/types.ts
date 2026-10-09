@@ -12,6 +12,8 @@ export interface DoctorProfile {
   showSignature: boolean;
   signatureText?: string;
   stampText?: string;
+  cnes?: string;
+  cpf?: string;
 }
 
 export interface Patient {
@@ -27,6 +29,12 @@ export interface Patient {
   motherName?: string;
   notes?: string;
   phone?: string;
+  cns?: string; // Cartão Nacional de Saúde (15 dígitos)
+  address?: string; // Logradouro e número
+  neighborhood?: string; // Bairro
+  city?: string; // Município
+  state?: string; // UF
+  cep?: string; // CEP formatado
 }
 
 export interface PediatricMedication {
@@ -253,6 +261,7 @@ export interface SavedDocument {
   contentHtml: string;
   contextId: string; // Vínculo com a UBS ou Policlínica ativa
   isTemplate: boolean; // Se é um modelo reutilizável
+  prescriptionItems?: PrescriptionItem[]; // Medicamentos estruturados caso seja um modelo de receita
   headerConfig?: DocumentHeaderConfig;
   logoConfig?: DocumentLogoConfig;
   typography?: string;
@@ -274,6 +283,78 @@ export interface PrescriptionStyle {
   showFooter: boolean;
   watermarkType: WatermarkType;
   isCustom?: boolean;
+}
+
+// Tipagem dos Formulários e Requisições Oficiais do SUS (SIA/SISREG, CEAF, SISCAN, GAL/LACEN)
+export type SusDocumentId = 
+  | 'apac_principal'
+  | 'apac_complementar'
+  | 'sisreg_guia'
+  | 'lme_medicamentos'
+  | 'siscan_citopatologico'
+  | 'gal_lacen_geral'
+  | 'siscan_histopatologico'
+  | 'siscan_mamografia'
+  | 'gal_trm_tb';
+
+export interface SusDocumentItem {
+  id: SusDocumentId;
+  title: string;
+  shortTitle: string;
+  system: string;
+  complexity: 'Alta Complexidade' | 'Média Complexidade' | 'Atenção Básica' | 'Vigilância Laboratorial';
+  category: 'apac' | 'sisreg' | 'lme' | 'siscan' | 'gal';
+  description: string;
+  badge: string;
+  defaultSigtap?: string;
+  defaultProcedure?: string;
+  defaultJustification?: string;
+  defaultCid10?: string;
+}
+
+export interface SusFilledFormData {
+  // Dados do Médico
+  doctorName: string;
+  doctorCrm: string;
+  doctorCrmState: string;
+  doctorSpecialty: string;
+  doctorCnes: string;
+  doctorClinicName: string;
+  doctorCpf?: string;
+
+  // Dados do Paciente
+  patientName: string;
+  patientCns: string;
+  patientCpf: string;
+  patientBirthDate: string;
+  patientAge: string;
+  patientGender: 'male' | 'female' | 'other';
+  patientMotherName: string;
+  patientPhone: string;
+  patientAddress: string;
+  patientNeighborhood: string;
+  patientCity: string;
+  patientState: string;
+  patientCep: string;
+
+  // Dados Clínicos & Procedimento
+  sigtapCode?: string;
+  procedureName?: string;
+  cid10Code?: string;
+  cid10Description?: string;
+  clinicalJustification?: string;
+  sinanNumber?: string;
+  symptomsStartDate?: string;
+  renalCreatinine?: string;
+  renalEtfg?: string;
+  isContrastNeeded?: boolean;
+  gynecologyDum?: string;
+  gynecologyPreviousExam?: string;
+  specimenType?: string;
+  tuberculosisSymptomsDuration?: string;
+  lmeMedicationName?: string;
+  lmeMedicationPosology?: string;
+  lmeMedicationQuantityMonthly?: string;
 }
 
 export type { UnifiedMedication } from './data/medicationDatabase';

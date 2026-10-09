@@ -191,9 +191,16 @@ export default function App() {
   };
 
   const [editorInitialSyncTrigger, setEditorInitialSyncTrigger] = useState(0);
+  const [editorCustomDoc, setEditorCustomDoc] = useState<{ html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null>(null);
 
   const handleNavigateToEditor = () => {
+    setEditorCustomDoc(null);
     setEditorInitialSyncTrigger(prev => prev + 1);
+    setActiveTab('editor');
+  };
+
+  const handleNavigateToEditorWithHtml = (html: string, title: string, type: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' = 'custom') => {
+    setEditorCustomDoc({ html, title, type });
     setActiveTab('editor');
   };
 
@@ -383,6 +390,7 @@ export default function App() {
               patient={patient}
               onUpdatePatient={setPatient}
               doctor={doctor}
+              activeContext={activeContext}
               certificate={certificate}
               onUpdateCertificate={setCertificate}
               referral={referral}
@@ -391,6 +399,7 @@ export default function App() {
               onUpdateSelectedExams={setSelectedExams}
               clinicalIndication={examIndication}
               onUpdateClinicalIndication={setExamIndication}
+              onNavigateToEditorWithHtml={handleNavigateToEditorWithHtml}
               initialSubTab={
                 activeTab === 'certificate' ? 'certificate' :
                 activeTab === 'referral' ? 'referral' :
@@ -427,6 +436,9 @@ export default function App() {
                   patient={patient}
                   prescriptionItems={prescriptionItems}
                   onUpdatePrescriptionItems={setPrescriptionItems}
+                  referral={referral}
+                  certificate={certificate}
+                  initialDocumentToLoad={editorCustomDoc}
                   activeContext={activeContext}
                   onSaveContext={saveContext}
                   onNavigateToPrint={() => handleNavigateToPrint('prescription')}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   Plus,
   Trash2,
@@ -8,12 +8,18 @@ import {
   Search,
   X,
   ArrowRight,
+  ArrowLeft,
   FileText,
-  Pencil
+  Pencil,
+  BookmarkPlus,
+  FolderOpen
 } from 'lucide-react';
 import { PrescriptionItem, Patient, DoctorProfile } from '../types';
+import { db, SavedDocument } from '../services/db';
 import { searchUnifiedMedicationsFuzzy } from '../utils/fuzzySearch';
 import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../data/medicationDatabase';
+import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
+import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
 import {
@@ -101,6 +107,165 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const [copiedSuccess, setCopiedSuccess] = useState(false);
   const [itemAddedToast, setItemAddedToast] = useState(false);
   const [isPediatricDrawerOpen, setIsPediatricDrawerOpen] = useState(false);
+
+  // Modelos de Prescrição Salvos
+  const [isSaveModelModalOpen, setIsSaveModelModalOpen] = useState(false);
+  const [isLoadModelModalOpen, setIsLoadModelModalOpen] = useState(false);
+  const [newModelName, setNewModelName] = useState('');
+  const [savedPrescriptionModels, setSavedPrescriptionModels] = useState<SavedDocument[]>([]);
+  const [prescriptionModelToast, setPrescriptionModelToast] = useState<string | null>(null);
+
+  // Estado para criar modelo diretamente sem precisar gerar receita na consulta
+  const [isCreatingCustomModel, setIsCreatingCustomModel] = useState(false);
+  const [customModelDraftTitle, setCustomModelDraftTitle] = useState('');
+  const [customModelDraftItems, setCustomModelDraftItems] = useState<PrescriptionItem[]>([]);
+  const [customModelSearchTerm, setCustomModelSearchTerm] = useState('');
+  const [customModelSuggestions, setCustomModelSuggestions] = useState<UnifiedMedication[]>([]);
+
+  const handleCustomModelSearchChange = (term: string) => {
+    setCustomModelSearchTerm(term);
+    if (!term || term.trim().length < 2) {
+      setCustomModelSuggestions([]);
+    } else {
+      const matches = searchUnifiedMedicationsFuzzy(UNIFIED_MEDICATIONS, term, 'all').slice(0, 6);
+      setCustomModelSuggestions(matches);
+    }
+  };
+
+  const handleAddCustomModelItem = (med: UnifiedMedication) => {
+    const newItem: PrescriptionItem = {
+      id: `draft-rx-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      name: med.name,
+      presentation: med.route || 'Uso Oral',
+      quantity: med.defaultQuantity || '1 caixa',
+      doseCalculatedText: '1 dose',
+      frequencyText: 'Conforme posologia',
+      instructions: med.defaultPosology || 'Tomar conforme orientação médica.',
+      route: med.route || 'Uso Oral',
+      scheduleInterval: 'Conforme posologia',
+      scheduleTimes: [],
+      isContinuous: false,
+      isSpecialControl: med.isSpecialControl || false
+    };
+    setCustomModelDraftItems(prev => [...prev, newItem]);
+    setCustomModelSearchTerm('');
+    setCustomModelSuggestions([]);
+  };
+
+  const handleRemoveCustomModelItem = (id: string) => {
+    setCustomModelDraftItems(prev => prev.filter(i => i.id !== id));
+  };
+
+  const handleUpdateCustomModelItem = (id: string, updates: Partial<PrescriptionItem>) => {
+    setCustomModelDraftItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
+  };
+
+  const loadPrescriptionModels = useCallback(async () => {
+    try {
+      const allDocs = await db.savedDocuments.toArray();
+      const models = allDocs.filter(d => {
+        if (!d.isTemplate) return false;
+        if (d.prescriptionItems && d.prescriptionItems.length > 0) return true;
+        if (d.contentHtml) {
+          const parsed = parsePrescriptionHtmlToItems(d.contentHtml);
+          if (parsed && parsed.length > 0) {
+            d.prescriptionItems = parsed;
+            return true;
+          }
+        }
+        return false;
+      });
+
+      // Também inclui os presets de presetClinicalTemplates se não estiverem no banco
+      PRESET_CLINICAL_TEMPLATES.forEach(preset => {
+        if (preset.prescriptionItems && preset.prescriptionItems.length > 0) {
+          if (!models.some(m => m.id === preset.id)) {
+            models.push(preset);
+          }
+        }
+      });
+
+      setSavedPrescriptionModels(models.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)));
+    } catch (err) {
+      console.error('Erro ao carregar modelos de receita:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPrescriptionModels();
+  }, [loadPrescriptionModels]);
+
+  const handleSaveCustomCreatedModel = async () => {
+    if (!customModelDraftTitle.trim() || customModelDraftItems.length === 0) return;
+    const docId = `rx-model-${Date.now()}`;
+    const newDoc: SavedDocument = {
+      id: docId,
+      title: customModelDraftTitle.trim(),
+      contentJson: null,
+      contentHtml: '',
+      contextId: 'general',
+      isTemplate: true,
+      prescriptionItems: [...customModelDraftItems],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    try {
+      await db.savedDocuments.put(newDoc);
+      await loadPrescriptionModels();
+      setIsCreatingCustomModel(false);
+      setCustomModelDraftTitle('');
+      setCustomModelDraftItems([]);
+      setPrescriptionModelToast(`Modelo "${newDoc.title}" criado e salvo com sucesso!`);
+      setTimeout(() => setPrescriptionModelToast(null), 3000);
+    } catch (err) {
+      console.error('Erro ao salvar modelo criado:', err);
+      alert('Falha ao salvar modelo no banco local.');
+    }
+  };
+
+  const handleSavePrescriptionModel = async () => {
+    if (!newModelName.trim() || items.length === 0) return;
+    const docId = `rx-model-${Date.now()}`;
+    const newDoc: SavedDocument = {
+      id: docId,
+      title: newModelName.trim(),
+      contentJson: null,
+      contentHtml: '',
+      contextId: 'general',
+      isTemplate: true,
+      prescriptionItems: [...items],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    await db.savedDocuments.put(newDoc);
+    setIsSaveModelModalOpen(false);
+    setNewModelName('');
+    setPrescriptionModelToast(`Modelo "${newDoc.title}" salvo com sucesso!`);
+    loadPrescriptionModels();
+    setTimeout(() => setPrescriptionModelToast(null), 3000);
+  };
+
+  const handleApplyPrescriptionModel = (model: SavedDocument, mode: 'replace' | 'append') => {
+    if (!model.prescriptionItems || model.prescriptionItems.length === 0) return;
+    if (mode === 'replace') {
+      onUpdateItems([...model.prescriptionItems]);
+      setPrescriptionModelToast(`Modelo "${model.title}" aplicado na receita!`);
+    } else {
+      onUpdateItems([...items, ...model.prescriptionItems]);
+      setPrescriptionModelToast(`Medicamentos do modelo "${model.title}" adicionados à receita!`);
+    }
+    setIsLoadModelModalOpen(false);
+    setTimeout(() => setPrescriptionModelToast(null), 3000);
+  };
+
+  const handleDeletePrescriptionModel = async (modelId: string, modelTitle: string) => {
+    if (confirm(`Deseja realmente excluir o modelo "${modelTitle}"?`)) {
+      await db.savedDocuments.delete(modelId);
+      loadPrescriptionModels();
+      setPrescriptionModelToast(`Modelo "${modelTitle}" excluído.`);
+      setTimeout(() => setPrescriptionModelToast(null), 3000);
+    }
+  };
 
   // Controle de expansão de dados extras do paciente (CPF e Peso)
   const [showExtraPatientFields, setShowExtraPatientFields] = useState(() => {
@@ -1180,16 +1345,68 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 )}
               </div>
 
-              {items.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Botão Biblioteca de Modelos Salvos */}
                 <button
                   type="button"
-                  onClick={onClearPrescription}
-                  className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-rose-500"
+                  onClick={() => {
+                    loadPrescriptionModels();
+                    setIsLoadModelModalOpen(true);
+                  }}
+                  className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-sky-600 flex items-center gap-1.5 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-navy-800 dark:hover:bg-navy-700 transition"
+                  title="Abrir biblioteca de modelos de receitas salvos"
                 >
-                  <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
-                  <span>Limpar Receita</span>
+                  <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Modelos</span>
+                  {savedPrescriptionModels.length > 0 && (
+                    <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
+                      {savedPrescriptionModels.length}
+                    </span>
+                  )}
                 </button>
-              )}
+
+                {/* Botão Salvar como Modelo / Criar Novo Modelo */}
+                {items.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewModelName('');
+                      setIsSaveModelModalOpen(true);
+                    }}
+                    className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/60 border border-sky-200 dark:border-sky-800 transition"
+                    title="Salvar esta combinação de medicamentos como um modelo reutilizável"
+                  >
+                    <BookmarkPlus className="w-3.5 h-3.5" />
+                    <span>Salvar Modelo</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCreatingCustomModel(true);
+                      setCustomModelDraftTitle('');
+                      setCustomModelDraftItems([]);
+                      setIsLoadModelModalOpen(true);
+                    }}
+                    className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/60 border border-sky-200 dark:border-sky-800 transition"
+                    title="Criar e salvar um novo modelo de receita reutilizável mesmo sem receita ativa na consulta"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Novo Modelo</span>
+                  </button>
+                )}
+
+                {items.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={onClearPrescription}
+                    className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-rose-500 px-2 py-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    <span>Limpar</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Aviso de Segregação Sanitária Automática quando houver itens comuns e antimicrobianos/controlados */}
@@ -1598,6 +1815,381 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 isDrawer={true}
                 onClose={() => setIsPediatricDrawerOpen(false)}
               />
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Toast de Notificação de Modelo de Receita */}
+      {prescriptionModelToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-slate-700 animate-tab-fade">
+          <Check className="w-4 h-4 text-emerald-400" />
+          <span>{prescriptionModelToast}</span>
+        </div>
+      )}
+
+      {/* MODAL: Salvar Combinação Atual como Modelo de Receita */}
+      {isSaveModelModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-tab-fade">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-tactile-lg space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <BookmarkPlus className="w-5 h-5 text-sky-600" />
+                <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+                  Salvar como Modelo de Receita
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsSaveModelModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Este modelo salvará os <strong>{items.length} medicamentos</strong> prescritos para que você possa reutilizá-los com 1 clique em consultas futuras.
+            </p>
+
+            <div>
+              <label htmlFor="model-name-input" className="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                Nome do Modelo
+              </label>
+              <input
+                id="model-name-input"
+                type="text"
+                autoFocus
+                value={newModelName}
+                onChange={e => setNewModelName(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleSavePrescriptionModel();
+                }}
+                placeholder="Ex: Hipertensão Inicial, GECA Pediátrica, Amigdalite..."
+                className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+              />
+            </div>
+
+            <div className="max-h-36 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800 p-2.5 bg-slate-50/50 dark:bg-slate-950/40 space-y-1.5 text-xs">
+              <span className="text-[10px] font-bold text-slate-400 uppercase block">Itens inclusos:</span>
+              {items.map((it, idx) => (
+                <div key={it.id} className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5 truncate">
+                  <span className="font-mono text-slate-400">{idx + 1}.</span>
+                  <span className="font-semibold truncate">{it.name}</span>
+                  <span className="text-[10px] text-slate-500">({it.quantity})</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsSaveModelModalOpen(false)}
+                className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSavePrescriptionModel}
+                disabled={!newModelName.trim()}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white cursor-pointer shadow-tactile-btn transition active:scale-95"
+              >
+                Salvar Modelo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Biblioteca e Criador de Modelos de Receitas Salvos */}
+      {isLoadModelModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-tab-fade">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-tactile-lg">
+            
+            {/* CABEÇALHO DO MODAL */}
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800">
+              {isCreatingCustomModel ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreatingCustomModel(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    title="Voltar para a lista de modelos"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
+                  <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                    Novo Modelo de Receita
+                  </h3>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FolderOpen className="w-5 h-5 text-amber-500" />
+                  <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                    Modelos de Receitas Salvos
+                  </h3>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                {!isCreatingCustomModel && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCreatingCustomModel(true);
+                      setCustomModelDraftTitle('');
+                      setCustomModelDraftItems([]);
+                      setCustomModelSearchTerm('');
+                    }}
+                    className="px-2.5 py-1 text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-sky-900/60 rounded-lg cursor-pointer flex items-center gap-1 transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Criar Modelo</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsLoadModelModalOpen(false);
+                    setIsCreatingCustomModel(false);
+                  }}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* CONTEÚDO DO MODAL */}
+            {isCreatingCustomModel ? (
+              /* MODO CRIAÇÃO DIRETA DE MODELO */
+              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 custom-scrollbar">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    Nome do Modelo
+                  </label>
+                  <input
+                    type="text"
+                    value={customModelDraftTitle}
+                    onChange={(e) => setCustomModelDraftTitle(e.target.value)}
+                    placeholder="Ex: Hipertensão Leve, ITU Ambulatorial, Pós-Op..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white outline-none focus:border-sky-500"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Busca de medicamentos para o modelo */}
+                <div className="relative">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    Adicionar Medicamento ao Modelo
+                  </label>
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={customModelSearchTerm}
+                      onChange={(e) => handleCustomModelSearchChange(e.target.value)}
+                      placeholder="Buscar medicamento (ex: Amoxicilina, Dipirona, Losartana)..."
+                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white outline-none focus:border-sky-500"
+                    />
+                  </div>
+
+                  {/* Sugestões do Autocomplete */}
+                  {customModelSuggestions.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full mt-1 z-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-tactile-lg max-h-48 overflow-y-auto p-1 space-y-1">
+                      {customModelSuggestions.map((sug) => (
+                        <button
+                          key={sug.id}
+                          type="button"
+                          onClick={() => handleAddCustomModelItem(sug)}
+                          className="w-full text-left p-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 transition cursor-pointer flex items-center justify-between text-xs"
+                        >
+                          <div>
+                            <span className="font-bold text-slate-900 dark:text-white block">
+                              {sug.name}
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              {sug.route} • {sug.defaultQuantity}
+                            </span>
+                          </div>
+                          <Plus className="w-4 h-4 text-sky-600 shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Lista de Medicamentos do Rascunho */}
+                <div className="space-y-2.5 pt-1">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                    Medicamentos deste modelo ({customModelDraftItems.length}):
+                  </span>
+
+                  {customModelDraftItems.length === 0 ? (
+                    <div className="p-4 text-center rounded-xl bg-slate-50 dark:bg-slate-950 border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+                      Nenhum medicamento incluído ainda. Digite o nome acima para adicionar.
+                    </div>
+                  ) : (
+                    customModelDraftItems.map((item, idx) => (
+                      <div
+                        key={item.id}
+                        className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40 space-y-2"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white">
+                            {idx + 1}. {item.name}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCustomModelItem(item.id)}
+                            className="p-1 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded"
+                            title="Remover do modelo"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <div>
+                            <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">
+                              Quantidade
+                            </label>
+                            <input
+                              type="text"
+                              value={item.quantity}
+                              onChange={(e) => handleUpdateCustomModelItem(item.id, { quantity: e.target.value })}
+                              placeholder="1 caixa"
+                              className="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:border-sky-500"
+                            />
+                          </div>
+                          <div className="sm:col-span-2">
+                            <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">
+                              Posologia / Instruções
+                            </label>
+                            <input
+                              type="text"
+                              value={item.instructions}
+                              onChange={(e) => handleUpdateCustomModelItem(item.id, { instructions: e.target.value })}
+                              placeholder="Instruções de tomada"
+                              className="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:border-sky-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* MODO LISTA DE MODELOS SALVOS */
+              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
+                {savedPrescriptionModels.length === 0 ? (
+                  <div className="p-8 text-center rounded-xl bg-slate-50 dark:bg-slate-950 border border-dashed border-slate-200 dark:border-slate-800 space-y-3">
+                    <BookmarkPlus className="w-8 h-8 text-slate-400 mx-auto" />
+                    <div>
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Nenhum modelo de receita salvo ainda.
+                      </p>
+                      <p className="text-[11px] text-slate-500 max-w-xs mx-auto mt-0.5">
+                        Você pode criar um modelo agora mesmo ou salvar uma receita ativa na consulta.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCreatingCustomModel(true);
+                        setCustomModelDraftTitle('');
+                        setCustomModelDraftItems([]);
+                        setCustomModelSearchTerm('');
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white cursor-pointer transition shadow-tactile-btn inline-flex items-center gap-1.5"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Criar Meu Primeiro Modelo</span>
+                    </button>
+                  </div>
+                ) : (
+                  savedPrescriptionModels.map((model) => (
+                    <div
+                      key={model.id}
+                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40 hover:border-sky-300 dark:hover:border-sky-800 transition space-y-2"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                            {model.title}
+                          </h4>
+                          <span className="text-[10px] font-semibold text-slate-500">
+                            {model.prescriptionItems?.length || 0} medicamentos cadastrados
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePrescriptionModel(model.id, model.title)}
+                          className="p-1 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded"
+                          title="Excluir este modelo"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
+                        {model.prescriptionItems?.map(i => i.name).join(' • ')}
+                      </p>
+
+                      <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-200/60 dark:border-slate-800/60">
+                        <button
+                          type="button"
+                          onClick={() => handleApplyPrescriptionModel(model, 'append')}
+                          className="px-3 py-1 rounded-lg text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-100 hover:bg-sky-200 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 cursor-pointer transition"
+                          title="Adicionar estes medicamentos mantendo os que já estão na receita"
+                        >
+                          Adicionar (+)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApplyPrescriptionModel(model, 'replace')}
+                          className="px-3 py-1 rounded-lg text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 cursor-pointer transition shadow-xs"
+                          title="Substituir todos os medicamentos da receita por este modelo"
+                        >
+                          Substituir Receita
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* RODAPÉ DO MODAL */}
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+              {isCreatingCustomModel ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsCreatingCustomModel(false)}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                  >
+                    Voltar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveCustomCreatedModel}
+                    disabled={!customModelDraftTitle.trim() || customModelDraftItems.length === 0}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white cursor-pointer shadow-tactile-btn transition active:scale-95"
+                  >
+                    Salvar Modelo
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsLoadModelModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                >
+                  Fechar
+                </button>
+              )}
             </div>
           </div>
         </div>

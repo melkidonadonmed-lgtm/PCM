@@ -8,6 +8,39 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
     isTemplate: true,
     createdAt: 1727500000000,
     updatedAt: 1727500000000,
+    headerConfig: {
+      showHeader: false,
+      showFooter: false,
+      showPatientBanner: false
+    },
+    prescriptionItems: [
+      {
+        id: 'rx-item-losartana',
+        name: 'Losartana Potássica 50 mg',
+        presentation: 'Comprimidos 50 mg',
+        quantity: '60 comprimidos',
+        doseCalculatedText: '1 comprimido',
+        frequencyText: '1 vez ao dia pela manhã',
+        instructions: 'Tomar 1 comprimido por via oral 1 vez ao dia, pela manhã, em uso contínuo.',
+        route: 'Uso Oral',
+        scheduleTimes: ['08:00'],
+        scheduleInterval: '1x ao dia',
+        isContinuous: true
+      },
+      {
+        id: 'rx-item-hidroclorotiazida',
+        name: 'Hidroclorotiazida 25 mg',
+        presentation: 'Comprimidos 25 mg',
+        quantity: '30 comprimidos',
+        doseCalculatedText: '1 comprimido',
+        frequencyText: '1 vez ao dia pela manhã',
+        instructions: 'Tomar 1 comprimido por via oral pela manhã após o desjejum.',
+        route: 'Uso Oral',
+        scheduleTimes: ['08:00'],
+        scheduleInterval: '1x ao dia',
+        isContinuous: false
+      }
+    ],
     contentJson: null,
     contentHtml: `
       <div style="font-family: inherit;">
@@ -51,6 +84,39 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
     isTemplate: true,
     createdAt: 1727500000001,
     updatedAt: 1727500000001,
+    headerConfig: {
+      showHeader: false,
+      showFooter: false,
+      showPatientBanner: false
+    },
+    prescriptionItems: [
+      {
+        id: 'rx-item-metformina',
+        name: 'Cloridrato de Metformina 850 mg',
+        presentation: 'Comprimidos 850 mg',
+        quantity: '60 comprimidos',
+        doseCalculatedText: '1 comprimido',
+        frequencyText: '2 vezes ao dia',
+        instructions: 'Tomar 1 comprimido por via oral 2 vezes ao dia, imediatamente após o almoço e jantar.',
+        route: 'Uso Oral',
+        scheduleTimes: ['12:00', '20:00'],
+        scheduleInterval: '12/12h',
+        isContinuous: true
+      },
+      {
+        id: 'rx-item-sinvastatina',
+        name: 'Sinvastatina 20 mg',
+        presentation: 'Comprimidos 20 mg',
+        quantity: '30 comprimidos',
+        doseCalculatedText: '1 comprimido',
+        frequencyText: '1 vez ao dia à noite',
+        instructions: 'Tomar 1 comprimido por via oral 1 vez ao dia, à noite ao deitar.',
+        route: 'Uso Oral',
+        scheduleTimes: ['22:00'],
+        scheduleInterval: 'À noite',
+        isContinuous: true
+      }
+    ],
     contentJson: null,
     contentHtml: `
       <div style="font-family: inherit;">
@@ -94,6 +160,41 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
     isTemplate: true,
     createdAt: 1727500000002,
     updatedAt: 1727500000002,
+    headerConfig: {
+      showHeader: false,
+      showFooter: false,
+      showPatientBanner: false
+    },
+    prescriptionItems: [
+      {
+        id: 'rx-item-clonazepam',
+        name: 'Clonazepam 2,5 mg/mL (Gotas)',
+        presentation: 'Gotas 2,5 mg/mL',
+        quantity: '01 frasco (vinte mililitros)',
+        doseCalculatedText: '5 gotas',
+        frequencyText: 'À noite se necessário',
+        instructions: 'Pingar 05 (cinco) gotas por via oral às 21:00 horas se insônia grave ou ansiedade aguda.',
+        route: 'Uso Oral',
+        scheduleTimes: ['21:00'],
+        scheduleInterval: 'À noite',
+        isContinuous: false,
+        isSpecialControl: true
+      },
+      {
+        id: 'rx-item-sertralina',
+        name: 'Sertralina 50 mg (Comprimidos)',
+        presentation: 'Comprimidos 50 mg',
+        quantity: '60 comprimidos (sessenta comprimidos)',
+        doseCalculatedText: '1 comprimido',
+        frequencyText: '1 vez ao dia pela manhã',
+        instructions: 'Tomar 01 (um) comprimido por via oral pela manhã, após o café, diariamente durante 60 dias.',
+        route: 'Uso Oral',
+        scheduleTimes: ['08:00'],
+        scheduleInterval: 'Pela manhã',
+        isContinuous: true,
+        isSpecialControl: true
+      }
+    ],
     contentJson: null,
     contentHtml: `
       <div style="font-family: inherit; font-size: 11px;">
@@ -104,20 +205,20 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
 
         <div style="border: 1px solid #94A3B8; padding: 6px 10px; margin-bottom: 10px; background-color: #F8FAFC;">
           <p style="font-weight: bold; margin: 0 0 4px 0; font-size: 10px; text-transform: uppercase; color: #1E293B;">IDENTIFICAÇÃO DO EMITENTE</p>
-          <p style="margin: 0;"><strong>Médico:</strong> Dra. Giseli Nobres S Freitas &nbsp;|&nbsp; <strong>CRM:</strong> 4493-RO &nbsp;|&nbsp; <strong>RQE:</strong> 1866</p>
-          <p style="margin: 2px 0 0 0; font-size: 10px; color: #475569;">Endereço: Av. Campos Sales, 858 - Areal, Porto Velho - RO &nbsp;|&nbsp; Telefone: (69) 3901-2822</p>
+          <p style="margin: 0;"><strong>Médico:</strong> {{medico_nome}} &nbsp;|&nbsp; <strong>CRM:</strong> {{medico_crm}}</p>
+          <p style="margin: 2px 0 0 0; font-size: 10px; color: #475569;">{{clinica_nome}} &nbsp;|&nbsp; {{clinica_endereco}}</p>
         </div>
 
         <div style="border: 1px solid #94A3B8; padding: 6px 10px; margin-bottom: 12px;">
           <p style="margin: 0;"><strong>PACIENTE:</strong> {{paciente_nome}} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>IDADE:</strong> {{paciente_idade}}</p>
-          <p style="margin: 3px 0 0 0;"><strong>ENDEREÇO:</strong> Porto Velho - RO</p>
+          <p style="margin: 3px 0 0 0;"><strong>ENDEREÇO:</strong> {{paciente_endereco}}</p>
         </div>
 
         <div style="min-height: 140px; padding: 8px; border: 1px dashed #94A3B8; margin-bottom: 12px;">
           <p style="font-weight: bold; margin: 0 0 8px 0; text-transform: uppercase; color: #0F172A;">PRESCRIÇÃO MEDICAMENTOSA:</p>
-          <p style="margin: 0 0 6px 0;"><strong>1. Clonazepam 2,5 mg/mL (Gotas)</strong> ---------------------------- 01 frasco (vinte mililitros)</p>
+          <p style="margin: 0 0 4px 0;"><strong>1. Clonazepam 2,5 mg/mL (Gotas)</strong> • 01 frasco (vinte mililitros)</p>
           <p style="margin: 0 0 10px 16px; color: #334155;">Pingar 05 (cinco) gotas por via oral às 21:00 horas se insônia grave ou ansiedade aguda.</p>
-          <p style="margin: 0 0 6px 0;"><strong>2. Sertralina 50 mg (Comprimidos)</strong> ------------------------ 60 comprimidos (sessenta comprimidos)</p>
+          <p style="margin: 0 0 4px 0;"><strong>2. Sertralina 50 mg (Comprimidos)</strong> • 60 comprimidos (sessenta comprimidos)</p>
           <p style="margin: 0 0 4px 16px; color: #334155;">Tomar 01 (um) comprimido por via oral pela manhã, após o café, diariamente durante 60 dias.</p>
         </div>
 
@@ -156,6 +257,11 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
     isTemplate: true,
     createdAt: 1727500000003,
     updatedAt: 1727500000003,
+    headerConfig: {
+      showHeader: false,
+      showFooter: false,
+      showPatientBanner: false
+    },
     contentJson: null,
     contentHtml: `
       <div style="font-family: inherit; font-size: 11px;">
@@ -214,6 +320,11 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
     isTemplate: true,
     createdAt: 1727500000004,
     updatedAt: 1727500000004,
+    headerConfig: {
+      showHeader: false,
+      showFooter: false,
+      showPatientBanner: false
+    },
     contentJson: null,
     contentHtml: `
       <div style="font-family: inherit; font-size: 11px;">
@@ -263,6 +374,11 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
     isTemplate: true,
     createdAt: 1727500000005,
     updatedAt: 1727500000005,
+    headerConfig: {
+      showHeader: false,
+      showFooter: false,
+      showPatientBanner: false
+    },
     contentJson: null,
     contentHtml: `
       <div style="font-family: inherit;">
@@ -314,6 +430,11 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
     isTemplate: true,
     createdAt: 1727500000006,
     updatedAt: 1727500000006,
+    headerConfig: {
+      showHeader: false,
+      showFooter: false,
+      showPatientBanner: false
+    },
     contentJson: null,
     contentHtml: `
       <div style="font-family: inherit;">

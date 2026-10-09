@@ -43,13 +43,21 @@ import {
   Scissors,
   RefreshCw,
   Layers,
-  ChevronLeft
+  ChevronLeft,
+  Download,
+  Pill,
+  Stethoscope,
+  Award
 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { 
   DoctorProfile, 
   Patient, 
   WorkContext, 
   PrescriptionItem, 
+  MedicalCertificate,
+  MedicalReferral,
   WatermarkType,
   LogoPosition,
   DocumentHeaderConfig,
@@ -61,6 +69,7 @@ import {
 } from '../types';
 import { db, initializeDefaultTemplates } from '../services/db';
 import { PRESET_LOGOS } from '../data/presetAssets';
+import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
@@ -195,6 +204,9 @@ interface DocumentEditorViewProps {
   patient: Patient;
   prescriptionItems?: PrescriptionItem[];
   onUpdatePrescriptionItems?: (items: PrescriptionItem[]) => void;
+  referral?: MedicalReferral;
+  certificate?: MedicalCertificate;
+  initialDocumentToLoad?: { html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null;
   activeContext: WorkContext | null;
   onSaveContext?: (updatedContext: WorkContext) => Promise<void>;
   onNavigateToPrint?: () => void;
@@ -209,6 +221,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   patient,
   prescriptionItems = [],
   onUpdatePrescriptionItems,
+  referral,
+  certificate,
+  initialDocumentToLoad,
   activeContext,
   onSaveContext,
   onOpenDoctorModal,
@@ -422,9 +437,15 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       const qtdLower = (item.quantity || '').toLowerCase();
       const showPres = item.presentation && presLower !== qtdLower && !presLower.includes('caixa') && presLower !== 'uso oral' && !qtdLower.includes(presLower);
       const presLabel = showPres ? ` (${item.presentation})` : '';
+      const routeLabel = item.route ? ` (${item.route})` : '';
+      const qtyLabel = item.quantity ? ` &nbsp;—&nbsp; <strong>${item.quantity}</strong>` : '';
+      const instructions = item.instructions || 'Conforme orientação médica.';
+      const times = item.scheduleTimes && item.scheduleTimes.length > 0
+        ? `<br><span style="font-size: 0.9em; color: #475569;">Horários recomendados: ${item.scheduleTimes.join(' — ')}</span>`
+        : '';
       return `
-        <p><strong>${idx + 1}. ${item.name}${presLabel}</strong> (${item.route}) -------------------- ${item.quantity}</p>
-        <p style="margin-left: 20px;">${item.instructions}</p>
+        <p><strong>${idx + 1}. ${item.name}${presLabel}</strong>${routeLabel}${qtyLabel}</p>
+        <p style="margin-left: 20px; color: #334155;">${instructions}${times}</p>
       `;
     }).join('<p><br></p>');
   }, []);
@@ -439,30 +460,52 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     return parts.join(' | ') || '<strong>Paciente:</strong> Não identificado';
   }, []);
 
-  // Interpolação de tags dinâmicas
+  // Interpolação de tags dinâmicas completa para receitas, atestados e encaminhamentos
   const interpolateMedicalTags = useCallback((rawHtml: string): string => {
     const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
     const pName = patient?.name?.trim() || '______________________________';
     const pAge = patient?.ageText || (patient?.birthDate ? patient.birthDate : '____ anos');
+    const pDoc = patient?.documentNumber?.trim() || '____________________';
+    const pCns = (patient as any)?.cns?.trim() || '____________________';
+    const pAddressParts = [(patient as any)?.address, (patient as any)?.neighborhood, (patient as any)?.city ? `${(patient as any).city}${(patient as any).state ? `/${(patient as any).state}` : ''}` : ''].filter(Boolean);
+    const pAddress = pAddressParts.join(', ') || '______________________________';
+    const pWeight = patient?.weightKg ? `${patient.weightKg} kg` : '';
     const meds = formatPrescriptionItemsList(prescriptionItems);
+
+    const docName = doctor?.name ? (doctor.name.startsWith('Dr') ? doctor.name : `Dr(a). ${doctor.name}`) : 'Dr(a). ____________________';
+    const docCrm = doctor?.crm ? `CRM ${doctor.crm}${doctor.crmState ? `/${doctor.crmState}` : ''}` : 'CRM: ____________';
+    const docSpec = doctor?.specialty?.trim() || activeContext?.doctorCredentials?.specialty || 'Medicina Geral';
+    const clinicName = activeContext?.clinicName || doctor?.clinicName || 'Clínica Médica';
+    const clinicAddress = activeContext?.clinicAddress || doctor?.address || '';
+    const clinicPhone = doctor?.phone || '';
+    const clinicCnes = activeContext?.cnes || doctor?.cnes || '';
 
     return rawHtml
       .replace(/\{\{paciente_nome\}\}/g, pName)
       .replace(/\{\{paciente_idade\}\}/g, pAge)
+      .replace(/\{\{paciente_documento\}\}/g, pDoc)
+      .replace(/\{\{paciente_cns\}\}/g, pCns)
+      .replace(/\{\{paciente_endereco\}\}/g, pAddress)
+      .replace(/\{\{paciente_peso\}\}/g, pWeight)
       .replace(/\{\{medicamentos_prescritos\}\}/g, meds)
-      .replace(/\{\{data_atendimento\}\}/g, today);
-  }, [patient, prescriptionItems, formatPrescriptionItemsList]);
-
-
+      .replace(/\{\{data_atendimento\}\}/g, today)
+      .replace(/\{\{medico_nome\}\}/g, docName)
+      .replace(/\{\{medico_crm\}\}/g, docCrm)
+      .replace(/\{\{medico_especialidade\}\}/g, docSpec)
+      .replace(/\{\{clinica_nome\}\}/g, clinicName)
+      .replace(/\{\{clinica_endereco\}\}/g, clinicAddress)
+      .replace(/\{\{clinica_telefone\}\}/g, clinicPhone)
+      .replace(/\{\{clinica_cnes\}\}/g, clinicCnes);
+  }, [patient, prescriptionItems, formatPrescriptionItemsList, doctor, activeContext]);
 
   const initialContent = `
     <p style="text-align: center;"><strong>RECEITUÁRIO MÉDICO</strong></p>
     <p></p>
-    <p><strong>1. Amoxicilina 500mg</strong> ------------------------------------------------ 1 caixa</p>
-    <p style="margin-left: 20px;">Tomar 1 cápsula por via oral a cada 8 horas durante 7 dias.</p>
+    <p><strong>1. Amoxicilina 500mg</strong> (Uso Oral) &nbsp;—&nbsp; <strong>1 caixa</strong></p>
+    <p style="margin-left: 20px; color: #334155;">Tomar 1 cápsula por via oral a cada 8 horas durante 7 dias.</p>
     <p></p>
-    <p><strong>2. Dipirona 500mg/mL (Gotas)</strong> ---------------------------------- 1 frasco</p>
-    <p style="margin-left: 20px;">Tomar 30 a 40 gotas por via oral até de 6 em 6 horas se febre ou dor.</p>
+    <p><strong>2. Dipirona 500mg/mL (Gotas)</strong> (Uso Oral) &nbsp;—&nbsp; <strong>1 frasco</strong></p>
+    <p style="margin-left: 20px; color: #334155;">Tomar 30 a 40 gotas por via oral até de 6 em 6 horas se febre ou dor.</p>
     <p></p>
     <p><strong>Recomendações Clínicas:</strong> Repouso, hidratação oral vigorosa (mínimo 2 litros de água/dia) e retorno imediato ao serviço se sinais de alarme ou piora respiratória.</p>
   `;
@@ -605,7 +648,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           const qtdLower = (item.quantity || '').toLowerCase();
           const showPres = item.presentation && presLower !== qtdLower && !presLower.includes('caixa') && presLower !== 'uso oral' && !qtdLower.includes(presLower);
           const presentation = showPres ? ` (${item.presentation})` : '';
-          const quantity = item.quantity ? ` ----------------- ${item.quantity}` : '';
+          const quantity = item.quantity ? ` &nbsp;—&nbsp; <strong>${item.quantity}</strong>` : '';
           const instructions = item.instructions || 'Conforme orientação médica.';
           const times = item.scheduleTimes && item.scheduleTimes.length > 0
             ? `<br><span style="font-size: 0.9em; color: #475569;">Horários recomendados: ${item.scheduleTimes.join(' — ')}</span>`
@@ -613,7 +656,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
           return `
             <p><strong>${idx + 1}. ${item.name}${presentation}</strong> ${route}${quantity}</p>
-            <p style="margin-left: 20px;">${instructions}${times}</p>
+            <p style="margin-left: 20px; color: #334155;">${instructions}${times}</p>
             <p></p>
           `;
         }).join('')
@@ -662,6 +705,123 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     }
   }, [editor, prescriptionItems, patient, headerConfig.showPatientBanner, triggerAutoSave]);
 
+  // Carrega e formata o encaminhamento médico ativo da consulta
+  const handleLoadActiveReferral = useCallback((showToastMsg = true) => {
+    if (!editor) return;
+
+    const pName = patient?.name?.trim() || referral?.patientName?.trim() || '______________________________';
+    const pDoc = patient?.documentNumber || referral?.documentNumber || '____________________';
+    const pAge = patient?.ageText || (patient?.birthDate ? patient.birthDate : '');
+    const today = referral?.date || new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const priorityLabel = (referral?.priority || 'eletivo').toUpperCase();
+    const specialty = referral?.destinationSpecialty || 'Especialidade Médica';
+    const institution = referral?.destinationInstitution || 'Serviço de Referência / Atenção Especializada';
+    const reason = referral?.reason || 'Avaliação e conduta especializada.';
+    const summary = referral?.clinicalSummary || 'Quadro clínico em investigação.';
+    const exams = referral?.relevantExams || 'Sem exames complementares anexados.';
+    const cid = referral?.hypothesisCID || 'A esclarecer.';
+
+    const referralHtml = `
+      <p style="text-align: center;"><strong>GUIA DE ENCAMINHAMENTO MÉDICO</strong></p>
+      <p style="text-align: center; font-size: 0.9em; color: #475569;"><strong>PRIORIDADE: [ ${priorityLabel} ]</strong></p>
+      <p></p>
+      <p><strong>Ao Serviço / Colega:</strong> ${specialty}</p>
+      <p><strong>Instituição de Destino:</strong> ${institution}</p>
+      <p></p>
+      <p><strong>Paciente:</strong> ${pName} &nbsp;|&nbsp; <strong>Doc:</strong> ${pDoc}${pAge ? ` &nbsp;|&nbsp; <strong>Idade:</strong> ${pAge}` : ''}</p>
+      <p></p>
+      <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 12px 0;" />
+      <p><strong>1. Motivo do Encaminhamento:</strong></p>
+      <p style="margin-left: 15px; color: #1e293b;">${reason}</p>
+      <p></p>
+      <p><strong>2. História Clínica & Exame Físico Relevante:</strong></p>
+      <p style="margin-left: 15px; color: #1e293b;">${summary}</p>
+      <p></p>
+      <p><strong>3. Exames Complementares Realizados:</strong></p>
+      <p style="margin-left: 15px; color: #1e293b;">${exams}</p>
+      <p></p>
+      <p><strong>4. Hipótese Diagnóstica (CID-10):</strong></p>
+      <p style="margin-left: 15px; color: #1e293b;">${cid}</p>
+      <p></p>
+      <p>Agradeço a atenção e coloco-me à disposição para discussão do caso.</p>
+    `;
+
+    setViaLayout('1-via');
+    setPageOrientation('portrait');
+    setBaseFontSize(11);
+    editor.commands.setContent(referralHtml);
+    setEditorHtml(referralHtml);
+    setHeaderConfig(prev => ({
+      ...prev,
+      showHeader: true,
+      showFooter: true,
+      showPatientBanner: false,
+      badgeText: `ENCAMINHAMENTO • ${specialty.toUpperCase()}`,
+      dateText: today
+    }));
+    setCurrentModel({
+      id: null,
+      title: `Encaminhamento - ${specialty}`,
+      isPreset: false
+    });
+    isDraftRestoredRef.current = true;
+    triggerAutoSave(editor);
+    if (showToastMsg) {
+      showToast('Encaminhamento carregado no editor com formatação limpa!');
+    }
+  }, [editor, patient, referral, triggerAutoSave]);
+
+  // Carrega e formata o atestado médico ativo da consulta
+  const handleLoadActiveCertificate = useCallback((showToastMsg = true) => {
+    if (!editor) return;
+
+    const pName = patient?.name?.trim() || certificate?.patientName?.trim() || '______________________________';
+    const pDoc = patient?.documentNumber || certificate?.documentNumber || '____________________';
+    const days = certificate?.daysOff || 1;
+    const daysText = days === 1 ? '1 (um) dia' : `${days} dias`;
+    const period = certificate?.periodText || 'por motivo de doença e necessidade de repouso';
+    const today = certificate?.date || new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const cidText = certificate?.includeCID && certificate?.cid10Code 
+      ? `<p><strong>Diagnóstico (CID-10):</strong> ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''} <em>(Expressamente autorizado pelo paciente)</em></p><p></p>`
+      : '';
+    const obsText = certificate?.observations ? `<p><strong>Observações:</strong> ${certificate.observations}</p><p></p>` : '';
+
+    const certHtml = `
+      <p style="text-align: center;"><strong>ATESTADO MÉDICO</strong></p>
+      <p></p>
+      <p style="text-align: justify; line-height: 1.8;">
+        Atesto para os devidos fins que o(a) paciente <strong>${pName}</strong>, inscrito(a) no documento nº <strong>${pDoc}</strong>, foi submetido(a) a atendimento médico nesta data e deve permanecer afastado(a) de suas atividades laborais e habituais pelo período de <strong>${daysText}</strong>, a contar desta data, ${period}.
+      </p>
+      <p></p>
+      ${cidText}
+      ${obsText}
+      <p style="text-align: right; margin-top: 25px;">${headerConfig.clinicAddress ? `${headerConfig.clinicAddress.split('-')[0].trim()}, ` : ''}${today}.</p>
+    `;
+
+    setViaLayout('1-via');
+    setPageOrientation('portrait');
+    setBaseFontSize(12);
+    editor.commands.setContent(certHtml);
+    setEditorHtml(certHtml);
+    setHeaderConfig(prev => ({
+      ...prev,
+      showHeader: true,
+      showFooter: true,
+      badgeText: 'ATESTADO MÉDICO',
+      dateText: today
+    }));
+    setCurrentModel({
+      id: null,
+      title: 'Atestado Médico',
+      isPreset: false
+    });
+    isDraftRestoredRef.current = true;
+    triggerAutoSave(editor);
+    if (showToastMsg) {
+      showToast('Atestado médico carregado no editor com formatação limpa!');
+    }
+  }, [editor, patient, certificate, headerConfig.clinicAddress, triggerAutoSave]);
+
   // Gatilho externo: Navegar para o Editor a partir da aba de prescrição
   const lastTriggerRef = useRef(0);
   useEffect(() => {
@@ -671,17 +831,87 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     }
   }, [editor, editorInitialSyncTrigger, handleLoadActivePrescription]);
 
-  // Carregar rascunho existente do IndexedDB OU carregar consulta ativa na inicialização
+  // Helper para ajustar layout e cabeçalho conforme o tipo de documento injetado
+  const applyInitialDocumentLayout = useCallback((doc: { html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' }) => {
+    if (doc.type === 'sus') {
+      setHeaderConfig(prev => ({
+        ...prev,
+        showHeader: false,
+        showFooter: false,
+        showPatientBanner: false
+      }));
+    } else if (doc.type === 'referral') {
+      setHeaderConfig(prev => ({
+        ...prev,
+        showHeader: true,
+        showFooter: true,
+        showPatientBanner: false,
+        badgeText: 'ENCAMINHAMENTO MÉDICO'
+      }));
+    } else if (doc.type === 'certificate') {
+      setHeaderConfig(prev => ({
+        ...prev,
+        showHeader: true,
+        showFooter: true,
+        showPatientBanner: false,
+        badgeText: 'ATESTADO MÉDICO'
+      }));
+    } else if (doc.type === 'prescription') {
+      setHeaderConfig(prev => ({
+        ...prev,
+        showHeader: true,
+        showFooter: true,
+        showPatientBanner: true,
+        badgeText: 'RECEITUÁRIO MÉDICO'
+      }));
+    }
+  }, []);
+
+  // Efeito para carregar documento inicial explicitamente passado via props (ex: SUS, Encaminhamento, Atestado)
+  const lastInitialDocRef = useRef<any>(null);
+  useEffect(() => {
+    if (editor && initialDocumentToLoad && initialDocumentToLoad !== lastInitialDocRef.current) {
+      lastInitialDocRef.current = initialDocumentToLoad;
+      editor.commands.setContent(initialDocumentToLoad.html);
+      setEditorHtml(initialDocumentToLoad.html);
+      applyInitialDocumentLayout(initialDocumentToLoad);
+      setCurrentModel({
+        id: null,
+        title: initialDocumentToLoad.title || 'Documento Clínico',
+        isPreset: false
+      });
+      isDraftRestoredRef.current = true;
+      triggerAutoSave(editor);
+      showToast(`Documento "${initialDocumentToLoad.title}" carregado no editor!`);
+    }
+  }, [editor, initialDocumentToLoad, applyInitialDocumentLayout, triggerAutoSave]);
+
+  // Carregar rascunho existente do IndexedDB de forma não-destrutiva
   useEffect(() => {
     if (!editor) return;
 
     let isMounted = true;
     const restoreDraft = async () => {
-      // Prioridade clínica máxima: se houver itens prescritos na consulta ativa ou gatilho de sincronização, carrega a receita atual
-      if ((prescriptionItems && prescriptionItems.length > 0) || (editorInitialSyncTrigger && editorInitialSyncTrigger > 0)) {
-        if (editorInitialSyncTrigger) {
-          lastTriggerRef.current = editorInitialSyncTrigger;
+      // Prioridade 1: Documento inicial explicitamente injetado por navegação
+      if (initialDocumentToLoad) {
+        lastInitialDocRef.current = initialDocumentToLoad;
+        if (isMounted) {
+          editor.commands.setContent(initialDocumentToLoad.html);
+          setEditorHtml(initialDocumentToLoad.html);
+          applyInitialDocumentLayout(initialDocumentToLoad);
+          setCurrentModel({
+            id: null,
+            title: initialDocumentToLoad.title || 'Documento Clínico',
+            isPreset: false
+          });
+          isDraftRestoredRef.current = true;
         }
+        return;
+      }
+
+      // Prioridade 2: Usuário clicou explicitamente em "Abrir no Editor" da receita ativa
+      if (editorInitialSyncTrigger && editorInitialSyncTrigger > 0 && editorInitialSyncTrigger !== lastTriggerRef.current) {
+        lastTriggerRef.current = editorInitialSyncTrigger;
         if (isMounted) {
           handleLoadActivePrescription(false);
           isDraftRestoredRef.current = true;
@@ -689,6 +919,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         return;
       }
 
+      // Prioridade 3: Restaura o rascunho salvo do usuário sem destruí-lo com dados da receita
       try {
         const draft = await db.savedDocuments.get('draft-current');
         if (isMounted) {
@@ -733,7 +964,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             );
             setSaveStatus('saved');
           } else {
-            // Se não houver rascunho e houver prescrição ativa, já carrega a prescrição!
+            // Se NÃO houver rascunho salvo prévio E houver receita ativa, carrega a receita
             if (prescriptionItems && prescriptionItems.length > 0) {
               handleLoadActivePrescription(false);
             } else {
@@ -765,7 +996,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         clearTimeout(saveTimerRef.current);
       }
     };
-  }, [editor, buildDefaultHeader, editorInitialSyncTrigger, handleLoadActivePrescription, prescriptionItems, initialContent]);
+  }, [editor, buildDefaultHeader, editorInitialSyncTrigger, initialDocumentToLoad, handleLoadActivePrescription, prescriptionItems, initialContent]);
 
   // Carregar lista de modelos salvos do IndexedDB
   const loadSavedTemplates = useCallback(async () => {
@@ -885,6 +1116,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       const now = Date.now();
       const contextId = saveAsGlobal ? 'global' : (activeContext?.id || 'global');
 
+      // Extrai medicamentos estruturados do HTML do editor para compatibilidade com modelos de receitas
+      const parsedItems = parsePrescriptionHtmlToItems(editor.getHTML(), prescriptionItems);
+
       const templateDoc: SavedDocument = {
         id: tplId,
         title: newModelTitle.trim(),
@@ -892,6 +1126,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         contentHtml: editor.getHTML(),
         contextId,
         isTemplate: true,
+        prescriptionItems: parsedItems,
         headerConfig,
         logoConfig,
         typography: fontFamilyId,
@@ -932,19 +1167,38 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       setEditorHtml(tpl.contentHtml || '');
     }
 
-    if (tpl.headerConfig) {
+    const presetMatch = PRESET_CLINICAL_TEMPLATES.find(p => p.id === tpl.id);
+    const effectiveHeaderConfig = tpl.headerConfig || presetMatch?.headerConfig;
+    if (effectiveHeaderConfig) {
       setHeaderConfig({
         ...buildDefaultHeader(),
-        ...tpl.headerConfig,
+        ...effectiveHeaderConfig,
         // Garante data de hoje se dateText estiver desatualizado
         dateText: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
       });
     } else {
-      // Se não tinha headerConfig salvo, define o badge com o título
-      setHeaderConfig(prev => ({
-        ...prev,
-        badgeText: tpl.title.toUpperCase().slice(0, 32)
-      }));
+      // Se o template possui cabeçalho gráfico próprio incorporado no HTML, oculta o cabeçalho externo para não duplicar
+      const hasEmbeddedHeader = tpl.contentHtml && (
+        tpl.contentHtml.includes('border-bottom: 2px solid') ||
+        tpl.contentHtml.includes('UNIDADE DE SAÚDE') ||
+        tpl.contentHtml.includes('POLICLÍNICA') ||
+        tpl.contentHtml.includes('RECEITUÁRIO DE CONTROLE ESPECIAL')
+      );
+      if (hasEmbeddedHeader) {
+        setHeaderConfig({
+          ...buildDefaultHeader(),
+          showHeader: false,
+          showFooter: false,
+          showPatientBanner: false,
+          dateText: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+        });
+      } else {
+        // Se não tinha headerConfig salvo, define o badge com o título
+        setHeaderConfig(prev => ({
+          ...prev,
+          badgeText: tpl.title.toUpperCase().slice(0, 32)
+        }));
+      }
     }
 
     if (tpl.logoConfig) {
@@ -1298,6 +1552,86 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     }
 
     window.print();
+  };
+
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const handleDownloadPdf = async () => {
+    if (!medicoConfigurado(doctor)) {
+      if (onOpenDoctorModal) {
+        onOpenDoctorModal();
+      }
+      showToast('Configure o nome e CRM do médico emitente para gerar PDF.');
+      return;
+    }
+
+    if (!sheetRef.current) {
+      handlePrint();
+      return;
+    }
+
+    try {
+      setIsExportingPdf(true);
+      showToast('Renderizando PDF com tipografia e alta fidelidade...');
+
+      if ((document as any).fonts?.ready) {
+        await (document as any).fonts.ready;
+      }
+
+      const canvas = await html2canvas(sheetRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#FFFFFF',
+        logging: false,
+        onclone: (clonedDoc) => {
+          const sheet = clonedDoc.getElementById('printable-a4-sheet');
+          if (sheet) {
+            sheet.style.fontFamily = selectedFont.family;
+            const allInputs = sheet.querySelectorAll('input, textarea');
+            allInputs.forEach((inp: any) => {
+              inp.style.fontFamily = selectedFont.family;
+            });
+            const allTextNodes = sheet.querySelectorAll('p, span, h1, h2, h3, div');
+            allTextNodes.forEach((node: any) => {
+              if (!node.style.fontFamily) {
+                node.style.fontFamily = 'inherit';
+              }
+            });
+          }
+        }
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const isLandscape = pageOrientation === 'landscape';
+      const pdf = new jsPDF({
+        orientation: isLandscape ? 'landscape' : 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfPageWidth = isLandscape ? 297 : 210;
+      const pdfPageHeight = isLandscape ? 210 : 297;
+      const calculatedHeight = (canvas.height * pdfPageWidth) / canvas.width;
+
+      pdf.addImage(
+        imgData,
+        'JPEG',
+        0,
+        0,
+        pdfPageWidth,
+        Math.min(calculatedHeight, pdfPageHeight)
+      );
+
+      const cleanDocTitle = (currentModel.title || 'Documento_PresCMed').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
+      const cleanPatient = (patient?.name || 'Paciente').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
+      pdf.save(`${cleanDocTitle}_${cleanPatient}.pdf`);
+
+      showToast('PDF de alta fidelidade baixado com sucesso!');
+    } catch (err) {
+      console.error('Erro ao gerar PDF nativo no editor:', err);
+      window.print();
+    } finally {
+      setIsExportingPdf(false);
+    }
   };
 
   // Upload de arquivo de imagem para logotipo
@@ -1661,13 +1995,76 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
           >
             <Printer className="w-4 h-4" />
-            <span>Imprimir A4 / PDF</span>
+            <span>Imprimir A4</span>
             {!medicoConfigurado(doctor) && (
               <span className="text-[10px] px-1.5 py-0.2 bg-amber-400 text-slate-950 rounded font-bold">
                 Configurar
               </span>
             )}
           </button>
+
+          {/* Botão Baixar PDF Nativo de Alta Fidelidade (Preserva tipografia e layout) */}
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            disabled={isExportingPdf}
+            className="btn-tactile-secondary h-9 px-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap text-slate-800 dark:text-slate-200"
+            title="Baixar documento em PDF preservando rigorosamente a tipografia e o layout visual do editor"
+          >
+            {isExportingPdf ? (
+              <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
+            ) : (
+              <Download className="w-4 h-4 text-sky-600" />
+            )}
+            <span>{isExportingPdf ? 'Gerando...' : 'Baixar PDF'}</span>
+          </button>
+
+          {/* Menu Carregar da Consulta */}
+          <div className="relative group">
+            <button
+              type="button"
+              className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
+              title="Carregar documentos e dados da consulta ativa para edição"
+            >
+              <FileText className="w-3.5 h-3.5 text-sky-500" />
+              <span>Carregar da Consulta</span>
+            </button>
+            <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-tactile-lg p-1.5 hidden group-hover:block z-50 animate-tab-fade">
+              <button
+                type="button"
+                onClick={() => handleLoadActivePrescription(true)}
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer"
+              >
+                <Pill className="w-3.5 h-3.5 text-sky-600" />
+                <span>Receita Médica Ativa</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleLoadActiveReferral(true)}
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer"
+              >
+                <Stethoscope className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Encaminhamento Ativo</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleLoadActiveCertificate(true)}
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer"
+              >
+                <Award className="w-3.5 h-3.5 text-amber-600" />
+                <span>Atestado Médico Ativo</span>
+              </button>
+              <div className="border-t border-slate-100 dark:border-slate-800 my-1"></div>
+              <button
+                type="button"
+                onClick={handleStartNewDocument}
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-2 text-slate-700 dark:text-slate-300 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5 text-slate-500" />
+                <span>Documento em Branco</span>
+              </button>
+            </div>
+          </div>
 
           {/* Botão SALVAR NA RECEITA (Salva documento e sincroniza diretamente com a consulta ativa) */}
           <button
@@ -2685,7 +3082,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             value={headerConfig.doctorName || ''}
                             onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                             placeholder="DR(A). MÉDICO(A)"
-                            className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
+                            style={{ fontFamily: 'inherit' }}
+                            className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
                             title="Clique para editar o nome do médico"
                           />
 
@@ -2695,7 +3093,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             value={headerConfig.doctorCrm || ''}
                             onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
                             placeholder="CRM-SP 000000 • RQE 0000"
-                            className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
+                            style={{ fontFamily: 'inherit' }}
+                            className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
                             title="Clique para editar CRM e RQE"
                           />
                         </div>
@@ -2707,7 +3106,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.doctorSpecialty || ''}
                         onChange={e => handleHeaderFieldChange('doctorSpecialty', e.target.value)}
                         placeholder="Especialidade Médica (Ex: Clínica Médica)"
-                        className="text-xs font-semibold text-slate-700 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
+                        style={{ fontFamily: 'inherit' }}
+                        className="text-xs font-semibold text-slate-700 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
                         title="Clique para editar a especialidade"
                       />
 
@@ -2717,7 +3117,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.clinicName || ''}
                         onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
                         placeholder="Nome da Instituição ou Clínica de Atendimento"
-                        className="text-[11px] font-medium text-slate-600 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
+                        style={{ fontFamily: 'inherit' }}
+                        className="text-[11px] font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
                         title="Clique para editar a instituição ou clínica"
                       />
 
@@ -2727,7 +3128,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.clinicAddress || ''}
                         onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
                         placeholder="Endereço e Informações de Contato"
-                        className="text-[10px] text-slate-500 font-sans w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center"
+                        style={{ fontFamily: 'inherit' }}
+                        className="text-[10px] text-slate-500 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
                         title="Clique para editar o endereço"
                       />
                     </div>
@@ -2765,7 +3167,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.badgeText || ''}
                         onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
                         placeholder="TIPO DE DOCUMENTO"
-                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-sans text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition w-full max-w-[200px]"
+                        style={{ fontFamily: 'inherit' }}
+                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition w-full max-w-[200px]"
                         title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
                       />
 
@@ -2775,7 +3178,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.dateText || ''}
                         onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
                         placeholder="Data de emissão"
-                        className="text-[11px] text-slate-500 font-sans mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
+                        style={{ fontFamily: 'inherit' }}
+                        className="text-[11px] text-slate-500 mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
                         title="Clique para editar a data de emissão"
                       />
                     </div>
@@ -2783,7 +3187,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
                   {/* Identificação Rápida do Paciente (Se houver) */}
                   {headerConfig.showPatientBanner && (
-                    <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs font-sans text-slate-700">
+                    <div 
+                      style={{ fontFamily: 'inherit' }}
+                      className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-700"
+                    >
                       {patient?.name ? (
                         <>
                           <span><strong>Paciente:</strong> {patient.name}</span>
@@ -2798,6 +3205,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           value={headerConfig.patientCustomText || ''}
                           onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
                           placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
+                          style={{ fontFamily: 'inherit' }}
                           className="w-full text-xs text-slate-700 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition placeholder:text-slate-400"
                         />
                       )}
@@ -2813,7 +3221,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
               {/* RODAPÉ CLÍNICO COM CARIMBO E ASSINATURA EDITÁVEIS */}
               {headerConfig.showFooter && (
-                <footer className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center font-sans relative z-10 group">
+                <footer 
+                  style={{ fontFamily: 'inherit' }}
+                  className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center relative z-10 group"
+                >
                   <div className="w-72 border-b border-slate-400 mb-2" />
 
                   {/* Nome do Médico na Assinatura */}
@@ -2890,7 +3301,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                                 placeholder="DR(A). MÉDICO(A)"
                                 aria-label="Nome do médico emitente (1ª via)"
-                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-slate-200"
                               />
                               <input
                                 type="text"
@@ -2898,7 +3309,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
                                 placeholder="CRM-SP 000000"
                                 aria-label="CRM do médico emitente (1ª via)"
-                                className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
+                                style={{ fontFamily: 'inherit' }}
+                                className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-slate-200"
                               />
                               <p className="text-[10px] text-slate-600 truncate mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
@@ -2991,7 +3403,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight truncate h-5 flex items-center">
                                 {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
                               </h3>
-                              <p className="text-xs font-bold text-sky-800 font-sans mt-0.5 h-4 flex items-center">
+                              <p 
+                                style={{ fontFamily: 'inherit' }}
+                                className="text-xs font-bold text-sky-800 mt-0.5 h-4 flex items-center"
+                              >
                                 {headerConfig.doctorCrm || 'CRM'}
                               </p>
                               <p className="text-[10px] text-slate-600 truncate mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
@@ -3085,16 +3500,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 value={headerConfig.doctorName || ''}
                                 onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                                 placeholder="DR(A). MÉDICO(A)"
-                                aria-label="Nome do médico emitente (1ª via paisagem)"
-                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
+                                aria-label="Nome do médico emitente (1ª via retrato)"
+                                style={{ fontFamily: 'inherit' }}
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full !bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                               />
                               <input
                                 type="text"
                                 value={headerConfig.doctorCrm || ''}
                                 onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
                                 placeholder="CRM-SP 000000"
-                                aria-label="CRM do médico emitente (1ª via paisagem)"
-                                className="text-xs font-bold text-sky-800 font-sans mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
+                                aria-label="CRM do médico emitente (1ª via retrato)"
+                                style={{ fontFamily: 'inherit' }}
+                                className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                               />
                             </div>
                             <div className="text-right shrink-0">
@@ -3169,10 +3586,16 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <header className="border-b border-slate-900 pb-2 mb-2">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight truncate h-5 flex items-center">
+                              <h3 
+                                style={{ fontFamily: 'inherit' }}
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight truncate h-5 flex items-center"
+                              >
                                 {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
                               </h3>
-                              <p className="text-xs font-bold text-sky-800 font-sans mt-0.5 h-4 flex items-center">
+                              <p 
+                                style={{ fontFamily: 'inherit' }}
+                                className="text-xs font-bold text-sky-800 mt-0.5 h-4 flex items-center"
+                              >
                                 {headerConfig.doctorCrm || 'CRM'}
                               </p>
                             </div>

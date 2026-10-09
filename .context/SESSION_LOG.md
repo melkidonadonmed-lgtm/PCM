@@ -1,5 +1,29 @@
 # PresCMed — SESSION LOG (.context)
 
+## Turno: 2026-10-08 — Catálogo e Preenchedor Guiado de Documentos e Laudos SUS no Hub Clínico
+
+### Arquivos Modificados / Criados
+- `src/data/susDocumentsCatalog.ts` (Novo):
+  - Catálogo de formulários oficiais SUS com campos dinâmicos e templates HTML (LME, APAC, TFD, BPC/LOAS, Encaminhamento SUS, Declaração de Acompanhante, Notificação Compulsória).
+- `src/components/SusDocumentsFiller.tsx` (Novo):
+  - Modal/formulário tátil mineral com preenchimento guiado, sincronização automática do paciente e injeção no Editor TipTap.
+- `src/__tests__/susDocumentsAndEditorEnhancements.test.ts` (Novo):
+  - Suíte de 7 testes unitários cobrindo o catálogo SUS, integridade dos campos e injeção no editor.
+- `src/components/ClinicalDocumentsHub.tsx`:
+  - Integração do botão tátil "Laudos & Docs SUS" abrindo o preenchedor guiado.
+- `src/components/DocumentEditorView.tsx`:
+  - Ações rápidas na barra do editor para inserção direta de seções clínicas e modelos SUS.
+- `src/components/PrescriptionBuilder.tsx`:
+  - Sincronização e atalhos táteis refinados para emissão e edição integrada.
+
+### Comandos Validados
+- `npm test`: 13 arquivos de teste aprovados (83 testes, ExitCode: 0).
+- `npm run lint`: `tsc --noEmit` aprovado com 0 erros (ExitCode: 0).
+- `npm run design:lint`: 0 erros / 0 avisos (ExitCode: 0).
+- `npm run build`: Build de produção gerado com sucesso em 5.27s (ExitCode: 0).
+
+---
+
 ## Turno: 2026-10-08 — Unificação do Fluxo de Emissão, Edição Direta e Sincronização Bidirecional Editor <-> Receita
 
 ### Arquivos Modificados / Criados

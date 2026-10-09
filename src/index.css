@@ -1111,6 +1111,11 @@
     word-wrap: break-word;
   }
 
+  .a4-editor-canvas input,
+  .a4-editor-canvas textarea {
+    background-color: transparent !important;
+  }
+
   .a4-editor-canvas .ProseMirror {
     outline: none;
     font-size: inherit;
