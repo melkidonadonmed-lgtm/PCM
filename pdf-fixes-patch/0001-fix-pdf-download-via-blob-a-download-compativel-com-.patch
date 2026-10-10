@@ -1,0 +1,156 @@
+From 57adf873d3e3cb1a5340fbc46d6a5a0349996cbd Mon Sep 17 00:00:00 2001
+From: "qwen.ai[bot]" <qwenlm-intl@service.alibaba.com>
+Date: Sat, 10 Oct 2026 16:55:24 +0000
+Subject: [PATCH 1/4] fix(pdf): download via blob+<a download> compativel com
+ WebView (jsPDF save() abre popup bloqueado no app)
+
+---
+ .gitignore                            |  2 +-
+ src/components/DocumentEditorView.tsx |  3 +-
+ src/components/PrintPreview.tsx       |  3 +-
+ src/components/SusDocumentsFiller.tsx |  5 +--
+ src/utils/downloadPdf.ts              | 52 +++++++++++++++++++++++++++
+ 5 files changed, 60 insertions(+), 5 deletions(-)
+ create mode 100644 src/utils/downloadPdf.ts
+
+diff --git a/.gitignore b/.gitignore
+index cfa61fd1..c2658d7d 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1 @@
+-(empty)
+\ No newline at end of file
++node_modules/
+diff --git a/src/components/DocumentEditorView.tsx b/src/components/DocumentEditorView.tsx
+index dee1c271..a7d11390 100644
+--- a/src/components/DocumentEditorView.tsx
++++ b/src/components/DocumentEditorView.tsx
+@@ -50,6 +50,7 @@ import {
+   Award
+ } from 'lucide-react';
+ import jsPDF from 'jspdf';
++import { downloadPdfDoc } from '../utils/downloadPdf';
+ import html2canvas from 'html2canvas';
+ import { 
+   DoctorProfile, 
+@@ -1623,7 +1624,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
+ 
+       const cleanDocTitle = (currentModel.title || 'Documento_PresCMed').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
+       const cleanPatient = (patient?.name || 'Paciente').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
+-      pdf.save(`${cleanDocTitle}_${cleanPatient}.pdf`);
++      await downloadPdfDoc(pdf, `${cleanDocTitle}_${cleanPatient}.pdf`);
+ 
+       showToast('PDF de alta fidelidade baixado com sucesso!');
+     } catch (err) {
+diff --git a/src/components/PrintPreview.tsx b/src/components/PrintPreview.tsx
+index a532dae2..5d1e7b90 100644
+--- a/src/components/PrintPreview.tsx
++++ b/src/components/PrintPreview.tsx
+@@ -25,6 +25,7 @@ import jsPDF from 'jspdf';
+ import html2canvas from 'html2canvas';
+ import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext, WatermarkType } from '../types';
+ import { generateMedicalPDF } from '../utils/pdfGenerator';
++import { downloadPdfDoc } from '../utils/downloadPdf';
+ import { medicoConfigurado } from '../utils/medicoConfigurado';
+ import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
+ import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
+@@ -270,7 +271,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
+       const dateStr = new Date().toISOString().split('T')[0];
+       const filename = `${getDocTitle()}_${cleanPatient}_${dateStr}.pdf`;
+ 
+-      pdf.save(filename);
++      await downloadPdfDoc(pdf, filename);
+       setExportSuccess(true);
+       setTimeout(() => setExportSuccess(false), 3000);
+     } catch (err: unknown) {
+diff --git a/src/components/SusDocumentsFiller.tsx b/src/components/SusDocumentsFiller.tsx
+index f1450851..bfc15676 100644
+--- a/src/components/SusDocumentsFiller.tsx
++++ b/src/components/SusDocumentsFiller.tsx
+@@ -30,6 +30,7 @@ import {
+ } from '../data/susDocumentsCatalog';
+ import { medicoConfigurado } from '../utils/medicoConfigurado';
+ import jsPDF from 'jspdf';
++import { downloadPdfDoc } from '../utils/downloadPdf';
+ import html2canvas from 'html2canvas';
+ 
+ interface SusDocumentsFillerProps {
+@@ -346,7 +347,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
+         const pdfWidth = pdf.internal.pageSize.getWidth();
+         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, Math.min(pdfHeight, 297));
+-        pdf.save(`${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
++        await downloadPdfDoc(pdf, `${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
+         showToast('PDF do documento SUS gerado com sucesso!');
+       } else {
+         // Baixa todos os selecionados em páginas consecutivas
+@@ -383,7 +384,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
+         }
+ 
+         document.body.removeChild(tempContainer);
+-        pdf.save(`Documentos_SUS_Multiplos_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
++        await downloadPdfDoc(pdf, `Documentos_SUS_Multiplos_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
+         showToast(`PDF com ${selectedDocIds.length} documentos SUS gerado com sucesso!`);
+       }
+     } catch (err) {
+diff --git a/src/utils/downloadPdf.ts b/src/utils/downloadPdf.ts
+new file mode 100644
+index 00000000..52f53b12
+--- /dev/null
++++ b/src/utils/downloadPdf.ts
+@@ -0,0 +1,52 @@
++import type { jsPDF } from 'jspdf';
++
++/**
++ * Download de PDF 100% compatível com WebView Android (app instalado via PWA)
++ * e navegadores desktop/mobile convencionais.
++ *
++ * Motivo: o `pdf.save()` interno do jsPDF usa um truque (`viewSupported`) que,
++ * em WebViews sem suporte nativo a visualização de PDF, abre uma JANELA POPUP
++ * (`window.open('about:blank')`). Em WebViews de app o popup é bloqueado
++ * silenciosamente — o usuário clica em "Baixar PDF" e NADA acontece.
++ *
++ * Esta função gera o Blob diretamente e dispara o download por um <a download>
++ * anexado ao documento, com fallbacks em cascata:
++ *   1. <a download> + blob URL (funciona em Chrome/Edge/Android WebView modernos)
++ *   2. navigator.msSaveOrOpenBlob (legado)
++ *   3. Abre o blob em nova aba se nada mais funcionar
++ */
++export async function downloadPdfDoc(doc: jsPDF, filename: string): Promise<void> {
++  const safeName = (filename || 'documento.pdf').replace(/\s+/g, '_');
++
++  let blob: Blob;
++  try {
++    blob = doc.output('blob');
++  } catch {
++    // Última linha de defesa: dataURI -> fetch -> blob
++    const dataUri = doc.output('datauristring');
++    const resp = await fetch(dataUri);
++    blob = await resp.blob();
++  }
++
++  const typedBlob = new Blob([blob], { type: 'application/pdf' });
++  const url = URL.createObjectURL(typedBlob);
++
++  try {
++    const a = document.createElement('a');
++    a.href = url;
++    a.download = safeName;
++    a.rel = 'noopener';
++    a.style.display = 'none';
++    document.body.appendChild(a);
++    a.click();
++    // Remoção tardia: alguns WebViews cancelam o download se removermos na hora
++    setTimeout(() => {
++      document.body.removeChild(a);
++      URL.revokeObjectURL(url);
++    }, 10000);
++  } catch {
++    // Fallback final: exibe o PDF numa aba (navegadores plenos)
++    window.open(url, '_blank');
++    setTimeout(() => URL.revokeObjectURL(url), 60000);
++  }
++}
+-- 
+2.39.5
+
