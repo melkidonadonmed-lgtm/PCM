@@ -25,6 +25,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext, WatermarkType } from '../types';
 import { generateMedicalPDF } from '../utils/pdfGenerator';
+import { downloadPdfDoc } from '../utils/downloadPdf';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
 import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
@@ -270,7 +271,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       const dateStr = new Date().toISOString().split('T')[0];
       const filename = `${getDocTitle()}_${cleanPatient}_${dateStr}.pdf`;
 
-      pdf.save(filename);
+      await downloadPdfDoc(pdf, filename);
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000);
     } catch (err: unknown) {

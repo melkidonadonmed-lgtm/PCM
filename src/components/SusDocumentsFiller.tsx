@@ -30,6 +30,8 @@ import {
 } from '../data/susDocumentsCatalog';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import jsPDF from 'jspdf';
+import { downloadPdfDoc } from '../utils/downloadPdf';
+import { renderSheetToPdf } from '../utils/renderSheetToPdf';
 import html2canvas from 'html2canvas';
 
 interface SusDocumentsFillerProps {
@@ -330,23 +332,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       }
 
       if (!downloadAll || selectedDocIds.length <= 1) {
-        // Baixa o documento ativo
-        const canvas = await html2canvas(container, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#FFFFFF',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: 'a4'
-        });
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, Math.min(pdfHeight, 297));
-        pdf.save(`${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
+        // Baixa o documento ativo (folha inteira, sem corte, fundo branco garantido)
+        await renderSheetToPdf(
+          container,
+          `${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`,
+        );
         showToast('PDF do documento SUS gerado com sucesso!');
       } else {
         // Baixa todos os selecionados em páginas consecutivas
@@ -356,6 +346,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
           format: 'a4'
         });
         const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
         const tempContainer = document.createElement('div');
         tempContainer.style.position = 'fixed';
         tempContainer.style.left = '-9999px';
@@ -374,16 +365,44 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             scale: 2,
             useCORS: true,
             backgroundColor: '#FFFFFF',
-            logging: false
+            logging: false,
+            windowWidth: 794,
+            onclone: (clonedDoc) => {
+              clonedDoc.documentElement.style.backgroundColor = '#FFFFFF';
+              clonedDoc.body.style.backgroundColor = '#FFFFFF';
+            }
           });
           const imgData = canvas.toDataURL('image/jpeg', 0.95);
-          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+          const naturalHeightMm = (canvas.height * pdfWidth) / canvas.width;
           if (i > 0) pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, Math.min(pdfHeight, 297));
+          if (naturalHeightMm <= pdfHeight + 0.5) {
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, naturalHeightMm);
+          } else {
+            // Estourou A4: fatia em páginas consecutivas
+            const pxPerFullPage = Math.floor((pdfHeight * canvas.width) / pdfWidth);
+            let y = 0;
+            let firstSlice = true;
+            while (y < canvas.height) {
+              const sliceH = Math.min(pxPerFullPage, canvas.height - y);
+              const slice = document.createElement('canvas');
+              slice.width = canvas.width;
+              slice.height = sliceH;
+              const ctx = slice.getContext('2d')!;
+              ctx.fillStyle = '#FFFFFF';
+              ctx.fillRect(0, 0, slice.width, slice.height);
+              ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+              const sliceImg = slice.toDataURL('image/jpeg', 0.95);
+              const sliceHeightMm = (sliceH * pdfWidth) / canvas.width;
+              if (!firstSlice) pdf.addPage();
+              pdf.addImage(sliceImg, 'JPEG', 0, 0, pdfWidth, sliceHeightMm);
+              firstSlice = false;
+              y += sliceH;
+            }
+          }
         }
 
         document.body.removeChild(tempContainer);
-        pdf.save(`Documentos_SUS_Multiplos_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
+        await downloadPdfDoc(pdf, `Documentos_SUS_Multiplos_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
         showToast(`PDF com ${selectedDocIds.length} documentos SUS gerado com sucesso!`);
       }
     } catch (err) {

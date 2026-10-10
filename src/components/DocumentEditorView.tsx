@@ -49,8 +49,7 @@ import {
   Stethoscope,
   Award
 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { renderSheetToPdf } from '../utils/renderSheetToPdf';
 import { 
   DoctorProfile, 
   Patient, 
@@ -1577,53 +1576,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         await (document as any).fonts.ready;
       }
 
-      const canvas = await html2canvas(sheetRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#FFFFFF',
-        logging: false,
-        onclone: (clonedDoc) => {
-          const sheet = clonedDoc.getElementById('printable-a4-sheet');
-          if (sheet) {
-            sheet.style.fontFamily = selectedFont.family;
-            const allInputs = sheet.querySelectorAll('input, textarea');
-            allInputs.forEach((inp: any) => {
-              inp.style.fontFamily = selectedFont.family;
-            });
-            const allTextNodes = sheet.querySelectorAll('p, span, h1, h2, h3, div');
-            allTextNodes.forEach((node: any) => {
-              if (!node.style.fontFamily) {
-                node.style.fontFamily = 'inherit';
-              }
-            });
-          }
-        }
-      });
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
-      const isLandscape = pageOrientation === 'landscape';
-      const pdf = new jsPDF({
-        orientation: isLandscape ? 'landscape' : 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const pdfPageWidth = isLandscape ? 297 : 210;
-      const pdfPageHeight = isLandscape ? 210 : 297;
-      const calculatedHeight = (canvas.height * pdfPageWidth) / canvas.width;
-
-      pdf.addImage(
-        imgData,
-        'JPEG',
-        0,
-        0,
-        pdfPageWidth,
-        Math.min(calculatedHeight, pdfPageHeight)
-      );
-
       const cleanDocTitle = (currentModel.title || 'Documento_PresCMed').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
       const cleanPatient = (patient?.name || 'Paciente').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
-      pdf.save(`${cleanDocTitle}_${cleanPatient}.pdf`);
+
+      await renderSheetToPdf(sheetRef.current, `${cleanDocTitle}_${cleanPatient}.pdf`, {
+        orientation: pageOrientation === 'landscape' ? 'landscape' : 'portrait',
+      });
 
       showToast('PDF de alta fidelidade baixado com sucesso!');
     } catch (err) {
