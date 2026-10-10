@@ -380,9 +380,12 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
   const marginX = 14;
   const contentWidth = pageWidth - (marginX * 2);
 
-  const patientName = patient?.name?.trim() || certificate?.patientName?.trim() || referral?.patientName?.trim() || 'Não identificado';
+  // Fallbacks defensivos: atestado/encaminhamento podem ser emitidos sem paciente na sessão ativa.
+  const safeCertificate = certificate ?? ({} as MedicalCertificate);
+  const safeReferral = referral ?? ({} as MedicalReferral);
+  const patientName = patient?.name?.trim() || safeCertificate.patientName?.trim() || safeReferral.patientName?.trim() || 'Não identificado';
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : null;
-  const patientDoc = patient?.documentNumber?.trim() || certificate?.documentNumber?.trim() || referral?.documentNumber?.trim() || '—';
+  const patientDoc = patient?.documentNumber?.trim() || safeCertificate.documentNumber?.trim() || safeReferral.documentNumber?.trim() || '—';
   const patientAge = patient?.ageText?.trim() || patient?.birthDate?.trim() || '—';
 
   const docName = doctor?.name?.trim() || 'Dr(a). Médico(a)';
@@ -726,20 +729,19 @@ export const generateMedicalPDF = (options: PDFExportOptions): jsPDF => {
 
       currentY += 16;
 
-      const certPatient = certificate.patientName?.trim() || patientName;
-      const certDocNumber = (certificate.documentNumber?.trim() || (patientDoc !== '—' ? patientDoc : ''))
-        ? `portador(a) do documento nº ${certificate.documentNumber?.trim() || patientDoc}, `
-        : '';
-      const daysCount = Math.max(1, certificate.daysOff || 1);
+      const certPatient = safeCertificate.patientName?.trim() || patientName;
+      const certDocRaw = safeCertificate.documentNumber?.trim() || (patientDoc !== '—' ? patientDoc : '');
+      const certDocNumber = certDocRaw ? `portador(a) do documento nº ${certDocRaw}, ` : '';
+      const daysCount = Math.max(1, safeCertificate.daysOff || 1);
       const daysWritten = numberToWordsPtBr(daysCount);
-      const startDateFormatted = certificate.startDate
-        ? new Date(certificate.startDate + 'T00:00:00').toLocaleDateString('pt-BR')
+      const startDateFormatted = safeCertificate.startDate
+        ? new Date(safeCertificate.startDate + 'T00:00:00').toLocaleDateString('pt-BR')
         : new Date().toLocaleDateString('pt-BR');
-      const endDateFormatted = certificate.endDate
-        ? new Date(certificate.endDate + 'T00:00:00').toLocaleDateString('pt-BR')
+      const endDateFormatted = safeCertificate.endDate
+        ? new Date(safeCertificate.endDate + 'T00:00:00').toLocaleDateString('pt-BR')
         : new Date().toLocaleDateString('pt-BR');
 
-      const certText = `Atesto para os devidos fins de direito que o(a) paciente ${certPatient.toUpperCase()}, ${certDocNumber}esteve sob meus cuidados médicos profissionais no dia ${startDateFormatted}, necessitando de ${daysCount} (${daysWritten}) dia(s) de repouso e afastamento de suas atividades habituais ${certificate.periodText || ''}, com retorno previsto a partir de ${endDateFormatted}.`;
+      const certText = `Atesto para os devidos fins de direito que o(a) paciente ${certPatient.toUpperCase()}, ${certDocNumber}esteve sob meus cuidados médicos profissionais no dia ${startDateFormatted}, necessitando de ${daysCount} (${daysWritten}) dia(s) de repouso e afastamento de suas atividades habituais ${safeCertificate.periodText || ''}, com retorno previsto a partir de ${endDateFormatted}.`;
 
       pdf.setFont('times', 'normal');
       pdf.setFontSize(12);
