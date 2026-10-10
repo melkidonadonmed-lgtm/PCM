@@ -50,6 +50,7 @@ import {
   Award
 } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { downloadPdfDoc } from '../utils/downloadPdf';
 import html2canvas from 'html2canvas';
 import { 
   DoctorProfile, 
@@ -1623,7 +1624,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
       const cleanDocTitle = (currentModel.title || 'Documento_PresCMed').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
       const cleanPatient = (patient?.name || 'Paciente').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
-      pdf.save(`${cleanDocTitle}_${cleanPatient}.pdf`);
+      await downloadPdfDoc(pdf, `${cleanDocTitle}_${cleanPatient}.pdf`);
 
       showToast('PDF de alta fidelidade baixado com sucesso!');
     } catch (err) {

@@ -30,6 +30,7 @@ import {
 } from '../data/susDocumentsCatalog';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import jsPDF from 'jspdf';
+import { downloadPdfDoc } from '../utils/downloadPdf';
 import html2canvas from 'html2canvas';
 
 interface SusDocumentsFillerProps {
@@ -346,7 +347,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, Math.min(pdfHeight, 297));
-        pdf.save(`${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
+        await downloadPdfDoc(pdf, `${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
         showToast('PDF do documento SUS gerado com sucesso!');
       } else {
         // Baixa todos os selecionados em páginas consecutivas
@@ -383,7 +384,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         }
 
         document.body.removeChild(tempContainer);
-        pdf.save(`Documentos_SUS_Multiplos_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
+        await downloadPdfDoc(pdf, `Documentos_SUS_Multiplos_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
         showToast(`PDF com ${selectedDocIds.length} documentos SUS gerado com sucesso!`);
       }
     } catch (err) {
