@@ -1,0 +1,321 @@
+From e7b32d486e86de415f35d622af6ae09b47a61f12 Mon Sep 17 00:00:00 2001
+From: "qwen.ai[bot]" <qwenlm-intl@service.alibaba.com>
+Date: Sat, 10 Oct 2026 17:10:41 +0000
+Subject: [PATCH 4/4] fix(pdf): folha completa sem corte e sem papel de fundo
+ vazando (renderSheetToPdf)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Novo util renderSheetToPdf: html2canvas com root/body brancos forçados no
+  onclone + windowWidth = offsetWidth (elimina faixa creme/rosa 'por trás' da
+  folha capturada fora do viewport/scroll lateral)
+- Remove Math.min(altura, 297) que esmagava/cortava conteúdo em ~3/4 da página;
+  agora usa altura natural e, se estourar A4, fatia em páginas consecutivas
+- Neutraliza transform/zoom do preview responsivo na cópia clonada
+- Aplicado em SusDocumentsFiller (documento único) e DocumentEditorView;
+  fluxo multi-documento também corrigido
+---
+ src/components/DocumentEditorView.tsx |  53 ++---------
+ src/components/SusDocumentsFiller.tsx |  58 +++++++-----
+ src/utils/renderSheetToPdf.ts         | 122 ++++++++++++++++++++++++++
+ 3 files changed, 165 insertions(+), 68 deletions(-)
+ create mode 100644 src/utils/renderSheetToPdf.ts
+
+diff --git a/src/components/DocumentEditorView.tsx b/src/components/DocumentEditorView.tsx
+index a7d11390..a387f493 100644
+--- a/src/components/DocumentEditorView.tsx
++++ b/src/components/DocumentEditorView.tsx
+@@ -49,9 +49,7 @@ import {
+   Stethoscope,
+   Award
+ } from 'lucide-react';
+-import jsPDF from 'jspdf';
+-import { downloadPdfDoc } from '../utils/downloadPdf';
+-import html2canvas from 'html2canvas';
++import { renderSheetToPdf } from '../utils/renderSheetToPdf';
+ import { 
+   DoctorProfile, 
+   Patient, 
+@@ -1578,53 +1576,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
+         await (document as any).fonts.ready;
+       }
+ 
+-      const canvas = await html2canvas(sheetRef.current, {
+-        scale: 2,
+-        useCORS: true,
+-        backgroundColor: '#FFFFFF',
+-        logging: false,
+-        onclone: (clonedDoc) => {
+-          const sheet = clonedDoc.getElementById('printable-a4-sheet');
+-          if (sheet) {
+-            sheet.style.fontFamily = selectedFont.family;
+-            const allInputs = sheet.querySelectorAll('input, textarea');
+-            allInputs.forEach((inp: any) => {
+-              inp.style.fontFamily = selectedFont.family;
+-            });
+-            const allTextNodes = sheet.querySelectorAll('p, span, h1, h2, h3, div');
+-            allTextNodes.forEach((node: any) => {
+-              if (!node.style.fontFamily) {
+-                node.style.fontFamily = 'inherit';
+-              }
+-            });
+-          }
+-        }
+-      });
+-
+-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+-      const isLandscape = pageOrientation === 'landscape';
+-      const pdf = new jsPDF({
+-        orientation: isLandscape ? 'landscape' : 'portrait',
+-        unit: 'mm',
+-        format: 'a4'
+-      });
+-
+-      const pdfPageWidth = isLandscape ? 297 : 210;
+-      const pdfPageHeight = isLandscape ? 210 : 297;
+-      const calculatedHeight = (canvas.height * pdfPageWidth) / canvas.width;
+-
+-      pdf.addImage(
+-        imgData,
+-        'JPEG',
+-        0,
+-        0,
+-        pdfPageWidth,
+-        Math.min(calculatedHeight, pdfPageHeight)
+-      );
+-
+       const cleanDocTitle = (currentModel.title || 'Documento_PresCMed').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
+       const cleanPatient = (patient?.name || 'Paciente').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
+-      await downloadPdfDoc(pdf, `${cleanDocTitle}_${cleanPatient}.pdf`);
++
++      await renderSheetToPdf(sheetRef.current, `${cleanDocTitle}_${cleanPatient}.pdf`, {
++        orientation: pageOrientation === 'landscape' ? 'landscape' : 'portrait',
++      });
+ 
+       showToast('PDF de alta fidelidade baixado com sucesso!');
+     } catch (err) {
+diff --git a/src/components/SusDocumentsFiller.tsx b/src/components/SusDocumentsFiller.tsx
+index bfc15676..702a127a 100644
+--- a/src/components/SusDocumentsFiller.tsx
++++ b/src/components/SusDocumentsFiller.tsx
+@@ -31,6 +31,7 @@ import {
+ import { medicoConfigurado } from '../utils/medicoConfigurado';
+ import jsPDF from 'jspdf';
+ import { downloadPdfDoc } from '../utils/downloadPdf';
++import { renderSheetToPdf } from '../utils/renderSheetToPdf';
+ import html2canvas from 'html2canvas';
+ 
+ interface SusDocumentsFillerProps {
+@@ -331,23 +332,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
+       }
+ 
+       if (!downloadAll || selectedDocIds.length <= 1) {
+-        // Baixa o documento ativo
+-        const canvas = await html2canvas(container, {
+-          scale: 2,
+-          useCORS: true,
+-          backgroundColor: '#FFFFFF',
+-          logging: false
+-        });
+-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+-        const pdf = new jsPDF({
+-          orientation: 'portrait',
+-          unit: 'mm',
+-          format: 'a4'
+-        });
+-        const pdfWidth = pdf.internal.pageSize.getWidth();
+-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, Math.min(pdfHeight, 297));
+-        await downloadPdfDoc(pdf, `${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
++        // Baixa o documento ativo (folha inteira, sem corte, fundo branco garantido)
++        await renderSheetToPdf(
++          container,
++          `${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`,
++        );
+         showToast('PDF do documento SUS gerado com sucesso!');
+       } else {
+         // Baixa todos os selecionados em páginas consecutivas
+@@ -357,6 +346,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
+           format: 'a4'
+         });
+         const pdfWidth = pdf.internal.pageSize.getWidth();
++        const pdfHeight = pdf.internal.pageSize.getHeight();
+         const tempContainer = document.createElement('div');
+         tempContainer.style.position = 'fixed';
+         tempContainer.style.left = '-9999px';
+@@ -375,12 +365,40 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
+             scale: 2,
+             useCORS: true,
+             backgroundColor: '#FFFFFF',
+-            logging: false
++            logging: false,
++            windowWidth: 794,
++            onclone: (clonedDoc) => {
++              clonedDoc.documentElement.style.backgroundColor = '#FFFFFF';
++              clonedDoc.body.style.backgroundColor = '#FFFFFF';
++            }
+           });
+           const imgData = canvas.toDataURL('image/jpeg', 0.95);
+-          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
++          const naturalHeightMm = (canvas.height * pdfWidth) / canvas.width;
+           if (i > 0) pdf.addPage();
+-          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, Math.min(pdfHeight, 297));
++          if (naturalHeightMm <= pdfHeight + 0.5) {
++            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, naturalHeightMm);
++          } else {
++            // Estourou A4: fatia em páginas consecutivas
++            const pxPerFullPage = Math.floor((pdfHeight * canvas.width) / pdfWidth);
++            let y = 0;
++            let firstSlice = true;
++            while (y < canvas.height) {
++              const sliceH = Math.min(pxPerFullPage, canvas.height - y);
++              const slice = document.createElement('canvas');
++              slice.width = canvas.width;
++              slice.height = sliceH;
++              const ctx = slice.getContext('2d')!;
++              ctx.fillStyle = '#FFFFFF';
++              ctx.fillRect(0, 0, slice.width, slice.height);
++              ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
++              const sliceImg = slice.toDataURL('image/jpeg', 0.95);
++              const sliceHeightMm = (sliceH * pdfWidth) / canvas.width;
++              if (!firstSlice) pdf.addPage();
++              pdf.addImage(sliceImg, 'JPEG', 0, 0, pdfWidth, sliceHeightMm);
++              firstSlice = false;
++              y += sliceH;
++            }
++          }
+         }
+ 
+         document.body.removeChild(tempContainer);
+diff --git a/src/utils/renderSheetToPdf.ts b/src/utils/renderSheetToPdf.ts
+new file mode 100644
+index 00000000..5517b3ad
+--- /dev/null
++++ b/src/utils/renderSheetToPdf.ts
+@@ -0,0 +1,122 @@
++import jsPDF from 'jspdf';
++import html2canvas from 'html2canvas';
++
++/**
++ * Renderiza um elemento "folha A4" do DOM em um PDF vetorialmente fiel,
++ * SEM cortar o conteúdo e SEM deixar papel de fundo aparecendo atrás.
++ *
++ * Corre dois bugs clássicos do pipeline antigo (html2canvas -> addImage):
++ *  1. `Math.min(pdfHeight, 297)` esmagava/encurtava a imagem quando o canvas
++ *     era mais alto que a página -> conteúdo cortado ("só até 3/4 da folha").
++ *  2. Fundo creme/rosa do app vazando pelo html2canvas ao fotografar elementos
++ *     estreitos (largura < scrollWidth) ou com rootBackgroundColor transparente
++ *     -> faixa de cor estranha "por trás" da folha no PDF.
++ *
++ * Estratégia:
++ *  - Força largura real de renderização = offsetWidth (sem scroll lateral).
++ *  - Mede o conteúdo real (maior entre bounding rect e scroll) para definir a
++ *    altura da página do PDF.
++ *  - Se a altura real <= 297mm: uma única página A4 exata, sem faixas vazias.
++ *  - Se estourar A4: fatia o canvas em páginas A4 em sequência (page break),
++ *    aproveitando que a folha é branca nas margens para cortes suaves.
++ */
++
++const A4_W_MM = 210;
++const A4_H_MM = 297;
++
++export interface RenderSheetOptions {
++  orientation?: 'portrait' | 'landscape';
++  /** escala do html2canvas (default 2) */
++  scale?: number;
++}
++
++async function captureCanvas(el: HTMLElement, opts: RenderSheetOptions): Promise<HTMLCanvasElement> {
++  const widthPx = el.offsetWidth || Math.round((A4_W_MM * 96) / 25.4); // fallback ~794px
++
++  // Garante fundo branco opaco na cópia clonada (evita raiz transparente -> vazamento de cor)
++  const html2canvasOpts: Parameters<typeof html2canvas>[1] = {
++    scale: opts.scale ?? 2,
++    useCORS: true,
++    logging: false,
++    backgroundColor: '#FFFFFF',
++    windowWidth: widthPx,
++    onclone: (clonedDoc) => {
++      const root = clonedDoc.documentElement;
++      const body = clonedDoc.body;
++      if (root) {
++        root.style.backgroundColor = '#FFFFFF';
++        root.style.background = '#FFFFFF';
++      }
++      if (body) {
++        body.style.backgroundColor = '#FFFFFF';
++        body.style.background = '#FFFFFF';
++      }
++      // Neutraliza transform: scale() do preview responsivo (fitToMobile),
++      // que distorceria a proporção da folha no PDF
++      const sheet = clonedDoc.getElementById('printable-a4-sheet');
++      if (sheet) {
++        const anyStyle = (sheet as HTMLElement).style;
++        anyStyle.transform = 'none';
++        anyStyle.zoom = '1';
++      }
++    },
++  };
++
++  return html2canvas(el, html2canvasOpts);
++}
++
++function mmToPx(mm: number): number {
++  return (mm * 96) / 25.4;
++}
++
++export async function renderSheetToPdf(
++  el: HTMLElement,
++  filename: string,
++  opts: RenderSheetOptions = {},
++): Promise<void> {
++  const orientation = opts.orientation ?? 'portrait';
++  const pageWmm = orientation === 'landscape' ? A4_H_MM : A4_W_MM;
++  const pageHmm = orientation === 'landscape' ? A4_W_MM : A4_H_MM;
++
++  const canvas = await captureCanvas(el, opts);
++
++  // Proporção direta do canvas para mm de largura (sem Math.min que cortava conteúdo)
++  const naturalHeightMm = (canvas.height * pageWmm) / canvas.width;
++
++  const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4', compress: true });
++
++  const imgData = canvas.toDataURL('image/jpeg', 0.95);
++
++  if (naturalHeightMm <= pageHmm + 0.5) {
++    // Cabe numa página: desenha a folha inteira (usa a altura natural, sem Math.min que corta)
++    pdf.addImage(imgData, 'JPEG', 0, 0, pageWmm, naturalHeightMm);
++  } else {
++    // Estourou A4: fatia o canvas em páginas consecutivas
++    const pxPerFullPage = Math.floor((pageHmm * canvas.width) / pageWmm);
++    let y = 0;
++    let first = true;
++    while (y < canvas.height) {
++      const sliceH = Math.min(pxPerFullPage, canvas.height - y);
++      const slice = document.createElement('canvas');
++      slice.width = canvas.width;
++      slice.height = sliceH;
++      const ctx = slice.getContext('2d')!;
++      ctx.fillStyle = '#FFFFFF';
++      ctx.fillRect(0, 0, slice.width, slice.height);
++      ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
++
++      const sliceImg = slice.toDataURL('image/jpeg', 0.95);
++      const sliceHeightMm = (sliceH * pageWmm) / canvas.width;
++      if (!first) pdf.addPage();
++      pdf.addImage(sliceImg, 'JPEG', 0, 0, pageWmm, sliceHeightMm);
++      first = false;
++      y += sliceH;
++    }
++  }
++
++  const { downloadPdfDoc } = await import('./downloadPdf');
++  await downloadPdfDoc(pdf, filename);
++}
++
++// util exportado p/ testes/cálculos futuros
++export { mmToPx };
+-- 
+2.39.5
+

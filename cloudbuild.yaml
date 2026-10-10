@@ -1,0 +1,45 @@
+steps:
+  # 1. Build da imagem Docker com a aplicação web (Nginx + assets compilados)
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:$SHORT_SHA'
+      - '-t'
+      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:latest'
+      - '.'
+
+  # 2. Push da imagem com a tag de commit e latest
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:$SHORT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:latest'
+
+  # 3. Deploy contínuo no Google Cloud Run na região southamerica-east1 (São Paulo)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'prescmed'
+      - '--image=southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:$SHORT_SHA'
+      - '--platform=managed'
+      - '--region=southamerica-east1'
+      - '--allow-unauthenticated'
+      - '--memory=256Mi'
+      - '--cpu=1'
+      - '--min-instances=0'
+      - '--max-instances=10'
+      - '--port=8080'
+
+images:
+  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:$SHORT_SHA'
+  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

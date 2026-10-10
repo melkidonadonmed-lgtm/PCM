@@ -1,0 +1,47 @@
+{
+  "name": "prescmed-pcm",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=3001 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
+    "lint": "tsc --noEmit",
+    "design:lint": "npx -p @google/design.md designmd lint DESIGN.md",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "@tiptap/extension-placeholder": "^3.31.3",
+    "@tiptap/extension-text-align": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
+    "@vitejs/plugin-react": "^5.0.4",
+    "dexie": "^4.4.6",
+    "firebase": "^12.19.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "lucide-react": "^0.546.0",
+    "material-symbols": "^0.47.5",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "vite": "^6.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "autoprefixer": "^10.4.21",
+    "esbuild": "^0.25.0",
+    "tailwindcss": "^4.1.14",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.3",
+    "vite-plugin-pwa": "^1.3.0",
+    "vitest": "^5.0.2"
+  }
+}

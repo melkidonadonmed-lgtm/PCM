@@ -1,0 +1,11 @@
+.gcloudignore
+.git
+.gitignore
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.gemini/
+.env*
+!.env.example
