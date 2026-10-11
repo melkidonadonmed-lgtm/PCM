@@ -39,7 +39,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
       )}
 
       {type === 'sus_double' && (
-        <div className="w-full h-full flex items-center justify-around px-6 sm:px-10">
+        <div className="w-full h-full flex items-center justify-around px-10">
           <div className="w-1/2 flex items-center justify-center">
             <img 
               src={logoSrc} 
@@ -60,7 +60,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
       )}
 
       {type === 'sus_triple' && (
-        <div className="w-full h-full flex items-center justify-around px-3 sm:px-6">
+        <div className="w-full h-full flex items-center justify-around px-6">
           <div className="w-1/3 flex items-center justify-center">
             <img 
               src={logoSrc} 

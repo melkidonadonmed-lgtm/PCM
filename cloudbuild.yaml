@@ -1,45 +1,72 @@
+# Deploy contínuo do PresCMed no Cloud Run (gatilho: push em main).
+# O Dockerfile roda type-check e testes antes do build: se algo falhar, a imagem
+# não é gerada e os passos de push/deploy abaixo não executam.
+
+substitutions:
+  _REGION: southamerica-east1
+  _SERVICE: prescmed
+  _REPO: prescmed-repo
+
 steps:
-  # 1. Build da imagem Docker com a aplicação web (Nginx + assets compilados)
-  - name: 'gcr.io/cloud-builders/docker'
+  # 1. Verificação (lint + testes) e build da imagem
+  - id: build
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
-      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:$SHORT_SHA'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:$SHORT_SHA'
       - '-t'
-      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:latest'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:latest'
       - '.'
 
-  # 2. Push da imagem com a tag de commit e latest
-  - name: 'gcr.io/cloud-builders/docker'
+  # 2. Publica a imagem (tag do commit e latest)
+  - id: push
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:$SHORT_SHA'
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}'
 
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'push'
-      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:latest'
-
-  # 3. Deploy contínuo no Google Cloud Run na região southamerica-east1 (São Paulo)
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  # 3. Deploy da imagem do commit (rastreável e reversível por revisão)
+  - id: deploy
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     entrypoint: 'gcloud'
     args:
       - 'run'
       - 'deploy'
-      - 'prescmed'
-      - '--image=southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:$SHORT_SHA'
+      - '${_SERVICE}'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:$SHORT_SHA'
+      - '--region=${_REGION}'
       - '--platform=managed'
-      - '--region=southamerica-east1'
       - '--allow-unauthenticated'
+      - '--port=8080'
       - '--memory=256Mi'
       - '--cpu=1'
       - '--min-instances=0'
       - '--max-instances=10'
-      - '--port=8080'
+      - '--labels=commit=$SHORT_SHA'
+      - '--quiet'
+
+  # 4. Teste de fumaça: a revisão nova precisa responder e servir o app
+  - id: smoke-test
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -euo pipefail
+        URL="$(gcloud run services describe ${_SERVICE} --region=${_REGION} --format='value(status.url)')"
+        echo "Verificando $$URL"
+        curl --fail --silent --show-error --retry 5 --retry-delay 3 "$$URL/health"
+        curl --fail --silent --show-error "$$URL/" | grep -q '<div id="root">'
+        curl --fail --silent --show-error --head "$$URL/" | grep -qi '^x-content-type-options: nosniff'
+        echo "Revisão publicada e respondendo."
 
 images:
-  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:$SHORT_SHA'
-  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/prescmed-repo/prescmed:latest'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:$SHORT_SHA'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:latest'
+
+timeout: 1200s
 
 options:
   logging: CLOUD_LOGGING_ONLY

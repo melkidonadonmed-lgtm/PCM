@@ -14,7 +14,7 @@ import {
   BookmarkPlus,
   FolderOpen
 } from 'lucide-react';
-import { PrescriptionItem, Patient, DoctorProfile } from '../types';
+import { PrescriptionItem, Patient, DoctorProfile, WorkContext } from '../types';
 import { db, SavedDocument } from '../services/db';
 import { searchUnifiedMedicationsFuzzy } from '../utils/fuzzySearch';
 import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../data/medicationDatabase';
@@ -28,7 +28,8 @@ import {
   UnidadeDose,
   formatarUnidadeDose
 } from '../utils/prescricaoRapida';
-import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
+import { FolhaA4 } from './documento/FolhaA4';
+import { DocumentoClinico } from './documento/DocumentoClinico';
 import { Icon } from './Icon';
 import { AcoesDaReceita } from './AcoesDaReceita';
 import { PediatricCalculator } from './PediatricCalculator';
@@ -39,6 +40,7 @@ interface PrescriptionBuilderProps {
   onUpdateDoctor?: (doctor: DoctorProfile) => void;
   patient: Patient;
   onUpdatePatient: (patient: Patient) => void;
+  activeContext?: WorkContext | null;
   items: PrescriptionItem[];
   onUpdateItems: (items: PrescriptionItem[]) => void;
   weightCalcEnabled?: boolean;
@@ -62,6 +64,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   doctor,
   patient,
   onUpdatePatient,
+  activeContext = null,
   items,
   onUpdateItems,
   onClearPrescription,
@@ -314,27 +317,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
   const isDoctorConfigured = medicoConfigurado(doctor);
   const handleAbrirPerfilMedico = onAbrirPerfilMedico || onOpenDoctorModal;
-
-  // Dados para exibição na folha de prévia A4
-  const displayDoctorName = isDoctorConfigured
-    ? doctor.name.trim()
-    : EXEMPLO_MEDICO.name;
-
-  const displayDoctorCRM = isDoctorConfigured
-    ? `CRM ${doctor.crm.trim()}/${doctor.crmState || 'SP'}${doctor.rqe ? ` • RQE ${doctor.rqe}` : ''}`
-    : `CRM-${EXEMPLO_MEDICO.crmState} ${EXEMPLO_MEDICO.crm}`;
-
-  const displayDoctorSpecialty = isDoctorConfigured
-    ? (doctor.specialty || 'Clínica Médica')
-    : EXEMPLO_MEDICO.specialty;
-
-  const displayDoctorSignatureCRM = isDoctorConfigured
-    ? `CRM: ${doctor.crm.trim()}/${doctor.crmState || 'SP'}`
-    : `CRM-${EXEMPLO_MEDICO.crmState} ${EXEMPLO_MEDICO.crm}`;
-
-  const displayPatientName = patientName
-    ? patientName
-    : (!isDoctorConfigured ? EXEMPLO_PACIENTE.name : 'Não identificado');
 
   // Atalhos de Teclado Globais: '/', 'Ctrl+K' para busca, e 'Escape' para fechar o Drawer
   useEffect(() => {
@@ -1612,135 +1594,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
           )}
 
-          {/* Printable Simulated A4 Sheet */}
-          <div
-            className={`prescription-sheet paper-sheet-floating p-6 sm:p-8 rounded-2xl min-h-[560px] flex flex-col justify-between text-left relative overflow-hidden transition ${
-              !isDoctorConfigured ? 'no-print' : ''
-            }`}
-          >
-            {/* Marca d'água diagonal "EXEMPLO" */}
-            {!isDoctorConfigured && (
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-10 overflow-hidden"
-              >
-                <span className="text-slate-300/40 text-7xl sm:text-8xl font-black tracking-widest uppercase transform -rotate-45">
-                  EXEMPLO
-                </span>
-              </div>
-            )}
-
-            <div className="relative z-20">
-              {/* Document Header */}
-              <div className="border-b-2 border-slate-900 pb-3 mb-4 text-center">
-                <h2 className="text-base font-bold uppercase tracking-wide text-slate-900">
-                  {displayDoctorName}
-                </h2>
-                <p className="text-xs font-semibold text-slate-700">
-                  {displayDoctorSpecialty} • {displayDoctorCRM}
-                </p>
-                {isDoctorConfigured && doctor?.clinicName && (
-                  <p className="text-[10px] text-slate-500 mt-0.5">
-                    {doctor.clinicName} {doctor?.address ? `• ${doctor.address}` : ''} {doctor?.phone ? `• Tel: ${doctor.phone}` : ''}
-                  </p>
-                )}
-              </div>
-
-              {/* Patient Info Bar */}
-              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mb-4 flex flex-wrap justify-between items-center text-xs text-slate-800">
-                <div>
-                  <span className="font-bold text-slate-500">Paciente:</span>
-                  <span className="font-bold text-slate-900 ml-1">
-                    {displayPatientName}
-                  </span>
-                </div>
-                <div className="flex gap-3 text-[11px] text-slate-600 font-medium">
-                  {patient?.ageText && <span>Idade: {patient.ageText}</span>}
-                  {hasWeight && <span className="font-bold text-emerald-700">Peso: {patientWeight} kg</span>}
-                </div>
-              </div>
-
-              {/* Document Title & Badge */}
-              <div className="text-center mb-4">
-                {activePreviewType === 'special' ? (
-                  <>
-                    <div className="flex items-center justify-center gap-1.5 mb-1">
-                      <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
-                        2ª Via: Paciente • 1ª Via: Retenção na Farmácia
-                      </span>
-                    </div>
-                    <h3 className="serif-title text-sm font-bold uppercase tracking-widest text-slate-900 border-b border-slate-200 pb-1 inline-block">
-                      Receituário de Controle Especial
-                    </h3>
-                    <p className="text-[10px] text-sky-900 font-bold uppercase tracking-wider mt-1">
-                      Portaria SVS/MS 344/98 • RDC Anvisa 20/2011 (Antimicrobianos)
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <h3 className="serif-title text-sm font-bold uppercase tracking-widest text-slate-800 border-b border-slate-200 pb-1 inline-block">
-                      Receituário Médico
-                    </h3>
-                    <p className="text-[10px] text-slate-500 font-semibold mt-0.5">
-                      Receituário Simples • Uso Ambulatorial
-                    </p>
-                  </>
-                )}
-              </div>
-
-              {/* Prescription Body Items */}
-              {itemsInPreview.length === 0 ? (
-                <div className="py-16 text-center text-slate-500 italic text-xs">
-                  {activePreviewType === 'special'
-                    ? 'Nenhum medicamento sob controle especial ou antimicrobiano nesta prescrição.'
-                    : 'Nenhum medicamento simples nesta prescrição.'}
-                </div>
-              ) : (
-                <div className="space-y-4 text-xs text-slate-800 leading-relaxed">
-                  {itemsInPreview.map((it, idx) => (
-                    <div key={it.id} className="mb-3">
-                      <div className="flex justify-between items-baseline font-bold text-slate-900">
-                        <span>{idx + 1}. {it.name} ({it.route})</span>
-                        <span className="text-[11px] font-semibold text-slate-600">{it.quantity}</span>
-                      </div>
-                      <p className="text-slate-700 pl-4 mt-0.5 leading-relaxed">
-                        {it.instructions}
-                      </p>
-                    </div>
-                  ))}
-
-                  {/* Advertências Sanitárias em caso de Controle Especial */}
-                  {activePreviewType === 'special' && (
-                    <div className="mt-4 p-2 rounded bg-amber-50/80 border border-amber-200 text-[9px] text-amber-950 space-y-0.5">
-                      <span className="font-bold uppercase block text-amber-900">
-                        ⚠️ Orientações e Retenção de Receita (Portaria 344/98 & RDC 20/2011)
-                      </span>
-                      <p>• 1ª Via: Retenção obrigatória na farmácia / drogaria.</p>
-                      <p>• 2ª Via: Orientação médica do paciente.</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Document Footer (Date, Place & Signature Line) */}
-            <div className="relative z-20 pt-6 mt-6 border-t border-slate-200 text-center space-y-3">
-              <p className="text-[11px] text-slate-600">
-                {doctor?.cityState || 'Brasil'}, {new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
-              
-              {doctor?.showSignature !== false && (
-                <div className="pt-3 max-w-[240px] mx-auto border-t border-dashed border-slate-400">
-                  <p className="text-xs font-bold text-slate-900">
-                    {displayDoctorName}
-                  </p>
-                  <p className="text-[10px] text-slate-600">
-                    {displayDoctorSignatureCRM}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Folha A4 da bancada: o mesmo documento que será impresso / exportado em PDF */}
+          <FolhaA4 orientacao={activePreviewType === 'special' ? 'landscape' : 'portrait'}>
+            <DocumentoClinico
+              tipo={activePreviewType === 'special' ? 'special_prescription' : 'prescription'}
+              doctor={doctor}
+              patient={patient}
+              activeContext={activeContext}
+              prescriptionItems={itemsInPreview}
+            />
+          </FolhaA4>
 
           {/* Action Buttons: visível no desktop (xl), nunca duplicado com o cartão */}
           <div className="hidden xl:block">

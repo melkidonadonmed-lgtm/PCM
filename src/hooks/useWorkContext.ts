@@ -92,7 +92,9 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
           createdAt: Date.now(),
           updatedAt: Date.now()
         };
-        await db.workContexts.bulkAdd([ubsContext, polContext, consultorioContext]);
+        // bulkPut (e não bulkAdd): a carga inicial pode rodar duas vezes em paralelo
+        // e precisa ser idempotente em vez de falhar por chave duplicada.
+        await db.workContexts.bulkPut([ubsContext, polContext, consultorioContext]);
         allContexts = [ubsContext, polContext, consultorioContext];
       }
 

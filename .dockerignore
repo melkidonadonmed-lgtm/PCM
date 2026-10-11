@@ -16,3 +16,13 @@ yarn-error.log*
 coverage
 .DS_Store
 Thumbs.db
+
+# Documentação e artefatos que não entram na imagem
+*.md
+docs
+.context
+pdf-fixes-patch
+*.png
+!public/**/*.png
+deploy-cloudrun.*
+cloudbuild.yaml

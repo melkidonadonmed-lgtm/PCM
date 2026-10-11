@@ -355,6 +355,7 @@ export default function App() {
               onUpdateDoctor={setDoctor}
               patient={patient}
               onUpdatePatient={setPatient}
+              activeContext={activeContext}
               items={prescriptionItems}
               onUpdateItems={setPrescriptionItems}
               weightCalcEnabled={patient.weightCalcEnabled}
@@ -461,22 +462,16 @@ export default function App() {
                 </div>
               }>
                 <PrintPreview
-                  darkMode={darkMode}
                   doctor={doctor}
                   patient={patient}
                   prescriptionItems={prescriptionItems}
                   exams={selectedExams}
-                  selectedExams={selectedExams}
                   examIndication={examIndication}
                   certificate={certificate}
                   referral={referral}
                   activeContext={activeContext}
                   initialDocType={printDocType}
-                  onNavigateBack={() => setActiveTab('prescription')}
                   onBack={() => setActiveTab('prescription')}
-                  onClearPrescription={handleClearPrescription}
-                  onResetAll={handleResetAll}
-                  onOpenDoctorModal={handleOpenDoctorModal}
                   onAbrirPerfilMedico={handleOpenDoctorModal}
                 />
               </Suspense>

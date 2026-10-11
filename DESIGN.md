@@ -216,7 +216,7 @@ Os botões, campos e cartões obedecem a uma hierarquia estrita de relevo e foco
   - Campo vazio (`:placeholder-shown`) assume fundo de microcavidade côncava `--surface-inset`.
 - **Regra Sem Peso, Sem Dose**:
   - A calculadora pediátrica e os protocolos de urgência bloqueiam a exibição de doses ou volumes calculados até que o peso do paciente seja informado.
-- **Folha de Impressão A4 (`printable-a4-sheet`)**: Base retangular branca de `210mm x 297mm`, margens regulamentares de 15mm a 20mm, cabeçalho médico com CRM/UF e rodapé sanitário.
+- **Folha de Impressão A4 (`printable-a4-sheet`)**: Base retangular branca de `210mm x 297mm`, margens regulamentares de 15mm a 20mm, cabeçalho institucional (logo e local de atendimento) e assinatura do médico com CRM/UF. A prévia, a impressão e o PDF usam a mesma folha.
 
 ---
 

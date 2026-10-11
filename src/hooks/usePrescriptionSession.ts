@@ -8,6 +8,7 @@ import {
   MedicalReferral
 } from '../types';
 import { storageService } from '../services/storageService';
+import { dataLocalISO } from '../utils/documentoClinico';
 
 export const DEFAULT_DOCTOR: DoctorProfile = {
   name: '',
@@ -37,8 +38,11 @@ export const DEFAULT_PATIENT: Patient = {
 };
 
 const createDefaultCertificate = (cityState?: string): MedicalCertificate => {
-  const today = new Date().toISOString().split('T')[0];
-  const tomorrow = new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0];
+  const hoje = new Date();
+  const retorno = new Date(hoje);
+  retorno.setDate(hoje.getDate() + 2);
+  const today = dataLocalISO(hoje);
+  const tomorrow = dataLocalISO(retorno);
   return {
     id: 'cert-1',
     patientName: '',
@@ -48,9 +52,11 @@ const createDefaultCertificate = (cityState?: string): MedicalCertificate => {
     startDate: today,
     endDate: tomorrow,
     periodText: 'por motivo de doença e necessidade de repouso',
-    includeCID: true,
-    cid10Code: 'J00',
-    cid10Description: 'Nasofaringite aguda (resfriado comum)',
+    // CID-10 só entra no atestado com autorização expressa do paciente
+    // (Res. CFM nº 1.658/2002): começa desmarcado e sem diagnóstico pré-preenchido.
+    includeCID: false,
+    cid10Code: '',
+    cid10Description: '',
     observations: 'Paciente necessita de repouso e hidratação domiciliar durante o período estipulado.',
     cityDateText: (cityState || 'Brasil') + ', ' + new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })
   };
@@ -68,7 +74,7 @@ const createDefaultReferral = (): MedicalReferral => {
     clinicalSummary: 'Paciente com indicação de avaliação especializada.',
     relevantExams: '',
     hypothesisCID: '',
-    date: new Date().toISOString().split('T')[0]
+    date: dataLocalISO()
   };
 };
 

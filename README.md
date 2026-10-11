@@ -54,7 +54,7 @@ O PresCMed foi concebido para atuar em cenários clínicos de alta exigência (P
 | **Framework & UI** | React 19, TypeScript ~5.8, Tailwind CSS v4 (`@tailwindcss/vite`), Lucide Icons, Motion |
 | **Editor de Texto** | Tiptap v3 Starter Kit (`@tiptap/pm`, `@tiptap/react`, text-align, placeholder) |
 | **Banco Local** | Dexie.js v4 (IndexedDB) com hooks nativos de sincronização |
-| **Exportação PDF** | jsPDF, jsPDF-AutoTable, html2canvas |
+| **Exportação PDF** | html2canvas-pro + jsPDF (fotografia fiel da folha A4 exibida) |
 | **PWA & Offline** | Vite Plugin PWA, Workbox (precache estrito com `globIgnores` para chunks lazy) |
 | **Infraestrutura Cloud** | Google Cloud Run (São Paulo / `southamerica-east1`), Docker Multi-Stage (`node:20-alpine` + `nginx:alpine`) |
 | **Nuvem & Auth** | Firebase Auth (Google Sign-In OAuth2) + Cloud Firestore (`firestore.rules` com Zero-Knowledge) |
@@ -101,7 +101,7 @@ PCM/
 │   │       └── cloudSyncManager.ts          # Sincronizador assíncrono bidirecional (Last-Write-Wins)
 │   ├── utils/                               # Utilitários de domínio
 │   │   ├── doseCalculator.ts                # Motor matemático de doses pediátricas
-│   │   └── pdfGenerator.ts                  # Montador programático de PDFs médicos
+│   │   └── renderSheetToPdf.ts              # Exporta em PDF a mesma folha A4 exibida na tela
 │   ├── types.ts                             # Contratos e interfaces de domínio médico
 │   └── index.css                            # Design System em Tailwind v4 (Tokens de luz óptica)
 ```

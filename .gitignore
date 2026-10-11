@@ -1,2 +1,22 @@
+# Dependências e build
 node_modules/
 dist/
+coverage/
+
+# Segredos e configuração local (nunca commitar)
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs e sistema
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/*
+!.vscode/extensions.json
+!.vscode/mcp.json
+.idea/

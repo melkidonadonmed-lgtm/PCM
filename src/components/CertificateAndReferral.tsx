@@ -22,6 +22,7 @@ import { MedicalCertificate, MedicalReferral, Patient, DoctorProfile } from '../
 import { CidSearchBar } from './CidSearchBar';
 import { COMMON_CID10, CIDItem } from '../data/cidCatalog';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
+import { dataLocalISO } from '../utils/documentoClinico';
 
 interface CertificateAndReferralProps {
   darkMode: boolean;
@@ -211,7 +212,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
     onUpdateCertificate({
       ...certificate,
       daysOff: validDays,
-      endDate: end.toISOString().split('T')[0]
+      endDate: dataLocalISO(end)
     });
   };
 

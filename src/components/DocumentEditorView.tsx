@@ -49,7 +49,7 @@ import {
   Stethoscope,
   Award
 } from 'lucide-react';
-import { renderSheetToPdf } from '../utils/renderSheetToPdf';
+import { exportarFolhaPdf } from '../utils/folhaA4';
 import { 
   DoctorProfile, 
   Patient, 
@@ -70,6 +70,7 @@ import { db, initializeDefaultTemplates } from '../services/db';
 import { PRESET_LOGOS } from '../data/presetAssets';
 import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
+import { resolverIdentidade } from '../utils/documentoClinico';
 import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import LogoGeneratorModal from './LogoGeneratorModal';
@@ -175,6 +176,20 @@ const CustomUnderline = Mark.create({
   },
 });
 
+/**
+ * HTML renderizado pelo TipTap, ou null se o editor ainda não foi montado.
+ * No TipTap 3, `editor.view` lança exceção quando acessado antes da montagem
+ * (o `?.` não protege), o que derrubava a tela do Editor ao abrir.
+ */
+function htmlDoEditorMontado(ed: { isDestroyed: boolean; view: { dom: Element } } | null | undefined): string | null {
+  if (!ed || ed.isDestroyed) return null;
+  try {
+    return ed.view.dom.innerHTML;
+  } catch {
+    return null;
+  }
+}
+
 export interface FontOption {
   id: string;
   name: string;
@@ -269,8 +284,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
   // Estados do Cabeçalho e Rodapé Editáveis em Tempo Real
   const buildDefaultHeader = useCallback((): DocumentHeaderConfig => {
-    const docClinic = activeContext?.clinicName || doctor?.clinicName?.trim() || 'Rede de Atenção à Saúde';
-    const docAddress = activeContext?.clinicAddress || doctor?.address?.trim() || 'Unidade Básica de Saúde';
+    // Título do timbre: o local de atendimento (ou o próprio médico, se não houver local cadastrado)
+    const { cabecalho } = resolverIdentidade(doctor, activeContext);
     const docCrm = activeContext?.doctorCredentials?.crm || doctor?.crm || '------';
     const docCrmState = activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP';
     const docRqe = activeContext?.doctorCredentials?.rqe || doctor?.rqe;
@@ -282,8 +297,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       doctorName: docName,
       doctorCrm: `CRM-${docCrmState} ${docCrm}${docRqe ? ` • RQE ${docRqe}` : ''}`,
       doctorSpecialty: docSpecialty,
-      clinicName: docClinic,
-      clinicAddress: `${docAddress}${activeContext?.cnes && activeContext.documentFormatting?.showCnesOnHeader ? ` • CNES: ${activeContext.cnes}` : ''}`,
+      clinicName: cabecalho.titulo,
+      clinicAddress: cabecalho.linhas.join(' • '),
       badgeText: 'DOCUMENTO CLÍNICO LIVRE',
       dateText: today,
       showHeader: true,
@@ -293,7 +308,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       footerDocName: docName,
       footerCrm: `Médico(a) — CRM-${docCrmState} ${docCrm}${docRqe ? ` • RQE ${docRqe}` : ''}`,
       footerSpecialty: docSpecialty,
-      footerSubtext: 'Emitido eletronicamente via PresCMed • Documento em conformidade com as resoluções do CFM'
+      footerSubtext: ''
     };
   }, [doctor, activeContext]);
 
@@ -570,20 +585,22 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         class: 'min-h-[200px] leading-relaxed text-inherit selection:bg-sky-200 dark:selection:bg-sky-800'
       }
     },
+    onCreate: ({ editor: ed }) => {
+      const html = htmlDoEditorMontado(ed);
+      if (html !== null) setEditorDomHtml(html);
+    },
     onUpdate: ({ editor: ed }) => {
       setEditorHtml(ed.getHTML());
-      if (ed.view?.dom) {
-        setEditorDomHtml(ed.view.dom.innerHTML);
-      }
+      const html = htmlDoEditorMontado(ed);
+      if (html !== null) setEditorDomHtml(html);
       triggerAutoSave(ed);
     }
   });
 
   // Mantém editorDomHtml continuamente sincronizado com o DOM real do TipTap para espelhamento perfeito na 2ª via
   useEffect(() => {
-    if (editor?.view?.dom) {
-      setEditorDomHtml(editor.view.dom.innerHTML);
-    }
+    const html = htmlDoEditorMontado(editor);
+    if (html !== null) setEditorDomHtml(html);
   }, [editorHtml, editor]);
 
   const [activeLoadedRecipeType, setActiveLoadedRecipeType] = useState<'special' | 'simple' | null>(null);
@@ -1572,21 +1589,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       setIsExportingPdf(true);
       showToast('Renderizando PDF com tipografia e alta fidelidade...');
 
-      if ((document as any).fonts?.ready) {
-        await (document as any).fonts.ready;
-      }
-
       const cleanDocTitle = (currentModel.title || 'Documento_PresCMed').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
       const cleanPatient = (patient?.name || 'Paciente').replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
 
-      await renderSheetToPdf(sheetRef.current, `${cleanDocTitle}_${cleanPatient}.pdf`, {
+      await exportarFolhaPdf(sheetRef.current, `${cleanDocTitle}_${cleanPatient}.pdf`, {
         orientation: pageOrientation === 'landscape' ? 'landscape' : 'portrait',
       });
 
       showToast('PDF de alta fidelidade baixado com sucesso!');
     } catch (err) {
-      console.error('Erro ao gerar PDF nativo no editor:', err);
-      window.print();
+      console.error('Erro ao gerar PDF no editor:', err);
+      showToast('Não foi possível gerar o PDF. Tente novamente ou use Imprimir.');
     } finally {
       setIsExportingPdf(false);
     }
@@ -3006,7 +3019,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   )}
 
                   <div className="flex items-start justify-between gap-4">
-                    {/* Lado Esquerdo: Identificação Médica e Institucional Editáveis Inline */}
+                    {/* Lado Esquerdo: timbre do local de atendimento (o médico é identificado na assinatura) */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start gap-2.5 mb-1">
                         {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
@@ -3027,69 +3040,34 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               </button>
                             </div>
                           </div>
-                        ) : (
-                          <div className="w-8 h-8 rounded-lg bg-sky-900 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                            <ShieldCheck className="w-5 h-5" />
-                          </div>
-                        )}
+                        ) : null}
 
                         <div className="flex-1 min-w-0">
-                          {/* Nome do Médico Editável */}
+                          {/* Nome do local de atendimento: é o título do timbre */}
                           <input
                             type="text"
-                            value={headerConfig.doctorName || ''}
-                            onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
-                            placeholder="DR(A). MÉDICO(A)"
+                            value={headerConfig.clinicName || ''}
+                            onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
+                            placeholder="Nome do local de atendimento"
+                            aria-label="Nome do local de atendimento"
                             style={{ fontFamily: 'inherit' }}
-                            className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                            title="Clique para editar o nome do médico"
+                            className="text-xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
+                            title="Clique para editar o nome do local de atendimento"
                           />
 
-                          {/* CRM e RQE Editáveis */}
+                          {/* Endereço / CNES / contato */}
                           <input
                             type="text"
-                            value={headerConfig.doctorCrm || ''}
-                            onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
-                            placeholder="CRM-SP 000000 • RQE 0000"
+                            value={headerConfig.clinicAddress || ''}
+                            onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
+                            placeholder="Endereço e informações de contato"
+                            aria-label="Endereço e contato do local de atendimento"
                             style={{ fontFamily: 'inherit' }}
-                            className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                            title="Clique para editar CRM e RQE"
+                            className="text-[11px] font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
+                            title="Clique para editar o endereço"
                           />
                         </div>
                       </div>
-
-                      {/* Especialidade Editável */}
-                      <input
-                        type="text"
-                        value={headerConfig.doctorSpecialty || ''}
-                        onChange={e => handleHeaderFieldChange('doctorSpecialty', e.target.value)}
-                        placeholder="Especialidade Médica (Ex: Clínica Médica)"
-                        style={{ fontFamily: 'inherit' }}
-                        className="text-xs font-semibold text-slate-700 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                        title="Clique para editar a especialidade"
-                      />
-
-                      {/* Nome da Instituição / Hospital / Clínica Editável */}
-                      <input
-                        type="text"
-                        value={headerConfig.clinicName || ''}
-                        onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
-                        placeholder="Nome da Instituição ou Clínica de Atendimento"
-                        style={{ fontFamily: 'inherit' }}
-                        className="text-[11px] font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                        title="Clique para editar a instituição ou clínica"
-                      />
-
-                      {/* Endereço / CNES Editável */}
-                      <input
-                        type="text"
-                        value={headerConfig.clinicAddress || ''}
-                        onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
-                        placeholder="Endereço e Informações de Contato"
-                        style={{ fontFamily: 'inherit' }}
-                        className="text-[10px] text-slate-500 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                        title="Clique para editar o endereço"
-                      />
                     </div>
 
                     {/* Lado Direito: Logo (header-right ou secundário), Selo do Tipo de Documento & Data */}

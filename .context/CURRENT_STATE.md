@@ -1,33 +1,38 @@
 # PresCMed — CURRENT STATE (.context)
 
-## Fase Atual: v2.0.7 (Correção Crítica: Emissão de PDF no Android/WebView)
+## Fase atual: saída única de documentos (10/10/2026)
 
-**Correção aplicada (10/10/2026):** "Baixar PDF" não emitia nada na receita nem na APAC/documentos SUS.
-- **Causa raiz:** `pdf.save()` do jsPDF usa internamente o truque `viewSupported` que, em WebViews sem visualizador de PDF embutido, abre uma JANELA POPUP (`window.open`) — bloqueada silenciosamente no app instalado. O clique simplesmente não fazia nada.
-- **Fix:** novo utilitário `src/utils/downloadPdf.ts` (`downloadPdfDoc`): gera o Blob via `doc.output('blob')` e dispara download por `<a download>` anexado ao DOM (remoção tardia de 10s para não cancelar o download no WebView), com fallback dataURI→fetch e, em último caso, abertura em aba.
-- **Pontos de chamada substituídos (todos os fluxos de PDF):**
-  - `PrintPreview.tsx` (receita comum, controle especial, exames)
-  - `SusDocumentsFiller.tsx` (APAC/LME/TFD/LOAS — individual e múltiplos documentos)
-  - `DocumentEditorView.tsx` (Editor A4 / laudos TipTap)
+**Problema resolvido:** a prévia mostrava uma coisa e o arquivo saía outra. Havia cinco desenhos
+independentes do mesmo documento (prévia da tela de receitas, folha do `PrintPreview`, PDF desenhado à
+mão em `pdfGenerator.ts`, Editor A4 e HTML dos documentos SUS).
 
-## Design System (fase anterior, mantido)
-- Paleta fosca/tátil uniforme (tokens únicos em `index.css` + `tailwind.config.js`), cores discretas creme/sálvia, sem tons discrepantes; `PrintablePrescription.tsx` sincronizado.
+**Agora existe uma única folha:** `src/components/documento/` (`FolhaA4` + `DocumentoClinico`). A prévia,
+a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração e Impressão de Documentos".
 
----
+### O que mudou
+- `pdfGenerator.ts` e `jspdf-autotable` removidos; PDF = fotografia da folha exibida (`exportarFolhaPdf`).
+- `html2canvas` → `html2canvas-pro`: o original falhava com as cores `oklch` do Tailwind v4, e o código
+  caía em silêncio em `window.print()` — por isso o PDF do SUS/APAC e do Editor A4 nunca era gerado.
+- Cabeçalho = local de atendimento + logo; médico na assinatura (e no "emitente" da receita especial).
+- Removidos QR code, "Validação Digital CFM" e "Assinatura Eletrônica Válida": o app não assina digitalmente.
+- Receita de controle especial: as duas vias trazem a prescrição completa e o endereço do paciente.
+- Editor A4 voltou a abrir (TipTap 3 lançava exceção ao ler `editor.view` antes da montagem).
+- Atestado: CID-10 começa desmarcado; datas em horário local (antes, à noite, saía o dia seguinte).
+- Deploy: cabeçalhos de segurança efetivos no nginx, Node 24, testes como portão do build, teste de fumaça.
+- `node_modules/` deixou de ser versionado (eram 30.957 arquivos no git).
 
-## Status de Implantação e Nuvem
-- **Deploy único e oficial: Google Cloud Run** (decisão do usuário em 10/10/2026 — Vercel descartada; nenhum arquivo/config Vercel no repositório).
-- Firebase segue apenas como camada de dados/auth (Firestore rules no repo); o app é servido pelo Cloud Run.
-- URL Ativa: `https://prescmed-1044179901556.southamerica-east1.run.app`
-- Alias Direto: `https://prescmed-syqnqsm4iq-rj.a.run.app`
-- **PENDENTE:** commit local `57adf873` (fix PDF) ainda NÃO foi publicado — esta sessão não tem acesso ao GitHub nem credenciais gcloud. Publicar de quem tem as credenciais:
-  1. `git push origin HEAD:main`
-  2. `pwsh -File .\deploy-cloudrun.ps1` (ou `bash deploy-cloudrun.sh`)
-
----
+## Implantação
+- Produção: Cloud Run `prescmed` (southamerica-east1) — https://prescmed-syqnqsm4iq-rj.a.run.app
+- Deploy automático no push em `main` (gatilho `gcpmain` → `cloudbuild.yaml`).
 
 ## Qualidade
-- 83/83 testes aprovados · `tsc --noEmit` limpo · `npm run build` OK (PWA gerado) · design:lint 0 erros
+- 101/101 testes · `tsc --noEmit` limpo · `npm run build` OK · bundle principal 2,34 MB → 1,76 MB.
+- Validado em navegador (dados fictícios): desktop claro e celular escuro geram PDFs idênticos.
 
-## Débitos Técnicos e Blockers
-- Nenhum blocker de código. Único débito: publicar o fix do PDF (push + deploy acima).
+## Pendências (precisam de decisão ou revisão humana)
+1. **Revisão clínica dos documentos SUS** (`susDocumentsCatalog.ts`): há justificativa clínica, CID e
+   função renal pré-preenchidos por padrão — risco de sair texto que o médico não escreveu.
+2. Antimicrobianos (RDC 471/2021) saem hoje com o título "Controle Especial" e avisos da Portaria 344/98.
+3. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
+4. Desativar o gatilho duplicado `gcloudmelki` (us-central1), que refaz o build a cada push sem publicar.
+5. Unificar os 5 cabeçalhos duplicados do Editor A4 (`DocumentEditorView.tsx`, 4.270 linhas).
