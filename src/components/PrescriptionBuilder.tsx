@@ -21,7 +21,8 @@ import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../data/medicationDataba
 import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
-import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
+import { classificarReceita, type RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
+import { DOCUMENTO_DO_REGIME, separarPorRegime, type TipoDocumento } from '../utils/documentoClinico';
 import {
   calcularPrescricaoRapida,
   FrequenciaHorario,
@@ -33,6 +34,27 @@ import { DocumentoClinico } from './documento/DocumentoClinico';
 import { Icon } from './Icon';
 import { AcoesDaReceita } from './AcoesDaReceita';
 import { PediatricCalculator } from './PediatricCalculator';
+
+const REGIMES: RegimeReceita[] = ['simples', 'antimicrobiano', 'controle_especial'];
+
+/** Como cada tipo de receita é apresentado na tela e no texto compartilhado. */
+const REGIME_INFO: Record<RegimeReceita, { rotulo: string; detalhe: string; tituloTexto: string }> = {
+  simples: {
+    rotulo: 'Simples',
+    detalhe: '1 via',
+    tituloTexto: 'RECEITUÁRIO MÉDICO'
+  },
+  antimicrobiano: {
+    rotulo: 'Antimicrobiano',
+    detalhe: '2 vias • válida por 10 dias • a farmácia retém a 2ª via',
+    tituloTexto: 'RECEITUÁRIO MÉDICO — ANTIMICROBIANO (2 vias • válida por 10 dias)'
+  },
+  controle_especial: {
+    rotulo: 'Controle especial',
+    detalhe: '2 vias • a farmácia retém a 1ª via',
+    tituloTexto: 'RECEITUÁRIO DE CONTROLE ESPECIAL (2 vias • retenção na farmácia)'
+  }
+};
 
 interface PrescriptionBuilderProps {
   darkMode: boolean;
@@ -47,7 +69,7 @@ interface PrescriptionBuilderProps {
   onToggleWeightCalc?: (enabled: boolean) => void;
   onClearPrescription?: () => void;
   onClearPatient?: () => void;
-  onNavigateToPrint: (docType?: 'prescription' | 'special_prescription') => void;
+  onNavigateToPrint: (docType?: TipoDocumento) => void;
   onNavigateToPediatricCalc?: () => void;
   onNavigateToEditor?: () => void;
   onNavigateToCertificate?: () => void;
@@ -94,7 +116,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const [selectedRoute, setSelectedRoute] = useState('Uso Oral');
   const [selectedQuantity, setSelectedQuantity] = useState('30 comprimidos');
   const [selectedPosology, setSelectedPosology] = useState('');
-  const [selectedIsSpecial, setSelectedIsSpecial] = useState(false);
+  const [selectedRegime, setSelectedRegime] = useState<RegimeReceita>('simples');
 
   // Estados do Construtor Rápido de Prescrição (Dose, Unidade, Frequência, Duração)
   const [doseAmount, setDoseAmount] = useState<number>(1);
@@ -279,41 +301,18 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const hasWeight = patientWeight > 0;
   const patientName = patient?.name?.trim() || '';
 
-  // Classificação sanitária automática: medicamentos simples vs antibióticos / controle especial (2 vias)
-  const specialItems = useMemo(() => items.filter(i => isSpecialControlOrAntibiotic(i)), [items]);
-  const simpleItems = useMemo(() => items.filter(i => !isSpecialControlOrAntibiotic(i)), [items]);
-  const hasBothPrescriptionTypes = specialItems.length > 0 && simpleItems.length > 0;
+  // Cada regime sanitário sai em um documento próprio (simples, antimicrobiano, controle especial)
+  const porRegime = useMemo(() => separarPorRegime(items), [items]);
+  const regimesComItens = REGIMES.filter((regime) => porRegime[regime].length > 0);
+  const itensEmDuasVias = porRegime.antimicrobiano.length + porRegime.controle_especial.length;
 
-  // Alternância da folha na bancada de prévia A4
-  const [previewTab, setPreviewTab] = useState<'auto' | 'simple' | 'special'>('auto');
+  // Folha mostrada na bancada: a escolhida pelo médico ou, por padrão, a primeira receita com itens
+  const [previewRegime, setPreviewRegime] = useState<RegimeReceita | null>(null);
+  const regimeAtivo: RegimeReceita =
+    previewRegime && porRegime[previewRegime].length > 0 ? previewRegime : (regimesComItens[0] ?? 'simples');
+  const itemsInPreview = porRegime[regimeAtivo];
 
-  // Tipo ativo da folha na prévia
-  const activePreviewType = useMemo<'simple' | 'special'>(() => {
-    if (previewTab === 'special') return 'special';
-    if (previewTab === 'simple') return 'simple';
-    // Se tiver apenas antibióticos/especiais, exibe direto a folha de 2 vias
-    if (specialItems.length > 0 && simpleItems.length === 0) return 'special';
-    return 'simple';
-  }, [previewTab, specialItems.length, simpleItems.length]);
-
-  // Itens exibidos na folha de prévia A4
-  const itemsInPreview = useMemo(() => {
-    if (activePreviewType === 'special') {
-      return specialItems.length > 0 ? specialItems : items;
-    }
-    if (hasBothPrescriptionTypes) {
-      return simpleItems;
-    }
-    return items;
-  }, [activePreviewType, specialItems, simpleItems, hasBothPrescriptionTypes, items]);
-
-  const handlePrintClick = () => {
-    if (activePreviewType === 'special') {
-      onNavigateToPrint('special_prescription');
-    } else {
-      onNavigateToPrint('prescription');
-    }
-  };
+  const handlePrintClick = () => onNavigateToPrint(DOCUMENTO_DO_REGIME[regimeAtivo]);
 
   const isDoctorConfigured = medicoConfigurado(doctor);
   const handleAbrirPerfilMedico = onAbrirPerfilMedico || onOpenDoctorModal;
@@ -408,7 +407,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     const qtdInicial = med.defaultQuantity || '30 comprimidos';
     setSelectedQuantity(qtdInicial);
     setSelectedPosology(med.defaultPosology);
-    setSelectedIsSpecial(isSpecialControlOrAntibiotic(med));
+    setSelectedRegime(classificarReceita(med));
 
     // Deduzir forma da dose para o modo ágil de prescrição
     const lower = med.name.toLowerCase();
@@ -428,8 +427,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
   // Detecção proativa: se o médico digita ou cola um nome de antibiótico ou substância controlada, ativa 2 vias automaticamente
   useEffect(() => {
-    if (selectedMedName.trim() && isSpecialControlOrAntibiotic(selectedMedName)) {
-      setSelectedIsSpecial(true);
+    const detectado = classificarReceita(selectedMedName);
+    if (selectedMedName.trim() && detectado !== 'simples') {
+      setSelectedRegime(detectado);
     }
   }, [selectedMedName]);
 
@@ -448,7 +448,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setSelectedRoute(item.route);
     setSelectedQuantity(item.quantity);
     setSelectedPosology(item.instructions);
-    setSelectedIsSpecial(Boolean(item.isSpecialControl));
+    setSelectedRegime(classificarReceita(item));
 
     const lower = item.name.toLowerCase();
     let unit: UnidadeDose = 'comprimido';
@@ -471,7 +471,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setSelectedMedName('');
     setSelectedQuantity('30 comprimidos');
     setSelectedPosology('');
-    setSelectedIsSpecial(false);
+    setSelectedRegime('simples');
     setDoseAmount(1);
     setDoseUnit('comprimido');
     setDoseFrequency('8/8h');
@@ -490,7 +490,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       return;
     }
 
-    const isSpecial = selectedIsSpecial || isSpecialControlOrAntibiotic(selectedMedName);
+    // O tipo detectado pelo nome prevalece sobre "simples"; o médico só pode torná-lo mais restritivo.
+    const detectado = classificarReceita(selectedMedName);
+    const regime: RegimeReceita =
+      detectado === 'simples' || selectedRegime === 'controle_especial' ? selectedRegime : detectado;
 
     if (editingItemId) {
       const updatedItems = items.map(it => {
@@ -506,7 +509,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             scheduleInterval: doseFrequency,
             instructions: selectedPosology.trim(),
             isContinuous: isContinuousDose || selectedPosology.toLowerCase().includes('contínuo'),
-            isSpecialControl: isSpecial
+            isSpecialControl: regime !== 'simples',
+            regimeReceita: regime
           };
         }
         return it;
@@ -514,9 +518,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
       onUpdateItems(updatedItems);
       setEditingItemId(null);
-      if (isSpecial) {
-        setPreviewTab('special');
-      }
+      setPreviewRegime(regime);
       setItemAddedToast(true);
       setTimeout(() => setItemAddedToast(false), 2000);
 
@@ -524,7 +526,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       setSelectedMedName('');
       setSelectedQuantity('30 comprimidos');
       setSelectedPosology('');
-      setSelectedIsSpecial(false);
+      setSelectedRegime('simples');
       setDoseAmount(1);
       setDoseUnit('comprimido');
       setDoseFrequency('8/8h');
@@ -545,13 +547,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       scheduleTimes: [],
       instructions: selectedPosology.trim(),
       isContinuous: isContinuousDose || selectedPosology.toLowerCase().includes('contínuo'),
-      isSpecialControl: isSpecial
+      isSpecialControl: regime !== 'simples',
+      regimeReceita: regime
     };
 
     onUpdateItems([...items, newItem]);
-    if (isSpecial) {
-      setPreviewTab('special');
-    }
+    setPreviewRegime(regime);
     setItemAddedToast(true);
     setTimeout(() => setItemAddedToast(false), 2000);
 
@@ -559,7 +560,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setSelectedMedName('');
     setSelectedQuantity('30 comprimidos');
     setSelectedPosology('');
-    setSelectedIsSpecial(false);
+    setSelectedRegime('simples');
     setDoseAmount(1);
     setDoseUnit('comprimido');
     setDoseFrequency('8/8h');
@@ -587,24 +588,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const handleCopyText = () => {
     if (items.length === 0 || !medicoConfigurado(doctor)) return;
     let text = '';
-    if (hasBothPrescriptionTypes) {
-      text += '📋 RECEITUÁRIO MÉDICO (Receita Simples)\n------------------------------------\n';
-      simpleItems.forEach((it, idx) => {
+    regimesComItens.forEach((regime) => {
+      text += `📋 ${REGIME_INFO[regime].tituloTexto}\n------------------------------------\n`;
+      porRegime[regime].forEach((it, idx) => {
         text += `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n\n`;
       });
-      text += '📑 RECEITUÁRIO DE CONTROLE ESPECIAL (2 Vias • Retenção na Farmácia)\n------------------------------------\n';
-      specialItems.forEach((it, idx) => {
-        text += `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n\n`;
-      });
-    } else {
-      const headerLabel = items.every(i => isSpecialControlOrAntibiotic(i))
-        ? '📑 RECEITUÁRIO DE CONTROLE ESPECIAL (2 Vias • Retenção na Farmácia)\n------------------------------------\n'
-        : '📋 RECEITUÁRIO MÉDICO\n------------------------------------\n';
-      text += headerLabel;
-      items.forEach((it, idx) => {
-        text += `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n\n`;
-      });
-    }
+    });
     navigator.clipboard.writeText(text);
     setCopiedSuccess(true);
     setTimeout(() => setCopiedSuccess(false), 2000);
@@ -623,24 +612,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
     let text = `📋 *RECEITUÁRIO MÉDICO DIGITAL*\n${doctorLine}${patientLine}${dateLine}------------------------------------\n`;
 
-    if (hasBothPrescriptionTypes) {
-      text += `\n💊 *RECEITUÁRIO MÉDICO (Receita Simples):*\n`;
-      simpleItems.forEach((it, idx) => {
+    regimesComItens.forEach((regime) => {
+      text += `\n💊 *${REGIME_INFO[regime].tituloTexto}:*\n`;
+      porRegime[regime].forEach((it, idx) => {
         text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
       });
-      text += `\n📑 *RECEITUÁRIO DE CONTROLE ESPECIAL (2 Vias • Retenção na Farmácia):*\n`;
-      specialItems.forEach((it, idx) => {
-        text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
-      });
-    } else {
-      const isAllSpecial = items.every(i => isSpecialControlOrAntibiotic(i));
-      text += isAllSpecial
-        ? `\n📑 *RECEITUÁRIO DE CONTROLE ESPECIAL (2 Vias • Portaria 344/98 & RDC 20/2011):*\n`
-        : `\n💊 *PRESCRIÇÃO:*\n`;
-      items.forEach((it, idx) => {
-        text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
-      });
-    }
+    });
 
     text += `\n------------------------------------\n⚠️ _Documento de orientação terapêutica emitido pelo médico. Siga as orientações e horários informados. Para medicamentos controlados e antibióticos, a 1ª via fica retida na farmácia._`;
     return text;
@@ -775,18 +752,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               {/* Atalhos Rápidos para Documentos com este Paciente */}
               <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
                 <span className="text-[11px] text-[var(--text-muted)] dark:text-slate-400">
-                  Emitir com este paciente:
+                  Outros documentos deste paciente:
                 </span>
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() => setIsPediatricDrawerOpen(true)}
-                    className="text-xs px-2.5 py-1 rounded-lg bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300/80 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 hover:border-emerald-400 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
-                    title="Abrir Calculadora Pediátrica em painel lateral sem sair da receita"
-                  >
-                    <Icon name="balanca" className="text-[14px] text-emerald-600 dark:text-emerald-400" />
-                    <span>Dose Pediátrica</span>
-                  </button>
                   {onNavigateToCertificate && (
                     <button
                       type="button"
@@ -807,17 +775,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     >
                       <Icon name="encaminhamento" className="text-[14px] text-blue-600 dark:text-blue-400" />
                       <span>Encaminhamento</span>
-                    </button>
-                  )}
-                  {onNavigateToEditor && (
-                    <button
-                      type="button"
-                      onClick={onNavigateToEditor}
-                      className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
-                      title="Abrir no Editor de Texto Livre"
-                    >
-                      <Icon name="editor" className="text-[14px] text-slate-600 dark:text-slate-400" />
-                      <span>Editor Livre</span>
                     </button>
                   )}
                 </div>
@@ -845,15 +802,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                         Peso (kg)
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => setIsPediatricDrawerOpen(true)}
-                        className="text-[11px] text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-                        title="Abrir Calculadora Pediátrica lateral"
-                      >
-                        <Icon name="balanca" className="text-[12px]" />
-                        <span>Calculadora</span>
-                      </button>
                     </div>
                     <input
                       id="quick-patient-weight"
@@ -887,7 +835,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 title="Abrir Calculadora Pediátrica em painel lateral sem sair da receita"
               >
                 <Icon name="balanca" className="text-[14px] text-emerald-600 dark:text-emerald-400" />
-                <span>Dose Pediátrica</span>
+                <span>Calcular dose pelo peso</span>
               </button>
             </div>
 
@@ -1240,6 +1188,38 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 </select>
               </div>
 
+              {/* Tipo de receita: preenchido pelo nome do medicamento; o médico pode ajustar */}
+              <fieldset>
+                <legend className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                  Tipo de receita
+                </legend>
+                <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Tipo de receita">
+                  {REGIMES.map((regime) => {
+                    const ativo = selectedRegime === regime;
+                    return (
+                      <button
+                        key={regime}
+                        type="button"
+                        role="radio"
+                        aria-checked={ativo}
+                        onClick={() => setSelectedRegime(regime)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                          ativo
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-400'
+                        }`}
+                      >
+                        {REGIME_INFO[regime].rotulo}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-1.5 text-[11px] text-[var(--text-muted)]">
+                  {REGIME_INFO[selectedRegime].detalhe}
+                  {selectedMedName.trim() && classificarReceita(selectedMedName) !== 'simples' && ' — identificado pelo nome do medicamento'}
+                </p>
+              </fieldset>
+
               {/* Ação Primária: Inserir ou Salvar Alterações na Receita */}
               <div className="pt-0.5 flex items-center gap-2">
                 <button
@@ -1275,38 +1255,6 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   </button>
                 )}
               </div>
-
-              {/* Opções Auxiliares: Controle Especial e Cálculo de Dose Pediátrica */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
-                <label className="inline-flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                  <input
-                    type="checkbox"
-                    checked={selectedIsSpecial}
-                    onChange={(e) => setSelectedIsSpecial(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-0 cursor-pointer"
-                  />
-                  <span className="flex items-center gap-1.5 flex-wrap">
-                    <span>Receita de 2 Vias (Controle Especial / Antibiótico)</span>
-                    {selectedIsSpecial && (
-                      <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.2 rounded">
-                        2 Vias Ativo
-                      </span>
-                    )}
-                  </span>
-                </label>
-
-                {onNavigateToPediatricCalc && (
-                  <button
-                    type="button"
-                    onClick={onNavigateToPediatricCalc}
-                    className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer self-start sm:self-auto"
-                    title="Abrir calculadora de doses pediátricas pelo peso"
-                  >
-                    <Icon name="scale" className="text-[14px]" />
-                    <span>Calcular dose pelo peso</span>
-                  </button>
-                )}
-              </div>
             </div>
           </section>
 
@@ -1320,9 +1268,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-navy-800 dark:bg-navy-700 text-white">
                   {items.length}
                 </span>
-                {specialItems.length > 0 && (
+                {itensEmDuasVias > 0 && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                    {specialItems.length} em 2 Vias
+                    {itensEmDuasVias} em 2 vias
                   </span>
                 )}
               </div>
@@ -1391,16 +1339,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               </div>
             </div>
 
-            {/* Aviso de Segregação Sanitária Automática quando houver itens comuns e antimicrobianos/controlados */}
-            {hasBothPrescriptionTypes && (
+            {/* Mais de um tipo de receita na consulta: cada um vira um documento separado */}
+            {regimesComItens.length > 1 && (
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2.5">
                 <Icon name="shield" className="text-amber-600 dark:text-amber-400 text-base shrink-0 mt-0.5" />
-                <div className="space-y-0.5 flex-1 min-w-0">
-                  <p className="font-bold">Segregação Sanitária Automática (Portaria 344/98 e RDC 20/2011)</p>
-                  <p className="text-[11px] leading-relaxed text-amber-800 dark:text-amber-300 font-medium">
-                    Esta consulta contém {simpleItems.length} {simpleItems.length === 1 ? 'medicamento comum' : 'medicamentos comuns'} (Receita Simples) e {specialItems.length} {specialItems.length === 1 ? 'antimicrobiano/controlado' : 'antimicrobianos/controlados'} (Controle Especial • 2 Vias). Eles serão emitidos em folhas separadas no Editor e no PDF para garantir a retenção na farmácia.
-                  </p>
-                </div>
+                <p className="flex-1 min-w-0 leading-relaxed font-medium">
+                  <strong className="font-bold">Esta consulta gera {regimesComItens.length} receitas separadas: </strong>
+                  {regimesComItens.map((regime) => `${REGIME_INFO[regime].rotulo.toLowerCase()} (${porRegime[regime].length})`).join(', ')}.
+                  Cada uma é emitida em sua própria folha.
+                </p>
               </div>
             )}
 
@@ -1411,7 +1358,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             ) : (
               <div className="space-y-2.5">
                 {items.map((it, idx) => {
-                  const isSpecial = isSpecialControlOrAntibiotic(it);
+                  const regimeDoItem = classificarReceita(it);
                   return (
                     <div
                       key={it.id}
@@ -1440,10 +1387,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                               <span>Em Edição</span>
                             </span>
                           )}
-                          {isSpecial && (
+                          {regimeDoItem !== 'simples' && (
                             <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
                               <Icon name="security" className="text-[11px]" />
-                              <span>2 Vias (Controle Especial / Antibiótico)</span>
+                              <span>{REGIME_INFO[regimeDoItem].rotulo} • 2 vias</span>
                             </span>
                           )}
                         </div>
@@ -1521,28 +1468,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         {/* RIGHT COLUMN: Real-Time A4 Document Simulation (Tactile Sheet) */}
         <div className={`xl:col-span-5 space-y-4 ${mobileSection === 'composer' ? 'hidden md:block' : 'block'}`}>
           <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300">
-                Visualização em tempo real (A4)
-              </h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                if (onNavigateToEditor) {
-                  onNavigateToEditor();
-                } else {
-                  handlePrintClick();
-                }
-              }}
-              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer rounded-md focus-visible:ring-2 focus-visible:ring-sky-500"
-              title="Abrir folha oficial no Editor para conferir ou editar livremente"
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span>Editor de Folha A4</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300">
+              Prévia da folha — é exatamente o que será impresso
+            </h3>
           </div>
 
           {/* Aviso de Prévia de Exemplo (fora da folha) */}
@@ -1564,40 +1492,31 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
           )}
 
-          {/* Abas de Alternância da Folha A4 na Prévia quando houver prescrição mista */}
-          {hasBothPrescriptionTypes && (
+          {/* Uma aba por receita quando a consulta gera mais de um documento */}
+          {regimesComItens.length > 1 && (
             <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/80 dark:bg-navy-900 border border-slate-300 dark:border-navy-700 w-full overflow-x-auto shadow-tactile-sm">
-              <button
-                type="button"
-                onClick={() => setPreviewTab('simple')}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                  activePreviewType === 'simple'
-                    ? 'bg-white dark:bg-navy-800 text-blue-700 dark:text-blue-300 shadow-tactile-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <FileText className="w-3.5 h-3.5 shrink-0" />
-                <span>Receita Simples ({simpleItems.length})</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setPreviewTab('special')}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                  activePreviewType === 'special'
-                    ? 'bg-amber-600 text-white shadow-tactile-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Icon name="security" className="text-[14px] shrink-0" />
-                <span>Controle Especial • 2 Vias ({specialItems.length})</span>
-              </button>
+              {regimesComItens.map((regime) => (
+                <button
+                  key={regime}
+                  type="button"
+                  onClick={() => setPreviewRegime(regime)}
+                  aria-pressed={regimeAtivo === regime}
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                    regimeAtivo === regime
+                      ? 'bg-white dark:bg-navy-800 text-blue-700 dark:text-blue-300 shadow-tactile-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span>{REGIME_INFO[regime].rotulo} ({porRegime[regime].length})</span>
+                </button>
+              ))}
             </div>
           )}
 
           {/* Folha A4 da bancada: o mesmo documento que será impresso / exportado em PDF */}
-          <FolhaA4 orientacao={activePreviewType === 'special' ? 'landscape' : 'portrait'}>
+          <FolhaA4 orientacao={regimeAtivo === 'simples' ? 'portrait' : 'landscape'}>
             <DocumentoClinico
-              tipo={activePreviewType === 'special' ? 'special_prescription' : 'prescription'}
+              tipo={DOCUMENTO_DO_REGIME[regimeAtivo]}
               doctor={doctor}
               patient={patient}
               activeContext={activeContext}

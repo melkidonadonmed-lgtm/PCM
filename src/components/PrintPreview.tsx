@@ -8,7 +8,6 @@ import {
   Check,
   Layers,
   ArrowLeft,
-  ArrowRight,
   Loader2,
   Maximize2,
   Minimize2,
@@ -19,12 +18,14 @@ import {
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext, WatermarkType } from '../types';
 import { exportarFolhaPdf } from '../utils/folhaA4';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
-import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
+import type { RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import {
+  DOCUMENTO_DO_REGIME,
   nomeArquivoDocumento,
   nomeDoPaciente,
   orientacaoDoDocumento,
   resolverIdentidade,
+  separarPorRegime,
   type TipoDocumento
 } from '../utils/documentoClinico';
 import { FolhaA4 } from './documento/FolhaA4';
@@ -46,6 +47,12 @@ interface PrintPreviewProps {
 }
 
 const AVISO_SEM_MEDICO = 'Configure nome e CRM do médico para emitir documentos';
+const REGIMES: RegimeReceita[] = ['simples', 'antimicrobiano', 'controle_especial'];
+const NOME_DO_REGIME: Record<RegimeReceita, string> = {
+  simples: 'simples',
+  antimicrobiano: 'antimicrobiano',
+  controle_especial: 'controle especial'
+};
 
 /**
  * Tela de emissão: mostra a folha A4 do documento e as ações de saída. A
@@ -67,20 +74,23 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 }) => {
   const isConfigured = medicoConfigurado(doctor);
 
-  // Segregação sanitária automática: medicamentos simples vs antibióticos / controle especial (2 vias)
-  const specialPrescriptionItems = useMemo(
-    () => prescriptionItems.filter(i => isSpecialControlOrAntibiotic(i)),
-    [prescriptionItems]
-  );
-  const simplePrescriptionItems = useMemo(
-    () => prescriptionItems.filter(i => !isSpecialControlOrAntibiotic(i)),
-    [prescriptionItems]
-  );
-  const apenasEspeciais = specialPrescriptionItems.length > 0 && simplePrescriptionItems.length === 0;
+  // Cada regime sanitário sai em um documento próprio: receita simples, antimicrobiano
+  // (2 vias, RDC 471/2021) e controle especial (2 vias, Portaria 344/98).
+  const porRegime = useMemo(() => separarPorRegime(prescriptionItems), [prescriptionItems]);
+  const itensDoTipo = (tipo: TipoDocumento): PrescriptionItem[] | null => {
+    if (tipo === 'prescription') return porRegime.simples;
+    if (tipo === 'antimicrobial_prescription') return porRegime.antimicrobiano;
+    if (tipo === 'special_prescription') return porRegime.controle_especial;
+    return null;
+  };
+  const receitasComItens = REGIMES.filter((regime) => porRegime[regime].length > 0);
 
-  // Se todos os medicamentos forem especiais, abre direto na aba de 2 vias
-  const resolverTipoInicial = (tipo: TipoDocumento): TipoDocumento =>
-    tipo === 'prescription' && apenasEspeciais ? 'special_prescription' : tipo;
+  // Se a receita pedida não tem itens, abre a primeira receita que tiver
+  const resolverTipoInicial = (tipo: TipoDocumento): TipoDocumento => {
+    const itens = itensDoTipo(tipo);
+    if (itens === null || itens.length > 0 || receitasComItens.length === 0) return tipo;
+    return DOCUMENTO_DO_REGIME[receitasComItens[0]];
+  };
 
   const [docType, setDocType] = useState<TipoDocumento>(() => resolverTipoInicial(initialDocType));
   const [textoCopiado, setTextoCopiado] = useState(false);
@@ -96,7 +106,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   useEffect(() => {
     setDocType(resolverTipoInicial(initialDocType));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialDocType, apenasEspeciais]);
+  }, [initialDocType, receitasComItens.join(',')]);
 
   useEffect(() => {
     if (activeContext?.watermarkType !== undefined) {
@@ -104,16 +114,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     }
   }, [activeContext?.watermarkType]);
 
-  // Itens da folha conforme a aba selecionada (simples e especiais nunca se misturam na mesma folha)
-  const itensDaFolha = useMemo(() => {
-    // Sem item classificado como especial, a aba de 2 vias aceita a receita inteira
-    // (o médico pode emitir em 2 vias um medicamento que a detecção automática não reconheceu).
-    if (docType === 'special_prescription') {
-      return specialPrescriptionItems.length > 0 ? specialPrescriptionItems : prescriptionItems;
-    }
-    if (docType === 'prescription') return simplePrescriptionItems;
-    return prescriptionItems;
-  }, [docType, specialPrescriptionItems, simplePrescriptionItems, prescriptionItems]);
+  // Itens da folha conforme a aba selecionada (regimes diferentes nunca dividem a mesma folha)
+  const itensDaFolha = itensDoTipo(docType) ?? prescriptionItems;
 
   const identidade = resolverIdentidade(doctor, activeContext);
   const patientName = nomeDoPaciente(patient, identidade.exemplo, [certificate?.patientName, referral?.patientName]);
@@ -148,11 +150,13 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     const patientLine = patientName !== 'Não identificado' ? `👤 *Paciente:* ${patientName}${patientWeight ? ` (${patientWeight} kg)` : ''}\n` : '';
     const header = `📋 *DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}📅 *Data:* ${dateStr}\n------------------------------------\n`;
 
-    if (docType === 'prescription' || docType === 'special_prescription') {
+    if (itensDoTipo(docType) !== null) {
       if (itensDaFolha.length === 0) return '';
       const docLabel = docType === 'special_prescription'
-        ? 'RECEITUÁRIO DE CONTROLE ESPECIAL (2 VIAS • PORTARIA 344/98 & RDC 20/2011)'
-        : 'RECEITUÁRIO MÉDICO';
+        ? 'RECEITUÁRIO DE CONTROLE ESPECIAL (2 VIAS • PORTARIA 344/98)'
+        : docType === 'antimicrobial_prescription'
+          ? 'RECEITUÁRIO MÉDICO — ANTIMICROBIANO (2 VIAS • VÁLIDA POR 10 DIAS • RDC 471/2021)'
+          : 'RECEITUÁRIO MÉDICO';
       let text = `${header}💊 *${docLabel}:*\n`;
       itensDaFolha.forEach((it, idx) => {
         text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
@@ -228,8 +232,14 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   };
 
   const abas: Array<{ id: TipoDocumento; rotulo: string; icone: typeof FileText }> = [
-    { id: 'prescription', rotulo: `Receita Simples (${simplePrescriptionItems.length})`, icone: FileText },
-    { id: 'special_prescription', rotulo: `Controle Especial • 2 Vias (${specialPrescriptionItems.length})`, icone: Layers },
+    { id: 'prescription', rotulo: `Receita Simples (${porRegime.simples.length})`, icone: FileText },
+    // As receitas de 2 vias só aparecem quando há medicamento desse regime na consulta
+    ...(porRegime.antimicrobiano.length > 0
+      ? [{ id: 'antimicrobial_prescription' as const, rotulo: `Antimicrobiano • 2 Vias (${porRegime.antimicrobiano.length})`, icone: Layers }]
+      : []),
+    ...(porRegime.controle_especial.length > 0
+      ? [{ id: 'special_prescription' as const, rotulo: `Controle Especial • 2 Vias (${porRegime.controle_especial.length})`, icone: Layers }]
+      : []),
     { id: 'exams', rotulo: `Exames (${exams.length})`, icone: FlaskConical },
     { id: 'certificate', rotulo: 'Atestado', icone: Award },
     { id: 'referral', rotulo: 'Encaminhamento', icone: Share2 }
@@ -398,18 +408,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
         </div>
       </div>
 
-      {/* Atalhos entre receita simples e controle especial quando a aba atual está vazia */}
-      {docType === 'prescription' && simplePrescriptionItems.length === 0 && specialPrescriptionItems.length > 0 && (
-        <div className="no-print flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border text-xs font-semibold bg-sky-500/10 text-sky-900 dark:text-sky-200 border-sky-500/25">
-          <span>Todos os medicamentos desta consulta são antimicrobianos ou controlados (2 vias).</span>
-          <button
-            type="button"
-            onClick={() => setDocType('special_prescription')}
-            className="inline-flex items-center gap-1.5 font-bold hover:underline shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
-          >
-            <span>Ver Controle Especial</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+      {/* Mais de uma receita na mesma consulta: cada uma é um documento e precisa ser emitida */}
+      {receitasComItens.length > 1 && itensDoTipo(docType) !== null && (
+        <div role="status" className="no-print px-4 py-2.5 rounded-xl border text-xs font-semibold bg-sky-500/10 text-sky-900 dark:text-sky-200 border-sky-500/25">
+          Esta consulta gera {receitasComItens.length} receitas separadas ({receitasComItens.map((r) => NOME_DO_REGIME[r]).join(', ')}).
+          Emita cada uma pela sua aba.
         </div>
       )}
 

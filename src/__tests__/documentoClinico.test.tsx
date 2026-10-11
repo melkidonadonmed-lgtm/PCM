@@ -120,7 +120,7 @@ const folha = (tipo: TipoDocumento, extra: Partial<DocumentoClinicoProps> = {}):
   );
 
 const ocorrencias = (texto: string, trecho: string) => texto.split(trecho).length - 1;
-const TODOS: TipoDocumento[] = ['prescription', 'special_prescription', 'exams', 'certificate', 'referral'];
+const TODOS: TipoDocumento[] = ['prescription', 'antimicrobial_prescription', 'special_prescription', 'exams', 'certificate', 'referral'];
 
 describe('Folha única do documento clínico (prévia = impressão = PDF)', () => {
   it('nenhum documento traz selo de validação digital, QR code ou assinatura eletrônica', () => {
@@ -201,8 +201,9 @@ describe('Folha única do documento clínico (prévia = impressão = PDF)', () =
 });
 
 describe('Regras de conteúdo do documento (utils/documentoClinico)', () => {
-  it('receita de controle especial é paisagem; os demais documentos, retrato', () => {
+  it('receitas de 2 vias são paisagem; os demais documentos, retrato', () => {
     expect(orientacaoDoDocumento('special_prescription')).toBe('landscape');
+    expect(orientacaoDoDocumento('antimicrobial_prescription')).toBe('landscape');
     (['prescription', 'exams', 'certificate', 'referral'] as TipoDocumento[]).forEach((tipo) => {
       expect(orientacaoDoDocumento(tipo)).toBe('portrait');
     });

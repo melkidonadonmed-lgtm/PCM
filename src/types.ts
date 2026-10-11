@@ -70,6 +70,12 @@ export interface AdultMedication {
   isSpecialControl?: boolean;
 }
 
+/**
+ * Regime sanitário da receita: simples (1 via), antimicrobiano (2 vias, RDC 471/2021)
+ * ou controle especial (2 vias, Portaria 344/98). Cada regime sai em um documento próprio.
+ */
+export type RegimeReceita = 'simples' | 'antimicrobiano' | 'controle_especial';
+
 export interface PrescriptionItem {
   id: string;
   name: string;
@@ -83,7 +89,8 @@ export interface PrescriptionItem {
   durationDays?: number;
   instructions: string; // Detailed instructions
   isContinuous: boolean;
-  isSpecialControl?: boolean; // Receita de controle especial (C1, B1, etc.)
+  isSpecialControl?: boolean; // Sai em receita de 2 vias (antimicrobiano ou controle especial)
+  regimeReceita?: RegimeReceita; // Tipo de receita escolhido no formulário; sem ele, vale a detecção pelo nome
   calculatedFromWeight?: number; // If calculated for a specific weight
 }
 

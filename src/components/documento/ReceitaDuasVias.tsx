@@ -9,7 +9,11 @@ import {
 import { CabecalhoInstitucional } from './CabecalhoInstitucional';
 import { AssinaturaMedico } from './AssinaturaMedico';
 
-interface ReceitaControleEspecialProps {
+/** Regime da receita de 2 vias: muda título, via retida pela farmácia e quadros regulamentares. */
+export type RegimeDuasVias = 'controle_especial' | 'antimicrobiano';
+
+interface ReceitaDuasViasProps {
+  regime: RegimeDuasVias;
   identidade: IdentidadeDocumento;
   patient: Patient;
   nomePaciente: string;
@@ -49,11 +53,12 @@ const Campo: React.FC<{ nome: string; largura?: string }> = ({ nome, largura = '
   </span>
 );
 
-interface ViaProps extends ReceitaControleEspecialProps {
+interface ViaProps extends ReceitaDuasViasProps {
   via: 1 | 2;
 }
 
-const Via: React.FC<ViaProps> = ({ via, identidade, patient, nomePaciente, items, emissao }) => {
+const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePaciente, items, emissao }) => {
+  const controleEspecial = regime === 'controle_especial';
   const { medico } = identidade;
   const endereco = enderecoDoPaciente(patient);
   const documento = patient?.documentNumber?.trim() || '';
@@ -65,14 +70,21 @@ const Via: React.FC<ViaProps> = ({ via, identidade, patient, nomePaciente, items
 
       <div style={{ marginTop: 7, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
         <h1 style={{ margin: 0, fontFamily: SERIFA, fontSize: 15, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TINTA }}>
-          Receituário de Controle Especial
+          {controleEspecial ? 'Receituário de Controle Especial' : 'Receituário Médico'}
         </h1>
         <p style={{ margin: 0, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: TINTA, whiteSpace: 'nowrap' }}>
-          {via === 1 ? '1ª via — Farmácia (retenção)' : '2ª via — Paciente (orientação)'}
+          {controleEspecial
+            ? (via === 1 ? '1ª via — Farmácia (retenção)' : '2ª via — Paciente (orientação)')
+            : (via === 1 ? '1ª via — Paciente' : '2ª via — Farmácia (retenção)')}
         </p>
       </div>
+      {!controleEspecial && (
+        <p style={{ margin: '2px 0 0', fontSize: 8.5, color: TINTA_SUAVE }}>
+          Antimicrobiano — receita válida por 10 dias a contar da data de emissão (RDC Anvisa nº 471/2021).
+        </p>
+      )}
 
-      {/* Identificação do emitente (exigida pela Portaria SVS/MS nº 344/98) */}
+      {/* Identificação do emitente (exigida nos dois regimes) */}
       <div style={{ ...quadro, marginTop: 7 }}>
         <p style={rotulo}>Identificação do emitente</p>
         <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700 }}>
@@ -87,7 +99,7 @@ const Via: React.FC<ViaProps> = ({ via, identidade, patient, nomePaciente, items
         </p>
       </div>
 
-      {/* Identificação do paciente, com endereço */}
+      {/* Identificação do paciente; o endereço é exigido só na receita de controle especial */}
       <div style={{ ...quadro, marginTop: 5 }}>
         <p style={rotulo}>Paciente</p>
         <p style={{ margin: '2px 0 0', fontSize: 11 }}>
@@ -95,10 +107,12 @@ const Via: React.FC<ViaProps> = ({ via, identidade, patient, nomePaciente, items
           {documento && <span style={{ color: TINTA_SUAVE }}> — Doc. {documento}</span>}
           {idade && <span style={{ color: TINTA_SUAVE }}> — {idade}</span>}
         </p>
-        {endereco ? (
-          <p style={{ margin: 0, fontSize: 9, color: TINTA_SUAVE }}>Endereço: {endereco}</p>
-        ) : (
-          <Campo nome="Endereço" />
+        {controleEspecial && (
+          endereco ? (
+            <p style={{ margin: 0, fontSize: 9, color: TINTA_SUAVE }}>Endereço: {endereco}</p>
+          ) : (
+            <Campo nome="Endereço" />
+          )
         )}
       </div>
 
@@ -107,7 +121,7 @@ const Via: React.FC<ViaProps> = ({ via, identidade, patient, nomePaciente, items
         <p style={{ ...rotulo, fontSize: 8, color: TINTA_SUAVE }}>Prescrição</p>
         {items.length === 0 ? (
           <p style={{ margin: '28px 0', textAlign: 'center', fontFamily: SERIFA, fontStyle: 'italic', fontSize: 13, color: TINTA_APAGADA }}>
-            Nenhum antimicrobiano ou medicamento de controle especial prescrito.
+            {controleEspecial ? 'Nenhum medicamento de controle especial prescrito.' : 'Nenhum antimicrobiano prescrito.'}
           </p>
         ) : (
           agruparPorVia(items).map((grupo) => (
@@ -143,7 +157,15 @@ const Via: React.FC<ViaProps> = ({ via, identidade, patient, nomePaciente, items
         )}
       </div>
 
-      {via === 1 ? (
+      {!controleEspecial ? (
+        // Antimicrobiano: a farmácia anota a dispensação nas duas vias (RDC 471/2021)
+        <div style={{ ...quadro, marginTop: 8, fontSize: 8.5 }}>
+          <p style={rotulo}>Dispensação — preenchimento da farmácia</p>
+          <Campo nome="Data" largura="28%" />{' '}
+          <Campo nome="Quantidade aviada" largura="38%" />{' '}
+          <Campo nome="Lote" largura="30%" />
+        </div>
+      ) : via === 1 ? (
         <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
           <div style={{ ...quadro, fontSize: 8.5 }}>
             <p style={rotulo}>Identificação do comprador</p>
@@ -180,11 +202,14 @@ const Via: React.FC<ViaProps> = ({ via, identidade, patient, nomePaciente, items
 };
 
 /**
- * Receita de controle especial em folha única A4 paisagem, com as 2 vias lado
- * a lado e linha de corte central (1ª via: retenção na farmácia; 2ª via:
- * orientação ao paciente). As duas vias trazem a mesma prescrição completa.
+ * Receita em 2 vias em folha única A4 paisagem, lado a lado, com linha de corte
+ * central. As duas vias trazem a mesma prescrição completa. São dois regimes:
+ *  - controle especial (Portaria SVS/MS nº 344/98): a farmácia retém a 1ª via;
+ *    traz os quadros de comprador e fornecedor e o endereço do paciente;
+ *  - antimicrobiano (RDC Anvisa nº 471/2021): a farmácia retém a 2ª via e a 1ª
+ *    volta ao paciente; receita válida por 10 dias.
  */
-export const ReceitaControleEspecial: React.FC<ReceitaControleEspecialProps> = (props) => (
+export const ReceitaDuasVias: React.FC<ReceitaDuasViasProps> = (props) => (
   <div
     style={{
       position: 'relative',
@@ -206,4 +231,4 @@ export const ReceitaControleEspecial: React.FC<ReceitaControleEspecialProps> = (
   </div>
 );
 
-export default ReceitaControleEspecial;
+export default ReceitaDuasVias;
