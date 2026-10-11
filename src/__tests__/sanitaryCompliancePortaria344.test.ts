@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
-import { PrescriptionItem } from '../types';
-import { generateMedicalPDF } from '../utils/pdfGenerator';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { DoctorProfile, Patient, PrescriptionItem } from '../types';
+import { DocumentoClinico } from '../components/documento/DocumentoClinico';
+import { orientacaoDoDocumento } from '../utils/documentoClinico';
+import { alturaFolhaPx, larguraFolhaPx } from '../utils/folhaA4';
 
 describe('Conformidade Sanitária: Portaria SVS/MS nº 344/98 e RDC 784/2023 (Controle Especial)', () => {
   it('deve identificar corretamente medicamentos sujeitos a controle especial (Lista C1 e B1)', () => {
@@ -102,24 +106,8 @@ describe('Conformidade Sanitária: Portaria SVS/MS nº 344/98 e RDC 784/2023 (Co
     expect(specialPrescription[0].isSpecialControl).toBe(true);
   });
 
-  it('deve validar a presença dos campos obrigatórios da Portaria 344/98 na receita especial de 2 vias', () => {
-    // Especificação dos campos regulatórios de Identificação do Comprador e Fornecedor
-    const buyerFields = ['Nome', 'RG', 'CPF', 'Endereço', 'Cidade/UF', 'Telefone'];
-    const supplierFields = ['Farmácia/Drogaria', 'Assinatura do Farmacêutico', 'Data', 'Lote', 'Quantidade Dispensada'];
-
-    buyerFields.forEach((field) => {
-      expect(field).toBeDefined();
-      expect(typeof field).toBe('string');
-    });
-
-    supplierFields.forEach((field) => {
-      expect(field).toBeDefined();
-      expect(typeof field).toBe('string');
-    });
-  });
-
-  it('deve gerar PDF em modo Paisagem (297x210 mm) com folha única de 2 vias para Controle Especial', () => {
-    const mockDoctor = {
+  describe('folha de 2 vias (a mesma usada na prévia, na impressão e no PDF)', () => {
+    const doctor: DoctorProfile = {
       name: 'Dra. Gabriela Silveira',
       crm: '123456',
       crmState: 'SP',
@@ -134,13 +122,13 @@ describe('Conformidade Sanitária: Portaria SVS/MS nº 344/98 e RDC 784/2023 (Co
       stampText: ''
     };
 
-    const mockPatient = {
+    const patient: Patient = {
       id: 'pat-1',
       name: 'Carlos Eduardo Souza',
       weightKg: 72,
       birthDate: '1985-06-15',
       ageText: '41 anos',
-      gender: 'male' as const,
+      gender: 'male',
       documentNumber: '123.456.789-00',
       phone: '(11) 98888-7777',
       allergies: []
@@ -155,7 +143,7 @@ describe('Conformidade Sanitária: Portaria SVS/MS nº 344/98 e RDC 784/2023 (Co
         doseCalculatedText: '1 comprimido',
         frequencyText: 'à noite',
         scheduleInterval: '24/24h',
-        scheduleTimes: ['22:00'],
+        scheduleTimes: [],
         instructions: 'Tomar 1 comprimido via oral à noite ao deitar',
         durationDays: 30,
         route: 'Oral',
@@ -164,49 +152,63 @@ describe('Conformidade Sanitária: Portaria SVS/MS nº 344/98 e RDC 784/2023 (Co
       }
     ];
 
-    const pdfSpecial = generateMedicalPDF({
-      docType: 'special_prescription',
-      doctor: mockDoctor,
-      patient: mockPatient,
-      prescriptionItems: specialItems,
-      exams: [],
-      examIndication: '',
-      certificate: {
-        id: 'c1',
-        patientName: 'Carlos Eduardo Souza',
-        documentNumber: '123.456.789-00',
-        daysOff: 2,
-        startDate: '2026-09-30',
-        endDate: '2026-10-02',
-        periodText: '',
-        includeCID: false,
-        cid10Code: '',
-        cid10Description: '',
-        observations: '',
-        cityDateText: ''
-      },
-      referral: {
-        id: 'r1',
-        patientName: 'Carlos Eduardo Souza',
-        documentNumber: '123.456.789-00',
-        destinationSpecialty: 'Neurologia',
-        destinationInstitution: '',
-        priority: 'prioritario',
-        reason: '',
-        clinicalSummary: '',
-        relevantExams: '',
-        hypothesisCID: '',
-        date: '2026-09-30'
-      }
+    const folha = (p: Patient = patient) =>
+      renderToStaticMarkup(
+        React.createElement(DocumentoClinico, {
+          tipo: 'special_prescription',
+          doctor,
+          patient: p,
+          prescriptionItems: specialItems
+        })
+      );
+    const ocorrencias = (texto: string, trecho: string) => texto.split(trecho).length - 1;
+
+    it('sai em folha única A4 paisagem', () => {
+      expect(orientacaoDoDocumento('special_prescription')).toBe('landscape');
+      expect(larguraFolhaPx('landscape')).toBeGreaterThan(alturaFolhaPx('landscape'));
+      // A4 a 96 dpi: 297 mm x 210 mm
+      expect(larguraFolhaPx('landscape')).toBe(1123);
+      expect(alturaFolhaPx('landscape')).toBe(794);
     });
 
-    // Validar dimensões de modo Paisagem (A4: 297mm largura x 210mm altura)
-    const width = Math.round(pdfSpecial.internal.pageSize.getWidth());
-    const height = Math.round(pdfSpecial.internal.pageSize.getHeight());
+    it('traz as duas vias identificadas, com a mesma prescrição completa em ambas', () => {
+      const html = folha();
+      expect(html).toContain('1ª via — Farmácia (retenção)');
+      expect(html).toContain('2ª via — Paciente (orientação)');
+      expect(ocorrencias(html, 'Receituário de Controle Especial')).toBe(2);
+      expect(ocorrencias(html, 'Clonazepam 2 mg')).toBe(2);
+      expect(ocorrencias(html, 'Tomar 1 comprimido via oral à noite ao deitar')).toBe(2);
+      expect(ocorrencias(html, '1 caixa')).toBe(2);
+    });
 
-    expect(width).toBe(297);
-    expect(height).toBe(210);
-    // Folha única econômica com as duas vias lado a lado
-    expect(pdfSpecial.getNumberOfPages()).toBe(1);
+    it('identifica o emitente (nome, CRM/UF, endereço) e o paciente com endereço nas duas vias', () => {
+      const html = folha({ ...patient, address: 'Rua das Flores, 10', city: 'São Paulo', state: 'SP' });
+      expect(ocorrencias(html, 'Identificação do emitente')).toBe(2);
+      expect(html).toContain('Dra. Gabriela Silveira');
+      expect(html).toContain('CRM-SP 123456 • RQE 7890');
+      expect(html).toContain('Av. Paulista, 1000');
+      expect(ocorrencias(html, 'Carlos Eduardo Souza')).toBe(2);
+      expect(ocorrencias(html, 'Endereço: Rua das Flores, 10, São Paulo - SP')).toBe(2);
+    });
+
+    it('traz os quadros de comprador e fornecedor com os campos regulamentares na via da farmácia', () => {
+      const html = folha();
+      expect(html).toContain('Identificação do comprador');
+      ['Nome', 'RG', 'Órgão emissor', 'Endereço', 'Cidade/UF', 'Telefone'].forEach((campo) => {
+        expect(html, campo).toContain(`${campo}:`);
+      });
+      expect(html).toContain('Identificação do fornecedor');
+      ['Farmácia/Drogaria', 'Quantidade dispensada', 'Lote', 'Data'].forEach((campo) => {
+        expect(html, campo).toContain(`${campo}:`);
+      });
+      expect(html).toContain('Assinatura do farmacêutico');
+    });
+
+    it('não declara assinatura eletrônica nem validação digital inexistentes', () => {
+      const html = folha();
+      expect(html).not.toMatch(/assinatura eletr[ôo]nica/i);
+      expect(html).not.toMatch(/valida[çc][ãa]o digital/i);
+      expect(html).not.toContain('prescmed.digital');
+    });
   });
 });

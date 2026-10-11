@@ -1065,6 +1065,31 @@
     box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.6), 0 6px 16px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
   }
 
+  /* Folha A4 em tamanho real (components/documento/FolhaA4.tsx): fonte única da
+     prévia, da impressão e do PDF. Diagramação fixa, sem variantes responsivas. */
+  .folha-a4 {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 15mm 16mm 14mm;
+    border-radius: 2px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  .folha-a4--paisagem {
+    padding: 9mm 10mm;
+  }
+
+  /* Cópia da folha montada só durante a impressão (invisível na tela) */
+  #pcm-print-root {
+    display: none;
+  }
+
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -1327,6 +1352,40 @@
     .print-page-break {
       break-before: page !important;
       page-break-before: always !important;
+    }
+
+    /* Impressão fiel da FolhaA4: a cópia em #pcm-print-root é o único conteúdo
+       da página, em tamanho real (a regra @page é injetada junto com a cópia). */
+    body.pcm-imprimindo {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #FFFFFF !important;
+    }
+
+    body.pcm-imprimindo > *:not(#pcm-print-root) {
+      display: none !important;
+    }
+
+    #pcm-print-root {
+      display: block !important;
+    }
+
+    #pcm-print-root,
+    #pcm-print-root * {
+      visibility: visible !important;
+    }
+
+    #pcm-print-root .folha-a4 {
+      zoom: 1 !important;
+      width: 210mm !important;
+      min-height: 296mm !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+    }
+
+    #pcm-print-root .folha-a4--paisagem {
+      width: 297mm !important;
+      min-height: 209mm !important;
     }
   }
 

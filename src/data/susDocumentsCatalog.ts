@@ -204,7 +204,7 @@ ${data.clinicalJustification || item.defaultJustification}
 ---
 
 ## 1. Identificação da Unidade e do Médico Solicitante
-- **Unidade de Saúde**: ${data.doctorClinicName || 'Unidade Básica de Saúde'} | **CNES**: ${data.doctorCnes || '2678942'}
+- **Unidade de Saúde**: ${data.doctorClinicName || 'Unidade Básica de Saúde'} | **CNES**: ${data.doctorCnes || '—'}
 - **Médico(a) Solicitante**: ${data.doctorName || 'Dr(a). Médico(a)'}
 - **CRM / UF**: ${data.doctorCrm}-${data.doctorCrmState || 'SP'} | **Especialidade**: ${data.doctorSpecialty || 'Clínica Médica'}${data.doctorCpf ? ` | **CPF Médico**: ${data.doctorCpf}` : ''}
 - **Data da Solicitação**: ${today}
@@ -244,6 +244,12 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
     data.patientCity ? `${data.patientCity} - ${data.patientState || 'SP'}` : '',
     data.patientCep ? `CEP: ${data.patientCep}` : ''
   ].filter(Boolean).join(', ') || 'Endereço não informado';
+  // Nascimento em dd/mm/aaaa e idade sem repetir a unidade ("36 anos", nunca "36 anos anos")
+  const nascimento = /^\d{4}-\d{2}-\d{2}$/.test(data.patientBirthDate || '')
+    ? data.patientBirthDate.split('-').reverse().join('/')
+    : (data.patientBirthDate || '—');
+  const idadeBruta = (data.patientAge || '').trim();
+  const idade = idadeBruta && !/[a-zA-Z]/.test(idadeBruta) ? `${idadeBruta} anos` : idadeBruta;
 
   return `
     <div class="sus-document-rendered" style="font-family: inherit; line-height: 1.5; color: #0F172A;">
@@ -255,7 +261,7 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
       <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
           <span><strong>Unidade Solicitante:</strong> ${data.doctorClinicName || 'Unidade de Saúde'}</span>
-          <span><strong>CNES:</strong> ${data.doctorCnes || '2678942'}</span>
+          <span><strong>CNES:</strong> ${data.doctorCnes || '—'}</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span><strong>Profissional:</strong> ${data.doctorName || 'Dr(a). Médico(a)'} &nbsp;|&nbsp; <strong>CRM:</strong> ${data.doctorCrm}-${data.doctorCrmState || 'SP'}</span>
@@ -268,7 +274,7 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
           IDENTIFICAÇÃO DO PACIENTE
         </p>
         <p style="margin: 3px 0;"><strong>Paciente:</strong> ${data.patientName || 'Não identificado'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>CNS (Cartão SUS):</strong> ${data.patientCns || '—'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>CPF:</strong> ${data.patientCpf || '—'}</p>
-        <p style="margin: 3px 0;"><strong>Nascimento:</strong> ${data.patientBirthDate || '—'} (${data.patientAge || '—'} anos) &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Mãe:</strong> ${data.patientMotherName || '—'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Tel:</strong> ${data.patientPhone || '—'}</p>
+        <p style="margin: 3px 0;"><strong>Nascimento:</strong> ${nascimento}${idade ? ` (${idade})` : ''} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Mãe:</strong> ${data.patientMotherName || '—'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Tel:</strong> ${data.patientPhone || '—'}</p>
         <p style="margin: 3px 0;"><strong>Endereço:</strong> ${fullAddress}</p>
       </div>
 
@@ -289,8 +295,7 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
 
       <div style="margin-top: 32px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 11px;">
         <div>
-          <p style="margin: 0;">${data.patientCity || 'Local'}, ${today}</p>
-          <p style="margin: 2px 0 0 0; font-size: 9px; color: #64748B;">Documento emitido eletronicamente em conformidade com o SUS / CFM</p>
+          <p style="margin: 0;">${data.patientCity ? `${data.patientCity}, ` : ''}${today}</p>
         </div>
         <div style="text-align: center; min-width: 240px;">
           <div style="border-top: 1px solid #0F172A; padding-top: 4px;">

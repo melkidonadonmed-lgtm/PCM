@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { 
   FileText, 
   FlaskConical, 
@@ -29,10 +29,8 @@ import {
   buildSusDocumentHtml 
 } from '../data/susDocumentsCatalog';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
-import jsPDF from 'jspdf';
-import { downloadPdfDoc } from '../utils/downloadPdf';
-import { renderSheetToPdf } from '../utils/renderSheetToPdf';
-import html2canvas from 'html2canvas';
+import { exportarFolhaPdf } from '../utils/folhaA4';
+import { FolhaA4 } from './documento/FolhaA4';
 
 interface SusDocumentsFillerProps {
   darkMode: boolean;
@@ -315,100 +313,53 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     }
   };
 
-  // Ação: Baixar PDF Direto com fidelidade
+  // Ação: Baixar PDF — fotografia fiel da folha exibida na prévia (mesmo caminho da receita)
+  const folhaSusRef = useRef<HTMLDivElement>(null);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const nomeArquivo = (prefixo: string) =>
+    `${prefixo}_${(formData.patientName || 'Paciente').trim().replace(/\s+/g, '_')}.pdf`;
+
   const handleDownloadPdf = async (downloadAll = false) => {
-    const container = document.getElementById('sus-document-print-sheet');
-    if (!container) {
-      window.print();
+    if (!medicoConfigurado(doctor)) {
+      showToast('Configure nome e CRM do médico para emitir documentos.');
       return;
     }
+    const folhaAtual = folhaSusRef.current;
+    if (!folhaAtual) return;
 
+    // Vários documentos: monta uma folha fora da tela para cada um, com a mesma
+    // classe e largura da prévia, e exporta todas em um único arquivo.
+    let bancadaOculta: HTMLDivElement | null = null;
     try {
       setIsExportingPdf(true);
-      showToast('Renderizando PDF com alta fidelidade...');
-      if ((document as any).fonts?.ready) {
-        await (document as any).fonts.ready;
-      }
 
       if (!downloadAll || selectedDocIds.length <= 1) {
-        // Baixa o documento ativo (folha inteira, sem corte, fundo branco garantido)
-        await renderSheetToPdf(
-          container,
-          `${currentDocItem.shortTitle.replace(/\s+/g, '_')}_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`,
-        );
-        showToast('PDF do documento SUS gerado com sucesso!');
-      } else {
-        // Baixa todos os selecionados em páginas consecutivas
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: 'a4'
-        });
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'fixed';
-        tempContainer.style.left = '-9999px';
-        tempContainer.style.top = '0';
-        tempContainer.style.width = '794px';
-        tempContainer.style.backgroundColor = '#FFFFFF';
-        tempContainer.style.padding = '24px';
-        document.body.appendChild(tempContainer);
-
-        for (let i = 0; i < selectedDocIds.length; i++) {
-          const docId = selectedDocIds[i];
-          const docItem = SUS_DOCUMENTS_CATALOG.find(d => d.id === docId);
-          if (!docItem) continue;
-          tempContainer.innerHTML = buildSusDocumentHtml(docItem, getFilledDataForDoc(docId));
-          const canvas = await html2canvas(tempContainer, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#FFFFFF',
-            logging: false,
-            windowWidth: 794,
-            onclone: (clonedDoc) => {
-              clonedDoc.documentElement.style.backgroundColor = '#FFFFFF';
-              clonedDoc.body.style.backgroundColor = '#FFFFFF';
-            }
-          });
-          const imgData = canvas.toDataURL('image/jpeg', 0.95);
-          const naturalHeightMm = (canvas.height * pdfWidth) / canvas.width;
-          if (i > 0) pdf.addPage();
-          if (naturalHeightMm <= pdfHeight + 0.5) {
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, naturalHeightMm);
-          } else {
-            // Estourou A4: fatia em páginas consecutivas
-            const pxPerFullPage = Math.floor((pdfHeight * canvas.width) / pdfWidth);
-            let y = 0;
-            let firstSlice = true;
-            while (y < canvas.height) {
-              const sliceH = Math.min(pxPerFullPage, canvas.height - y);
-              const slice = document.createElement('canvas');
-              slice.width = canvas.width;
-              slice.height = sliceH;
-              const ctx = slice.getContext('2d')!;
-              ctx.fillStyle = '#FFFFFF';
-              ctx.fillRect(0, 0, slice.width, slice.height);
-              ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-              const sliceImg = slice.toDataURL('image/jpeg', 0.95);
-              const sliceHeightMm = (sliceH * pdfWidth) / canvas.width;
-              if (!firstSlice) pdf.addPage();
-              pdf.addImage(sliceImg, 'JPEG', 0, 0, pdfWidth, sliceHeightMm);
-              firstSlice = false;
-              y += sliceH;
-            }
-          }
-        }
-
-        document.body.removeChild(tempContainer);
-        await downloadPdfDoc(pdf, `Documentos_SUS_Multiplos_${(formData.patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`);
-        showToast(`PDF com ${selectedDocIds.length} documentos SUS gerado com sucesso!`);
+        await exportarFolhaPdf(folhaAtual, nomeArquivo(currentDocItem.shortTitle.replace(/\s+/g, '_')));
+        showToast('PDF do documento gerado.');
+        return;
       }
+
+      bancadaOculta = document.createElement('div');
+      bancadaOculta.style.cssText = 'position:fixed;left:-10000px;top:0;';
+      const folhas = selectedDocIds.flatMap((docId) => {
+        const docItem = SUS_DOCUMENTS_CATALOG.find(d => d.id === docId);
+        if (!docItem) return [];
+        const folha = document.createElement('div');
+        folha.className = folhaAtual.className;
+        folha.style.width = `${folhaAtual.offsetWidth}px`;
+        folha.innerHTML = buildSusDocumentHtml(docItem, getFilledDataForDoc(docId));
+        bancadaOculta!.appendChild(folha);
+        return [folha];
+      });
+      document.body.appendChild(bancadaOculta);
+
+      await exportarFolhaPdf(folhas, nomeArquivo('Documentos_SUS'));
+      showToast(`PDF com ${folhas.length} documentos gerado.`);
     } catch (err) {
       console.error('Erro ao gerar PDF do documento SUS:', err);
-      window.print();
+      showToast('Não foi possível gerar o PDF. Tente novamente ou use Imprimir.');
     } finally {
+      bancadaOculta?.remove();
       setIsExportingPdf(false);
     }
   };
@@ -1247,19 +1198,20 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               </div>
 
               {/* Folha Física A4 Prévia (Papel Branco com Tipografia Grafite) */}
-              <div className="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden shadow-tactile-md bg-white">
-                <div className="bg-slate-100 dark:bg-slate-800 px-3 py-2 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <span>Prévia da Folha Oficial SUS</span>
-                  <span className="text-[10px] font-mono text-slate-500">Padrão A4</span>
+              <div className="space-y-2">
+                <p className="px-1 text-[11px] font-semibold text-[var(--text-muted)]">
+                  Prévia da folha A4 — o PDF e a impressão saem exatamente assim.
+                </p>
+                <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/50">
+                  <FolhaA4
+                    ref={folhaSusRef}
+                    id="sus-document-print-sheet"
+                    imprimivel
+                    className={`select-text ${medicoConfigurado(doctor) ? '' : 'no-print'}`}
+                  >
+                    <div dangerouslySetInnerHTML={{ __html: buildSusDocumentHtml(currentDocItem, formData) }} />
+                  </FolhaA4>
                 </div>
-
-                <div 
-                  id="sus-document-print-sheet" 
-                  className="p-6 bg-white text-slate-900 text-[11px] leading-relaxed select-text"
-                  dangerouslySetInnerHTML={{
-                    __html: buildSusDocumentHtml(currentDocItem, formData)
-                  }}
-                />
               </div>
             </div>
           </div>
