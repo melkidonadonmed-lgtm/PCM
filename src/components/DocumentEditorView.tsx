@@ -70,8 +70,8 @@ import { db, initializeDefaultTemplates } from '../services/db';
 import { PRESET_LOGOS } from '../data/presetAssets';
 import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
-import { resolverIdentidade } from '../utils/documentoClinico';
-import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
+import { resolverIdentidade, separarPorRegime } from '../utils/documentoClinico';
+import type { RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import LogoGeneratorModal from './LogoGeneratorModal';
 import WatermarkOverlay from './WatermarkOverlay';
@@ -189,6 +189,33 @@ function htmlDoEditorMontado(ed: { isDestroyed: boolean; view: { dom: Element } 
     return null;
   }
 }
+
+const REGIMES_RECEITA: RegimeReceita[] = ['simples', 'antimicrobiano', 'controle_especial'];
+
+/** Como cada tipo de receita é montado no editor. */
+const RECEITA_NO_EDITOR: Record<RegimeReceita, { botao: string; titulo: string; selo: string; modelo: string; aviso: string }> = {
+  simples: {
+    botao: 'Receita simples',
+    titulo: 'RECEITUÁRIO MÉDICO',
+    selo: 'RECEITUÁRIO MÉDICO',
+    modelo: 'Receita Médica (Consulta)',
+    aviso: 'Receita simples (1 via) carregada no editor.'
+  },
+  antimicrobiano: {
+    botao: 'Antimicrobiano',
+    titulo: 'RECEITUÁRIO MÉDICO',
+    selo: 'RECEITUÁRIO MÉDICO — ANTIMICROBIANO',
+    modelo: 'Receita de Antimicrobiano (Consulta)',
+    aviso: 'Receita de antimicrobiano (2 vias) carregada no editor.'
+  },
+  controle_especial: {
+    botao: 'Controle especial',
+    titulo: 'RECEITUÁRIO DE CONTROLE ESPECIAL',
+    selo: 'RECEITUÁRIO DE CONTROLE ESPECIAL',
+    modelo: 'Receita de Controle Especial (Consulta)',
+    aviso: 'Receita de controle especial (2 vias) carregada no editor.'
+  }
+};
 
 export interface FontOption {
   id: string;
@@ -603,42 +630,35 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     if (html !== null) setEditorDomHtml(html);
   }, [editorHtml, editor]);
 
-  const [activeLoadedRecipeType, setActiveLoadedRecipeType] = useState<'special' | 'simple' | null>(null);
+  const [activeLoadedRecipeType, setActiveLoadedRecipeType] = useState<RegimeReceita | null>(null);
 
-  const specialPrescriptionItems = useMemo(
-    () => (prescriptionItems || []).filter(i => isSpecialControlOrAntibiotic(i)),
-    [prescriptionItems]
-  );
-  const simplePrescriptionItems = useMemo(
-    () => (prescriptionItems || []).filter(i => !isSpecialControlOrAntibiotic(i)),
-    [prescriptionItems]
-  );
-  const hasBothPrescriptionTypesInEditor = specialPrescriptionItems.length > 0 && simplePrescriptionItems.length > 0;
+  // Cada regime sanitário é uma receita separada (simples, antimicrobiano, controle especial)
+  const itensPorRegime = useMemo(() => separarPorRegime(prescriptionItems || []), [prescriptionItems]);
+  const regimesNaConsulta = REGIMES_RECEITA.filter((regime) => itensPorRegime[regime].length > 0);
+
+  // Nas 2 vias, quem fica com cada via depende do regime: no controle especial a farmácia
+  // retém a 1ª (Portaria 344/98); no antimicrobiano, a 2ª (RDC 471/2021). O regime é lido do
+  // selo do documento, que é salvo junto com ele.
+  const viasDeAntimicrobiano = /antimicrobiano/i.test(headerConfig.badgeText || '');
+  const rotuloVia1 = viasDeAntimicrobiano ? '1ª via — Paciente' : '1ª via — Farmácia (retenção)';
+  const rotuloVia2 = viasDeAntimicrobiano ? '2ª via — Farmácia (retenção)' : '2ª via — Paciente (orientação)';
 
   // Construtor e carregador completo da receita médica em tempo real com segregação inteligente
-  const handleLoadActivePrescription = useCallback((showToastMsg = true, targetMode: 'auto' | 'special' | 'simple' = 'auto') => {
+  const handleLoadActivePrescription = useCallback((showToastMsg = true, targetMode: 'auto' | RegimeReceita = 'auto') => {
     if (!editor) return;
 
     const allItems = prescriptionItems || [];
-    const specialItems = allItems.filter(i => isSpecialControlOrAntibiotic(i));
-    const simpleItems = allItems.filter(i => !isSpecialControlOrAntibiotic(i));
+    const grupos = separarPorRegime(allItems);
+    const comItens = REGIMES_RECEITA.filter((regime) => grupos[regime].length > 0);
 
-    let effectiveMode: 'special' | 'simple' = 'simple';
-    if (targetMode === 'special') {
-      effectiveMode = 'special';
-    } else if (targetMode === 'simple') {
-      effectiveMode = 'simple';
-    } else {
-      // Prioridade sanitária: se houver antimicrobianos ou substâncias controladas, abre em 2 vias
-      effectiveMode = specialItems.length > 0 ? 'special' : 'simple';
-    }
+    // Sem escolha explícita, abre a receita mais restritiva que a consulta tiver
+    const regime: RegimeReceita =
+      targetMode !== 'auto' ? targetMode : (comItens.length > 0 ? comItens[comItens.length - 1] : 'simples');
+    const isSpecial = regime !== 'simples';
+    const receita = RECEITA_NO_EDITOR[regime];
+    const itemsToLoad = grupos[regime];
 
-    const isSpecial = effectiveMode === 'special';
-    const itemsToLoad = isSpecial
-      ? (specialItems.length > 0 ? specialItems : allItems)
-      : (simpleItems.length > 0 ? simpleItems : allItems);
-
-    setActiveLoadedRecipeType(isSpecial ? 'special' : 'simple');
+    setActiveLoadedRecipeType(regime);
 
     const pName = patient?.name?.trim() || '______________________________';
     const pDoc = patient?.documentNumber ? ` • Doc: ${patient.documentNumber}` : '';
@@ -646,7 +666,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     const pWeight = patient?.weightKg > 0 ? ` • Peso: ${patient.weightKg} kg` : '';
     const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-    // Ajuste regulamentar inteligente: Se for controle especial, define 2 vias e paisagem!
+    // Receitas de 2 vias (antimicrobiano e controle especial) usam folha paisagem com as vias lado a lado
     if (isSpecial) {
       setViaLayout('2-vias');
       setPageOrientation('landscape');
@@ -665,7 +685,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           const showPres = item.presentation && presLower !== qtdLower && !presLower.includes('caixa') && presLower !== 'uso oral' && !qtdLower.includes(presLower);
           const presentation = showPres ? ` (${item.presentation})` : '';
           const quantity = item.quantity ? ` &nbsp;—&nbsp; <strong>${item.quantity}</strong>` : '';
-          const instructions = item.instructions || 'Conforme orientação médica.';
+          const instructions = item.instructions || '';
           const times = item.scheduleTimes && item.scheduleTimes.length > 0
             ? `<br><span style="font-size: 0.9em; color: #475569;">Horários recomendados: ${item.scheduleTimes.join(' — ')}</span>`
             : '';
@@ -688,13 +708,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       : `<p><strong>Paciente:</strong> ${pName}${pDoc}${pAge}${pWeight}</p><p></p>`;
 
     const newHtml = `
-      <p style="text-align: center;"><strong>${isSpecial ? 'RECEITUÁRIO DE CONTROLE ESPECIAL' : 'RECEITUÁRIO MÉDICO'}</strong></p>
+      <p style="text-align: center;"><strong>${receita.titulo}</strong></p>
+      ${regime === 'antimicrobiano' ? '<p style="text-align: center; font-size: 0.85em; color: #475569;">Antimicrobiano — receita válida por 10 dias a contar da data de emissão (RDC Anvisa nº 471/2021).</p>' : ''}
       <p></p>
       ${patientLineHtml}
-      <p><strong>USO INTERNO / PRESCRIÇÃO:</strong></p>
+      <p><strong>PRESCRIÇÃO:</strong></p>
       <p></p>
       ${itemsHtml}
-      <p><strong>Orientações Gerais:</strong> Seguir rigorosamente a posologia prescrita. Manter boa hidratação oral e retornar para reavaliação clínica se houver persistência dos sintomas.</p>
     `;
 
     editor.commands.setContent(newHtml);
@@ -704,20 +724,20 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       showHeader: true,
       showFooter: true,
       showPatientBanner: true,
-      badgeText: isSpecial ? 'RECEITUÁRIO DE CONTROLE ESPECIAL' : 'RECEITUÁRIO MÉDICO',
+      badgeText: receita.selo,
       dateText: today
     }));
 
     setCurrentModel({
       id: null,
-      title: isSpecial ? 'Receita de Controle Especial (Consulta)' : 'Receita Médica (Consulta)',
+      title: receita.modelo,
       isPreset: false
     });
 
     isDraftRestoredRef.current = true;
     triggerAutoSave(editor);
     if (showToastMsg) {
-      showToast(isSpecial ? 'Receita de Controle Especial (2 Vias • Paisagem) carregada no editor!' : 'Receita médica comum (1 Via • Retrato) carregada no editor!');
+      showToast(receita.aviso);
     }
   }, [editor, prescriptionItems, patient, headerConfig.showPatientBanner, triggerAutoSave]);
 
@@ -2819,40 +2839,33 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       </div>
 
       {/* SELETOR RÁPIDO ENTRE RECEITAS QUANDO HOUVER ITENS SIMPLES E ESPECIAIS NA MESMA CONSULTA */}
-      {hasBothPrescriptionTypesInEditor && (
+      {regimesNaConsulta.length > 1 && (
         <div className="no-print p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-tactile-sm">
           <div className="flex items-center gap-2 text-xs text-amber-900 dark:text-amber-200">
             <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <div>
-              <span className="font-bold">Segregação Sanitária:</span>
+              <span className="font-bold">Receitas separadas:</span>
               <span className="ml-1 text-[11px] opacity-90">
-                Esta consulta possui antimicrobianos/controlados e medicamentos comuns. Alterne a folha:
+                esta consulta gera {regimesNaConsulta.length} receitas. Escolha a folha:
               </span>
             </div>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => handleLoadActivePrescription(true, 'special')}
-              className={`flex-1 sm:flex-initial h-8 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 shadow-tactile-sm ${
-                activeLoadedRecipeType === 'special'
-                  ? 'bg-amber-600 text-white border border-amber-700'
-                  : 'bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 hover:bg-amber-50'
-              }`}
-            >
-              <span>📑 Controle Especial ({specialPrescriptionItems.length} • 2 Vias)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleLoadActivePrescription(true, 'simple')}
-              className={`flex-1 sm:flex-initial h-8 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 shadow-tactile-sm ${
-                activeLoadedRecipeType === 'simple'
-                  ? 'bg-sky-600 text-white border border-sky-700'
-                  : 'bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800 hover:bg-sky-50'
-              }`}
-            >
-              <span>📋 Receita Simples ({simplePrescriptionItems.length} • 1 Via)</span>
-            </button>
+            {regimesNaConsulta.map((regime) => (
+              <button
+                key={regime}
+                type="button"
+                onClick={() => handleLoadActivePrescription(true, regime)}
+                aria-pressed={activeLoadedRecipeType === regime}
+                className={`flex-1 sm:flex-initial h-8 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 shadow-tactile-sm ${
+                  activeLoadedRecipeType === regime
+                    ? 'bg-sky-600 text-white border border-sky-700'
+                    : 'bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800 hover:bg-sky-50'
+                }`}
+              >
+                <span>{RECEITA_NO_EDITOR[regime].botao} ({itensPorRegime[regime].length})</span>
+              </button>
+            ))}
           </div>
         </div>
       )}
@@ -3252,9 +3265,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             </div>
                             <div className="text-right shrink-0">
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
-                                1ª VIA — FARMÁCIA
+                                {rotuloVia1}
                               </span>
-                              <span className="text-[8px] text-slate-500 font-bold block mt-0.5">(RETENÇÃO)</span>
                               <span className="text-[9px] text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
                             </div>
                           </div>
@@ -3349,9 +3361,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             </div>
                             <div className="text-right shrink-0">
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
-                                2ª VIA — PACIENTE
+                                {rotuloVia2}
                               </span>
-                              <span className="text-[8px] text-slate-500 font-bold block mt-0.5">(ORIENTAÇÃO)</span>
                               <span className="text-[9px] text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
                             </div>
                           </div>
@@ -3452,7 +3463,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             </div>
                             <div className="text-right shrink-0">
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
-                                1ª VIA — FARMÁCIA (RETENÇÃO)
+                                {rotuloVia1}
                               </span>
                               <span className="text-[9px] text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
                             </div>
@@ -3537,7 +3548,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             </div>
                             <div className="text-right shrink-0">
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
-                                2ª VIA — PACIENTE (ORIENTAÇÃO)
+                                {rotuloVia2}
                               </span>
                               <span className="text-[9px] text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
                             </div>

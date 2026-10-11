@@ -15,6 +15,7 @@ import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescription
 import { useWorkContext } from './hooks/useWorkContext';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { AsyncErrorBoundary } from './components/AsyncErrorBoundary';
+import type { TipoDocumento } from './utils/documentoClinico';
 
 // Carregamento sob demanda com retry resiliente contra falhas de rede ou cache antigo
 const loadDocumentEditor = () =>
@@ -105,9 +106,9 @@ export default function App() {
   // Navegação entre abas
   const [activeTab, setActiveTab] = useState<ActiveTab>('prescription');
   const [documentsSubTab, setDocumentsSubTab] = useState<DocumentsSubTab>('certificate');
-  const [printDocType, setPrintDocType] = useState<'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral'>('prescription');
+  const [printDocType, setPrintDocType] = useState<TipoDocumento>('prescription');
 
-  const handleNavigateToPrint = (type?: 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral') => {
+  const handleNavigateToPrint = (type?: TipoDocumento) => {
     if (type) {
       setPrintDocType(type);
     }

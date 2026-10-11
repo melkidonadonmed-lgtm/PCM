@@ -64,9 +64,10 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   const getDocDefaultFields = useCallback((doc: SusDocumentItem): Partial<SusFilledFormData> => ({
     sigtapCode: doc.defaultSigtap || '',
     procedureName: doc.defaultProcedure || '',
-    cid10Code: doc.defaultCid10 || '',
+    // Diagnóstico e justificativa são do caso: abrem em branco (o modelo é oferecido por botão)
+    cid10Code: '',
     cid10Description: '',
-    clinicalJustification: doc.defaultJustification || '',
+    clinicalJustification: '',
     sinanNumber: '',
     symptomsStartDate: '',
     // Exames e achados clínicos começam vazios: quem informa é o médico.
@@ -89,9 +90,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       map[d.id] = {
         sigtapCode: d.defaultSigtap || '',
         procedureName: d.defaultProcedure || '',
-        cid10Code: d.defaultCid10 || '',
+        cid10Code: '',
         cid10Description: '',
-        clinicalJustification: d.defaultJustification || '',
+        clinicalJustification: '',
         sinanNumber: '',
         symptomsStartDate: '',
         renalCreatinine: '',
@@ -313,6 +314,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       showToast('Navegando para o Editor A4...');
     }
   };
+
+  // Campos clínicos do documento ativo que ainda estão em branco (saem como "—" na folha)
+  const pendenciasClinicas = [
+    !formData.cid10Code?.trim() && 'CID-10',
+    !formData.clinicalJustification?.trim() && 'justificativa clínica',
+    currentDocItem.id === 'apac_complementar' && !(formData.renalCreatinine?.trim() && formData.renalEtfg?.trim()) && 'função renal'
+  ].filter(Boolean) as string[];
 
   // Ação: Baixar PDF — fotografia fiel da folha exibida na prévia (mesmo caminho da receita)
   const folhaSusRef = useRef<HTMLDivElement>(null);
@@ -977,7 +985,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         type="text"
                         value={formData.cid10Code}
                         onChange={e => handleFieldChange('cid10Code', e.target.value)}
-                        placeholder="Ex: M54.5"
+                        placeholder="Código"
                         className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 uppercase font-mono font-bold"
                       />
                     </div>
@@ -994,6 +1002,19 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       />
                     </div>
                   </div>
+
+                  {!formData.cid10Code?.trim() && currentDocItem.defaultCid10 && (
+                    <p className="text-[11px] text-[var(--text-muted)]">
+                      CID-10 em branco.{' '}
+                      <button
+                        type="button"
+                        onClick={() => handleFieldChange('cid10Code', currentDocItem.defaultCid10 || '')}
+                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                      >
+                        Usar o código habitual deste documento ({currentDocItem.defaultCid10})
+                      </button>
+                    </p>
+                  )}
 
                   {/* Campos Específicos para GAL / LACEN */}
                   {(currentDocItem.category === 'gal') && (
@@ -1088,23 +1109,30 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   )}
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] flex items-center justify-between mb-1">
-                      <span>Justificativa Clínica e Indicação Técnica (Anti-Glosa)</span>
-                      <button
-                        type="button"
-                        onClick={() => handleFieldChange('clinicalJustification', currentDocItem.defaultJustification)}
-                        className="text-[10px] text-blue-600 dark:text-blue-400 font-bold hover:underline cursor-pointer"
-                      >
-                        Restaurar Modelo Oficial
-                      </button>
+                    <label htmlFor="sus-justificativa" className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      Justificativa clínica e indicação técnica
                     </label>
                     <textarea
+                      id="sus-justificativa"
                       rows={4}
                       value={formData.clinicalJustification}
                       onChange={e => handleFieldChange('clinicalJustification', e.target.value)}
-                      placeholder="Descreva a história cronológica, achados do exame físico e falhas terapêuticas prévias para evitar devolução no SISREG..."
+                      placeholder="Descreva o quadro do paciente: história, exame físico e o que já foi tentado."
                       className="w-full p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 leading-relaxed font-sans"
                     />
+                    <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleFieldChange('clinicalJustification', currentDocItem.defaultJustification || '')}
+                        className="h-8 px-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] cursor-pointer transition active:scale-95"
+                        title="Preenche o campo com um texto-modelo deste documento, para você adaptar ao caso"
+                      >
+                        {formData.clinicalJustification?.trim() ? 'Substituir pelo texto-modelo' : 'Inserir texto-modelo'}
+                      </button>
+                      <span className="text-[11px] text-[var(--text-muted)]">
+                        O modelo é um ponto de partida: ajuste ao caso antes de emitir.
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1123,6 +1151,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--text-muted)] px-1">
                   Ações de Emissão & Protocolo
                 </span>
+
+                {pendenciasClinicas.length > 0 && (
+                  <p role="status" className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/25">
+                    Em branco neste documento: {pendenciasClinicas.join(', ')}.
+                  </p>
+                )}
 
                 <div className="grid grid-cols-2 gap-2">
                   {/* Baixar PDF (Individual ou Todos) */}

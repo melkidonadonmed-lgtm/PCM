@@ -46,6 +46,7 @@ npm run clean      # remove dist/
 - Conformidade sanitária com a Portaria SVS/MS 344/98 para controle especial em 2 vias (`sanitaryCompliancePortaria344.test.ts`).
 - Consentimento explícito de CID-10 conforme Resoluções CFM 1.658/2002 e 1.819/2007 (`cfmConsentCid10.test.ts`).
 - Resolução de símbolos e aliases do componente canônico de ícones (`iconComponent.test.ts`).
+- Regimes de receita e folha do antimicrobiano (`regimesDeReceita.test.tsx`); documentos SUS em branco sem dado clínico (`susSemDadosInventados.test.ts`).
 - Folha única dos documentos — cabeçalho institucional, ausência de selos/QR de validação, CID só com consentimento, nada de texto clínico inventado (`documentoClinico.test.tsx`).
 
 Ao modificar lógica de cálculo, kits ou conformidade sanitária, execute obrigatoriamente `npm run test`, `npm run lint` e `npm run design:lint`.
@@ -77,7 +78,7 @@ src/
     documento/
       FolhaA4.tsx              # Papel A4 em tamanho real (794×1123 px), reduzido por zoom para caber; impressão fiel
       DocumentoClinico.tsx     # ÚNICO desenho de receita, exames, atestado e encaminhamento
-      ReceitaControleEspecial.tsx # 2 vias lado a lado em paisagem (Portaria 344/98)
+      ReceitaDuasVias.tsx      # 2 vias lado a lado em paisagem: antimicrobiano (RDC 471/2021) e controle especial (Portaria 344/98)
       CabecalhoInstitucional.tsx  # Timbre: logo + local de atendimento
       AssinaturaMedico.tsx     # Local, data e assinatura com nome/CRM do médico
     PatientModal.tsx           # Modal de edição rápida e cadastro de dados do paciente
@@ -183,7 +184,11 @@ src/
   - **Sem peso, sem dose:** A calculadora pediátrica e os protocolos de urgência bloqueiam doses e volumes calculados caso o peso do paciente não esteja cadastrado.
   - **Formatação Numérica Rigorosa:** Doses em miligramas utilizam vírgula decimal e **sem separador de milhar** (ex.: "7,5 mg", "1000 mg", evitando que "1.000 mg" seja interpretado erroneamente como 1 mg); concordância gramatical estrita para unidades ("1 gota" no singular, "X gotas" no plural).
   - **Sem horários inventados:** `scheduleTimes` só é preenchido quando o intervalo vem de dado estruturado (catálogo pediátrico ou protocolo). Itens digitados no formulário e itens de kits usam `scheduleInterval: 'Conforme posologia'` e `scheduleTimes: []`, para o PDF e a folha A4 não imprimirem "Horários sugeridos" que contradigam a posologia escrita.
-  - **Documentos SUS sem dado presumido:** a folha e o laudo copiado trazem só o que está no formulário (`susDocumentsCatalog.ts`). Campo vazio sai como "—" / "não informado". Nunca use valor padrão para resultado de exame (creatinina, eTFG), triagem de segurança (ex.: marca-passo em RM), história clínica, data de início de sintomas, CID ou justificativa — nem como `||` de reserva na montagem, nem como valor inicial de campo sem controle visível na tela. Coberto por `susSemDadosInventados.test.ts`.
+  - **Três regimes de receita, três documentos:** `classificarReceita` (`utils/isSpecialControlOrAntibiotic.ts`) devolve `simples`, `antimicrobiano` ou `controle_especial`, e cada regime sai na sua própria folha (`separarPorRegime`, `DOCUMENTO_DO_REGIME`). Nunca emita antimicrobiano com título ou avisos de controle especial.
+    - *Antimicrobiano (RDC Anvisa nº 471/2021):* 2 vias, válida por 10 dias; a farmácia retém a **2ª via** e a 1ª volta ao paciente.
+    - *Controle especial (Portaria SVS/MS nº 344/98):* 2 vias; a farmácia retém a **1ª via**; quadros de comprador/fornecedor e endereço do paciente.
+    - A detecção olha só nome e princípio ativo (a categoria conta apenas quando é a de antibióticos). Termos curtos entram como palavra inteira — `astro` já casou dentro de `gastro` e mandou omeprazol para 2 vias. O tipo escolhido no formulário (`regimeReceita`) vale, mas nunca rebaixa um controlado detectado.
+  - **Documentos SUS sem dado presumido:** a folha e o laudo copiado trazem só o que está no formulário (`susDocumentsCatalog.ts`). Campo vazio sai como "—" / "não informado". CID-10 e justificativa abrem em branco e o texto-modelo só entra quando o médico clica em "Inserir texto-modelo". Nunca use valor padrão para resultado de exame (creatinina, eTFG), triagem de segurança (ex.: marca-passo em RM), história clínica, data de início de sintomas, CID ou justificativa — nem como `||` de reserva na montagem, nem como valor inicial de campo sem controle visível na tela. Coberto por `susSemDadosInventados.test.ts`.
   - **Kits de plantão pendentes de revisão clínica:** as doses pediátricas fixas de `src/utils/montarItensDoKit.ts` (paracetamol limitado a 35 gotas, amoxicilina e prednisolona sem dose máxima) e os kits com apresentações de adulto sem restrição de faixa etária aguardam revisão humana qualificada. Não os altere sem fonte clínica.
 - **Regras de CSS e Estilização (Tailwind CSS v4):**
   - **Arquitetura em Camadas:** Classes de componentes devem ser declaradas dentro de `@layer components`.

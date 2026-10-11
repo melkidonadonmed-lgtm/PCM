@@ -1,14 +1,21 @@
-import { PrescriptionItem, AdultMedication, UnifiedMedication } from '../types';
+import { PrescriptionItem, AdultMedication, UnifiedMedication, RegimeReceita } from '../types';
+
+export type { RegimeReceita };
 
 /**
- * Palavras-chave clínicas determinísticas para detecção de antimicrobianos
- * (sujeitos à retenção de receita em 2 vias pela RDC 20/2011 e RDC 471/2021 da ANVISA)
- * e medicamentos sob controle especial (Portaria SVS/MS 344/98 - Listas A, B e C).
+ * Regime sanitário da receita de um medicamento:
+ *  - 'simples': receituário comum, 1 via.
+ *  - 'antimicrobiano': receita em 2 vias, válida por 10 dias; a farmácia retém a
+ *    2ª via e devolve a 1ª ao paciente (RDC Anvisa nº 471/2021).
+ *  - 'controle_especial': receita de controle especial em 2 vias; a farmácia
+ *    retém a 1ª via (Portaria SVS/MS nº 344/98).
+ * São documentos diferentes e nunca dividem a mesma folha.
  */
-const ANTIMICROBIAL_AND_CONTROLLED_KEYWORDS = [
-  // 1. Antibióticos / Antimicrobianos (RDC 20/2011 e RDC 471/2021)
+
+/** Antibióticos / antimicrobianos (RDC 471/2021). */
+const ANTIMICROBIANOS = [
   'amoxicilina', 'clavulanato', 'clavulin', 'amoxil', 'novocilin',
-  'azitromicina', 'zitromax', 'astro',
+  'azitromicina', 'zitromax',
   'cefalexina', 'keflex', 'cefaclor', 'cefadroxila', 'cefuroxima', 'ceftriaxona', 'rocefin', 'cefalotina',
   'ciprofloxacino', 'levofloxacino', 'levaquin', 'moxifloxacino', 'norfloxacino',
   'claritromicina', 'klacid', 'eritromicina',
@@ -21,14 +28,17 @@ const ANTIMICROBIAL_AND_CONTROLLED_KEYWORDS = [
   'penicilina', 'benzetacil', 'ampicilina', 'oxacilina',
   'gentamicina', 'amicacina', 'tobramicina',
   'rifampicina', 'isoniazida', 'pirazinamida', 'etambutol',
-  'linezolida', 'vancomicina', 'meropenem', 'imipenem',
+  'linezolida', 'vancomicina', 'meropenem', 'imipenem'
+];
 
-  // 2. Psicotrópicos, Ansiolíticos, Sedativos e Hipnóticos (Portaria 344/98 - Listas B1, B2)
+/** Medicamentos sob controle especial (Portaria 344/98 — Listas A, B e C). */
+const CONTROLADOS = [
+  // Psicotrópicos, ansiolíticos, sedativos e hipnóticos (Listas B1, B2)
   'diazepam', 'clonazepam', 'rivotril', 'alprazolam', 'frontin',
   'lorazepam', 'bromazepam', 'lexotan', 'midazolam', 'dormonid',
   'zolpidem', 'stilnox', 'zopiclona', 'eszopiclona',
 
-  // 3. Antidepressivos e Estabilizadores (Portaria 344/98 - Lista C1)
+  // Antidepressivos e estabilizadores (Lista C1)
   'fluoxetina', 'prozac', 'daforin', 'sertralina', 'zoloft', 'assert',
   'escitalopram', 'lexapro', 'reconter', 'citalopram', 'cipramil',
   'paroxetina', 'aropax', 'venlafaxina', 'efexor', 'desvenlafaxina', 'pristiq',
@@ -37,31 +47,33 @@ const ANTIMICROBIAL_AND_CONTROLLED_KEYWORDS = [
   'amitriptilina', 'tryptanol', 'nortriptilina', 'pamelor', 'imipramina', 'clomipramina', 'anafranil',
   'carbonato de litio', 'carbolitium',
 
-  // 4. Antipsicóticos (Portaria 344/98 - Lista C1)
+  // Antipsicóticos (Lista C1)
   'haloperidol', 'haldol', 'risperidona', 'risperdal',
   'olanzapina', 'zyprexa', 'quetiapina', 'seroquel',
   'aripiprazol', 'abilify', 'clorpromazina', 'amplictil', 'levomepromazina',
 
-  // 5. Anticonvulsivantes e Moduladores (Portaria 344/98 - Lista C1)
+  // Anticonvulsivantes e moduladores (Lista C1)
   'carbamazepina', 'tegretol', 'oxcarbazepina', 'trileptal',
   'valproato', 'depakene', 'depakote', 'divalproato',
   'lamotrigina', 'lamictal', 'topiramato', 'topamax',
   'fenobarbital', 'gardenal', 'primidona',
   'gabapentina', 'pregabalina', 'lyrica',
 
-  // 6. Opioides e Analgésicos Narcóticos (Portaria 344/98 - Listas A1, A2, C1)
+  // Opioides e analgésicos narcóticos (Listas A1, A2, C1)
   'tramadol', 'tramal', 'sylador', 'codeina', 'tylex', 'paco',
   'morfina', 'dimorf', 'metadona', 'fentanil', 'oxicodona', 'buprenorfina',
 
-  // 7. Estimulantes do SNC (Portaria 344/98 - Lista A3)
+  // Estimulantes do SNC (Lista A3)
   'metilfenidato', 'ritalina', 'concerta', 'lisdexanfetamina', 'venvanse', 'modafinila', 'stavigile',
 
-  // 8. Retinoides e Anorexígenos
+  // Retinoides e anorexígenos
   'isotretinoina', 'roacutan', 'sibutramina'
 ];
 
-// Termos curtos que exigem correspondência exata de limite de palavra (\b) para prevenir falsos positivos
-const WORD_BOUNDARY_TERMS = ['cipro', 'bup', 'litio', 'tylex', 'paco'];
+// Termos curtos só valem como palavra inteira, para não casar dentro de outras
+// palavras ("astro" dentro de "gastro", por exemplo).
+const ANTIMICROBIANOS_PALAVRA_INTEIRA = ['cipro', 'astro'];
+const CONTROLADOS_PALAVRA_INTEIRA = ['bup', 'litio', 'tylex', 'paco'];
 
 /**
  * Normaliza um texto removendo acentuação e convertendo para minúsculas.
@@ -70,54 +82,61 @@ function normalizeText(text: string): string {
   return text
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .replace(/[̀-ͯ]/g, '');
+}
+
+function contemTermo(texto: string, termos: string[], palavrasInteiras: string[]): boolean {
+  return (
+    termos.some((termo) => texto.includes(termo)) ||
+    palavrasInteiras.some((termo) => new RegExp(`\\b${termo}\\b`).test(texto))
+  );
+}
+
+type MedicamentoClassificavel =
+  | PrescriptionItem
+  | AdultMedication
+  | UnifiedMedication
+  | { name?: string; activeIngredient?: string; category?: string; isSpecialControl?: boolean; regimeReceita?: RegimeReceita }
+  | string
+  | null
+  | undefined;
+
+/**
+ * Classifica o regime de receita de um medicamento (objeto ou nome em texto
+ * livre). A busca por palavra-chave olha apenas o nome e o princípio ativo —
+ * a categoria só conta quando é, ela própria, a de antibióticos.
+ */
+export function classificarReceita(med?: MedicamentoClassificavel): RegimeReceita {
+  if (!med) return 'simples';
+
+  const obj = typeof med === 'string' ? null : (med as Record<string, any>);
+  const texto = normalizeText(
+    typeof med === 'string' ? med : `${obj!.name || obj!.tradeName || ''} ${obj!.activeIngredient || ''}`
+  );
+
+  // O regime mais restritivo prevalece.
+  if (contemTermo(texto, CONTROLADOS, CONTROLADOS_PALAVRA_INTEIRA)) return 'controle_especial';
+
+  // Tipo de receita escolhido pelo médico no formulário (nunca rebaixa um controlado detectado acima)
+  if (obj?.regimeReceita === 'antimicrobiano' || obj?.regimeReceita === 'controle_especial') {
+    return obj.regimeReceita;
+  }
+
+  const categoria = obj && typeof obj.category === 'string' ? normalizeText(obj.category) : '';
+  if (categoria.includes('antibi') || contemTermo(texto, ANTIMICROBIANOS, ANTIMICROBIANOS_PALAVRA_INTEIRA)) {
+    return 'antimicrobiano';
+  }
+
+  // Marcação manual de "2 vias" em um medicamento que a detecção não reconheceu.
+  if (obj?.isSpecialControl === true) return 'controle_especial';
+
+  return 'simples';
 }
 
 /**
- * Avalia se um medicamento (objeto ou nome em texto livre) é sujeito a controle
- * especial ou retenção de receita em 2 vias (RDC 20/2011 ou Portaria 344/98).
+ * Indica se o medicamento sai em receita de 2 vias (antimicrobiano ou controle
+ * especial). Para saber qual dos dois documentos usar, chame `classificarReceita`.
  */
-export function isSpecialControlOrAntibiotic(
-  med?: PrescriptionItem | AdultMedication | UnifiedMedication | {
-    name?: string;
-    activeIngredient?: string;
-    category?: string;
-    isSpecialControl?: boolean;
-  } | string | null
-): boolean {
-  if (!med) return false;
-
-  // 1. Verificação explícita de flag existente
-  if (typeof med === 'object') {
-    const obj = med as Record<string, any>;
-    if (obj.isSpecialControl === true) return true;
-    if (obj.category === 'antibioticos') return true;
-    if (obj.category && typeof obj.category === 'string' && normalizeText(obj.category).includes('antibi')) return true;
-  }
-
-  // 2. Verificação textual pelo nome, princípio ativo e categoria
-  let textToScan = '';
-  if (typeof med === 'string') {
-    textToScan = normalizeText(med);
-  } else {
-    const obj = med as Record<string, any>;
-    const namePart = obj.name || obj.tradeName || '';
-    const activePart = obj.activeIngredient || '';
-    const catPart = obj.category || '';
-    textToScan = normalizeText(`${namePart} ${activePart} ${catPart}`);
-  }
-
-  // Checagem de palavras-chave principais
-  const matchesKeyword = ANTIMICROBIAL_AND_CONTROLLED_KEYWORDS.some(kw => {
-    const cleanKw = normalizeText(kw);
-    return textToScan.includes(cleanKw);
-  });
-
-  if (matchesKeyword) return true;
-
-  // Checagem de termos curtos com limite de palavra
-  return WORD_BOUNDARY_TERMS.some(term => {
-    const regex = new RegExp(`\\b${term}\\b`, 'i');
-    return regex.test(textToScan);
-  });
+export function isSpecialControlOrAntibiotic(med?: MedicamentoClassificavel): boolean {
+  return classificarReceita(med) !== 'simples';
 }

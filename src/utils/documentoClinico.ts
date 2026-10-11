@@ -1,5 +1,6 @@
 import type { DoctorProfile, Patient, PrescriptionItem, WorkContext } from '../types';
 import { medicoConfigurado } from './medicoConfigurado';
+import { classificarReceita, type RegimeReceita } from './isSpecialControlOrAntibiotic';
 import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
 
 /**
@@ -8,13 +9,33 @@ import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
  * desenhada por `components/documento/DocumentoClinico.tsx`.
  */
 
-export type TipoDocumento = 'prescription' | 'special_prescription' | 'exams' | 'certificate' | 'referral';
+export type TipoDocumento =
+  | 'prescription'
+  | 'antimicrobial_prescription'
+  | 'special_prescription'
+  | 'exams'
+  | 'certificate'
+  | 'referral';
 
 export type OrientacaoDocumento = 'portrait' | 'landscape';
 
-/** A receita de controle especial sai em folha única paisagem com as 2 vias lado a lado. */
+/** Receitas de 2 vias (antimicrobiano e controle especial) saem em folha única paisagem, lado a lado. */
 export function orientacaoDoDocumento(tipo: TipoDocumento): OrientacaoDocumento {
-  return tipo === 'special_prescription' ? 'landscape' : 'portrait';
+  return tipo === 'special_prescription' || tipo === 'antimicrobial_prescription' ? 'landscape' : 'portrait';
+}
+
+/** Tipo de documento em que cada regime de receita é emitido. */
+export const DOCUMENTO_DO_REGIME: Record<RegimeReceita, TipoDocumento> = {
+  simples: 'prescription',
+  antimicrobiano: 'antimicrobial_prescription',
+  controle_especial: 'special_prescription'
+};
+
+/** Separa os itens da prescrição pelo documento em que cada um deve sair. */
+export function separarPorRegime(items: PrescriptionItem[]): Record<RegimeReceita, PrescriptionItem[]> {
+  const grupos: Record<RegimeReceita, PrescriptionItem[]> = { simples: [], antimicrobiano: [], controle_especial: [] };
+  items.forEach((item) => grupos[classificarReceita(item)].push(item));
+  return grupos;
 }
 
 export interface IdentidadeDocumento {
@@ -88,6 +109,7 @@ export function resolverIdentidade(
 export function tituloDoDocumento(tipo: TipoDocumento, activeContext?: WorkContext | null): string {
   switch (tipo) {
     case 'prescription':
+    case 'antimicrobial_prescription':
       return 'Receituário Médico';
     case 'special_prescription':
       return 'Receituário de Controle Especial';
@@ -196,6 +218,7 @@ export function localEData(cidadeUf: string, emissao: Date): string {
 
 const PREFIXO_ARQUIVO: Record<TipoDocumento, string> = {
   prescription: 'Receita_Medica',
+  antimicrobial_prescription: 'Receita_Antimicrobiano',
   special_prescription: 'Receita_Controle_Especial',
   exams: 'Pedido_Exames',
   certificate: 'Atestado_Medico',

@@ -21,7 +21,7 @@ import {
 } from '../../utils/documentoClinico';
 import { CabecalhoInstitucional } from './CabecalhoInstitucional';
 import { AssinaturaMedico } from './AssinaturaMedico';
-import { ReceitaControleEspecial } from './ReceitaControleEspecial';
+import { ReceitaDuasVias } from './ReceitaDuasVias';
 import { WatermarkOverlay } from '../WatermarkOverlay';
 
 export interface DocumentoClinicoProps {
@@ -29,7 +29,7 @@ export interface DocumentoClinicoProps {
   doctor: DoctorProfile;
   patient: Patient;
   activeContext?: WorkContext | null;
-  /** Itens já filtrados para este documento (simples OU controle especial, nunca misturados). */
+  /** Itens já filtrados para este documento (simples, antimicrobianos OU controle especial — nunca misturados). */
   prescriptionItems?: PrescriptionItem[];
   exams?: ExamItem[];
   examIndication?: string;
@@ -130,11 +130,12 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
     </>
   );
 
-  if (tipo === 'special_prescription') {
+  if (tipo === 'special_prescription' || tipo === 'antimicrobial_prescription') {
     return (
       <>
         {fundo}
-        <ReceitaControleEspecial
+        <ReceitaDuasVias
+          regime={tipo === 'special_prescription' ? 'controle_especial' : 'antimicrobiano'}
           identidade={identidade}
           patient={patient}
           nomePaciente={paciente}
