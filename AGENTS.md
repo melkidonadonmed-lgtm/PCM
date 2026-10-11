@@ -99,7 +99,7 @@ src/
     clinicalProtocols.ts       # Protocolos patológicos com doses de emergência e cálculo de hidratação
     medicationDatabase.ts      # Base unificada de medicamentos (adulto e pediátrico) categorizada por classe SUS/RENAME
     exemplos.ts                # Dados fictícios de exemplo (Melki Donadon / Seu Melki) para prévia e placeholders
-    presetAssets.ts            # Ativos visuais e marcas d'água predefinidas
+    presetAssets.ts            # Logos e marcas d'água predefinidos (apontam para arquivos em public/; nunca embutir base64 aqui)
     presetClinicalTemplates.ts # Modelos estruturados de documentos e atestados clínicos
   hooks/
     usePrescriptionSession.ts  # Gerenciamento de sessão, rascunhos e ciclo de vida da receita
@@ -183,6 +183,7 @@ src/
   - **Sem peso, sem dose:** A calculadora pediátrica e os protocolos de urgência bloqueiam doses e volumes calculados caso o peso do paciente não esteja cadastrado.
   - **Formatação Numérica Rigorosa:** Doses em miligramas utilizam vírgula decimal e **sem separador de milhar** (ex.: "7,5 mg", "1000 mg", evitando que "1.000 mg" seja interpretado erroneamente como 1 mg); concordância gramatical estrita para unidades ("1 gota" no singular, "X gotas" no plural).
   - **Sem horários inventados:** `scheduleTimes` só é preenchido quando o intervalo vem de dado estruturado (catálogo pediátrico ou protocolo). Itens digitados no formulário e itens de kits usam `scheduleInterval: 'Conforme posologia'` e `scheduleTimes: []`, para o PDF e a folha A4 não imprimirem "Horários sugeridos" que contradigam a posologia escrita.
+  - **Documentos SUS sem dado presumido:** a folha e o laudo copiado trazem só o que está no formulário (`susDocumentsCatalog.ts`). Campo vazio sai como "—" / "não informado". Nunca use valor padrão para resultado de exame (creatinina, eTFG), triagem de segurança (ex.: marca-passo em RM), história clínica, data de início de sintomas, CID ou justificativa — nem como `||` de reserva na montagem, nem como valor inicial de campo sem controle visível na tela. Coberto por `susSemDadosInventados.test.ts`.
   - **Kits de plantão pendentes de revisão clínica:** as doses pediátricas fixas de `src/utils/montarItensDoKit.ts` (paracetamol limitado a 35 gotas, amoxicilina e prednisolona sem dose máxima) e os kits com apresentações de adulto sem restrição de faixa etária aguardam revisão humana qualificada. Não os altere sem fonte clínica.
 - **Regras de CSS e Estilização (Tailwind CSS v4):**
   - **Arquitetura em Camadas:** Classes de componentes devem ser declaradas dentro de `@layer components`.

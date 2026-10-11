@@ -1301,57 +1301,9 @@
       display: none !important;
     }
 
-    .print-only {
-      display: block !important;
-    }
-
-    #printable-a4-sheet.print-page {
-      width: 100% !important;
-      max-width: 100% !important;
-      min-height: 277mm !important; /* 297mm A4 portrait height minus margins */
-      height: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      box-shadow: none !important;
-      border: none !important;
-      background: #FFFFFF !important;
-      color: #0F172A !important;
-      display: grid !important;
-      grid-template-rows: auto 1fr auto !important;
-      row-gap: 1.5rem !important;
-      page-break-after: auto !important;
-      break-after: auto !important;
-    }
-
-    .print-header {
-      grid-row: 1 !important;
-      break-inside: avoid !important;
-      page-break-inside: avoid !important;
-    }
-
-    .print-body {
-      grid-row: 2 !important;
-      min-height: 0 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: flex-start !important;
-    }
-
-    .print-footer {
-      grid-row: 3 !important;
-      margin-top: auto !important;
-      break-inside: avoid !important;
-      page-break-inside: avoid !important;
-    }
-
     .print-avoid-break {
       break-inside: avoid !important;
       page-break-inside: avoid !important;
-    }
-
-    .print-page-break {
-      break-before: page !important;
-      page-break-before: always !important;
     }
 
     /* Impressão fiel da FolhaA4: a cópia em #pcm-print-root é o único conteúdo
