@@ -129,6 +129,20 @@ export const SUS_DOCUMENTS_CATALOG: SusDocumentItem[] = [
   }
 ];
 
+/**
+ * Regra dos documentos SUS: a folha só traz o que está no formulário. Campo
+ * vazio sai como "—" / "não informado" — nunca um código, exame, data ou
+ * achado clínico padrão que o médico não digitou.
+ */
+const VAZIO = '—';
+
+/** Função renal como informada; cada valor ausente é dito como ausente (nunca um "normal" presumido). */
+function funcaoRenal(data: SusFilledFormData): string {
+  const creatinina = data.renalCreatinine?.trim();
+  const etfg = data.renalEtfg?.trim();
+  return `Creatinina: ${creatinina ? `${creatinina} mg/dL` : 'não informada'} | eTFG: ${etfg ? `${etfg} mL/min/1,73m²` : 'não informada'}`;
+}
+
 export function buildSusDocumentMarkdown(item: SusDocumentItem, data: SusFilledFormData): string {
   const today = new Date().toLocaleDateString('pt-BR');
   const fullAddress = [
@@ -143,58 +157,57 @@ export function buildSusDocumentMarkdown(item: SusDocumentItem, data: SusFilledF
   if (item.id === 'apac_principal' || item.id === 'apac_complementar') {
     specificDetails = `
 ### Procedimento SIGTAP & Justificativa de Alta Complexidade
-- **Código SIGTAP**: ${data.sigtapCode || item.defaultSigtap || '02.07.01.006-4'}
-- **Procedimento**: ${data.procedureName || item.defaultProcedure || 'Ressonância Magnética / Tomografia'}
-- **CID-10 Principal**: ${data.cid10Code || item.defaultCid10 || 'M54.5'}${data.cid10Description ? ' — ' + data.cid10Description : ''}
+- **Código SIGTAP**: ${data.sigtapCode || VAZIO}
+- **Procedimento**: ${data.procedureName || VAZIO}
+- **CID-10 Principal**: ${data.cid10Code || VAZIO}${data.cid10Description ? ' — ' + data.cid10Description : ''}
 ${item.id === 'apac_complementar' ? `
-- **Função Renal**: Creatinina: ${data.renalCreatinine || '1,0'} mg/dL | eTFG: ${data.renalEtfg || '> 60'} mL/min/1,73m²
+- **Função Renal**: ${funcaoRenal(data)}
 - **Meio de Contraste**: ${data.isContrastNeeded ? 'Indicado e indispensável para delimitação tecidual' : 'Sem indicação de contraste'}
-- **Triagem de Segurança para RM**: Sem marca-passo, clipes vasculares ferromagnéticos ou corpos estranhos metálicos intraoculares.
 ` : ''}
 - **Justificativa Clínica Anti-Glosa**:
-${data.clinicalJustification || item.defaultJustification}
+${data.clinicalJustification || VAZIO}
 `;
   } else if (item.id === 'lme_medicamentos') {
     specificDetails = `
 ### Medicamento(s) do Componente Especializado Solicitado(s)
-- **Fármaco / Apresentação**: ${data.lmeMedicationName || 'Medicamento sob PCDT/MS'}
-- **Posologia Diária**: ${data.lmeMedicationPosology || 'Conforme protocolo clínico'}
-- **Quantidade Mensal**: ${data.lmeMedicationQuantityMonthly || '1 mês de tratamento'} (Previsão para até 6 meses)
-- **CID-10**: ${data.cid10Code || item.defaultCid10 || 'M05.8'}${data.cid10Description ? ' — ' + data.cid10Description : ''}
+- **Fármaco / Apresentação**: ${data.lmeMedicationName || VAZIO}
+- **Posologia Diária**: ${data.lmeMedicationPosology || VAZIO}
+- **Quantidade Mensal**: ${data.lmeMedicationQuantityMonthly || VAZIO} (Previsão para até 6 meses)
+- **CID-10**: ${data.cid10Code || VAZIO}${data.cid10Description ? ' — ' + data.cid10Description : ''}
 - **Justificativa conforme PCDT**:
-${data.clinicalJustification || item.defaultJustification}
+${data.clinicalJustification || VAZIO}
 `;
   } else if (item.id === 'siscan_citopatologico' || item.id === 'siscan_mamografia' || item.id === 'siscan_histopatologico') {
     specificDetails = `
 ### Parâmetros SISCAN & Saúde da Mulher
-- **Procedimento**: ${data.procedureName || item.defaultProcedure} (SIGTAP: ${data.sigtapCode || item.defaultSigtap})
-- **CID-10**: ${data.cid10Code || item.defaultCid10 || 'Z12.4'}
+- **Procedimento**: ${data.procedureName || VAZIO} (SIGTAP: ${data.sigtapCode || VAZIO})
+- **CID-10**: ${data.cid10Code || VAZIO}
 ${data.gynecologyDum ? `- **Data da Última Menstruação (DUM)**: ${data.gynecologyDum}` : ''}
 ${data.gynecologyPreviousExam ? `- **Exame Preventivo Anterior**: ${data.gynecologyPreviousExam}` : ''}
 ${data.specimenType ? `- **Topografia / Espécime da Amostra**: ${data.specimenType}` : ''}
 - **Indicação Clínica / Achados**:
-${data.clinicalJustification || item.defaultJustification}
+${data.clinicalJustification || VAZIO}
 `;
   } else if (item.id === 'gal_lacen_geral' || item.id === 'gal_trm_tb') {
     specificDetails = `
 ### Vigilância Epidemiológica & LACEN
 - **Nº Notificação SINAN**: ${data.sinanNumber || 'Preenchimento obrigatório na unidade'}
-- **Data de Início dos Primeiros Sintomas (D1)**: ${data.symptomsStartDate || today}
+- **Data de Início dos Primeiros Sintomas (D1)**: ${data.symptomsStartDate || 'não informada'}
 ${data.tuberculosisSymptomsDuration ? `- **Duração dos Sintomas Respiratórios**: ${data.tuberculosisSymptomsDuration}` : ''}
-- **Amostra / Metodologia**: ${data.specimenType || 'Soro / Amostra Biológica padrão'} — ${data.procedureName || item.defaultProcedure} (SIGTAP: ${data.sigtapCode || item.defaultSigtap})
-- **Hipótese Diagnóstica (CID-10)**: ${data.cid10Code || item.defaultCid10 || 'A90'}
+- **Amostra / Metodologia**: ${data.specimenType || 'não informada'} — ${data.procedureName || VAZIO} (SIGTAP: ${data.sigtapCode || VAZIO})
+- **Hipótese Diagnóstica (CID-10)**: ${data.cid10Code || VAZIO}
 - **Justificativa Clínica**:
-${data.clinicalJustification || item.defaultJustification}
+${data.clinicalJustification || VAZIO}
 `;
   } else {
     // Guia SISREG
     specificDetails = `
 ### Dados da Regulação SISREG
-- **Especialidade / Procedimento**: ${data.procedureName || item.defaultProcedure}
-- **Código SIGTAP**: ${data.sigtapCode || item.defaultSigtap}
-- **Hipótese Diagnóstica (CID-10)**: ${data.cid10Code || item.defaultCid10 || 'I10'}${data.cid10Description ? ' — ' + data.cid10Description : ''}
+- **Especialidade / Procedimento**: ${data.procedureName || VAZIO}
+- **Código SIGTAP**: ${data.sigtapCode || VAZIO}
+- **Hipótese Diagnóstica (CID-10)**: ${data.cid10Code || VAZIO}${data.cid10Description ? ' — ' + data.cid10Description : ''}
 - **Resumo Clínico & Justificativa**:
-${data.clinicalJustification || item.defaultJustification}
+${data.clinicalJustification || VAZIO}
 `;
   }
 
@@ -282,14 +295,14 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
         <p style="margin: 0 0 6px 0; font-weight: bold; font-size: 12px; color: #0369A1; text-transform: uppercase;">
           PROCEDIMENTO & DADOS CLÍNICOS REGULATÓRIOS
         </p>
-        <p style="margin: 3px 0;"><strong>Procedimento SIGTAP:</strong> ${data.sigtapCode || item.defaultSigtap || '—'} — ${data.procedureName || item.defaultProcedure || '—'}</p>
-        <p style="margin: 3px 0;"><strong>Diagnóstico / CID-10:</strong> ${data.cid10Code || item.defaultCid10 || '—'} ${data.cid10Description ? `(${data.cid10Description})` : ''}</p>
-        ${data.sinanNumber ? `<p style="margin: 3px 0;"><strong>Nº Notificação SINAN:</strong> ${data.sinanNumber} &nbsp;|&nbsp; <strong>Início dos Sintomas (D1):</strong> ${data.symptomsStartDate || today}</p>` : ''}
-        ${data.renalCreatinine ? `<p style="margin: 3px 0;"><strong>Função Renal:</strong> Creatinina ${data.renalCreatinine} mg/dL &nbsp;|&nbsp; eTFG: ${data.renalEtfg || '> 60'} mL/min</p>` : ''}
+        <p style="margin: 3px 0;"><strong>Procedimento SIGTAP:</strong> ${data.sigtapCode || VAZIO} — ${data.procedureName || VAZIO}</p>
+        <p style="margin: 3px 0;"><strong>Diagnóstico / CID-10:</strong> ${data.cid10Code || VAZIO} ${data.cid10Description ? `(${data.cid10Description})` : ''}</p>
+        ${data.sinanNumber ? `<p style="margin: 3px 0;"><strong>Nº Notificação SINAN:</strong> ${data.sinanNumber} &nbsp;|&nbsp; <strong>Início dos Sintomas (D1):</strong> ${data.symptomsStartDate || 'não informado'}</p>` : ''}
+        ${item.id === 'apac_complementar' || data.renalCreatinine || data.renalEtfg ? `<p style="margin: 3px 0;"><strong>Função Renal:</strong> ${funcaoRenal(data)}</p>` : ''}
         
         <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed #CBD5E1;">
           <p style="margin: 0 0 3px 0; font-weight: bold; color: #334155;">Justificativa Técnica (Anti-Glosa):</p>
-          <p style="margin: 0; text-align: justify; color: #1E293B;">${data.clinicalJustification || item.defaultJustification}</p>
+          <p style="margin: 0; text-align: justify; color: #1E293B;">${data.clinicalJustification || VAZIO}</p>
         </div>
       </div>
 
