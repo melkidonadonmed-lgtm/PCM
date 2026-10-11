@@ -60,6 +60,11 @@ steps:
         curl --fail --silent --show-error --retry 5 --retry-delay 3 "$$URL/health"
         curl --fail --silent --show-error "$$URL/" | grep -q '<div id="root">'
         curl --fail --silent --show-error --head "$$URL/" | grep -qi '^x-content-type-options: nosniff'
+        # Asset inexistente responde 404 e esse 404 não pode levar cache longo
+        if curl --silent --head "$$URL/assets/__inexistente__.js" | grep -qi 'immutable'; then
+          echo "ERRO: 404 de /assets/ está saindo com cache imutável." >&2
+          exit 1
+        fi
         echo "Revisão publicada e respondendo."
 
 images:
