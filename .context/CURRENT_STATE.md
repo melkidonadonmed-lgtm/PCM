@@ -26,15 +26,17 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
 - Deploy automático no push em `main` (gatilho `gcpmain` → `cloudbuild.yaml`).
 
 ## Qualidade
-- 130/130 testes · `tsc --noEmit` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
+- 138/138 testes · `tsc --noEmit` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
   (logos em base64 saíram do JavaScript; motor de PDF sob demanda).
 - Validado em navegador (dados fictícios): desktop claro e celular escuro geram PDFs idênticos.
 
 ## Pendências (precisam de decisão ou revisão humana)
-1. **Documentos SUS:** removidos os dados presumidos (creatinina/eTFG, triagem de marca-passo, duração
-   de sintomas, preventivo anterior, data de início dos sintomas). **Ainda pendente de decisão médica:** o
-   formulário abre com justificativa clínica e CID-10 de modelo já preenchidos (visíveis e editáveis).
-2. Antimicrobianos (RDC 471/2021) saem hoje com o título "Controle Especial" e avisos da Portaria 344/98.
-3. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
-4. Desativar o gatilho duplicado `gcloudmelki` (us-central1), que refaz o build a cada push sem publicar.
-5. Unificar os 5 cabeçalhos duplicados do Editor A4 (`DocumentEditorView.tsx`, 4.270 linhas).
+1. **Notificação de Receita:** benzodiazepínicos (B1), opioides (A1/A2) e estimulantes (A3) saem hoje como
+   "Receituário de Controle Especial". Esses exigem Notificação de Receita B/A em talonário próprio; o app
+   deveria avisar isso em vez de sugerir que a folha impressa basta.
+2. **Sexo do paciente na receita de antimicrobiano:** a RDC 471/2021 pede nome, idade e sexo. O cadastro
+   usa "masculino" como valor inicial, então o sexo não é impresso (seria um dado presumido).
+3. **SIGTAP e procedimento dos documentos SUS** ainda abrem preenchidos com o padrão do catálogo.
+4. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
+5. Unificar os cabeçalhos duplicados do Editor A4 (`DocumentEditorView.tsx`) com os componentes da folha.
+6. Fonte de ícones de 4 MB (`material-symbols`) domina o cache offline; avaliar subconjunto.
