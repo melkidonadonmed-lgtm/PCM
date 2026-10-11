@@ -122,12 +122,12 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
     try {
       if (activeContext) {
         await db.workContexts.update(activeContext.id, {
-          logoDataUrl: preset.dataUrl,
+          logoDataUrl: preset.publicUrl,
           updatedAt: Date.now()
         });
       }
       if (onApplyLogo) {
-        await onApplyLogo(preset.dataUrl);
+        await onApplyLogo(preset.publicUrl);
       }
       onClose();
     } catch (err) {
@@ -294,7 +294,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                     <div>
                       <div className="h-28 w-full bg-white rounded-xl border border-slate-200 flex items-center justify-center p-3 shadow-inner overflow-hidden mb-3">
                         <img
-                          src={logo.dataUrl}
+                          src={logo.publicUrl}
                           alt={logo.name}
                           className="max-h-full max-w-full object-contain"
                         />
@@ -328,7 +328,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                         <span>Aplicar ao Contexto</span>
                       </button>
                       <a
-                        href={logo.dataUrl}
+                        href={logo.publicUrl}
                         download={`${logo.id}.png`}
                         onClick={(e) => e.stopPropagation()}
                         className="p-2 rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] text-xs text-[var(--text-muted)] flex items-center justify-center cursor-pointer"

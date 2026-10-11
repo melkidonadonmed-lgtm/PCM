@@ -26,12 +26,14 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
 - Deploy automático no push em `main` (gatilho `gcpmain` → `cloudbuild.yaml`).
 
 ## Qualidade
-- 101/101 testes · `tsc --noEmit` limpo · `npm run build` OK · bundle principal 2,34 MB → 1,76 MB.
+- 130/130 testes · `tsc --noEmit` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
+  (logos em base64 saíram do JavaScript; motor de PDF sob demanda).
 - Validado em navegador (dados fictícios): desktop claro e celular escuro geram PDFs idênticos.
 
 ## Pendências (precisam de decisão ou revisão humana)
-1. **Revisão clínica dos documentos SUS** (`susDocumentsCatalog.ts`): há justificativa clínica, CID e
-   função renal pré-preenchidos por padrão — risco de sair texto que o médico não escreveu.
+1. **Documentos SUS:** removidos os dados presumidos (creatinina/eTFG, triagem de marca-passo, duração
+   de sintomas, preventivo anterior, data de início dos sintomas). **Ainda pendente de decisão médica:** o
+   formulário abre com justificativa clínica e CID-10 de modelo já preenchidos (visíveis e editáveis).
 2. Antimicrobianos (RDC 471/2021) saem hoje com o título "Controle Especial" e avisos da Portaria 344/98.
 3. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
 4. Desativar o gatilho duplicado `gcloudmelki` (us-central1), que refaz o build a cada push sem publicar.

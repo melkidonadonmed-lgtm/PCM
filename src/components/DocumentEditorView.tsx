@@ -2662,21 +2662,21 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <div className="flex items-center gap-1.5">
                           <button
                             type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.dataUrl, 'SEMUSA')}
+                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
                             className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
                           >
                             SEMUSA
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.dataUrl, 'SESAU')}
+                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
                             className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
                           >
                             SESAU
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.dataUrl, 'SUS')}
+                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
                             className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
                           >
                             SUS
@@ -2753,21 +2753,21 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <div className="flex items-center gap-1.5">
                           <button
                             type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sus.dataUrl, 'SUS')}
+                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
                             className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer font-bold text-blue-600 dark:text-blue-400"
                           >
                             SUS
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sesau_ro.dataUrl, 'SESAU')}
+                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
                             className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
                           >
                             SESAU
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.semusa.dataUrl, 'SEMUSA')}
+                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
                             className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
                           >
                             SEMUSA

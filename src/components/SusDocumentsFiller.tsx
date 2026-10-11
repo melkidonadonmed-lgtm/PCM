@@ -69,13 +69,14 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     clinicalJustification: doc.defaultJustification || '',
     sinanNumber: '',
     symptomsStartDate: '',
-    renalCreatinine: '1,0',
-    renalEtfg: '> 60',
+    // Exames e achados clínicos começam vazios: quem informa é o médico.
+    renalCreatinine: '',
+    renalEtfg: '',
     isContrastNeeded: true,
     gynecologyDum: '',
-    gynecologyPreviousExam: 'Nunca realizou / Há mais de 3 anos',
+    gynecologyPreviousExam: '',
     specimenType: '',
-    tuberculosisSymptomsDuration: 'Mais de 3 semanas',
+    tuberculosisSymptomsDuration: '',
     lmeMedicationName: '',
     lmeMedicationPosology: '',
     lmeMedicationQuantityMonthly: '1 mês'
@@ -93,13 +94,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         clinicalJustification: d.defaultJustification || '',
         sinanNumber: '',
         symptomsStartDate: '',
-        renalCreatinine: '1,0',
-        renalEtfg: '> 60',
+        renalCreatinine: '',
+        renalEtfg: '',
         isContrastNeeded: true,
         gynecologyDum: '',
-        gynecologyPreviousExam: 'Nunca realizou / Há mais de 3 anos',
+        gynecologyPreviousExam: '',
         specimenType: '',
-        tuberculosisSymptomsDuration: 'Mais de 3 semanas',
+        tuberculosisSymptomsDuration: '',
         lmeMedicationName: '',
         lmeMedicationPosology: '',
         lmeMedicationQuantityMonthly: '1 mês'
@@ -1033,9 +1034,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.renalCreatinine || '1,0'}
+                          value={formData.renalCreatinine || ''}
                           onChange={e => handleFieldChange('renalCreatinine', e.target.value)}
-                          placeholder="1,0 mg/dL"
+                          placeholder="Resultado do exame (ex.: 0,9)"
                           className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
                         />
                       </div>
@@ -1045,9 +1046,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.renalEtfg || '> 60'}
+                          value={formData.renalEtfg || ''}
                           onChange={e => handleFieldChange('renalEtfg', e.target.value)}
-                          placeholder="> 60 mL/min"
+                          placeholder="Resultado em mL/min/1,73m²"
                           className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
                         />
                       </div>
