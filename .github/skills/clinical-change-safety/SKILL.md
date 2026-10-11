@@ -10,8 +10,9 @@ Treat clinical changes as safety-critical:
    or legal requirements.
 2. Map every affected reference across `src/data/`,
    `src/utils/doseCalculator.ts`, protocol `pediatricMedId` links, UI
-   summaries, `PrintPreview.tsx`, sharing text, and
-   `src/utils/pdfGenerator.ts`.
+   summaries, `PrintPreview.tsx` (sharing text), and the document sheet in
+   `src/components/documento/` with its rules in
+   `src/utils/documentoClinico.ts`.
 3. Preserve units explicitly. Check conversions among mg, mg/kg, mL, drops,
    concentration, dose frequency, and maximum dose.
 4. Reject silent fallbacks, ambiguous rounding, invalid weights, missing

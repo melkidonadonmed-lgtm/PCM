@@ -35,7 +35,7 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 | **Bundler** | Vite 6 | `@vitejs/plugin-react` e `@tailwindcss/vite`. |
 | **Estilos** | Tailwind CSS v4 | Configurado diretamente via CSS em `src/index.css` (`@import "tailwindcss"` e `@theme`). |
 | **UI & Ícones** | Google Material Symbols (`material-symbols`), `lucide-react`, `motion` | Sistema canônico `<Icon />` com Google Material Design Icons offline + suporte legado Lucide. |
-| **Documentos / PDF** | `jspdf`, `jspdf-autotable`, `html2canvas` | Geração vetorial programática e visualização de folha A4. |
+| **Documentos / PDF** | `html2canvas-pro`, `jspdf` | Folha A4 única (`components/documento/`): prévia, impressão e PDF saem do mesmo componente. |
 | **Testes** | Vitest 5 | Testes unitários para cálculos de dose e conformidade sanitária/CFM. |
 | **Persistência** | `localStorage` + `Dexie.js` v2 | Persistência local segura + backup e restauração portátil (`.pcm.json`). |
 
