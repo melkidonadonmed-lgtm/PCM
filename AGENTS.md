@@ -174,8 +174,8 @@ src/
   - *Nota:* A chave legada `prescmed_show_pedia_calc` não existe mais no sistema.
 - **Tema claro/escuro e layout:**
   - Script inline no `<head>` de `index.html` avalia `prescmed_theme` antes da pintura da tela para prevenir FOUC (flash de tema).
-  - Tema Claro: Canvas creme/slate cirúrgico (`--bg-app: #F9F6F0` / `#F8FAFC`), superfícies e cards brancos (`--surface-card: #FFFFFF` / `#FFFDF9`).
-  - Tema Escuro: Fundo obsidian (`--bg-app: #0D0F12`), superfícies grafite translúcidas (`--surface-card: #1A1D24`).
+  - Tema Claro: canvas slate claro (`--bg-app: #F8FAFC`), superfícies e cards brancos (`--surface-card: #FFFFFF`).
+  - Tema Escuro: fundo slate profundo (`--bg-app: #0F172A`), superfícies `--surface-card: #1E293B`.
   - **Header claro no tema claro**: `Header.tsx` adota superfície de cartão `bg-[var(--surface-card)]` (claro no tema claro, escuro no tema escuro), integrando-se ao canvas de trabalho. O logo é um botão "Início" funcional (retorna à aba Receitas e rola para o topo) sem tagline textual decorativa.
   - **Sidebar e MobileBottomNav contínuos em Deep Navy**: Ambos mantêm acabamento azul-marinho profundo (`.panel-navy`) com tipografia clara em ambos os temas.
   - **Navegação Mobile (`MobileBottomNav`)**: Visível abaixo de `lg` (1024px) com exatamente 5 destinos (Receitas, Documentos, Doses, Editor, Mais). O botão "Mais" abre a `Sidebar` completa em modo gaveta/diálogo acessível, onde ficam Protocolos e Exportar. A funcionalidade de exportar/backup reside na Sidebar.
