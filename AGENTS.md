@@ -6,13 +6,14 @@
 
 - Prescrição médica estruturada com busca inteligente de fármacos, categorias SUS/RENAME e kits de plantão.
 - Calculadora pediátrica unificada de doses por peso (mg/kg → mL/gotas), com regra estrita "sem peso, sem dose".
-- Solicitação de exames laboratoriais e diagnósticos por imagem.
+- Solicitação de exames laboratoriais e diagnósticos por imagem, com rotinas e painéis prontos.
+- Documentos SUS: APAC e LME sobre o impresso oficial; guia SISREG, GAL/LACEN, SISCAN e TRM-TB no modelo do app.
 - Emissão de atestados médicos e encaminhamentos (com conformidade ética e legal CFM, ex.: Res. CFM 1.658/2002 para consentimento de CID-10).
 - Editor visual de laudos e documentos clínicos.
 - Emissão de documentos (receituário simples, receituário de controle especial em 2 vias — Portaria 344/98, exames, atestado, encaminhamento, documentos SUS) por **uma única folha A4**: a prévia na tela, a impressão e o PDF saem do mesmo componente.
 - Tela de emissão (`PrintPreview`) e protocolos clínicos por patologia.
 
-O projeto foi gerado a partir de um template do **Google AI Studio** (ver `metadata.json` e `README.md`), mas o código atual é uma **SPA 100% client-side**: não há backend implementado em produção. As dependências `@google/genai`, `express`, `dotenv` e `motion` estão declaradas no `package.json`, porém **não são importadas em nenhum arquivo de `src/`** — não crie código assumindo que exista um servidor, chamadas ativas à API Gemini ou animações via `motion`. O script `clean` remove `server.js`, que não existe no repositório.
+O projeto foi gerado a partir de um template do **Google AI Studio** (ver `metadata.json`), mas o código atual é uma **SPA 100% client-side**: não há backend próprio. A única comunicação com servidor é a sincronização opcional com o Firebase (login Google + Firestore), carregada sob demanda. `@google/genai`, `express`, `dotenv` e `motion` **saíram do `package.json`** e não são importados em nenhum arquivo de `src/` — não crie código assumindo que exista um servidor, chamadas à API Gemini ou animações via `motion`.
 
 **Atenção:** este é um app do domínio médico (YMYL). As doses pediátricas usam regras clínicas específicas do Brasil (ex.: paracetamol gotas = 1 gota/kg/dose). Qualquer alteração em lógica de cálculo de doses (`src/utils/doseCalculator.ts`), kits de plantão (`src/data/clinicalKits.ts`) ou catálogos farmacêuticos (`src/data/`) exige revisão cuidadosa e execução dos testes.
 
@@ -23,8 +24,12 @@ O projeto foi gerado a partir de um template do **Google AI Studio** (ver `metad
 - **Tailwind CSS v4** via `@tailwindcss/vite` (configuração declarada diretamente no CSS com `@import "tailwindcss"`, `@theme`, `@utility` e `@layer` em `src/index.css`).
 - **Ícones**: Componente canônico `<Icon />` com Google Material Design Symbols (`material-symbols` 100% offline via woff2) e `lucide-react`.
 - **html2canvas-pro + jspdf** para exportar em PDF a folha exibida na tela (carregados sob demanda). `html2canvas-pro` é obrigatório: o `html2canvas` original não entende as cores `oklch` do Tailwind v4 e falha em silêncio.
-- **Dexie.js v2** para persistência estruturada IndexedDB de contextos e documentos salvos.
-- Gerenciador de pacotes: **npm**, com `package-lock.json`. O `bun.lock` é legado e não exige a instalação do Bun.
+- **Dexie.js 4** para persistência estruturada IndexedDB de contextos e documentos salvos (o esquema do banco está na versão 2: tabelas `workContexts` e `savedDocuments`).
+- **Tiptap 3** no Editor A4 (`DocumentEditorView.tsx`), em chunk separado.
+- **Firebase 12** (Auth + Firestore) para a sincronização opcional na nuvem, em chunk `vendor-firebase` carregado só depois do clique em "Nuvem" e fora do precache.
+- **vite-plugin-pwa** (Workbox) para instalação como PWA e funcionamento offline.
+- **Vitest 5** para os testes.
+- Gerenciador de pacotes: **npm**, com `package-lock.json`.
 
 ## Comandos
 
@@ -51,10 +56,16 @@ npm run clean      # remove dist/
 - Regimes de receita e folha do antimicrobiano (`regimesDeReceita.test.tsx`); documentos SUS em branco sem dado clínico (`susSemDadosInventados.test.ts`).
 - APAC e LME sobre o impresso oficial: cada dado no campo numerado, campo vazio em branco, encaixe do texto na caixa (`formulariosOficiaisSus.test.tsx`).
 - Folha única dos documentos — cabeçalho institucional, ausência de selos/QR de validação, CID só com consentimento, nada de texto clínico inventado (`documentoClinico.test.tsx`).
+- Detecção de antimicrobianos e controlados por nome e princípio ativo (`specialControlAntibiotic.test.ts`).
+- Prescrição rápida: posologia estruturada e total de comprimidos a dispensar (`prescricaoRapida.test.ts`).
+- Volta do Editor A4 para a receita: HTML editado convertido de novo em itens tipados (`parsePrescriptionHtml.test.ts`).
+- Catálogo e gerador dos documentos SUS (`susDocumentsAndEditorEnhancements.test.ts`).
+- Limpeza dos dados antes de gravar no Firestore (`cloudSyncSanitize.test.ts`).
+- Navegação e fluxo de consulta: rotas do editor, preenchimento e limpeza do paciente, calculadora em gaveta e Central de Documentos (`editorRoutingAndActions.test.ts`, `patientAutofillAndClear.test.ts`, `pediatricDrawerAndDocumentsHub.test.ts`).
 
 Ao modificar lógica de cálculo, kits ou conformidade sanitária, execute obrigatoriamente `npm run test`, `npm run lint` e `npm run design:lint`.
 
-Para alterações de UI, impressão ou PDF, use a skill `ui-pdf-validation`. Para qualquer alteração clínica, use `clinical-change-safety` e solicite revisão do agente `prescmed-clinical-reviewer`.
+Para alterações de UI, impressão ou PDF, use a skill `ui-pdf-validation`. Para qualquer alteração clínica, use `clinical-change-safety` e solicite revisão do agente `prescmed-clinical-reviewer`. As skills ficam em `.github/skills/` e o agente em `.github/agents/`.
 
 ## Estrutura do código
 
@@ -69,12 +80,15 @@ src/
   components/
     Header.tsx                 # Header superior (fundo claro no Light, botão Início, perfil e nuvem)
     Sidebar.tsx                # Menu lateral de navegação e kits clínicos de plantão (deep navy contínuo)
-    MobileBottomNav.tsx        # Barra de navegação inferior mobile com 5 destinos (Receitas, Doses, Exames, Editor, Mais)
+    MobileBottomNav.tsx        # Barra de navegação inferior mobile com 5 destinos (Receitas, Documentos, Doses, Editor, Mais)
     PrescriptionBuilder.tsx    # Construtor de receitas (busca, formulário de prescrição, lista e prévia A4)
     AcoesDaReceita.tsx         # Barra de ações única da receita (Imprimir/PDF, Editor, WhatsApp, Copiar)
     PediatricCalculator.tsx    # Calculadora pediátrica dedicada por peso (mg/kg → mL/gotas)
     ExamRequester.tsx          # Solicitação de exames laboratoriais e diagnósticos por imagem
     CertificateAndReferral.tsx # Emissão de atestados médicos e encaminhamentos com conformidade CFM
+    ClinicalDocumentsHub.tsx   # Central de Documentos: abas Atestado, Encaminhamento, Pedidos de Exames e Documentos SUS
+    SusDocumentsFiller.tsx     # Catálogo e preenchimento dos documentos SUS (APAC, LME, SISREG, GAL/LACEN, SISCAN, TRM-TB)
+    AvisoNotificacaoReceita.tsx # Aviso de tela (.no-print) para controlados que exigem Notificação de Receita
     ClinicalProtocolsView.tsx  # Protocolos de conduta clínica e catálogo por classes terapêuticas SUS/RENAME
     DocumentEditorView.tsx     # Editor visual avançado para laudos e documentos médicos livres
     PrintPreview.tsx           # Tela de emissão: folha A4 + ações (baixar PDF, imprimir, WhatsApp, copiar)
@@ -82,13 +96,15 @@ src/
       FolhaA4.tsx              # Papel A4 em tamanho real (794×1123 px), reduzido por zoom para caber; impressão fiel
       DocumentoClinico.tsx     # ÚNICO desenho de receita, exames, atestado e encaminhamento
       ReceitaDuasVias.tsx      # 2 vias lado a lado em paisagem: antimicrobiano (RDC 471/2021) e controle especial (Portaria 344/98)
-      CabecalhoInstitucional.tsx  # Timbre: logo + local de atendimento
+      CabecalhoInstitucional.tsx  # Timbre: logo do órgão + local de atendimento + segundo logo (SUS na rede pública)
+      FormularioOficialSus.tsx # Impresso oficial (APAC, LME) como fundo da folha, com os dados escritos por cima
       AssinaturaMedico.tsx     # Local, data e assinatura com nome/CRM do médico
     PatientModal.tsx           # Modal de edição rápida e cadastro de dados do paciente
     DoctorProfileModal.tsx     # Modal de configuração do médico emitente (nome, CRM/UF, clínica)
     CidSearchBar.tsx           # Campo de busca preditiva de diagnósticos e códigos CID-10
     BackupModal.tsx            # Modal de exportação e restauração de backups portáteis (.pcm.json)
     ConfirmationModal.tsx      # Modal genérico de confirmação para ações destrutivas ou de descarte
+    AsyncErrorBoundary.tsx     # Barreira de erro das telas carregadas sob demanda, com opção de tentar de novo
     ContextSwitcher.tsx        # Seletor rápido de postos de trabalho e contextos clínicos do médico
     LogoGeneratorModal.tsx     # Utilitário para personalização de cabeçalho e monograma de receituário
     PuxarParaAtualizar.tsx     # Gesto tátil de pull-to-refresh para atualização em dispositivos móveis
@@ -105,12 +121,14 @@ src/
     exemplos.ts                # Dados fictícios de exemplo (Melki Donadon / Seu Melki) para prévia e placeholders
     presetAssets.ts            # Logos e marcas d'água predefinidos (apontam para arquivos em public/; nunca embutir base64 aqui)
     presetClinicalTemplates.ts # Modelos estruturados de documentos e atestados clínicos
+    susDocumentsCatalog.ts     # Catálogo dos 9 documentos SUS, laudo copiável e HTML do modelo do app (`TimbreSus`)
+    formulariosOficiaisSus.ts  # Campos numerados da APAC e da LME: coordenadas no impresso oficial e fonte conferida
   hooks/
     usePrescriptionSession.ts  # Gerenciamento de sessão, rascunhos e ciclo de vida da receita
     usePwaInstall.ts           # Detecção de suporte e acionamento de instalação como Progressive Web App
     useWorkContext.ts          # Controle de posto de trabalho ativo e alternância de contexto
   services/
-    db.ts                      # Banco IndexedDB local estruturado via Dexie.js v2
+    db.ts                      # Banco IndexedDB local via Dexie.js (esquema v2: workContexts e savedDocuments)
     storageService.ts          # Camada de persistência segura com fallback tipado para localStorage
     backupService.ts           # Geração e importação de backups integrais em formato .pcm.json
     cloud/
@@ -126,18 +144,19 @@ src/
     folhaA4.ts                 # Geometria da folha e `exportarFolhaPdf` (entrada leve; carrega o motor sob demanda)
     renderSheetToPdf.ts        # Motor de PDF: fotografa a folha na largura real do A4 e pagina
     downloadPdf.ts             # Download por blob compatível com WebView/PWA
-  __tests__/
-    doseCalculator.test.ts     # Testes da calculadora de dose por peso e regras de arredondamento
-    clinicalKits.test.ts       # Testes de montagem de kits clínicos de plantão com snapshots
-    cfmConsentCid10.test.ts    # Testes de validação de consentimento de CID em atestados (CFM 1.658/2002)
-    sanitaryCompliancePortaria344.test.ts # Testes de emissão em 2 vias para Portaria 344/98
-    iconComponent.test.ts      # Testes de tipagem, aliases clínicos e renderização de ícones
-    documentoClinico.test.tsx  # Testes da folha única dos documentos (renderizada para HTML)
+    isSpecialControlOrAntibiotic.ts # `classificarReceita`: regime da receita (simples, antimicrobiano, controle especial)
+    notificacaoDeReceita.ts    # `notificacaoExigida`: controlados que pedem Notificação de Receita em talonário próprio
+    formularioOficial.ts       # Encaixe e quebra de linha do texto nas caixas do impresso oficial
+    prescricaoRapida.ts        # Prescrição rápida: posologia estruturada e total de comprimidos a dispensar
+    parsePrescriptionHtml.ts   # Converte o HTML do Editor A4 de volta em itens tipados da receita
+  __tests__/                   # Um arquivo por regra; a lista do que cada um cobre está em "Comandos → Testes"
 ```
 
 ## Arquitetura em tempo de execução
 
-- **SPA sem roteador:** A navegação ocorre por estado centralizado (`activeTab: ActiveTab`) em `App.tsx` (valores: `'prescription'`, `'pediatric_calc'`, `'exams'`, `'editor'`, `'certificate'`, `'referral'`, `'protocols'`, `'print_preview'`). Não há react-router nem alteração de rota via URL.
+- **SPA sem roteador:** A navegação ocorre por estado centralizado (`activeTab: ActiveTab`) em `App.tsx` (valores: `'prescription'`, `'pediatric_calc'`, `'documents'`, `'exams'`, `'certificate'`, `'referral'`, `'protocols'`, `'editor'`, `'print_preview'`, `'patients'`). Não há react-router nem alteração de rota via URL.
+  - `'documents'`, `'certificate'`, `'referral'` e `'exams'` abrem a mesma tela, a Central de Documentos (`ClinicalDocumentsHub.tsx`), já na aba correspondente; os documentos SUS são a quarta aba dela.
+  - `'patients'` não tem tela: selecioná-lo só abre o `PatientModal`.
 - **Estado centralizado em `App.tsx`:** Médico, paciente, medicamentos prescritos, exames selecionados, atestado e encaminhamento residem em `useState` no App e são transmitidos via props. Mantenha esse padrão determinístico; não adicione gerenciadores globais externos (Redux/Zustand).
 - **Persistência em `localStorage`:** O sistema utiliza 11 chaves oficiais sincronizadas via `storageService` e `useEffect`:
   1. `prescmed_theme`: Tema visual (`'light'` ou `'dark'`).
@@ -155,11 +174,11 @@ src/
   - *Nota:* A chave legada `prescmed_show_pedia_calc` não existe mais no sistema.
 - **Tema claro/escuro e layout:**
   - Script inline no `<head>` de `index.html` avalia `prescmed_theme` antes da pintura da tela para prevenir FOUC (flash de tema).
-  - Tema Claro: Canvas creme/slate cirúrgico (`--bg-app: #F9F6F0` / `#F8FAFC`), superfícies e cards brancos (`--surface-card: #FFFFFF` / `#FFFDF9`).
-  - Tema Escuro: Fundo obsidian (`--bg-app: #0D0F12`), superfícies grafite translúcidas (`--surface-card: #1A1D24`).
+  - Tema Claro: canvas slate claro (`--bg-app: #F8FAFC`), superfícies e cards brancos (`--surface-card: #FFFFFF`).
+  - Tema Escuro: fundo slate profundo (`--bg-app: #0F172A`), superfícies `--surface-card: #1E293B`.
   - **Header claro no tema claro**: `Header.tsx` adota superfície de cartão `bg-[var(--surface-card)]` (claro no tema claro, escuro no tema escuro), integrando-se ao canvas de trabalho. O logo é um botão "Início" funcional (retorna à aba Receitas e rola para o topo) sem tagline textual decorativa.
   - **Sidebar e MobileBottomNav contínuos em Deep Navy**: Ambos mantêm acabamento azul-marinho profundo (`.panel-navy`) com tipografia clara em ambos os temas.
-  - **Navegação Mobile (`MobileBottomNav`)**: Visível abaixo de `lg` (1024px) com exatamente 5 destinos (Receitas, Doses, Exames, Editor, Mais). O botão "Mais" abre a `Sidebar` completa em modo gaveta/diálogo acessível. A funcionalidade de exportar/backup reside na Sidebar.
+  - **Navegação Mobile (`MobileBottomNav`)**: Visível abaixo de `lg` (1024px) com exatamente 5 destinos (Receitas, Documentos, Doses, Editor, Mais). O botão "Mais" abre a `Sidebar` completa em modo gaveta/diálogo acessível, onde ficam Protocolos e Exportar. A funcionalidade de exportar/backup reside na Sidebar.
   - Gesto tátil de puxar para atualizar (`PuxarParaAtualizar.tsx`) integrado para telas de toque.
 - **Página Principal de Receituário (`PrescriptionBuilder.tsx`):**
   - Composta por busca rápida de medicamentos, formulário "Prescrição", lista "Medicamentos prescritos" e bancada com prévia de impressão A4.
@@ -219,7 +238,7 @@ src/
 
 ## Deploy
 
-Produção: **Google Cloud Run**, serviço `prescmed`, região `southamerica-east1` (projeto `agent-md-506215`), imagem Nginx servindo `dist/`.
+Produção: **Google Cloud Run**, serviço `prescmed`, região `southamerica-east1` (projeto `agent-md-506215`), imagem Nginx servindo `dist/` (build em `node:24-alpine`).
 
 - **Deploy automático:** push em `main` dispara o gatilho Cloud Build `gcpmain`, que executa `cloudbuild.yaml`: build da imagem → push → deploy → teste de fumaça.
 - **Portão de qualidade no `Dockerfile`:** `npm run lint && npm run test` rodam antes do build. Teste vermelho = imagem não é gerada = nada é publicado.

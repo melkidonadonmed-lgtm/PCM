@@ -43,7 +43,7 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
 - Deploy automático no push em `main` (gatilho `gcpmain` → `cloudbuild.yaml`).
 
 ## Qualidade
-- 177/177 testes · `tsc --noEmit` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
+- 180/180 testes · `tsc --noEmit` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
   (logos em base64 saíram do JavaScript; motor de PDF sob demanda).
 - Validado em navegador (dados fictícios): desktop claro e celular escuro geram PDFs idênticos.
 
@@ -64,16 +64,16 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
    usa "masculino" como valor inicial, então o sexo não é impresso (seria um dado presumido).
 3. **SIGTAP e procedimento dos documentos SUS** ainda abrem preenchidos com o padrão do catálogo nos 7
    documentos que não têm impresso oficial (na APAC e na LME já abrem em branco).
-8. **Impressos oficiais que faltam:** SISCAN (citopatológico, histopatológico, mamografia) tem formulário
+4. **Impressos oficiais que faltam:** SISCAN (citopatológico, histopatológico, mamografia) tem formulário
    nacional do INCA e pode entrar no mesmo motor, mas exige campos novos na tela (anamnese ginecológica,
    exame clínico). Guia SISREG, GAL/LACEN, TRM-TB e "APAC complementar" não têm modelo nacional único:
    é preciso o impresso usado em Porto Velho/RO (foto ou PDF) para reproduzir.
-9. **APAC:** a cópia do modelo nacional veio do site da SES/RS (o Ministério não publica o PDF em página
+5. **APAC:** a cópia do modelo nacional veio do site da SES/RS (o Ministério não publica o PDF em página
    própria). Conferir com o impresso que a regulação local aceita; campos 4, 11, 12, 15 e 21–35 ficam em
    branco porque o app não coleta esses dados.
-10. **LME:** o cadastro do médico não guarda CNS (campo 15); é digitado a cada sessão na tela do documento.
-4. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
-5. Unificar os cabeçalhos duplicados do Editor A4 (`DocumentEditorView.tsx`) com os componentes da folha.
-6. Fonte de ícones de 4 MB (`material-symbols`) domina o cache offline; avaliar subconjunto.
-7. Editor A4: com mais de uma receita na consulta, o botão "Receita simples" do seletor não troca a folha
+6. **LME:** o cadastro do médico não guarda CNS (campo 15); é digitado a cada sessão na tela do documento.
+7. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
+8. Unificar os cabeçalhos duplicados do Editor A4 (`DocumentEditorView.tsx`) com os componentes da folha.
+9. Fonte de ícones de 4 MB (`material-symbols`) domina o cache offline; avaliar subconjunto.
+10. Editor A4: com mais de uma receita na consulta, o botão "Receita simples" do seletor não troca a folha
    (continua na de controle especial). Visto em 11/10/2026; já ocorria antes do aviso de notificação.

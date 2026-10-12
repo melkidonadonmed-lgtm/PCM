@@ -2,6 +2,8 @@
 
 Este arquivo serve como **memória persistente, diretrizes de arquitetura e base de conhecimento** para o desenvolvimento do **PresCMed**. Todos os agentes e modelos que atuam neste repositório devem seguir estritamente as diretrizes aqui documentadas.
 
+> **Fonte detalhada:** o [`AGENTS.md`](./AGENTS.md) traz as regras completas (regimes de receita, emissão de documentos, documentos SUS, estrutura arquivo por arquivo). Em caso de divergência, vale o `AGENTS.md`. As seções 1 a 6 abaixo foram conferidas com o código em 11/10/2026; a seção 7 é histórico.
+
 ---
 
 ## 1. Identificação do Projeto
@@ -10,7 +12,7 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 - **Versão**: 2.0.0
 - **Natureza**: Sistema de Prescrição Médica Digital ambulatorial voltado ao ecossistema de saúde brasileiro.
 - **Domínio**: Clínico / Saúde (YMYL — *Your Money or Your Life*). Qualquer alteração de dose, posologia ou conformidade regulatória exige precisão cirúrgica e validação de testes.
-- **Arquitetura**: **SPA 100% Client-Side** (React 19 + Vite 6). Não há backend ativo em Node/Express no código de produção; dados sensíveis residem estritamente no navegador do médico (localStorage e Dexie.js / IndexedDB).
+- **Arquitetura**: **SPA 100% Client-Side** (React 19 + Vite 6). Não há backend próprio; dados sensíveis residem estritamente no navegador do médico (localStorage e Dexie.js / IndexedDB). A única comunicação com servidor é a sincronização opcional com o Firebase (login Google + Firestore), que leva apenas postos de trabalho e modelos reutilizáveis.
 
 ---
 
@@ -34,10 +36,13 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 | **Frontend** | React 19 + TypeScript | Modo funcional com hooks. Sem React Router (roteamento por aba `activeTab` em `App.tsx`). |
 | **Bundler** | Vite 6 | `@vitejs/plugin-react` e `@tailwindcss/vite`. |
 | **Estilos** | Tailwind CSS v4 | Configurado diretamente via CSS em `src/index.css` (`@import "tailwindcss"` e `@theme`). |
-| **UI & Ícones** | Google Material Symbols (`material-symbols`), `lucide-react`, `motion` | Sistema canônico `<Icon />` com Google Material Design Icons offline + suporte legado Lucide. |
+| **UI & Ícones** | Google Material Symbols (`material-symbols`), `lucide-react` | Sistema canônico `<Icon />` com Google Material Design Icons offline + suporte legado Lucide. O pacote `motion` foi removido. |
+| **Editor** | Tiptap 3 | Editor A4 (`DocumentEditorView.tsx`), carregado sob demanda. |
 | **Documentos / PDF** | `html2canvas-pro`, `jspdf` | Folha A4 única (`components/documento/`): prévia, impressão e PDF saem do mesmo componente. |
-| **Testes** | Vitest 5 | Testes unitários para cálculos de dose e conformidade sanitária/CFM. |
-| **Persistência** | `localStorage` + `Dexie.js` v2 | Persistência local segura + backup e restauração portátil (`.pcm.json`). |
+| **Testes** | Vitest 5 | Doses, kits, regimes de receita, consentimento de CID, folha dos documentos e documentos SUS. |
+| **Persistência** | `localStorage` + Dexie.js 4 (esquema v2) | Persistência local segura + backup e restauração portátil (`.pcm.json`). |
+| **Nuvem (opcional)** | Firebase 12 (Auth + Firestore) | Chunk `vendor-firebase`, carregado só após o clique em "Nuvem" e fora do cache offline. |
+| **PWA** | `vite-plugin-pwa` (Workbox) | Instalação como aplicativo e funcionamento offline. |
 
 ---
 
@@ -46,29 +51,37 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 1. **Portaria SVS/MS 344/98 (Receituário de Controle Especial)**:
    - Obrigatório formato em **2 vias** (1ª via: Retenção da Farmácia / 2ª via: Orientação do Paciente).
    - Obrigatoriedade dos campos de identificação do emitente (médico/CRM/UF), do paciente, do comprador (se terceiro) e do fornecedor/farmácia.
+   - **Três regimes, três folhas** (`classificarReceita` em `src/utils/isSpecialControlOrAntibiotic.ts`): simples; antimicrobiano (RDC Anvisa nº 471/2021, 2 vias, válida por 10 dias, a farmácia retém a 2ª via); controle especial (a farmácia retém a 1ª via). Nunca emita antimicrobiano com título ou avisos de controle especial.
+   - **Notificação de Receita** (listas A1, A3, B1, B2 e C2): o app não emite o talonário; só mostra um aviso de tela, fora da folha (`src/utils/notificacaoDeReceita.ts`).
 2. **Resoluções CFM 1.658/2002 e 1.819/2007 (Consentimento de CID-10)**:
    - A inclusão do diagnóstico ou código CID-10 em atestados médicos é **vedada sem a expressa concordância e solicitação do paciente**.
    - A interface do PresCMed exige a marcação explícita de consentimento (`authorizedByPatient = true`) antes de emitir atestado com CID visível.
 3. **Calculadora Pediátrica de Doses (`src/utils/doseCalculator.ts`)**:
    - Cálculos por peso (mg/kg) convertidos em volumes práticos (mL ou gotas) baseados nas apresentações farmacêuticas reais do mercado brasileiro.
-   - Paracetamol gotas: 1 gota/kg/dose (máximo 35 gotas por dose).
-   - Dipirona gotas: 0,5 a 1 gota/kg/dose (apresentação 500 mg/mL).
-   - Formatação numérica sempre com vírgula no padrão brasileiro (`toLocaleString('pt-BR')`).
+   - Paracetamol gotas: 1 gota/kg/dose. Na calculadora o teto é 100 gotas (1000 mg) por dose; nos kits de plantão (`src/utils/montarItensDoKit.ts`) o teto é 35 gotas. Essa diferença faz parte das doses fixas dos kits que aguardam revisão clínica: não altere sem fonte.
+   - Dipirona gotas: 0,5 a 1 gota/kg/dose (apresentação 500 mg/mL), entre 4 e 40 gotas por dose.
+   - **Sem peso, sem dose:** sem peso cadastrado, nenhuma dose é calculada.
+   - Formatação numérica sempre com vírgula decimal e **sem separador de milhar** ("1000 mg", nunca "1.000 mg").
+4. **Nada inventado no documento**:
+   - Sem QR code, "validação digital" ou "assinatura eletrônica": o app não assina digitalmente.
+   - Campo vazio não imprime; dado clínico (CID, justificativa, resultado de exame) nunca abre preenchido por padrão.
+5. **Documentos SUS**:
+   - APAC e LME saem sobre o impresso oficial (`public/formularios-sus/`), com cada dado no campo numerado. Nunca desenhe um formulário "no estilo SUS".
 
 ---
 
 ## 5. Design System e Regras de Interface
 
-- **Chrome de Navegação** (`Header`, `Sidebar`, `MobileBottomNav`):
-  - **Sempre Deep Navy** (`#0B132B` / `#1C2541` via `.panel-navy`) em **ambos os temas** (Claro e Escuro).
-  - Tipografia sobre o navy sempre em tons claros (`#F1F5F9`, `#CBD5E1`, `#94A3B8`).
+- **Chrome de Navegação**:
+  - `Sidebar` e `MobileBottomNav`: **sempre Deep Navy** (`.panel-navy`) em **ambos os temas**, com tipografia clara.
+  - `Header`: superfície de cartão (`--surface-card`), clara no tema claro e escura no tema escuro.
+  - `MobileBottomNav`: 5 destinos (Receitas, Documentos, Doses, Editor, Mais).
 - **Tema Claro**:
-  - Fundo da aplicação: Canvas creme suave (`--bg-app: #F9F6F0`).
-  - Cards e superfícies: Branco-quente (`--surface-card: #FFFDF9`).
-  - Tipografia: Azul-marinho profundo (`#0F172A`).
+  - Fundo da aplicação: slate claro (`--bg-app: #F8FAFC`).
+  - Cards e superfícies: branco (`--surface-card: #FFFFFF`).
 - **Tema Escuro**:
-  - Fundo da aplicação: Obsidian profundo (`--bg-app: #0D0F12`).
-  - Cards e superfícies: Grafite translúcido (`--surface-card: #1A1D24`).
+  - Fundo da aplicação: slate profundo (`--bg-app: #0F172A`).
+  - Cards e superfícies: `--surface-card: #1E293B`.
 - **Folha de Impressão A4 (`printable-a4-sheet`)**:
   - **Sempre fundo branco puro (`#FFFFFF`) e texto preto/escuro**, independentemente do tema ativo na UI.
   - A impressão e o preview simulam papel físico real. Nunca aplique classes de modo escuro dentro da folha do documento.
@@ -97,9 +110,13 @@ npm run build       # Compilação otimizada para a pasta dist/
 npm run preview     # Pré-visualização do bundle compilado
 ```
 
+**Deploy:** push em `main` publica em produção (Cloud Run, serviço `prescmed`, `southamerica-east1`) pelo gatilho do Cloud Build, que executa o `cloudbuild.yaml`. O `Dockerfile` roda `npm run lint` e `npm run test` antes do build: teste vermelho, nada é publicado. Trabalhe em branch e abra pull request; não faça push em `main` sem confirmação do Melki.
+
 ---
 
 ## 7. Registro de Decisões e Histórico Técnico
+
+> Registro cronológico: cada entrada descreve o estado **na data em que foi escrita**. Arquivos, contagens de testes, cores e URLs citados em entradas antigas podem não existir mais (ex.: `pdfGenerator.ts` foi removido em 10/10/2026). O estado atual está nas seções 1 a 6 e no `AGENTS.md`.
 
 - **28/09/2026**:
   - Diagnosticado e corrigido o bloqueio geral do Node.js causado pelo hook de telemetria com aspas escapadas incorretamente no Windows.
@@ -193,5 +210,17 @@ npm run preview     # Pré-visualização do bundle compilado
     - Tipagem TypeScript (`tsc --noEmit`) 100% limpa.
     - Auditoria de Design Tokens (`npm run design:lint`) com 0 erros e 0 avisos.
     - Build de produção (`vite build`) gerado com sucesso em 5.16s.
-
-
+- **10/10/2026**:
+  - **Saída única de documentos**: a prévia, a impressão e o PDF passaram a sair de um único componente (`src/components/documento/`: `FolhaA4` + `DocumentoClinico`). `pdfGenerator.ts` e `jspdf-autotable` foram removidos; o PDF é uma fotografia da folha exibida (`exportarFolhaPdf`).
+  - `html2canvas` trocado por `html2canvas-pro`: o original falhava em silêncio com as cores `oklch` do Tailwind v4.
+  - Cabeçalho = local de atendimento + logo; o médico aparece na assinatura. Removidos QR code, "Validação Digital CFM" e "Assinatura Eletrônica Válida".
+  - **Três regimes de receita**: antimicrobiano (RDC Anvisa nº 471/2021) deixou de sair como "Controle Especial".
+  - Documentos SUS sem dado clínico presumido; CID-10 e justificativa abrem em branco, com texto-modelo por botão.
+  - Deploy: testes como portão do build no `Dockerfile`, teste de fumaça no `cloudbuild.yaml`, cabeçalhos de segurança efetivos no nginx, Node 24. `node_modules/` deixou de ser versionado.
+- **11/10/2026**:
+  - **APAC e LME no impresso oficial**: a imagem do formulário do Ministério da Saúde é o fundo da folha e os dados caem em cada campo numerado (`data/formulariosOficiaisSus.ts`, `FormularioOficialSus.tsx`).
+  - **Aviso de Notificação de Receita** para as listas A1, A3, B1, B2 e C2 (`utils/notificacaoDeReceita.ts`), sempre fora da folha impressa.
+  - **Timbre da rede pública**: logo do órgão de um lado, SUS do outro e o nome do local no meio.
+  - **Rotinas e painéis de exames**: pré-natal por trimestre, saúde da mulher, do homem e do idoso, HAS, diabetes, IST.
+  - `README.md`, `AGENTS.md`, `.github/copilot-instructions.md` e este arquivo conferidos com o código.
+  - Pendências em aberto: ver `.context/CURRENT_STATE.md`.
