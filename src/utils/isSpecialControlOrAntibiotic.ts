@@ -34,9 +34,11 @@ const ANTIMICROBIANOS = [
 /** Medicamentos sob controle especial (Portaria 344/98 — Listas A, B e C). */
 const CONTROLADOS = [
   // Psicotrópicos, ansiolíticos, sedativos e hipnóticos (Listas B1, B2)
-  'diazepam', 'clonazepam', 'rivotril', 'alprazolam', 'frontin',
+  'diazepam', 'valium', 'clonazepam', 'rivotril', 'alprazolam', 'frontin',
   'lorazepam', 'bromazepam', 'lexotan', 'midazolam', 'dormonid',
-  'zolpidem', 'stilnox', 'zopiclona', 'eszopiclona',
+  'clobazam', 'cloxazolam', 'clordiazepoxido', 'clorazepato', 'nitrazepam', 'flunitrazepam',
+  'flurazepam', 'estazolam', 'oxazepam', 'triazolam',
+  'zolpidem', 'stilnox', 'zopiclona', 'eszopiclona', 'zaleplona', 'lemborexant',
 
   // Antidepressivos e estabilizadores (Lista C1)
   'fluoxetina', 'prozac', 'daforin', 'sertralina', 'zoloft', 'assert',
@@ -62,18 +64,19 @@ const CONTROLADOS = [
   // Opioides e analgésicos narcóticos (Listas A1, A2, C1)
   'tramadol', 'tramal', 'sylador', 'codeina', 'tylex', 'paco',
   'morfina', 'dimorf', 'metadona', 'fentanil', 'oxicodona', 'buprenorfina',
+  'petidina', 'meperidina', 'hidromorfona', 'tapentadol',
 
-  // Estimulantes do SNC (Lista A3)
+  // Estimulantes do SNC (Lista A3; modafinila está na B1)
   'metilfenidato', 'ritalina', 'concerta', 'lisdexanfetamina', 'venvanse', 'modafinila', 'stavigile',
 
   // Retinoides e anorexígenos
-  'isotretinoina', 'roacutan', 'sibutramina'
+  'isotretinoina', 'roacutan', 'acitretina', 'sibutramina', 'anfepramona', 'femproporex', 'mazindol'
 ];
 
 // Termos curtos só valem como palavra inteira, para não casar dentro de outras
 // palavras ("astro" dentro de "gastro", por exemplo).
 const ANTIMICROBIANOS_PALAVRA_INTEIRA = ['cipro', 'astro'];
-const CONTROLADOS_PALAVRA_INTEIRA = ['bup', 'litio', 'tylex', 'paco'];
+const CONTROLADOS_PALAVRA_INTEIRA = ['bup', 'litio', 'tylex', 'paco', 'frontal'];
 
 /**
  * Normaliza um texto removendo acentuação e convertendo para minúsculas.
@@ -92,7 +95,7 @@ function contemTermo(texto: string, termos: string[], palavrasInteiras: string[]
   );
 }
 
-type MedicamentoClassificavel =
+export type MedicamentoClassificavel =
   | PrescriptionItem
   | AdultMedication
   | UnifiedMedication
@@ -100,6 +103,14 @@ type MedicamentoClassificavel =
   | string
   | null
   | undefined;
+
+/** Nome e princípio ativo do medicamento, normalizados para a busca por palavra-chave. */
+export function textoDoMedicamento(med?: MedicamentoClassificavel): string {
+  if (!med) return '';
+  if (typeof med === 'string') return normalizeText(med);
+  const obj = med as Record<string, any>;
+  return normalizeText(`${obj.name || obj.tradeName || ''} ${obj.activeIngredient || ''}`);
+}
 
 /**
  * Classifica o regime de receita de um medicamento (objeto ou nome em texto
@@ -110,9 +121,7 @@ export function classificarReceita(med?: MedicamentoClassificavel): RegimeReceit
   if (!med) return 'simples';
 
   const obj = typeof med === 'string' ? null : (med as Record<string, any>);
-  const texto = normalizeText(
-    typeof med === 'string' ? med : `${obj!.name || obj!.tradeName || ''} ${obj!.activeIngredient || ''}`
-  );
+  const texto = textoDoMedicamento(med);
 
   // O regime mais restritivo prevalece.
   if (contemTermo(texto, CONTROLADOS, CONTROLADOS_PALAVRA_INTEIRA)) return 'controle_especial';

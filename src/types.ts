@@ -14,6 +14,7 @@ export interface DoctorProfile {
   stampText?: string;
   cnes?: string;
   cpf?: string;
+  cns?: string; // Cartão Nacional de Saúde do médico (campo 15 da LME)
 }
 
 export interface Patient {
@@ -362,6 +363,28 @@ export interface SusFilledFormData {
   lmeMedicationName?: string;
   lmeMedicationPosology?: string;
   lmeMedicationQuantityMonthly?: string;
+
+  // Campos que só existem nos formulários oficiais (APAC e LME). Todos abrem
+  // em branco: campo vazio fica em branco na folha, para preenchimento à mão.
+  doctorCns?: string;
+  patientSex?: '' | 'M' | 'F';
+  patientRaceColor?: '' | 'branca' | 'preta' | 'parda' | 'amarela' | 'indigena';
+  patientEthnicity?: string;
+  patientWeightKg?: string;
+  patientHeightCm?: string;
+  patientEmail?: string;
+  procedureQuantity?: string;
+  lmeMedications?: LmeMedicationRow[];
+  lmePreviousTreatment?: '' | 'nao' | 'sim';
+  lmePreviousTreatmentReport?: string;
+  lmeIncapable?: '' | 'nao' | 'sim';
+  lmeResponsibleName?: string;
+}
+
+/** Linha do campo 7/8 da LME: medicamento e quantidade solicitada do 1º ao 6º mês. */
+export interface LmeMedicationRow {
+  name: string;
+  quantities: string[];
 }
 
 export type { UnifiedMedication } from './data/medicationDatabase';

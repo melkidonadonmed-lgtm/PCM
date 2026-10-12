@@ -2,6 +2,7 @@ import type { DoctorProfile, Patient, PrescriptionItem, WorkContext } from '../t
 import { medicoConfigurado } from './medicoConfigurado';
 import { classificarReceita, type RegimeReceita } from './isSpecialControlOrAntibiotic';
 import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
+import { LOGO_DO_SUS } from '../data/presetAssets';
 
 /**
  * Regras de conteúdo dos documentos emitidos (sem JSX): quem aparece no
@@ -85,14 +86,21 @@ export function resolverIdentidade(
 
   const contato = [cnes, telefone ? `Tel. ${telefone}` : ''].filter(Boolean).join(' • ');
 
+  // Timbre geral da rede pública: logo do órgão (ex.: SEMUSA) de um lado, SUS do outro e,
+  // no meio, o nome do local — que é a única coisa que muda de uma unidade para outra.
+  const logo = activeContext?.logoDataUrl || undefined;
+  const localPublico = Boolean(activeContext) && activeContext!.sphere !== 'private';
+  const logoSecundario = activeContext?.secondaryLogoDataUrl
+    || (localPublico && logo && logo !== LOGO_DO_SUS ? LOGO_DO_SUS : undefined);
+
   return {
     exemplo: !configurado,
     cabecalho: {
       titulo: local || nome,
       tituloEhMedico: !local,
       linhas: [endereco, contato].filter(Boolean),
-      logo: activeContext?.logoDataUrl || undefined,
-      logoSecundario: activeContext?.secondaryLogoDataUrl || undefined,
+      logo,
+      logoSecundario,
       alinhamentoLogo: activeContext?.logoAlignment || 'left'
     },
     medico: {

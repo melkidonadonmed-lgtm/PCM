@@ -1085,6 +1085,11 @@
     padding: 9mm 10mm;
   }
 
+  /* Formulário oficial do SUS: o impresso do órgão ocupa a folha inteira, sem margem do app */
+  .folha-a4--formulario {
+    padding: 0;
+  }
+
   /* Cópia da folha montada só durante a impressão (invisível na tela) */
   #pcm-print-root {
     display: none;

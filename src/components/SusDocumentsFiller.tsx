@@ -25,12 +25,50 @@ import {
 } from '../types';
 import { 
   SUS_DOCUMENTS_CATALOG, 
-  buildSusDocumentMarkdown, 
-  buildSusDocumentHtml 
+  buildSusDocumentMarkdown,
+  buildSusDocumentHtml,
+  timbreDoDocumentoSus
 } from '../data/susDocumentsCatalog';
+import { camposSemEspaco, formularioOficialDe } from '../data/formulariosOficiaisSus';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { exportarFolhaPdf } from '../utils/folhaA4';
 import { FolhaA4 } from './documento/FolhaA4';
+import { FormularioOficialSus } from './documento/FormularioOficialSus';
+
+const MESES_DA_LME = ['1º', '2º', '3º', '4º', '5º', '6º'];
+const linhaVaziaDaLme = () => ({ name: '', quantities: MESES_DA_LME.map(() => '') });
+
+/** Campos próprios de cada documento. Dado clínico abre em branco: quem informa é o médico. */
+const camposIniciaisDoDocumento = (doc: SusDocumentItem): Partial<SusFilledFormData> => ({
+  // No impresso oficial o procedimento é do caso: abre em branco, nunca com o exemplo do catálogo
+  sigtapCode: formularioOficialDe(doc.id) ? '' : doc.defaultSigtap || '',
+  procedureName: formularioOficialDe(doc.id) ? '' : doc.defaultProcedure || '',
+  procedureQuantity: '',
+  // Diagnóstico e justificativa são do caso: abrem em branco (o modelo é oferecido por botão)
+  cid10Code: '',
+  cid10Description: '',
+  clinicalJustification: '',
+  sinanNumber: '',
+  symptomsStartDate: '',
+  renalCreatinine: '',
+  renalEtfg: '',
+  isContrastNeeded: true,
+  gynecologyDum: '',
+  gynecologyPreviousExam: '',
+  specimenType: '',
+  tuberculosisSymptomsDuration: '',
+  lmeMedicationName: '',
+  lmeMedicationPosology: '',
+  lmeMedicationQuantityMonthly: '',
+  lmeMedications: [linhaVaziaDaLme()],
+  lmePreviousTreatment: '',
+  lmePreviousTreatmentReport: '',
+  lmeIncapable: '',
+  lmeResponsibleName: ''
+});
+
+const CAMPO_SUS = 'w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500';
+const ROTULO_SUS = 'text-[11px] font-semibold text-[var(--text-muted)] block mb-1';
 
 interface SusDocumentsFillerProps {
   darkMode: boolean;
@@ -61,51 +99,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   const [activeFormDocId, setActiveFormDocId] = useState<SusDocumentId>('apac_principal');
 
   // Helper para dados padrão específicos de um documento
-  const getDocDefaultFields = useCallback((doc: SusDocumentItem): Partial<SusFilledFormData> => ({
-    sigtapCode: doc.defaultSigtap || '',
-    procedureName: doc.defaultProcedure || '',
-    // Diagnóstico e justificativa são do caso: abrem em branco (o modelo é oferecido por botão)
-    cid10Code: '',
-    cid10Description: '',
-    clinicalJustification: '',
-    sinanNumber: '',
-    symptomsStartDate: '',
-    // Exames e achados clínicos começam vazios: quem informa é o médico.
-    renalCreatinine: '',
-    renalEtfg: '',
-    isContrastNeeded: true,
-    gynecologyDum: '',
-    gynecologyPreviousExam: '',
-    specimenType: '',
-    tuberculosisSymptomsDuration: '',
-    lmeMedicationName: '',
-    lmeMedicationPosology: '',
-    lmeMedicationQuantityMonthly: '1 mês'
-  }), []);
+  const getDocDefaultFields = useCallback(camposIniciaisDoDocumento, []);
 
   // Dados específicos isolados por documento para evitar contaminação na seleção múltipla
   const [docsSpecificData, setDocsSpecificData] = useState<Record<string, Partial<SusFilledFormData>>>(() => {
     const map: Record<string, Partial<SusFilledFormData>> = {};
     SUS_DOCUMENTS_CATALOG.forEach(d => {
-      map[d.id] = {
-        sigtapCode: d.defaultSigtap || '',
-        procedureName: d.defaultProcedure || '',
-        cid10Code: '',
-        cid10Description: '',
-        clinicalJustification: '',
-        sinanNumber: '',
-        symptomsStartDate: '',
-        renalCreatinine: '',
-        renalEtfg: '',
-        isContrastNeeded: true,
-        gynecologyDum: '',
-        gynecologyPreviousExam: '',
-        specimenType: '',
-        tuberculosisSymptomsDuration: '',
-        lmeMedicationName: '',
-        lmeMedicationPosology: '',
-        lmeMedicationQuantityMonthly: '1 mês'
-      };
+      map[d.id] = camposIniciaisDoDocumento(d);
     });
     return map;
   });
@@ -119,6 +119,15 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     doctorCnes: doctor?.cnes || activeContext?.cnes || '',
     doctorClinicName: activeContext?.clinicName || doctor?.clinicName?.trim() || 'Unidade Básica de Saúde',
     doctorCpf: doctor?.cpf || '',
+    doctorCns: doctor?.cns || '',
+
+    // Só para os impressos oficiais; sexo e raça/cor abrem em branco (o cadastro traz um sexo padrão, não informado)
+    patientSex: '' as SusFilledFormData['patientSex'],
+    patientRaceColor: '' as SusFilledFormData['patientRaceColor'],
+    patientEthnicity: '',
+    patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : '',
+    patientHeightCm: '',
+    patientEmail: '',
 
     patientName: patient?.name?.trim() || '',
     patientCns: (patient as any)?.cns?.trim() || '',
@@ -146,6 +155,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       doctorCnes: doctor?.cnes || activeContext?.cnes || prev.doctorCnes,
       doctorClinicName: activeContext?.clinicName || doctor?.clinicName?.trim() || prev.doctorClinicName,
       doctorCpf: doctor?.cpf || prev.doctorCpf,
+      doctorCns: doctor?.cns || prev.doctorCns,
+      patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : prev.patientWeightKg,
 
       patientName: patient?.name?.trim() || prev.patientName,
       patientCns: (patient as any)?.cns?.trim() || prev.patientCns,
@@ -231,7 +242,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   // Atualização dos campos do formulário (comum vs específico do documento ativo)
   const handleFieldChange = (field: keyof SusFilledFormData, value: any) => {
     const commonFieldKeys: (keyof typeof commonData)[] = [
-      'doctorName', 'doctorCrm', 'doctorCrmState', 'doctorSpecialty', 'doctorCnes', 'doctorClinicName', 'doctorCpf',
+      'doctorName', 'doctorCrm', 'doctorCrmState', 'doctorSpecialty', 'doctorCnes', 'doctorClinicName', 'doctorCpf', 'doctorCns',
+      'patientSex', 'patientRaceColor', 'patientEthnicity', 'patientWeightKg', 'patientHeightCm', 'patientEmail',
       'patientName', 'patientCns', 'patientCpf', 'patientBirthDate', 'patientAge', 'patientGender',
       'patientMotherName', 'patientPhone', 'patientAddress', 'patientNeighborhood', 'patientCity', 'patientState', 'patientCep'
     ];
@@ -317,10 +329,25 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
   // Campos clínicos do documento ativo que ainda estão em branco (saem como "—" na folha)
   const pendenciasClinicas = [
+    currentDocItem.id === 'apac_principal' && !(formData.sigtapCode?.trim() && formData.procedureName?.trim()) && 'procedimento (código e nome)',
+    currentDocItem.id === 'lme_medicamentos' && !formData.lmeMedications?.some((m) => m.name?.trim()) && 'medicamento',
     !formData.cid10Code?.trim() && 'CID-10',
     !formData.clinicalJustification?.trim() && 'justificativa clínica',
     currentDocItem.id === 'apac_complementar' && !(formData.renalCreatinine?.trim() && formData.renalEtfg?.trim()) && 'função renal'
   ].filter(Boolean) as string[];
+
+  // Impresso oficial do órgão (APAC, LME): a folha é o próprio formulário, com os dados por cima
+  const formularioOficial = formularioOficialDe(currentDocItem.id);
+  const camposCortados = formularioOficial ? camposSemEspaco(formularioOficial, formData) : [];
+  // Documentos sem impresso nacional: logo do SUS + logo do órgão (o do estado na APAC, o do posto de trabalho nos demais)
+  const timbreDe = (doc: SusDocumentItem) => timbreDoDocumentoSus(doc, activeContext?.logoDataUrl || undefined);
+  const classeDaFolha = (oficial: boolean) =>
+    `select-text ${oficial ? 'folha-a4--formulario' : ''} ${medicoConfigurado(doctor) ? '' : 'no-print'}`;
+
+  const linhasDaLme = formData.lmeMedications?.length ? formData.lmeMedications : [linhaVaziaDaLme()];
+  const alterarLinhaDaLme = (indice: number, alterar: (linha: ReturnType<typeof linhaVaziaDaLme>) => ReturnType<typeof linhaVaziaDaLme>) => {
+    handleFieldChange('lmeMedications', linhasDaLme.map((linha, i) => (i === indice ? alterar(linha) : linha)));
+  };
 
   // Ação: Baixar PDF — fotografia fiel da folha exibida na prévia (mesmo caminho da receita)
   const folhaSusRef = useRef<HTMLDivElement>(null);
@@ -350,13 +377,17 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
       bancadaOculta = document.createElement('div');
       bancadaOculta.style.cssText = 'position:fixed;left:-10000px;top:0;';
+      const { renderToStaticMarkup } = await import('react-dom/server');
       const folhas = selectedDocIds.flatMap((docId) => {
         const docItem = SUS_DOCUMENTS_CATALOG.find(d => d.id === docId);
         if (!docItem) return [];
+        const oficial = formularioOficialDe(docId);
         const folha = document.createElement('div');
-        folha.className = folhaAtual.className;
+        folha.className = `folha-a4 ${classeDaFolha(Boolean(oficial))}`;
         folha.style.width = `${folhaAtual.offsetWidth}px`;
-        folha.innerHTML = buildSusDocumentHtml(docItem, getFilledDataForDoc(docId));
+        folha.innerHTML = oficial
+          ? renderToStaticMarkup(<FormularioOficialSus formulario={oficial} dados={getFilledDataForDoc(docId)} />)
+          : buildSusDocumentHtml(docItem, getFilledDataForDoc(docId), timbreDe(docItem));
         bancadaOculta!.appendChild(folha);
         return [folha];
       });
@@ -513,6 +544,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                     <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1">
                       Sistema: <span className="text-[var(--text-main)]">{doc.system}</span>
                     </p>
+                    <p className={`text-[11px] font-bold mt-1 ${formularioOficialDe(doc.id) ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'}`}>
+                      {formularioOficialDe(doc.id) ? 'Sai no impresso oficial' : 'Modelo do app, com os logos do SUS e do órgão'}
+                    </p>
                     <p className="text-xs text-[var(--text-muted)] mt-2 line-clamp-3 leading-relaxed">
                       {doc.description}
                     </p>
@@ -564,7 +598,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               </button>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block">
-                  Formulário Oficial SUS • {currentDocItem.system}
+                  {formularioOficial ? 'Impresso oficial do Ministério da Saúde' : 'Modelo do PresCMed (sem impresso nacional único)'} • {currentDocItem.system}
                 </span>
                 <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] truncate max-w-lg">
                   {currentDocItem.title}
@@ -851,6 +885,53 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                     />
                   </div>
 
+                  {/* Sexo e raça/cor: campos dos impressos oficiais; só saem marcados se escolhidos aqui */}
+                  {formularioOficial && (
+                    <div className="grid grid-cols-2 gap-2 sm:col-span-2">
+                      <div>
+                        <label htmlFor="sus-sexo" className={ROTULO_SUS}>Sexo (campo do impresso)</label>
+                        <select
+                          id="sus-sexo"
+                          value={formData.patientSex || ''}
+                          onChange={e => handleFieldChange('patientSex', e.target.value)}
+                          className={CAMPO_SUS}
+                        >
+                          <option value="">Deixar em branco</option>
+                          <option value="M">Masculino</option>
+                          <option value="F">Feminino</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label htmlFor="sus-raca-cor" className={ROTULO_SUS}>Raça/cor informada pelo paciente</label>
+                        <select
+                          id="sus-raca-cor"
+                          value={formData.patientRaceColor || ''}
+                          onChange={e => handleFieldChange('patientRaceColor', e.target.value)}
+                          className={CAMPO_SUS}
+                        >
+                          <option value="">Deixar em branco</option>
+                          <option value="branca">Branca</option>
+                          <option value="preta">Preta</option>
+                          <option value="parda">Parda</option>
+                          <option value="amarela">Amarela</option>
+                          <option value="indigena">Indígena</option>
+                        </select>
+                      </div>
+                      {formData.patientRaceColor === 'indigena' && currentDocItem.id === 'lme_medicamentos' && (
+                        <div className="col-span-2">
+                          <label htmlFor="sus-etnia" className={ROTULO_SUS}>Etnia</label>
+                          <input
+                            id="sus-etnia"
+                            type="text"
+                            value={formData.patientEthnicity || ''}
+                            onChange={e => handleFieldChange('patientEthnicity', e.target.value)}
+                            className={CAMPO_SUS}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* CAMPOS DE ENDEREÇO RESIDENCIAL (MANDATÓRIO NO SUS) */}
                   <div className="sm:col-span-2 pt-2 border-t border-[var(--border-subtle)]">
                     <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-2">
@@ -949,7 +1030,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                 </div>
 
                 <div className="space-y-3 text-xs">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {/* A LME não tem campo de procedimento SIGTAP */}
+                  <div className={`grid grid-cols-1 sm:grid-cols-3 gap-2 ${currentDocItem.id === 'lme_medicamentos' ? 'hidden' : ''}`}>
                     <div>
                       <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
                         Código SIGTAP
@@ -1076,35 +1158,148 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                     </div>
                   )}
 
-                  {/* Campos Específicos para LME Farmácia de Alto Custo */}
+                  {/* Campo 20 da APAC: quantidade do procedimento principal */}
+                  {(currentDocItem.id === 'apac_principal') && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div>
+                        <label htmlFor="sus-qtde" className={ROTULO_SUS}>Quantidade (campo 20)</label>
+                        <input
+                          id="sus-qtde"
+                          type="text"
+                          inputMode="numeric"
+                          value={formData.procedureQuantity || ''}
+                          onChange={e => handleFieldChange('procedureQuantity', e.target.value)}
+                          placeholder="Ex.: 01"
+                          className={CAMPO_SUS}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Campos Específicos para LME Farmácia de Alto Custo (numeração do impresso oficial) */}
                   {(currentDocItem.id === 'lme_medicamentos') && (
-                    <div className="space-y-2 p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/20">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="space-y-3 p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                      <div className="space-y-2">
+                        <span className={ROTULO_SUS}>7 e 8 — Medicamento(s) e quantidade solicitada por mês</span>
+                        {linhasDaLme.map((linha, indice) => (
+                          <div key={indice} className="space-y-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-4 text-[11px] font-bold text-[var(--text-muted)]">{indice + 1}</span>
+                              <input
+                                type="text"
+                                aria-label={`Medicamento ${indice + 1}`}
+                                value={linha.name}
+                                onChange={e => alterarLinhaDaLme(indice, (l) => ({ ...l, name: e.target.value }))}
+                                placeholder="Medicamento, concentração e forma (como no PCDT)"
+                                className={`${CAMPO_SUS} font-semibold`}
+                              />
+                              {linhasDaLme.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleFieldChange('lmeMedications', linhasDaLme.filter((_, i) => i !== indice))}
+                                  className="h-8 px-2 rounded-lg border border-[var(--border-subtle)] text-[11px] font-semibold text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
+                                  aria-label={`Remover medicamento ${indice + 1}`}
+                                >
+                                  Remover
+                                </button>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-6 gap-1 pl-5">
+                              {MESES_DA_LME.map((mes, m) => (
+                                <input
+                                  key={mes}
+                                  type="text"
+                                  inputMode="numeric"
+                                  aria-label={`Quantidade do ${mes} mês, medicamento ${indice + 1}`}
+                                  value={linha.quantities[m] || ''}
+                                  onChange={e => alterarLinhaDaLme(indice, (l) => ({
+                                    ...l,
+                                    quantities: MESES_DA_LME.map((_, i) => (i === m ? e.target.value : l.quantities[i] || ''))
+                                  }))}
+                                  placeholder={`${mes} mês`}
+                                  className="w-full px-1.5 py-1 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-blue-500"
+                                />
+                              ))}
+                            </div>
+                            {linha.quantities[0]?.trim() && (
+                              <button
+                                type="button"
+                                onClick={() => alterarLinhaDaLme(indice, (l) => ({ ...l, quantities: MESES_DA_LME.map(() => l.quantities[0]) }))}
+                                className="ml-5 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                              >
+                                Repetir a quantidade do 1º mês nos 6 meses
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                        {linhasDaLme.length < 6 && (
+                          <button
+                            type="button"
+                            onClick={() => handleFieldChange('lmeMedications', [...linhasDaLme, linhaVaziaDaLme()])}
+                            className="h-8 px-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] text-xs font-semibold text-[var(--text-main)] cursor-pointer"
+                          >
+                            Adicionar medicamento
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         <div>
-                          <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
-                            Medicamento do Componente Especializado (DCB)
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.lmeMedicationName || ''}
-                            onChange={e => handleFieldChange('lmeMedicationName', e.target.value)}
-                            placeholder="Fármaco conforme PCDT ministerial"
-                            className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 font-semibold"
-                          />
+                          <label htmlFor="lme-peso" className={ROTULO_SUS}>5 — Peso (kg)</label>
+                          <input id="lme-peso" type="text" inputMode="decimal" value={formData.patientWeightKg || ''} onChange={e => handleFieldChange('patientWeightKg', e.target.value)} className={CAMPO_SUS} />
                         </div>
                         <div>
-                          <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
-                            Posologia Diária Estruturada
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.lmeMedicationPosology || ''}
-                            onChange={e => handleFieldChange('lmeMedicationPosology', e.target.value)}
-                            placeholder="Ex: 1 comp pela manhã por 180 dias"
-                            className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
-                          />
+                          <label htmlFor="lme-altura" className={ROTULO_SUS}>6 — Altura (cm)</label>
+                          <input id="lme-altura" type="text" inputMode="numeric" value={formData.patientHeightCm || ''} onChange={e => handleFieldChange('patientHeightCm', e.target.value)} className={CAMPO_SUS} />
+                        </div>
+                        <div className="col-span-2">
+                          <label htmlFor="lme-cns-medico" className={ROTULO_SUS}>15 — CNS do médico solicitante</label>
+                          <input id="lme-cns-medico" type="text" inputMode="numeric" value={formData.doctorCns || ''} onChange={e => handleFieldChange('doctorCns', e.target.value)} placeholder="15 dígitos" className={`${CAMPO_SUS} font-mono`} />
                         </div>
                       </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div>
+                          <label htmlFor="lme-tratamento" className={ROTULO_SUS}>12 — Tratamento prévio?</label>
+                          <select id="lme-tratamento" value={formData.lmePreviousTreatment || ''} onChange={e => handleFieldChange('lmePreviousTreatment', e.target.value)} className={CAMPO_SUS}>
+                            <option value="">Deixar em branco</option>
+                            <option value="nao">Não</option>
+                            <option value="sim">Sim (relatar)</option>
+                          </select>
+                        </div>
+                        {formData.lmePreviousTreatment === 'sim' && (
+                          <div className="sm:col-span-2">
+                            <label htmlFor="lme-tratamento-relato" className={ROTULO_SUS}>Relato do tratamento prévio</label>
+                            <input id="lme-tratamento-relato" type="text" value={formData.lmePreviousTreatmentReport || ''} onChange={e => handleFieldChange('lmePreviousTreatmentReport', e.target.value)} className={CAMPO_SUS} />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div>
+                          <label htmlFor="lme-incapaz" className={ROTULO_SUS}>13 — Paciente incapaz?</label>
+                          <select id="lme-incapaz" value={formData.lmeIncapable || ''} onChange={e => handleFieldChange('lmeIncapable', e.target.value)} className={CAMPO_SUS}>
+                            <option value="">Deixar em branco</option>
+                            <option value="nao">Não</option>
+                            <option value="sim">Sim (indicar responsável)</option>
+                          </select>
+                        </div>
+                        {formData.lmeIncapable === 'sim' && (
+                          <div className="sm:col-span-2">
+                            <label htmlFor="lme-responsavel" className={ROTULO_SUS}>Nome do responsável</label>
+                            <input id="lme-responsavel" type="text" value={formData.lmeResponsibleName || ''} onChange={e => handleFieldChange('lmeResponsibleName', e.target.value)} className={CAMPO_SUS} />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="lme-email" className={ROTULO_SUS}>22 — Correio eletrônico do paciente (opcional)</label>
+                        <input id="lme-email" type="email" value={formData.patientEmail || ''} onChange={e => handleFieldChange('patientEmail', e.target.value)} className={CAMPO_SUS} />
+                      </div>
+
+                      <p className="text-[11px] text-[var(--text-muted)]">
+                        Os campos 18 e 23 (quem preencheu os dados complementares e assinatura) ficam em branco para preenchimento à mão. A LME não tem campo de posologia: ela vai na receita que acompanha o laudo.
+                      </p>
                     </div>
                   )}
 
@@ -1155,6 +1350,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                 {pendenciasClinicas.length > 0 && (
                   <p role="status" className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/25">
                     Em branco neste documento: {pendenciasClinicas.join(', ')}.
+                  </p>
+                )}
+
+                {camposCortados.length > 0 && (
+                  <p role="alert" className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-rose-500/10 text-rose-900 dark:text-rose-200 border border-rose-500/30">
+                    O texto não coube {camposCortados.length > 1 ? 'nos campos' : 'no campo'} {camposCortados.join(', ')} do impresso e saiu cortado, com a marca […]. Resuma o texto ou anexe um relatório.
                   </p>
                 )}
 
@@ -1242,9 +1443,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                     ref={folhaSusRef}
                     id="sus-document-print-sheet"
                     imprimivel
-                    className={`select-text ${medicoConfigurado(doctor) ? '' : 'no-print'}`}
+                    className={classeDaFolha(Boolean(formularioOficial))}
                   >
-                    <div dangerouslySetInnerHTML={{ __html: buildSusDocumentHtml(currentDocItem, formData) }} />
+                    {formularioOficial ? (
+                      <FormularioOficialSus formulario={formularioOficial} dados={formData} />
+                    ) : (
+                      <div dangerouslySetInnerHTML={{ __html: buildSusDocumentHtml(currentDocItem, formData, timbreDe(currentDocItem)) }} />
+                    )}
                   </FolhaA4>
                 </div>
               </div>

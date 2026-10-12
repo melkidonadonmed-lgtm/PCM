@@ -71,6 +71,7 @@ import { PRESET_LOGOS } from '../data/presetAssets';
 import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { resolverIdentidade, separarPorRegime } from '../utils/documentoClinico';
+import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
 import type { RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import LogoGeneratorModal from './LogoGeneratorModal';
@@ -2868,6 +2869,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             ))}
           </div>
         </div>
+      )}
+
+      {/* Controlados que exigem Notificação de Receita em talonário específico (aviso de tela, fora da folha) */}
+      {activeLoadedRecipeType === 'controle_especial' && (
+        <AvisoNotificacaoReceita items={itensPorRegime.controle_especial} />
       )}
 
       {/* ÁREA DA FOLHA A4 TÁTIL MILIMÉTRICA (210mm x 297mm) */}

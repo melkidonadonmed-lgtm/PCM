@@ -1,4 +1,6 @@
 import { SusDocumentItem, SusFilledFormData } from '../types';
+import { medicamentosDaLme } from './formulariosOficiaisSus';
+import { LOGO_DO_ESTADO, LOGO_DO_SUS } from './presetAssets';
 
 export const SUS_DOCUMENTS_CATALOG: SusDocumentItem[] = [
   {
@@ -168,11 +170,17 @@ ${item.id === 'apac_complementar' ? `
 ${data.clinicalJustification || VAZIO}
 `;
   } else if (item.id === 'lme_medicamentos') {
+    const medicamentos = medicamentosDaLme(data);
+    const linhasDeMedicamento = medicamentos.length > 0
+      ? medicamentos.map((m, i) => {
+          const quantidades = (m.quantities || []).map((q) => q?.trim() || VAZIO);
+          const porMes = quantidades.some((q) => q !== VAZIO) ? ` | quantidade do 1º ao 6º mês: ${quantidades.join(' / ')}` : '';
+          return `- **Medicamento ${i + 1}**: ${m.name?.trim() || VAZIO}${porMes}`;
+        }).join('\n')
+      : `- **Medicamento**: ${VAZIO}`;
     specificDetails = `
 ### Medicamento(s) do Componente Especializado Solicitado(s)
-- **Fármaco / Apresentação**: ${data.lmeMedicationName || VAZIO}
-- **Posologia Diária**: ${data.lmeMedicationPosology || VAZIO}
-- **Quantidade Mensal**: ${data.lmeMedicationQuantityMonthly || VAZIO} (Previsão para até 6 meses)
+${linhasDeMedicamento}
 - **CID-10**: ${data.cid10Code || VAZIO}${data.cid10Description ? ' — ' + data.cid10Description : ''}
 - **Justificativa conforme PCDT**:
 ${data.clinicalJustification || VAZIO}
@@ -247,9 +255,54 @@ ${data.doctorClinicName || 'Rede de Atenção à Saúde'}
 `;
 }
 
-export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormData): string {
-  const md = buildSusDocumentMarkdown(item, data);
-  // Converte Markdown básico em HTML elegante para visualização ou TipTap
+/**
+ * Logos do cabeçalho dos documentos SUS sem impresso nacional (guia SISREG,
+ * GAL/LACEN, SISCAN, TRM-TB): o do SUS e o do órgão do local de atendimento
+ * (ex.: SEMUSA), que vem do posto de trabalho ativo — nunca fixo no código.
+ */
+export interface TimbreSus {
+  logoSus?: string;
+  logoLocal?: string;
+}
+
+/**
+ * Logos de um documento SUS. A regulação da APAC é estadual, então o cabeçalho
+ * leva o logo do estado; nos demais, o do órgão do posto de trabalho ativo.
+ */
+export function timbreDoDocumentoSus(item: SusDocumentItem, logoDoLocal?: string): TimbreSus {
+  return { logoSus: LOGO_DO_SUS, logoLocal: item.category === 'apac' ? LOGO_DO_ESTADO : logoDoLocal };
+}
+
+/** Largura reservada de cada lado do título; cabe o logo largo do estado sem apertar o do SUS. */
+const LARGURA_DO_LOGO_PX = 130;
+
+function cabecalhoSus(item: SusDocumentItem, timbre?: TimbreSus): string {
+  const titulo = `
+        <h2 style="font-size: 15px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">${item.title}</h2>
+        <p style="font-size: 11px; margin: 3px 0 0 0; color: #475569; font-weight: bold;">SISTEMA ÚNICO DE SAÚDE — ${item.system} &nbsp;|&nbsp; ${item.complexity}</p>`;
+
+  const logoLocal = timbre?.logoLocal && timbre.logoLocal !== timbre.logoSus ? timbre.logoLocal : '';
+  const logoSus = timbre?.logoSus || '';
+  if (!logoLocal && !logoSus) {
+    return `
+      <div style="border-bottom: 2px solid #0F172A; padding-bottom: 8px; margin-bottom: 12px; text-align: center;">${titulo}
+      </div>`;
+  }
+
+  // Cada lado ocupa a mesma largura (com ou sem logo), para o título ficar centralizado na folha.
+  const lado = (src: string, alt: string, larguraMaxima: number) => `
+        <div style="width: ${LARGURA_DO_LOGO_PX}px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+          ${src ? `<img src="${src}" alt="${alt}" style="max-width: ${larguraMaxima}px; max-height: 78px; object-fit: contain;" />` : ''}
+        </div>`;
+
+  return `
+      <div style="display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #0F172A; padding-bottom: 8px; margin-bottom: 12px;">${lado(logoLocal, 'Logotipo do órgão do local de atendimento', LARGURA_DO_LOGO_PX)}
+        <div style="flex: 1; min-width: 0; text-align: center;">${titulo}
+        </div>${lado(logoSus, 'Logotipo do SUS', 100)}
+      </div>`;
+}
+
+export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormData, timbre?: TimbreSus): string {
   const today = new Date().toLocaleDateString('pt-BR');
   const fullAddress = [
     data.patientAddress,
@@ -265,11 +318,7 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
   const idade = idadeBruta && !/[a-zA-Z]/.test(idadeBruta) ? `${idadeBruta} anos` : idadeBruta;
 
   return `
-    <div class="sus-document-rendered" style="font-family: inherit; line-height: 1.5; color: #0F172A;">
-      <div style="border-bottom: 2px solid #0F172A; padding-bottom: 8px; margin-bottom: 12px; text-align: center;">
-        <h2 style="font-size: 15px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">${item.title}</h2>
-        <p style="font-size: 11px; margin: 3px 0 0 0; color: #475569; font-weight: bold;">SISTEMA ÚNICO DE SAÚDE — ${item.system} &nbsp;|&nbsp; ${item.complexity}</p>
-      </div>
+    <div class="sus-document-rendered" style="font-family: inherit; line-height: 1.5; color: #0F172A;">${cabecalhoSus(item, timbre)}
 
       <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
