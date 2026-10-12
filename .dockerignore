@@ -21,7 +21,6 @@ Thumbs.db
 *.md
 docs
 .context
-pdf-fixes-patch
 *.png
 !public/**/*.png
 deploy-cloudrun.*
