@@ -40,6 +40,12 @@ export const PRESET_LOGOS: Record<string, PresetLogoItem> = {
   }
 };
 
+/** Segundo logo do cabeçalho em todo local de atendimento público (ao lado do logo do órgão). */
+export const LOGO_DO_SUS = PRESET_LOGOS.sus.publicUrl;
+
+/** Órgão estadual: vai no cabeçalho dos documentos de regulação estadual (APAC), no lugar do logo municipal. */
+export const LOGO_DO_ESTADO = PRESET_LOGOS.sesau_ro.publicUrl;
+
 export interface PresetWatermarkItem {
   id: WatermarkType;
   name: string;

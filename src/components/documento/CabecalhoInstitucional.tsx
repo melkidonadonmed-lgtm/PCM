@@ -14,7 +14,8 @@ interface CabecalhoInstitucionalProps {
  */
 export const CabecalhoInstitucional: React.FC<CabecalhoInstitucionalProps> = ({ cabecalho, compacto = false }) => {
   const { titulo, linhas, logo, logoSecundario, alinhamentoLogo } = cabecalho;
-  const alturaLogo = compacto ? 34 : 60;
+  // Logos de órgão trazem o nome por extenso embaixo do símbolo (ex.: SEMUSA): menores que isto, ficam ilegíveis.
+  const alturaLogo = compacto ? 40 : 70;
   const duplo = Boolean(logo && logoSecundario);
   const centralizado = duplo || (Boolean(logo) && alinhamentoLogo === 'center') || !logo;
   const logoADireita = !duplo && Boolean(logo) && alinhamentoLogo === 'right';

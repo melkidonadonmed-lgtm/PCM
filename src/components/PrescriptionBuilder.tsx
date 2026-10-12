@@ -23,6 +23,7 @@ import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { classificarReceita, type RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import { DOCUMENTO_DO_REGIME, separarPorRegime, type TipoDocumento } from '../utils/documentoClinico';
+import { descreverNotificacao, notificacaoExigida } from '../utils/notificacaoDeReceita';
 import {
   calcularPrescricaoRapida,
   FrequenciaHorario,
@@ -33,6 +34,7 @@ import { FolhaA4 } from './documento/FolhaA4';
 import { DocumentoClinico } from './documento/DocumentoClinico';
 import { Icon } from './Icon';
 import { AcoesDaReceita } from './AcoesDaReceita';
+import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
 import { PediatricCalculator } from './PediatricCalculator';
 
 const REGIMES: RegimeReceita[] = ['simples', 'antimicrobiano', 'controle_especial'];
@@ -313,6 +315,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const itemsInPreview = porRegime[regimeAtivo];
 
   const handlePrintClick = () => onNavigateToPrint(DOCUMENTO_DO_REGIME[regimeAtivo]);
+
+  // Medicamento em digitação que só é dispensado com Notificação de Receita (talonário próprio)
+  const notificacaoDoFormulario = notificacaoExigida(selectedMedName);
 
   const isDoctorConfigured = medicoConfigurado(doctor);
   const handleAbrirPerfilMedico = onAbrirPerfilMedico || onOpenDoctorModal;
@@ -1218,6 +1223,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   {REGIME_INFO[selectedRegime].detalhe}
                   {selectedMedName.trim() && classificarReceita(selectedMedName) !== 'simples' && ' — identificado pelo nome do medicamento'}
                 </p>
+                {notificacaoDoFormulario && (
+                  <p role="status" className="mt-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                    Exige {descreverNotificacao(notificacaoDoFormulario)}. O PresCMed não emite a notificação, e a folha impressa aqui não a substitui.
+                  </p>
+                )}
               </fieldset>
 
               {/* Ação Primária: Inserir ou Salvar Alterações na Receita */}
@@ -1359,6 +1369,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               <div className="space-y-2.5">
                 {items.map((it, idx) => {
                   const regimeDoItem = classificarReceita(it);
+                  const notificacaoDoItem = notificacaoExigida(it);
                   return (
                     <div
                       key={it.id}
@@ -1391,6 +1402,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                             <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
                               <Icon name="security" className="text-[11px]" />
                               <span>{REGIME_INFO[regimeDoItem].rotulo} • 2 vias</span>
+                            </span>
+                          )}
+                          {notificacaoDoItem && (
+                            <span
+                              title={`Exige ${descreverNotificacao(notificacaoDoItem)}`}
+                              className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30 flex items-center gap-1"
+                            >
+                              <Icon name="warning" className="text-[11px]" />
+                              <span>{notificacaoDoItem.ressalva ? 'Verificar' : 'Exige'} {notificacaoDoItem.rotuloCurto}</span>
                             </span>
                           )}
                         </div>
@@ -1449,7 +1469,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
             {/* Barra de Ações: visível apenas abaixo de xl (nunca duplicada) */}
             {items.length > 0 && (
-              <div className="block xl:hidden pt-3 border-t border-slate-200 dark:border-slate-800">
+              <div className="block xl:hidden pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                <AvisoNotificacaoReceita items={porRegime.controle_especial} />
                 <AcoesDaReceita
                   itemsCount={items.length}
                   isMedicoConfigurado={isDoctorConfigured}
@@ -1489,6 +1510,13 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   Configurar médico
                 </button>
               )}
+            </div>
+          )}
+
+          {/* Controlados que exigem Notificação de Receita: no desktop (xl) fica aqui; abaixo disso, junto das ações */}
+          {porRegime.controle_especial.some((it) => notificacaoExigida(it)) && (
+            <div className="hidden xl:block">
+              <AvisoNotificacaoReceita items={porRegime.controle_especial} />
             </div>
           )}
 

@@ -30,6 +30,7 @@ import {
 } from '../utils/documentoClinico';
 import { FolhaA4 } from './documento/FolhaA4';
 import { DocumentoClinico } from './documento/DocumentoClinico';
+import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
 import WatermarkSelector from './WatermarkSelector';
 
 interface PrintPreviewProps {
@@ -415,6 +416,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           Emita cada uma pela sua aba.
         </div>
       )}
+
+      {/* Controlados que exigem Notificação de Receita em talonário próprio (aviso de tela, fora da folha) */}
+      {docType === 'special_prescription' && <AvisoNotificacaoReceita items={itensDaFolha} />}
 
       {/* Bancada com a folha A4: única fonte da prévia, da impressão e do PDF */}
       <div className="p-3 sm:p-8 bg-slate-900/5 dark:bg-slate-950/40 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-tactile-inset dark:shadow-tactile-inset-dark">
