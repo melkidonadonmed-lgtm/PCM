@@ -201,12 +201,21 @@ describe('Folha única do documento clínico (prévia = impressão = PDF)', () =
 });
 
 describe('Regras de conteúdo do documento (utils/documentoClinico)', () => {
-  it('receitas de 2 vias são paisagem; os demais documentos, retrato', () => {
+  it('todas as receitas são paisagem (padrão PEC do SUS); exames, atestado e encaminhamento são retrato', () => {
+    expect(orientacaoDoDocumento('prescription')).toBe('landscape');
     expect(orientacaoDoDocumento('special_prescription')).toBe('landscape');
     expect(orientacaoDoDocumento('antimicrobial_prescription')).toBe('landscape');
-    (['prescription', 'exams', 'certificate', 'referral'] as TipoDocumento[]).forEach((tipo) => {
+    (['exams', 'certificate', 'referral'] as TipoDocumento[]).forEach((tipo) => {
       expect(orientacaoDoDocumento(tipo)).toBe('portrait');
     });
+  });
+
+  it('receita simples sai em meia folha à esquerda (1 via) sem duplicar itens e sem quadros de controle especial', () => {
+    const html = folha('prescription');
+    expect(ocorrencias(html, '1. Dipirona 500 mg')).toBe(1);
+    expect(html).not.toContain('Identificação do emitente');
+    expect(html).not.toContain('Identificação do comprador');
+    expect(html).not.toContain('1ª via');
   });
 
   it('não repete a apresentação quando ela já está na quantidade', () => {

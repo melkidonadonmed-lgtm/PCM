@@ -556,8 +556,32 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     <p><strong>Recomendações Clínicas:</strong> Repouso, hidratação oral vigorosa (mínimo 2 litros de água/dia) e retorno imediato ao serviço se sinais de alarme ou piora respiratória.</p>
   `;
 
-  // Função para salvar rascunho com debounce no IndexedDB
-  const triggerAutoSave = useCallback((editorInstance: any, updatedHeader?: DocumentHeaderConfig, updatedLogo?: DocumentLogoConfig) => {
+  const draftMetaRef = useRef({
+    headerConfig,
+    logoConfig,
+    fontFamilyId,
+    baseFontSize,
+    pageOrientation,
+    viaLayout,
+    title: currentModel.title
+  });
+  draftMetaRef.current = {
+    headerConfig,
+    logoConfig,
+    fontFamilyId,
+    baseFontSize,
+    pageOrientation,
+    viaLayout,
+    title: currentModel.title
+  };
+
+  // Função para salvar rascunho com debounce no IndexedDB (referência estável para evitar loops em useEffects)
+  const triggerAutoSave = useCallback((
+    editorInstance: any,
+    updatedHeader?: DocumentHeaderConfig,
+    updatedLogo?: DocumentLogoConfig,
+    overrides?: Partial<{ title: string; fontSize: number; orientation: DocumentOrientation; viaLayout: DocumentViaLayout }>
+  ) => {
     if (!isDraftRestoredRef.current) return;
     setSaveStatus('saving');
 
@@ -565,27 +589,34 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       clearTimeout(saveTimerRef.current);
     }
 
-    const currentHeader = updatedHeader || headerConfig;
-    const currentLogo = updatedLogo || logoConfig;
+    if (updatedHeader) draftMetaRef.current.headerConfig = updatedHeader;
+    if (updatedLogo) draftMetaRef.current.logoConfig = updatedLogo;
+    if (overrides) {
+      if (overrides.title !== undefined) draftMetaRef.current.title = overrides.title;
+      if (overrides.fontSize !== undefined) draftMetaRef.current.baseFontSize = overrides.fontSize;
+      if (overrides.orientation !== undefined) draftMetaRef.current.pageOrientation = overrides.orientation;
+      if (overrides.viaLayout !== undefined) draftMetaRef.current.viaLayout = overrides.viaLayout;
+    }
 
     saveTimerRef.current = setTimeout(async () => {
       try {
+        const meta = draftMetaRef.current;
         const json = editorInstance?.getJSON?.() || null;
         const html = editorInstance?.getHTML?.() || '';
         const now = Date.now();
         await db.savedDocuments.put({
           id: 'draft-current',
-          title: currentModel.title || 'Rascunho Automático',
+          title: meta.title || 'Rascunho Automático',
           contentJson: json,
           contentHtml: html,
           contextId: activeContextRef.current?.id || 'global',
           isTemplate: false,
-          headerConfig: currentHeader,
-          logoConfig: currentLogo,
-          typography: fontFamilyId,
-          fontSize: baseFontSize,
-          orientation: pageOrientation,
-          viaLayout: viaLayout,
+          headerConfig: meta.headerConfig,
+          logoConfig: meta.logoConfig,
+          typography: meta.fontFamilyId,
+          fontSize: meta.baseFontSize,
+          orientation: meta.pageOrientation,
+          viaLayout: meta.viaLayout,
           createdAt: now,
           updatedAt: now
         });
@@ -598,7 +629,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         setSaveStatus('idle');
       }
     }, 600);
-  }, [headerConfig, logoConfig, fontFamilyId, baseFontSize, pageOrientation, viaLayout, currentModel.title]);
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -645,12 +676,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   // retém a 1ª (Portaria 344/98); no antimicrobiano, a 2ª (RDC 471/2021). O regime é lido do
   // selo do documento, que é salvo junto com ele.
   const viasDeAntimicrobiano = /antimicrobiano/i.test(headerConfig.badgeText || '');
+  const viasDeControleEspecial = /controle especial/i.test(headerConfig.badgeText || '') || activeLoadedRecipeType === 'controle_especial';
   const rotuloVia1 = viasDeAntimicrobiano ? '1ª via — Paciente' : '1ª via — Farmácia (retenção)';
   const rotuloVia2 = viasDeAntimicrobiano ? '2ª via — Farmácia (retenção)' : '2ª via — Paciente (orientação)';
 
   // Construtor e carregador completo da receita médica em tempo real com segregação inteligente
   const handleLoadActivePrescription = useCallback((showToastMsg = true, targetMode: 'auto' | RegimeReceita = 'auto') => {
     if (!editor) return;
+
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
 
     const allItems = prescriptionItems || [];
     const grupos = separarPorRegime(allItems);
@@ -671,16 +707,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     const pWeight = patient?.weightKg > 0 ? ` • Peso: ${patient.weightKg} kg` : '';
     const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-    // Receitas de 2 vias (antimicrobiano e controle especial) usam folha paisagem com as vias lado a lado
-    if (isSpecial) {
-      setViaLayout('2-vias');
-      setPageOrientation('landscape');
-      setBaseFontSize(10);
-    } else {
-      setViaLayout('1-via');
-      setPageOrientation('portrait');
-      setBaseFontSize(11);
-    }
+    // Padrão PEC do SUS: todas as receitas usam folha paisagem; simples ocupa 1 via na metade esquerda e 2 vias ocupa as duas metades
+    const nextViaLayout: DocumentViaLayout = isSpecial ? '2-vias' : '1-via';
+    const nextOrientation: DocumentOrientation = 'landscape';
+    const nextFontSize = 10;
+    setViaLayout(nextViaLayout);
+    setPageOrientation(nextOrientation);
+    setBaseFontSize(nextFontSize);
 
     const itemsHtml = itemsToLoad && itemsToLoad.length > 0
       ? itemsToLoad.map((item, idx) => {
@@ -708,7 +741,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         `;
 
     // Evita duplicidade: se o banner de identificação de paciente no cabeçalho estiver ativo, não repete no corpo
-    const patientLineHtml = headerConfig.showPatientBanner
+    const patientLineHtml = draftMetaRef.current.headerConfig.showPatientBanner
       ? ''
       : `<p><strong>Paciente:</strong> ${pName}${pDoc}${pAge}${pWeight}</p><p></p>`;
 
@@ -722,16 +755,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       ${itemsHtml}
     `;
 
-    editor.commands.setContent(newHtml);
-    setEditorHtml(newHtml);
-    setHeaderConfig(prev => ({
-      ...prev,
+    const nextHeader: DocumentHeaderConfig = {
+      ...draftMetaRef.current.headerConfig,
       showHeader: true,
       showFooter: true,
       showPatientBanner: true,
       badgeText: receita.selo,
       dateText: today
-    }));
+    };
+
+    editor.commands.setContent(newHtml);
+    setEditorHtml(newHtml);
+    setHeaderConfig(nextHeader);
 
     setCurrentModel({
       id: null,
@@ -740,11 +775,16 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     });
 
     isDraftRestoredRef.current = true;
-    triggerAutoSave(editor);
+    triggerAutoSave(editor, nextHeader, undefined, {
+      title: receita.modelo,
+      fontSize: nextFontSize,
+      orientation: nextOrientation,
+      viaLayout: nextViaLayout
+    });
     if (showToastMsg) {
       showToast(receita.aviso);
     }
-  }, [editor, prescriptionItems, patient, headerConfig.showPatientBanner, triggerAutoSave]);
+  }, [editor, prescriptionItems, patient, triggerAutoSave]);
 
   // Carrega e formata o encaminhamento médico ativo da consulta
   const handleLoadActiveReferral = useCallback((showToastMsg = true) => {
@@ -787,26 +827,33 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       <p>Agradeço a atenção e coloco-me à disposição para discussão do caso.</p>
     `;
 
+    setActiveLoadedRecipeType(null);
     setViaLayout('1-via');
     setPageOrientation('portrait');
     setBaseFontSize(11);
     editor.commands.setContent(referralHtml);
     setEditorHtml(referralHtml);
-    setHeaderConfig(prev => ({
-      ...prev,
+    const nextHeader: DocumentHeaderConfig = {
+      ...draftMetaRef.current.headerConfig,
       showHeader: true,
       showFooter: true,
       showPatientBanner: false,
       badgeText: `ENCAMINHAMENTO • ${specialty.toUpperCase()}`,
       dateText: today
-    }));
+    };
+    setHeaderConfig(nextHeader);
     setCurrentModel({
       id: null,
       title: `Encaminhamento - ${specialty}`,
       isPreset: false
     });
     isDraftRestoredRef.current = true;
-    triggerAutoSave(editor);
+    triggerAutoSave(editor, nextHeader, undefined, {
+      title: `Encaminhamento - ${specialty}`,
+      fontSize: 11,
+      orientation: 'portrait',
+      viaLayout: '1-via'
+    });
     if (showToastMsg) {
       showToast('Encaminhamento carregado no editor com formatação limpa!');
     }
@@ -826,6 +873,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       ? `<p><strong>Diagnóstico (CID-10):</strong> ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''} <em>(Expressamente autorizado pelo paciente)</em></p><p></p>`
       : '';
     const obsText = certificate?.observations ? `<p><strong>Observações:</strong> ${certificate.observations}</p><p></p>` : '';
+    const addr = draftMetaRef.current.headerConfig.clinicAddress;
 
     const certHtml = `
       <p style="text-align: center;"><strong>ATESTADO MÉDICO</strong></p>
@@ -836,32 +884,39 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       <p></p>
       ${cidText}
       ${obsText}
-      <p style="text-align: right; margin-top: 25px;">${headerConfig.clinicAddress ? `${headerConfig.clinicAddress.split('-')[0].trim()}, ` : ''}${today}.</p>
+      <p style="text-align: right; margin-top: 25px;">${addr ? `${addr.split('-')[0].trim()}, ` : ''}${today}.</p>
     `;
 
+    setActiveLoadedRecipeType(null);
     setViaLayout('1-via');
     setPageOrientation('portrait');
     setBaseFontSize(12);
     editor.commands.setContent(certHtml);
     setEditorHtml(certHtml);
-    setHeaderConfig(prev => ({
-      ...prev,
+    const nextHeader: DocumentHeaderConfig = {
+      ...draftMetaRef.current.headerConfig,
       showHeader: true,
       showFooter: true,
       badgeText: 'ATESTADO MÉDICO',
       dateText: today
-    }));
+    };
+    setHeaderConfig(nextHeader);
     setCurrentModel({
       id: null,
       title: 'Atestado Médico',
       isPreset: false
     });
     isDraftRestoredRef.current = true;
-    triggerAutoSave(editor);
+    triggerAutoSave(editor, nextHeader, undefined, {
+      title: 'Atestado Médico',
+      fontSize: 12,
+      orientation: 'portrait',
+      viaLayout: '1-via'
+    });
     if (showToastMsg) {
       showToast('Atestado médico carregado no editor com formatação limpa!');
     }
-  }, [editor, patient, certificate, headerConfig.clinicAddress, triggerAutoSave]);
+  }, [editor, patient, certificate, triggerAutoSave]);
 
   // Gatilho externo: Navegar para o Editor a partir da aba de prescrição
   const lastTriggerRef = useRef(0);
@@ -874,6 +929,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
   // Helper para ajustar layout e cabeçalho conforme o tipo de documento injetado
   const applyInitialDocumentLayout = useCallback((doc: { html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' }) => {
+    if (doc.type !== 'prescription') {
+      setActiveLoadedRecipeType(null);
+      setViaLayout('1-via');
+      setPageOrientation('portrait');
+    }
     if (doc.type === 'sus') {
       setHeaderConfig(prev => ({
         ...prev,
@@ -898,6 +958,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         badgeText: 'ATESTADO MÉDICO'
       }));
     } else if (doc.type === 'prescription') {
+      setPageOrientation('landscape');
       setHeaderConfig(prev => ({
         ...prev,
         showHeader: true,
@@ -913,6 +974,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   useEffect(() => {
     if (editor && initialDocumentToLoad && initialDocumentToLoad !== lastInitialDocRef.current) {
       lastInitialDocRef.current = initialDocumentToLoad;
+      isDraftRestoredRef.current = true;
       editor.commands.setContent(initialDocumentToLoad.html);
       setEditorHtml(initialDocumentToLoad.html);
       applyInitialDocumentLayout(initialDocumentToLoad);
@@ -921,15 +983,15 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         title: initialDocumentToLoad.title || 'Documento Clínico',
         isPreset: false
       });
-      isDraftRestoredRef.current = true;
       triggerAutoSave(editor);
       showToast(`Documento "${initialDocumentToLoad.title}" carregado no editor!`);
     }
   }, [editor, initialDocumentToLoad, applyInitialDocumentLayout, triggerAutoSave]);
 
-  // Carregar rascunho existente do IndexedDB de forma não-destrutiva
+  // Carregar rascunho existente do IndexedDB apenas UMA vez na montagem do editor
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || isDraftRestoredRef.current) return;
+    isDraftRestoredRef.current = true;
 
     let isMounted = true;
     const restoreDraft = async () => {
@@ -945,7 +1007,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             title: initialDocumentToLoad.title || 'Documento Clínico',
             isPreset: false
           });
-          isDraftRestoredRef.current = true;
         }
         return;
       }
@@ -955,7 +1016,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         lastTriggerRef.current = editorInitialSyncTrigger;
         if (isMounted) {
           handleLoadActivePrescription(false);
-          isDraftRestoredRef.current = true;
         }
         return;
       }
@@ -974,6 +1034,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             }
             if (draft.headerConfig) {
               setHeaderConfig(draft.headerConfig);
+              if (/controle especial/i.test(draft.headerConfig.badgeText || '')) {
+                setActiveLoadedRecipeType('controle_especial');
+              } else if (/antimicrobiano/i.test(draft.headerConfig.badgeText || '')) {
+                setActiveLoadedRecipeType('antimicrobiano');
+              } else if (/receitu[áa]rio/i.test(draft.headerConfig.badgeText || '')) {
+                setActiveLoadedRecipeType('simples');
+              }
             }
             if (draft.logoConfig) {
               setLogoConfig(draft.logoConfig);
@@ -1021,10 +1088,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         if (isMounted) {
           editor.commands.setContent(initialContent);
           setEditorHtml(initialContent);
-        }
-      } finally {
-        if (isMounted) {
-          isDraftRestoredRef.current = true;
         }
       }
     };
@@ -2948,285 +3011,305 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             </div>
           )}
 
-          {/* LAYOUT 1 VIA (FOLHA ÚNICA PADRÃO) */}
-          {viaLayout === '1-via' && (
-            <>
-              {/* CABEÇALHO HOSPITALAR / TIMBRADO TOTALMENTE EDITÁVEL EM TEMPO REAL */}
-              {headerConfig.showHeader && (
-                <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition">
-                  {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
-                  <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
-                    <span className="flex items-center gap-1 text-slate-600 font-semibold">
-                      <Pencil className="w-3 h-3 text-sky-600" />
-                      <span>Clique em qualquer texto do cabeçalho para editar</span>
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={handleResetHeaderFromProfile}
-                        className="hover:text-sky-700 font-medium flex items-center gap-1 cursor-pointer"
-                        title="Preencher com os dados do seu Perfil Médico cadastrado"
-                      >
-                        <RotateCcw className="w-3 h-3" />
-                        <span>Puxar do Perfil</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleHeaderFieldChange('showHeader', false)}
-                        className="hover:text-amber-600 font-medium flex items-center gap-1 cursor-pointer"
-                        title="Ocultar cabeçalho (ideal se usar folha já timbrada)"
-                      >
-                        <EyeOff className="w-3 h-3" />
-                        <span>Ocultar Cabeçalho</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* LOGOTIPO NO TOPO (Top-Left, Top-Center ou Top-Right) */}
-                  {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'top-left' || logoConfig.position === 'top-center' || logoConfig.position === 'top-right') && (
-                    <div className={`mb-3 flex relative group ${
-                      logoConfig.position === 'top-center' ? 'justify-center' :
-                      logoConfig.position === 'top-right' ? 'justify-end' : 'justify-start'
-                    }`}>
-                      <div className="relative">
-                        <img 
-                          src={logoConfig.dataUrl} 
-                          alt="Logotipo da Instituição" 
-                          className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
-                        />
-                        {/* Alça rápida no-print para trocar posição ou tamanho */}
-                        <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-[9px] z-20">
-                          <button
-                            type="button"
-                            onClick={() => handleChangeLogoPosition('free')}
-                            className="hover:text-sky-300 flex items-center gap-0.5 cursor-pointer"
-                            title="Ativar modo livre e arrastar para qualquer lugar"
-                          >
-                            <Move className="w-2.5 h-2.5" />
-                            <span>Mover</span>
-                          </button>
-                          <span>•</span>
-                          <button
-                            type="button"
-                            onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
-                            className="hover:text-sky-300 cursor-pointer"
-                          >
-                            Tamanho ({String(logoConfig.size).toUpperCase()})
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-start justify-between gap-4">
-                    {/* Lado Esquerdo: timbre do local de atendimento (o médico é identificado na assinatura) */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-2.5 mb-1">
-                        {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
-                        {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'header-left' || logoConfig.secondaryDataUrl || (!logoConfig.position && !logoConfig.secondaryDataUrl)) ? (
-                          <div className="relative group shrink-0">
-                            <img 
-                              src={logoConfig.dataUrl} 
-                              alt="Logotipo Principal / Esquerdo" 
-                              className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
-                            />
-                            <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 left-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
-                              <button
-                                type="button"
-                                onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
-                                className="hover:text-sky-300 cursor-pointer"
-                              >
-                                {String(logoConfig.size).toUpperCase()}
-                              </button>
-                            </div>
-                          </div>
-                        ) : null}
-
-                        <div className="flex-1 min-w-0">
-                          {/* Nome do local de atendimento: é o título do timbre */}
-                          <input
-                            type="text"
-                            value={headerConfig.clinicName || ''}
-                            onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
-                            placeholder="Nome do local de atendimento"
-                            aria-label="Nome do local de atendimento"
-                            style={{ fontFamily: 'inherit' }}
-                            className="text-xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                            title="Clique para editar o nome do local de atendimento"
-                          />
-
-                          {/* Endereço / CNES / contato */}
-                          <input
-                            type="text"
-                            value={headerConfig.clinicAddress || ''}
-                            onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
-                            placeholder="Endereço e informações de contato"
-                            aria-label="Endereço e contato do local de atendimento"
-                            style={{ fontFamily: 'inherit' }}
-                            className="text-[11px] font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                            title="Clique para editar o endereço"
-                          />
-                        </div>
+          {/* LAYOUT 1 VIA (FOLHA ÚNICA PADRÃO OU MEIA FOLHA ESQUERDA PEC DO SUS EM PAISAGEM) */}
+          {viaLayout === '1-via' && (() => {
+            const meiaFolhaPaisagem = pageOrientation === 'landscape' && /receitu[áa]rio/i.test(headerConfig.badgeText || '');
+            const conteudoViaUnica = (
+              <div className="flex flex-col justify-between h-full flex-1 w-full min-w-0 relative z-10">
+                {/* CABEÇALHO HOSPITALAR / TIMBRADO TOTALMENTE EDITÁVEL EM TEMPO REAL */}
+                {headerConfig.showHeader && (
+                  <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition">
+                    {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
+                    <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
+                      <span className="flex items-center gap-1 text-slate-600 font-semibold">
+                        <Pencil className="w-3 h-3 text-sky-600" />
+                        <span>Clique em qualquer texto do cabeçalho para editar</span>
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleResetHeaderFromProfile}
+                          className="hover:text-sky-700 font-medium flex items-center gap-1 cursor-pointer"
+                          title="Preencher com os dados do seu Perfil Médico cadastrado"
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          <span>Puxar do Perfil</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleHeaderFieldChange('showHeader', false)}
+                          className="hover:text-amber-600 font-medium flex items-center gap-1 cursor-pointer"
+                          title="Ocultar cabeçalho (ideal se usar folha já timbrada)"
+                        >
+                          <EyeOff className="w-3 h-3" />
+                          <span>Ocultar Cabeçalho</span>
+                        </button>
                       </div>
                     </div>
 
-                    {/* Lado Direito: Logo (header-right ou secundário), Selo do Tipo de Documento & Data */}
-                    <div className="text-right flex flex-col items-end shrink-0 max-w-[220px]">
-                      {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false ? (
-                        <div className="relative group mb-2">
+                    {/* LOGOTIPO NO TOPO (Top-Left, Top-Center ou Top-Right) */}
+                    {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'top-left' || logoConfig.position === 'top-center' || logoConfig.position === 'top-right') && (
+                      <div className={`mb-3 flex relative group ${
+                        logoConfig.position === 'top-center' ? 'justify-center' :
+                        logoConfig.position === 'top-right' ? 'justify-end' : 'justify-start'
+                      }`}>
+                        <div className="relative">
                           <img 
-                            src={logoConfig.secondaryDataUrl} 
-                            alt="Logotipo Secundário / Direito" 
-                            className={`${getLogoSizeClass(logoConfig.secondarySize || logoConfig.size)} object-contain`}
+                            src={logoConfig.dataUrl} 
+                            alt="Logotipo da Instituição" 
+                            className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
                           />
-                          <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 right-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
+                          {/* Alça rápida no-print para trocar posição ou tamanho */}
+                          <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-[9px] z-20">
                             <button
                               type="button"
-                              onClick={() => handleChangeSecondaryLogoSize(logoConfig.secondarySize === 'sm' ? 'md' : logoConfig.secondarySize === 'md' ? 'lg' : 'sm')}
+                              onClick={() => handleChangeLogoPosition('free')}
+                              className="hover:text-sky-300 flex items-center gap-0.5 cursor-pointer"
+                              title="Ativar modo livre e arrastar para qualquer lugar"
+                            >
+                              <Move className="w-2.5 h-2.5" />
+                              <span>Mover</span>
+                            </button>
+                            <span>•</span>
+                            <button
+                              type="button"
+                              onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
                               className="hover:text-sky-300 cursor-pointer"
                             >
-                              Tamanho ({String(logoConfig.secondarySize || logoConfig.size).toUpperCase()})
+                              Tamanho ({String(logoConfig.size).toUpperCase()})
                             </button>
                           </div>
                         </div>
-                      ) : (logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-right' && (
-                        <img 
-                          src={logoConfig.dataUrl} 
-                          alt="Logotipo" 
-                          className={`${getLogoSizeClass(logoConfig.size)} object-contain mb-2`}
-                        />
-                      ))}
+                      </div>
+                    )}
 
-                      {/* Badge Editável do Tipo de Documento */}
-                      <input
-                        type="text"
-                        value={headerConfig.badgeText || ''}
-                        onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
-                        placeholder="TIPO DE DOCUMENTO"
-                        // Largura acompanha o texto: com a largura padrão do campo o selo saía cortado ("RECEITUÁRIO MÉDIC") na tela, na impressão e no PDF
-                        style={{ fontFamily: 'inherit', width: `${Math.max(12, (headerConfig.badgeText || 'TIPO DE DOCUMENTO').length) * 0.8 + 2.5}em` }}
-                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 text-center hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition max-w-[220px]"
-                        title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
-                      />
+                    <div className="flex flex-wrap sm:flex-nowrap items-start justify-between gap-3 sm:gap-4">
+                      {/* Lado Esquerdo: timbre do local de atendimento (o médico é identificado na assinatura) */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start gap-2.5 mb-1">
+                          {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
+                          {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'header-left' || logoConfig.secondaryDataUrl || (!logoConfig.position && !logoConfig.secondaryDataUrl)) ? (
+                            <div className="relative group shrink-0">
+                              <img 
+                                src={logoConfig.dataUrl} 
+                                alt="Logotipo Principal / Esquerdo" 
+                                className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
+                              />
+                              <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 left-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
+                                <button
+                                  type="button"
+                                  onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
+                                  className="hover:text-sky-300 cursor-pointer"
+                                >
+                                  {String(logoConfig.size).toUpperCase()}
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
 
-                      {/* Data Editável */}
-                      <input
-                        type="text"
-                        value={headerConfig.dateText || ''}
-                        onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
-                        placeholder="Data de emissão"
-                        style={{ fontFamily: 'inherit' }}
-                        className="text-[11px] text-slate-500 mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
-                        title="Clique para editar a data de emissão"
-                      />
-                    </div>
-                  </div>
+                          <div className="flex-1 min-w-0">
+                            {/* Nome do local de atendimento: é o título do timbre */}
+                            <input
+                              type="text"
+                              value={headerConfig.clinicName || ''}
+                              onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
+                              placeholder="Nome do local de atendimento"
+                              aria-label="Nome do local de atendimento"
+                              style={{ fontFamily: 'inherit' }}
+                              className="text-sm sm:text-base font-bold uppercase tracking-tight text-slate-900 leading-snug w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
+                              title="Clique para editar o nome do local de atendimento"
+                            />
 
-                  {/* Identificação Rápida do Paciente (Se houver) */}
-                  {headerConfig.showPatientBanner && (
-                    <div 
-                      style={{ fontFamily: 'inherit' }}
-                      className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-700"
-                    >
-                      {patient?.name ? (
-                        <>
-                          <span><strong>Paciente:</strong> {patient.name}</span>
-                          {patient.documentNumber && <span><strong>Doc:</strong> {patient.documentNumber}</span>}
-                          {patient.weightKg > 0 && <span><strong>Peso:</strong> {patient.weightKg} kg</span>}
-                        </>
-                      ) : (
+                            {/* Endereço / CNES / contato */}
+                            <input
+                              type="text"
+                              value={headerConfig.clinicAddress || ''}
+                              onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
+                              placeholder="Endereço e informações de contato"
+                              aria-label="Endereço e contato do local de atendimento"
+                              style={{ fontFamily: 'inherit' }}
+                              className="text-[11px] font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
+                              title="Clique para editar o endereço"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Lado Direito: Logo (header-right ou secundário), Selo do Tipo de Documento & Data */}
+                      <div className="text-right flex flex-col items-end shrink-0 max-w-[220px]">
+                        {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false ? (
+                          <div className="relative group mb-2">
+                            <img 
+                              src={logoConfig.secondaryDataUrl} 
+                              alt="Logotipo Secundário / Direito" 
+                              className={`${getLogoSizeClass(logoConfig.secondarySize || logoConfig.size)} object-contain`}
+                            />
+                            <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 right-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
+                              <button
+                                type="button"
+                                onClick={() => handleChangeSecondaryLogoSize(logoConfig.secondarySize === 'sm' ? 'md' : logoConfig.secondarySize === 'md' ? 'lg' : 'sm')}
+                                className="hover:text-sky-300 cursor-pointer"
+                              >
+                                Tamanho ({String(logoConfig.secondarySize || logoConfig.size).toUpperCase()})
+                              </button>
+                            </div>
+                          </div>
+                        ) : (logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-right' && (
+                          <img 
+                            src={logoConfig.dataUrl} 
+                            alt="Logotipo" 
+                            className={`${getLogoSizeClass(logoConfig.size)} object-contain mb-2`}
+                          />
+                        ))}
+
+                        {/* Badge Editável do Tipo de Documento */}
                         <input
                           type="text"
-                          id="editor-patient-custom-text"
-                          aria-label="Identificação do paciente"
-                          value={headerConfig.patientCustomText || ''}
-                          onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
-                          placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
-                          style={{ fontFamily: 'inherit' }}
-                          className="w-full text-xs text-slate-700 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition placeholder:text-slate-400"
+                          value={headerConfig.badgeText || ''}
+                          onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
+                          placeholder="TIPO DE DOCUMENTO"
+                          // Largura acompanha o texto: com a largura padrão do campo o selo saía cortado ("RECEITUÁRIO MÉDIC") na tela, na impressão e no PDF
+                          style={{ fontFamily: 'inherit', width: `${Math.max(12, (headerConfig.badgeText || 'TIPO DE DOCUMENTO').length) * 0.8 + 2.5}em` }}
+                          className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 text-center hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition max-w-[220px]"
+                          title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
                         />
-                      )}
+
+                        {/* Data Editável */}
+                        <input
+                          type="text"
+                          value={headerConfig.dateText || ''}
+                          onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
+                          placeholder="Data de emissão"
+                          style={{ fontFamily: 'inherit' }}
+                          className="text-[11px] text-slate-500 mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
+                          title="Clique para editar a data de emissão"
+                        />
+                      </div>
                     </div>
-                  )}
-                </header>
-              )}
 
-              {/* ÁREA PRINCIPAL DO EDITOR (Tiptap WYSIWYG em Tempo Real) */}
-              <div className="flex-1 w-full text-slate-900 relative z-10 py-1">
-                <EditorContent editor={editor} />
-              </div>
+                    {/* Identificação Rápida do Paciente (Se houver) */}
+                    {headerConfig.showPatientBanner && (
+                      <div 
+                        style={{ fontFamily: 'inherit' }}
+                        className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-700"
+                      >
+                        {patient?.name ? (
+                          <>
+                            <span><strong>Paciente:</strong> {patient.name}</span>
+                            {patient.documentNumber && <span><strong>Doc:</strong> {patient.documentNumber}</span>}
+                            {patient.weightKg > 0 && <span><strong>Peso:</strong> {patient.weightKg} kg</span>}
+                          </>
+                        ) : (
+                          <input
+                            type="text"
+                            id="editor-patient-custom-text"
+                            aria-label="Identificação do paciente"
+                            value={headerConfig.patientCustomText || ''}
+                            onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
+                            placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
+                            style={{ fontFamily: 'inherit' }}
+                            className="w-full text-xs text-slate-700 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition placeholder:text-slate-400"
+                          />
+                        )}
+                      </div>
+                    )}
+                  </header>
+                )}
 
-              {/* RODAPÉ CLÍNICO COM CARIMBO E ASSINATURA EDITÁVEIS */}
-              {headerConfig.showFooter && (
-                <footer 
-                  style={{ fontFamily: 'inherit' }}
-                  className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center relative z-10 group"
-                >
-                  <div className="w-72 border-b border-slate-400 mb-2" />
+                {/* ÁREA PRINCIPAL DO EDITOR (Tiptap WYSIWYG em Tempo Real) */}
+                <div className="flex-1 w-full text-slate-900 relative z-10 py-1">
+                  <EditorContent editor={editor} />
+                </div>
 
-                  {/* Nome do Médico na Assinatura */}
-                  <input
-                    type="text"
-                    value={headerConfig.footerDocName || headerConfig.doctorName || ''}
-                    onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
-                    placeholder="Dr(a). Médico(a)"
-                    className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 min-h-6 flex items-center justify-center"
-                    title="Clique para editar o nome na assinatura"
-                  />
-
-                  {/* CRM na Assinatura */}
-                  <input
-                    type="text"
-                    value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
-                    onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
-                    placeholder="Médico(a) — CRM-SP 00000"
-                    className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 mt-0.5 min-h-6 flex items-center justify-center"
-                    title="Clique para editar CRM na assinatura"
-                  />
-
-                  {/* Especialidade na Assinatura */}
-                  <input
-                    type="text"
-                    value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
-                    onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
-                    placeholder="Especialidade"
-                    className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 min-h-6 flex items-center justify-center"
-                    title="Clique para editar a especialidade no carimbo"
-                  />
-
-                  {/* Subtexto Regulamentar CFM */}
-                  <input
-                    type="text"
-                    id="editor-footer-subtext"
-                    aria-label="Subtexto regulamentar CFM"
-                    value={headerConfig.footerSubtext || ''}
-                    onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
-                    className="text-[9px] text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-md min-h-6"
-                  />
-
-                  {/* Botão no-print para Ocultar Rodapé */}
-                  <button
-                    type="button"
-                    onClick={() => handleHeaderFieldChange('showFooter', false)}
-                    className="no-print opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
-                    title="Ocultar rodapé de assinatura"
+                {/* RODAPÉ CLÍNICO COM CARIMBO E ASSINATURA EDITÁVEIS */}
+                {headerConfig.showFooter && (
+                  <footer 
+                    style={{ fontFamily: 'inherit' }}
+                    className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center relative z-10 group"
                   >
-                    <EyeOff className="w-2.5 h-2.5" />
-                    <span>Ocultar Rodapé</span>
-                  </button>
-                </footer>
-              )}
-            </>
-          )}
+                    <div className="w-64 max-w-full border-b border-slate-400 mb-2" />
 
-          {/* LAYOUT 2 VIAS NA MESMA FOLHA (PORTARIA SVS/MS 344/98 & CONTROLE ESPECIAL) */}
+                    {/* Nome do Médico na Assinatura */}
+                    <input
+                      type="text"
+                      value={headerConfig.footerDocName || headerConfig.doctorName || ''}
+                      onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
+                      placeholder="Dr(a). Médico(a)"
+                      className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs min-h-6 flex items-center justify-center"
+                      title="Clique para editar o nome na assinatura"
+                    />
+
+                    {/* CRM na Assinatura */}
+                    <input
+                      type="text"
+                      value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
+                      onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
+                      placeholder="Médico(a) — CRM-SP 00000"
+                      className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs mt-0.5 min-h-6 flex items-center justify-center"
+                      title="Clique para editar CRM na assinatura"
+                    />
+
+                    {/* Especialidade na Assinatura */}
+                    <input
+                      type="text"
+                      value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
+                      onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
+                      placeholder="Especialidade"
+                      className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs min-h-6 flex items-center justify-center"
+                      title="Clique para editar a especialidade no carimbo"
+                    />
+
+                    {/* Subtexto Regulamentar CFM */}
+                    <input
+                      type="text"
+                      id="editor-footer-subtext"
+                      aria-label="Subtexto regulamentar CFM"
+                      value={headerConfig.footerSubtext || ''}
+                      onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
+                      className="text-[9px] text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-md min-h-6"
+                    />
+
+                    {/* Botão no-print para Ocultar Rodapé */}
+                    <button
+                      type="button"
+                      onClick={() => handleHeaderFieldChange('showFooter', false)}
+                      className="no-print opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
+                      title="Ocultar rodapé de assinatura"
+                    >
+                      <EyeOff className="w-2.5 h-2.5" />
+                      <span>Ocultar Rodapé</span>
+                    </button>
+                  </footer>
+                )}
+              </div>
+            );
+
+            return meiaFolhaPaisagem ? (
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-6 flex-1 w-full relative z-10">
+                <div className="flex flex-col justify-between h-full pr-2 min-w-0">
+                  {conteudoViaUnica}
+                </div>
+                <div className="flex flex-col items-center justify-center relative border-l border-dashed border-slate-400 px-1 select-none">
+                  <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                    <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
+                    <span style={{ writingMode: 'vertical-rl' }}>✂ CORTE AQUI</span>
+                  </div>
+                </div>
+                <div aria-hidden="true" />
+              </div>
+            ) : (
+              conteudoViaUnica
+            );
+          })()}
+
+          {/* LAYOUT 2 VIAS NA MESMA FOLHA (ANTIMICROBIANO RDC 471/2021 OU CONTROLE ESPECIAL PORTARIA 344/98) */}
           {viaLayout === '2-vias' && (
             <>
               {pageOrientation === 'landscape' ? (
-                /* 2 VIAS LADO A LADO EM PAISAGEM (LAYOUT CLÁSSICO DE CONTROLE ESPECIAL) */
+                /* 2 VIAS LADO A LADO EM PAISAGEM */
                 <div className="grid grid-cols-[1fr_auto_1fr] gap-6 flex-1 w-full relative z-10">
-                  {/* 1ª VIA: FARMÁCIA (RETENÇÃO) */}
-                  <div className="flex flex-col justify-between h-full pr-2">
+                  {/* 1ª VIA */}
+                  <div className="flex flex-col justify-between h-full pr-2 min-w-0">
                     <div>
                       {headerConfig.showHeader && (
                         <header className="border-b-2 border-slate-900 pb-2 mb-3">
@@ -3249,7 +3332,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 style={{ fontFamily: 'inherit' }}
                                 className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-slate-200"
                               />
-                              <p className="text-[10px] text-slate-600 truncate mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
+                              <p className="text-[10px] text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
                             <div className="text-right shrink-0">
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
@@ -3286,37 +3369,45 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           </p>
                         </div>
 
-                        {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
-                        <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Comprador
-                            </p>
-                            <div className="space-y-0.5">
-                              <p><strong>Nome:</strong> _________________________</p>
-                              <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
-                              <p><strong>Endereço:</strong> _____________________</p>
-                              <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
-                            </div>
-                          </div>
+                        {viasDeControleEspecial ? (
+                          <>
+                            {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
+                            <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Comprador
+                                </p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Nome:</strong> _________________________</p>
+                                  <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                                  <p><strong>Endereço:</strong> _____________________</p>
+                                  <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                                </div>
+                              </div>
 
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Fornecedor
-                            </p>
-                            <div className="space-y-0.5">
-                              <p><strong>Farmácia/Drogaria:</strong> _____________</p>
-                              <p><strong>Assinatura Farmacêutico:</strong> _________</p>
-                              <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
-                              <p><strong>Quantidade Dispensada:</strong> __________</p>
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Fornecedor
+                                </p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                                  <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                                  <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                                  <p><strong>Quantidade Dispensada:</strong> __________</p>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
 
-                        {/* Subtexto Regulamentar / Validade */}
-                        <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
-                          1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
-                        </div>
+                            {/* Subtexto Regulamentar / Validade */}
+                            <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                              1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
+                            </div>
+                          </>
+                        ) : (
+                          <div className="mt-1.5 text-[7.5px] text-slate-500 italic text-center">
+                            1ª Via: Orientação ao Paciente • Válida por 10 (dez) dias a partir da emissão (RDC Anvisa nº 471/2021).
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -3329,23 +3420,23 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     </div>
                   </div>
 
-                  {/* 2ª VIA: PACIENTE (ORIENTAÇÃO) */}
-                  <div className="flex flex-col justify-between h-full pl-2">
+                  {/* 2ª VIA */}
+                  <div className="flex flex-col justify-between h-full pl-2 min-w-0">
                     <div>
                       {headerConfig.showHeader && (
                         <header className="border-b-2 border-slate-900 pb-2 mb-3">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight truncate h-5 flex items-center">
+                              <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight break-words flex items-center">
                                 {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
                               </h3>
                               <p 
                                 style={{ fontFamily: 'inherit' }}
-                                className="text-xs font-bold text-sky-800 mt-0.5 h-4 flex items-center"
+                                className="text-xs font-bold text-sky-800 mt-0.5 flex items-center"
                               >
                                 {headerConfig.doctorCrm || 'CRM'}
                               </p>
-                              <p className="text-[10px] text-slate-600 truncate mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
+                              <p className="text-[10px] text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
                             <div className="text-right shrink-0">
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
@@ -3385,37 +3476,52 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           </p>
                         </div>
 
-                        {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
-                        <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Comprador
-                            </p>
-                            <div className="space-y-0.5">
-                              <p><strong>Nome:</strong> _________________________</p>
-                              <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
-                              <p><strong>Endereço:</strong> _____________________</p>
-                              <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
-                            </div>
-                          </div>
+                        {viasDeControleEspecial ? (
+                          <>
+                            {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
+                            <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Comprador
+                                </p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Nome:</strong> _________________________</p>
+                                  <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                                  <p><strong>Endereço:</strong> _____________________</p>
+                                  <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                                </div>
+                              </div>
 
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Fornecedor
-                            </p>
-                            <div className="space-y-0.5">
-                              <p><strong>Farmácia/Drogaria:</strong> _____________</p>
-                              <p><strong>Assinatura Farmacêutico:</strong> _________</p>
-                              <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
-                              <p><strong>Quantidade Dispensada:</strong> __________</p>
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Fornecedor
+                                </p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                                  <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                                  <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                                  <p><strong>Quantidade Dispensada:</strong> __________</p>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
 
-                        {/* Subtexto Regulamentar / Validade */}
-                        <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
-                          2ª Via: Orientação ao Paciente • Válido por 30 (trinta) dias em todo o território nacional (Portaria SVS/MS nº 344/98).
-                        </div>
+                            {/* Subtexto Regulamentar / Validade */}
+                            <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                              2ª Via: Orientação ao Paciente • Válido por 30 (trinta) dias em todo o território nacional (Portaria SVS/MS nº 344/98).
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="mt-2 pt-1.5 border-t border-slate-300 text-[8px] text-slate-700 flex items-center justify-between gap-2">
+                              <span><strong>Dispensação (farmácia):</strong> Data: ___/___/_____</span>
+                              <span>Qtd aviada: _______</span>
+                              <span>Lote: _______</span>
+                            </div>
+                            <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                              2ª Via: Retenção da Farmácia / Drogaria • Válida por 10 (dez) dias (RDC Anvisa nº 471/2021).
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
@@ -3423,7 +3529,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               ) : (
                 /* 2 VIAS EMPILHADAS EM RETRATO (SUPERIOR E INFERIOR) */
                 <div className="flex flex-col justify-between h-full flex-1 w-full relative z-10 gap-3">
-                  {/* 1ª VIA: FARMÁCIA (SUPERIOR) */}
+                  {/* 1ª VIA (SUPERIOR) */}
                   <div className="flex-1 flex flex-col justify-between pb-2">
                     <div>
                       {headerConfig.showHeader && (
@@ -3479,29 +3585,37 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
                           </p>
                         </div>
-                        <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Comprador
-                            </p>
-                            <p><strong>Nome:</strong> _________________________</p>
-                            <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
-                            <p><strong>Endereço:</strong> _____________________</p>
-                            <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                        {viasDeControleEspecial ? (
+                          <>
+                            <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Comprador
+                                </p>
+                                <p><strong>Nome:</strong> _________________________</p>
+                                <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                                <p><strong>Endereço:</strong> _____________________</p>
+                                <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                              </div>
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Fornecedor
+                                </p>
+                                <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                                <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                                <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                                <p><strong>Quantidade Dispensada:</strong> __________</p>
+                              </div>
+                            </div>
+                            <div className="mt-0.5 text-[7px] text-slate-500 italic text-center">
+                              1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
+                            </div>
+                          </>
+                        ) : (
+                          <div className="mt-1 text-[7px] text-slate-500 italic text-center">
+                            1ª Via: Orientação ao Paciente • Válida por 10 (dez) dias a partir da emissão (RDC Anvisa nº 471/2021).
                           </div>
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Fornecedor
-                            </p>
-                            <p><strong>Farmácia/Drogaria:</strong> _____________</p>
-                            <p><strong>Assinatura Farmacêutico:</strong> _________</p>
-                            <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
-                            <p><strong>Quantidade Dispensada:</strong> __________</p>
-                          </div>
-                        </div>
-                        <div className="mt-0.5 text-[7px] text-slate-500 italic text-center">
-                          1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
-                        </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -3514,7 +3628,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     </span>
                   </div>
 
-                  {/* 2ª VIA: PACIENTE (INFERIOR) */}
+                  {/* 2ª VIA (INFERIOR) */}
                   <div className="flex-1 flex flex-col justify-between pt-2">
                     <div>
                       {headerConfig.showHeader && (
@@ -3523,13 +3637,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             <div className="flex-1 min-w-0">
                               <h3 
                                 style={{ fontFamily: 'inherit' }}
-                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight truncate h-5 flex items-center"
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight break-words flex items-center"
                               >
                                 {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
                               </h3>
                               <p 
                                 style={{ fontFamily: 'inherit' }}
-                                className="text-xs font-bold text-sky-800 mt-0.5 h-4 flex items-center"
+                                className="text-xs font-bold text-sky-800 mt-0.5 flex items-center"
                               >
                                 {headerConfig.doctorCrm || 'CRM'}
                               </p>
@@ -3566,29 +3680,44 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
                           </p>
                         </div>
-                        <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Comprador
-                            </p>
-                            <p><strong>Nome:</strong> _________________________</p>
-                            <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
-                            <p><strong>Endereço:</strong> _____________________</p>
-                            <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
-                          </div>
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Fornecedor
-                            </p>
-                            <p><strong>Farmácia/Drogaria:</strong> _____________</p>
-                            <p><strong>Assinatura Farmacêutico:</strong> _________</p>
-                            <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
-                            <p><strong>Quantidade Dispensada:</strong> __________</p>
-                          </div>
-                        </div>
-                        <div className="mt-0.5 text-[7px] text-slate-600 italic text-center">
-                          2ª Via: Orientação ao Paciente • Válido por 30 dias a contar da emissão (Portaria SVS/MS nº 344/98).
-                        </div>
+                        {viasDeControleEspecial ? (
+                          <>
+                            <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Comprador
+                                </p>
+                                <p><strong>Nome:</strong> _________________________</p>
+                                <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                                <p><strong>Endereço:</strong> _____________________</p>
+                                <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                              </div>
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Fornecedor
+                                </p>
+                                <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                                <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                                <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                                <p><strong>Quantidade Dispensada:</strong> __________</p>
+                              </div>
+                            </div>
+                            <div className="mt-0.5 text-[7px] text-slate-600 italic text-center">
+                              2ª Via: Orientação ao Paciente • Válido por 30 dias a contar da emissão (Portaria SVS/MS nº 344/98).
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="mt-1 pt-1 border-t border-slate-300 text-[7.5px] text-slate-700 flex items-center justify-between gap-2">
+                              <span><strong>Dispensação (farmácia):</strong> Data: ___/___/_____</span>
+                              <span>Qtd aviada: _______</span>
+                              <span>Lote: _______</span>
+                            </div>
+                            <div className="mt-0.5 text-[7px] text-slate-600 italic text-center">
+                              2ª Via: Retenção da Farmácia / Drogaria • Válida por 10 (dez) dias (RDC Anvisa nº 471/2021).
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>

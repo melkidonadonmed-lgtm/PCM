@@ -1541,8 +1541,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
           )}
 
-          {/* Folha A4 da bancada: o mesmo documento que será impresso / exportado em PDF */}
-          <FolhaA4 orientacao={regimeAtivo === 'simples' ? 'portrait' : 'landscape'}>
+          {/* Folha A4 da bancada: o mesmo documento que será impresso / exportado em PDF (sempre paisagem no padrão PEC do SUS) */}
+          <FolhaA4 orientacao="landscape">
             <DocumentoClinico
               tipo={DOCUMENTO_DO_REGIME[regimeAtivo]}
               doctor={doctor}

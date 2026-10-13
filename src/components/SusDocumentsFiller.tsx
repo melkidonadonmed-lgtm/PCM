@@ -39,10 +39,10 @@ const MESES_DA_LME = ['1º', '2º', '3º', '4º', '5º', '6º'];
 const linhaVaziaDaLme = () => ({ name: '', quantities: MESES_DA_LME.map(() => '') });
 
 /** Campos próprios de cada documento. Dado clínico abre em branco: quem informa é o médico. */
-const camposIniciaisDoDocumento = (doc: SusDocumentItem): Partial<SusFilledFormData> => ({
-  // No impresso oficial o procedimento é do caso: abre em branco, nunca com o exemplo do catálogo
-  sigtapCode: formularioOficialDe(doc.id) ? '' : doc.defaultSigtap || '',
-  procedureName: formularioOficialDe(doc.id) ? '' : doc.defaultProcedure || '',
+const camposIniciaisDoDocumento = (_doc: SusDocumentItem): Partial<SusFilledFormData> => ({
+  // Procedimento (código SIGTAP e descrição) é dado clínico do caso: abre sempre em branco (o padrão do catálogo é oferecido por botão)
+  sigtapCode: '',
+  procedureName: '',
   procedureQuantity: '',
   // Diagnóstico e justificativa são do caso: abrem em branco (o modelo é oferecido por botão)
   cid10Code: '',
@@ -329,7 +329,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
   // Campos clínicos do documento ativo que ainda estão em branco (saem como "—" na folha)
   const pendenciasClinicas = [
-    currentDocItem.id === 'apac_principal' && !(formData.sigtapCode?.trim() && formData.procedureName?.trim()) && 'procedimento (código e nome)',
+    currentDocItem.id !== 'lme_medicamentos' && !(formData.sigtapCode?.trim() && formData.procedureName?.trim()) && 'procedimento (código e nome)',
     currentDocItem.id === 'lme_medicamentos' && !formData.lmeMedications?.some((m) => m.name?.trim()) && 'medicamento',
     !formData.cid10Code?.trim() && 'CID-10',
     !formData.clinicalJustification?.trim() && 'justificativa clínica',
@@ -1057,6 +1057,22 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       />
                     </div>
                   </div>
+
+                  {currentDocItem.id !== 'lme_medicamentos' && (!formData.sigtapCode?.trim() || !formData.procedureName?.trim()) && (currentDocItem.defaultSigtap || currentDocItem.defaultProcedure) && (
+                    <p className="text-[11px] text-[var(--text-muted)]">
+                      Procedimento em branco.{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (currentDocItem.defaultSigtap) handleFieldChange('sigtapCode', currentDocItem.defaultSigtap);
+                          if (currentDocItem.defaultProcedure) handleFieldChange('procedureName', currentDocItem.defaultProcedure);
+                        }}
+                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                      >
+                        Usar o procedimento habitual deste documento ({currentDocItem.defaultSigtap})
+                      </button>
+                    </p>
+                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>

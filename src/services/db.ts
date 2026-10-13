@@ -22,11 +22,11 @@ export class PresCMedDatabase extends Dexie {
 
 export const db = new PresCMedDatabase();
 
-// Inicializa modelos clínicos padrão salvos no Dexie
+// Inicializa modelos clínicos padrão salvos no Dexie (idempotente sob React 19 StrictMode)
 export async function initializeDefaultTemplates() {
   const count = await db.savedDocuments.count();
   if (count === 0) {
-    await db.savedDocuments.bulkAdd(PRESET_CLINICAL_TEMPLATES);
+    await db.savedDocuments.bulkPut(PRESET_CLINICAL_TEMPLATES);
   }
 }
 

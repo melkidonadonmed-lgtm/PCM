@@ -10,12 +10,10 @@ import type {
   WorkContext
 } from '../../types';
 import {
-  agruparPorVia,
   dataCurta,
   nomeDoPaciente,
   numeroPorExtenso,
   resolverIdentidade,
-  rotuloApresentacao,
   tituloDoDocumento,
   type TipoDocumento
 } from '../../utils/documentoClinico';
@@ -130,12 +128,18 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
     </>
   );
 
-  if (tipo === 'special_prescription' || tipo === 'antimicrobial_prescription') {
+  if (tipo === 'prescription' || tipo === 'special_prescription' || tipo === 'antimicrobial_prescription') {
+    const regime =
+      tipo === 'special_prescription'
+        ? 'controle_especial'
+        : tipo === 'antimicrobial_prescription'
+          ? 'antimicrobiano'
+          : 'simples';
     return (
       <>
         {fundo}
         <ReceitaDuasVias
-          regime={tipo === 'special_prescription' ? 'controle_especial' : 'antimicrobiano'}
+          regime={regime}
           identidade={identidade}
           patient={patient}
           nomePaciente={paciente}
@@ -201,47 +205,7 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
         </div>
 
         <main style={{ marginTop: 8 }}>
-          {/* 1. Receita simples */}
-          {tipo === 'prescription' && (
-            prescriptionItems.length === 0 ? (
-              <Vazio>Nenhum medicamento adicionado nesta prescrição.</Vazio>
-            ) : (
-              agruparPorVia(prescriptionItems).map((grupo) => (
-                <section key={grupo.via} style={{ marginTop: 18 }}>
-                  <p style={{ ...rotulo, fontSize: 10.5, color: TINTA_SUAVE }}>{grupo.via}</p>
-                  <ol style={{ margin: '6px 0 0', padding: 0, listStyle: 'none', fontFamily: SERIFA, color: TINTA }}>
-                    {grupo.itens.map((item, idx) => {
-                      const apresentacao = rotuloApresentacao(item);
-                      return (
-                        <li key={item.id} className="print-avoid-break" style={{ marginTop: idx === 0 ? 0 : 16 }}>
-                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontSize: 17, lineHeight: 1.35 }}>
-                            <span style={{ fontWeight: 700 }}>
-                              {idx + 1}. {item.name}
-                              {apresentacao && (
-                                <span style={{ fontWeight: 500, fontStyle: 'italic', color: TINTA_SUAVE }}> ({apresentacao})</span>
-                              )}
-                            </span>
-                            <span aria-hidden="true" style={{ flex: 1, minWidth: 24, borderBottom: `1px dotted ${TINTA_APAGADA}`, transform: 'translateY(-4px)' }} />
-                            <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{item.quantity}</span>
-                          </div>
-                          <p style={{ margin: '3px 0 0', paddingLeft: 20, fontSize: 16, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
-                            {item.instructions}
-                          </p>
-                          {item.scheduleTimes && item.scheduleTimes.length > 0 && (
-                            <p style={{ margin: '2px 0 0', paddingLeft: 20, fontFamily: 'var(--font-sans)', fontSize: 11.5, color: TINTA_SUAVE }}>
-                              Horários sugeridos: <strong style={{ fontWeight: 600 }}>{item.scheduleTimes.join(' • ')}</strong>
-                            </p>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ol>
-                </section>
-              ))
-            )
-          )}
-
-          {/* 2. Solicitação de exames */}
+          {/* 1. Solicitação de exames */}
           {tipo === 'exams' && (
             <>
               {examIndication.trim() && <Secao titulo="Indicação clínica">{examIndication}</Secao>}
