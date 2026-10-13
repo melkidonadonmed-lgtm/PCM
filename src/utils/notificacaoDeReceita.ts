@@ -120,3 +120,26 @@ export function descreverNotificacao(notificacao: NotificacaoDeReceita): string 
   const base = `${notificacao.documento} — Lista ${notificacao.lista}`;
   return notificacao.ressalva ? `${base}, ${notificacao.ressalva}` : base;
 }
+
+/**
+ * Ressalva textual para cópia/WhatsApp quando há medicamentos que exigem
+ * talonário próprio de Notificação de Receita (Portaria SVS/MS nº 344/98).
+ * Retorna string vazia quando nenhum item exige notificação.
+ */
+export function avisoTextoNotificacao(items: Array<MedicamentoClassificavel & { name?: string }>): string {
+  const exigencias = (items || [])
+    .map((item) => {
+      const notif = notificacaoExigida(item);
+      return notif ? { nome: item?.name?.trim() || 'Medicamento controlado', notif } : null;
+    })
+    .filter((x): x is { nome: string; notif: NotificacaoDeReceita } => x !== null);
+
+  if (exigencias.length === 0) return '';
+
+  const detalhes = exigencias
+    .map(({ nome, notif }) => `${nome} (${descreverNotificacao(notif)})`)
+    .join('; ');
+
+  return `⚠️ Nota sanitária (Portaria SVS/MS nº 344/98): a dispensação de ${detalhes} exige talonário próprio de Notificação de Receita emitido presencialmente pelo médico.`;
+}
+

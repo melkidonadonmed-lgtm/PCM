@@ -98,7 +98,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       <div 
         className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4"
         style={{
-          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+          backgroundColor: 'var(--surface-card)',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
@@ -138,7 +138,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       <div 
         className="tactile-card p-3.5 sm:p-4 rounded-2xl"
         style={{
-          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+          backgroundColor: 'var(--surface-card)',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
@@ -185,7 +185,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       <div 
         className="tactile-card p-3.5 sm:p-4 rounded-2xl"
         style={{
-          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+          backgroundColor: 'var(--surface-card)',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
@@ -266,7 +266,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             aria-label="Lista de exames"
             className="tactile-card p-3 rounded-2xl max-h-[520px] overflow-y-auto space-y-1.5 divide-y focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             style={{
-              backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+              backgroundColor: 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
             }}
           >
@@ -323,7 +323,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         <div 
           className="tactile-card p-3.5 sm:p-4 rounded-2xl flex flex-col h-fit space-y-3"
           style={{
-            backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+            backgroundColor: 'var(--surface-card)',
             borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
           }}
         >

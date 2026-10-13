@@ -37,7 +37,10 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
     email: doctor?.email || '',
     showSignature: doctor?.showSignature ?? true,
     signatureText: doctor?.signatureText || '',
-    stampText: doctor?.stampText || ''
+    stampText: doctor?.stampText || '',
+    cnes: doctor?.cnes || '',
+    cpf: doctor?.cpf || '',
+    cns: doctor?.cns || ''
   });
 
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -60,7 +63,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
   }, [onClose]);
 
   const [showAdvancedClinic, setShowAdvancedClinic] = useState(
-    Boolean(doctor?.clinicName || doctor?.address || doctor?.cityState || doctor?.phone)
+    Boolean(doctor?.clinicName || doctor?.address || doctor?.cityState || doctor?.phone || doctor?.cns || doctor?.cpf || doctor?.cnes)
   );
 
   const states = [
@@ -83,7 +86,10 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       email: formData.email || '',
       showSignature: true,
       signatureText: '',
-      stampText: ''
+      stampText: '',
+      cnes: formData.cnes || '',
+      cpf: formData.cpf || '',
+      cns: formData.cns || ''
     });
     setValidationError(null);
   };
@@ -102,7 +108,10 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       email: '',
       showSignature: true,
       signatureText: '',
-      stampText: ''
+      stampText: '',
+      cnes: '',
+      cpf: '',
+      cns: ''
     });
     setValidationError(null);
   };
@@ -391,6 +400,56 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                     placeholder="Ex: Av. 7 de Setembro, 1200 - Sala 04"
                     className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   />
+                </div>
+
+                <div className="pt-2 border-t border-slate-200 dark:border-navy-800">
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                    Identificação SUS (APAC / LME / SISREG — opcional)
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label htmlFor="doc-input-cns" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                        CNS do Médico (LME)
+                      </label>
+                      <input
+                        id="doc-input-cns"
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.cns || ''}
+                        onChange={(e) => setFormData({ ...formData, cns: e.target.value })}
+                        placeholder="15 dígitos"
+                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="doc-input-cpf" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                        CPF do Médico (APAC)
+                      </label>
+                      <input
+                        id="doc-input-cpf"
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.cpf || ''}
+                        onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                        placeholder="000.000.000-00"
+                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="doc-input-cnes" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                        CNES da Unidade
+                      </label>
+                      <input
+                        id="doc-input-cnes"
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.cnes || ''}
+                        onChange={(e) => setFormData({ ...formData, cnes: e.target.value })}
+                        placeholder="7 dígitos"
+                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-slate-300 dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

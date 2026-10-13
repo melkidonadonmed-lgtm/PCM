@@ -31,6 +31,7 @@ import {
 import { FolhaA4 } from './documento/FolhaA4';
 import { DocumentoClinico } from './documento/DocumentoClinico';
 import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
+import { avisoTextoNotificacao } from '../utils/notificacaoDeReceita';
 import WatermarkSelector from './WatermarkSelector';
 
 interface PrintPreviewProps {
@@ -162,6 +163,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       itensDaFolha.forEach((it, idx) => {
         text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
       });
+      const avisoNotif = avisoTextoNotificacao(itensDaFolha);
+      if (avisoNotif) {
+        text += `\n${avisoNotif}\n`;
+      }
       text += `\n------------------------------------\n⚠️ _Siga as instruções médicas e os horários informados._`;
       return text;
     }
@@ -258,7 +263,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={onBack}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer transition active:scale-95 tactile-btn-secondary bg-[var(--surface-inset)] focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl border flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer transition active:scale-95 tactile-btn-secondary bg-[var(--surface-inset)] focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             title="Voltar para edição"
             aria-label="Voltar para edição"
           >

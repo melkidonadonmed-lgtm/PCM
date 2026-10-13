@@ -39,10 +39,10 @@ const MESES_DA_LME = ['1º', '2º', '3º', '4º', '5º', '6º'];
 const linhaVaziaDaLme = () => ({ name: '', quantities: MESES_DA_LME.map(() => '') });
 
 /** Campos próprios de cada documento. Dado clínico abre em branco: quem informa é o médico. */
-const camposIniciaisDoDocumento = (doc: SusDocumentItem): Partial<SusFilledFormData> => ({
-  // No impresso oficial o procedimento é do caso: abre em branco, nunca com o exemplo do catálogo
-  sigtapCode: formularioOficialDe(doc.id) ? '' : doc.defaultSigtap || '',
-  procedureName: formularioOficialDe(doc.id) ? '' : doc.defaultProcedure || '',
+const camposIniciaisDoDocumento = (_doc: SusDocumentItem): Partial<SusFilledFormData> => ({
+  // Procedimento (código SIGTAP e descrição) é dado clínico do caso: abre sempre em branco (o padrão do catálogo é oferecido por botão)
+  sigtapCode: '',
+  procedureName: '',
   procedureQuantity: '',
   // Diagnóstico e justificativa são do caso: abrem em branco (o modelo é oferecido por botão)
   cid10Code: '',
@@ -121,8 +121,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     doctorCpf: doctor?.cpf || '',
     doctorCns: doctor?.cns || '',
 
-    // Só para os impressos oficiais; sexo e raça/cor abrem em branco (o cadastro traz um sexo padrão, não informado)
-    patientSex: '' as SusFilledFormData['patientSex'],
+    // Só para os impressos oficiais; sexo e raça/cor abrem em branco se o médico não informou explicitamente
+    patientSex: (patient?.sex || '') as SusFilledFormData['patientSex'],
     patientRaceColor: '' as SusFilledFormData['patientRaceColor'],
     patientEthnicity: '',
     patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : '',
@@ -156,6 +156,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       doctorClinicName: activeContext?.clinicName || doctor?.clinicName?.trim() || prev.doctorClinicName,
       doctorCpf: doctor?.cpf || prev.doctorCpf,
       doctorCns: doctor?.cns || prev.doctorCns,
+      patientSex: patient?.sex || prev.patientSex,
       patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : prev.patientWeightKg,
 
       patientName: patient?.name?.trim() || prev.patientName,
@@ -256,7 +257,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         if (field === 'patientName' || field === 'patientCpf' || field === 'patientCns' || 
             field === 'patientMotherName' || field === 'patientPhone' || field === 'patientAddress' || 
             field === 'patientNeighborhood' || field === 'patientCity' || field === 'patientState' || 
-            field === 'patientCep' || field === 'patientBirthDate') {
+            field === 'patientCep' || field === 'patientBirthDate' || field === 'patientSex') {
           onUpdatePatient({
             ...patient,
             name: field === 'patientName' ? value : patient.name,
@@ -269,7 +270,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             city: field === 'patientCity' ? value : (patient as any).city,
             state: field === 'patientState' ? value : (patient as any).state,
             cep: field === 'patientCep' ? value : (patient as any).cep,
-            birthDate: field === 'patientBirthDate' ? value : patient.birthDate
+            birthDate: field === 'patientBirthDate' ? value : patient.birthDate,
+            sex: field === 'patientSex' ? (value === 'M' || value === 'F' ? value : '') : patient.sex
           });
         }
       }
@@ -329,7 +331,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
   // Campos clínicos do documento ativo que ainda estão em branco (saem como "—" na folha)
   const pendenciasClinicas = [
-    currentDocItem.id === 'apac_principal' && !(formData.sigtapCode?.trim() && formData.procedureName?.trim()) && 'procedimento (código e nome)',
+    currentDocItem.id !== 'lme_medicamentos' && !(formData.sigtapCode?.trim() && formData.procedureName?.trim()) && 'procedimento (código e nome)',
     currentDocItem.id === 'lme_medicamentos' && !formData.lmeMedications?.some((m) => m.name?.trim()) && 'medicamento',
     !formData.cid10Code?.trim() && 'CID-10',
     !formData.clinicalJustification?.trim() && 'justificativa clínica',
@@ -421,7 +423,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
           <div 
             className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4"
             style={{
-              backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+              backgroundColor: 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
             }}
           >
@@ -503,7 +505,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               return (
                 <div
                   key={doc.id}
-                  className={`tactile-card rounded-2xl p-4 flex flex-col justify-between transition cursor-pointer border relative group ${
+                  className={`tactile-card-interactive rounded-2xl p-4 flex flex-col justify-between border relative group ${
                     isSelected
                       ? 'border-blue-500 bg-blue-500/5 shadow-tactile-sm'
                       : 'hover:border-blue-400/40'
@@ -583,7 +585,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
           <div 
             className="tactile-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             style={{
-              backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+              backgroundColor: 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
             }}
           >
@@ -1058,6 +1060,22 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                     </div>
                   </div>
 
+                  {currentDocItem.id !== 'lme_medicamentos' && (!formData.sigtapCode?.trim() || !formData.procedureName?.trim()) && (currentDocItem.defaultSigtap || currentDocItem.defaultProcedure) && (
+                    <p className="text-[11px] text-[var(--text-muted)]">
+                      Procedimento em branco.{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (currentDocItem.defaultSigtap) handleFieldChange('sigtapCode', currentDocItem.defaultSigtap);
+                          if (currentDocItem.defaultProcedure) handleFieldChange('procedureName', currentDocItem.defaultProcedure);
+                        }}
+                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                      >
+                        Usar o procedimento habitual deste documento ({currentDocItem.defaultSigtap})
+                      </button>
+                    </p>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
@@ -1339,7 +1357,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               <div 
                 className="tactile-card p-3 rounded-2xl border flex flex-col gap-2.5"
                 style={{
-                  backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                  backgroundColor: 'var(--surface-card)',
                   borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
                 }}
               >

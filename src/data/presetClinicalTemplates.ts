@@ -167,17 +167,17 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
     },
     prescriptionItems: [
       {
-        id: 'rx-item-clonazepam',
-        name: 'Clonazepam 2,5 mg/mL (Gotas)',
-        presentation: 'Gotas 2,5 mg/mL',
-        quantity: '01 frasco (vinte mililitros)',
-        doseCalculatedText: '5 gotas',
-        frequencyText: 'À noite se necessário',
-        instructions: 'Pingar 05 (cinco) gotas por via oral às 21:00 horas se insônia grave ou ansiedade aguda.',
+        id: 'rx-item-amitriptilina',
+        name: 'Cloridrato de Amitriptilina 25 mg (Comprimidos)',
+        presentation: 'Comprimidos 25 mg',
+        quantity: '30 comprimidos (trinta comprimidos)',
+        doseCalculatedText: '1 comprimido',
+        frequencyText: '1 vez ao dia à noite',
+        instructions: 'Tomar 01 (um) comprimido por via oral às 21:00 horas, diariamente durante 30 dias.',
         route: 'Uso Oral',
         scheduleTimes: ['21:00'],
         scheduleInterval: 'À noite',
-        isContinuous: false,
+        isContinuous: true,
         isSpecialControl: true
       },
       {
@@ -216,8 +216,8 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
 
         <div style="min-height: 140px; padding: 8px; border: 1px dashed #94A3B8; margin-bottom: 12px;">
           <p style="font-weight: bold; margin: 0 0 8px 0; text-transform: uppercase; color: #0F172A;">PRESCRIÇÃO MEDICAMENTOSA:</p>
-          <p style="margin: 0 0 4px 0;"><strong>1. Clonazepam 2,5 mg/mL (Gotas)</strong> • 01 frasco (vinte mililitros)</p>
-          <p style="margin: 0 0 10px 16px; color: #334155;">Pingar 05 (cinco) gotas por via oral às 21:00 horas se insônia grave ou ansiedade aguda.</p>
+          <p style="margin: 0 0 4px 0;"><strong>1. Cloridrato de Amitriptilina 25 mg (Comprimidos)</strong> • 30 comprimidos (trinta comprimidos)</p>
+          <p style="margin: 0 0 10px 16px; color: #334155;">Tomar 01 (um) comprimido por via oral às 21:00 horas, diariamente durante 30 dias.</p>
           <p style="margin: 0 0 4px 0;"><strong>2. Sertralina 50 mg (Comprimidos)</strong> • 60 comprimidos (sessenta comprimidos)</p>
           <p style="margin: 0 0 4px 16px; color: #334155;">Tomar 01 (um) comprimido por via oral pela manhã, após o café, diariamente durante 60 dias.</p>
         </div>

@@ -47,7 +47,11 @@ import {
   Download,
   Pill,
   Stethoscope,
-  Award
+  Award,
+  RectangleVertical,
+  RectangleHorizontal,
+  File,
+  Files
 } from 'lucide-react';
 import { exportarFolhaPdf } from '../utils/folhaA4';
 import { 
@@ -552,8 +556,32 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     <p><strong>Recomendações Clínicas:</strong> Repouso, hidratação oral vigorosa (mínimo 2 litros de água/dia) e retorno imediato ao serviço se sinais de alarme ou piora respiratória.</p>
   `;
 
-  // Função para salvar rascunho com debounce no IndexedDB
-  const triggerAutoSave = useCallback((editorInstance: any, updatedHeader?: DocumentHeaderConfig, updatedLogo?: DocumentLogoConfig) => {
+  const draftMetaRef = useRef({
+    headerConfig,
+    logoConfig,
+    fontFamilyId,
+    baseFontSize,
+    pageOrientation,
+    viaLayout,
+    title: currentModel.title
+  });
+  draftMetaRef.current = {
+    headerConfig,
+    logoConfig,
+    fontFamilyId,
+    baseFontSize,
+    pageOrientation,
+    viaLayout,
+    title: currentModel.title
+  };
+
+  // Função para salvar rascunho com debounce no IndexedDB (referência estável para evitar loops em useEffects)
+  const triggerAutoSave = useCallback((
+    editorInstance: any,
+    updatedHeader?: DocumentHeaderConfig,
+    updatedLogo?: DocumentLogoConfig,
+    overrides?: Partial<{ title: string; fontSize: number; orientation: DocumentOrientation; viaLayout: DocumentViaLayout }>
+  ) => {
     if (!isDraftRestoredRef.current) return;
     setSaveStatus('saving');
 
@@ -561,27 +589,34 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       clearTimeout(saveTimerRef.current);
     }
 
-    const currentHeader = updatedHeader || headerConfig;
-    const currentLogo = updatedLogo || logoConfig;
+    if (updatedHeader) draftMetaRef.current.headerConfig = updatedHeader;
+    if (updatedLogo) draftMetaRef.current.logoConfig = updatedLogo;
+    if (overrides) {
+      if (overrides.title !== undefined) draftMetaRef.current.title = overrides.title;
+      if (overrides.fontSize !== undefined) draftMetaRef.current.baseFontSize = overrides.fontSize;
+      if (overrides.orientation !== undefined) draftMetaRef.current.pageOrientation = overrides.orientation;
+      if (overrides.viaLayout !== undefined) draftMetaRef.current.viaLayout = overrides.viaLayout;
+    }
 
     saveTimerRef.current = setTimeout(async () => {
       try {
+        const meta = draftMetaRef.current;
         const json = editorInstance?.getJSON?.() || null;
         const html = editorInstance?.getHTML?.() || '';
         const now = Date.now();
         await db.savedDocuments.put({
           id: 'draft-current',
-          title: currentModel.title || 'Rascunho Automático',
+          title: meta.title || 'Rascunho Automático',
           contentJson: json,
           contentHtml: html,
           contextId: activeContextRef.current?.id || 'global',
           isTemplate: false,
-          headerConfig: currentHeader,
-          logoConfig: currentLogo,
-          typography: fontFamilyId,
-          fontSize: baseFontSize,
-          orientation: pageOrientation,
-          viaLayout: viaLayout,
+          headerConfig: meta.headerConfig,
+          logoConfig: meta.logoConfig,
+          typography: meta.fontFamilyId,
+          fontSize: meta.baseFontSize,
+          orientation: meta.pageOrientation,
+          viaLayout: meta.viaLayout,
           createdAt: now,
           updatedAt: now
         });
@@ -594,7 +629,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         setSaveStatus('idle');
       }
     }, 600);
-  }, [headerConfig, logoConfig, fontFamilyId, baseFontSize, pageOrientation, viaLayout, currentModel.title]);
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -641,12 +676,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   // retém a 1ª (Portaria 344/98); no antimicrobiano, a 2ª (RDC 471/2021). O regime é lido do
   // selo do documento, que é salvo junto com ele.
   const viasDeAntimicrobiano = /antimicrobiano/i.test(headerConfig.badgeText || '');
+  const viasDeControleEspecial = /controle especial/i.test(headerConfig.badgeText || '') || activeLoadedRecipeType === 'controle_especial';
   const rotuloVia1 = viasDeAntimicrobiano ? '1ª via — Paciente' : '1ª via — Farmácia (retenção)';
   const rotuloVia2 = viasDeAntimicrobiano ? '2ª via — Farmácia (retenção)' : '2ª via — Paciente (orientação)';
 
   // Construtor e carregador completo da receita médica em tempo real com segregação inteligente
   const handleLoadActivePrescription = useCallback((showToastMsg = true, targetMode: 'auto' | RegimeReceita = 'auto') => {
     if (!editor) return;
+
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
 
     const allItems = prescriptionItems || [];
     const grupos = separarPorRegime(allItems);
@@ -667,16 +707,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     const pWeight = patient?.weightKg > 0 ? ` • Peso: ${patient.weightKg} kg` : '';
     const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-    // Receitas de 2 vias (antimicrobiano e controle especial) usam folha paisagem com as vias lado a lado
-    if (isSpecial) {
-      setViaLayout('2-vias');
-      setPageOrientation('landscape');
-      setBaseFontSize(10);
-    } else {
-      setViaLayout('1-via');
-      setPageOrientation('portrait');
-      setBaseFontSize(11);
-    }
+    // Padrão PEC do SUS: todas as receitas usam folha paisagem; simples ocupa 1 via na metade esquerda e 2 vias ocupa as duas metades
+    const nextViaLayout: DocumentViaLayout = isSpecial ? '2-vias' : '1-via';
+    const nextOrientation: DocumentOrientation = 'landscape';
+    const nextFontSize = 10;
+    setViaLayout(nextViaLayout);
+    setPageOrientation(nextOrientation);
+    setBaseFontSize(nextFontSize);
 
     const itemsHtml = itemsToLoad && itemsToLoad.length > 0
       ? itemsToLoad.map((item, idx) => {
@@ -704,7 +741,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         `;
 
     // Evita duplicidade: se o banner de identificação de paciente no cabeçalho estiver ativo, não repete no corpo
-    const patientLineHtml = headerConfig.showPatientBanner
+    const patientLineHtml = draftMetaRef.current.headerConfig.showPatientBanner
       ? ''
       : `<p><strong>Paciente:</strong> ${pName}${pDoc}${pAge}${pWeight}</p><p></p>`;
 
@@ -718,16 +755,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       ${itemsHtml}
     `;
 
-    editor.commands.setContent(newHtml);
-    setEditorHtml(newHtml);
-    setHeaderConfig(prev => ({
-      ...prev,
+    const nextHeader: DocumentHeaderConfig = {
+      ...draftMetaRef.current.headerConfig,
       showHeader: true,
       showFooter: true,
       showPatientBanner: true,
       badgeText: receita.selo,
       dateText: today
-    }));
+    };
+
+    editor.commands.setContent(newHtml);
+    setEditorHtml(newHtml);
+    setHeaderConfig(nextHeader);
 
     setCurrentModel({
       id: null,
@@ -736,11 +775,16 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     });
 
     isDraftRestoredRef.current = true;
-    triggerAutoSave(editor);
+    triggerAutoSave(editor, nextHeader, undefined, {
+      title: receita.modelo,
+      fontSize: nextFontSize,
+      orientation: nextOrientation,
+      viaLayout: nextViaLayout
+    });
     if (showToastMsg) {
       showToast(receita.aviso);
     }
-  }, [editor, prescriptionItems, patient, headerConfig.showPatientBanner, triggerAutoSave]);
+  }, [editor, prescriptionItems, patient, triggerAutoSave]);
 
   // Carrega e formata o encaminhamento médico ativo da consulta
   const handleLoadActiveReferral = useCallback((showToastMsg = true) => {
@@ -783,26 +827,33 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       <p>Agradeço a atenção e coloco-me à disposição para discussão do caso.</p>
     `;
 
+    setActiveLoadedRecipeType(null);
     setViaLayout('1-via');
     setPageOrientation('portrait');
     setBaseFontSize(11);
     editor.commands.setContent(referralHtml);
     setEditorHtml(referralHtml);
-    setHeaderConfig(prev => ({
-      ...prev,
+    const nextHeader: DocumentHeaderConfig = {
+      ...draftMetaRef.current.headerConfig,
       showHeader: true,
       showFooter: true,
       showPatientBanner: false,
       badgeText: `ENCAMINHAMENTO • ${specialty.toUpperCase()}`,
       dateText: today
-    }));
+    };
+    setHeaderConfig(nextHeader);
     setCurrentModel({
       id: null,
       title: `Encaminhamento - ${specialty}`,
       isPreset: false
     });
     isDraftRestoredRef.current = true;
-    triggerAutoSave(editor);
+    triggerAutoSave(editor, nextHeader, undefined, {
+      title: `Encaminhamento - ${specialty}`,
+      fontSize: 11,
+      orientation: 'portrait',
+      viaLayout: '1-via'
+    });
     if (showToastMsg) {
       showToast('Encaminhamento carregado no editor com formatação limpa!');
     }
@@ -822,6 +873,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       ? `<p><strong>Diagnóstico (CID-10):</strong> ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''} <em>(Expressamente autorizado pelo paciente)</em></p><p></p>`
       : '';
     const obsText = certificate?.observations ? `<p><strong>Observações:</strong> ${certificate.observations}</p><p></p>` : '';
+    const addr = draftMetaRef.current.headerConfig.clinicAddress;
 
     const certHtml = `
       <p style="text-align: center;"><strong>ATESTADO MÉDICO</strong></p>
@@ -832,32 +884,39 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       <p></p>
       ${cidText}
       ${obsText}
-      <p style="text-align: right; margin-top: 25px;">${headerConfig.clinicAddress ? `${headerConfig.clinicAddress.split('-')[0].trim()}, ` : ''}${today}.</p>
+      <p style="text-align: right; margin-top: 25px;">${addr ? `${addr.split('-')[0].trim()}, ` : ''}${today}.</p>
     `;
 
+    setActiveLoadedRecipeType(null);
     setViaLayout('1-via');
     setPageOrientation('portrait');
     setBaseFontSize(12);
     editor.commands.setContent(certHtml);
     setEditorHtml(certHtml);
-    setHeaderConfig(prev => ({
-      ...prev,
+    const nextHeader: DocumentHeaderConfig = {
+      ...draftMetaRef.current.headerConfig,
       showHeader: true,
       showFooter: true,
       badgeText: 'ATESTADO MÉDICO',
       dateText: today
-    }));
+    };
+    setHeaderConfig(nextHeader);
     setCurrentModel({
       id: null,
       title: 'Atestado Médico',
       isPreset: false
     });
     isDraftRestoredRef.current = true;
-    triggerAutoSave(editor);
+    triggerAutoSave(editor, nextHeader, undefined, {
+      title: 'Atestado Médico',
+      fontSize: 12,
+      orientation: 'portrait',
+      viaLayout: '1-via'
+    });
     if (showToastMsg) {
       showToast('Atestado médico carregado no editor com formatação limpa!');
     }
-  }, [editor, patient, certificate, headerConfig.clinicAddress, triggerAutoSave]);
+  }, [editor, patient, certificate, triggerAutoSave]);
 
   // Gatilho externo: Navegar para o Editor a partir da aba de prescrição
   const lastTriggerRef = useRef(0);
@@ -870,6 +929,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
   // Helper para ajustar layout e cabeçalho conforme o tipo de documento injetado
   const applyInitialDocumentLayout = useCallback((doc: { html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' }) => {
+    if (doc.type !== 'prescription') {
+      setActiveLoadedRecipeType(null);
+      setViaLayout('1-via');
+      setPageOrientation('portrait');
+    }
     if (doc.type === 'sus') {
       setHeaderConfig(prev => ({
         ...prev,
@@ -894,6 +958,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         badgeText: 'ATESTADO MÉDICO'
       }));
     } else if (doc.type === 'prescription') {
+      setPageOrientation('landscape');
       setHeaderConfig(prev => ({
         ...prev,
         showHeader: true,
@@ -909,6 +974,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   useEffect(() => {
     if (editor && initialDocumentToLoad && initialDocumentToLoad !== lastInitialDocRef.current) {
       lastInitialDocRef.current = initialDocumentToLoad;
+      isDraftRestoredRef.current = true;
       editor.commands.setContent(initialDocumentToLoad.html);
       setEditorHtml(initialDocumentToLoad.html);
       applyInitialDocumentLayout(initialDocumentToLoad);
@@ -917,15 +983,15 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         title: initialDocumentToLoad.title || 'Documento Clínico',
         isPreset: false
       });
-      isDraftRestoredRef.current = true;
       triggerAutoSave(editor);
       showToast(`Documento "${initialDocumentToLoad.title}" carregado no editor!`);
     }
   }, [editor, initialDocumentToLoad, applyInitialDocumentLayout, triggerAutoSave]);
 
-  // Carregar rascunho existente do IndexedDB de forma não-destrutiva
+  // Carregar rascunho existente do IndexedDB apenas UMA vez na montagem do editor
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || isDraftRestoredRef.current) return;
+    isDraftRestoredRef.current = true;
 
     let isMounted = true;
     const restoreDraft = async () => {
@@ -941,7 +1007,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             title: initialDocumentToLoad.title || 'Documento Clínico',
             isPreset: false
           });
-          isDraftRestoredRef.current = true;
         }
         return;
       }
@@ -951,7 +1016,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         lastTriggerRef.current = editorInitialSyncTrigger;
         if (isMounted) {
           handleLoadActivePrescription(false);
-          isDraftRestoredRef.current = true;
         }
         return;
       }
@@ -970,6 +1034,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             }
             if (draft.headerConfig) {
               setHeaderConfig(draft.headerConfig);
+              if (/controle especial/i.test(draft.headerConfig.badgeText || '')) {
+                setActiveLoadedRecipeType('controle_especial');
+              } else if (/antimicrobiano/i.test(draft.headerConfig.badgeText || '')) {
+                setActiveLoadedRecipeType('antimicrobiano');
+              } else if (/receitu[áa]rio/i.test(draft.headerConfig.badgeText || '')) {
+                setActiveLoadedRecipeType('simples');
+              }
             }
             if (draft.logoConfig) {
               setLogoConfig(draft.logoConfig);
@@ -1017,10 +1088,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         if (isMounted) {
           editor.commands.setContent(initialContent);
           setEditorHtml(initialContent);
-        }
-      } finally {
-        if (isMounted) {
-          isDraftRestoredRef.current = true;
         }
       }
     };
@@ -1891,7 +1958,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 syncWithActivePrescription();
                 onNavigateBack();
               }}
-              className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
+              className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
               title="Sincronizar e voltar à tela de montagem de receitas"
             >
               <ChevronLeft className="w-4 h-4 text-[var(--text-muted)]" />
@@ -1976,12 +2043,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         </div>
 
         {/* Botões de Ação de Impressão e Modelo */}
-        <div className="flex items-center gap-2 flex-wrap shrink-0">
+        <div className="flex items-center gap-2 flex-wrap min-w-0 max-w-full">
           {/* Botão de Impressão Direta A4 Superior (Alta visibilidade) */}
           <button
             type="button"
             onClick={handlePrint}
-            className={`btn-tactile-primary h-9 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
+            className={`btn-tactile-primary h-10 min-h-10 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
               !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
             }`}
             title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
@@ -2000,13 +2067,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={handleDownloadPdf}
             disabled={isExportingPdf}
-            className="btn-tactile-secondary h-9 px-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap text-slate-800 dark:text-slate-200"
+            className="btn-tactile-secondary h-10 min-h-10 px-3 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
             title="Baixar documento em PDF preservando rigorosamente a tipografia e o layout visual do editor"
           >
             {isExportingPdf ? (
-              <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
+              <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />
             ) : (
-              <Download className="w-4 h-4 text-sky-600" />
+              <Download className="w-4 h-4 text-[var(--text-muted)]" />
             )}
             <span>{isExportingPdf ? 'Gerando...' : 'Baixar PDF'}</span>
           </button>
@@ -2015,10 +2082,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <div className="relative group">
             <button
               type="button"
-              className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
+              className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
               title="Carregar documentos e dados da consulta ativa para edição"
             >
-              <FileText className="w-3.5 h-3.5 text-sky-500" />
+              <FileText className="w-4 h-4 text-[var(--text-muted)]" />
               <span>Carregar da Consulta</span>
             </button>
             <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-tactile-lg p-1.5 hidden group-hover:block z-50 animate-tab-fade">
@@ -2062,10 +2129,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handleSaveModelDirectly}
-            className="h-9 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none shrink-0 whitespace-nowrap"
+            className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none shrink-0 whitespace-nowrap"
             title="Salvar alterações no documento e sincronizar diretamente com a receita ativa da consulta"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-[var(--text-muted)]" />
             <span>Salvar na Receita</span>
           </button>
 
@@ -2076,10 +2143,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? `${currentModel.title} (Cópia)` : '');
               setIsSaveModelModalOpen(true);
             }}
-            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
+            className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
             title="Criar um novo modelo salvo a partir deste documento"
           >
-            <BookmarkPlus className="w-3.5 h-3.5 text-slate-500" />
+            <BookmarkPlus className="w-4 h-4 text-[var(--text-muted)]" />
             <span className="hidden sm:inline">Salvar como Novo</span>
           </button>
 
@@ -2087,10 +2154,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => setIsModelsDrawerOpen(true)}
-            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
+            className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
             title="Abrir biblioteca de modelos clínicos e laudos salvos"
           >
-            <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+            <FolderOpen className="w-4 h-4 text-[var(--text-muted)]" />
             <span>Modelos</span>
             {savedTemplates.length > 0 && (
               <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
@@ -2103,7 +2170,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handleStartNewDocument}
-            className="h-9 w-9 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center justify-center cursor-pointer shadow-tactile-sm shrink-0"
+            className="h-10 w-10 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center justify-center cursor-pointer shadow-tactile-sm shrink-0"
             title="Iniciar novo documento em branco"
           >
             <Plus className="w-4 h-4" />
@@ -2111,732 +2178,709 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         </div>
       </div>
 
-      {/* BARRA DE FERRAMENTAS DO EDITOR (Fixa / Sticky) */}
-      <div 
-        className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 rounded-2xl p-2.5 sm:p-3 border backdrop-blur-md shadow-tactile-sm flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-2.5 bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)]"
-      >
-        {/* Agrupamento 1: Formatação Tiptap & Estilo Docs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 xl:pb-0 scrollbar-none touch-pan-x flex-nowrap shrink-0">
-          {/* Estilo do Parágrafo / Título */}
+      {/* CONFIGURAÇÃO DA FOLHA (estilo, fonte, orientação, vias, cabeçalho, logotipo, marca d'água): rola com a página */}
+      <div className="editor-toolbar no-print relative z-20 rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex flex-wrap items-center gap-2">
+        {/* Seletor Rápido de Estilo de Receita Atual */}
+        <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
+          <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
           <select
-            value={
-              editor?.isActive('heading', { level: 1 }) ? 'h1' :
-              editor?.isActive('heading', { level: 2 }) ? 'h2' :
-              editor?.isActive('heading', { level: 3 }) ? 'h3' : 'p'
-            }
+            value=""
             onChange={(e) => {
               const val = e.target.value;
-              if (val === 'p') editor?.chain().focus().setParagraph().run();
-              else if (val === 'h1') editor?.chain().focus().toggleHeading({ level: 1 }).run();
-              else if (val === 'h2') editor?.chain().focus().toggleHeading({ level: 2 }).run();
-              else if (val === 'h3') editor?.chain().focus().toggleHeading({ level: 3 }).run();
+              if (!val) return;
+              const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
+              if (found) handleApplyStyle(found);
             }}
-            className="bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-            title="Estilo de texto (Parágrafo ou Título)"
-            aria-label="Estilo de texto"
+            className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[155px] truncate"
+            title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
+            aria-label="Selecionar estilo visual da receita"
           >
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="p">Texto Normal</option>
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h1">Título 1 (Grande)</option>
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h2">Título 2 (Médio)</option>
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h3">Título 3 (Pequeno)</option>
-          </select>
-
-          {/* Ajuste Fino do Tamanho da Fonte (Docs Style: [-] 11 pt [+]) */}
-          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] px-1 py-0.5 text-xs">
-            <button
-              type="button"
-              onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
-              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
-              title="Diminuir tamanho da fonte da folha (A-)"
-              aria-label="Diminuir fonte"
-            >
-              −
-            </button>
-            <select
-              value={baseFontSize}
-              onChange={(e) => setBaseFontSize(Number(e.target.value))}
-              className="bg-transparent text-[var(--text-main)] px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer"
-              title="Tamanho da fonte em pontos (pt)"
-              aria-label="Tamanho da fonte em pontos (pt)"
-            >
-              {[8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28].map(sz => (
-                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={sz} value={sz}>{sz} pt</option>
+            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="" disabled>Selecionar estilo...</option>
+            <optgroup label="Estilos Padrão" className="bg-[var(--surface-card)] text-[var(--text-main)]">
+              {DEFAULT_PRESCRIPTION_STYLES.map(s => (
+                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
               ))}
-            </select>
-            <button
-              type="button"
-              onClick={() => setBaseFontSize(prev => Math.min(32, prev + 1))}
-              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
-              title="Aumentar tamanho da fonte da folha (A+)"
-              aria-label="Aumentar fonte"
-            >
-              +
-            </button>
-          </div>
-
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-          {/* Formatação básica: Negrito, Itálico, Sublinhado */}
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().toggleBold().run()}
-            disabled={!editor}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive('bold') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Negrito (Ctrl+B)"
-            aria-label="Negrito"
-          >
-            <Bold className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().toggleItalic().run()}
-            disabled={!editor}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive('italic') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Itálico (Ctrl+I)"
-            aria-label="Itálico"
-          >
-            <Italic className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => (editor as any)?.chain().focus().toggleUnderline().run()}
-            disabled={!editor}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              (editor as any)?.isActive('underline') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Sublinhado (Ctrl+U)"
-            aria-label="Sublinhado"
-          >
-            <UnderlineIcon className="w-4 h-4" />
-          </button>
-
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-          {/* Alinhamento de Texto */}
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive({ textAlign: 'left' }) 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Alinhar à Esquerda"
-            aria-label="Alinhar à Esquerda"
-          >
-            <AlignLeft className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive({ textAlign: 'center' }) 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Centralizar"
-            aria-label="Centralizar"
-          >
-            <AlignCenter className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive({ textAlign: 'right' }) 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Alinhar à Direita"
-            aria-label="Alinhar à Direita"
-          >
-            <AlignRight className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive({ textAlign: 'justify' }) 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Justificar"
-            aria-label="Justificar"
-          >
-            <AlignJustify className="w-4 h-4" />
-          </button>
-
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-          {/* Listas */}
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().toggleBulletList().run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive('bulletList') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Lista com Marcadores"
-            aria-label="Lista com Marcadores"
-          >
-            <List className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive('orderedList') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Lista Numerada"
-            aria-label="Lista Numerada"
-          >
-            <ListOrdered className="w-4 h-4" />
-          </button>
-
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-          {/* Desfazer / Refazer */}
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().undo().run()}
-            disabled={!editor?.can().undo()}
-            className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
-            title="Desfazer (Ctrl+Z)"
-            aria-label="Desfazer"
-          >
-            <Undo className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().redo().run()}
-            disabled={!editor?.can().redo()}
-            className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
-            title="Refazer (Ctrl+Y)"
-            aria-label="Refazer"
-          >
-            <Redo className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Agrupamento 2: Tipografia, Orientação, Vias, Cabeçalho, Carregar Consulta & Impressão */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0 scrollbar-none touch-pan-x flex-nowrap shrink-0">
-          {/* Seletor Rápido de Estilo de Receita Atual */}
-          <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
-            <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
-            <select
-              value=""
-              onChange={(e) => {
-                const val = e.target.value;
-                if (!val) return;
-                const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
-                if (found) handleApplyStyle(found);
-              }}
-              className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[155px] truncate"
-              title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
-              aria-label="Selecionar estilo visual da receita"
-            >
-              <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="" disabled>Selecionar estilo...</option>
-              <optgroup label="Estilos Padrão" className="bg-[var(--surface-card)] text-[var(--text-main)]">
-                {DEFAULT_PRESCRIPTION_STYLES.map(s => (
+            </optgroup>
+            {customStyles.length > 0 && (
+              <optgroup label="Meus Estilos Salvos" className="bg-[var(--surface-card)] text-[var(--text-main)]">
+                {customStyles.map(s => (
                   <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
                 ))}
               </optgroup>
-              {customStyles.length > 0 && (
-                <optgroup label="Meus Estilos Salvos" className="bg-[var(--surface-card)] text-[var(--text-main)]">
-                  {customStyles.map(s => (
-                    <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </optgroup>
-              )}
-            </select>
-            <button
-              type="button"
-              onClick={() => setIsSaveStyleModalOpen(true)}
-              className="p-1 rounded hover:bg-[var(--surface-hover)] text-sky-600 dark:text-sky-400 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
-              title="Salvar configuração visual atual como novo estilo personalizado"
-            >
-              <BookmarkPlus className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Seletor Tipográfico Docs Style (12 fontes) */}
-          <div className="flex items-center gap-1.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1 text-xs">
-            <Type className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
-            <select
-              value={fontFamilyId}
-              onChange={(e) => {
-                setFontFamilyId(e.target.value);
-                if (editor) triggerAutoSave(editor);
-              }}
-              className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[170px] truncate"
-              aria-label="Família Tipográfica da Folha A4"
-              title="Trocar fonte da receita médica estilo Google Docs"
-            >
-              {FONT_OPTIONS.map(f => (
-                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={f.id} value={f.id}>
-                  {f.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Alternador de Orientação: Retrato / Paisagem */}
-          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
-            <button
-              type="button"
-              onClick={() => setPageOrientation('portrait')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                pageOrientation === 'portrait' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-              title="Orientação Retrato (Vertical 210×297mm)"
-            >
-              <span>↕️</span>
-              <span className="hidden xl:inline">Retrato</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setPageOrientation('landscape')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                pageOrientation === 'landscape' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-              title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
-            >
-              <span>↔️</span>
-              <span className="hidden xl:inline">Paisagem</span>
-            </button>
-          </div>
-
-          {/* Alternador de Vias: 1 Via / 2 Vias na Mesma Folha */}
-          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
-            <button
-              type="button"
-              onClick={() => setViaLayout('1-via')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                viaLayout === '1-via' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-              title="Folha Única (1 Via Padrão)"
-            >
-              <span>📄</span>
-              <span className="hidden xl:inline">1 Via</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setViaLayout('2-vias');
-                if (pageOrientation === 'portrait') {
-                  setPageOrientation('landscape');
-                  showToast('Modo 2 Vias ativado! Paisagem recomendada para imprimir as duas vias lado a lado.');
-                }
-              }}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                viaLayout === '2-vias' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-              title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
-            >
-              <span>📑</span>
-              <span className="hidden xl:inline">2 Vias (Mesma Folha)</span>
-            </button>
-          </div>
-
-          {/* Alternador de Visibilidade do Cabeçalho */}
+            )}
+          </select>
           <button
             type="button"
-            onClick={() => handleHeaderFieldChange('showHeader', !headerConfig.showHeader)}
-            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              headerConfig.showHeader
-                ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
-                : 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
-            }`}
-            title={headerConfig.showHeader ? "Cabeçalho visível. Clique para ocultar (ideal para papel já timbrado)" : "Cabeçalho ocultado. Clique para restaurar"}
+            onClick={() => setIsSaveStyleModalOpen(true)}
+            className="p-1 rounded hover:bg-[var(--surface-hover)] text-sky-600 dark:text-sky-400 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            title="Salvar configuração visual atual como novo estilo personalizado"
           >
-            {headerConfig.showHeader ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-amber-500" />}
-            <span className="hidden sm:inline">Cabeçalho</span>
-            <span className="text-[10px] opacity-75">({headerConfig.showHeader ? 'Sim' : 'Não'})</span>
+            <BookmarkPlus className="w-3.5 h-3.5" />
           </button>
+        </div>
 
-          {/* Alternador de Visibilidade do Rodapé */}
+        {/* Seletor Tipográfico Docs Style (12 fontes) */}
+        <div className="flex items-center gap-1.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1 text-xs">
+          <Type className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
+          <select
+            value={fontFamilyId}
+            onChange={(e) => {
+              setFontFamilyId(e.target.value);
+              if (editor) triggerAutoSave(editor);
+            }}
+            className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[170px] truncate"
+            aria-label="Família Tipográfica da Folha A4"
+            title="Trocar fonte da receita médica estilo Google Docs"
+          >
+            {FONT_OPTIONS.map(f => (
+              <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Alternador de Orientação: Retrato / Paisagem */}
+        <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
           <button
             type="button"
-            onClick={() => handleHeaderFieldChange('showFooter', !headerConfig.showFooter)}
-            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              headerConfig.showFooter
-                ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
-                : 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
+            onClick={() => setPageOrientation('portrait')}
+            className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              pageOrientation === 'portrait' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
-            title={headerConfig.showFooter ? "Rodapé de carimbo visível. Clique para ocultar" : "Rodapé ocultado. Clique para restaurar"}
+            title="Orientação Retrato (Vertical 210×297mm)"
           >
-            {headerConfig.showFooter ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-slate-400" />}
-            <span className="hidden sm:inline">Rodapé</span>
-            <span className="text-[10px] opacity-75">({headerConfig.showFooter ? 'Sim' : 'Não'})</span>
+            <RectangleVertical className="w-3.5 h-3.5" />
+            <span>Retrato</span>
           </button>
-
-          {/* Botão CARREGAR RECEITA ATUAL */}
           <button
             type="button"
-            onClick={() => handleLoadActivePrescription(true)}
-            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
-            title="Preencher a folha A4 com os dados do paciente e medicamentos prescritos nesta consulta"
+            onClick={() => setPageOrientation('landscape')}
+            className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              pageOrientation === 'landscape' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+            }`}
+            title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
-            <span className="hidden sm:inline">Carregar Receita Atual</span>
-            <span className="sm:hidden">Receita</span>
-            {prescriptionItems && prescriptionItems.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
-                {prescriptionItems.length}
+            <RectangleHorizontal className="w-3.5 h-3.5" />
+            <span>Paisagem</span>
+          </button>
+        </div>
+
+        {/* Alternador de Vias: 1 Via / 2 Vias na Mesma Folha */}
+        <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
+          <button
+            type="button"
+            onClick={() => setViaLayout('1-via')}
+            className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              viaLayout === '1-via' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+            }`}
+            title="Folha Única (1 Via Padrão)"
+          >
+            <File className="w-3.5 h-3.5" />
+            <span>1 Via</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setViaLayout('2-vias');
+              if (pageOrientation === 'portrait') {
+                setPageOrientation('landscape');
+                showToast('Modo 2 Vias ativado! Paisagem recomendada para imprimir as duas vias lado a lado.');
+              }
+            }}
+            className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              viaLayout === '2-vias' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+            }`}
+            title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
+          >
+            <Files className="w-3.5 h-3.5" />
+            <span>2 Vias</span>
+          </button>
+        </div>
+
+        {/* Alternador de Visibilidade do Cabeçalho */}
+        <button
+          type="button"
+          onClick={() => handleHeaderFieldChange('showHeader', !headerConfig.showHeader)}
+          className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            headerConfig.showHeader
+              ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
+              : 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
+          }`}
+          title={headerConfig.showHeader ? "Cabeçalho visível. Clique para ocultar (ideal para papel já timbrado)" : "Cabeçalho ocultado. Clique para restaurar"}
+        >
+          {headerConfig.showHeader ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-amber-500" />}
+          <span>Cabeçalho</span>
+          <span className="text-[10px] opacity-75">({headerConfig.showHeader ? 'Sim' : 'Não'})</span>
+        </button>
+
+        {/* Alternador de Visibilidade do Rodapé */}
+        <button
+          type="button"
+          onClick={() => handleHeaderFieldChange('showFooter', !headerConfig.showFooter)}
+          className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            headerConfig.showFooter
+              ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
+              : 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
+          }`}
+          title={headerConfig.showFooter ? "Rodapé de carimbo visível. Clique para ocultar" : "Rodapé ocultado. Clique para restaurar"}
+        >
+          {headerConfig.showFooter ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-slate-400" />}
+          <span>Rodapé</span>
+          <span className="text-[10px] opacity-75">({headerConfig.showFooter ? 'Sim' : 'Não'})</span>
+        </button>
+
+        {/* Botão CARREGAR RECEITA ATUAL */}
+        <button
+          type="button"
+          onClick={() => handleLoadActivePrescription(true)}
+          className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
+          title="Preencher a folha A4 com os dados do paciente e medicamentos prescritos nesta consulta"
+        >
+          <RotateCcw className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
+          <span className="hidden sm:inline">Carregar Receita Atual</span>
+          <span className="sm:hidden">Receita</span>
+          {prescriptionItems && prescriptionItems.length > 0 && (
+            <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
+              {prescriptionItems.length}
+            </span>
+          )}
+        </button>
+
+        {/* MENU / CONTROLE DE LOGOTIPO (Mudar de lugar, carregar, redimensionar) */}
+        <div className="relative shrink-0" onClick={e => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => setIsLogoMenuOpen(prev => !prev)}
+            className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              (logoConfig.dataUrl && logoConfig.visible) || (logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false)
+                ? 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-[var(--text-main)] font-bold'
+                : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+            }`}
+            title="Configurar logotipos (esquerdo e direito) no timbrado A4"
+          >
+            <ImageIcon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
+            <span>Logotipo</span>
+            {(logoConfig.dataUrl || logoConfig.secondaryDataUrl) && (
+              <span className="text-[10px] px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 rounded font-bold uppercase">
+                {logoConfig.dataUrl && logoConfig.secondaryDataUrl ? 'Duplo' : '1 Logo'}
               </span>
             )}
           </button>
 
-          {/* MENU / CONTROLE DE LOGOTIPO (Mudar de lugar, carregar, redimensionar) */}
-          <div className="relative shrink-0" onClick={e => e.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setIsLogoMenuOpen(prev => !prev)}
-              className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                (logoConfig.dataUrl && logoConfig.visible) || (logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false)
-                  ? 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-[var(--text-main)] font-bold'
-                  : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-              }`}
-              title="Configurar logotipos (esquerdo e direito) no timbrado A4"
-            >
-              <ImageIcon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
-              <span>Logotipo</span>
-              {(logoConfig.dataUrl || logoConfig.secondaryDataUrl) && (
-                <span className="text-[10px] px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 rounded font-bold uppercase">
-                  {logoConfig.dataUrl && logoConfig.secondaryDataUrl ? 'Duplo' : '1 Logo'}
-                </span>
-              )}
-            </button>
-
-            {/* Dropdown de Gestão do Logotipo com Abas: Esquerdo e Direito */}
-            {isLogoMenuOpen && (
-              <div className="absolute right-0 top-11 w-84 sm:w-90 bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-2xl shadow-tactile-lg p-4 z-50 flex flex-col gap-3 animate-tab-fade">
-                <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
-                  <div className="flex items-center gap-1.5">
-                    <ImageIcon className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-                    <h4 className="text-xs font-bold">Timbrado / Logotipos</h4>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsLogoMenuOpen(false)}
-                    className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+          {/* Dropdown de Gestão do Logotipo com Abas: Esquerdo e Direito */}
+          {isLogoMenuOpen && (
+            <div className="absolute right-0 top-11 w-84 sm:w-90 bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-2xl shadow-tactile-lg p-4 z-50 flex flex-col gap-3 animate-tab-fade">
+              <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
+                <div className="flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                  <h4 className="text-xs font-bold">Timbrado / Logotipos</h4>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsLogoMenuOpen(false)}
+                  className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-                {/* Seletor de Abas: Esquerda vs Direita */}
-                <div className="flex items-center p-1 bg-[var(--bg-app)] rounded-xl border border-[var(--border-subtle)] gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setActiveLogoTab('left')}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                      activeLogoTab === 'left'
-                        ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                    }`}
-                  >
-                    <span>⇱ Logo Esquerdo</span>
-                    {logoConfig.dataUrl && logoConfig.visible && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo esquerdo ativo" />
-                    )}
-                  </button>
+              {/* Seletor de Abas: Esquerda vs Direita */}
+              <div className="flex items-center p-1 bg-[var(--bg-app)] rounded-xl border border-[var(--border-subtle)] gap-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveLogoTab('left')}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                    activeLogoTab === 'left'
+                      ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  }`}
+                >
+                  <span>⇱ Logo Esquerdo</span>
+                  {logoConfig.dataUrl && logoConfig.visible && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo esquerdo ativo" />
+                  )}
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setActiveLogoTab('right')}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                      activeLogoTab === 'right'
-                        ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                    }`}
-                  >
-                    <span>Logo Direito ⇲</span>
-                    {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo direito ativo" />
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveLogoTab('right')}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                    activeLogoTab === 'right'
+                      ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  }`}
+                >
+                  <span>Logo Direito ⇲</span>
+                  {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo direito ativo" />
+                  )}
+                </button>
+              </div>
 
-                {/* CONTEÚDO DA ABA ESQUERDA */}
-                {activeLogoTab === 'left' && (
-                  <div className="space-y-3">
-                    {/* Posição do Logo Esquerdo */}
-                    <div>
-                      <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
-                        Posição do Logo Esquerdo:
-                      </label>
-                      <div className="grid grid-cols-3 gap-1 text-xs">
-                        <button
-                          type="button"
-                          onClick={() => handleChangeLogoPosition('header-left')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                            logoConfig.position === 'header-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                          }`}
-                        >
-                          <span className="text-xs">🏢</span>
-                          <span className="text-[10px]">Header Esq.</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleChangeLogoPosition('top-left')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                            logoConfig.position === 'top-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                          }`}
-                        >
-                          <span className="text-xs">⇱</span>
-                          <span className="text-[10px]">Topo Esq.</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleChangeLogoPosition('top-center')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                            logoConfig.position === 'top-center' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                          }`}
-                        >
-                          <span className="text-xs">⬌</span>
-                          <span className="text-[10px]">Topo Centro</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Tamanho do Logo Esquerdo */}
-                    <div>
-                      <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
-                        Tamanho do Logo Esquerdo:
-                      </label>
-                      <div className="grid grid-cols-4 gap-1 text-xs">
-                        {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
-                          <button
-                            key={sz}
-                            type="button"
-                            onClick={() => handleChangeLogoSize(sz)}
-                            className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                              logoConfig.size === sz 
-                                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
-                                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                            }`}
-                          >
-                            {sz.toUpperCase()}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Ações: Upload, SVG, Presets */}
-                    <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handleLogoUpload}
-                          accept="image/*"
-                          className="hidden"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={logoUploading}
-                          className="flex-1 py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
-                        >
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>{logoUploading ? 'Carregando...' : 'Upload Logo Esq.'}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsLogoMenuOpen(false);
-                            setIsLogoGeneratorOpen(true);
-                          }}
-                          className="py-1.5 px-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
-                          title="Criar brasão vetorial SVG"
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>Criar SVG</span>
-                        </button>
-                      </div>
-
-                      {/* Presets Rápidos */}
-                      <div>
-                        <span className="text-[10px] text-[var(--text-muted)] block mb-1">Brasões Rápidos:</span>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SEMUSA
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SESAU
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SUS
-                          </button>
-                        </div>
-                      </div>
-
-                      {logoConfig.dataUrl && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveLogo}
-                          className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Remover Logo Esquerdo</span>
-                        </button>
-                      )}
+              {/* CONTEÚDO DA ABA ESQUERDA */}
+              {activeLogoTab === 'left' && (
+                <div className="space-y-3">
+                  {/* Posição do Logo Esquerdo */}
+                  <div>
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                      Posição do Logo Esquerdo:
+                    </label>
+                    <div className="grid grid-cols-3 gap-1 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => handleChangeLogoPosition('header-left')}
+                        className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                          logoConfig.position === 'header-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                        }`}
+                      >
+                        <span className="text-xs">🏢</span>
+                        <span className="text-[10px]">Header Esq.</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeLogoPosition('top-left')}
+                        className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                          logoConfig.position === 'top-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                        }`}
+                      >
+                        <span className="text-xs">⇱</span>
+                        <span className="text-[10px]">Topo Esq.</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeLogoPosition('top-center')}
+                        className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                          logoConfig.position === 'top-center' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                        }`}
+                      >
+                        <span className="text-xs">⬌</span>
+                        <span className="text-[10px]">Topo Centro</span>
+                      </button>
                     </div>
                   </div>
-                )}
 
-                {/* CONTEÚDO DA ABA DIREITA */}
-                {activeLogoTab === 'right' && (
-                  <div className="space-y-3">
-                    <p className="text-[11px] text-[var(--text-muted)] leading-tight">
-                      O logotipo secundário é exibido no canto superior direito do timbrado A4 (ao lado da data e selo do documento).
-                    </p>
-
-                    {/* Tamanho do Logo Direito */}
-                    <div>
-                      <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
-                        Tamanho do Logo Direito:
-                      </label>
-                      <div className="grid grid-cols-4 gap-1 text-xs">
-                        {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
-                          <button
-                            key={sz}
-                            type="button"
-                            onClick={() => handleChangeSecondaryLogoSize(sz)}
-                            className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                              (logoConfig.secondarySize || 'md') === sz 
-                                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
-                                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                            }`}
-                          >
-                            {sz.toUpperCase()}
-                          </button>
-                        ))}
-                      </div>
+                  {/* Tamanho do Logo Esquerdo */}
+                  <div>
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                      Tamanho do Logo Esquerdo:
+                    </label>
+                    <div className="grid grid-cols-4 gap-1 text-xs">
+                      {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => handleChangeLogoSize(sz)}
+                          className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                            logoConfig.size === sz 
+                              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
+                              : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                          }`}
+                        >
+                          {sz.toUpperCase()}
+                        </button>
+                      ))}
                     </div>
+                  </div>
 
-                    {/* Ações: Upload, Presets */}
-                    <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
+                  {/* Ações: Upload, SVG, Presets */}
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
                       <input
                         type="file"
-                        ref={secondaryFileInputRef}
-                        onChange={handleSecondaryLogoUpload}
+                        ref={fileInputRef}
+                        onChange={handleLogoUpload}
                         accept="image/*"
                         className="hidden"
                       />
                       <button
                         type="button"
-                        onClick={() => secondaryFileInputRef.current?.click()}
-                        disabled={secondaryLogoUploading}
-                        className="w-full py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={logoUploading}
+                        className="flex-1 py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
                       >
                         <Upload className="w-3.5 h-3.5" />
-                        <span>{secondaryLogoUploading ? 'Carregando...' : 'Upload Logo Direito (SUS / Clínica)'}</span>
+                        <span>{logoUploading ? 'Carregando...' : 'Upload Logo Esq.'}</span>
                       </button>
 
-                      {/* Presets Rápidos para o lado direito */}
-                      <div>
-                        <span className="text-[10px] text-[var(--text-muted)] block mb-1">Logos Rápidos para a Direita:</span>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer font-bold text-blue-600 dark:text-blue-400"
-                          >
-                            SUS
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SESAU
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SEMUSA
-                          </button>
-                        </div>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsLogoMenuOpen(false);
+                          setIsLogoGeneratorOpen(true);
+                        }}
+                        className="py-1.5 px-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                        title="Criar brasão vetorial SVG"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Criar SVG</span>
+                      </button>
+                    </div>
 
-                      {logoConfig.secondaryDataUrl && (
+                    {/* Presets Rápidos */}
+                    <div>
+                      <span className="text-[10px] text-[var(--text-muted)] block mb-1">Brasões Rápidos:</span>
+                      <div className="flex items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={handleRemoveSecondaryLogo}
-                          className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Remover Logo Direito</span>
+                          SEMUSA
                         </button>
-                      )}
+                        <button
+                          type="button"
+                          onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                        >
+                          SESAU
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                        >
+                          SUS
+                        </button>
+                      </div>
+                    </div>
+
+                    {logoConfig.dataUrl && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveLogo}
+                        className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remover Logo Esquerdo</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* CONTEÚDO DA ABA DIREITA */}
+              {activeLogoTab === 'right' && (
+                <div className="space-y-3">
+                  <p className="text-[11px] text-[var(--text-muted)] leading-tight">
+                    O logotipo secundário é exibido no canto superior direito do timbrado A4 (ao lado da data e selo do documento).
+                  </p>
+
+                  {/* Tamanho do Logo Direito */}
+                  <div>
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                      Tamanho do Logo Direito:
+                    </label>
+                    <div className="grid grid-cols-4 gap-1 text-xs">
+                      {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => handleChangeSecondaryLogoSize(sz)}
+                          className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                            (logoConfig.secondarySize || 'md') === sz 
+                              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
+                              : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                          }`}
+                        >
+                          {sz.toUpperCase()}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
 
-          {/* Seletor de Marca d'Água Oficial */}
-          <WatermarkSelector 
-            currentType={docWatermark} 
-            onChange={handleWatermarkChange} 
-          />
+                  {/* Ações: Upload, Presets */}
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
+                    <input
+                      type="file"
+                      ref={secondaryFileInputRef}
+                      onChange={handleSecondaryLogoUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => secondaryFileInputRef.current?.click()}
+                      disabled={secondaryLogoUploading}
+                      className="w-full py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{secondaryLogoUploading ? 'Carregando...' : 'Upload Logo Direito (SUS / Clínica)'}</span>
+                    </button>
 
-          {/* Botão de Impressão Direta A4 */}
+                    {/* Presets Rápidos para o lado direito */}
+                    <div>
+                      <span className="text-[10px] text-[var(--text-muted)] block mb-1">Logos Rápidos para a Direita:</span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer font-bold text-blue-600 dark:text-blue-400"
+                        >
+                          SUS
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                        >
+                          SESAU
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                        >
+                          SEMUSA
+                        </button>
+                      </div>
+                    </div>
+
+                    {logoConfig.secondaryDataUrl && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveSecondaryLogo}
+                        className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remover Logo Direito</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Seletor de Marca d'Água Oficial */}
+        <WatermarkSelector 
+          currentType={docWatermark} 
+          onChange={handleWatermarkChange} 
+        />
+      </div>
+
+      {/* FORMATAÇÃO DO TEXTO: única barra fixa (sticky), numa linha só, logo acima da folha */}
+      <div className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 backdrop-blur-md rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex items-center gap-1.5 overflow-x-auto scrollbar-none touch-pan-x flex-nowrap lg:flex-wrap lg:overflow-visible">
+        {/* Estilo do Parágrafo / Título */}
+        <select
+          value={
+            editor?.isActive('heading', { level: 1 }) ? 'h1' :
+            editor?.isActive('heading', { level: 2 }) ? 'h2' :
+            editor?.isActive('heading', { level: 3 }) ? 'h3' : 'p'
+          }
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === 'p') editor?.chain().focus().setParagraph().run();
+            else if (val === 'h1') editor?.chain().focus().toggleHeading({ level: 1 }).run();
+            else if (val === 'h2') editor?.chain().focus().toggleHeading({ level: 2 }).run();
+            else if (val === 'h3') editor?.chain().focus().toggleHeading({ level: 3 }).run();
+          }}
+          className="bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          title="Estilo de texto (Parágrafo ou Título)"
+          aria-label="Estilo de texto"
+        >
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="p">Texto Normal</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h1">Título 1 (Grande)</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h2">Título 2 (Médio)</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h3">Título 3 (Pequeno)</option>
+        </select>
+
+        {/* Ajuste Fino do Tamanho da Fonte (Docs Style: [-] 11 pt [+]) */}
+        <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] px-1 py-0.5 text-xs">
           <button
             type="button"
-            onClick={handlePrint}
-            className={`btn-tactile-primary h-9 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer ${
-              !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
-            }`}
-            title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
+            onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
+            className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
+            title="Diminuir tamanho da fonte da folha (A-)"
+            aria-label="Diminuir fonte"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span>Imprimir A4</span>
-            {!medicoConfigurado(doctor) && (
-              <span className="text-[10px] px-1.5 py-0.2 bg-amber-400 text-slate-950 rounded font-bold">
-                Configurar
-              </span>
-            )}
+            −
+          </button>
+          <select
+            value={baseFontSize}
+            onChange={(e) => setBaseFontSize(Number(e.target.value))}
+            className="bg-transparent text-[var(--text-main)] px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer"
+            title="Tamanho da fonte em pontos (pt)"
+            aria-label="Tamanho da fonte em pontos (pt)"
+          >
+            {[8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28].map(sz => (
+              <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={sz} value={sz}>{sz} pt</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => setBaseFontSize(prev => Math.min(32, prev + 1))}
+            className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
+            title="Aumentar tamanho da fonte da folha (A+)"
+            aria-label="Aumentar fonte"
+          >
+            +
           </button>
         </div>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Formatação básica: Negrito, Itálico, Sublinhado */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleBold().run()}
+          disabled={!editor}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive('bold') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Negrito (Ctrl+B)"
+          aria-label="Negrito"
+        >
+          <Bold className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleItalic().run()}
+          disabled={!editor}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive('italic') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Itálico (Ctrl+I)"
+          aria-label="Itálico"
+        >
+          <Italic className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => (editor as any)?.chain().focus().toggleUnderline().run()}
+          disabled={!editor}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            (editor as any)?.isActive('underline') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Sublinhado (Ctrl+U)"
+          aria-label="Sublinhado"
+        >
+          <UnderlineIcon className="w-4 h-4" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Alinhamento de Texto */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive({ textAlign: 'left' }) 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Alinhar à Esquerda"
+          aria-label="Alinhar à Esquerda"
+        >
+          <AlignLeft className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive({ textAlign: 'center' }) 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Centralizar"
+          aria-label="Centralizar"
+        >
+          <AlignCenter className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().setTextAlign('right').run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive({ textAlign: 'right' }) 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Alinhar à Direita"
+          aria-label="Alinhar à Direita"
+        >
+          <AlignRight className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive({ textAlign: 'justify' }) 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Justificar"
+          aria-label="Justificar"
+        >
+          <AlignJustify className="w-4 h-4" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Listas */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleBulletList().run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive('bulletList') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Lista com Marcadores"
+          aria-label="Lista com Marcadores"
+        >
+          <List className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive('orderedList') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Lista Numerada"
+          aria-label="Lista Numerada"
+        >
+          <ListOrdered className="w-4 h-4" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Desfazer / Refazer */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().undo().run()}
+          disabled={!editor?.can().undo()}
+          className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
+          title="Desfazer (Ctrl+Z)"
+          aria-label="Desfazer"
+        >
+          <Undo className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().redo().run()}
+          disabled={!editor?.can().redo()}
+          className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
+          title="Refazer (Ctrl+Y)"
+          aria-label="Refazer"
+        >
+          <Redo className="w-4 h-4" />
+        </button>
       </div>
 
       {/* SELETOR RÁPIDO ENTRE RECEITAS QUANDO HOUVER ITENS SIMPLES E ESPECIAIS NA MESMA CONSULTA */}
@@ -2967,288 +3011,316 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             </div>
           )}
 
-          {/* LAYOUT 1 VIA (FOLHA ÚNICA PADRÃO) */}
-          {viaLayout === '1-via' && (
-            <>
-              {/* CABEÇALHO HOSPITALAR / TIMBRADO TOTALMENTE EDITÁVEL EM TEMPO REAL */}
-              {headerConfig.showHeader && (
-                <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition">
-                  {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
-                  <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
-                    <span className="flex items-center gap-1 text-slate-600 font-semibold">
-                      <Pencil className="w-3 h-3 text-sky-600" />
-                      <span>Cabeçalho Editável em Tempo Real (clique em qualquer texto para editar)</span>
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={handleResetHeaderFromProfile}
-                        className="hover:text-sky-700 font-medium flex items-center gap-1 cursor-pointer"
-                        title="Preencher com os dados do seu Perfil Médico cadastrado"
-                      >
-                        <RotateCcw className="w-3 h-3" />
-                        <span>Puxar do Perfil</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleHeaderFieldChange('showHeader', false)}
-                        className="hover:text-amber-600 font-medium flex items-center gap-1 cursor-pointer"
-                        title="Ocultar cabeçalho (ideal se usar folha já timbrada)"
-                      >
-                        <EyeOff className="w-3 h-3" />
-                        <span>Ocultar Cabeçalho</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* LOGOTIPO NO TOPO (Top-Left, Top-Center ou Top-Right) */}
-                  {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'top-left' || logoConfig.position === 'top-center' || logoConfig.position === 'top-right') && (
-                    <div className={`mb-3 flex relative group ${
-                      logoConfig.position === 'top-center' ? 'justify-center' :
-                      logoConfig.position === 'top-right' ? 'justify-end' : 'justify-start'
-                    }`}>
-                      <div className="relative">
-                        <img 
-                          src={logoConfig.dataUrl} 
-                          alt="Logotipo da Instituição" 
-                          className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
-                        />
-                        {/* Alça rápida no-print para trocar posição ou tamanho */}
-                        <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-[9px] z-20">
-                          <button
-                            type="button"
-                            onClick={() => handleChangeLogoPosition('free')}
-                            className="hover:text-sky-300 flex items-center gap-0.5 cursor-pointer"
-                            title="Ativar modo livre e arrastar para qualquer lugar"
-                          >
-                            <Move className="w-2.5 h-2.5" />
-                            <span>Mover</span>
-                          </button>
-                          <span>•</span>
-                          <button
-                            type="button"
-                            onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
-                            className="hover:text-sky-300 cursor-pointer"
-                          >
-                            Tamanho ({String(logoConfig.size).toUpperCase()})
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-start justify-between gap-4">
-                    {/* Lado Esquerdo: timbre do local de atendimento (o médico é identificado na assinatura) */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-2.5 mb-1">
-                        {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
-                        {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'header-left' || logoConfig.secondaryDataUrl || (!logoConfig.position && !logoConfig.secondaryDataUrl)) ? (
-                          <div className="relative group shrink-0">
-                            <img 
-                              src={logoConfig.dataUrl} 
-                              alt="Logotipo Principal / Esquerdo" 
-                              className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
-                            />
-                            <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 left-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
-                              <button
-                                type="button"
-                                onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
-                                className="hover:text-sky-300 cursor-pointer"
-                              >
-                                {String(logoConfig.size).toUpperCase()}
-                              </button>
-                            </div>
-                          </div>
-                        ) : null}
-
-                        <div className="flex-1 min-w-0">
-                          {/* Nome do local de atendimento: é o título do timbre */}
-                          <input
-                            type="text"
-                            value={headerConfig.clinicName || ''}
-                            onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
-                            placeholder="Nome do local de atendimento"
-                            aria-label="Nome do local de atendimento"
-                            style={{ fontFamily: 'inherit' }}
-                            className="text-xl font-bold uppercase tracking-tight text-slate-900 leading-none w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                            title="Clique para editar o nome do local de atendimento"
-                          />
-
-                          {/* Endereço / CNES / contato */}
-                          <input
-                            type="text"
-                            value={headerConfig.clinicAddress || ''}
-                            onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
-                            placeholder="Endereço e informações de contato"
-                            aria-label="Endereço e contato do local de atendimento"
-                            style={{ fontFamily: 'inherit' }}
-                            className="text-[11px] font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
-                            title="Clique para editar o endereço"
-                          />
-                        </div>
+          {/* LAYOUT 1 VIA (FOLHA ÚNICA PADRÃO OU MEIA FOLHA ESQUERDA PEC DO SUS EM PAISAGEM) */}
+          {viaLayout === '1-via' && (() => {
+            const meiaFolhaPaisagem = pageOrientation === 'landscape' && /receitu[áa]rio/i.test(headerConfig.badgeText || '');
+            const conteudoViaUnica = (
+              <div className="flex flex-col justify-between h-full flex-1 w-full min-w-0 relative z-10">
+                {/* CABEÇALHO HOSPITALAR / TIMBRADO TOTALMENTE EDITÁVEL EM TEMPO REAL */}
+                {headerConfig.showHeader && (
+                  <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition">
+                    {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
+                    <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
+                      <span className="flex items-center gap-1 text-slate-600 font-semibold">
+                        <Pencil className="w-3 h-3 text-sky-600" />
+                        <span>Clique em qualquer texto do cabeçalho para editar</span>
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleResetHeaderFromProfile}
+                          className="hover:text-sky-700 font-medium flex items-center gap-1 cursor-pointer"
+                          title="Preencher com os dados do seu Perfil Médico cadastrado"
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          <span>Puxar do Perfil</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleHeaderFieldChange('showHeader', false)}
+                          className="hover:text-amber-600 font-medium flex items-center gap-1 cursor-pointer"
+                          title="Ocultar cabeçalho (ideal se usar folha já timbrada)"
+                        >
+                          <EyeOff className="w-3 h-3" />
+                          <span>Ocultar Cabeçalho</span>
+                        </button>
                       </div>
                     </div>
 
-                    {/* Lado Direito: Logo (header-right ou secundário), Selo do Tipo de Documento & Data */}
-                    <div className="text-right flex flex-col items-end shrink-0 max-w-[220px]">
-                      {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false ? (
-                        <div className="relative group mb-2">
+                    {/* LOGOTIPO NO TOPO (Top-Left, Top-Center ou Top-Right) */}
+                    {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'top-left' || logoConfig.position === 'top-center' || logoConfig.position === 'top-right') && (
+                      <div className={`mb-3 flex relative group ${
+                        logoConfig.position === 'top-center' ? 'justify-center' :
+                        logoConfig.position === 'top-right' ? 'justify-end' : 'justify-start'
+                      }`}>
+                        <div className="relative">
                           <img 
-                            src={logoConfig.secondaryDataUrl} 
-                            alt="Logotipo Secundário / Direito" 
-                            className={`${getLogoSizeClass(logoConfig.secondarySize || logoConfig.size)} object-contain`}
+                            src={logoConfig.dataUrl} 
+                            alt="Logotipo da Instituição" 
+                            className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
                           />
-                          <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 right-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
+                          {/* Alça rápida no-print para trocar posição ou tamanho */}
+                          <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-[9px] z-20">
                             <button
                               type="button"
-                              onClick={() => handleChangeSecondaryLogoSize(logoConfig.secondarySize === 'sm' ? 'md' : logoConfig.secondarySize === 'md' ? 'lg' : 'sm')}
+                              onClick={() => handleChangeLogoPosition('free')}
+                              className="hover:text-sky-300 flex items-center gap-0.5 cursor-pointer"
+                              title="Ativar modo livre e arrastar para qualquer lugar"
+                            >
+                              <Move className="w-2.5 h-2.5" />
+                              <span>Mover</span>
+                            </button>
+                            <span>•</span>
+                            <button
+                              type="button"
+                              onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
                               className="hover:text-sky-300 cursor-pointer"
                             >
-                              Tamanho ({String(logoConfig.secondarySize || logoConfig.size).toUpperCase()})
+                              Tamanho ({String(logoConfig.size).toUpperCase()})
                             </button>
                           </div>
                         </div>
-                      ) : (logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-right' && (
-                        <img 
-                          src={logoConfig.dataUrl} 
-                          alt="Logotipo" 
-                          className={`${getLogoSizeClass(logoConfig.size)} object-contain mb-2`}
-                        />
-                      ))}
+                      </div>
+                    )}
 
-                      {/* Badge Editável do Tipo de Documento */}
-                      <input
-                        type="text"
-                        value={headerConfig.badgeText || ''}
-                        onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
-                        placeholder="TIPO DE DOCUMENTO"
-                        style={{ fontFamily: 'inherit' }}
-                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition w-full max-w-[200px]"
-                        title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
-                      />
+                    <div className="flex flex-wrap sm:flex-nowrap items-start justify-between gap-3 sm:gap-4">
+                      {/* Lado Esquerdo: timbre do local de atendimento (o médico é identificado na assinatura) */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start gap-2.5 mb-1">
+                          {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
+                          {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'header-left' || logoConfig.secondaryDataUrl || (!logoConfig.position && !logoConfig.secondaryDataUrl)) ? (
+                            <div className="relative group shrink-0">
+                              <img 
+                                src={logoConfig.dataUrl} 
+                                alt="Logotipo Principal / Esquerdo" 
+                                className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
+                              />
+                              <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 left-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
+                                <button
+                                  type="button"
+                                  onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
+                                  className="hover:text-sky-300 cursor-pointer"
+                                >
+                                  {String(logoConfig.size).toUpperCase()}
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
 
-                      {/* Data Editável */}
-                      <input
-                        type="text"
-                        value={headerConfig.dateText || ''}
-                        onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
-                        placeholder="Data de emissão"
-                        style={{ fontFamily: 'inherit' }}
-                        className="text-[11px] text-slate-500 mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
-                        title="Clique para editar a data de emissão"
-                      />
-                    </div>
-                  </div>
+                          <div className="flex-1 min-w-0">
+                            {/* Nome do local de atendimento: é o título do timbre */}
+                            <input
+                              type="text"
+                              value={headerConfig.clinicName || ''}
+                              onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
+                              placeholder="Nome do local de atendimento"
+                              aria-label="Nome do local de atendimento"
+                              style={{ fontFamily: 'inherit' }}
+                              className="text-sm sm:text-base font-bold uppercase tracking-tight text-slate-900 leading-snug w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
+                              title="Clique para editar o nome do local de atendimento"
+                            />
 
-                  {/* Identificação Rápida do Paciente (Se houver) */}
-                  {headerConfig.showPatientBanner && (
-                    <div 
-                      style={{ fontFamily: 'inherit' }}
-                      className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-700"
-                    >
-                      {patient?.name ? (
-                        <>
-                          <span><strong>Paciente:</strong> {patient.name}</span>
-                          {patient.documentNumber && <span><strong>Doc:</strong> {patient.documentNumber}</span>}
-                          {patient.weightKg > 0 && <span><strong>Peso:</strong> {patient.weightKg} kg</span>}
-                        </>
-                      ) : (
+                            {/* Endereço / CNES / contato */}
+                            <input
+                              type="text"
+                              value={headerConfig.clinicAddress || ''}
+                              onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
+                              placeholder="Endereço e informações de contato"
+                              aria-label="Endereço e contato do local de atendimento"
+                              style={{ fontFamily: 'inherit' }}
+                              className="text-[11px] font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
+                              title="Clique para editar o endereço"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Lado Direito: Logo (header-right ou secundário), Selo do Tipo de Documento & Data */}
+                      <div className="text-right flex flex-col items-end shrink-0 max-w-[220px]">
+                        {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false ? (
+                          <div className="relative group mb-2">
+                            <img 
+                              src={logoConfig.secondaryDataUrl} 
+                              alt="Logotipo Secundário / Direito" 
+                              className={`${getLogoSizeClass(logoConfig.secondarySize || logoConfig.size)} object-contain`}
+                            />
+                            <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 right-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
+                              <button
+                                type="button"
+                                onClick={() => handleChangeSecondaryLogoSize(logoConfig.secondarySize === 'sm' ? 'md' : logoConfig.secondarySize === 'md' ? 'lg' : 'sm')}
+                                className="hover:text-sky-300 cursor-pointer"
+                              >
+                                Tamanho ({String(logoConfig.secondarySize || logoConfig.size).toUpperCase()})
+                              </button>
+                            </div>
+                          </div>
+                        ) : (logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'header-right' && (
+                          <img 
+                            src={logoConfig.dataUrl} 
+                            alt="Logotipo" 
+                            className={`${getLogoSizeClass(logoConfig.size)} object-contain mb-2`}
+                          />
+                        ))}
+
+                        {/* Badge Editável do Tipo de Documento */}
                         <input
                           type="text"
-                          id="editor-patient-custom-text"
-                          aria-label="Identificação do paciente"
-                          value={headerConfig.patientCustomText || ''}
-                          onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
-                          placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
-                          style={{ fontFamily: 'inherit' }}
-                          className="w-full text-xs text-slate-700 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition placeholder:text-slate-400"
+                          value={headerConfig.badgeText || ''}
+                          onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
+                          placeholder="TIPO DE DOCUMENTO"
+                          // Largura acompanha o texto: com a largura padrão do campo o selo saía cortado ("RECEITUÁRIO MÉDIC") na tela, na impressão e no PDF
+                          style={{ fontFamily: 'inherit', width: `${Math.max(12, (headerConfig.badgeText || 'TIPO DE DOCUMENTO').length) * 0.8 + 2.5}em` }}
+                          className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 text-center hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition max-w-[220px]"
+                          title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
                         />
-                      )}
+
+                        {/* Data Editável */}
+                        <input
+                          type="text"
+                          value={headerConfig.dateText || ''}
+                          onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
+                          placeholder="Data de emissão"
+                          style={{ fontFamily: 'inherit' }}
+                          className="text-[11px] text-slate-500 mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
+                          title="Clique para editar a data de emissão"
+                        />
+                      </div>
                     </div>
-                  )}
-                </header>
-              )}
 
-              {/* ÁREA PRINCIPAL DO EDITOR (Tiptap WYSIWYG em Tempo Real) */}
-              <div className="flex-1 w-full text-slate-900 relative z-10 py-1">
-                <EditorContent editor={editor} />
-              </div>
+                    {/* Identificação Rápida do Paciente (Se houver) */}
+                    {headerConfig.showPatientBanner && (
+                      <div 
+                        style={{ fontFamily: 'inherit' }}
+                        className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-700"
+                      >
+                        {patient?.name ? (
+                          <>
+                            <span><strong>Paciente:</strong> {patient.name}</span>
+                            {patient.documentNumber && <span><strong>Doc:</strong> {patient.documentNumber}</span>}
+                            {patient.weightKg > 0 && <span><strong>Peso:</strong> {patient.weightKg} kg</span>}
+                          </>
+                        ) : (
+                          <input
+                            type="text"
+                            id="editor-patient-custom-text"
+                            aria-label="Identificação do paciente"
+                            value={headerConfig.patientCustomText || ''}
+                            onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
+                            placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
+                            style={{ fontFamily: 'inherit' }}
+                            className="w-full text-xs text-slate-700 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition placeholder:text-slate-400"
+                          />
+                        )}
+                      </div>
+                    )}
+                  </header>
+                )}
 
-              {/* RODAPÉ CLÍNICO COM CARIMBO E ASSINATURA EDITÁVEIS */}
-              {headerConfig.showFooter && (
-                <footer 
-                  style={{ fontFamily: 'inherit' }}
-                  className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center relative z-10 group"
-                >
-                  <div className="w-72 border-b border-slate-400 mb-2" />
+                {/* ÁREA PRINCIPAL DO EDITOR (Tiptap WYSIWYG em Tempo Real) */}
+                <div className="flex-1 w-full text-slate-900 relative z-10 py-1">
+                  <EditorContent editor={editor} />
+                </div>
 
-                  {/* Nome do Médico na Assinatura */}
-                  <input
-                    type="text"
-                    value={headerConfig.footerDocName || headerConfig.doctorName || ''}
-                    onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
-                    placeholder="Dr(a). Médico(a)"
-                    className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 min-h-6 flex items-center justify-center"
-                    title="Clique para editar o nome na assinatura"
-                  />
-
-                  {/* CRM na Assinatura */}
-                  <input
-                    type="text"
-                    value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
-                    onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
-                    placeholder="Médico(a) — CRM-SP 00000"
-                    className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 mt-0.5 min-h-6 flex items-center justify-center"
-                    title="Clique para editar CRM na assinatura"
-                  />
-
-                  {/* Especialidade na Assinatura */}
-                  <input
-                    type="text"
-                    value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
-                    onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
-                    placeholder="Especialidade"
-                    className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-80 min-h-6 flex items-center justify-center"
-                    title="Clique para editar a especialidade no carimbo"
-                  />
-
-                  {/* Subtexto Regulamentar CFM */}
-                  <input
-                    type="text"
-                    id="editor-footer-subtext"
-                    aria-label="Subtexto regulamentar CFM"
-                    value={headerConfig.footerSubtext || ''}
-                    onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
-                    className="text-[9px] text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-md min-h-6"
-                  />
-
-                  {/* Botão no-print para Ocultar Rodapé */}
-                  <button
-                    type="button"
-                    onClick={() => handleHeaderFieldChange('showFooter', false)}
-                    className="no-print opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
-                    title="Ocultar rodapé de assinatura"
+                {/* RODAPÉ CLÍNICO COM CARIMBO E ASSINATURA EDITÁVEIS */}
+                {headerConfig.showFooter && (
+                  <footer 
+                    style={{ fontFamily: 'inherit' }}
+                    className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center relative z-10 group"
                   >
-                    <EyeOff className="w-2.5 h-2.5" />
-                    <span>Ocultar Rodapé</span>
-                  </button>
-                </footer>
-              )}
-            </>
-          )}
+                    <div className="w-64 max-w-full border-b border-slate-400 mb-2" />
 
-          {/* LAYOUT 2 VIAS NA MESMA FOLHA (PORTARIA SVS/MS 344/98 & CONTROLE ESPECIAL) */}
+                    {/* Nome do Médico na Assinatura */}
+                    <input
+                      type="text"
+                      value={headerConfig.footerDocName || headerConfig.doctorName || ''}
+                      onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
+                      placeholder="Dr(a). Médico(a)"
+                      className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs min-h-6 flex items-center justify-center"
+                      title="Clique para editar o nome na assinatura"
+                    />
+
+                    {/* CRM na Assinatura */}
+                    <input
+                      type="text"
+                      value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
+                      onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
+                      placeholder="Médico(a) — CRM-SP 00000"
+                      className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs mt-0.5 min-h-6 flex items-center justify-center"
+                      title="Clique para editar CRM na assinatura"
+                    />
+
+                    {/* Especialidade na Assinatura */}
+                    <input
+                      type="text"
+                      value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
+                      onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
+                      placeholder="Especialidade"
+                      className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs min-h-6 flex items-center justify-center"
+                      title="Clique para editar a especialidade no carimbo"
+                    />
+
+                    {/* Subtexto Regulamentar CFM */}
+                    <input
+                      type="text"
+                      id="editor-footer-subtext"
+                      aria-label="Subtexto regulamentar CFM"
+                      value={headerConfig.footerSubtext || ''}
+                      onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
+                      className="text-[9px] text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-md min-h-6"
+                    />
+
+                    {/* Botão no-print para Ocultar Rodapé */}
+                    <button
+                      type="button"
+                      onClick={() => handleHeaderFieldChange('showFooter', false)}
+                      className="no-print opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
+                      title="Ocultar rodapé de assinatura"
+                    >
+                      <EyeOff className="w-2.5 h-2.5" />
+                      <span>Ocultar Rodapé</span>
+                    </button>
+                  </footer>
+                )}
+              </div>
+            );
+
+            return meiaFolhaPaisagem ? (
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-6 flex-1 w-full relative z-10">
+                <div className="flex flex-col justify-between h-full pr-2 min-w-0">
+                  {conteudoViaUnica}
+                </div>
+                <div className="flex flex-col items-center justify-center relative border-l border-dashed border-slate-400 px-1 select-none">
+                  <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                    <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
+                    <span style={{ writingMode: 'vertical-rl' }}>✂ CORTE AQUI</span>
+                  </div>
+                </div>
+                <div aria-hidden="true" />
+              </div>
+            ) : (
+              conteudoViaUnica
+            );
+          })()}
+
+          {/* LAYOUT 2 VIAS NA MESMA FOLHA (ANTIMICROBIANO RDC 471/2021 OU CONTROLE ESPECIAL PORTARIA 344/98) */}
           {viaLayout === '2-vias' && (
             <>
               {pageOrientation === 'landscape' ? (
-                /* 2 VIAS LADO A LADO EM PAISAGEM (LAYOUT CLÁSSICO DE CONTROLE ESPECIAL) */
+                /* 2 VIAS LADO A LADO EM PAISAGEM */
                 <div className="grid grid-cols-[1fr_auto_1fr] gap-6 flex-1 w-full relative z-10">
-                  {/* 1ª VIA: FARMÁCIA (RETENÇÃO) */}
-                  <div className="flex flex-col justify-between h-full pr-2">
+                  {/* 1ª VIA */}
+                  <div className="flex flex-col justify-between h-full pr-2 min-w-0">
                     <div>
                       {headerConfig.showHeader && (
                         <header className="border-b-2 border-slate-900 pb-2 mb-3">
                           <div className="flex items-start justify-between gap-2">
+                            {logoConfig.dataUrl && logoConfig.visible && (
+                              <img
+                                src={logoConfig.dataUrl}
+                                alt="Logotipo Institucional"
+                                className="h-9 max-w-[84px] object-contain shrink-0"
+                              />
+                            )}
                             <div className="flex-1 min-w-0">
                               <input
                                 type="text"
@@ -3267,9 +3339,16 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 style={{ fontFamily: 'inherit' }}
                                 className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-slate-200"
                               />
-                              <p className="text-[10px] text-slate-600 truncate mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
+                              <p className="text-[10px] text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
-                            <div className="text-right shrink-0">
+                            <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                              {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
+                                <img
+                                  src={logoConfig.secondaryDataUrl}
+                                  alt="Logotipo Secundário"
+                                  className="h-7 max-w-[72px] object-contain"
+                                />
+                              )}
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
                                 {rotuloVia1}
                               </span>
@@ -3304,37 +3383,45 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           </p>
                         </div>
 
-                        {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
-                        <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Comprador
-                            </p>
-                            <div className="space-y-0.5">
-                              <p><strong>Nome:</strong> _________________________</p>
-                              <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
-                              <p><strong>Endereço:</strong> _____________________</p>
-                              <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
-                            </div>
-                          </div>
+                        {viasDeControleEspecial ? (
+                          <>
+                            {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
+                            <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Comprador
+                                </p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Nome:</strong> _________________________</p>
+                                  <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                                  <p><strong>Endereço:</strong> _____________________</p>
+                                  <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                                </div>
+                              </div>
 
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Fornecedor
-                            </p>
-                            <div className="space-y-0.5">
-                              <p><strong>Farmácia/Drogaria:</strong> _____________</p>
-                              <p><strong>Assinatura Farmacêutico:</strong> _________</p>
-                              <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
-                              <p><strong>Quantidade Dispensada:</strong> __________</p>
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Fornecedor
+                                </p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                                  <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                                  <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                                  <p><strong>Quantidade Dispensada:</strong> __________</p>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
 
-                        {/* Subtexto Regulamentar / Validade */}
-                        <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
-                          1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
-                        </div>
+                            {/* Subtexto Regulamentar / Validade */}
+                            <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                              1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
+                            </div>
+                          </>
+                        ) : (
+                          <div className="mt-1.5 text-[7.5px] text-slate-500 italic text-center">
+                            1ª Via: Orientação ao Paciente • Válida por 10 (dez) dias a partir da emissão (RDC Anvisa nº 471/2021).
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -3347,25 +3434,39 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     </div>
                   </div>
 
-                  {/* 2ª VIA: PACIENTE (ORIENTAÇÃO) */}
-                  <div className="flex flex-col justify-between h-full pl-2">
+                  {/* 2ª VIA */}
+                  <div className="flex flex-col justify-between h-full pl-2 min-w-0">
                     <div>
                       {headerConfig.showHeader && (
                         <header className="border-b-2 border-slate-900 pb-2 mb-3">
                           <div className="flex items-start justify-between gap-2">
+                            {logoConfig.dataUrl && logoConfig.visible && (
+                              <img
+                                src={logoConfig.dataUrl}
+                                alt="Logotipo Institucional"
+                                className="h-9 max-w-[84px] object-contain shrink-0"
+                              />
+                            )}
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight truncate h-5 flex items-center">
+                              <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight break-words flex items-center">
                                 {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
                               </h3>
                               <p 
                                 style={{ fontFamily: 'inherit' }}
-                                className="text-xs font-bold text-sky-800 mt-0.5 h-4 flex items-center"
+                                className="text-xs font-bold text-sky-800 mt-0.5 flex items-center"
                               >
                                 {headerConfig.doctorCrm || 'CRM'}
                               </p>
-                              <p className="text-[10px] text-slate-600 truncate mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
+                              <p className="text-[10px] text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
-                            <div className="text-right shrink-0">
+                            <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                              {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
+                                <img
+                                  src={logoConfig.secondaryDataUrl}
+                                  alt="Logotipo Secundário"
+                                  className="h-7 max-w-[72px] object-contain"
+                                />
+                              )}
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
                                 {rotuloVia2}
                               </span>
@@ -3403,37 +3504,52 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           </p>
                         </div>
 
-                        {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
-                        <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Comprador
-                            </p>
-                            <div className="space-y-0.5">
-                              <p><strong>Nome:</strong> _________________________</p>
-                              <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
-                              <p><strong>Endereço:</strong> _____________________</p>
-                              <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
-                            </div>
-                          </div>
+                        {viasDeControleEspecial ? (
+                          <>
+                            {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
+                            <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Comprador
+                                </p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Nome:</strong> _________________________</p>
+                                  <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                                  <p><strong>Endereço:</strong> _____________________</p>
+                                  <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                                </div>
+                              </div>
 
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Fornecedor
-                            </p>
-                            <div className="space-y-0.5">
-                              <p><strong>Farmácia/Drogaria:</strong> _____________</p>
-                              <p><strong>Assinatura Farmacêutico:</strong> _________</p>
-                              <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
-                              <p><strong>Quantidade Dispensada:</strong> __________</p>
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Fornecedor
+                                </p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                                  <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                                  <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                                  <p><strong>Quantidade Dispensada:</strong> __________</p>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
 
-                        {/* Subtexto Regulamentar / Validade */}
-                        <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
-                          2ª Via: Orientação ao Paciente • Válido por 30 (trinta) dias em todo o território nacional (Portaria SVS/MS nº 344/98).
-                        </div>
+                            {/* Subtexto Regulamentar / Validade */}
+                            <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                              2ª Via: Orientação ao Paciente • Válido por 30 (trinta) dias em todo o território nacional (Portaria SVS/MS nº 344/98).
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="mt-2 pt-1.5 border-t border-slate-300 text-[8px] text-slate-700 flex items-center justify-between gap-2">
+                              <span><strong>Dispensação (farmácia):</strong> Data: ___/___/_____</span>
+                              <span>Qtd aviada: _______</span>
+                              <span>Lote: _______</span>
+                            </div>
+                            <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                              2ª Via: Retenção da Farmácia / Drogaria • Válida por 10 (dez) dias (RDC Anvisa nº 471/2021).
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
@@ -3441,7 +3557,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               ) : (
                 /* 2 VIAS EMPILHADAS EM RETRATO (SUPERIOR E INFERIOR) */
                 <div className="flex flex-col justify-between h-full flex-1 w-full relative z-10 gap-3">
-                  {/* 1ª VIA: FARMÁCIA (SUPERIOR) */}
+                  {/* 1ª VIA (SUPERIOR) */}
                   <div className="flex-1 flex flex-col justify-between pb-2">
                     <div>
                       {headerConfig.showHeader && (
@@ -3497,29 +3613,37 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
                           </p>
                         </div>
-                        <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Comprador
-                            </p>
-                            <p><strong>Nome:</strong> _________________________</p>
-                            <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
-                            <p><strong>Endereço:</strong> _____________________</p>
-                            <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                        {viasDeControleEspecial ? (
+                          <>
+                            <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Comprador
+                                </p>
+                                <p><strong>Nome:</strong> _________________________</p>
+                                <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                                <p><strong>Endereço:</strong> _____________________</p>
+                                <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                              </div>
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Fornecedor
+                                </p>
+                                <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                                <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                                <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                                <p><strong>Quantidade Dispensada:</strong> __________</p>
+                              </div>
+                            </div>
+                            <div className="mt-0.5 text-[7px] text-slate-500 italic text-center">
+                              1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
+                            </div>
+                          </>
+                        ) : (
+                          <div className="mt-1 text-[7px] text-slate-500 italic text-center">
+                            1ª Via: Orientação ao Paciente • Válida por 10 (dez) dias a partir da emissão (RDC Anvisa nº 471/2021).
                           </div>
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Fornecedor
-                            </p>
-                            <p><strong>Farmácia/Drogaria:</strong> _____________</p>
-                            <p><strong>Assinatura Farmacêutico:</strong> _________</p>
-                            <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
-                            <p><strong>Quantidade Dispensada:</strong> __________</p>
-                          </div>
-                        </div>
-                        <div className="mt-0.5 text-[7px] text-slate-500 italic text-center">
-                          1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
-                        </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -3532,7 +3656,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     </span>
                   </div>
 
-                  {/* 2ª VIA: PACIENTE (INFERIOR) */}
+                  {/* 2ª VIA (INFERIOR) */}
                   <div className="flex-1 flex flex-col justify-between pt-2">
                     <div>
                       {headerConfig.showHeader && (
@@ -3541,13 +3665,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             <div className="flex-1 min-w-0">
                               <h3 
                                 style={{ fontFamily: 'inherit' }}
-                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight truncate h-5 flex items-center"
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight break-words flex items-center"
                               >
                                 {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
                               </h3>
                               <p 
                                 style={{ fontFamily: 'inherit' }}
-                                className="text-xs font-bold text-sky-800 mt-0.5 h-4 flex items-center"
+                                className="text-xs font-bold text-sky-800 mt-0.5 flex items-center"
                               >
                                 {headerConfig.doctorCrm || 'CRM'}
                               </p>
@@ -3584,29 +3708,44 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
                           </p>
                         </div>
-                        <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Comprador
-                            </p>
-                            <p><strong>Nome:</strong> _________________________</p>
-                            <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
-                            <p><strong>Endereço:</strong> _____________________</p>
-                            <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
-                          </div>
-                          <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                            <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
-                              Identificação do Fornecedor
-                            </p>
-                            <p><strong>Farmácia/Drogaria:</strong> _____________</p>
-                            <p><strong>Assinatura Farmacêutico:</strong> _________</p>
-                            <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
-                            <p><strong>Quantidade Dispensada:</strong> __________</p>
-                          </div>
-                        </div>
-                        <div className="mt-0.5 text-[7px] text-slate-600 italic text-center">
-                          2ª Via: Orientação ao Paciente • Válido por 30 dias a contar da emissão (Portaria SVS/MS nº 344/98).
-                        </div>
+                        {viasDeControleEspecial ? (
+                          <>
+                            <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Comprador
+                                </p>
+                                <p><strong>Nome:</strong> _________________________</p>
+                                <p><strong>RG:</strong> _______ <strong>CPF:</strong> ____________</p>
+                                <p><strong>Endereço:</strong> _____________________</p>
+                                <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
+                              </div>
+                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                                  Identificação do Fornecedor
+                                </p>
+                                <p><strong>Farmácia/Drogaria:</strong> _____________</p>
+                                <p><strong>Assinatura Farmacêutico:</strong> _________</p>
+                                <p><strong>Data:</strong> __/__/____ <strong>Lote:</strong> ________</p>
+                                <p><strong>Quantidade Dispensada:</strong> __________</p>
+                              </div>
+                            </div>
+                            <div className="mt-0.5 text-[7px] text-slate-600 italic text-center">
+                              2ª Via: Orientação ao Paciente • Válido por 30 dias a contar da emissão (Portaria SVS/MS nº 344/98).
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="mt-1 pt-1 border-t border-slate-300 text-[7.5px] text-slate-700 flex items-center justify-between gap-2">
+                              <span><strong>Dispensação (farmácia):</strong> Data: ___/___/_____</span>
+                              <span>Qtd aviada: _______</span>
+                              <span>Lote: _______</span>
+                            </div>
+                            <div className="mt-0.5 text-[7px] text-slate-600 italic text-center">
+                              2ª Via: Retenção da Farmácia / Drogaria • Válida por 10 (dez) dias (RDC Anvisa nº 471/2021).
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>

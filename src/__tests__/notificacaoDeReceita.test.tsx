@@ -2,8 +2,9 @@ import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
+import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
 import { classificarReceita } from '../utils/isSpecialControlOrAntibiotic';
-import { TERMOS_COM_NOTIFICACAO, descreverNotificacao, notificacaoExigida } from '../utils/notificacaoDeReceita';
+import { TERMOS_COM_NOTIFICACAO, avisoTextoNotificacao, descreverNotificacao, notificacaoExigida } from '../utils/notificacaoDeReceita';
 import { AvisoNotificacaoReceita } from '../components/AvisoNotificacaoReceita';
 import { DocumentoClinico } from '../components/documento/DocumentoClinico';
 import type { DoctorProfile, Patient, PrescriptionItem } from '../types';
@@ -177,4 +178,23 @@ describe('Aviso de Notificação de Receita na tela', () => {
     expect(folha).toContain('Clonazepam 2mg (Rivotril)');
     expect(folha).not.toContain('Notificação de Receita');
   });
+
+  it('gera aviso textual de Notificação de Receita para WhatsApp/área de transferência apenas quando necessário', () => {
+    expect(avisoTextoNotificacao([item('1', 'Fluoxetina 20mg')])).toBe('');
+    const texto = avisoTextoNotificacao([item('1', 'Clonazepam 2mg'), item('2', 'Fluoxetina 20mg')]);
+    expect(texto).toContain('Nota sanitária (Portaria SVS/MS nº 344/98)');
+    expect(texto).toContain('talonário próprio de Notificação de Receita');
+    expect(texto).toContain('Clonazepam 2mg');
+    expect(texto).toContain('Lista B1');
+    expect(texto).not.toContain('Fluoxetina');
+  });
+
+  it('modelo predefinido de Receituário de Controle Especial usa fármaco da Lista C1 (sem exigir talonário de Notificação)', () => {
+    const tpl = PRESET_CLINICAL_TEMPLATES.find((t) => t.id === 'tpl-receituario-controle-especial');
+    expect(tpl).toBeDefined();
+    expect(tpl!.contentHtml).toContain('Amitriptilina');
+    expect(tpl!.contentHtml).not.toMatch(/clonazepam/i);
+    expect(tpl!.prescriptionItems?.every((i) => notificacaoExigida(i) === null)).toBe(true);
+  });
 });
+

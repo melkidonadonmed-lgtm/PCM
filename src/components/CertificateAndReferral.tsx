@@ -380,7 +380,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
           <div 
             className="tactile-card p-4 sm:p-5 md:p-6 rounded-2xl space-y-5"
             style={{
-              backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+              backgroundColor: 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
             }}
           >
@@ -396,18 +396,15 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   <h3 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                     Emissão de Atestado Médico
                   </h3>
-                  <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 font-medium">
-                    Atestado de afastamento, repouso ou comparecimento em conformidade com o CFM.
-                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap lg:shrink-0">
                 <button
                   type="button"
                   onClick={handleSendCertificateWhatsApp}
                   disabled={!medicoConfigurado(doctor)}
-                  className="btn-tactile-clinical text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
+                  className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                   title={medicoConfigurado(doctor) ? 'Enviar o atestado médico diretamente pelo WhatsApp' : 'Configure nome e CRM do médico para emitir documentos'}
                 >
                   <Send className="w-4 h-4" strokeWidth={2} />
@@ -421,7 +418,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                     title="Editar e personalizar o atestado no Editor de Folha A4"
                   >
-                    <FileText className="w-4 h-4 text-sky-600" />
+                    <FileText className="w-4 h-4 text-[var(--text-muted)]" />
                     <span>Editar no Editor A4</span>
                   </button>
                 )}
@@ -541,7 +538,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     onChange={(e) => handleDaysChange(parseInt(e.target.value) || 0)}
                     className="w-full p-2.5 rounded-xl border font-bold text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center"
                     style={{
-                      backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                      backgroundColor: 'var(--surface-card)',
                       borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
                       color: darkMode ? '#F1F5F9' : '#0F172A'
                     }}
@@ -561,7 +558,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     onChange={(e) => onUpdateCertificate({ ...certificate, startDate: e.target.value })}
                     className="w-full p-2.5 rounded-xl border font-medium text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                     style={{
-                      backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                      backgroundColor: 'var(--surface-card)',
                       borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
                       color: darkMode ? '#F1F5F9' : '#0F172A'
                     }}
@@ -581,7 +578,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     onChange={(e) => onUpdateCertificate({ ...certificate, endDate: e.target.value })}
                     className="w-full p-2.5 rounded-xl border font-medium text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                     style={{
-                      backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                      backgroundColor: 'var(--surface-card)',
                       borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
                       color: darkMode ? '#F1F5F9' : '#0F172A'
                     }}
@@ -647,7 +644,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                         placeholder="Ex: J00"
                         className="w-full p-2.5 rounded-xl border text-xs sm:text-sm font-mono font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center"
                         style={{
-                          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                          backgroundColor: 'var(--surface-card)',
                           borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
                           color: darkMode ? '#388EE6' : '#0369A1'
                         }}
@@ -665,7 +662,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                         placeholder="Ex: Nasofaringite aguda (resfriado comum)..."
                         className="w-full p-2.5 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                         style={{
-                          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                          backgroundColor: 'var(--surface-card)',
                           borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
                           color: darkMode ? '#F1F5F9' : '#0F172A'
                         }}
@@ -717,18 +714,15 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   <h3 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                     Guia de Encaminhamento & Referência Especializada
                   </h3>
-                  <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 font-medium">
-                    Referência e contrarreferência para ambulatórios de especialidades e hospitais.
-                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap lg:shrink-0">
                 <button
                   type="button"
                   onClick={handleSendReferralWhatsApp}
                   disabled={!medicoConfigurado(doctor)}
-                  className="btn-tactile-clinical text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
+                  className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                   title={medicoConfigurado(doctor) ? 'Enviar a guia de encaminhamento diretamente pelo WhatsApp' : 'Configure nome e CRM do médico para emitir documentos'}
                 >
                   <Send className="w-4 h-4" strokeWidth={2} />
@@ -742,7 +736,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                     title="Editar e personalizar o encaminhamento no Editor de Folha A4"
                   >
-                    <FileText className="w-4 h-4 text-sky-600" />
+                    <FileText className="w-4 h-4 text-[var(--text-muted)]" />
                     <span>Editar no Editor A4</span>
                   </button>
                 )}

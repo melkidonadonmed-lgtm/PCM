@@ -9,8 +9,8 @@ import {
 import { CabecalhoInstitucional } from './CabecalhoInstitucional';
 import { AssinaturaMedico } from './AssinaturaMedico';
 
-/** Regime da receita de 2 vias: muda título, via retida pela farmácia e quadros regulamentares. */
-export type RegimeDuasVias = 'controle_especial' | 'antimicrobiano';
+/** Regime da receita em folha A4 paisagem: simples (1 via à esquerda), antimicrobiano (2 vias) ou controle especial (2 vias Portaria 344/98). */
+export type RegimeDuasVias = 'simples' | 'controle_especial' | 'antimicrobiano';
 
 interface ReceitaDuasViasProps {
   regime: RegimeDuasVias;
@@ -58,11 +58,14 @@ interface ViaProps extends ReceitaDuasViasProps {
 }
 
 const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePaciente, items, emissao }) => {
+  const simples = regime === 'simples';
   const controleEspecial = regime === 'controle_especial';
   const { medico } = identidade;
   const endereco = enderecoDoPaciente(patient);
   const documento = patient?.documentNumber?.trim() || '';
   const idade = patient?.ageText?.trim() || '';
+  const sexo = patient?.sex === 'M' ? 'Sexo: Masculino' : patient?.sex === 'F' ? 'Sexo: Feminino' : '';
+  const peso = patient?.weightKg && patient.weightKg > 0 ? `${String(patient.weightKg).replace('.', ',')} kg` : '';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
@@ -72,40 +75,46 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
         <h1 style={{ margin: 0, fontFamily: SERIFA, fontSize: 15, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TINTA }}>
           {controleEspecial ? 'Receituário de Controle Especial' : 'Receituário Médico'}
         </h1>
-        <p style={{ margin: 0, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: TINTA, whiteSpace: 'nowrap' }}>
-          {controleEspecial
-            ? (via === 1 ? '1ª via — Farmácia (retenção)' : '2ª via — Paciente (orientação)')
-            : (via === 1 ? '1ª via — Paciente' : '2ª via — Farmácia (retenção)')}
-        </p>
+        {!simples && (
+          <p style={{ margin: 0, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: TINTA, whiteSpace: 'nowrap' }}>
+            {controleEspecial
+              ? (via === 1 ? '1ª via — Farmácia (retenção)' : '2ª via — Paciente (orientação)')
+              : (via === 1 ? '1ª via — Paciente' : '2ª via — Farmácia (retenção)')}
+          </p>
+        )}
       </div>
-      {!controleEspecial && (
+      {regime === 'antimicrobiano' && (
         <p style={{ margin: '2px 0 0', fontSize: 8.5, color: TINTA_SUAVE }}>
           Antimicrobiano — receita válida por 10 dias a contar da data de emissão (RDC Anvisa nº 471/2021).
         </p>
       )}
 
-      {/* Identificação do emitente (exigida nos dois regimes) */}
-      <div style={{ ...quadro, marginTop: 7 }}>
-        <p style={rotulo}>Identificação do emitente</p>
-        <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700 }}>
-          {medico.nome} <span style={{ fontWeight: 600, color: TINTA_SUAVE }}>— {medico.registro}</span>
-        </p>
-        <p style={{ margin: 0, fontSize: 9, color: TINTA_SUAVE }}>
-          {[
-            medico.endereco,
-            medico.cidadeUf && !medico.endereco.includes(medico.cidadeUf) ? medico.cidadeUf : '',
-            medico.telefone ? `Tel. ${medico.telefone}` : ''
-          ].filter(Boolean).join(' • ') || ' '}
-        </p>
-      </div>
+      {/* Identificação do emitente em quadro próprio (exigida nos regimes de 2 vias: antimicrobiano e controle especial) */}
+      {!simples && (
+        <div style={{ ...quadro, marginTop: 7 }}>
+          <p style={rotulo}>Identificação do emitente</p>
+          <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700 }}>
+            {medico.nome} <span style={{ fontWeight: 600, color: TINTA_SUAVE }}>— {medico.registro}</span>
+          </p>
+          <p style={{ margin: 0, fontSize: 9, color: TINTA_SUAVE }}>
+            {[
+              medico.endereco,
+              medico.cidadeUf && !medico.endereco.includes(medico.cidadeUf) ? medico.cidadeUf : '',
+              medico.telefone ? `Tel. ${medico.telefone}` : ''
+            ].filter(Boolean).join(' • ') || '\u00A0'}
+          </p>
+        </div>
+      )}
 
       {/* Identificação do paciente; o endereço é exigido só na receita de controle especial */}
-      <div style={{ ...quadro, marginTop: 5 }}>
+      <div style={{ ...quadro, marginTop: simples ? 8 : 5 }}>
         <p style={rotulo}>Paciente</p>
         <p style={{ margin: '2px 0 0', fontSize: 11 }}>
           <strong style={{ fontWeight: 700 }}>{nomePaciente}</strong>
           {documento && <span style={{ color: TINTA_SUAVE }}> — Doc. {documento}</span>}
           {idade && <span style={{ color: TINTA_SUAVE }}> — {idade}</span>}
+          {sexo && <span style={{ color: TINTA_SUAVE }}> — {sexo}</span>}
+          {peso && <span style={{ color: TINTA_SUAVE }}> — {peso}</span>}
         </p>
         {controleEspecial && (
           endereco ? (
@@ -116,12 +125,16 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
         )}
       </div>
 
-      {/* Prescrição: idêntica nas duas vias (medicamento, apresentação, quantidade e posologia) */}
+      {/* Prescrição: idêntica nas vias (medicamento, apresentação, quantidade e posologia) */}
       <div style={{ marginTop: 9, flex: 1 }}>
         <p style={{ ...rotulo, fontSize: 8, color: TINTA_SUAVE }}>Prescrição</p>
         {items.length === 0 ? (
           <p style={{ margin: '28px 0', textAlign: 'center', fontFamily: SERIFA, fontStyle: 'italic', fontSize: 13, color: TINTA_APAGADA }}>
-            {controleEspecial ? 'Nenhum medicamento de controle especial prescrito.' : 'Nenhum antimicrobiano prescrito.'}
+            {controleEspecial
+              ? 'Nenhum medicamento de controle especial prescrito.'
+              : simples
+                ? 'Nenhum medicamento adicionado nesta prescrição.'
+                : 'Nenhum antimicrobiano prescrito.'}
           </p>
         ) : (
           agruparPorVia(items).map((grupo) => (
@@ -157,7 +170,7 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
         )}
       </div>
 
-      {!controleEspecial ? (
+      {regime === 'antimicrobiano' && (
         // Antimicrobiano: a farmácia anota a dispensação nas duas vias (RDC 471/2021)
         <div style={{ ...quadro, marginTop: 8, fontSize: 8.5 }}>
           <p style={rotulo}>Dispensação — preenchimento da farmácia</p>
@@ -165,35 +178,39 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
           <Campo nome="Quantidade aviada" largura="38%" />{' '}
           <Campo nome="Lote" largura="30%" />
         </div>
-      ) : via === 1 ? (
-        <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-          <div style={{ ...quadro, fontSize: 8.5 }}>
-            <p style={rotulo}>Identificação do comprador</p>
-            <Campo nome="Nome" />
-            <Campo nome="RG" largura="48%" />{' '}
-            <Campo nome="Órgão emissor" largura="48%" />
-            <Campo nome="Endereço" />
-            <Campo nome="Cidade/UF" largura="58%" />{' '}
-            <Campo nome="Telefone" largura="38%" />
+      )}
+
+      {controleEspecial && (
+        via === 1 ? (
+          <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <div style={{ ...quadro, fontSize: 8.5 }}>
+              <p style={rotulo}>Identificação do comprador</p>
+              <Campo nome="Nome" />
+              <Campo nome="RG" largura="48%" />{' '}
+              <Campo nome="Órgão emissor" largura="48%" />
+              <Campo nome="Endereço" />
+              <Campo nome="Cidade/UF" largura="58%" />{' '}
+              <Campo nome="Telefone" largura="38%" />
+            </div>
+            <div style={{ ...quadro, fontSize: 8.5 }}>
+              <p style={rotulo}>Identificação do fornecedor</p>
+              <Campo nome="Farmácia/Drogaria" />
+              <Campo nome="Quantidade dispensada" />
+              <Campo nome="Lote" largura="58%" />{' '}
+              <Campo nome="Data" largura="38%" />
+              <span style={{ display: 'block', marginTop: 20, paddingTop: 2, borderTop: `1px solid ${FILETE}`, textAlign: 'center', fontSize: 7.5, color: TINTA_APAGADA }}>
+                Assinatura do farmacêutico
+              </span>
+            </div>
           </div>
-          <div style={{ ...quadro, fontSize: 8.5 }}>
-            <p style={rotulo}>Identificação do fornecedor</p>
-            <Campo nome="Farmácia/Drogaria" />
-            <Campo nome="Quantidade dispensada" />
-            <Campo nome="Lote" largura="58%" />{' '}
-            <Campo nome="Data" largura="38%" />
-            <span style={{ display: 'block', marginTop: 20, paddingTop: 2, borderTop: `1px solid ${FILETE}`, textAlign: 'center', fontSize: 7.5, color: TINTA_APAGADA }}>
-              Assinatura do farmacêutico
-            </span>
+        ) : (
+          <div style={{ ...quadro, marginTop: 8, fontSize: 8.5, color: TINTA_SUAVE }}>
+            <p style={rotulo}>Orientações ao paciente (Portaria SVS/MS nº 344/98)</p>
+            <p style={{ margin: '3px 0 0' }}>• Medicamento sujeito a controle especial. Uso estritamente individual conforme prescrito.</p>
+            <p style={{ margin: 0 }}>• Não altere as doses nem interrompa o tratamento sem prévia avaliação médica.</p>
+            <p style={{ margin: 0 }}>• Mantenha fora do alcance de crianças, em local seguro e protegido de luz e umidade.</p>
           </div>
-        </div>
-      ) : (
-        <div style={{ ...quadro, marginTop: 8, fontSize: 8.5, color: TINTA_SUAVE }}>
-          <p style={rotulo}>Orientações ao paciente (Portaria SVS/MS nº 344/98)</p>
-          <p style={{ margin: '3px 0 0' }}>• Medicamento sujeito a controle especial. Uso estritamente individual conforme prescrito.</p>
-          <p style={{ margin: 0 }}>• Não altere as doses nem interrompa o tratamento sem prévia avaliação médica.</p>
-          <p style={{ margin: 0 }}>• Mantenha fora do alcance de crianças, em local seguro e protegido de luz e umidade.</p>
-        </div>
+        )
       )}
 
       <AssinaturaMedico medico={medico} emissao={emissao} compacto />
@@ -202,12 +219,13 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
 };
 
 /**
- * Receita em 2 vias em folha única A4 paisagem, lado a lado, com linha de corte
- * central. As duas vias trazem a mesma prescrição completa. São dois regimes:
- *  - controle especial (Portaria SVS/MS nº 344/98): a farmácia retém a 1ª via;
- *    traz os quadros de comprador e fornecedor e o endereço do paciente;
- *  - antimicrobiano (RDC Anvisa nº 471/2021): a farmácia retém a 2ª via e a 1ª
- *    volta ao paciente; receita válida por 10 dias.
+ * Receita em folha única A4 paisagem (padrão PEC do SUS), dividida ao meio com
+ * linha de corte central:
+ *  - simples: 1 via na metade esquerda e metade direita livre;
+ *  - antimicrobiano (RDC Anvisa nº 471/2021): 2 vias lado a lado no mesmo modelo
+ *    limpo (1ª via Paciente / 2ª via Farmácia, válida por 10 dias);
+ *  - controle especial (Portaria SVS/MS nº 344/98): 2 vias lado a lado com os
+ *    quadros regulamentares de comprador e fornecedor e endereço do paciente.
  */
 export const ReceitaDuasVias: React.FC<ReceitaDuasViasProps> = (props) => (
   <div
@@ -227,7 +245,7 @@ export const ReceitaDuasVias: React.FC<ReceitaDuasViasProps> = (props) => (
     >
       <span style={{ padding: '6px 0', backgroundColor: '#FFFFFF', fontSize: 11, color: TINTA_APAGADA, transform: 'translateX(-0.5px)' }}>✂</span>
     </div>
-    <Via via={2} {...props} />
+    {props.regime === 'simples' ? <div aria-hidden="true" /> : <Via via={2} {...props} />}
   </div>
 );
 

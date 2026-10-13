@@ -20,9 +20,11 @@ export type TipoDocumento =
 
 export type OrientacaoDocumento = 'portrait' | 'landscape';
 
-/** Receitas de 2 vias (antimicrobiano e controle especial) saem em folha única paisagem, lado a lado. */
+/** Todas as receitas (simples, antimicrobiano e controle especial) saem em folha A4 paisagem (padrão PEC do SUS). */
 export function orientacaoDoDocumento(tipo: TipoDocumento): OrientacaoDocumento {
-  return tipo === 'special_prescription' || tipo === 'antimicrobial_prescription' ? 'landscape' : 'portrait';
+  return tipo === 'prescription' || tipo === 'special_prescription' || tipo === 'antimicrobial_prescription'
+    ? 'landscape'
+    : 'portrait';
 }
 
 /** Tipo de documento em que cada regime de receita é emitido. */

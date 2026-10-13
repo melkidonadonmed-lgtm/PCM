@@ -115,7 +115,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       <div 
         className="tactile-card p-4 sm:p-5 rounded-2xl relative overflow-hidden w-full"
         style={{
-          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+          backgroundColor: 'var(--surface-card)',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
@@ -181,7 +181,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.max(1, +(patientWeight - 1).toFixed(1)))}
-                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] sm:order-1 focus-visible:ring-2 focus-visible:ring-sky-500"
+                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl font-extrabold text-sm flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] sm:order-1 focus-visible:ring-2 focus-visible:ring-sky-500"
                 title="Diminuir 1 kg"
               >
                 -1
@@ -189,7 +189,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.max(1, +(patientWeight - 0.5).toFixed(1)))}
-                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] sm:order-1 focus-visible:ring-2 focus-visible:ring-sky-500"
+                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] sm:order-1 focus-visible:ring-2 focus-visible:ring-sky-500"
                 title="Diminuir 0.5 kg"
               >
                 -0.5
@@ -197,7 +197,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.min(120, +(patientWeight + 0.5).toFixed(1)))}
-                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] sm:order-3 focus-visible:ring-2 focus-visible:ring-sky-500"
+                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] sm:order-3 focus-visible:ring-2 focus-visible:ring-sky-500"
                 title="Aumentar 0.5 kg"
               >
                 +0.5
@@ -205,7 +205,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdatePatientWeight(Math.min(120, +(patientWeight + 1).toFixed(1)))}
-                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl font-extrabold text-sm flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] sm:order-3 focus-visible:ring-2 focus-visible:ring-sky-500"
+                className="w-full sm:w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl font-extrabold text-sm flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] sm:order-3 focus-visible:ring-2 focus-visible:ring-sky-500"
                 title="Aumentar 1 kg"
               >
                 +1
