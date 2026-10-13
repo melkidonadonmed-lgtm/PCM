@@ -27,6 +27,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     ageText: patient?.ageText || '',
     birthDate: patient?.birthDate || '',
     gender: patient?.gender || 'male',
+    sex: patient?.sex || '',
     documentNumber: patient?.documentNumber || '',
     motherName: patient?.motherName || '',
     phone: patient?.phone || '',
@@ -60,6 +61,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       ageText: '',
       birthDate: '',
       gender: 'male',
+      sex: '',
       documentNumber: '',
       motherName: '',
       phone: '',
@@ -180,7 +182,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label htmlFor="patient-modal-weight" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
                 Peso (kg) {formData.weightCalcEnabled ? '*' : '(opcional)'}
@@ -217,6 +219,22 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 placeholder="Ex: 35 anos ou 2 anos..."
                 className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
+            </div>
+
+            <div>
+              <label htmlFor="patient-modal-sex" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
+                Sexo (RDC 471 / SUS)
+              </label>
+              <select
+                id="patient-modal-sex"
+                value={formData.sex || ''}
+                onChange={(e) => setFormData({ ...formData, sex: (e.target.value as '' | 'M' | 'F') })}
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+              >
+                <option value="">Não informado</option>
+                <option value="F">Feminino</option>
+                <option value="M">Masculino</option>
+              </select>
             </div>
           </div>
 

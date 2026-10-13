@@ -31,6 +31,7 @@ import {
 import { FolhaA4 } from './documento/FolhaA4';
 import { DocumentoClinico } from './documento/DocumentoClinico';
 import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
+import { avisoTextoNotificacao } from '../utils/notificacaoDeReceita';
 import WatermarkSelector from './WatermarkSelector';
 
 interface PrintPreviewProps {
@@ -162,6 +163,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       itensDaFolha.forEach((it, idx) => {
         text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
       });
+      const avisoNotif = avisoTextoNotificacao(itensDaFolha);
+      if (avisoNotif) {
+        text += `\n${avisoNotif}\n`;
+      }
       text += `\n------------------------------------\n⚠️ _Siga as instruções médicas e os horários informados._`;
       return text;
     }

@@ -43,37 +43,37 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
 - Deploy automático no push em `main` (gatilho `gcpmain` → `cloudbuild.yaml`).
 
 ## Qualidade
-- 180/180 testes · `tsc --noEmit` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
+- 184/184 testes · `tsc --noEmit` limpo · `npm run design:lint` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
   (logos em base64 saíram do JavaScript; motor de PDF sob demanda).
 - Validado em navegador (dados fictícios): desktop claro e celular escuro geram PDFs idênticos.
 
+### Padrão PEC do SUS (A4 Paisagem) + Correções dos Grupos A e B (13/10/2026)
+- **Receituário em A4 paisagem (padrão PEC do SUS):** as três modalidades de receita (`simple_prescription`, `antimicrobial_prescription`, `special_prescription`) saem sempre em A4 paisagem (`1123×794 px`), facilitando o corte ao meio (`✂`):
+  - *Simples:* 1 via na metade esquerda da folha A4 paisagem, linha de corte central e metade direita em branco.
+  - *Antimicrobiano (RDC Anvisa nº 471/2021):* 2 vias lado a lado no mesmo modelo limpo da receita simples (válida por 10 dias; retenção da 2ª via na farmácia).
+  - *Controle Especial (Portaria SVS/MS nº 344/98):* 2 vias lado a lado com os quadros de comprador e fornecedor (retenção da 1ª via na farmácia).
+- **Grupo A resolvido:**
+  - Editor A4 (`DocumentEditorView.tsx`): seletor no topo com 3 botões independentes (`Receita simples`, `Antimicrobiano • 2 vias`, `Controle especial • 2 vias`), corrigindo o bug em que o botão "Receita simples" não trocava a folha em consultas mistas (antiga pendência #10).
+  - Documentos SUS sem impresso oficial (`susDocumentsCatalog.ts`): SIGTAP e nome do procedimento não abrem mais pré-preenchidos por padrão nos 7 modelos restantes; o médico opta explicitamente pelo botão "Usar código sugerido" em `SusDocumentsFiller.tsx` (antiga pendência #3).
+- **Grupo B resolvido:**
+  - *Notificação de Receita (antiga pendência #1):* adicionado `avisoTextoNotificacao` no texto de WhatsApp e área de transferência (`PrescriptionBuilder.tsx` e `PrintPreview.tsx`) para alertar sobre a exigência de talonário físico (Listas A1, A3, B1, B2 e C2) sem poluir a folha A4 impressa; substituído o Clonazepam (Lista B1) por Cloridrato de Amitriptilina 25 mg (Lista C1) no modelo pronto `tpl-receituario-controle-especial` (`presetClinicalTemplates.ts`).
+  - *Sexo do paciente na receita de antimicrobiano (RDC 471/2021 — antiga pendência #2):* adicionado campo opcional `sex?: '' | 'M' | 'F'` em `Patient` (iniciando vazio `''`, nunca presumido), com seletor em `PatientModal.tsx`, sincronização bidirecional com `SusDocumentsFiller.tsx` e impressão em `ReceitaDuasVias.tsx` apenas quando informado.
+  - *CNS, CPF e CNES do médico no perfil (antiga pendência #6):* adicionados campos opcionais `cns`, `cpf` e `cnes` em `DoctorProfileModal.tsx` e `DEFAULT_DOCTOR`, preservando-os ao salvar o perfil e preenchendo automaticamente o campo 15 da LME e o campo 44 da APAC.
+  - *Timbre institucional nas 2 vias do Editor A4 (antiga pendência #8):* cabeçalhos de 1ª e 2ª via em `DocumentEditorView.tsx` exibem o logotipo principal à esquerda e o logotipo secundário (SUS) à direita, alinhados ao `CabecalhoInstitucional.tsx`.
+
 ## Pendências (precisam de decisão ou revisão humana)
-1. **Notificação de Receita:** o app agora avisa na tela (formulário, lista de medicamentos, prévia e
-   emissão) quando o controlado exige Notificação de Receita A/B/B2/Especial em talonário próprio
-   (`utils/notificacaoDeReceita.ts`), também no Editor A4. Continua em aberto:
-   - esses itens ainda saem na folha de controle especial, com os dizeres de retenção da 1ª via (o aviso
-     não bloqueia a emissão nem muda a folha);
-   - o texto de WhatsApp/copiar ainda os chama de "Receituário de Controle Especial", sem ressalva;
-   - o modelo pronto de controle especial (`presetClinicalTemplates.ts`) usa clonazepam, que é B1, como exemplo;
+1. **Notificação de Receita (escopo complementar):**
    - a detecção é por nome: marcas fora da tabela, codeína/tramadol acima de 100 mg por unidade,
      tretinoína sistêmica e a Lista C3 (talidomida, lenalidomida) passam sem aviso;
    - o Termo de Responsabilidade da sibutramina não é citado (falta fonte primária);
-   - a tabela precisa ser reconferida a cada atualização do Anexo I da Portaria 344/98 (conferida na
-     Atualização nº 101, RDC 1.036/2026, por leitura resumida de reprodução não oficial).
-2. **Sexo do paciente na receita de antimicrobiano:** a RDC 471/2021 pede nome, idade e sexo. O cadastro
-   usa "masculino" como valor inicial, então o sexo não é impresso (seria um dado presumido).
-3. **SIGTAP e procedimento dos documentos SUS** ainda abrem preenchidos com o padrão do catálogo nos 7
-   documentos que não têm impresso oficial (na APAC e na LME já abrem em branco).
-4. **Impressos oficiais que faltam:** SISCAN (citopatológico, histopatológico, mamografia) tem formulário
+   - a tabela precisa ser reconferida a cada atualização do Anexo I da Portaria 344/98.
+2. **Impressos oficiais que faltam:** SISCAN (citopatológico, histopatológico, mamografia) tem formulário
    nacional do INCA e pode entrar no mesmo motor, mas exige campos novos na tela (anamnese ginecológica,
    exame clínico). Guia SISREG, GAL/LACEN, TRM-TB e "APAC complementar" não têm modelo nacional único:
    é preciso o impresso usado em Porto Velho/RO (foto ou PDF) para reproduzir.
-5. **APAC:** a cópia do modelo nacional veio do site da SES/RS (o Ministério não publica o PDF em página
+3. **APAC:** a cópia do modelo nacional veio do site da SES/RS (o Ministério não publica o PDF em página
    própria). Conferir com o impresso que a regulação local aceita; campos 4, 11, 12, 15 e 21–35 ficam em
    branco porque o app não coleta esses dados.
-6. **LME:** o cadastro do médico não guarda CNS (campo 15); é digitado a cada sessão na tela do documento.
-7. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
-8. Unificar os cabeçalhos duplicados do Editor A4 (`DocumentEditorView.tsx`) com os componentes da folha.
-9. Fonte de ícones de 4 MB (`material-symbols`) domina o cache offline; avaliar subconjunto.
-10. Editor A4: com mais de uma receita na consulta, o botão "Receita simples" do seletor não troca a folha
-   (continua na de controle especial). Visto em 11/10/2026; já ocorria antes do aviso de notificação.
+4. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
+5. Fonte de ícones de 4 MB (`material-symbols`) domina o cache offline; avaliar subconjunto.
+

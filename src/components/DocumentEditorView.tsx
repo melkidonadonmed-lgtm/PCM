@@ -3314,6 +3314,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       {headerConfig.showHeader && (
                         <header className="border-b-2 border-slate-900 pb-2 mb-3">
                           <div className="flex items-start justify-between gap-2">
+                            {logoConfig.dataUrl && logoConfig.visible && (
+                              <img
+                                src={logoConfig.dataUrl}
+                                alt="Logotipo Institucional"
+                                className="h-9 max-w-[84px] object-contain shrink-0"
+                              />
+                            )}
                             <div className="flex-1 min-w-0">
                               <input
                                 type="text"
@@ -3334,7 +3341,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               />
                               <p className="text-[10px] text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
-                            <div className="text-right shrink-0">
+                            <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                              {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
+                                <img
+                                  src={logoConfig.secondaryDataUrl}
+                                  alt="Logotipo Secundário"
+                                  className="h-7 max-w-[72px] object-contain"
+                                />
+                              )}
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
                                 {rotuloVia1}
                               </span>
@@ -3426,6 +3440,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       {headerConfig.showHeader && (
                         <header className="border-b-2 border-slate-900 pb-2 mb-3">
                           <div className="flex items-start justify-between gap-2">
+                            {logoConfig.dataUrl && logoConfig.visible && (
+                              <img
+                                src={logoConfig.dataUrl}
+                                alt="Logotipo Institucional"
+                                className="h-9 max-w-[84px] object-contain shrink-0"
+                              />
+                            )}
                             <div className="flex-1 min-w-0">
                               <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight break-words flex items-center">
                                 {headerConfig.doctorName || 'DR(A). MÉDICO(A)'}
@@ -3438,7 +3459,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               </p>
                               <p className="text-[10px] text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
-                            <div className="text-right shrink-0">
+                            <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                              {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
+                                <img
+                                  src={logoConfig.secondaryDataUrl}
+                                  alt="Logotipo Secundário"
+                                  className="h-7 max-w-[72px] object-contain"
+                                />
+                              )}
                               <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
                                 {rotuloVia2}
                               </span>

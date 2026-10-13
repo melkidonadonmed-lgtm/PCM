@@ -23,7 +23,7 @@ import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { classificarReceita, type RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import { DOCUMENTO_DO_REGIME, separarPorRegime, type TipoDocumento } from '../utils/documentoClinico';
-import { descreverNotificacao, notificacaoExigida } from '../utils/notificacaoDeReceita';
+import { avisoTextoNotificacao, descreverNotificacao, notificacaoExigida } from '../utils/notificacaoDeReceita';
 import {
   calcularPrescricaoRapida,
   FrequenciaHorario,
@@ -599,6 +599,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         text += `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n\n`;
       });
     });
+    const avisoNotif = avisoTextoNotificacao(items);
+    if (avisoNotif) {
+      text += `${avisoNotif}\n`;
+    }
     navigator.clipboard.writeText(text);
     setCopiedSuccess(true);
     setTimeout(() => setCopiedSuccess(false), 2000);
@@ -624,7 +628,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       });
     });
 
-    text += `\n------------------------------------\n⚠️ _Documento de orientação terapêutica emitido pelo médico. Siga as orientações e horários informados. Para medicamentos controlados e antibióticos, a 1ª via fica retida na farmácia._`;
+    const avisoNotif = avisoTextoNotificacao(items);
+    if (avisoNotif) {
+      text += `\n${avisoNotif}\n`;
+    }
+    text += `\n------------------------------------\n⚠️ _Documento de orientação terapêutica emitido pelo médico. Siga as orientações e horários informados. Para medicamentos controlados e antibióticos, a via da farmácia fica retida na dispensação._`;
     return text;
   };
 

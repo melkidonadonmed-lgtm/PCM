@@ -64,6 +64,7 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
   const endereco = enderecoDoPaciente(patient);
   const documento = patient?.documentNumber?.trim() || '';
   const idade = patient?.ageText?.trim() || '';
+  const sexo = patient?.sex === 'M' ? 'Sexo: Masculino' : patient?.sex === 'F' ? 'Sexo: Feminino' : '';
   const peso = patient?.weightKg && patient.weightKg > 0 ? `${String(patient.weightKg).replace('.', ',')} kg` : '';
 
   return (
@@ -112,6 +113,7 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
           <strong style={{ fontWeight: 700 }}>{nomePaciente}</strong>
           {documento && <span style={{ color: TINTA_SUAVE }}> — Doc. {documento}</span>}
           {idade && <span style={{ color: TINTA_SUAVE }}> — {idade}</span>}
+          {sexo && <span style={{ color: TINTA_SUAVE }}> — {sexo}</span>}
           {peso && <span style={{ color: TINTA_SUAVE }}> — {peso}</span>}
         </p>
         {controleEspecial && (

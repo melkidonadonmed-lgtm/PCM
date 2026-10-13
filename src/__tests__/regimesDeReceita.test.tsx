@@ -125,4 +125,30 @@ describe('Folha da receita de antimicrobiano (RDC Anvisa nº 471/2021)', () => {
     expect(html).not.toContain('Identificação do fornecedor');
     expect(html).toContain('Receituário Médico');
   });
+
+  it('imprime o sexo do paciente (RDC 471/2021) apenas quando informado explicitamente (M ou F)', () => {
+    // Sem patient.sex informado (mesmo com gender='male' legado), não presume sexo
+    expect(html).not.toContain('Sexo:');
+
+    const htmlFeminino = renderToStaticMarkup(
+      <DocumentoClinico
+        tipo="antimicrobial_prescription"
+        doctor={doctor}
+        patient={{ ...patient, sex: 'F' }}
+        prescriptionItems={[item('1', 'Amoxicilina 500mg')]}
+      />
+    );
+    expect((htmlFeminino.match(/Sexo: Feminino/g) || []).length).toBe(2);
+
+    const htmlMasculino = renderToStaticMarkup(
+      <DocumentoClinico
+        tipo="antimicrobial_prescription"
+        doctor={doctor}
+        patient={{ ...patient, sex: 'M' }}
+        prescriptionItems={[item('1', 'Amoxicilina 500mg')]}
+      />
+    );
+    expect((htmlMasculino.match(/Sexo: Masculino/g) || []).length).toBe(2);
+  });
 });
+

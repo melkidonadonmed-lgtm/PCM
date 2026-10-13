@@ -121,8 +121,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     doctorCpf: doctor?.cpf || '',
     doctorCns: doctor?.cns || '',
 
-    // Só para os impressos oficiais; sexo e raça/cor abrem em branco (o cadastro traz um sexo padrão, não informado)
-    patientSex: '' as SusFilledFormData['patientSex'],
+    // Só para os impressos oficiais; sexo e raça/cor abrem em branco se o médico não informou explicitamente
+    patientSex: (patient?.sex || '') as SusFilledFormData['patientSex'],
     patientRaceColor: '' as SusFilledFormData['patientRaceColor'],
     patientEthnicity: '',
     patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : '',
@@ -156,6 +156,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       doctorClinicName: activeContext?.clinicName || doctor?.clinicName?.trim() || prev.doctorClinicName,
       doctorCpf: doctor?.cpf || prev.doctorCpf,
       doctorCns: doctor?.cns || prev.doctorCns,
+      patientSex: patient?.sex || prev.patientSex,
       patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : prev.patientWeightKg,
 
       patientName: patient?.name?.trim() || prev.patientName,
@@ -256,7 +257,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         if (field === 'patientName' || field === 'patientCpf' || field === 'patientCns' || 
             field === 'patientMotherName' || field === 'patientPhone' || field === 'patientAddress' || 
             field === 'patientNeighborhood' || field === 'patientCity' || field === 'patientState' || 
-            field === 'patientCep' || field === 'patientBirthDate') {
+            field === 'patientCep' || field === 'patientBirthDate' || field === 'patientSex') {
           onUpdatePatient({
             ...patient,
             name: field === 'patientName' ? value : patient.name,
@@ -269,7 +270,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             city: field === 'patientCity' ? value : (patient as any).city,
             state: field === 'patientState' ? value : (patient as any).state,
             cep: field === 'patientCep' ? value : (patient as any).cep,
-            birthDate: field === 'patientBirthDate' ? value : patient.birthDate
+            birthDate: field === 'patientBirthDate' ? value : patient.birthDate,
+            sex: field === 'patientSex' ? (value === 'M' || value === 'F' ? value : '') : patient.sex
           });
         }
       }

@@ -25,6 +25,8 @@ export interface Patient {
   birthDate?: string;
   ageText?: string;
   gender: 'male' | 'female' | 'other';
+  /** Sexo informado explicitamente pelo médico (RDC Anvisa nº 471/2021 e impressos SUS); em branco quando não informado. */
+  sex?: '' | 'M' | 'F';
   documentNumber?: string; // RG or CPF
   allergies: string[];
   motherName?: string;

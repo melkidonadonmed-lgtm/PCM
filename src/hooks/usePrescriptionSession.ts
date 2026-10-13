@@ -22,7 +22,10 @@ export const DEFAULT_DOCTOR: DoctorProfile = {
   phone: '',
   email: '',
   showSignature: true,
-  stampText: ''
+  stampText: '',
+  cnes: '',
+  cpf: '',
+  cns: ''
 };
 
 export const DEFAULT_PATIENT: Patient = {
@@ -32,6 +35,7 @@ export const DEFAULT_PATIENT: Patient = {
   birthDate: '',
   ageText: '',
   gender: 'male',
+  sex: '',
   documentNumber: '',
   phone: '',
   allergies: []
