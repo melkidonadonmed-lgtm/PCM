@@ -54,9 +54,24 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
   }, [initialSubTab]);
 
   const tabsList: { id: DocumentsSubTab; label: string; icon: typeof Award; badge?: string }[] = [
-    { id: 'certificate', label: 'Atestado Médico', icon: Award },
-    { id: 'referral', label: 'Encaminhamento', icon: Share2 },
-    { id: 'exams', label: 'Pedidos de Exames', icon: FlaskConical },
+    {
+      id: 'certificate',
+      label: 'Atestado Médico',
+      icon: Award,
+      badge: certificate?.daysOff > 0 ? `${certificate.daysOff}d` : undefined
+    },
+    {
+      id: 'referral',
+      label: 'Encaminhamento',
+      icon: Share2,
+      badge: referral?.destinationSpecialty ? referral.destinationSpecialty.split(' ')[0] : undefined
+    },
+    {
+      id: 'exams',
+      label: 'Pedidos de Exames',
+      icon: FlaskConical,
+      badge: selectedExams?.length > 0 ? `${selectedExams.length}` : undefined
+    },
     { id: 'sus', label: 'Documentos SUS', icon: FileText, badge: '9' }
   ];
 
@@ -92,7 +107,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
       <div 
         className="tactile-card p-2 sm:p-2.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         style={{
-          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+          backgroundColor: 'var(--surface-card)',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
@@ -109,109 +124,46 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
           </div>
         </div>
 
-        {/* Grupo de Pílulas Táteis (WAI-ARIA APG Tabs & Roving Tabindex) */}
-        <nav 
-          role="tablist" 
+        {/* Abas dos documentos (WAI-ARIA APG Tabs com roving tabindex). A aba inativa tem cara de botão — fundo, borda e sombra — para ficar claro que é clicável. */}
+        <nav
+          role="tablist"
           aria-label="Documentos clínicos disponíveis"
-          className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] overflow-x-auto scrollbar-none"
+          className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-inset)] overflow-x-auto scrollbar-none"
         >
-          {/* Pílula: Atestado Médico */}
-          <button
-            id="clinical-doc-tab-certificate"
-            type="button"
-            role="tab"
-            aria-selected={activeSubTab === 'certificate'}
-            aria-controls="clinical-doc-panel-certificate"
-            tabIndex={activeSubTab === 'certificate' ? 0 : -1}
-            onClick={() => setActiveSubTab('certificate')}
-            onKeyDown={(e) => handleTabKeyDown(e, 'certificate')}
-            className={`min-h-[42px] px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-              activeSubTab === 'certificate'
-                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
-            }`}
-          >
-            <Award className="w-4 h-4 shrink-0" strokeWidth={1.75} />
-            <span>Atestado Médico</span>
-            {certificate?.daysOff > 0 && (
-              <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                {certificate.daysOff}d
-              </span>
-            )}
-          </button>
-
-          {/* Pílula: Encaminhamento */}
-          <button
-            id="clinical-doc-tab-referral"
-            type="button"
-            role="tab"
-            aria-selected={activeSubTab === 'referral'}
-            aria-controls="clinical-doc-panel-referral"
-            tabIndex={activeSubTab === 'referral' ? 0 : -1}
-            onClick={() => setActiveSubTab('referral')}
-            onKeyDown={(e) => handleTabKeyDown(e, 'referral')}
-            className={`min-h-[42px] px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-              activeSubTab === 'referral'
-                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
-            }`}
-          >
-            <Share2 className="w-4 h-4 shrink-0" strokeWidth={1.75} />
-            <span>Encaminhamento</span>
-            {referral?.destinationSpecialty && (
-              <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-500/30 max-w-[90px] truncate">
-                {referral.destinationSpecialty.split(' ')[0]}
-              </span>
-            )}
-          </button>
-
-          {/* Pílula: Solicitação de Exames */}
-          <button
-            id="clinical-doc-tab-exams"
-            type="button"
-            role="tab"
-            aria-selected={activeSubTab === 'exams'}
-            aria-controls="clinical-doc-panel-exams"
-            tabIndex={activeSubTab === 'exams' ? 0 : -1}
-            onClick={() => setActiveSubTab('exams')}
-            onKeyDown={(e) => handleTabKeyDown(e, 'exams')}
-            className={`min-h-[42px] px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-              activeSubTab === 'exams'
-                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
-            }`}
-          >
-            <FlaskConical className="w-4 h-4 shrink-0" strokeWidth={1.75} />
-            <span>Pedidos de Exames</span>
-            {selectedExams?.length > 0 && (
-              <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                {selectedExams.length}
-              </span>
-            )}
-          </button>
-
-          {/* Pílula: Documentos Oficiais do SUS */}
-          <button
-            id="clinical-doc-tab-sus"
-            type="button"
-            role="tab"
-            aria-selected={activeSubTab === 'sus'}
-            aria-controls="clinical-doc-panel-sus"
-            tabIndex={activeSubTab === 'sus' ? 0 : -1}
-            onClick={() => setActiveSubTab('sus')}
-            onKeyDown={(e) => handleTabKeyDown(e, 'sus')}
-            className={`min-h-[42px] px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-              activeSubTab === 'sus'
-                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
-            }`}
-          >
-            <FileText className="w-4 h-4 shrink-0" strokeWidth={1.75} />
-            <span>Documentos SUS</span>
-            <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30">
-              9
-            </span>
-          </button>
+          {tabsList.map((tab) => {
+            const TabIcon = tab.icon;
+            const isActive = activeSubTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                id={`clinical-doc-tab-${tab.id}`}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`clinical-doc-panel-${tab.id}`}
+                tabIndex={isActive ? 0 : -1}
+                onClick={() => setActiveSubTab(tab.id)}
+                onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
+                className={`min-h-[42px] px-3.5 py-1.5 rounded-lg border text-xs font-bold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                  isActive
+                    ? 'bg-navy-900 border-navy-900 text-white dark:bg-blue-600 dark:border-blue-600'
+                    : 'bg-[var(--surface-card)] border-[var(--border-medium)] text-[var(--text-secondary)] shadow-tactile-sm hover:border-[var(--border-strong)] hover:text-[var(--text-main)]'
+                }`}
+              >
+                <TabIcon className="w-4 h-4 shrink-0" strokeWidth={1.75} />
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span
+                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full max-w-[90px] truncate ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-[var(--surface-inset)] text-[var(--text-muted)]'
+                    }`}
+                  >
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </nav>
       </div>
 

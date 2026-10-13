@@ -1025,7 +1025,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               </div>
 
               {/* MODO RÁPIDO DE PRESCRIÇÃO (Dose • Unidade • Horários • Dias) */}
-              <div className="p-3 rounded-xl bg-blue-50/50 dark:bg-slate-900/60 border border-blue-100 dark:border-slate-800/80 space-y-2.5">
+              <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-slate-900/60 space-y-2.5">
                 <div className="flex items-center justify-between pb-1.5 border-b border-blue-100/60 dark:border-slate-800/60">
                   <div className="flex items-center gap-1.5">
                     <Icon name="medication" className="text-blue-600 dark:text-blue-400 text-[16px]" />

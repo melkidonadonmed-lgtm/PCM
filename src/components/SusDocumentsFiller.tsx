@@ -421,7 +421,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
           <div 
             className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4"
             style={{
-              backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+              backgroundColor: 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
             }}
           >
@@ -503,7 +503,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               return (
                 <div
                   key={doc.id}
-                  className={`tactile-card rounded-2xl p-4 flex flex-col justify-between transition cursor-pointer border relative group ${
+                  className={`tactile-card-interactive rounded-2xl p-4 flex flex-col justify-between border relative group ${
                     isSelected
                       ? 'border-blue-500 bg-blue-500/5 shadow-tactile-sm'
                       : 'hover:border-blue-400/40'
@@ -583,7 +583,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
           <div 
             className="tactile-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             style={{
-              backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+              backgroundColor: 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
             }}
           >
@@ -1339,7 +1339,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               <div 
                 className="tactile-card p-3 rounded-2xl border flex flex-col gap-2.5"
                 style={{
-                  backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                  backgroundColor: 'var(--surface-card)',
                   borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
                 }}
               >

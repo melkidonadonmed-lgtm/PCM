@@ -550,7 +550,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     localStorage.setItem('prescmed_show_kits', 'true');
                   } catch {}
                 }}
-                className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-amber-400 outline-none relative text-amber-400/90 hover:text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/25 shadow-tactile-sm"
+                className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-amber-400 outline-none relative text-amber-400 hover:text-amber-300 hover:bg-white/10"
                 title="Kits de plantão"
                 aria-label="Kits de plantão"
               >
@@ -609,7 +609,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   handleOpenPatient();
                 }
               }}
-              className="w-11 h-11 mx-auto rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none shadow-tactile-sm"
+              className="w-11 h-11 mx-auto rounded-xl text-emerald-400 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none"
               title={hasPatient ? `Paciente: ${patientName} (${patientWeight ? patientWeight + 'kg' : 'sem peso'})` : 'Definir / Identificar Paciente'}
               aria-label="Dados do Paciente"
             >
@@ -691,7 +691,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={handleOpenBackup}
-              className="w-11 h-11 mx-auto rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400 outline-none shadow-tactile-sm relative group"
+              className="w-11 h-11 mx-auto rounded-xl text-amber-400 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400 outline-none relative group"
               title="Backup / Portabilidade (.pcm.json)"
               aria-label="Backup e Portabilidade"
             >
@@ -708,7 +708,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={onInstallApp}
-              className="w-11 h-11 mx-auto rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none shadow-tactile-sm animate-pulse relative group"
+              className="w-11 h-11 mx-auto rounded-xl text-emerald-400 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none animate-pulse relative group"
               title="Instalar PresCMed no dispositivo (100% Offline)"
               aria-label="Instalar App Offline"
             >

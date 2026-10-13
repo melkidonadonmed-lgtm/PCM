@@ -180,7 +180,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
       <div 
         className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         style={{
-          backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+          backgroundColor: 'var(--surface-card)',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
@@ -270,7 +270,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               key={protocol.id}
               className="tactile-card-interactive p-4 sm:p-5 rounded-2xl flex flex-col justify-between space-y-3.5"
               style={{
-                backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                backgroundColor: 'var(--surface-card)',
                 borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
               }}
             >
@@ -471,7 +471,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
         <div 
           className="rounded-2xl border divide-y tactile-flat overflow-hidden"
           style={{
-            backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+            backgroundColor: 'var(--surface-card)',
             borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
           }}
         >
@@ -554,7 +554,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                 key={protocol.id}
                 className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between space-y-3.5 relative overflow-hidden"
                 style={{
-                  backgroundColor: darkMode ? 'var(--surface-elevated)' : 'var(--surface-card)',
+                  backgroundColor: 'var(--surface-card)',
                   borderColor: isEmergency 
                     ? (darkMode ? 'rgba(244, 63, 94, 0.3)' : 'rgba(190, 18, 60, 0.25)')
                     : (darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)')

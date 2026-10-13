@@ -47,7 +47,11 @@ import {
   Download,
   Pill,
   Stethoscope,
-  Award
+  Award,
+  RectangleVertical,
+  RectangleHorizontal,
+  File,
+  Files
 } from 'lucide-react';
 import { exportarFolhaPdf } from '../utils/folhaA4';
 import { 
@@ -1891,7 +1895,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 syncWithActivePrescription();
                 onNavigateBack();
               }}
-              className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
+              className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
               title="Sincronizar e voltar à tela de montagem de receitas"
             >
               <ChevronLeft className="w-4 h-4 text-[var(--text-muted)]" />
@@ -1976,12 +1980,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         </div>
 
         {/* Botões de Ação de Impressão e Modelo */}
-        <div className="flex items-center gap-2 flex-wrap shrink-0">
+        <div className="flex items-center gap-2 flex-wrap min-w-0 max-w-full">
           {/* Botão de Impressão Direta A4 Superior (Alta visibilidade) */}
           <button
             type="button"
             onClick={handlePrint}
-            className={`btn-tactile-primary h-9 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
+            className={`btn-tactile-primary h-10 min-h-10 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
               !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
             }`}
             title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
@@ -2000,13 +2004,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={handleDownloadPdf}
             disabled={isExportingPdf}
-            className="btn-tactile-secondary h-9 px-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap text-slate-800 dark:text-slate-200"
+            className="btn-tactile-secondary h-10 min-h-10 px-3 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
             title="Baixar documento em PDF preservando rigorosamente a tipografia e o layout visual do editor"
           >
             {isExportingPdf ? (
-              <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
+              <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />
             ) : (
-              <Download className="w-4 h-4 text-sky-600" />
+              <Download className="w-4 h-4 text-[var(--text-muted)]" />
             )}
             <span>{isExportingPdf ? 'Gerando...' : 'Baixar PDF'}</span>
           </button>
@@ -2015,10 +2019,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <div className="relative group">
             <button
               type="button"
-              className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
+              className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
               title="Carregar documentos e dados da consulta ativa para edição"
             >
-              <FileText className="w-3.5 h-3.5 text-sky-500" />
+              <FileText className="w-4 h-4 text-[var(--text-muted)]" />
               <span>Carregar da Consulta</span>
             </button>
             <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-tactile-lg p-1.5 hidden group-hover:block z-50 animate-tab-fade">
@@ -2062,10 +2066,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handleSaveModelDirectly}
-            className="h-9 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none shrink-0 whitespace-nowrap"
+            className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none shrink-0 whitespace-nowrap"
             title="Salvar alterações no documento e sincronizar diretamente com a receita ativa da consulta"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-[var(--text-muted)]" />
             <span>Salvar na Receita</span>
           </button>
 
@@ -2076,10 +2080,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? `${currentModel.title} (Cópia)` : '');
               setIsSaveModelModalOpen(true);
             }}
-            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
+            className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
             title="Criar um novo modelo salvo a partir deste documento"
           >
-            <BookmarkPlus className="w-3.5 h-3.5 text-slate-500" />
+            <BookmarkPlus className="w-4 h-4 text-[var(--text-muted)]" />
             <span className="hidden sm:inline">Salvar como Novo</span>
           </button>
 
@@ -2087,10 +2091,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={() => setIsModelsDrawerOpen(true)}
-            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
+            className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
             title="Abrir biblioteca de modelos clínicos e laudos salvos"
           >
-            <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+            <FolderOpen className="w-4 h-4 text-[var(--text-muted)]" />
             <span>Modelos</span>
             {savedTemplates.length > 0 && (
               <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
@@ -2103,7 +2107,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <button
             type="button"
             onClick={handleStartNewDocument}
-            className="h-9 w-9 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center justify-center cursor-pointer shadow-tactile-sm shrink-0"
+            className="h-10 w-10 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center justify-center cursor-pointer shadow-tactile-sm shrink-0"
             title="Iniciar novo documento em branco"
           >
             <Plus className="w-4 h-4" />
@@ -2111,732 +2115,709 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         </div>
       </div>
 
-      {/* BARRA DE FERRAMENTAS DO EDITOR (Fixa / Sticky) */}
-      <div 
-        className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 rounded-2xl p-2.5 sm:p-3 border backdrop-blur-md shadow-tactile-sm flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-2.5 bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)]"
-      >
-        {/* Agrupamento 1: Formatação Tiptap & Estilo Docs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 xl:pb-0 scrollbar-none touch-pan-x flex-nowrap shrink-0">
-          {/* Estilo do Parágrafo / Título */}
+      {/* CONFIGURAÇÃO DA FOLHA (estilo, fonte, orientação, vias, cabeçalho, logotipo, marca d'água): rola com a página */}
+      <div className="editor-toolbar no-print relative z-20 rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex flex-wrap items-center gap-2">
+        {/* Seletor Rápido de Estilo de Receita Atual */}
+        <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
+          <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
           <select
-            value={
-              editor?.isActive('heading', { level: 1 }) ? 'h1' :
-              editor?.isActive('heading', { level: 2 }) ? 'h2' :
-              editor?.isActive('heading', { level: 3 }) ? 'h3' : 'p'
-            }
+            value=""
             onChange={(e) => {
               const val = e.target.value;
-              if (val === 'p') editor?.chain().focus().setParagraph().run();
-              else if (val === 'h1') editor?.chain().focus().toggleHeading({ level: 1 }).run();
-              else if (val === 'h2') editor?.chain().focus().toggleHeading({ level: 2 }).run();
-              else if (val === 'h3') editor?.chain().focus().toggleHeading({ level: 3 }).run();
+              if (!val) return;
+              const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
+              if (found) handleApplyStyle(found);
             }}
-            className="bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-            title="Estilo de texto (Parágrafo ou Título)"
-            aria-label="Estilo de texto"
+            className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[155px] truncate"
+            title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
+            aria-label="Selecionar estilo visual da receita"
           >
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="p">Texto Normal</option>
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h1">Título 1 (Grande)</option>
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h2">Título 2 (Médio)</option>
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h3">Título 3 (Pequeno)</option>
-          </select>
-
-          {/* Ajuste Fino do Tamanho da Fonte (Docs Style: [-] 11 pt [+]) */}
-          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] px-1 py-0.5 text-xs">
-            <button
-              type="button"
-              onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
-              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
-              title="Diminuir tamanho da fonte da folha (A-)"
-              aria-label="Diminuir fonte"
-            >
-              −
-            </button>
-            <select
-              value={baseFontSize}
-              onChange={(e) => setBaseFontSize(Number(e.target.value))}
-              className="bg-transparent text-[var(--text-main)] px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer"
-              title="Tamanho da fonte em pontos (pt)"
-              aria-label="Tamanho da fonte em pontos (pt)"
-            >
-              {[8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28].map(sz => (
-                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={sz} value={sz}>{sz} pt</option>
+            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="" disabled>Selecionar estilo...</option>
+            <optgroup label="Estilos Padrão" className="bg-[var(--surface-card)] text-[var(--text-main)]">
+              {DEFAULT_PRESCRIPTION_STYLES.map(s => (
+                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
               ))}
-            </select>
-            <button
-              type="button"
-              onClick={() => setBaseFontSize(prev => Math.min(32, prev + 1))}
-              className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
-              title="Aumentar tamanho da fonte da folha (A+)"
-              aria-label="Aumentar fonte"
-            >
-              +
-            </button>
-          </div>
-
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-          {/* Formatação básica: Negrito, Itálico, Sublinhado */}
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().toggleBold().run()}
-            disabled={!editor}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive('bold') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Negrito (Ctrl+B)"
-            aria-label="Negrito"
-          >
-            <Bold className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().toggleItalic().run()}
-            disabled={!editor}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive('italic') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Itálico (Ctrl+I)"
-            aria-label="Itálico"
-          >
-            <Italic className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => (editor as any)?.chain().focus().toggleUnderline().run()}
-            disabled={!editor}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              (editor as any)?.isActive('underline') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Sublinhado (Ctrl+U)"
-            aria-label="Sublinhado"
-          >
-            <UnderlineIcon className="w-4 h-4" />
-          </button>
-
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-          {/* Alinhamento de Texto */}
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive({ textAlign: 'left' }) 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Alinhar à Esquerda"
-            aria-label="Alinhar à Esquerda"
-          >
-            <AlignLeft className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive({ textAlign: 'center' }) 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Centralizar"
-            aria-label="Centralizar"
-          >
-            <AlignCenter className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive({ textAlign: 'right' }) 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Alinhar à Direita"
-            aria-label="Alinhar à Direita"
-          >
-            <AlignRight className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive({ textAlign: 'justify' }) 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Justificar"
-            aria-label="Justificar"
-          >
-            <AlignJustify className="w-4 h-4" />
-          </button>
-
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-          {/* Listas */}
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().toggleBulletList().run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive('bulletList') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Lista com Marcadores"
-            aria-label="Lista com Marcadores"
-          >
-            <List className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-            className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              editor?.isActive('orderedList') 
-                ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
-                : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-            }`}
-            title="Lista Numerada"
-            aria-label="Lista Numerada"
-          >
-            <ListOrdered className="w-4 h-4" />
-          </button>
-
-          <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-          {/* Desfazer / Refazer */}
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().undo().run()}
-            disabled={!editor?.can().undo()}
-            className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
-            title="Desfazer (Ctrl+Z)"
-            aria-label="Desfazer"
-          >
-            <Undo className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => editor?.chain().focus().redo().run()}
-            disabled={!editor?.can().redo()}
-            className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
-            title="Refazer (Ctrl+Y)"
-            aria-label="Refazer"
-          >
-            <Redo className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Agrupamento 2: Tipografia, Orientação, Vias, Cabeçalho, Carregar Consulta & Impressão */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0 scrollbar-none touch-pan-x flex-nowrap shrink-0">
-          {/* Seletor Rápido de Estilo de Receita Atual */}
-          <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
-            <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
-            <select
-              value=""
-              onChange={(e) => {
-                const val = e.target.value;
-                if (!val) return;
-                const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
-                if (found) handleApplyStyle(found);
-              }}
-              className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[155px] truncate"
-              title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
-              aria-label="Selecionar estilo visual da receita"
-            >
-              <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="" disabled>Selecionar estilo...</option>
-              <optgroup label="Estilos Padrão" className="bg-[var(--surface-card)] text-[var(--text-main)]">
-                {DEFAULT_PRESCRIPTION_STYLES.map(s => (
+            </optgroup>
+            {customStyles.length > 0 && (
+              <optgroup label="Meus Estilos Salvos" className="bg-[var(--surface-card)] text-[var(--text-main)]">
+                {customStyles.map(s => (
                   <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
                 ))}
               </optgroup>
-              {customStyles.length > 0 && (
-                <optgroup label="Meus Estilos Salvos" className="bg-[var(--surface-card)] text-[var(--text-main)]">
-                  {customStyles.map(s => (
-                    <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </optgroup>
-              )}
-            </select>
-            <button
-              type="button"
-              onClick={() => setIsSaveStyleModalOpen(true)}
-              className="p-1 rounded hover:bg-[var(--surface-hover)] text-sky-600 dark:text-sky-400 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
-              title="Salvar configuração visual atual como novo estilo personalizado"
-            >
-              <BookmarkPlus className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Seletor Tipográfico Docs Style (12 fontes) */}
-          <div className="flex items-center gap-1.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1 text-xs">
-            <Type className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
-            <select
-              value={fontFamilyId}
-              onChange={(e) => {
-                setFontFamilyId(e.target.value);
-                if (editor) triggerAutoSave(editor);
-              }}
-              className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[170px] truncate"
-              aria-label="Família Tipográfica da Folha A4"
-              title="Trocar fonte da receita médica estilo Google Docs"
-            >
-              {FONT_OPTIONS.map(f => (
-                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={f.id} value={f.id}>
-                  {f.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Alternador de Orientação: Retrato / Paisagem */}
-          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
-            <button
-              type="button"
-              onClick={() => setPageOrientation('portrait')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                pageOrientation === 'portrait' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-              title="Orientação Retrato (Vertical 210×297mm)"
-            >
-              <span>↕️</span>
-              <span className="hidden xl:inline">Retrato</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setPageOrientation('landscape')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                pageOrientation === 'landscape' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-              title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
-            >
-              <span>↔️</span>
-              <span className="hidden xl:inline">Paisagem</span>
-            </button>
-          </div>
-
-          {/* Alternador de Vias: 1 Via / 2 Vias na Mesma Folha */}
-          <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
-            <button
-              type="button"
-              onClick={() => setViaLayout('1-via')}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                viaLayout === '1-via' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-              title="Folha Única (1 Via Padrão)"
-            >
-              <span>📄</span>
-              <span className="hidden xl:inline">1 Via</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setViaLayout('2-vias');
-                if (pageOrientation === 'portrait') {
-                  setPageOrientation('landscape');
-                  showToast('Modo 2 Vias ativado! Paisagem recomendada para imprimir as duas vias lado a lado.');
-                }
-              }}
-              className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                viaLayout === '2-vias' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-              title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
-            >
-              <span>📑</span>
-              <span className="hidden xl:inline">2 Vias (Mesma Folha)</span>
-            </button>
-          </div>
-
-          {/* Alternador de Visibilidade do Cabeçalho */}
+            )}
+          </select>
           <button
             type="button"
-            onClick={() => handleHeaderFieldChange('showHeader', !headerConfig.showHeader)}
-            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              headerConfig.showHeader
-                ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
-                : 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
-            }`}
-            title={headerConfig.showHeader ? "Cabeçalho visível. Clique para ocultar (ideal para papel já timbrado)" : "Cabeçalho ocultado. Clique para restaurar"}
+            onClick={() => setIsSaveStyleModalOpen(true)}
+            className="p-1 rounded hover:bg-[var(--surface-hover)] text-sky-600 dark:text-sky-400 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            title="Salvar configuração visual atual como novo estilo personalizado"
           >
-            {headerConfig.showHeader ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-amber-500" />}
-            <span className="hidden sm:inline">Cabeçalho</span>
-            <span className="text-[10px] opacity-75">({headerConfig.showHeader ? 'Sim' : 'Não'})</span>
+            <BookmarkPlus className="w-3.5 h-3.5" />
           </button>
+        </div>
 
-          {/* Alternador de Visibilidade do Rodapé */}
+        {/* Seletor Tipográfico Docs Style (12 fontes) */}
+        <div className="flex items-center gap-1.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1 text-xs">
+          <Type className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
+          <select
+            value={fontFamilyId}
+            onChange={(e) => {
+              setFontFamilyId(e.target.value);
+              if (editor) triggerAutoSave(editor);
+            }}
+            className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[170px] truncate"
+            aria-label="Família Tipográfica da Folha A4"
+            title="Trocar fonte da receita médica estilo Google Docs"
+          >
+            {FONT_OPTIONS.map(f => (
+              <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Alternador de Orientação: Retrato / Paisagem */}
+        <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
           <button
             type="button"
-            onClick={() => handleHeaderFieldChange('showFooter', !headerConfig.showFooter)}
-            className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              headerConfig.showFooter
-                ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
-                : 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
+            onClick={() => setPageOrientation('portrait')}
+            className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              pageOrientation === 'portrait' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
-            title={headerConfig.showFooter ? "Rodapé de carimbo visível. Clique para ocultar" : "Rodapé ocultado. Clique para restaurar"}
+            title="Orientação Retrato (Vertical 210×297mm)"
           >
-            {headerConfig.showFooter ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-slate-400" />}
-            <span className="hidden sm:inline">Rodapé</span>
-            <span className="text-[10px] opacity-75">({headerConfig.showFooter ? 'Sim' : 'Não'})</span>
+            <RectangleVertical className="w-3.5 h-3.5" />
+            <span>Retrato</span>
           </button>
-
-          {/* Botão CARREGAR RECEITA ATUAL */}
           <button
             type="button"
-            onClick={() => handleLoadActivePrescription(true)}
-            className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
-            title="Preencher a folha A4 com os dados do paciente e medicamentos prescritos nesta consulta"
+            onClick={() => setPageOrientation('landscape')}
+            className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              pageOrientation === 'landscape' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+            }`}
+            title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
-            <span className="hidden sm:inline">Carregar Receita Atual</span>
-            <span className="sm:hidden">Receita</span>
-            {prescriptionItems && prescriptionItems.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
-                {prescriptionItems.length}
+            <RectangleHorizontal className="w-3.5 h-3.5" />
+            <span>Paisagem</span>
+          </button>
+        </div>
+
+        {/* Alternador de Vias: 1 Via / 2 Vias na Mesma Folha */}
+        <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
+          <button
+            type="button"
+            onClick={() => setViaLayout('1-via')}
+            className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              viaLayout === '1-via' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+            }`}
+            title="Folha Única (1 Via Padrão)"
+          >
+            <File className="w-3.5 h-3.5" />
+            <span>1 Via</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setViaLayout('2-vias');
+              if (pageOrientation === 'portrait') {
+                setPageOrientation('landscape');
+                showToast('Modo 2 Vias ativado! Paisagem recomendada para imprimir as duas vias lado a lado.');
+              }
+            }}
+            className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              viaLayout === '2-vias' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+            }`}
+            title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
+          >
+            <Files className="w-3.5 h-3.5" />
+            <span>2 Vias</span>
+          </button>
+        </div>
+
+        {/* Alternador de Visibilidade do Cabeçalho */}
+        <button
+          type="button"
+          onClick={() => handleHeaderFieldChange('showHeader', !headerConfig.showHeader)}
+          className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            headerConfig.showHeader
+              ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
+              : 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
+          }`}
+          title={headerConfig.showHeader ? "Cabeçalho visível. Clique para ocultar (ideal para papel já timbrado)" : "Cabeçalho ocultado. Clique para restaurar"}
+        >
+          {headerConfig.showHeader ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-amber-500" />}
+          <span>Cabeçalho</span>
+          <span className="text-[10px] opacity-75">({headerConfig.showHeader ? 'Sim' : 'Não'})</span>
+        </button>
+
+        {/* Alternador de Visibilidade do Rodapé */}
+        <button
+          type="button"
+          onClick={() => handleHeaderFieldChange('showFooter', !headerConfig.showFooter)}
+          className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            headerConfig.showFooter
+              ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
+              : 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
+          }`}
+          title={headerConfig.showFooter ? "Rodapé de carimbo visível. Clique para ocultar" : "Rodapé ocultado. Clique para restaurar"}
+        >
+          {headerConfig.showFooter ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-slate-400" />}
+          <span>Rodapé</span>
+          <span className="text-[10px] opacity-75">({headerConfig.showFooter ? 'Sim' : 'Não'})</span>
+        </button>
+
+        {/* Botão CARREGAR RECEITA ATUAL */}
+        <button
+          type="button"
+          onClick={() => handleLoadActivePrescription(true)}
+          className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
+          title="Preencher a folha A4 com os dados do paciente e medicamentos prescritos nesta consulta"
+        >
+          <RotateCcw className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
+          <span className="hidden sm:inline">Carregar Receita Atual</span>
+          <span className="sm:hidden">Receita</span>
+          {prescriptionItems && prescriptionItems.length > 0 && (
+            <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
+              {prescriptionItems.length}
+            </span>
+          )}
+        </button>
+
+        {/* MENU / CONTROLE DE LOGOTIPO (Mudar de lugar, carregar, redimensionar) */}
+        <div className="relative shrink-0" onClick={e => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => setIsLogoMenuOpen(prev => !prev)}
+            className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              (logoConfig.dataUrl && logoConfig.visible) || (logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false)
+                ? 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-[var(--text-main)] font-bold'
+                : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+            }`}
+            title="Configurar logotipos (esquerdo e direito) no timbrado A4"
+          >
+            <ImageIcon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
+            <span>Logotipo</span>
+            {(logoConfig.dataUrl || logoConfig.secondaryDataUrl) && (
+              <span className="text-[10px] px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 rounded font-bold uppercase">
+                {logoConfig.dataUrl && logoConfig.secondaryDataUrl ? 'Duplo' : '1 Logo'}
               </span>
             )}
           </button>
 
-          {/* MENU / CONTROLE DE LOGOTIPO (Mudar de lugar, carregar, redimensionar) */}
-          <div className="relative shrink-0" onClick={e => e.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setIsLogoMenuOpen(prev => !prev)}
-              className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                (logoConfig.dataUrl && logoConfig.visible) || (logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false)
-                  ? 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-[var(--text-main)] font-bold'
-                  : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
-              }`}
-              title="Configurar logotipos (esquerdo e direito) no timbrado A4"
-            >
-              <ImageIcon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
-              <span>Logotipo</span>
-              {(logoConfig.dataUrl || logoConfig.secondaryDataUrl) && (
-                <span className="text-[10px] px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 rounded font-bold uppercase">
-                  {logoConfig.dataUrl && logoConfig.secondaryDataUrl ? 'Duplo' : '1 Logo'}
-                </span>
-              )}
-            </button>
-
-            {/* Dropdown de Gestão do Logotipo com Abas: Esquerdo e Direito */}
-            {isLogoMenuOpen && (
-              <div className="absolute right-0 top-11 w-84 sm:w-90 bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-2xl shadow-tactile-lg p-4 z-50 flex flex-col gap-3 animate-tab-fade">
-                <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
-                  <div className="flex items-center gap-1.5">
-                    <ImageIcon className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-                    <h4 className="text-xs font-bold">Timbrado / Logotipos</h4>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsLogoMenuOpen(false)}
-                    className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+          {/* Dropdown de Gestão do Logotipo com Abas: Esquerdo e Direito */}
+          {isLogoMenuOpen && (
+            <div className="absolute right-0 top-11 w-84 sm:w-90 bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-2xl shadow-tactile-lg p-4 z-50 flex flex-col gap-3 animate-tab-fade">
+              <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
+                <div className="flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                  <h4 className="text-xs font-bold">Timbrado / Logotipos</h4>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsLogoMenuOpen(false)}
+                  className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-                {/* Seletor de Abas: Esquerda vs Direita */}
-                <div className="flex items-center p-1 bg-[var(--bg-app)] rounded-xl border border-[var(--border-subtle)] gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setActiveLogoTab('left')}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                      activeLogoTab === 'left'
-                        ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                    }`}
-                  >
-                    <span>⇱ Logo Esquerdo</span>
-                    {logoConfig.dataUrl && logoConfig.visible && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo esquerdo ativo" />
-                    )}
-                  </button>
+              {/* Seletor de Abas: Esquerda vs Direita */}
+              <div className="flex items-center p-1 bg-[var(--bg-app)] rounded-xl border border-[var(--border-subtle)] gap-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveLogoTab('left')}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                    activeLogoTab === 'left'
+                      ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  }`}
+                >
+                  <span>⇱ Logo Esquerdo</span>
+                  {logoConfig.dataUrl && logoConfig.visible && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo esquerdo ativo" />
+                  )}
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setActiveLogoTab('right')}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                      activeLogoTab === 'right'
-                        ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                    }`}
-                  >
-                    <span>Logo Direito ⇲</span>
-                    {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo direito ativo" />
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveLogoTab('right')}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                    activeLogoTab === 'right'
+                      ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  }`}
+                >
+                  <span>Logo Direito ⇲</span>
+                  {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo direito ativo" />
+                  )}
+                </button>
+              </div>
 
-                {/* CONTEÚDO DA ABA ESQUERDA */}
-                {activeLogoTab === 'left' && (
-                  <div className="space-y-3">
-                    {/* Posição do Logo Esquerdo */}
-                    <div>
-                      <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
-                        Posição do Logo Esquerdo:
-                      </label>
-                      <div className="grid grid-cols-3 gap-1 text-xs">
-                        <button
-                          type="button"
-                          onClick={() => handleChangeLogoPosition('header-left')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                            logoConfig.position === 'header-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                          }`}
-                        >
-                          <span className="text-xs">🏢</span>
-                          <span className="text-[10px]">Header Esq.</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleChangeLogoPosition('top-left')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                            logoConfig.position === 'top-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                          }`}
-                        >
-                          <span className="text-xs">⇱</span>
-                          <span className="text-[10px]">Topo Esq.</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleChangeLogoPosition('top-center')}
-                          className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                            logoConfig.position === 'top-center' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                          }`}
-                        >
-                          <span className="text-xs">⬌</span>
-                          <span className="text-[10px]">Topo Centro</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Tamanho do Logo Esquerdo */}
-                    <div>
-                      <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
-                        Tamanho do Logo Esquerdo:
-                      </label>
-                      <div className="grid grid-cols-4 gap-1 text-xs">
-                        {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
-                          <button
-                            key={sz}
-                            type="button"
-                            onClick={() => handleChangeLogoSize(sz)}
-                            className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                              logoConfig.size === sz 
-                                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
-                                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                            }`}
-                          >
-                            {sz.toUpperCase()}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Ações: Upload, SVG, Presets */}
-                    <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handleLogoUpload}
-                          accept="image/*"
-                          className="hidden"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={logoUploading}
-                          className="flex-1 py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
-                        >
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>{logoUploading ? 'Carregando...' : 'Upload Logo Esq.'}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsLogoMenuOpen(false);
-                            setIsLogoGeneratorOpen(true);
-                          }}
-                          className="py-1.5 px-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
-                          title="Criar brasão vetorial SVG"
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>Criar SVG</span>
-                        </button>
-                      </div>
-
-                      {/* Presets Rápidos */}
-                      <div>
-                        <span className="text-[10px] text-[var(--text-muted)] block mb-1">Brasões Rápidos:</span>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SEMUSA
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SESAU
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SUS
-                          </button>
-                        </div>
-                      </div>
-
-                      {logoConfig.dataUrl && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveLogo}
-                          className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Remover Logo Esquerdo</span>
-                        </button>
-                      )}
+              {/* CONTEÚDO DA ABA ESQUERDA */}
+              {activeLogoTab === 'left' && (
+                <div className="space-y-3">
+                  {/* Posição do Logo Esquerdo */}
+                  <div>
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                      Posição do Logo Esquerdo:
+                    </label>
+                    <div className="grid grid-cols-3 gap-1 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => handleChangeLogoPosition('header-left')}
+                        className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                          logoConfig.position === 'header-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                        }`}
+                      >
+                        <span className="text-xs">🏢</span>
+                        <span className="text-[10px]">Header Esq.</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeLogoPosition('top-left')}
+                        className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                          logoConfig.position === 'top-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                        }`}
+                      >
+                        <span className="text-xs">⇱</span>
+                        <span className="text-[10px]">Topo Esq.</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeLogoPosition('top-center')}
+                        className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                          logoConfig.position === 'top-center' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                        }`}
+                      >
+                        <span className="text-xs">⬌</span>
+                        <span className="text-[10px]">Topo Centro</span>
+                      </button>
                     </div>
                   </div>
-                )}
 
-                {/* CONTEÚDO DA ABA DIREITA */}
-                {activeLogoTab === 'right' && (
-                  <div className="space-y-3">
-                    <p className="text-[11px] text-[var(--text-muted)] leading-tight">
-                      O logotipo secundário é exibido no canto superior direito do timbrado A4 (ao lado da data e selo do documento).
-                    </p>
-
-                    {/* Tamanho do Logo Direito */}
-                    <div>
-                      <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
-                        Tamanho do Logo Direito:
-                      </label>
-                      <div className="grid grid-cols-4 gap-1 text-xs">
-                        {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
-                          <button
-                            key={sz}
-                            type="button"
-                            onClick={() => handleChangeSecondaryLogoSize(sz)}
-                            className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-                              (logoConfig.secondarySize || 'md') === sz 
-                                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
-                                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
-                            }`}
-                          >
-                            {sz.toUpperCase()}
-                          </button>
-                        ))}
-                      </div>
+                  {/* Tamanho do Logo Esquerdo */}
+                  <div>
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                      Tamanho do Logo Esquerdo:
+                    </label>
+                    <div className="grid grid-cols-4 gap-1 text-xs">
+                      {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => handleChangeLogoSize(sz)}
+                          className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                            logoConfig.size === sz 
+                              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
+                              : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                          }`}
+                        >
+                          {sz.toUpperCase()}
+                        </button>
+                      ))}
                     </div>
+                  </div>
 
-                    {/* Ações: Upload, Presets */}
-                    <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
+                  {/* Ações: Upload, SVG, Presets */}
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
                       <input
                         type="file"
-                        ref={secondaryFileInputRef}
-                        onChange={handleSecondaryLogoUpload}
+                        ref={fileInputRef}
+                        onChange={handleLogoUpload}
                         accept="image/*"
                         className="hidden"
                       />
                       <button
                         type="button"
-                        onClick={() => secondaryFileInputRef.current?.click()}
-                        disabled={secondaryLogoUploading}
-                        className="w-full py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={logoUploading}
+                        className="flex-1 py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
                       >
                         <Upload className="w-3.5 h-3.5" />
-                        <span>{secondaryLogoUploading ? 'Carregando...' : 'Upload Logo Direito (SUS / Clínica)'}</span>
+                        <span>{logoUploading ? 'Carregando...' : 'Upload Logo Esq.'}</span>
                       </button>
 
-                      {/* Presets Rápidos para o lado direito */}
-                      <div>
-                        <span className="text-[10px] text-[var(--text-muted)] block mb-1">Logos Rápidos para a Direita:</span>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer font-bold text-blue-600 dark:text-blue-400"
-                          >
-                            SUS
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SESAU
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
-                            className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
-                          >
-                            SEMUSA
-                          </button>
-                        </div>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsLogoMenuOpen(false);
+                          setIsLogoGeneratorOpen(true);
+                        }}
+                        className="py-1.5 px-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                        title="Criar brasão vetorial SVG"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Criar SVG</span>
+                      </button>
+                    </div>
 
-                      {logoConfig.secondaryDataUrl && (
+                    {/* Presets Rápidos */}
+                    <div>
+                      <span className="text-[10px] text-[var(--text-muted)] block mb-1">Brasões Rápidos:</span>
+                      <div className="flex items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={handleRemoveSecondaryLogo}
-                          className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Remover Logo Direito</span>
+                          SEMUSA
                         </button>
-                      )}
+                        <button
+                          type="button"
+                          onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                        >
+                          SESAU
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                        >
+                          SUS
+                        </button>
+                      </div>
+                    </div>
+
+                    {logoConfig.dataUrl && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveLogo}
+                        className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remover Logo Esquerdo</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* CONTEÚDO DA ABA DIREITA */}
+              {activeLogoTab === 'right' && (
+                <div className="space-y-3">
+                  <p className="text-[11px] text-[var(--text-muted)] leading-tight">
+                    O logotipo secundário é exibido no canto superior direito do timbrado A4 (ao lado da data e selo do documento).
+                  </p>
+
+                  {/* Tamanho do Logo Direito */}
+                  <div>
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                      Tamanho do Logo Direito:
+                    </label>
+                    <div className="grid grid-cols-4 gap-1 text-xs">
+                      {(['sm', 'md', 'lg', 'xl'] as const).map(sz => (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => handleChangeSecondaryLogoSize(sz)}
+                          className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                            (logoConfig.secondarySize || 'md') === sz 
+                              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
+                              : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                          }`}
+                        >
+                          {sz.toUpperCase()}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
 
-          {/* Seletor de Marca d'Água Oficial */}
-          <WatermarkSelector 
-            currentType={docWatermark} 
-            onChange={handleWatermarkChange} 
-          />
+                  {/* Ações: Upload, Presets */}
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
+                    <input
+                      type="file"
+                      ref={secondaryFileInputRef}
+                      onChange={handleSecondaryLogoUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => secondaryFileInputRef.current?.click()}
+                      disabled={secondaryLogoUploading}
+                      className="w-full py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{secondaryLogoUploading ? 'Carregando...' : 'Upload Logo Direito (SUS / Clínica)'}</span>
+                    </button>
 
-          {/* Botão de Impressão Direta A4 */}
+                    {/* Presets Rápidos para o lado direito */}
+                    <div>
+                      <span className="text-[10px] text-[var(--text-muted)] block mb-1">Logos Rápidos para a Direita:</span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer font-bold text-blue-600 dark:text-blue-400"
+                        >
+                          SUS
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                        >
+                          SESAU
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
+                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                        >
+                          SEMUSA
+                        </button>
+                      </div>
+                    </div>
+
+                    {logoConfig.secondaryDataUrl && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveSecondaryLogo}
+                        className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remover Logo Direito</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Seletor de Marca d'Água Oficial */}
+        <WatermarkSelector 
+          currentType={docWatermark} 
+          onChange={handleWatermarkChange} 
+        />
+      </div>
+
+      {/* FORMATAÇÃO DO TEXTO: única barra fixa (sticky), numa linha só, logo acima da folha */}
+      <div className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 backdrop-blur-md rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex items-center gap-1.5 overflow-x-auto scrollbar-none touch-pan-x flex-nowrap lg:flex-wrap lg:overflow-visible">
+        {/* Estilo do Parágrafo / Título */}
+        <select
+          value={
+            editor?.isActive('heading', { level: 1 }) ? 'h1' :
+            editor?.isActive('heading', { level: 2 }) ? 'h2' :
+            editor?.isActive('heading', { level: 3 }) ? 'h3' : 'p'
+          }
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === 'p') editor?.chain().focus().setParagraph().run();
+            else if (val === 'h1') editor?.chain().focus().toggleHeading({ level: 1 }).run();
+            else if (val === 'h2') editor?.chain().focus().toggleHeading({ level: 2 }).run();
+            else if (val === 'h3') editor?.chain().focus().toggleHeading({ level: 3 }).run();
+          }}
+          className="bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          title="Estilo de texto (Parágrafo ou Título)"
+          aria-label="Estilo de texto"
+        >
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="p">Texto Normal</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h1">Título 1 (Grande)</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h2">Título 2 (Médio)</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h3">Título 3 (Pequeno)</option>
+        </select>
+
+        {/* Ajuste Fino do Tamanho da Fonte (Docs Style: [-] 11 pt [+]) */}
+        <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] px-1 py-0.5 text-xs">
           <button
             type="button"
-            onClick={handlePrint}
-            className={`btn-tactile-primary h-9 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer ${
-              !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
-            }`}
-            title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
+            onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
+            className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
+            title="Diminuir tamanho da fonte da folha (A-)"
+            aria-label="Diminuir fonte"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span>Imprimir A4</span>
-            {!medicoConfigurado(doctor) && (
-              <span className="text-[10px] px-1.5 py-0.2 bg-amber-400 text-slate-950 rounded font-bold">
-                Configurar
-              </span>
-            )}
+            −
+          </button>
+          <select
+            value={baseFontSize}
+            onChange={(e) => setBaseFontSize(Number(e.target.value))}
+            className="bg-transparent text-[var(--text-main)] px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer"
+            title="Tamanho da fonte em pontos (pt)"
+            aria-label="Tamanho da fonte em pontos (pt)"
+          >
+            {[8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28].map(sz => (
+              <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={sz} value={sz}>{sz} pt</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => setBaseFontSize(prev => Math.min(32, prev + 1))}
+            className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
+            title="Aumentar tamanho da fonte da folha (A+)"
+            aria-label="Aumentar fonte"
+          >
+            +
           </button>
         </div>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Formatação básica: Negrito, Itálico, Sublinhado */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleBold().run()}
+          disabled={!editor}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive('bold') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Negrito (Ctrl+B)"
+          aria-label="Negrito"
+        >
+          <Bold className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleItalic().run()}
+          disabled={!editor}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive('italic') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Itálico (Ctrl+I)"
+          aria-label="Itálico"
+        >
+          <Italic className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => (editor as any)?.chain().focus().toggleUnderline().run()}
+          disabled={!editor}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            (editor as any)?.isActive('underline') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Sublinhado (Ctrl+U)"
+          aria-label="Sublinhado"
+        >
+          <UnderlineIcon className="w-4 h-4" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Alinhamento de Texto */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive({ textAlign: 'left' }) 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Alinhar à Esquerda"
+          aria-label="Alinhar à Esquerda"
+        >
+          <AlignLeft className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive({ textAlign: 'center' }) 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Centralizar"
+          aria-label="Centralizar"
+        >
+          <AlignCenter className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().setTextAlign('right').run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive({ textAlign: 'right' }) 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Alinhar à Direita"
+          aria-label="Alinhar à Direita"
+        >
+          <AlignRight className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive({ textAlign: 'justify' }) 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Justificar"
+          aria-label="Justificar"
+        >
+          <AlignJustify className="w-4 h-4" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Listas */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleBulletList().run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive('bulletList') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Lista com Marcadores"
+          aria-label="Lista com Marcadores"
+        >
+          <List className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+            editor?.isActive('orderedList') 
+              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
+          }`}
+          title="Lista Numerada"
+          aria-label="Lista Numerada"
+        >
+          <ListOrdered className="w-4 h-4" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Desfazer / Refazer */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().undo().run()}
+          disabled={!editor?.can().undo()}
+          className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
+          title="Desfazer (Ctrl+Z)"
+          aria-label="Desfazer"
+        >
+          <Undo className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().redo().run()}
+          disabled={!editor?.can().redo()}
+          className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
+          title="Refazer (Ctrl+Y)"
+          aria-label="Refazer"
+        >
+          <Redo className="w-4 h-4" />
+        </button>
       </div>
 
       {/* SELETOR RÁPIDO ENTRE RECEITAS QUANDO HOUVER ITENS SIMPLES E ESPECIAIS NA MESMA CONSULTA */}
@@ -2977,7 +2958,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
                     <span className="flex items-center gap-1 text-slate-600 font-semibold">
                       <Pencil className="w-3 h-3 text-sky-600" />
-                      <span>Cabeçalho Editável em Tempo Real (clique em qualquer texto para editar)</span>
+                      <span>Clique em qualquer texto do cabeçalho para editar</span>
                     </span>
                     <div className="flex items-center gap-2">
                       <button
@@ -3122,8 +3103,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         value={headerConfig.badgeText || ''}
                         onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
                         placeholder="TIPO DE DOCUMENTO"
-                        style={{ fontFamily: 'inherit' }}
-                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 text-right hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition w-full max-w-[200px]"
+                        // Largura acompanha o texto: com a largura padrão do campo o selo saía cortado ("RECEITUÁRIO MÉDIC") na tela, na impressão e no PDF
+                        style={{ fontFamily: 'inherit', width: `${Math.max(12, (headerConfig.badgeText || 'TIPO DE DOCUMENTO').length) * 0.8 + 2.5}em` }}
+                        className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 text-center hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition max-w-[220px]"
                         title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
                       />
 
