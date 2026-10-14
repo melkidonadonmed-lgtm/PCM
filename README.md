@@ -29,19 +29,23 @@ O PresCMed é uma **SPA 100% client-side**, pensada para pronto-socorro, UBS e a
 
 ## 2. Funcionalidades
 
-* **Receita médica**
-  * Busca de medicamentos por nome e classe SUS/RENAME, kits de plantão (6) e protocolos por patologia (8) com "Usar na receita".
-  * Três regimes, cada um na sua folha: **simples**; **antimicrobiano** (RDC Anvisa nº 471/2021, 2 vias, válida por 10 dias); **controle especial** (Portaria SVS/MS nº 344/98, 2 vias, com quadros de comprador e fornecedor).
-  * Aviso de tela quando o controlado exige **Notificação de Receita** em talonário próprio (listas A1, A3, B1, B2 e C2). O app não emite o talonário.
-* **Calculadora pediátrica por peso**
-  * Converte mg/kg em mL ou gotas, com regras usadas no Brasil (ex.: paracetamol gotas a 1 gota/kg/dose).
+* **Receita médica (A4 paisagem — padrão PEC do SUS)**
+  * Combobox único de busca (`Ctrl+K`) por nome e classe SUS/RENAME com proteção contra sobrescrita acidental no `Enter`, modo rápido de posologia (cálculo automático do total de comprimidos a dispensar), kits de plantão (6) e protocolos por patologia (8) com "Usar na receita".
+  * Três regimes em folha A4 horizontal (`1123×794 px`), cada um no seu documento:
+    * **Simples:** 1 via na metade esquerda da folha, linha de corte central (`✂`) e metade direita livre.
+    * **Antimicrobiano (RDC Anvisa nº 471/2021):** 2 vias lado a lado no mesmo modelo limpo, válida por 10 dias (retenção da 2ª via na farmácia), incluindo sexo do paciente quando informado.
+    * **Controle especial (Portaria SVS/MS nº 344/98):** 2 vias lado a lado (retenção da 1ª via na farmácia), com endereço do paciente e quadros de comprador e fornecedor.
+  * Aviso de tela (`.no-print`) e ressalva automática no WhatsApp/área de transferência quando o controlado exige **Notificação de Receita** em talonário próprio (listas A1, A3, B1, B2 e C2). O app não emite o talonário.
+* **Calculadora pediátrica por peso (aba dedicada e gaveta lateral)**
+  * Converte mg/kg em mL ou gotas, com regras usadas no Brasil (ex.: paracetamol gotas a 1 gota/kg/dose) e inserção em 1 toque direto na receita.
   * "Sem peso, sem dose": sem peso cadastrado, nenhuma dose é calculada. O peso aceito vai de 0,5 kg a 120 kg.
 * **Central de Documentos**
   * **Atestado médico:** o CID-10 só entra com consentimento explícito do paciente (Resoluções CFM nº 1.658/2002 e 1.819/2007).
   * **Encaminhamento:** especialidade de destino, justificativa e hipótese diagnóstica.
   * **Pedido de exames:** catálogo de exames laboratoriais e de imagem, com 14 rotinas prontas (pré-natal por trimestre, saúde da mulher, do homem e do idoso, HAS, diabetes, IST, pré-operatório, entre outras).
-  * **Documentos SUS (9):** a APAC (laudo principal) e a LME saem sobre o **impresso oficial**, com cada dado no campo numerado. Os demais (APAC complementar, guia SISREG, GAL/LACEN, SISCAN, TRM-TB) saem no modelo do app, com o logo do órgão e o do SUS.
-* **Editor A4:** editor de texto (Tiptap) para laudos e documentos livres, com timbre e marca d'água.
+  * **Documentos SUS (9):** a APAC (laudo principal de 55 campos) e a LME (23 campos) saem sobre o **impresso oficial**, com cada dado no campo numerado (incluindo preenchimento automático de CNS, CPF e CNES do médico quando cadastrados). Os demais (APAC complementar, guia SISREG, GAL/LACEN, SISCAN, TRM-TB) saem no modelo do app, com o logo do órgão e o do SUS, sem códigos SIGTAP ou CID-10 presumidos por padrão.
+* **Editor A4:** editor de texto (Tiptap) para laudos e documentos livres, com alternância entre os 3 regimes de receita, timbre institucional duplo (órgão + SUS) e conversão de volta para itens estruturados da receita.
+* **Ergonomia e navegação rápida:** barra segmentada no cabeçalho desktop com atalhos globais `Alt+1` a `Alt+5` (Receitas, Documentos, Doses, Protocolos e Editor), `Sidebar` recolhível (`68px`) com tooltips flutuantes e abas com navegação por setas (`roving tabindex`).
 * **Backup portátil:** exportação e restauração em arquivo `.pcm.json`.
 
 ### Como os documentos são emitidos
@@ -143,15 +147,16 @@ npm run design:lint  # Conformidade com o DESIGN.md
 npm run build        # Build de produção em dist/
 ```
 
-A suíte cobre as regras críticas do domínio médico:
+A suíte cobre as regras críticas do domínio médico e da interface:
 
 * Cálculo de dose pediátrica, formatação numérica e horários de tomada.
-* Kits de plantão, com snapshots.
-* Regime da receita (simples, antimicrobiano, controle especial), as 2 vias da Portaria 344/98 e o aviso de Notificação de Receita.
+* Kits de plantão, com snapshots, e posologia estruturada (total de comprimidos a dispensar).
+* Regime da receita em A4 paisagem (simples, antimicrobiano, controle especial), as 2 vias da Portaria 344/98 e o aviso de Notificação de Receita (tela e texto exportado).
 * Consentimento do paciente para o CID-10 no atestado.
-* Folha única dos documentos: cabeçalho, ausência de selos de validação, nenhum texto clínico inventado.
+* Folha única dos documentos: cabeçalho institucional, ausência de selos de validação, nenhum texto clínico inventado e retorno do HTML do Editor A4 para itens tipados.
 * Documentos SUS: nenhum dado presumido; APAC e LME com cada dado no campo certo do impresso oficial.
 * Catálogo de exames: todo exame de um painel existe no catálogo.
+* Navegação, acessibilidade e fluxo de consulta: atalhos globais (`Alt+1..5`), `roving tabindex` por setas, combobox único sem sobrescrita acidental, gaveta pediátrica e higienização de sessão ao trocar de paciente.
 
 Qualquer alteração em cálculo de dose, kits, catálogos de medicamentos ou conformidade sanitária exige rodar `npm run test`, `npm run lint` e `npm run design:lint`, além de revisão clínica.
 
