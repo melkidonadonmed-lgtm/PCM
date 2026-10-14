@@ -1,6 +1,6 @@
 import React from 'react';
-import { ChevronDown, ShieldCheck } from 'lucide-react';
 import { WorkContext } from '../types';
+import { Icon } from './Icon';
 
 interface ContextSwitcherProps {
   contexts: WorkContext[];
@@ -21,7 +21,7 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
     <div className={`px-2.5 py-2 border-b border-white/10 ${collapsed ? 'text-center' : ''}`}>
       {!collapsed && (
         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1 mb-1.5">
-          <ShieldCheck size={12} className="text-emerald-400 shrink-0" />
+          <Icon name="verified_user" className="text-[13px] text-emerald-400 shrink-0" />
           <span className="truncate">Local de Atuação (SUS)</span>
         </span>
       )}
@@ -41,9 +41,9 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
           ))}
         </select>
         {!collapsed && (
-          <ChevronDown
-            size={14}
-            className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"
+          <Icon
+            name="expand_more"
+            className="text-[15px] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"
           />
         )}
       </div>

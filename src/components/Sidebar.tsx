@@ -1,33 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FileEdit, 
-  FileText, 
-  Calculator, 
-  FlaskConical, 
-  Award, 
-  Share2, 
-  Download, 
-  Users, 
-  Stethoscope, 
-  HeartPulse, 
-  ChevronLeft, 
-  ChevronRight, 
-  X, 
-  Trash2, 
-  UserX, 
-  RotateCcw, 
-  Pencil, 
-  Sun, 
-  Moon, 
-  UserPlus, 
-  UserCheck,
-  Database
-} from 'lucide-react';
 import { ActiveTab, DoctorProfile, Patient, WorkContext } from '../types';
 import { CLINICAL_KITS, ClinicalKit } from '../data/clinicalKits';
 import { ConfirmationModal } from './ConfirmationModal';
 import { ContextSwitcher } from './ContextSwitcher';
-import { Icon } from './Icon';
+import { Icon, IconName } from './Icon';
 
 interface SidebarProps {
   darkMode: boolean;
@@ -55,9 +31,17 @@ interface SidebarProps {
   onAplicarKit?: (kit: ClinicalKit) => void;
 }
 
+interface SidebarNavItem {
+  id: ActiveTab;
+  label: string;
+  fullLabel?: string;
+  shortLabel: string;
+  iconName: IconName;
+  badge?: string;
+}
+
 export const Sidebar: React.FC<SidebarProps> = ({
   darkMode,
-  onToggleDarkMode,
   activeTab,
   onSelectTab,
   isOpen,
@@ -71,7 +55,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeContext = null,
   onSwitchContext,
   onOpenDoctorModal,
-  onOpenPatientModal,
   onOpenBackupModal,
   isInstallable = false,
   onInstallApp,
@@ -81,8 +64,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onAplicarKit
 }) => {
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
-  const hasPatient = Boolean(patient?.name?.trim());
-  const patientName = patient?.name?.trim() || '';
   const hasDoctor = Boolean(doctor?.name?.trim());
 
   // Estado de recolhimento dos Kits de Plantão (salvo no localStorage, padrão recolhido)
@@ -194,51 +175,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   // Grupo 1: Atendimento Clínico Principal (4 Hubs Canônicos)
-  const coreHubNavItems = [
+  const coreHubNavItems: SidebarNavItem[] = [
     {
-      id: 'prescription' as ActiveTab,
+      id: 'prescription',
       label: 'Receitas Médicas',
       shortLabel: 'Receitas',
-      icon: FileEdit,
+      iconName: 'receita',
       badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
     },
     {
-      id: 'documents' as ActiveTab,
+      id: 'documents',
       label: 'Central de Documentos',
-      fullLabel: 'Central de Documentos (Atestados, Encaminhamentos e Exames)',
+      fullLabel: 'Central de Documentos (Atestados, Encaminhamentos, Exames e SUS)',
       shortLabel: 'Documentos',
-      icon: Award,
+      iconName: 'documentos',
       badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
     },
     {
-      id: 'editor' as ActiveTab,
+      id: 'editor',
       label: 'Editor A4 & Timbrados',
       fullLabel: 'Editor de Prescrições e Laudos A4',
       shortLabel: 'Editor',
-      icon: FileText
+      iconName: 'editor'
     },
     {
-      id: 'print_preview' as ActiveTab,
+      id: 'print_preview',
       label: 'Exportar & Imprimir PDF',
       shortLabel: 'Exportar',
-      icon: Download
+      iconName: 'imprimir'
     }
   ];
 
   // Grupo 2: Ferramentas Clínicas & Apoio Diagnóstico
-  const clinicalToolsNavItems = [
+  const clinicalToolsNavItems: SidebarNavItem[] = [
     {
-      id: 'pediatric_calc' as ActiveTab,
+      id: 'pediatric_calc',
       label: 'Calculadora Pediátrica',
       shortLabel: 'Doses',
-      icon: Calculator,
+      iconName: 'balanca',
       badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
     },
     {
-      id: 'protocols' as ActiveTab,
+      id: 'protocols',
       label: 'Protocolos Clínicos',
       shortLabel: 'Protocolos',
-      icon: HeartPulse
+      iconName: 'coracao'
     }
   ];
 
@@ -254,11 +235,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (!isDesktop) onClose?.();
   };
 
-  const handleOpenPatient = () => {
-    onOpenPatientModal?.();
-    if (!isDesktop) onClose?.();
-  };
-
   const handleOpenBackup = () => {
     onOpenBackupModal?.();
     if (!isDesktop) onClose?.();
@@ -269,8 +245,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (!isDesktop) onClose?.();
   };
 
-  const renderNavButton = (item: { id: ActiveTab; label: string; fullLabel?: string; shortLabel: string; icon: React.ElementType; badge?: string }) => {
-    const Icon = item.icon;
+  const renderNavButton = (item: SidebarNavItem) => {
     const isActive = item.id === 'documents'
       ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
       : activeTab === item.id;
@@ -291,17 +266,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
           title={item.fullLabel || item.label}
         >
           <Icon
-            className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
-              isActive ? 'text-sky-300' : 'text-slate-300 group-hover:text-slate-200'
+            name={item.iconName}
+            size={20}
+            className={`transition-transform group-hover:scale-105 ${
+              isActive ? 'text-sky-300' : 'text-slate-300 group-hover:text-white'
             }`}
-            strokeWidth={isActive ? 2.2 : 1.75}
           />
           {item.badge && (
             <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-blue-500 text-white text-[9px] font-black flex items-center justify-center shadow-sm border border-white/20">
               {item.badge}
             </span>
           )}
-          {/* Tooltip Tátil Flutuante */}
           <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
             {item.label}
           </span>
@@ -316,19 +291,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => handleNavClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
+        className={`w-full min-h-[40px] flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
           isActive
             ? 'bg-blue-600/30 text-white border border-blue-400/30 shadow-tactile-sm font-bold'
-            : 'text-slate-300 hover:bg-white/5 hover:text-white'
+            : 'text-slate-300 hover:bg-white/[0.06] hover:text-white border border-transparent'
         }`}
         title={item.label}
       >
         <div className="flex items-center gap-2.5 min-w-0">
           <Icon 
-            className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
-              isActive ? 'text-sky-300' : 'text-slate-300 group-hover:text-slate-200'
+            name={item.iconName}
+            size={18}
+            className={`transition-transform group-hover:scale-105 ${
+              isActive ? 'text-sky-300' : 'text-slate-300 group-hover:text-white'
             }`} 
-            strokeWidth={isActive ? 2.2 : 1.75} 
           />
           <span className="truncate">
             {item.label}
@@ -363,12 +339,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         aria-label="Menu Lateral de Navegação"
         aria-hidden={!isOpen && !isDesktop}
         inert={!isOpen && !isDesktop ? true : undefined}
-        className={`fixed top-0 left-0 h-dvh z-50 w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform transition-transform duration-300 ease-out ${
+        className={`panel-navy fixed top-0 left-0 h-dvh z-50 w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full pointer-events-none'
-        } lg:pointer-events-auto lg:sticky lg:top-16 lg:h-[calc(100dvh-4rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl lg:transition-[width] lg:duration-200 lg:ease-in-out ${
+        } lg:pointer-events-auto lg:sticky lg:top-20 lg:h-[calc(100dvh-6rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl lg:transition-[width] lg:duration-200 lg:ease-in-out ${
           isOpen
-            ? 'lg:w-64 sm:lg:w-72 shadow-tactile-navy border'
-            : 'lg:w-[68px] overflow-hidden border'
+            ? 'lg:w-64 shadow-tactile-navy border'
+            : 'lg:w-[68px] overflow-visible border'
         }`}
         style={{
           backgroundColor: darkMode ? '#0B1120' : '#0F172A',
@@ -380,25 +356,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
             : '0 10px 25px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255,255,255,0.1)'
         }}
       >
-        <div className={`overflow-y-auto overscroll-contain flex-1 custom-scrollbar ${
-          isOpen ? 'p-3 space-y-4 pb-14 sm:pb-8' : 'py-3 px-1.5 space-y-3 flex flex-col items-center'
+        {/* Scrollable Main Area (overflow-visible when collapsed so floating tooltips are never clipped) */}
+        <div className={`flex-1 ${
+          isOpen
+            ? 'overflow-y-auto overscroll-contain custom-scrollbar p-3 space-y-3.5'
+            : 'overflow-visible py-3 px-1.5 space-y-2.5 flex flex-col items-center'
         }`}>
           
           {/* Mobile Header with Close Button */}
-          <div className="flex items-center justify-between pb-3 pt-1 border-b border-white/10 lg:hidden">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-200">
-                Menu PresCMed
-              </span>
-            </div>
+          <div className="flex items-center justify-between pb-2.5 pt-0.5 border-b border-white/10 lg:hidden">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-200">
+              Navegação & Recursos
+            </span>
             <button
               type="button"
               onClick={onClose || onToggleOpen}
               aria-label="Fechar menu lateral"
-              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors"
+              className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-xl flex items-center justify-center text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors"
             >
-              <X className="w-5 h-5" />
+              <Icon name="close" size={18} />
             </button>
           </div>
 
@@ -424,7 +400,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2"
+              className="p-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] transition cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2"
               title="Clique para editar CRM e dados profissionais"
             >
               <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -433,33 +409,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
                 <div className="overflow-hidden min-w-0 flex-1">
                   <p className="text-xs font-bold truncate text-white">
-                    {hasDoctor ? doctor?.name : 'Configurar Médico'}
+                    {hasDoctor ? doctor?.name : 'Configurar médico'}
                   </p>
                   <p className="text-[10px] text-slate-300 font-medium truncate">
                     {hasDoctor 
-                      ? `CRM: ${doctor?.crm}/${doctor?.crmState || 'SP'} ${doctor?.rqe ? '• RQE ' + doctor.rqe : ''}` 
-                      : 'Toque para preencher'}
+                      ? `CRM ${doctor?.crm}/${doctor?.crmState || 'SP'}${doctor?.rqe ? ' • RQE ' + doctor.rqe : ''}` 
+                      : 'Toque para informar CRM'}
                   </p>
                 </div>
               </div>
-              <Pencil className="w-3.5 h-3.5 text-slate-300 group-hover:text-white transition-colors shrink-0" />
+              <Icon name="edit" size={15} className="text-slate-400 group-hover:text-white transition-colors shrink-0" />
             </div>
           ) : (
             <button
               type="button"
               onClick={handleOpenDoctor}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleOpenDoctor();
-                }
-              }}
               className="w-11 h-11 mx-auto rounded-xl bg-white/10 text-sky-200 border border-white/15 hover:bg-white/15 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
               title={hasDoctor ? `Dr(a). ${doctor?.name} (CRM: ${doctor?.crm}/${doctor?.crmState})` : 'Configurar CRM / Perfil Médico'}
               aria-label="Perfil do Médico"
             >
               <span>CRM</span>
-              {/* Tooltip Tátil Flutuante */}
               <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 {hasDoctor ? `Dr(a). ${doctor?.name}` : 'Configurar CRM'}
               </span>
@@ -467,13 +436,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
 
           {/* Navegação por Grupos */}
-          <div className={isOpen ? 'w-full space-y-4' : 'w-full flex flex-col items-center space-y-3'}>
-            {/* Grupo 1: Atendimento Clínico Principal (4 Hubs) */}
+          <div className={isOpen ? 'w-full space-y-3.5' : 'w-full flex flex-col items-center space-y-2.5'}>
+            {/* Grupo 1: Atendimento Clínico Principal */}
             <div>
               {isOpen && (
-                <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-300 px-2 mb-1.5 flex items-center justify-between">
-                  <span>Atendimento Clínico</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 mb-1">
+                  Atendimento
                 </p>
               )}
               <nav className={isOpen ? 'space-y-1' : 'space-y-1.5 w-full flex flex-col items-center'}>
@@ -481,12 +449,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </nav>
             </div>
 
-            {/* Grupo 2: Ferramentas & Apoio Clínico */}
+            {/* Grupo 2: Ferramentas de Apoio */}
             <div>
               {isOpen && (
-                <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-300 px-2 mb-1.5 flex items-center justify-between">
-                  <span>Ferramentas de Apoio</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 mb-1">
+                  Apoio clínico
                 </p>
               )}
               <nav className={isOpen ? 'space-y-1' : 'space-y-1.5 w-full flex flex-col items-center'}>
@@ -494,7 +461,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </nav>
             </div>
 
-            {/* Grupo: Kits de Plantão */}
+            {/* Grupo 3: Kits de Plantão */}
             {isOpen ? (
               <div>
                 <button
@@ -502,33 +469,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={handleToggleKits}
                   aria-expanded={showKits}
                   aria-controls="sidebar-kits-list"
-                  className="w-full text-[9px] font-extrabold uppercase tracking-widest text-slate-300 px-2 py-1.5 mb-1.5 flex items-center justify-between hover:text-white transition-colors cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400 rounded-lg"
+                  className="w-full text-[10px] font-bold uppercase tracking-wider text-slate-300 px-2 py-1.5 rounded-lg flex items-center justify-between hover:text-white hover:bg-white/[0.04] transition-colors cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                 >
                   <span className="flex items-center gap-1.5">
-                    <Icon name="medication" className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Kits de Plantão</span>
+                    <Icon name="medication" size={15} className="text-amber-400" />
+                    <span>Kits de plantão ({CLINICAL_KITS.length})</span>
                   </span>
                   <Icon
                     name={showKits ? 'expand_less' : 'expand_more'}
-                    className="w-4 h-4 text-slate-300 group-hover:text-white transition-transform"
+                    size={16}
+                    className="text-slate-400 group-hover:text-white transition-transform"
                   />
                 </button>
 
                 {showKits && (
                   <div
                     id="sidebar-kits-list"
-                    className="space-y-1 pl-1 pr-0.5"
+                    className="space-y-1 pt-1 pl-1 pr-0.5"
                   >
                     {CLINICAL_KITS.map(kit => (
                       <button
                         key={kit.id}
                         type="button"
                         onClick={() => handleAplicarKitWithClose(kit)}
-                        className="w-full text-left p-2 rounded-xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.08] hover:border-amber-400/30 transition cursor-pointer group active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                        className="w-full text-left px-2.5 py-2 rounded-xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.08] hover:border-amber-400/30 transition cursor-pointer group active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                         title={`Aplicar kit: ${kit.name} (${kit.badge})`}
                       >
                         <div className="flex items-center justify-between gap-1.5">
-                          <span className="text-xs font-semibold text-slate-200 group-hover:text-white truncate">
+                          <span className="text-xs font-medium text-slate-200 group-hover:text-white truncate">
                             {kit.name}
                           </span>
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-400/15 text-amber-300 border border-amber-400/25 shrink-0">
@@ -556,119 +524,120 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <Icon
                   name="medication"
-                  className="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 text-amber-400"
+                  size={20}
+                  className="transition-transform group-hover:scale-105 text-amber-400"
                 />
-                {/* Tooltip Tátil Flutuante */}
                 <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                   Kits de plantão
                 </span>
               </button>
             )}
           </div>
+        </div>
 
-          {/* Active Patient Badge */}
+        {/* Pinned Footer: Ações da Consulta, Backup e Recolher Menu */}
+        <div className={`shrink-0 border-t border-white/10 bg-black/15 rounded-b-2xl ${
+          isOpen ? 'p-3 space-y-2 pb-14 lg:pb-3' : 'py-2.5 px-1.5 space-y-2 flex flex-col items-center'
+        }`}>
           {isOpen ? (
-            <div
-              onClick={handleOpenPatient}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleOpenPatient();
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2"
-              title="Clique para editar paciente"
-            >
-              <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-xs shrink-0">
-                  <Users className="w-4 h-4" />
-                </div>
-                <div className="overflow-hidden min-w-0 flex-1">
-                  <p className="text-[9px] font-extrabold uppercase tracking-wider text-slate-300">
-                    Paciente em Atendimento
-                  </p>
-                  <p className="text-xs font-bold truncate text-white">
-                    {hasPatient ? patientName : 'Não identificado'}
-                  </p>
-                  <p className="text-[10px] font-semibold text-emerald-400">
-                    {patientWeight > 0 ? `${patientWeight} kg` : 'Sem peso'} {patient?.ageText ? `• ${patient.ageText}` : ''}
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-300 group-hover:translate-x-0.5 transition-transform shrink-0" />
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={handleOpenPatient}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleOpenPatient();
-                }
-              }}
-              className="w-11 h-11 mx-auto rounded-xl text-emerald-400 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none"
-              title={hasPatient ? `Paciente: ${patientName} (${patientWeight ? patientWeight + 'kg' : 'sem peso'})` : 'Definir / Identificar Paciente'}
-              aria-label="Dados do Paciente"
-            >
-              <Users className="w-5 h-5" />
-            </button>
-          )}
+            <>
+              {/* Novo Atendimento + Ações Rápidas de Limpeza */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handleTriggerResetAll}
+                  className="flex-1 min-h-[38px] flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-sky-200 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/20 transition cursor-pointer shadow-tactile-sm active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                  title="Iniciar uma nova consulta do zero"
+                >
+                  <Icon name="refresh" size={16} />
+                  <span>Novo Atendimento</span>
+                </button>
 
-          {/* Quick Actions (Limpeza / Novo Atendimento) */}
-          {isOpen && (
-            <div className="space-y-2 pt-2 border-t border-white/10">
-              <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-300 px-2">
-                Ações da Consulta
-              </p>
-              
-              {/* Novo Atendimento */}
-              <button
-                type="button"
-                onClick={handleTriggerResetAll}
-                className="w-full min-h-[40px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-sky-200 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/20 transition cursor-pointer shadow-tactile-sm active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
-                title="Iniciar uma nova consulta do zero"
-              >
-                <RotateCcw className="w-4 h-4 shrink-0" />
-                <span>Novo Atendimento</span>
-              </button>
-
-              <div className="grid grid-cols-2 gap-1.5">
-                {/* Zerar Receita */}
                 <button
                   type="button"
                   onClick={handleTriggerClearPrescription}
-                  className="py-2 px-2 rounded-xl border border-white/10 text-slate-300 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer flex items-center justify-center gap-1.5 text-[11px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                  className="w-9 h-[38px] rounded-xl border border-white/10 text-slate-300 hover:text-rose-300 hover:bg-rose-500/15 hover:border-rose-400/30 transition cursor-pointer flex items-center justify-center shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
                   title="Zerar medicamentos da receita atual"
+                  aria-label="Zerar Receita"
                 >
-                  <Trash2 className="w-3.5 h-3.5 text-rose-400/80" />
-                  <span className="truncate">Zerar Receita</span>
+                  <Icon name="delete" size={16} />
                 </button>
 
-                {/* Limpar Paciente */}
                 <button
                   type="button"
                   onClick={handleTriggerClearPatient}
-                  className="py-2 px-2 rounded-xl border border-white/10 text-slate-300 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer flex items-center justify-center gap-1.5 text-[11px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                  className="w-9 h-[38px] rounded-xl border border-white/10 text-slate-300 hover:text-rose-300 hover:bg-rose-500/15 hover:border-rose-400/30 transition cursor-pointer flex items-center justify-center shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
                   title="Limpar dados cadastrais do paciente"
+                  aria-label="Limpar Paciente"
                 >
-                  <UserX className="w-3.5 h-3.5 text-rose-400/80" />
-                  <span className="truncate">Limpar Paciente</span>
+                  <Icon name="person_remove" size={16} />
                 </button>
               </div>
 
-              {/* Backup & Portabilidade */}
+              {/* Backup + Recolher Menu */}
+              <div className="flex items-center gap-1.5">
+                {onOpenBackupModal && (
+                  <button
+                    type="button"
+                    onClick={handleOpenBackup}
+                    className="flex-1 min-h-[36px] py-1.5 px-2.5 rounded-xl border border-white/10 text-slate-300 hover:text-amber-200 hover:bg-amber-500/10 transition cursor-pointer flex items-center justify-center gap-1.5 text-[11px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                    title="Exportar ou restaurar arquivo de backup (.pcm.json)"
+                  >
+                    <Icon name="cloud_download" size={15} className="text-amber-400" />
+                    <span className="truncate">Backup (.pcm)</span>
+                  </button>
+                )}
+
+                {isInstallable && onInstallApp && (
+                  <button
+                    type="button"
+                    onClick={onInstallApp}
+                    className="min-h-[36px] py-1.5 px-2.5 rounded-xl border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/15 transition cursor-pointer flex items-center justify-center gap-1 text-[11px] font-bold outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                    title="Instalar PresCMed como aplicativo offline"
+                  >
+                    <Icon name="download" size={15} className="text-emerald-400" />
+                    <span>Instalar</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={onToggleOpen}
+                  className="hidden lg:flex w-9 h-[36px] rounded-xl border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none shrink-0"
+                  title="Recolher menu lateral"
+                  aria-label="Recolher Menu"
+                >
+                  <Icon name="chevron_left" size={18} />
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={handleTriggerResetAll}
+                className="w-11 h-11 mx-auto rounded-xl text-sky-300 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+                title="Novo Atendimento"
+                aria-label="Novo Atendimento"
+              >
+                <Icon name="refresh" size={20} />
+                <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+                  Novo Atendimento
+                </span>
+              </button>
+
               {onOpenBackupModal && (
                 <button
                   type="button"
                   onClick={handleOpenBackup}
-                  className="w-full py-2 px-3 rounded-xl border border-white/10 text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition cursor-pointer flex items-center justify-center gap-2 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-                  title="Exportar ou restaurar arquivo de backup (.pcm.json)"
+                  className="w-11 h-11 mx-auto rounded-xl text-amber-400 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400 outline-none relative group"
+                  title="Backup / Portabilidade (.pcm.json)"
+                  aria-label="Backup e Portabilidade"
                 >
-                  <Database className="w-4 h-4 text-amber-400" />
-                  <span>Backup / Portabilidade</span>
+                  <Icon name="cloud_download" size={20} />
+                  <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+                    Backup (.pcm.json)
+                  </span>
                 </button>
               )}
 
@@ -676,71 +645,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={onInstallApp}
-                  className="w-full py-2 px-3 rounded-xl border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/15 transition cursor-pointer flex items-center justify-center gap-2 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-                  title="Instalar PresCMed como aplicativo no computador ou celular"
+                  className="w-11 h-11 mx-auto rounded-xl text-emerald-400 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none relative group"
+                  title="Instalar PresCMed no dispositivo (100% Offline)"
+                  aria-label="Instalar App Offline"
                 >
-                  <Download className="w-4 h-4 text-emerald-400" />
-                  <span>Instalar App Offline</span>
+                  <Icon name="download" size={20} />
+                  <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+                    Instalar App Offline
+                  </span>
                 </button>
               )}
-            </div>
+
+              <button
+                type="button"
+                onClick={onToggleOpen}
+                className="hidden lg:flex w-11 h-10 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none"
+                title="Expandir Menu Lateral"
+                aria-label="Expandir Menu Lateral"
+              >
+                <Icon name="chevron_right" size={20} />
+              </button>
+            </>
           )}
-
-          {/* Backup Icon Button in Collapsed Mode */}
-          {!isOpen && onOpenBackupModal && (
-            <button
-              type="button"
-              onClick={handleOpenBackup}
-              className="w-11 h-11 mx-auto rounded-xl text-amber-400 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400 outline-none relative group"
-              title="Backup / Portabilidade (.pcm.json)"
-              aria-label="Backup e Portabilidade"
-            >
-              <Database className="w-5 h-5" />
-              {/* Tooltip Tátil Flutuante */}
-              <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
-                Backup (.pcm.json)
-              </span>
-            </button>
-          )}
-
-          {/* Install PWA Icon Button in Collapsed Mode */}
-          {!isOpen && isInstallable && onInstallApp && (
-            <button
-              type="button"
-              onClick={onInstallApp}
-              className="w-11 h-11 mx-auto rounded-xl text-emerald-400 hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none animate-pulse relative group"
-              title="Instalar PresCMed no dispositivo (100% Offline)"
-              aria-label="Instalar App Offline"
-            >
-              <Download className="w-5 h-5" />
-              {/* Tooltip Tátil Flutuante */}
-              <span className="absolute left-[58px] bg-slate-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
-                Instalar App Offline
-              </span>
-            </button>
-          )}
-
-          {/* Toggle Collapse on Desktop */}
-          <div className="hidden lg:block pt-2 border-t border-white/10 w-full">
-            <button
-              type="button"
-              onClick={onToggleOpen}
-              className={`min-h-[40px] py-1.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/10 flex items-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
-                isOpen ? 'w-full justify-center gap-1.5 px-3' : 'w-11 h-11 mx-auto justify-center'
-              }`}
-              title={isOpen ? 'Recolher Menu Lateral' : 'Expandir Menu Lateral'}
-            >
-              {isOpen ? (
-                <>
-                  <ChevronLeft className="w-4 h-4" />
-                  <span>Recolher Menu</span>
-                </>
-              ) : (
-                <ChevronRight className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-
         </div>
       </aside>
 
@@ -758,3 +684,4 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </>
   );
 };
+

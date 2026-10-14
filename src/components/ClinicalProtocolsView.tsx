@@ -1,18 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  HeartPulse, 
-  Droplet, 
-  Scale, 
-  Clock,
-  Stethoscope,
-  Pill,
-  Plus,
-  Check,
-  ArrowRight,
-  Info,
-  AlertTriangle,
-  Baby
-} from 'lucide-react';
 import { CLINICAL_PROTOCOLS, PEDIATRIC_MEDICATIONS } from '../data/pediatricMeds';
 import { PATHOLOGY_PROTOCOLS } from '../data/clinicalProtocols';
 import { Patient, PrescriptionItem, ProtocolMedication, PathologyProtocol } from '../types';
@@ -192,14 +178,14 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               border: '1px solid rgba(255, 255, 255, 0.12)'
             }}
           >
-            <Stethoscope className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
+            <Icon name="stethoscope" className="text-[20px] text-slate-100" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-              Decks de Protocolos por Patologia
+            <h2 className="text-base sm:text-lg font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+              Protocolos clínicos por patologia
             </h2>
             <p className="text-xs font-medium text-[var(--text-muted)]">
-              Tratamentos de 1ª linha acionáveis, com dose pediátrica calculada para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
+              Condutas de 1ª linha acionáveis • dose pediátrica calculada para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
             </p>
           </div>
         </div>
@@ -212,7 +198,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
             }}
           >
-            <Scale className="w-4 h-4 text-emerald-700 dark:text-emerald-400" strokeWidth={1.75} />
+            <Icon name="balanca" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
             <span className="text-xs font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
               Peso: <span className="text-emerald-700 dark:text-emerald-400 font-bold">{patientWeight > 0 ? `${patientWeight} kg` : '—'}</span>
             </span>
@@ -223,15 +209,15 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
             onClick={onNavigateToPrescription}
             className="tactile-btn-primary px-4 py-2 min-h-[44px] flex items-center justify-center gap-2 text-xs font-bold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
           >
-            <span>Ir para Receita</span>
-            <ArrowRight className="w-4 h-4" strokeWidth={1.75} />
+            <span>Ir para receita</span>
+            <Icon name="arrow_forward" className="text-[16px]" />
           </button>
         </div>
       </div>
 
       {/* Aviso YMYL */}
       <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-[11px] font-medium text-amber-800 dark:text-amber-300 flex items-start gap-2">
-        <Info className="w-4 h-4 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
+        <Icon name="info" className="text-[16px] flex-shrink-0 mt-0.5" />
         <span>
           Os protocolos abaixo são <span className="font-bold">referências de apoio</span> baseadas em protocolos do Ministério da Saúde e diretrizes das sociedades de especialidade. A avaliação do paciente, a adaptação de doses e a <span className="font-bold">conduta final são de responsabilidade exclusiva do médico assistente</span>.
         </span>
@@ -268,7 +254,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
           return (
             <div
               key={protocol.id}
-              className="tactile-card-interactive p-4 sm:p-5 rounded-2xl flex flex-col justify-between space-y-3.5"
+              className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between space-y-3.5"
               style={{
                 backgroundColor: 'var(--surface-card)',
                 borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
@@ -286,12 +272,12 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   </span>
                   {protocol.pediatricRelevant && (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/50 flex items-center gap-1">
-                      <Baby className="w-3 h-3" strokeWidth={1.75} /> Pediátrico
+                      <Icon name="child_care" className="text-[12px]" /> Pediátrico
                     </span>
                   )}
                 </div>
 
-                <h3 className="text-sm sm:text-base font-bold tracking-tight" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                <h3 className="text-sm sm:text-base font-semibold tracking-tight" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                   {protocol.name}
                 </h3>
                 <p className="text-xs font-medium mt-1 leading-relaxed text-[var(--text-muted)]">
@@ -316,7 +302,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   return (
                     <div key={`${protocol.id}-med-${idx}`} className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-colors">
                       <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                        <Pill className="w-4 h-4 text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
+                        <Icon name="medication" className="text-[16px] text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="text-xs font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
@@ -349,18 +335,18 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                         className={`px-3 py-2 min-h-[38px] rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                           isMedAdded 
                             ? 'bg-emerald-600 text-white shadow-sm' 
-                            : 'tactile-btn-secondary hover:border-sky-500'
+                            : 'btn-tactile-secondary hover:border-sky-500'
                         }`}
                         title={`Adicionar apenas ${med.name} à receita`}
                       >
                         {isMedAdded ? (
                           <>
-                            <Check className="w-3.5 h-3.5 text-white" strokeWidth={2} />
+                            <Icon name="check" className="text-[14px] text-white" />
                             <span>Adicionado!</span>
                           </>
                         ) : (
                           <>
-                            <Plus className="w-3.5 h-3.5 text-sky-500" strokeWidth={2} />
+                            <Icon name="add" className="text-[14px] text-sky-500" />
                             <span>Adicionar</span>
                           </>
                         )}
@@ -373,7 +359,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               {/* Clinical Warning */}
               {protocol.clinicalWarning && (
                 <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-[11px] font-medium text-amber-800 dark:text-amber-300 flex items-start gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
+                  <Icon name="warning" className="text-[14px] flex-shrink-0 mt-0.5" />
                   <span>{protocol.clinicalWarning}</span>
                 </div>
               )}
@@ -394,12 +380,12 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   >
                     {isAdded ? (
                       <>
-                        <Check className="w-4 h-4" strokeWidth={1.75} />
+                        <Icon name="check" className="text-[16px]" />
                         <span>Adicionado</span>
                       </>
                     ) : (
                       <>
-                        <Plus className="w-4 h-4" strokeWidth={1.75} />
+                        <Icon name="add" className="text-[16px]" />
                         <span>Adicionar à prescrição</span>
                       </>
                     )}
@@ -408,10 +394,10 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                     <button
                       type="button"
                       onClick={onNavigateToPrescription}
-                      className="tactile-btn-secondary px-3 py-2 min-h-[44px] rounded-xl font-bold text-xs cursor-pointer flex items-center gap-1.5 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+                      className="btn-tactile-secondary px-3 py-2 min-h-[44px] rounded-xl font-bold text-xs cursor-pointer flex items-center gap-1.5 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
                     >
                       <span>Ver receita</span>
-                      <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.75} />
+                      <Icon name="arrow_forward" className="text-[14px]" />
                     </button>
                   )}
                 </div>
@@ -431,15 +417,12 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               border: '1px solid rgba(255, 255, 255, 0.12)'
             }}
           >
-            <Icon name="medication" className="w-4 h-4 text-slate-100" />
+            <Icon name="medication" className="text-[18px] text-slate-100" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <h3 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
               Medicamentos por classe (SUS/RENAME)
             </h3>
-            <p className="text-xs font-medium text-[var(--text-muted)] dark:text-slate-300">
-              Catálogo de fármacos de referência da Atenção Primária e Ambulatorial.
-            </p>
           </div>
         </div>
 
@@ -481,7 +464,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
             >
               <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                <Pill className="w-4 h-4 text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
+                <Icon name="medication" className="text-[16px] text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
@@ -507,11 +490,11 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               <button
                 type="button"
                 onClick={() => onUsarMedicamento?.(med)}
-                className="tactile-btn-primary px-3.5 py-2 min-h-[40px] rounded-xl font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="btn-tactile-secondary px-3.5 py-2 min-h-[40px] rounded-xl font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                 title={`Usar ${med.name} na receita`}
               >
                 <span>Usar na receita</span>
-                <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.75} />
+                <Icon name="arrow_forward" className="text-[14px]" />
               </button>
             </div>
           ))}
@@ -528,14 +511,14 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               border: '1px solid rgba(255, 255, 255, 0.12)'
             }}
           >
-            <HeartPulse className="w-4 h-4 text-slate-100" strokeWidth={1.75} />
+            <Icon name="emergency" className="text-[18px] text-slate-100" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
-              Urgência & Expansão Volêmica
+            <h3 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+              Urgência e expansão volêmica
             </h3>
             <p className="text-xs font-medium text-[var(--text-muted)] dark:text-slate-300">
-              Dengue (Grupos A, C e D), Choque Séptico e Hipoglicemia — cálculo para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
+              Dengue (Grupos A, C e D), choque séptico e hipoglicemia — cálculo para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
             </p>
           </div>
         </div>
@@ -627,7 +610,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                 {/* Details & Clinical Notes */}
                 <div className="text-xs space-y-2 border-t pt-3" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
                   <div className="flex items-start gap-1.5">
-                    <Droplet className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
+                    <Icon name="water_drop" className="text-[14px] text-sky-700 dark:text-sky-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold text-[var(--text-muted)] dark:text-slate-300">Via / Diluição: </span>
                       <span style={{ color: darkMode ? '#CBD5E1' : '#334155' }}>{protocol.routeDilution}</span>
@@ -635,7 +618,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   </div>
 
                   <div className="flex items-start gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
+                    <Icon name="schedule" className="text-[14px] text-amber-700 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold text-[var(--text-muted)] dark:text-slate-300">Tempo / Frequência: </span>
                       <span style={{ color: darkMode ? '#CBD5E1' : '#334155' }}>{protocol.frequencyTime}</span>
