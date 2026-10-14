@@ -1,19 +1,9 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { 
-  Calculator, 
-  Search, 
-  Plus, 
-  Check, 
-  Scale, 
-  AlertTriangle, 
-  ArrowRight,
-  Clock,
-  X
-} from 'lucide-react';
 import { PEDIATRIC_MEDICATIONS } from '../data/pediatricMeds';
 import { PediatricMedication, PrescriptionItem, Patient } from '../types';
 import { calculatePediatricDose } from '../utils/doseCalculator';
 import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
+import { Icon } from './Icon';
 
 interface PediatricCalculatorProps {
   darkMode: boolean;
@@ -127,7 +117,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             title="Fechar calculadora"
             aria-label="Fechar"
           >
-            <X className="w-5 h-5" />
+            <Icon name="close" className="text-[20px]" />
           </button>
         )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
@@ -135,16 +125,16 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           <div className="min-w-0 flex-1 pr-6">
             <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
               <span 
-                className="p-2 rounded-xl text-white flex-shrink-0 bg-emerald-700 dark:bg-emerald-800 border border-white/12"
+                className="p-2 rounded-xl text-white flex-shrink-0 bg-emerald-700 dark:bg-emerald-800 border border-white/12 flex items-center justify-center"
               >
-                <Calculator className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
+                <Icon name="calculate" className="text-[20px] text-slate-100" />
               </span>
-              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--text-main)]">
-                Calculadora de Doses Pediátricas
+              <h2 className="text-base sm:text-lg font-semibold tracking-tight text-[var(--text-main)]">
+                Calculadora de doses pediátricas
               </h2>
             </div>
             <p className="text-xs sm:text-sm font-medium leading-relaxed text-[var(--text-muted)]">
-              Ajuste o peso de <span className="text-blue-600 dark:text-blue-400 font-semibold">{patientName}</span> para recalcular doses em mg, volume (mL) e gotas instantaneamente com teto de segurança.
+              Paciente: <span className="text-blue-600 dark:text-blue-400 font-semibold">{patientName}</span> • cálculo automático em mg, mL e gotas com teto de segurança.
             </p>
           </div>
 
@@ -217,7 +207,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         {/* Quick Weight Range Presets */}
         <div className="mt-3.5 pt-3.5 border-t flex items-center gap-2 overflow-x-auto pb-1 max-w-full custom-scrollbar fade-scroll-x" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)' }}>
           <span className="text-xs font-bold whitespace-nowrap text-[var(--text-muted)] dark:text-slate-400 flex items-center gap-1 flex-shrink-0">
-            <Scale className="w-4 h-4 text-sky-500" strokeWidth={2} /> Faixas:
+            <Icon name="balanca" className="text-[16px] text-sky-500" /> Faixas:
           </span>
           {weightPresets.map((p) => (
             <button
@@ -242,10 +232,10 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400" strokeWidth={1.75} />
+          <Icon name="search" className="text-[16px] absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400 pointer-events-none" />
           <input
             type="text"
-            placeholder="Buscar medicamento ou apresentação (ex: Paracetamol, Amoxicilina, Dipirona, Ondansetrona)..."
+            placeholder="Ex.: Paracetamol, Amoxicilina, Dipirona, Ondansetrona..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 min-h-[44px] rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition tactile-input"
@@ -258,8 +248,8 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           onClick={isDrawer && onClose ? onClose : onNavigateToPrescription}
           className="tactile-btn-primary px-5 py-3 min-h-[44px] flex items-center justify-center gap-2 text-xs font-bold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
         >
-          <span>{isDrawer ? 'Concluir e Voltar à Receita' : 'Ir para Receita'}</span>
-          <ArrowRight className="w-4 h-4" strokeWidth={2.2} />
+          <span>{isDrawer ? 'Concluir e voltar à receita' : 'Ir para receita'}</span>
+          <Icon name="arrow_forward" className="text-[16px]" />
         </button>
       </div>
 
@@ -294,7 +284,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           className="p-3.5 sm:p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300"
         >
           <div className="flex items-center gap-2.5">
-            <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+            <Icon name="warning" className="text-[20px] flex-shrink-0 text-amber-600 dark:text-amber-400" />
             <span className="text-xs sm:text-sm font-semibold">
               Informe o peso do paciente para calcular as doses.
             </span>
@@ -319,8 +309,8 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         <div className="p-3.5 sm:p-4 border-b flex items-center justify-between" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400" />
-            <h3 className="font-bold text-xs sm:text-sm" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-              Tabela de Medicamentos Calculados ({filteredMedications.length} itens)
+            <h3 className="font-semibold text-xs sm:text-sm" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+              Tabela de medicamentos calculados ({filteredMedications.length} itens)
             </h3>
           </div>
           <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
@@ -386,7 +376,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                           </div>
                           {calc.isMaxDoseReached && (
                             <span className="text-[9px] font-bold text-amber-700 dark:text-amber-400 flex items-center gap-0.5">
-                              <AlertTriangle className="w-2.5 h-2.5" strokeWidth={1.75} /> Teto Máx
+                              <Icon name="warning" className="text-[11px]" /> Teto Máx
                             </span>
                           )}
                         </>
@@ -426,12 +416,12 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                       >
                         {isAdded ? (
                           <>
-                            <Check className="w-3.5 h-3.5" strokeWidth={1.75} />
+                            <Icon name="check" className="text-[14px]" />
                             <span>Adicionado</span>
                           </>
                         ) : (
                           <>
-                            <Plus className="w-3.5 h-3.5" strokeWidth={1.75} />
+                            <Icon name="add" className="text-[14px]" />
                             <span>Prescrever</span>
                           </>
                         )}
@@ -477,7 +467,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                         : 'btn-tactile-secondary cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed'
                     }`}
                   >
-                    {isAdded ? <Check className="w-3.5 h-3.5" strokeWidth={1.75} /> : <Plus className="w-3.5 h-3.5" strokeWidth={1.75} />}
+                    {isAdded ? <Icon name="check" className="text-[14px]" /> : <Icon name="add" className="text-[14px]" />}
                     <span>{isAdded ? 'Adicionado' : 'Prescrever'}</span>
                   </button>
                 </div>
@@ -512,7 +502,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
 
                 <div className="text-xs space-y-1">
                   <div className="font-semibold flex items-center gap-1.5" style={{ color: darkMode ? '#CBD5E1' : '#334155' }}>
-                    <Clock className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 flex-shrink-0" strokeWidth={1.75} />
+                    <Icon name="schedule" className="text-[14px] text-[var(--text-muted)] dark:text-slate-400 flex-shrink-0" />
                     <span>{med.frequency}</span>
                   </div>
                   <div className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 italic">

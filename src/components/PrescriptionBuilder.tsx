@@ -1,19 +1,4 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import {
-  Plus,
-  Trash2,
-  Check,
-  ChevronUp,
-  ChevronDown,
-  Search,
-  X,
-  ArrowRight,
-  ArrowLeft,
-  FileText,
-  Pencil,
-  BookmarkPlus,
-  FolderOpen
-} from 'lucide-react';
 import { PrescriptionItem, Patient, DoctorProfile, WorkContext } from '../types';
 import { db, SavedDocument } from '../services/db';
 import { searchUnifiedMedicationsFuzzy } from '../utils/fuzzySearch';
@@ -38,6 +23,55 @@ import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
 import { PediatricCalculator } from './PediatricCalculator';
 
 const REGIMES: RegimeReceita[] = ['simples', 'antimicrobiano', 'controle_especial'];
+
+/**
+ * Resolve de forma determinística a ação de teclado no combobox de medicamentos (#med-search-input).
+ * Garante que pressionar Enter sem ter navegado com as setas (highlightedIndex === -1)
+ * nunca sobrescreva um medicamento manipulado/personalizado com uma sugestão aproximada do catálogo.
+ */
+export function resolveMedicationKeyAction(
+  key: string,
+  showSuggestions: boolean,
+  suggestions: UnifiedMedication[],
+  highlightedIndex: number,
+  typedName: string
+):
+  | { type: 'none' }
+  | { type: 'highlight'; nextIndex: number }
+  | { type: 'select'; medication: UnifiedMedication }
+  | { type: 'dismiss' } {
+  if (!showSuggestions || suggestions.length === 0) {
+    return { type: 'none' };
+  }
+
+  if (key === 'ArrowDown') {
+    const nextIndex = highlightedIndex < 0 ? 0 : (highlightedIndex + 1) % suggestions.length;
+    return { type: 'highlight', nextIndex };
+  }
+
+  if (key === 'ArrowUp') {
+    const nextIndex = highlightedIndex <= 0 ? suggestions.length - 1 : highlightedIndex - 1;
+    return { type: 'highlight', nextIndex };
+  }
+
+  if (key === 'Escape') {
+    return { type: 'dismiss' };
+  }
+
+  if (key === 'Enter') {
+    if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
+      return { type: 'select', medication: suggestions[highlightedIndex] };
+    }
+    const cleanTyped = typedName.trim().toLowerCase();
+    const exactMatch = suggestions.find((m) => m.name.trim().toLowerCase() === cleanTyped);
+    if (exactMatch) {
+      return { type: 'select', medication: exactMatch };
+    }
+    return { type: 'dismiss' };
+  }
+
+  return { type: 'none' };
+}
 
 /** Como cada tipo de receita é apresentado na tela e no texto compartilhado. */
 const REGIME_INFO: Record<RegimeReceita, { rotulo: string; detalhe: string; tituloTexto: string }> = {
@@ -76,6 +110,7 @@ interface PrescriptionBuilderProps {
   onNavigateToEditor?: () => void;
   onNavigateToCertificate?: () => void;
   onNavigateToReferral?: () => void;
+  onNavigateToExams?: () => void;
   onOpenDoctorModal?: () => void;
   onOpenPatientModal: () => void;
   medicamentoPendente?: UnifiedMedication | null;
@@ -98,6 +133,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   onNavigateToEditor,
   onNavigateToCertificate,
   onNavigateToReferral,
+  onNavigateToExams,
   onOpenDoctorModal,
   onOpenPatientModal,
   medicamentoPendente,
@@ -109,9 +145,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   // Mobile active tab ('composer' | 'preview')
   const [mobileSection, setMobileSection] = useState<'composer' | 'preview'>('composer');
 
-  // Search
-  const [searchTerm, setSearchTerm] = useState('');
+  // Autocomplete dropdown control
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightedSuggestionIndex, setHighlightedSuggestionIndex] = useState<number>(-1);
 
   // Active form fields for adding/editing
   const [selectedMedName, setSelectedMedName] = useState('');
@@ -322,14 +358,26 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const isDoctorConfigured = medicoConfigurado(doctor);
   const handleAbrirPerfilMedico = onAbrirPerfilMedico || onOpenDoctorModal;
 
-  // Atalhos de Teclado Globais: '/', 'Ctrl+K' para busca, e 'Escape' para fechar o Drawer
+  // Atalhos de Teclado Globais: '/', 'Ctrl+K' para busca, e 'Escape' para fechar o Drawer ou Modais
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      // Escape fecha o Drawer da Calculadora se estiver aberto
-      if (e.key === 'Escape' && isPediatricDrawerOpen) {
-        e.preventDefault();
-        setIsPediatricDrawerOpen(false);
-        return;
+      if (e.key === 'Escape') {
+        if (isPediatricDrawerOpen) {
+          e.preventDefault();
+          setIsPediatricDrawerOpen(false);
+          return;
+        }
+        if (isSaveModelModalOpen) {
+          e.preventDefault();
+          setIsSaveModelModalOpen(false);
+          return;
+        }
+        if (isLoadModelModalOpen) {
+          e.preventDefault();
+          setIsLoadModelModalOpen(false);
+          setIsCreatingCustomModel(false);
+          return;
+        }
       }
 
       const activeTag = (document.activeElement?.tagName || '').toLowerCase();
@@ -357,7 +405,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isPediatricDrawerOpen]);
+  }, [isPediatricDrawerOpen, isSaveModelModalOpen, isLoadModelModalOpen]);
 
   // Quick Posology text shortcuts
   const posologyShortcuts = [
@@ -372,10 +420,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
   // Autocomplete suggestions (top 8)
   const searchSuggestions = useMemo(() => {
-    const term = searchTerm.trim();
+    const term = selectedMedName.trim();
     if (!term || term.length < 2) return [];
     return searchUnifiedMedicationsFuzzy(UNIFIED_MEDICATIONS, term, 'all').slice(0, 8);
-  }, [searchTerm]);
+  }, [selectedMedName]);
 
   // Aplica o cálculo rápido da posologia e quantidade total de comprimidos
   const handleAtualizarConstrutor = (
@@ -426,8 +474,37 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     else if (lower.includes('pomada') || lower.includes('creme') || lower.includes('gel')) unit = 'aplicação';
     setDoseUnit(unit);
 
-    setSearchTerm('');
     setShowSuggestions(false);
+    setHighlightedSuggestionIndex(-1);
+  };
+
+  // Navegação fluida por teclado na lista de medicamentos sem sobrescrever medicamentos livres
+  const handleMedInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const action = resolveMedicationKeyAction(
+      e.key,
+      showSuggestions,
+      searchSuggestions,
+      highlightedSuggestionIndex,
+      selectedMedName
+    );
+
+    if (action.type === 'highlight') {
+      e.preventDefault();
+      setHighlightedSuggestionIndex(action.nextIndex);
+      return;
+    }
+
+    if (action.type === 'select') {
+      e.preventDefault();
+      handleSelectMedication(action.medication);
+      return;
+    }
+
+    if (action.type === 'dismiss') {
+      e.preventDefault();
+      setShowSuggestions(false);
+      setHighlightedSuggestionIndex(-1);
+    }
   };
 
   // Detecção proativa: se o médico digita ou cola um nome de antibiótico ou substância controlada, ativa 2 vias automaticamente
@@ -649,29 +726,31 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-5">
       
       {/* Top Mobile View Switcher */}
-      <div className="flex md:hidden items-center justify-between p-1 rounded-xl bg-slate-200 dark:bg-navy-900 border border-slate-300 dark:border-navy-700">
+      <div className="flex md:hidden items-center justify-between p-1 rounded-xl bg-slate-200/80 dark:bg-slate-900 border border-slate-300/80 dark:border-slate-800">
         <button
+          type="button"
           onClick={() => setMobileSection('composer')}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition focus-visible:ring-2 focus-visible:ring-sky-500 ${
+          className={`flex-1 py-2 rounded-lg text-xs font-bold transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
             mobileSection === 'composer'
               ? 'bg-navy-800 text-white shadow-tactile-btn'
               : 'text-slate-600 dark:text-slate-400'
           }`}
         >
-          Prescrever Medicamentos
+          Prescrever medicamentos
         </button>
         <button
+          type="button"
           onClick={() => setMobileSection('preview')}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition focus-visible:ring-2 focus-visible:ring-sky-500 ${
+          className={`flex-1 py-2 rounded-lg text-xs font-bold transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
             mobileSection === 'preview'
               ? 'bg-navy-800 text-white shadow-tactile-btn'
               : 'text-slate-600 dark:text-slate-400'
           }`}
         >
-          Visualizar Receita ({items.length})
+          Visualizar receita ({items.length})
         </button>
       </div>
 
@@ -679,18 +758,18 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         
         {/* LEFT COLUMN: Composer, Search and Prescribed Items */}
-        <div className={`xl:col-span-7 space-y-5 ${mobileSection === 'preview' ? 'hidden md:block' : 'block'}`}>
+        <div className={`xl:col-span-7 space-y-4 ${mobileSection === 'preview' ? 'hidden md:block' : 'block'}`}>
           
-          {/* Card: Identificação Rápida do Paciente (Sincronizado) */}
-          <section className="card-surface rounded-2xl p-4 sm:p-5 space-y-3.5 border border-slate-200/80 dark:border-slate-800/80">
+          {/* Card 1: Identificação rápida do paciente */}
+          <section className="card-surface rounded-2xl p-4 sm:p-5 space-y-3 border border-slate-200/80 dark:border-slate-800/80">
             <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/80 dark:border-slate-800/80">
               <div className="flex items-center gap-2">
                 <Icon name="person" className="text-blue-600 dark:text-blue-400 text-[20px]" />
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Identificação do Paciente
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                  Identificação do paciente
                 </h2>
                 {patientName && (
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
                     Sincronizado
                   </span>
                 )}
@@ -707,8 +786,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     className="text-xs text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1 cursor-pointer transition p-1 rounded focus-visible:ring-2 focus-visible:ring-rose-500"
                     title="Limpar paciente e reiniciar consulta"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Limpar Atendimento</span>
+                    <Icon name="delete" className="text-[14px]" />
+                    <span className="hidden sm:inline">Limpar atendimento</span>
                   </button>
                 )}
                 <button
@@ -727,7 +806,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label htmlFor="quick-patient-name" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
-                    Nome do Paciente *
+                    Nome do paciente *
                   </label>
                   <button
                     type="button"
@@ -737,12 +816,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   >
                     {showExtraPatientFields ? (
                       <>
-                        <ChevronUp className="w-3.5 h-3.5" />
+                        <Icon name="expand_less" className="text-[14px]" />
                         <span>Ocultar CPF / Peso</span>
                       </>
                     ) : (
                       <>
-                        <ChevronDown className="w-3.5 h-3.5" />
+                        <Icon name="expand_more" className="text-[14px]" />
                         <span>
                           {patient.weightKg > 0 || (patient.documentNumber && patient.documentNumber.trim())
                             ? `Ver dados (${patient.weightKg > 0 ? `${patient.weightKg} kg` : ''}${patient.documentNumber ? ` • ${patient.documentNumber}` : ''})`
@@ -757,7 +836,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   type="text"
                   value={patient.name || ''}
                   onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
-                  placeholder="Nome completo do paciente"
+                  placeholder="Ex.: Maria de Oliveira Santos"
                   className="w-full px-3.5 py-2.5 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
                 />
               </div>
@@ -772,7 +851,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     <button
                       type="button"
                       onClick={onNavigateToCertificate}
-                      className="text-xs px-2.5 py-1 rounded-lg bg-blue-50/80 dark:bg-slate-900 border border-blue-200/60 dark:border-slate-800 text-blue-700 dark:text-blue-300 hover:border-blue-400 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                      className="text-xs px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
                       title="Abrir formulário de Atestado Médico para este paciente"
                     >
                       <Icon name="atestado" className="text-[14px] text-blue-600 dark:text-blue-400" />
@@ -783,11 +862,22 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     <button
                       type="button"
                       onClick={onNavigateToReferral}
-                      className="text-xs px-2.5 py-1 rounded-lg bg-blue-50/80 dark:bg-slate-900 border border-blue-200/60 dark:border-slate-800 text-blue-700 dark:text-blue-300 hover:border-blue-400 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                      className="text-xs px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
                       title="Abrir Encaminhamento Médico para este paciente"
                     >
                       <Icon name="encaminhamento" className="text-[14px] text-blue-600 dark:text-blue-400" />
                       <span>Encaminhamento</span>
+                    </button>
+                  )}
+                  {onNavigateToExams && (
+                    <button
+                      type="button"
+                      onClick={onNavigateToExams}
+                      className="text-xs px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                      title="Abrir Solicitação de Exames para este paciente"
+                    >
+                      <Icon name="exame" className="text-[14px] text-blue-600 dark:text-blue-400" />
+                      <span>Exames</span>
                     </button>
                   )}
                 </div>
@@ -805,7 +895,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       type="text"
                       value={patient.documentNumber || ''}
                       onChange={(e) => onUpdatePatient({ ...patient, documentNumber: e.target.value })}
-                      placeholder="000.000.000-00"
+                      placeholder="Ex.: 000.000.000-00"
                       className="w-full px-3 py-2 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
                     />
                   </div>
@@ -832,8 +922,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
           </section>
 
-            {/* Card: Prescrição */}
-          <section className="card-surface rounded-2xl p-4 sm:p-5 mb-4 space-y-4">
+          {/* Card 2: Prescrição (Unificado e Minimalista) */}
+          <section className="card-surface rounded-2xl p-4 sm:p-5 space-y-4 border border-slate-200/80 dark:border-slate-800/80">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
               <div className="flex items-center gap-2.5">
                 <Icon name="medication" className="text-blue-600 dark:text-blue-400 text-[22px]" />
@@ -856,9 +946,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             {editingItemId && (
               <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-300 dark:border-sky-800 flex items-center justify-between gap-3 text-xs text-sky-900 dark:text-sky-200 shadow-tactile-sm animate-in fade-in duration-150">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Pencil className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+                  <Icon name="edit" className="text-[16px] text-sky-600 dark:text-sky-400 shrink-0" />
                   <span className="font-semibold truncate">
-                    Modo de Edição: <strong>{selectedMedName || 'Medicamento'}</strong>. Altere os campos e salve a alteração.
+                    Modo de edição: <strong>{selectedMedName || 'Medicamento'}</strong>. Altere os campos e salve a alteração.
                   </span>
                 </div>
                 <button
@@ -871,100 +961,257 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               </div>
             )}
 
-            {/* Campo de Busca Instantânea com Atalho de Teclado */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="med-search-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Fármaco ou princípio ativo
-                </label>
-              </div>
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  ref={searchInputRef}
-                  id="med-search-input"
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setShowSuggestions(true);
-                  }}
-                  onFocus={() => setShowSuggestions(true)}
-                  placeholder="Ex.: Dipirona 500 mg, Amoxicilina 500 mg, Losartana..."
-                  className="w-full pl-9 pr-14 py-2.5 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-blue-500 transition placeholder:text-[var(--text-placeholder)] shadow-tactile-sm font-semibold"
-                />
-                {searchTerm ? (
-                  <button
-                    type="button"
-                    onClick={() => setSearchTerm('')}
-                    aria-label="Limpar busca"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer p-1 rounded focus-visible:ring-2 focus-visible:ring-sky-500"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-[var(--text-muted)] dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800 hidden sm:block">
-                    Ctrl+K
-                  </kbd>
-                )}
-
-                {/* Suggestions Dropdown (Instant, No Blocker) */}
-                {showSuggestions && searchSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-xl tactile-dropdown z-30 divide-y divide-slate-100 dark:divide-slate-800">
-                    {searchSuggestions.map(med => (
-                      <div
-                        key={med.id}
-                        onClick={() => handleSelectMedication(med)}
-                        className="p-3 hover:bg-blue-50 dark:hover:bg-slate-800/80 cursor-pointer flex items-center justify-between gap-2 transition"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                            {med.name}
-                          </p>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                            {med.defaultPosology}
-                          </p>
-                        </div>
-                        <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 shrink-0">
-                          {med.route}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Form de Edição e Adição Direta */}
-            <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 space-y-3.5">
+            {/* ZONA 1: Busca e Seleção Unificada de Fármaco + Tipo de Receita */}
+            <div className="space-y-3">
               <div>
-                <label htmlFor="presc-farmaco-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                  Fármaco selecionado *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="med-search-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Fármaco ou princípio ativo *
+                  </label>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 hidden sm:inline">
+                    Selecione do catálogo SUS/RENAME ou digite livremente
+                  </span>
+                </div>
                 <div className="relative">
+                  <Icon name="search" className="text-[16px] text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
-                    id="presc-farmaco-input"
+                    ref={searchInputRef}
+                    id="med-search-input"
                     type="text"
+                    role="combobox"
+                    aria-expanded={showSuggestions && searchSuggestions.length > 0}
+                    aria-autocomplete="list"
+                    aria-controls="med-search-listbox"
+                    aria-activedescendant={
+                      showSuggestions && highlightedSuggestionIndex >= 0 && searchSuggestions[highlightedSuggestionIndex]
+                        ? `med-suggestion-${highlightedSuggestionIndex}`
+                        : undefined
+                    }
                     value={selectedMedName}
-                    onChange={(e) => setSelectedMedName(e.target.value)}
-                    placeholder="Ex.: Dipirona 500 mg (ou selecione na busca acima)"
-                    className={`w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-blue-500 transition shadow-tactile-sm ${
+                    onChange={(e) => {
+                      setSelectedMedName(e.target.value);
+                      setShowSuggestions(true);
+                      setHighlightedSuggestionIndex(-1);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    onBlur={() => setShowSuggestions(false)}
+                    onKeyDown={handleMedInputKeyDown}
+                    placeholder="Ex.: Dipirona 500 mg, Amoxicilina 500 mg, Losartana 50 mg..."
+                    className={`w-full pl-9 pr-16 py-2.5 bg-slate-50/80 dark:bg-slate-950 border rounded-xl text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-blue-500 transition placeholder:text-[var(--text-placeholder)] placeholder:font-normal shadow-tactile-sm ${
                       selectedMedName.trim()
-                        ? 'border-emerald-500/60'
+                        ? 'border-emerald-500/60 dark:border-emerald-500/50'
                         : 'border-slate-200 dark:border-slate-800'
                     }`}
                   />
-                  {selectedMedName.trim() && (
-                    <Check className="w-4 h-4 text-emerald-500 absolute right-3.5 top-1/2 -translate-y-1/2" strokeWidth={2.5} />
+                  {selectedMedName ? (
+                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                      <Icon name="check" className="text-[16px] text-emerald-500 pointer-events-none" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedMedName('');
+                          setShowSuggestions(false);
+                          setHighlightedSuggestionIndex(-1);
+                          searchInputRef.current?.focus();
+                        }}
+                        aria-label="Limpar medicamento"
+                        title="Limpar medicamento"
+                        className="text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer p-1 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-sky-500"
+                      >
+                        <Icon name="close" className="text-[16px]" />
+                      </button>
+                    </div>
+                  ) : (
+                    <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-[var(--text-muted)] dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800 hidden sm:block pointer-events-none">
+                      Ctrl+K
+                    </kbd>
+                  )}
+
+                  {/* Suggestions Dropdown (Instant, Keyboard-Navigable) */}
+                  {showSuggestions && searchSuggestions.length > 0 && (
+                    <div
+                      id="med-search-listbox"
+                      role="listbox"
+                      className="absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-xl tactile-dropdown z-30 divide-y divide-slate-100 dark:divide-slate-800"
+                    >
+                      {searchSuggestions.map((med, idx) => {
+                        const isHighlighted = idx === highlightedSuggestionIndex;
+                        const medRegime = classificarReceita(med);
+                        return (
+                          <div
+                            key={med.id}
+                            id={`med-suggestion-${idx}`}
+                            role="option"
+                            aria-selected={isHighlighted}
+                            onMouseDown={(e) => {
+                              // Evita que o onBlur do input feche a lista antes do clique
+                              e.preventDefault();
+                              handleSelectMedication(med);
+                            }}
+                            onMouseEnter={() => setHighlightedSuggestionIndex(idx)}
+                            className={`p-3 cursor-pointer flex items-center justify-between gap-2 transition ${
+                              isHighlighted
+                                ? 'bg-blue-50 dark:bg-slate-800/90'
+                                : 'hover:bg-blue-50/60 dark:hover:bg-slate-800/50'
+                            }`}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                  {med.name}
+                                </p>
+                                {medRegime !== 'simples' && (
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 shrink-0">
+                                    {REGIME_INFO[medRegime].rotulo}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                {med.defaultPosology}
+                              </p>
+                            </div>
+                            <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 shrink-0">
+                              {med.route}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* Grid: 2 Colunas para Via e Quantidade Total */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="presc-route-select" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                    Via de administração
+              {/* Tipo de receita compacto: preenchido pelo nome do medicamento; o médico pode ajustar */}
+              <fieldset className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-0.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <legend className="text-xs font-medium text-slate-600 dark:text-slate-400 float-left mr-1">
+                    Tipo de receita:
+                  </legend>
+                  <div className="flex flex-wrap gap-1" role="radiogroup" aria-label="Tipo de receita">
+                    {REGIMES.map((regime) => {
+                      const ativo = selectedRegime === regime;
+                      return (
+                        <button
+                          key={regime}
+                          type="button"
+                          role="radio"
+                          aria-checked={ativo}
+                          onClick={() => setSelectedRegime(regime)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                            ativo
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                              : 'bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-400'
+                          }`}
+                        >
+                          {REGIME_INFO[regime].rotulo}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <p className="text-[11px] text-[var(--text-muted)]">
+                  {REGIME_INFO[selectedRegime].detalhe}
+                  {selectedMedName.trim() && classificarReceita(selectedMedName) !== 'simples' && ' • automático'}
+                </p>
+              </fieldset>
+              {notificacaoDoFormulario && (
+                <p role="status" className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
+                  Exige {descreverNotificacao(notificacaoDoFormulario)}. O PresCMed não emite a notificação, e a folha impressa aqui não a substitui.
+                </p>
+              )}
+            </div>
+
+            {/* ZONA 2: Modo rápido de posologia e dispensação */}
+            <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200/70 dark:border-slate-800/70">
+                <div className="flex items-center gap-1.5">
+                  <Icon name="schedule" className="text-blue-600 dark:text-blue-400 text-[16px]" />
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    Cálculo rápido de posologia e quantidade
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, doseDays, isContinuousDose)}
+                  className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                >
+                  Recalcular
+                </button>
+              </div>
+
+              {/* Linha 1: Dose, Apresentação, Frequência e Via */}
+              <div className="grid grid-cols-2 sm:grid-cols-12 gap-2.5">
+                {/* 1. Quantidade por dose (2 cols) */}
+                <div className="col-span-1 sm:col-span-2">
+                  <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    Dose
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0.5"
+                    value={doseAmount}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value) || 1;
+                      handleAtualizarConstrutor(val, doseUnit, doseFrequency, doseDays, isContinuousDose);
+                    }}
+                    className="w-full px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+                  />
+                </div>
+
+                {/* 2. Apresentação / Unidade (3 cols) */}
+                <div className="col-span-1 sm:col-span-3">
+                  <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    Apresentação
+                  </label>
+                  <select
+                    value={doseUnit}
+                    onChange={(e) => {
+                      const val = e.target.value as UnidadeDose;
+                      handleAtualizarConstrutor(doseAmount, val, doseFrequency, doseDays, isContinuousDose);
+                    }}
+                    className="w-full px-2 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+                  >
+                    <option value="comprimido">comp (comprimido)</option>
+                    <option value="cápsula">caps (cápsula)</option>
+                    <option value="gota">gotas</option>
+                    <option value="mL">mL</option>
+                    <option value="sachê">sachê</option>
+                    <option value="jato">jatos</option>
+                    <option value="ampola">ampola</option>
+                    <option value="aplicação">aplicação</option>
+                  </select>
+                </div>
+
+                {/* 3. Horários / Frequência (4 cols) */}
+                <div className="col-span-2 sm:col-span-4">
+                  <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    Frequência
+                  </label>
+                  <select
+                    value={doseFrequency}
+                    onChange={(e) => {
+                      const val = e.target.value as FrequenciaHorario;
+                      handleAtualizarConstrutor(doseAmount, doseUnit, val, doseDays, isContinuousDose);
+                    }}
+                    className="w-full px-2 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+                  >
+                    <option value="8/8h">8/8h (3x/dia)</option>
+                    <option value="12/12h">12/12h (2x/dia)</option>
+                    <option value="6/6h">6/6h (4x/dia)</option>
+                    <option value="4/4h">4/4h (6x/dia)</option>
+                    <option value="24h">24h (1x/dia)</option>
+                    <option value="manha">Manhã (1x/dia)</option>
+                    <option value="noite">Noite (ao deitar)</option>
+                    <option value="DU">Dose única</option>
+                    <option value="SOS">S.O.S (se dor/febre)</option>
+                  </select>
+                </div>
+
+                {/* 4. Via de administração (3 cols) */}
+                <div className="col-span-2 sm:col-span-3">
+                  <label htmlFor="presc-route-select" className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    Via
                   </label>
                   <select
                     id="presc-route-select"
@@ -974,7 +1221,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       setSelectedRoute(novaVia);
                       handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, doseDays, isContinuousDose, novaVia);
                     }}
-                    className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm cursor-pointer"
+                    className="w-full px-2 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm cursor-pointer"
                   >
                     <option value="Uso Oral">Uso Oral</option>
                     <option value="Uso Tópico">Uso Tópico</option>
@@ -989,186 +1236,109 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     <option value="Uso Subcutâneo">Uso Subcutâneo</option>
                   </select>
                 </div>
+              </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="presc-quantity-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+              {/* Linha 2: Duração / Dias e Uso Contínuo */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mr-0.5">
+                  Duração:
+                </span>
+                {[3, 5, 7, 10, 14, 30].map((dias) => (
+                  <button
+                    key={dias}
+                    type="button"
+                    onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, dias, false)}
+                    className={`text-[11px] px-2.5 py-0.5 rounded-md font-semibold transition cursor-pointer ${
+                      !isContinuousDose && doseDays === dias
+                        ? 'bg-blue-600 text-white shadow-tactile-sm'
+                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400'
+                    }`}
+                  >
+                    {dias} dias
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, 0, true)}
+                  className={`text-[11px] px-2.5 py-0.5 rounded-md font-semibold transition cursor-pointer ${
+                    isContinuousDose
+                      ? 'bg-emerald-600 text-white shadow-tactile-sm'
+                      : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-emerald-400'
+                  }`}
+                >
+                  Uso contínuo
+                </button>
+              </div>
+
+              {/* Linha 3: Quantidade Total a Dispensar + Pílulas Rápidas */}
+              <div className="pt-2 border-t border-slate-200/70 dark:border-slate-800/70">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="sm:w-64 shrink-0">
+                    <label htmlFor="presc-quantity-input" className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">
                       Quantidade total a dispensar *
                     </label>
-                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">
-                      Sem caixa • Total exato
+                    <input
+                      id="presc-quantity-input"
+                      type="text"
+                      value={selectedQuantity}
+                      onChange={(e) => setSelectedQuantity(e.target.value)}
+                      placeholder="Ex.: 30 comprimidos, 1 frasco..."
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-medium mb-1">
+                      Atalhos de dispensação (sem caixa):
                     </span>
-                  </div>
-                  <input
-                    id="presc-quantity-input"
-                    type="text"
-                    value={selectedQuantity}
-                    onChange={(e) => setSelectedQuantity(e.target.value)}
-                    placeholder="Ex.: 30 comprimidos, 20 cápsulas, 1 frasco..."
-                    className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm"
-                  />
-                  {/* Atalhos Rápidos Táteis de Quantidade de Comprimidos */}
-                  <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Comprimidos:</span>
-                    {['10 comp', '14 comp', '15 comp', '20 comp', '30 comp', '60 comp'].map((qtdLabel) => {
-                      const qtdValor = qtdLabel.replace('comp', 'comprimidos');
-                      const isAtivo = selectedQuantity.toLowerCase().includes(qtdLabel.replace(' comp', '')) && selectedQuantity.toLowerCase().includes('comp');
-                      return (
-                        <button
-                          key={qtdLabel}
-                          type="button"
-                          onClick={() => setSelectedQuantity(qtdValor)}
-                          className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition cursor-pointer ${
-                            isAtivo
-                              ? 'bg-blue-600 text-white shadow-tactile-sm'
-                              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400'
-                          }`}
-                        >
-                          {qtdLabel}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* MODO RÁPIDO DE PRESCRIÇÃO (Dose • Unidade • Horários • Dias) */}
-              <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-slate-900/60 space-y-2.5">
-                <div className="flex items-center justify-between pb-1.5 border-b border-blue-100/60 dark:border-slate-800/60">
-                  <div className="flex items-center gap-1.5">
-                    <Icon name="medication" className="text-blue-600 dark:text-blue-400 text-[16px]" />
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                      Modo Rápido de Prescrição
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
-                    Calcula Posologia & Quantidade
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {/* 1. Quantidade por dose */}
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                      Dose por tomada
-                    </label>
-                    <div className="flex items-center">
-                      <input
-                        type="number"
-                        step="0.5"
-                        min="0.5"
-                        value={doseAmount}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value) || 1;
-                          handleAtualizarConstrutor(val, doseUnit, doseFrequency, doseDays, isContinuousDose);
-                        }}
-                        className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
-                      />
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {['10 comp', '14 comp', '15 comp', '20 comp', '30 comp', '60 comp'].map((qtdLabel) => {
+                        const qtdValor = qtdLabel.replace('comp', 'comprimidos');
+                        const isAtivo = selectedQuantity.toLowerCase().includes(qtdLabel.replace(' comp', '')) && selectedQuantity.toLowerCase().includes('comp');
+                        return (
+                          <button
+                            key={qtdLabel}
+                            type="button"
+                            onClick={() => setSelectedQuantity(qtdValor)}
+                            className={`text-[11px] px-2 py-1 rounded-md font-semibold transition cursor-pointer ${
+                              isAtivo
+                                ? 'bg-blue-600 text-white shadow-tactile-sm'
+                                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400'
+                            }`}
+                          >
+                            {qtdLabel}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
-
-                  {/* 2. Apresentação / Unidade */}
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                      Apresentação
-                    </label>
-                    <select
-                      value={doseUnit}
-                      onChange={(e) => {
-                        const val = e.target.value as UnidadeDose;
-                        handleAtualizarConstrutor(doseAmount, val, doseFrequency, doseDays, isContinuousDose);
-                      }}
-                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
-                    >
-                      <option value="comprimido">comp (comprimido)</option>
-                      <option value="cápsula">caps (cápsula)</option>
-                      <option value="gota">gotas</option>
-                      <option value="mL">mL</option>
-                      <option value="sachê">sachê</option>
-                      <option value="jato">jatos</option>
-                      <option value="ampola">ampola</option>
-                      <option value="aplicação">aplicação</option>
-                    </select>
-                  </div>
-
-                  {/* 3. Horários / Frequência */}
-                  <div className="col-span-2 sm:col-span-2">
-                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                      Horários / Frequência
-                    </label>
-                    <select
-                      value={doseFrequency}
-                      onChange={(e) => {
-                        const val = e.target.value as FrequenciaHorario;
-                        handleAtualizarConstrutor(doseAmount, doseUnit, val, doseDays, isContinuousDose);
-                      }}
-                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
-                    >
-                      <option value="8/8h">8/8h (a cada 8 horas • 3x/dia)</option>
-                      <option value="12/12h">12/12h (a cada 12 horas • 2x/dia)</option>
-                      <option value="6/6h">6/6h (a cada 6 horas • 4x/dia)</option>
-                      <option value="4/4h">4/4h (a cada 4 horas • 6x/dia)</option>
-                      <option value="24h">24h (1x ao dia)</option>
-                      <option value="manha">Manhã (1x ao dia, pela manhã)</option>
-                      <option value="noite">Noite (1x ao dia, ao deitar)</option>
-                      <option value="DU">DU (Dose Única)</option>
-                      <option value="SOS">S.O.S (se dor ou febre)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Linha 2 do Modo Rápido: Duração / Dias e Uso Contínuo */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
-                      Duração:
-                    </span>
-                    {[3, 5, 7, 10, 14, 30].map((dias) => (
-                      <button
-                        key={dias}
-                        type="button"
-                        onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, dias, false)}
-                        className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition cursor-pointer ${
-                          !isContinuousDose && doseDays === dias
-                            ? 'bg-blue-600 text-white shadow-tactile-sm'
-                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400'
-                        }`}
-                      >
-                        {dias} dias
-                      </button>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, 0, true)}
-                      className={`text-[10px] px-2.5 py-0.5 rounded-md font-bold transition cursor-pointer ${
-                        isContinuousDose
-                          ? 'bg-emerald-600 text-white shadow-tactile-sm'
-                          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-emerald-400'
-                      }`}
-                    >
-                      Uso Contínuo
-                    </button>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, doseDays, isContinuousDose)}
-                    className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-                  >
-                    Recalcular
-                  </button>
                 </div>
               </div>
+            </div>
 
-              {/* Posologia & Orientações */}
+            {/* ZONA 3: Posologia & Orientações + Ação Primária */}
+            <div className="space-y-3">
               <div>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1.5">
                   <label htmlFor="presc-posology-textarea" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                     Posologia e orientações ao paciente *
                   </label>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                    Gerada pelo modo rápido • 100% editável
-                  </span>
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setSelectedPosology(e.target.value);
+                      }
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-medium text-slate-700 dark:text-slate-300 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer max-w-full sm:max-w-xs"
+                    aria-label="Atalhos rápidos de posologia"
+                  >
+                    <option value="">Selecionar posologia padrão...</option>
+                    {posologyShortcuts.map((ps, idx) => (
+                      <option key={idx} value={ps.text}>
+                        {ps.label} — {ps.text}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <textarea
                   id="presc-posology-textarea"
@@ -1176,70 +1346,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   value={selectedPosology}
                   onChange={(e) => setSelectedPosology(e.target.value)}
                   placeholder="Ex.: Tomar 1 comprimido via oral a cada 8 horas se dor ou febre por até 5 dias..."
-                  className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm resize-none"
+                  className="w-full p-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm resize-none"
                 />
               </div>
 
-              {/* Atalhos Rápidos Compactos em Dropdown de Linha Única */}
-              <div>
-                <select
-                  value=""
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setSelectedPosology(e.target.value);
-                    }
-                  }}
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
-                  aria-label="Atalhos rápidos de posologia"
-                >
-                  <option value="">⚡ Selecionar posologia padrão (atalhos rápidos)...</option>
-                  {posologyShortcuts.map((ps, idx) => (
-                    <option key={idx} value={ps.text}>
-                      {ps.label} — {ps.text}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Tipo de receita: preenchido pelo nome do medicamento; o médico pode ajustar */}
-              <fieldset>
-                <legend className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                  Tipo de receita
-                </legend>
-                <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Tipo de receita">
-                  {REGIMES.map((regime) => {
-                    const ativo = selectedRegime === regime;
-                    return (
-                      <button
-                        key={regime}
-                        type="button"
-                        role="radio"
-                        aria-checked={ativo}
-                        onClick={() => setSelectedRegime(regime)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
-                          ativo
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-400'
-                        }`}
-                      >
-                        {REGIME_INFO[regime].rotulo}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="mt-1.5 text-[11px] text-[var(--text-muted)]">
-                  {REGIME_INFO[selectedRegime].detalhe}
-                  {selectedMedName.trim() && classificarReceita(selectedMedName) !== 'simples' && ' — identificado pelo nome do medicamento'}
-                </p>
-                {notificacaoDoFormulario && (
-                  <p role="status" className="mt-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
-                    Exige {descreverNotificacao(notificacaoDoFormulario)}. O PresCMed não emite a notificação, e a folha impressa aqui não a substitui.
-                  </p>
-                )}
-              </fieldset>
-
               {/* Ação Primária: Inserir ou Salvar Alterações na Receita */}
-              <div className="pt-0.5 flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleAddMedicationToPrescription}
@@ -1252,13 +1364,13 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 >
                   {editingItemId ? (
                     <>
-                      <Check className="w-4 h-4" strokeWidth={2.5} />
-                      <span>Salvar Alterações no Medicamento</span>
+                      <Icon name="check" className="text-[16px]" />
+                      <span>Salvar alterações no medicamento</span>
                     </>
                   ) : (
                     <>
-                      <Plus className="w-4 h-4" strokeWidth={2.5} />
-                      <span>Inserir na Receita</span>
+                      <Icon name="add" className="text-[16px]" />
+                      <span>Inserir na receita</span>
                     </>
                   )}
                 </button>
@@ -1276,11 +1388,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             </div>
           </section>
 
-          {/* Card: Medicamentos prescritos */}
-          <section className="p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile dark:shadow-tactile-navy space-y-3">
+          {/* Card 3: Medicamentos prescritos */}
+          <section className="card-surface rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800/80 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                   Medicamentos prescritos
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-navy-800 dark:bg-navy-700 text-white">
@@ -1301,10 +1413,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     loadPrescriptionModels();
                     setIsLoadModelModalOpen(true);
                   }}
-                  className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-sky-600 flex items-center gap-1.5 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-navy-800 dark:hover:bg-navy-700 transition"
+                  className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-sky-600 flex items-center gap-1.5 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
                   title="Abrir biblioteca de modelos de receitas salvos"
                 >
-                  <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+                  <Icon name="folder_open" className="text-[15px] text-amber-500" />
                   <span>Modelos</span>
                   {savedPrescriptionModels.length > 0 && (
                     <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
@@ -1324,8 +1436,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/60 border border-sky-200 dark:border-sky-800 transition"
                     title="Salvar esta combinação de medicamentos como um modelo reutilizável"
                   >
-                    <BookmarkPlus className="w-3.5 h-3.5" />
-                    <span>Salvar Modelo</span>
+                    <Icon name="bookmark_add" className="text-[15px]" />
+                    <span>Salvar modelo</span>
                   </button>
                 ) : (
                   <button
@@ -1339,8 +1451,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/60 border border-sky-200 dark:border-sky-800 transition"
                     title="Criar e salvar um novo modelo de receita reutilizável mesmo sem receita ativa na consulta"
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>+ Novo Modelo</span>
+                    <Icon name="add" className="text-[15px]" />
+                    <span>Novo modelo</span>
                   </button>
                 )}
 
@@ -1350,7 +1462,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     onClick={onClearPrescription}
                     className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-rose-500 px-2 py-1"
                   >
-                    <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    <Icon name="delete" className="text-[14px]" />
                     <span>Limpar</span>
                   </button>
                 )}
@@ -1370,8 +1482,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             )}
 
             {items.length === 0 ? (
-              <div className="p-8 text-center rounded-xl bg-slate-50 dark:bg-navy-950 border border-dashed border-slate-300 dark:border-navy-800 text-[var(--text-muted)] dark:text-slate-400 text-xs italic">
-                Nenhum medicamento adicionado ainda. Use a busca acima ou clique nos atalhos.
+              <div className="p-7 text-center rounded-xl bg-slate-50/70 dark:bg-slate-950/50 border border-dashed border-slate-200 dark:border-slate-800 text-[var(--text-muted)] dark:text-slate-400 text-xs">
+                Nenhum medicamento adicionado ainda. Busque acima ou aplique um kit de plantão na barra lateral.
               </div>
             ) : (
               <div className="space-y-2.5">
@@ -1384,7 +1496,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       className={`p-3.5 rounded-xl border flex items-start justify-between gap-3 shadow-tactile-sm transition ${
                         editingItemId === it.id
                           ? 'bg-sky-50/70 dark:bg-sky-950/40 border-sky-400 dark:border-sky-600 ring-2 ring-sky-400/40'
-                          : 'bg-slate-50 dark:bg-navy-950 border-slate-200 dark:border-navy-800'
+                          : 'bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80'
                       }`}
                     >
                       <div className="flex-1 min-w-0">
@@ -1397,13 +1509,13 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
                             {it.name}
                           </h4>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                             {it.route} • {it.quantity}
                           </span>
                           {editingItemId === it.id && (
-                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-sky-500 text-white flex items-center gap-1 animate-pulse">
-                              <Pencil className="w-2.5 h-2.5" />
-                              <span>Em Edição</span>
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-sky-500 text-white flex items-center gap-1">
+                              <Icon name="edit" className="text-[10px]" />
+                              <span>Em edição</span>
                             </span>
                           )}
                           {regimeDoItem !== 'simples' && (
@@ -1435,30 +1547,30 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           className={`p-1 rounded-lg transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
                             editingItemId === it.id
                               ? 'bg-sky-600 text-white shadow-tactile-sm'
-                              : 'hover:bg-slate-200 dark:hover:bg-navy-800 text-slate-600 dark:text-slate-400'
+                              : 'hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
                           }`}
                           title="Editar este medicamento diretamente"
                           aria-label={`Editar ${it.name}`}
                         >
-                          <Pencil className="w-4 h-4" />
+                          <Icon name="edit" className="text-[16px]" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleMoveItem(idx, 'up')}
                           disabled={idx === 0}
-                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
+                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
                           title="Mover para cima"
                         >
-                          <ChevronUp className="w-4 h-4" />
+                          <Icon name="expand_less" className="text-[16px]" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleMoveItem(idx, 'down')}
                           disabled={idx === items.length - 1}
-                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
+                          className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
                           title="Mover para baixo"
                         >
-                          <ChevronDown className="w-4 h-4" />
+                          <Icon name="expand_more" className="text-[16px]" />
                         </button>
                         <button
                           type="button"
@@ -1466,7 +1578,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           className="p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
                           title="Remover medicamento"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Icon name="delete" className="text-[16px]" />
                         </button>
                       </div>
                     </div>
@@ -1494,11 +1606,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           </section>
         </div>
 
-        {/* RIGHT COLUMN: Real-Time A4 Document Simulation (Tactile Sheet) */}
-        <div className={`xl:col-span-5 space-y-4 ${mobileSection === 'composer' ? 'hidden md:block' : 'block'}`}>
+        {/* RIGHT COLUMN: Real-Time A4 Document Simulation (Sticky Tactile Sheet) */}
+        <div className={`xl:col-span-5 xl:sticky xl:top-20 space-y-3.5 ${mobileSection === 'composer' ? 'hidden md:block' : 'block'}`}>
           <div className="flex items-center justify-between px-1">
-            <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Prévia da folha — é exatamente o que será impresso
+            <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+              <Icon name="visibility" className="text-[15px] text-blue-600 dark:text-blue-400" />
+              <span>Prévia da folha — é exatamente o que será impresso</span>
             </h3>
           </div>
 
@@ -1584,7 +1697,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           aria-live="polite"
           className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center gap-2 shadow-tactile-lg animate-tab-fade"
         >
-          <Check className="w-4 h-4" />
+          <Icon name="check" className="text-[16px]" />
           <span>Medicamento inserido na receita com sucesso!</span>
         </div>
       )}
@@ -1592,6 +1705,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       {/* Drawer Lateral Flutuante da Calculadora Pediátrica */}
       {isPediatricDrawerOpen && (
         <div 
+          role="dialog"
+          aria-modal="true"
+          aria-label="Calculadora pediátrica por peso"
           className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs animate-in fade-in duration-200"
           onClick={() => setIsPediatricDrawerOpen(false)}
         >
@@ -1603,10 +1719,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
             <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-elevated)] shrink-0">
               <div className="flex items-center gap-2.5">
                 <Icon name="balanca" className="text-emerald-600 dark:text-emerald-400 text-[22px]" />
-                <div>
-                  <h3 className="font-bold text-sm text-[var(--text-main)]">Calculadora Pediátrica Integrada</h3>
-                  <p className="text-[11px] text-[var(--text-muted)]">Prescreva doses calculadas direto na receita do paciente</p>
-                </div>
+                <h3 className="font-semibold text-sm text-[var(--text-main)]">
+                  Calculadora pediátrica por peso
+                </h3>
               </div>
               <button
                 type="button"
@@ -1614,7 +1729,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                 title="Fechar calculadora"
               >
-                <X className="w-5 h-5" />
+                <Icon name="close" className="text-[20px]" />
               </button>
             </div>
             
@@ -1640,20 +1755,25 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       {/* Toast de Notificação de Modelo de Receita */}
       {prescriptionModelToast && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-slate-700 animate-tab-fade">
-          <Check className="w-4 h-4 text-emerald-400" />
+          <Icon name="check" className="text-[16px] text-emerald-400" />
           <span>{prescriptionModelToast}</span>
         </div>
       )}
 
       {/* MODAL: Salvar Combinação Atual como Modelo de Receita */}
       {isSaveModelModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-tab-fade">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Salvar como modelo de receita"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-tab-fade"
+        >
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-tactile-lg space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <BookmarkPlus className="w-5 h-5 text-sky-600" />
-                <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-                  Salvar como Modelo de Receita
+                <Icon name="bookmark_add" className="text-[20px] text-sky-600" />
+                <h3 className="font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                  Salvar como modelo de receita
                 </h3>
               </div>
               <button
@@ -1661,7 +1781,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 onClick={() => setIsSaveModelModalOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <Icon name="close" className="text-[20px]" />
               </button>
             </div>
 
@@ -1671,7 +1791,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
             <div>
               <label htmlFor="model-name-input" className="block text-[11px] font-bold uppercase text-slate-500 mb-1">
-                Nome do Modelo
+                Nome do modelo
               </label>
               <input
                 id="model-name-input"
@@ -1682,7 +1802,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 onKeyDown={e => {
                   if (e.key === 'Enter') handleSavePrescriptionModel();
                 }}
-                placeholder="Ex: Hipertensão Inicial, GECA Pediátrica, Amigdalite..."
+                placeholder="Ex.: Hipertensão inicial, GECA pediátrica, Amigdalite..."
                 className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
               />
             </div>
@@ -1712,7 +1832,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 disabled={!newModelName.trim()}
                 className="px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white cursor-pointer shadow-tactile-btn transition active:scale-95"
               >
-                Salvar Modelo
+                Salvar modelo
               </button>
             </div>
           </div>
@@ -1721,7 +1841,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
       {/* MODAL: Biblioteca e Criador de Modelos de Receitas Salvos */}
       {isLoadModelModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-tab-fade">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Modelos de receitas salvos"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-tab-fade"
+        >
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-tactile-lg">
             
             {/* CABEÇALHO DO MODAL */}
@@ -1734,17 +1859,17 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                     title="Voltar para a lista de modelos"
                   >
-                    <ArrowLeft className="w-4 h-4" />
+                    <Icon name="arrow_back" className="text-[18px]" />
                   </button>
-                  <h3 className="font-bold text-base text-slate-900 dark:text-white">
-                    Novo Modelo de Receita
+                  <h3 className="font-semibold text-base text-slate-900 dark:text-white">
+                    Novo modelo de receita
                   </h3>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <FolderOpen className="w-5 h-5 text-amber-500" />
-                  <h3 className="font-bold text-base text-slate-900 dark:text-white">
-                    Modelos de Receitas Salvos
+                  <Icon name="folder_open" className="text-[20px] text-amber-500" />
+                  <h3 className="font-semibold text-base text-slate-900 dark:text-white">
+                    Modelos de receitas salvos
                   </h3>
                 </div>
               )}
@@ -1761,8 +1886,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     }}
                     className="px-2.5 py-1 text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-sky-900/60 rounded-lg cursor-pointer flex items-center gap-1 transition"
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>+ Criar Modelo</span>
+                    <Icon name="add" className="text-[14px]" />
+                    <span>+ Criar modelo</span>
                   </button>
                 )}
                 <button
@@ -1773,7 +1898,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   }}
                   className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <Icon name="close" className="text-[20px]" />
                 </button>
               </div>
             </div>
@@ -1784,13 +1909,13 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 custom-scrollbar">
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                    Nome do Modelo
+                    Nome do modelo
                   </label>
                   <input
                     type="text"
                     value={customModelDraftTitle}
                     onChange={(e) => setCustomModelDraftTitle(e.target.value)}
-                    placeholder="Ex: Hipertensão Leve, ITU Ambulatorial, Pós-Op..."
+                    placeholder="Ex.: Hipertensão leve, ITU ambulatorial, Pós-operatório..."
                     className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white outline-none focus:border-sky-500"
                     autoFocus
                   />
@@ -1799,15 +1924,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 {/* Busca de medicamentos para o modelo */}
                 <div className="relative">
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                    Adicionar Medicamento ao Modelo
+                    Adicionar medicamento ao modelo
                   </label>
                   <div className="relative">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Icon name="search" className="text-[16px] text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       value={customModelSearchTerm}
                       onChange={(e) => handleCustomModelSearchChange(e.target.value)}
-                      placeholder="Buscar medicamento (ex: Amoxicilina, Dipirona, Losartana)..."
+                      placeholder="Ex.: Amoxicilina 500 mg, Dipirona 500 mg, Losartana..."
                       className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white outline-none focus:border-sky-500"
                     />
                   </div>
@@ -1830,7 +1955,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                               {sug.route} • {sug.defaultQuantity}
                             </span>
                           </div>
-                          <Plus className="w-4 h-4 text-sky-600 shrink-0" />
+                          <Icon name="add" className="text-[16px] text-sky-600 shrink-0" />
                         </button>
                       ))}
                     </div>
@@ -1863,7 +1988,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                             className="p-1 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded"
                             title="Remover do modelo"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Icon name="delete" className="text-[14px]" />
                           </button>
                         </div>
 
@@ -1876,7 +2001,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                               type="text"
                               value={item.quantity}
                               onChange={(e) => handleUpdateCustomModelItem(item.id, { quantity: e.target.value })}
-                              placeholder="1 caixa"
+                              placeholder="Ex.: 30 comprimidos"
                               className="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:border-sky-500"
                             />
                           </div>
@@ -1888,7 +2013,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                               type="text"
                               value={item.instructions}
                               onChange={(e) => handleUpdateCustomModelItem(item.id, { instructions: e.target.value })}
-                              placeholder="Instruções de tomada"
+                              placeholder="Ex.: Tomar 1 comprimido de 8 em 8 horas"
                               className="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:border-sky-500"
                             />
                           </div>
@@ -1903,7 +2028,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
                 {savedPrescriptionModels.length === 0 ? (
                   <div className="p-8 text-center rounded-xl bg-slate-50 dark:bg-slate-950 border border-dashed border-slate-200 dark:border-slate-800 space-y-3">
-                    <BookmarkPlus className="w-8 h-8 text-slate-400 mx-auto" />
+                    <Icon name="bookmark_add" className="text-[32px] text-slate-400 mx-auto" />
                     <div>
                       <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                         Nenhum modelo de receita salvo ainda.
@@ -1922,8 +2047,8 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       }}
                       className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white cursor-pointer transition shadow-tactile-btn inline-flex items-center gap-1.5"
                     >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>+ Criar Meu Primeiro Modelo</span>
+                      <Icon name="add" className="text-[14px]" />
+                      <span>+ Criar meu primeiro modelo</span>
                     </button>
                   </div>
                 ) : (
@@ -1947,7 +2072,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           className="p-1 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded"
                           title="Excluir este modelo"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Icon name="delete" className="text-[14px]" />
                         </button>
                       </div>
 
@@ -1970,7 +2095,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           className="px-3 py-1 rounded-lg text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 cursor-pointer transition shadow-xs"
                           title="Substituir todos os medicamentos da receita por este modelo"
                         >
-                          Substituir Receita
+                          Substituir receita
                         </button>
                       </div>
                     </div>
@@ -1996,7 +2121,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     disabled={!customModelDraftTitle.trim() || customModelDraftItems.length === 0}
                     className="px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white cursor-pointer shadow-tactile-btn transition active:scale-95"
                   >
-                    Salvar Modelo
+                    Salvar modelo
                   </button>
                 </>
               ) : (

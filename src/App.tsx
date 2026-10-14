@@ -220,6 +220,66 @@ export default function App() {
     setActiveTab('documents');
   };
 
+  const handleSelectTab = React.useCallback((tab: ActiveTab) => {
+    if (tab === 'patients') {
+      handleOpenPatientModal();
+      return;
+    }
+    if (tab === 'editor') {
+      setEditorCustomDoc(null);
+      setEditorInitialSyncTrigger(prev => prev + 1);
+      setActiveTab('editor');
+      return;
+    }
+    if (tab === 'certificate') {
+      setDocumentsSubTab('certificate');
+      setActiveTab('documents');
+      return;
+    }
+    if (tab === 'referral') {
+      setDocumentsSubTab('referral');
+      setActiveTab('documents');
+      return;
+    }
+    if (tab === 'exams') {
+      setDocumentsSubTab('exams');
+      setActiveTab('documents');
+      return;
+    }
+    setActiveTab(tab);
+  }, [handleOpenPatientModal]);
+
+  // Rolagem suave para o topo ao trocar de módulo
+  useEffect(() => {
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeTab]);
+
+  // Atalhos rápidos de navegação entre módulos (Alt+1 a Alt+5)
+  useEffect(() => {
+    const handleWorkspaceShortcuts = (e: KeyboardEvent) => {
+      if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (isPatientModalOpen || isDoctorModalOpen || isBackupModalOpen) return;
+      if (typeof document !== 'undefined' && document.querySelector('[role="dialog"], [aria-modal="true"]')) return;
+
+      const shortcutMap: Record<string, ActiveTab> = {
+        '1': 'prescription',
+        '2': 'documents',
+        '3': 'pediatric_calc',
+        '4': 'protocols',
+        '5': 'editor'
+      };
+      const targetTab = shortcutMap[e.key];
+      if (targetTab) {
+        e.preventDefault();
+        handleSelectTab(targetTab);
+      }
+    };
+    window.addEventListener('keydown', handleWorkspaceShortcuts);
+    return () => window.removeEventListener('keydown', handleWorkspaceShortcuts);
+  }, [handleSelectTab, isPatientModalOpen, isDoctorModalOpen, isBackupModalOpen]);
+
   // Medicamento pendente vindo de outras telas (ex: Protocolos)
   const [medicamentoPendente, setMedicamentoPendente] = useState<UnifiedMedication | null>(null);
 
@@ -286,9 +346,15 @@ export default function App() {
         onToggleDarkMode={() => setDarkMode(!darkMode)}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         onGoHome={handleGoHome}
+        activeTab={activeTab}
+        onSelectTab={handleSelectTab}
         patient={patient}
         onOpenPatientModal={handleOpenPatientModal}
+        doctor={doctor}
+        onOpenDoctorModal={handleOpenDoctorModal}
         onNavigateToEditor={handleNavigateToEditor}
+        prescriptionCount={prescriptionItems.length}
+        selectedExamsCount={selectedExams.length}
         isInstallable={isInstallable}
         onInstallApp={installApp}
       />
@@ -300,32 +366,7 @@ export default function App() {
           darkMode={darkMode}
           onToggleDarkMode={() => setDarkMode(!darkMode)}
           activeTab={activeTab}
-          onSelectTab={(tab) => {
-            if (tab === 'patients') {
-              handleOpenPatientModal();
-              return;
-            }
-            if (tab === 'editor') {
-              handleNavigateToEditor();
-              return;
-            }
-            if (tab === 'certificate') {
-              setDocumentsSubTab('certificate');
-              setActiveTab('documents');
-              return;
-            }
-            if (tab === 'referral') {
-              setDocumentsSubTab('referral');
-              setActiveTab('documents');
-              return;
-            }
-            if (tab === 'exams') {
-              setDocumentsSubTab('exams');
-              setActiveTab('documents');
-              return;
-            }
-            setActiveTab(tab);
-          }}
+          onSelectTab={handleSelectTab}
           isOpen={sidebarOpen}
           onToggleOpen={() => setSidebarOpen(!sidebarOpen)}
           onClose={() => setSidebarOpen(false)}
@@ -349,135 +390,138 @@ export default function App() {
 
         {/* Main Content Area */}
         <main className="flex-1 min-w-0 pb-20 lg:pb-6">
-          {activeTab === 'prescription' && (
-            <PrescriptionBuilder
-              darkMode={darkMode}
-              doctor={doctor}
-              onUpdateDoctor={setDoctor}
-              patient={patient}
-              onUpdatePatient={setPatient}
-              activeContext={activeContext}
-              items={prescriptionItems}
-              onUpdateItems={setPrescriptionItems}
-              weightCalcEnabled={patient.weightCalcEnabled}
-              onToggleWeightCalc={handleToggleWeightCalc}
-              onClearPrescription={handleClearPrescription}
-              onClearPatient={handleClearPatient}
-              onNavigateToPrint={(type) => handleNavigateToPrint(type || 'prescription')}
-              onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
-              onNavigateToEditor={handleNavigateToEditor}
-              onNavigateToCertificate={handleNavigateToCertificate}
-              onNavigateToReferral={handleNavigateToReferral}
-              onOpenDoctorModal={handleOpenDoctorModal}
-              onOpenPatientModal={handleOpenPatientModal}
-              medicamentoPendente={medicamentoPendente}
-              onConsumirMedicamentoPendente={() => setMedicamentoPendente(null)}
-              onAbrirPerfilMedico={handleOpenDoctorModal}
-            />
-          )}
+          <div key={activeTab} className="animate-tab-fade">
+            {activeTab === 'prescription' && (
+              <PrescriptionBuilder
+                darkMode={darkMode}
+                doctor={doctor}
+                onUpdateDoctor={setDoctor}
+                patient={patient}
+                onUpdatePatient={setPatient}
+                activeContext={activeContext}
+                items={prescriptionItems}
+                onUpdateItems={setPrescriptionItems}
+                weightCalcEnabled={patient.weightCalcEnabled}
+                onToggleWeightCalc={handleToggleWeightCalc}
+                onClearPrescription={handleClearPrescription}
+                onClearPatient={handleClearPatient}
+                onNavigateToPrint={(type) => handleNavigateToPrint(type || 'prescription')}
+                onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
+                onNavigateToEditor={handleNavigateToEditor}
+                onNavigateToCertificate={handleNavigateToCertificate}
+                onNavigateToReferral={handleNavigateToReferral}
+                onNavigateToExams={handleNavigateToExams}
+                onOpenDoctorModal={handleOpenDoctorModal}
+                onOpenPatientModal={handleOpenPatientModal}
+                medicamentoPendente={medicamentoPendente}
+                onConsumirMedicamentoPendente={() => setMedicamentoPendente(null)}
+                onAbrirPerfilMedico={handleOpenDoctorModal}
+              />
+            )}
 
-          {activeTab === 'pediatric_calc' && (
-            <PediatricCalculator
-              darkMode={darkMode}
-              patient={patient}
-              onUpdatePatientWeight={handleUpdatePatientWeight}
-              onAddPrescriptionItem={handleAddPrescriptionItem}
-              onNavigateToPrescription={() => setActiveTab('prescription')}
-            />
-          )}
+            {activeTab === 'pediatric_calc' && (
+              <PediatricCalculator
+                darkMode={darkMode}
+                patient={patient}
+                onUpdatePatientWeight={handleUpdatePatientWeight}
+                onAddPrescriptionItem={handleAddPrescriptionItem}
+                onNavigateToPrescription={() => setActiveTab('prescription')}
+              />
+            )}
 
-          {(activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams') && (
-            <ClinicalDocumentsHub
-              darkMode={darkMode}
-              patient={patient}
-              onUpdatePatient={setPatient}
-              doctor={doctor}
-              activeContext={activeContext}
-              certificate={certificate}
-              onUpdateCertificate={setCertificate}
-              referral={referral}
-              onUpdateReferral={setReferral}
-              selectedExams={selectedExams}
-              onUpdateSelectedExams={setSelectedExams}
-              clinicalIndication={examIndication}
-              onUpdateClinicalIndication={setExamIndication}
-              onNavigateToEditorWithHtml={handleNavigateToEditorWithHtml}
-              initialSubTab={
-                activeTab === 'certificate' ? 'certificate' :
-                activeTab === 'referral' ? 'referral' :
-                activeTab === 'exams' ? 'exams' : documentsSubTab
-              }
-              onNavigateToPrint={(type) => handleNavigateToPrint(type)}
-            />
-          )}
+            {(activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams') && (
+              <ClinicalDocumentsHub
+                darkMode={darkMode}
+                patient={patient}
+                onUpdatePatient={setPatient}
+                doctor={doctor}
+                activeContext={activeContext}
+                certificate={certificate}
+                onUpdateCertificate={setCertificate}
+                referral={referral}
+                onUpdateReferral={setReferral}
+                selectedExams={selectedExams}
+                onUpdateSelectedExams={setSelectedExams}
+                clinicalIndication={examIndication}
+                onUpdateClinicalIndication={setExamIndication}
+                onNavigateToEditorWithHtml={handleNavigateToEditorWithHtml}
+                initialSubTab={
+                  activeTab === 'certificate' ? 'certificate' :
+                  activeTab === 'referral' ? 'referral' :
+                  activeTab === 'exams' ? 'exams' : documentsSubTab
+                }
+                onNavigateToPrint={(type) => handleNavigateToPrint(type)}
+              />
+            )}
 
-          {activeTab === 'protocols' && (
-            <ClinicalProtocolsView
-              darkMode={darkMode}
-              patient={patient}
-              onUpdatePatientWeight={handleUpdatePatientWeight}
-              onAddPrescriptionItem={handleAddPrescriptionItem}
-              onNavigateToPrescription={() => setActiveTab('prescription')}
-              onUsarMedicamento={handleUsarMedicamento}
-            />
-          )}
+            {activeTab === 'protocols' && (
+              <ClinicalProtocolsView
+                darkMode={darkMode}
+                patient={patient}
+                onUpdatePatientWeight={handleUpdatePatientWeight}
+                onAddPrescriptionItem={handleAddPrescriptionItem}
+                onNavigateToPrescription={() => setActiveTab('prescription')}
+                onUsarMedicamento={handleUsarMedicamento}
+              />
+            )}
 
-          {activeTab === 'editor' && (
-            <AsyncErrorBoundary moduleName="o Editor de Prescrições e Documentos">
-              <Suspense fallback={
-                <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
-                  <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="font-medium text-slate-600 dark:text-slate-300">
-                    Carregando processador de texto clínico e canvas A4...
-                  </span>
-                </div>
-              }>
-                <DocumentEditorView
-                  darkMode={darkMode}
-                  doctor={doctor}
-                  patient={patient}
-                  prescriptionItems={prescriptionItems}
-                  onUpdatePrescriptionItems={setPrescriptionItems}
-                  referral={referral}
-                  certificate={certificate}
-                  initialDocumentToLoad={editorCustomDoc}
-                  activeContext={activeContext}
-                  onSaveContext={saveContext}
-                  onNavigateToPrint={() => handleNavigateToPrint('prescription')}
-                  onOpenDoctorModal={handleOpenDoctorModal}
-                  editorInitialSyncTrigger={editorInitialSyncTrigger}
-                  onNavigateBack={() => setActiveTab('prescription')}
-                />
-              </Suspense>
-            </AsyncErrorBoundary>
-          )}
+            {activeTab === 'editor' && (
+              <AsyncErrorBoundary moduleName="o Editor de Prescrições e Documentos">
+                <Suspense fallback={
+                  <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
+                    <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="font-medium text-slate-600 dark:text-slate-300">
+                      Carregando processador de texto clínico e canvas A4...
+                    </span>
+                  </div>
+                }>
+                  <DocumentEditorView
+                    darkMode={darkMode}
+                    doctor={doctor}
+                    patient={patient}
+                    prescriptionItems={prescriptionItems}
+                    onUpdatePrescriptionItems={setPrescriptionItems}
+                    referral={referral}
+                    certificate={certificate}
+                    initialDocumentToLoad={editorCustomDoc}
+                    activeContext={activeContext}
+                    onSaveContext={saveContext}
+                    onNavigateToPrint={() => handleNavigateToPrint('prescription')}
+                    onOpenDoctorModal={handleOpenDoctorModal}
+                    editorInitialSyncTrigger={editorInitialSyncTrigger}
+                    onNavigateBack={() => setActiveTab('prescription')}
+                  />
+                </Suspense>
+              </AsyncErrorBoundary>
+            )}
 
-          {activeTab === 'print_preview' && (
-            <AsyncErrorBoundary moduleName="a Prévia de Impressão">
-              <Suspense fallback={
-                <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
-                  <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="font-medium text-slate-600 dark:text-slate-300">
-                    Carregando visualização médica e módulos de exportação...
-                  </span>
-                </div>
-              }>
-                <PrintPreview
-                  doctor={doctor}
-                  patient={patient}
-                  prescriptionItems={prescriptionItems}
-                  exams={selectedExams}
-                  examIndication={examIndication}
-                  certificate={certificate}
-                  referral={referral}
-                  activeContext={activeContext}
-                  initialDocType={printDocType}
-                  onBack={() => setActiveTab('prescription')}
-                  onAbrirPerfilMedico={handleOpenDoctorModal}
-                />
-              </Suspense>
-            </AsyncErrorBoundary>
-          )}
+            {activeTab === 'print_preview' && (
+              <AsyncErrorBoundary moduleName="a Prévia de Impressão">
+                <Suspense fallback={
+                  <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
+                    <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="font-medium text-slate-600 dark:text-slate-300">
+                      Carregando visualização médica e módulos de exportação...
+                    </span>
+                  </div>
+                }>
+                  <PrintPreview
+                    doctor={doctor}
+                    patient={patient}
+                    prescriptionItems={prescriptionItems}
+                    exams={selectedExams}
+                    examIndication={examIndication}
+                    certificate={certificate}
+                    referral={referral}
+                    activeContext={activeContext}
+                    initialDocType={printDocType}
+                    onBack={() => setActiveTab('prescription')}
+                    onAbrirPerfilMedico={handleOpenDoctorModal}
+                  />
+                </Suspense>
+              </AsyncErrorBoundary>
+            )}
+          </div>
         </main>
       </div>
 
@@ -485,28 +529,7 @@ export default function App() {
       <MobileBottomNav
         activeTab={activeTab}
         sidebarOpen={sidebarOpen}
-        onSelectTab={(tab) => {
-          if (tab === 'editor') {
-            handleNavigateToEditor();
-            return;
-          }
-          if (tab === 'certificate') {
-            setDocumentsSubTab('certificate');
-            setActiveTab('documents');
-            return;
-          }
-          if (tab === 'referral') {
-            setDocumentsSubTab('referral');
-            setActiveTab('documents');
-            return;
-          }
-          if (tab === 'exams') {
-            setDocumentsSubTab('exams');
-            setActiveTab('documents');
-            return;
-          }
-          setActiveTab(tab);
-        }}
+        onSelectTab={handleSelectTab}
         prescriptionCount={prescriptionItems.length}
         selectedExamsCount={selectedExams.length}
         onOpenMenu={() => setSidebarOpen(true)}

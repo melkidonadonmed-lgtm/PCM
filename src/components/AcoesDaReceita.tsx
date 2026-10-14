@@ -1,5 +1,4 @@
 import React from 'react';
-import { Printer, FileText, Send, Copy, Check } from 'lucide-react';
 import { Icon } from './Icon';
 
 export interface AcoesDaReceitaProps {
@@ -69,7 +68,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
                 : 'Emitir receita oficial: imprimir folha A4 ou gerar PDF'
             }
           >
-            <Printer className="w-4 h-4" />
+            <Icon name="print" className="text-[16px]" />
             <span>Imprimir / Gerar PDF</span>
           </button>
 
@@ -82,7 +81,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
               className="btn-tactile-secondary px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 dark:text-slate-300"
               title="Abrir no Editor visual A4 para ajustes de texto livre, layout ou timbrados"
             >
-              <FileText className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+              <Icon name="description" className="text-[16px] text-slate-600 dark:text-slate-300" />
               <span>Editor de Folha A4</span>
             </button>
           )}
@@ -100,7 +99,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
                 : 'Enviar receita no WhatsApp'
             }
           >
-            <Send className="w-4 h-4" strokeWidth={2} />
+            <Icon name="send" className="text-[16px]" />
             <span>WhatsApp</span>
           </button>
         </div>
@@ -119,9 +118,9 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
           }
         >
           {copiedSuccess ? (
-            <Check className="w-3.5 h-3.5 text-emerald-500" strokeWidth={2.5} />
+            <Icon name="check" className="text-[14px] text-emerald-500" />
           ) : (
-            <Copy className="w-3.5 h-3.5" strokeWidth={2} />
+            <Icon name="content_copy" className="text-[14px]" />
           )}
           <span>{copiedSuccess ? 'Copiado!' : 'Copiar texto'}</span>
         </button>

@@ -78,26 +78,16 @@
 
   body {
     font-family: var(--font-main);
-    background-color: var(--bg-canvas);
+    background-color: var(--bg-app);
     color: var(--text-main);
     min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
     -webkit-font-smoothing: antialiased;
-    background-image:
-      radial-gradient(ellipse 90% 60% at 50% -10%, #FCF9F3 0%, rgba(245, 239, 230, 0) 70%),
-      linear-gradient(180deg, #F8F3EA 0%, #EFE7DA 100%);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
   }
 
   .dark body,
   body.dark {
     background-color: var(--bg-app);
-    background-image:
-      radial-gradient(ellipse 90% 60% at 50% -10%, #172236 0%, rgba(14, 20, 32, 0) 70%),
-      linear-gradient(180deg, #111827 0%, #0A0E17 100%);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
   }
 
   :root {
@@ -240,11 +230,11 @@
   .dark, [data-theme="dark"] {
     /* Baseline color-scheme */
     color-scheme: dark;
-    --canvas: #0b0f19;
-    --surface: #151e2e;
-    --border: #243044;
+    --canvas: #0f172a;
+    --surface: #1e293b;
+    --border: #334155;
     --text-primary: #f8fafc;
-    --text-muted: #a5b3c5;
+    --text-muted: #94a3b8;
     --primary: #2563eb;
     --primary-hover: #1d4ed8;
     --clinical: #10b981;

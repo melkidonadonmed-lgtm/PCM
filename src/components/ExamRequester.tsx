@@ -1,16 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  FlaskConical, 
-  Search, 
-  Check, 
-  Plus, 
-  Trash2, 
-  Download, 
-  Sparkles, 
-  FileCheck
-} from 'lucide-react';
 import { ExamItem, Patient } from '../types';
 import { EXAM_CATALOG, EXAM_PACKAGES, ExamPackage } from '../data/examCatalog';
+import { Icon } from './Icon';
 
 interface ExamRequesterProps {
   darkMode: boolean;
@@ -106,19 +97,19 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           <div 
             className="w-10 h-10 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-blue-600 border border-white/12 shadow-sm"
           >
-            <FlaskConical className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
+            <Icon name="science" className="text-[20px] text-slate-100" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-lg font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-                Solicitação de Exames Complementares
+              <h2 className="text-base sm:text-lg font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                Solicitação de exames complementares
               </h2>
               <span className="text-[11px] px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-blue-500/20 dark:text-blue-300 border border-navy-900/20 dark:border-blue-400/30 font-semibold">
                 {selectedExams.length} selecionado(s)
               </span>
             </div>
             <p className="text-xs font-medium mt-0.5" style={{ color: darkMode ? '#8E9CAE' : '#64748B' }}>
-              Paciente: <span className="text-navy-900 dark:text-blue-400 font-semibold">{patient?.name?.trim() || 'Não identificado'}</span> • Selecione exames individuais ou painéis rápidos.
+              Paciente: <span className="text-navy-900 dark:text-blue-400 font-semibold">{patient?.name?.trim() || 'Não identificado'}</span> • selecione exames individuais ou painéis rápidos.
             </p>
           </div>
         </div>
@@ -129,8 +120,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           disabled={selectedExams.length === 0}
           className="btn-tactile-primary text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
         >
-          <Download className="w-4 h-4" strokeWidth={1.75} />
-          <span>Visualizar & Baixar PDF ({selectedExams.length})</span>
+          <Icon name="download" className="text-[16px]" />
+          <span>Visualizar e baixar PDF ({selectedExams.length})</span>
         </button>
       </div>
 
@@ -143,9 +134,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         }}
       >
         <div className="flex items-center gap-1.5 mb-2.5">
-          <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" strokeWidth={1.75} />
+          <Icon name="auto_awesome" className="text-[16px] text-blue-600 dark:text-blue-400" />
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-            Painéis & Pacotes Clínicos:
+            Painéis e pacotes clínicos:
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -174,7 +165,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 </p>
               </div>
               <div className="mt-2 text-[11px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                <Plus className="w-3 h-3" strokeWidth={1.75} /> Incluir {pkg.examIds.length} exames
+                <Icon name="add" className="text-[13px]" /> Incluir {pkg.examIds.length} exames
               </div>
             </button>
           ))}
@@ -190,14 +181,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         }}
       >
         <label htmlFor="exam-clinical-indication" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1.5">
-          Indicação Clínica / Hipótese Diagnóstica (Para o Laboratório / Convênio)
+          Indicação clínica / hipótese diagnóstica (para o laboratório / convênio)
         </label>
         <input
           id="exam-clinical-indication"
           type="text"
           value={clinicalIndication}
           onChange={(e) => onUpdateClinicalIndication(e.target.value)}
-          placeholder="Ex: Investigação de síndrome febril aguda a esclarecer, controle de rotina, etc."
+          placeholder="Ex.: Investigação de síndrome febril aguda a esclarecer, controle de rotina, etc."
           className="w-full p-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
         />
       </div>
@@ -209,10 +200,10 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           {/* Search and Category Filters */}
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400" strokeWidth={1.75} />
+              <Icon name="search" className="text-[16px] absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Buscar exame (ex: Hemograma, PCR, Dengue, Ureia, Raio-X, ECG)..."
+                placeholder="Ex.: Hemograma, PCR, Dengue, Ureia, Raio-X, ECG..."
                 aria-label="Buscar exame no catálogo"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -223,7 +214,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             <form onSubmit={handleAddCustomExam} className="flex gap-2">
               <input
                 type="text"
-                placeholder="Adicionar exame avulso..."
+                placeholder="Ex.: Exame avulso..."
                 aria-label="Nome do exame avulso"
                 value={customExamName}
                 onChange={(e) => setCustomExamName(e.target.value)}
@@ -298,7 +289,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                         selected ? 'bg-navy-900 dark:bg-blue-600 border-navy-900 dark:border-blue-500 text-white' : 'border-slate-400'
                       }`}
                     >
-                      {selected && <Check className="w-3 h-3 stroke-[2.5]" />}
+                      {selected && <Icon name="check" className="text-[12px]" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold text-xs truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
@@ -328,9 +319,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           }}
         >
           <div className="flex items-center justify-between border-b pb-2.5" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
-            <h3 className="font-bold text-xs sm:text-sm flex items-center gap-2" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-              <FileCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" strokeWidth={1.75} />
-              Exames no Pedido ({selectedExams.length})
+            <h3 className="font-semibold text-xs sm:text-sm flex items-center gap-2" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+              <Icon name="fact_check" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
+              Exames no pedido ({selectedExams.length})
             </h3>
             {selectedExams.length > 0 && (
               <button
@@ -371,7 +362,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     title="Remover"
                     aria-label={`Remover exame ${exam.name}`}
                   >
-                    <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    <Icon name="delete" className="text-[14px]" />
                   </button>
                 </div>
               ))}
@@ -385,8 +376,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 onClick={onNavigateToPrint}
                 className="btn-tactile-primary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
-                <Download className="w-4 h-4" strokeWidth={1.75} />
-                <span>Gerar & Baixar PDF</span>
+                <Icon name="download" className="text-[16px]" />
+                <span>Gerar e baixar PDF</span>
               </button>
             </div>
           )}
