@@ -302,7 +302,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
   // Ação: Abrir documento ativo no Editor A4 / Timbrados
   const handleOpenInEditor = () => {
-    const html = buildSusDocumentHtml(currentDocItem, formData);
+    const html = buildSusDocumentHtml(currentDocItem, formData, timbreDe(currentDocItem));
     if (onNavigateToEditorWithHtml) {
       onNavigateToEditorWithHtml(html, currentDocItem.shortTitle, 'sus');
     } else {
@@ -316,7 +316,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     const combinedHtml = docsToOpen.map((id, index) => {
       const doc = SUS_DOCUMENTS_CATALOG.find(d => d.id === id);
       if (!doc) return '';
-      const docHtml = buildSusDocumentHtml(doc, getFilledDataForDoc(id));
+      const docHtml = buildSusDocumentHtml(doc, getFilledDataForDoc(id), timbreDe(doc));
       const pageBreak = index < docsToOpen.length - 1
         ? '<div class="page-break" style="page-break-after: always; break-after: page; margin-bottom: 24px;"></div>'
         : '';
@@ -363,6 +363,14 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const nomeArquivo = (prefixo: string) =>
     `${prefixo}_${(formData.patientName || 'Paciente').trim().replace(/\s+/g, '_')}.pdf`;
+
+  const handlePrintSheet = () => {
+    if (!medicoConfigurado(doctor)) {
+      showToast('Configure nome e CRM do médico para emitir documentos.');
+      return;
+    }
+    window.print();
+  };
 
   const handleDownloadPdf = async (downloadAll = false) => {
     if (!medicoConfigurado(doctor)) {
@@ -417,7 +425,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     <div id="sus-documents-filler-hub" className="space-y-4">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-2xl border border-white/10 flex items-center gap-2 animate-bounce-short">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-2xl border border-white/10 flex items-center gap-2 animate-bounce-short"
+        >
           <Check className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
@@ -1359,124 +1371,104 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             </div>
 
             {/* Coluna da Direita: Pré-visualização da Folha Oficial SUS e Ações de Emissão (5 Colunas) */}
-            <div className="lg:col-span-5 space-y-4">
-              {/* Barra de Ações de Emissão */}
+            <div className="lg:col-span-5 space-y-3">
+              {/* Barra de Ações Enxuta */}
               <div 
-                className="tactile-card p-3 rounded-2xl border flex flex-col gap-2.5"
+                className="tactile-card p-2.5 rounded-2xl border flex flex-col gap-2"
                 style={{
                   backgroundColor: 'var(--surface-card)',
                   borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
                 }}
               >
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--text-muted)] px-1">
-                  Ações de Emissão & Protocolo
-                </span>
-
                 {pendenciasClinicas.length > 0 && (
                   <p role="status" className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/25">
-                    Em branco neste documento: {pendenciasClinicas.join(', ')}.
+                    Em branco: {pendenciasClinicas.join(', ')}.
                   </p>
                 )}
 
                 {camposCortados.length > 0 && (
                   <p role="alert" className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-rose-500/10 text-rose-900 dark:text-rose-200 border border-rose-500/30">
-                    O texto não coube {camposCortados.length > 1 ? 'nos campos' : 'no campo'} {camposCortados.join(', ')} do impresso e saiu cortado, com a marca […]. Resuma o texto ou anexe um relatório.
+                    Texto cortado com […] {camposCortados.length > 1 ? 'nos campos' : 'no campo'} {camposCortados.join(', ')}.
                   </p>
                 )}
 
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Baixar PDF (Individual ou Todos) */}
+                <div className="flex items-center gap-2">
+                  {/* Imprimir Folha A4 (Apenas ícone da impressora) */}
+                  <button
+                    type="button"
+                    onClick={handlePrintSheet}
+                    aria-label="Imprimir folha A4"
+                    title="Imprimir folha A4 (Ctrl+P)"
+                    className="btn-tactile-primary w-11 h-11 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center cursor-pointer shrink-0"
+                  >
+                    <Printer className="w-4 h-4" />
+                  </button>
+
+                  {/* Baixar PDF (Individual) */}
                   <button
                     type="button"
                     onClick={() => handleDownloadPdf(false)}
                     disabled={isExportingPdf}
-                    className="btn-tactile-primary h-10 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                    aria-label="Baixar PDF do documento atual"
                     title="Baixar PDF do documento atual"
+                    className="btn-tactile-secondary h-11 min-h-[44px] px-3 text-xs font-bold flex-1 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
                   >
                     <Download className="w-4 h-4" />
-                    <span>{isExportingPdf ? 'Gerando...' : (selectedDocIds.length > 1 ? 'Baixar Este' : 'Baixar PDF')}</span>
+                    <span>{isExportingPdf ? 'Gerando...' : 'PDF'}</span>
                   </button>
 
-                  {selectedDocIds.length > 1 ? (
+                  {selectedDocIds.length > 1 && (
                     <button
                       type="button"
                       onClick={() => handleDownloadPdf(true)}
                       disabled={isExportingPdf}
-                      className="btn-tactile-clinical h-10 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                      aria-label={`Baixar todos os ${selectedDocIds.length} documentos em PDF`}
                       title={`Baixar todos os ${selectedDocIds.length} documentos selecionados em um único arquivo PDF`}
+                      className="btn-tactile-clinical h-11 min-h-[44px] px-3 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
                     >
                       <Layers className="w-4 h-4" />
-                      <span>{isExportingPdf ? 'Gerando...' : `Baixar Todos (${selectedDocIds.length})`}</span>
-                    </button>
-                  ) : (
-                    /* Imprimir Folha A4 */
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="btn-tactile-clinical h-10 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <Printer className="w-4 h-4" />
-                      <span>Imprimir A4</span>
+                      <span>{isExportingPdf ? '...' : `Todos (${selectedDocIds.length})`}</span>
                     </button>
                   )}
-                </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Abrir no Editor A4 */}
+                  {/* Abrir no Editor A4 (Ícone compacto) */}
                   <button
                     type="button"
-                    onClick={handleOpenInEditor}
-                    className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95"
-                    title="Editar texto deste documento no Editor A4"
+                    onClick={selectedDocIds.length > 1 ? handleOpenAllInEditor : handleOpenInEditor}
+                    aria-label="Abrir no Editor A4"
+                    title={selectedDocIds.length > 1 ? `Abrir todos (${selectedDocIds.length}) no Editor A4` : 'Abrir no Editor A4'}
+                    className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] flex items-center justify-center cursor-pointer transition active:scale-95 shrink-0"
                   >
-                    <Edit3 className="w-3.5 h-3.5 text-blue-500" />
-                    <span>{selectedDocIds.length > 1 ? 'Editar Este no A4' : 'Abrir no Editor A4'}</span>
+                    <Edit3 className="w-4 h-4 text-blue-500" />
                   </button>
 
-                  {selectedDocIds.length > 1 ? (
-                    <button
-                      type="button"
-                      onClick={handleOpenAllInEditor}
-                      className="h-9 px-3 rounded-xl border border-blue-400/40 bg-blue-500/10 hover:bg-blue-500/20 text-xs font-bold text-blue-700 dark:text-blue-300 flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95"
-                      title={`Abrir todos os ${selectedDocIds.length} documentos selecionados no Editor A4 com quebra de página`}
-                    >
-                      <Layers className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                      <span>Editar Todos ({selectedDocIds.length})</span>
-                    </button>
-                  ) : (
-                    /* Copiar Texto Markdown */
-                    <button
-                      type="button"
-                      onClick={handleCopyMarkdown}
-                      className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95"
-                      title="Copiar texto estruturado para colar no PEP / e-SUS APS"
-                    >
-                      <Copy className="w-3.5 h-3.5 text-slate-500" />
-                      <span>Copiar Laudo</span>
-                    </button>
-                  )}
+                  {/* Copiar Texto Markdown (Ícone compacto) */}
+                  <button
+                    type="button"
+                    onClick={handleCopyMarkdown}
+                    aria-label="Copiar laudo"
+                    title="Copiar laudo estruturado para colar no PEP / e-SUS APS"
+                    className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] flex items-center justify-center cursor-pointer transition active:scale-95 shrink-0"
+                  >
+                    <Copy className="w-4 h-4 text-slate-500" />
+                  </button>
                 </div>
               </div>
 
               {/* Folha Física A4 Prévia (Papel Branco com Tipografia Grafite) */}
-              <div className="space-y-2">
-                <p className="px-1 text-[11px] font-semibold text-[var(--text-muted)]">
-                  Prévia da folha A4 — o PDF e a impressão saem exatamente assim.
-                </p>
-                <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/50">
-                  <FolhaA4
-                    ref={folhaSusRef}
-                    id="sus-document-print-sheet"
-                    imprimivel
-                    className={classeDaFolha(Boolean(formularioOficial))}
-                  >
-                    {formularioOficial ? (
-                      <FormularioOficialSus formulario={formularioOficial} dados={formData} />
-                    ) : (
-                      <div dangerouslySetInnerHTML={{ __html: buildSusDocumentHtml(currentDocItem, formData, timbreDe(currentDocItem)) }} />
-                    )}
-                  </FolhaA4>
-                </div>
+              <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/50">
+                <FolhaA4
+                  ref={folhaSusRef}
+                  id="sus-document-print-sheet"
+                  imprimivel
+                  className={classeDaFolha(Boolean(formularioOficial))}
+                >
+                  {formularioOficial ? (
+                    <FormularioOficialSus formulario={formularioOficial} dados={formData} />
+                  ) : (
+                    <div dangerouslySetInnerHTML={{ __html: buildSusDocumentHtml(currentDocItem, formData, timbreDe(currentDocItem)) }} />
+                  )}
+                </FolhaA4>
               </div>
             </div>
           </div>

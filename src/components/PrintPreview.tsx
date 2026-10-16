@@ -349,11 +349,11 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               type="button"
               onClick={handlePrint}
               disabled={!isConfigured}
-              className={`${classeBotaoSecundario} flex`}
+              aria-label="Imprimir a folha"
+              className="btn-tactile-secondary w-10 sm:w-11 h-10 sm:h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl flex items-center justify-center shrink-0 transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               title={tituloAcao('Imprimir a folha (Ctrl+P)')}
             >
               <Printer className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
-              <span>Imprimir</span>
             </button>
 
             <button

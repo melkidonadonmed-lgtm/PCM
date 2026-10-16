@@ -2029,22 +2029,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
         {/* Botões de Ação de Impressão e Modelo */}
         <div className="flex items-center gap-2 flex-wrap min-w-0 max-w-full">
-          {/* Botão de Impressão Direta A4 Superior (Alta visibilidade) */}
+          {/* Botão de Impressão Direta A4 Superior (Apenas ícone para zero poluição visual) */}
           <button
             type="button"
             onClick={handlePrint}
-            className={`btn-tactile-primary h-10 min-h-10 px-3.5 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
+            aria-label="Imprimir folha A4"
+            className={`btn-tactile-primary w-10 h-10 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 ${
               !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
             }`}
             title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
           >
             <Printer className="w-4 h-4" />
-            <span>Imprimir A4</span>
-            {!medicoConfigurado(doctor) && (
-              <span className="text-[10px] px-1.5 py-0.2 bg-amber-400 text-slate-950 rounded font-bold">
-                Configurar
-              </span>
-            )}
           </button>
 
           {/* Botão Baixar PDF Nativo de Alta Fidelidade (Preserva tipografia e layout) */}
