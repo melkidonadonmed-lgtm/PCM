@@ -61,7 +61,7 @@ npm run clean      # remove dist/
 - Volta do Editor A4 para a receita: HTML editado convertido de novo em itens tipados (`parsePrescriptionHtml.test.ts`).
 - Catálogo e gerador dos documentos SUS (`susDocumentsAndEditorEnhancements.test.ts`).
 - Limpeza dos dados antes de gravar no Firestore (`cloudSyncSanitize.test.ts`).
-- Navegação e fluxo de consulta: rotas do editor, preenchimento e limpeza do paciente, calculadora em gaveta e Central de Documentos (`editorRoutingAndActions.test.ts`, `patientAutofillAndClear.test.ts`, `pediatricDrawerAndDocumentsHub.test.ts`).
+- Navegação, ergonomia e fluxo de consulta: rotas do editor, preenchimento e limpeza do paciente, calculadora em gaveta, Central de Documentos, combobox único sem sobrescrita no `Enter`, atalhos `Alt+1..5` e navegação por setas (`editorRoutingAndActions.test.ts`, `patientAutofillAndClear.test.ts`, `pediatricDrawerAndDocumentsHub.test.ts`, `uiNavigationAndLayout.test.tsx`).
 
 Ao modificar lógica de cálculo, kits ou conformidade sanitária, execute obrigatoriamente `npm run test`, `npm run lint` e `npm run design:lint`.
 

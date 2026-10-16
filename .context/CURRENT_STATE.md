@@ -43,7 +43,7 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
 - Deploy automático no push em `main` (gatilho `gcpmain` → `cloudbuild.yaml`).
 
 ## Qualidade
-- 184/184 testes · `tsc --noEmit` limpo · `npm run design:lint` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
+- 189/189 testes · `tsc --noEmit` limpo · `npm run design:lint` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
   (logos em base64 saíram do JavaScript; motor de PDF sob demanda).
 - Validado em navegador (dados fictícios): desktop claro e celular escuro geram PDFs idênticos.
 
@@ -61,16 +61,20 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
   - *CNS, CPF e CNES do médico no perfil (antiga pendência #6):* adicionados campos opcionais `cns`, `cpf` e `cnes` em `DoctorProfileModal.tsx` e `DEFAULT_DOCTOR`, preservando-os ao salvar o perfil e preenchendo automaticamente o campo 15 da LME e o campo 44 da APAC.
   - *Timbre institucional nas 2 vias do Editor A4 (antiga pendência #8):* cabeçalhos de 1ª e 2ª via em `DocumentEditorView.tsx` exibem o logotipo principal à esquerda e o logotipo secundário (SUS) à direita, alinhados ao `CabecalhoInstitucional.tsx`.
 
+### Refinamento de Front-End Minimalista e Navegação Fluida (14/10/2026)
+- **Combobox único de fármacos (`PrescriptionBuilder.tsx`):** unificação da busca e do campo de medicamento (`#med-search-input` / `Ctrl+K`), com proteção contra sobrescrita acidental ao pressionar `Enter` quando o médico edita livremente o nome do medicamento.
+- **Navegação de topo e atalhos globais (`Header.tsx` e `App.tsx`):** barra segmentada de módulos no desktop (`lg:flex`) com atalhos globais `Alt+1` a `Alt+5` (ignorados quando o foco está em campos editáveis ou `contenteditable`).
+- **Sidebar e Central de Documentos (`Sidebar.tsx` e `ClinicalDocumentsHub.tsx`):** `Sidebar` enxuta em Deep Navy com tooltips flutuantes no modo recolhido (`68px`); abas da Central de Documentos com navegação por setas (`roving tabindex`).
+- **Suíte dedicada:** adicionado `src/__tests__/uiNavigationAndLayout.test.tsx` (189/189 testes passando).
+
 ## Pendências (precisam de decisão ou revisão humana)
 1. **Notificação de Receita (escopo complementar):**
    - a detecção é por nome: marcas fora da tabela, codeína/tramadol acima de 100 mg por unidade,
      tretinoína sistêmica e a Lista C3 (talidomida, lenalidomida) passam sem aviso;
    - o Termo de Responsabilidade da sibutramina não é citado (falta fonte primária);
    - a tabela precisa ser reconferida a cada atualização do Anexo I da Portaria 344/98.
-2. **Impressos oficiais que faltam:** SISCAN (citopatológico, histopatológico, mamografia) tem formulário
-   nacional do INCA e pode entrar no mesmo motor, mas exige campos novos na tela (anamnese ginecológica,
-   exame clínico). Guia SISREG, GAL/LACEN, TRM-TB e "APAC complementar" não têm modelo nacional único:
-   é preciso o impresso usado em Porto Velho/RO (foto ou PDF) para reproduzir.
+2. **Demais 7 documentos SUS (Guia SISREG, APAC complementar, GAL/LACEN, TRM-TB e SISCAN citopatológico/mamografia/histopatológico):**
+   - Decisão técnica (14/10/2026): manter APAC Principal (55 campos) e LME (23 campos) no impresso oficial do MS (`FormularioOficialSus.tsx`), e evoluir os outros 7 documentos em código HTML de **grade técnica estruturada** (`buildSusDocumentHtml` em `susDocumentsCatalog.ts`), espelhando as seções, quadros e checkboxes `[ ]` das planilhas de referência em `G:\Meu Drive\16_Documentos_comp_SUS\02_Modelos_Planilhas_Excel_Sheets` (híbrido digital + preenchimento à caneta, editável no Tiptap, timbre dinâmico `TimbreSus` e zero dado clínico presumido).
 3. **APAC:** a cópia do modelo nacional veio do site da SES/RS (o Ministério não publica o PDF em página
    própria). Conferir com o impresso que a regulação local aceita; campos 4, 11, 12, 15 e 21–35 ficam em
    branco porque o app não coleta esses dados.
