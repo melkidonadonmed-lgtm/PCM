@@ -6,6 +6,11 @@ import { calculatePediatricDose } from '../utils/doseCalculator';
 import { UNIFIED_MEDICATIONS, UnifiedMedication, CATEGORY_LABELS } from '../data/medicationDatabase';
 import { Icon } from './Icon';
 
+/**
+ * Ilha de Protocolos Clínicos e Catálogo SUS/RENAME.
+ * Estados de UI cobertos: empty (nenhum protocolo/fármaco encontrado), loading (carregando filtro),
+ * success (sucesso ao transferir conduta para a receita) e error (erro de peso ausente na urgência).
+ */
 interface ClinicalProtocolsViewProps {
   darkMode: boolean;
   patient: Patient;

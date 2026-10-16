@@ -1,6 +1,16 @@
+import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral } from '../types';
-import { DEFAULT_PATIENT } from '../hooks/usePrescriptionSession';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { DoctorProfile, Patient } from '../types';
+import {
+  DEFAULT_PATIENT,
+  DEFAULT_EXAM_INDICATION,
+  createDefaultCertificate,
+  createDefaultReferral,
+  syncPatientToDocuments,
+  createCleanConsultationState
+} from '../hooks/usePrescriptionSession';
+import { DocumentoClinico } from '../components/documento/DocumentoClinico';
 
 describe('Sincronização de Paciente e Higiene de Consulta', () => {
   it('deve sincronizar nome e documento do paciente para atestados e encaminhamentos automaticamente', () => {
@@ -13,118 +23,69 @@ describe('Sincronização de Paciente e Higiene de Consulta', () => {
       ageText: '52 anos'
     };
 
-    // Simulação do sincronizador da sessão
-    const syncWithDocuments = (
-      p: Patient,
-      cert: Partial<MedicalCertificate>,
-      ref: Partial<MedicalReferral>
-    ) => ({
-      cert: {
-        ...cert,
-        patientName: p.name || '',
-        documentNumber: p.documentNumber || ''
-      },
-      ref: {
-        ...ref,
-        patientName: p.name || '',
-        documentNumber: p.documentNumber || ''
-      }
-    });
+    const certInitial = createDefaultCertificate('Porto Velho - RO');
+    const refInitial = createDefaultReferral();
 
-    const certInitial = { id: 'c1', patientName: '', documentNumber: '', daysOff: 3 };
-    const refInitial = { id: 'r1', patientName: '', documentNumber: '', destinationSpecialty: 'Cardiologia' };
+    const synced = syncPatientToDocuments(originalPatient, certInitial, refInitial);
 
-    const synced = syncWithDocuments(originalPatient, certInitial, refInitial);
-
-    expect(synced.cert.patientName).toBe('Maria Aparecida da Silva');
-    expect(synced.cert.documentNumber).toBe('987.654.321-99');
-    expect(synced.ref.patientName).toBe('Maria Aparecida da Silva');
-    expect(synced.ref.documentNumber).toBe('987.654.321-99');
+    expect(synced.certificate.patientName).toBe('Maria Aparecida da Silva');
+    expect(synced.certificate.documentNumber).toBe('987.654.321-99');
+    expect(synced.referral.patientName).toBe('Maria Aparecida da Silva');
+    expect(synced.referral.documentNumber).toBe('987.654.321-99');
   });
 
   it('ao limpar o paciente, deve disparar a limpeza de todos os documentos clínicos do atendimento', () => {
-    // Estado populado antes da limpeza
-    let currentPatient: Patient = {
-      ...DEFAULT_PATIENT,
-      id: 'pat-old',
-      name: 'João Pedro de Oliveira',
-      documentNumber: '111.222.333-44',
-      weightKg: 80
-    };
+    const cleanState = createCleanConsultationState('Porto Velho - RO', 'pat-reset-001');
 
-    let prescriptionItems: PrescriptionItem[] = [
-      {
-        id: 'i1',
-        name: 'Losartana 50 mg',
-        presentation: '30 comp',
-        quantity: '1 cx',
-        doseCalculatedText: '',
-        frequencyText: '1x ao dia',
-        scheduleInterval: '24/24h',
-        scheduleTimes: ['08:00'],
-        instructions: 'Tomar pela manhã',
-        route: 'Oral',
-        isContinuous: true,
-        isSpecialControl: false
-      }
-    ];
-
-    let selectedExams: ExamItem[] = [
-      {
-        id: 'e1',
-        name: 'Hemograma Completo',
-        category: 'Hematologia',
-        description: 'Rotina',
-        urgency: 'routine',
-        selected: true
-      }
-    ];
-
-    let examIndication = 'Controle de rotina anual';
-
-    // Ação sanitária: Limpeza segura do atendimento
-    const handleClearPatientConsultation = () => {
-      currentPatient = {
-        ...DEFAULT_PATIENT,
-        id: `pat-${Date.now()}`
-      };
-      prescriptionItems = [];
-      selectedExams = [];
-      examIndication = 'Investigação clínica de rotina e controle metabólico.';
-    };
-
-    // Executa a limpeza
-    handleClearPatientConsultation();
-
-    // Validação estrita: Nenhum dado residual do paciente anterior deve restar
-    expect(currentPatient.name).toBe('');
-    expect(currentPatient.documentNumber).toBe('');
-    expect(currentPatient.weightKg).toBe(0);
-    expect(prescriptionItems).toHaveLength(0);
-    expect(selectedExams).toHaveLength(0);
-    expect(examIndication).toBe('Investigação clínica de rotina e controle metabólico.');
+    expect(cleanState.patient.id).toBe('pat-reset-001');
+    expect(cleanState.patient.name).toBe('');
+    expect(cleanState.patient.documentNumber).toBe('');
+    expect(cleanState.patient.weightKg).toBe(0);
+    expect(cleanState.prescriptionItems).toHaveLength(0);
+    expect(cleanState.selectedExams).toHaveLength(0);
+    expect(cleanState.examIndication).toBe(DEFAULT_EXAM_INDICATION);
+    expect(cleanState.certificate.patientName).toBe('');
+    expect(cleanState.certificate.includeCID).toBe(false);
+    expect(cleanState.certificate.cid10Code).toBe('');
+    expect(cleanState.referral.patientName).toBe('');
   });
 
   it('deve permitir fluxo rápido apenas com nome do paciente para atestados e encaminhamentos sem exigir CPF ou peso obrigatoriamente', () => {
-    // Fluxo ambulatorial ágil: médico preenche apenas o nome no card inicial
+    const doctor: DoctorProfile = {
+      name: 'Dr. Roberto Almeida',
+      crm: '54321',
+      crmState: 'RO',
+      specialty: 'Clínica Médica',
+      clinicName: 'UBS Teste',
+      address: 'Rua A, 10',
+      cityState: 'Porto Velho - RO',
+      phone: '(69) 0000-0000',
+      email: '',
+      showSignature: true
+    };
     const fastPatient: Patient = {
       ...DEFAULT_PATIENT,
       id: 'pat-fast-1',
       name: 'Carlos Eduardo Souza'
     };
 
-    expect(fastPatient.name).toBe('Carlos Eduardo Souza');
+    const synced = syncPatientToDocuments(
+      fastPatient,
+      createDefaultCertificate('Porto Velho - RO'),
+      createDefaultReferral()
+    );
+
+    const certHtml = renderToStaticMarkup(
+      React.createElement(DocumentoClinico, {
+        tipo: 'certificate',
+        doctor,
+        patient: fastPatient,
+        certificate: synced.certificate
+      })
+    );
+    expect(certHtml).toContain('Carlos Eduardo Souza');
     expect(fastPatient.documentNumber).toBe('');
     expect(fastPatient.weightKg).toBe(0);
-
-    // O atestado e encaminhamento devem aceitar o paciente mesmo sem CPF e peso cadastrados
-    const certPayload: Partial<MedicalCertificate> = {
-      patientName: fastPatient.name,
-      documentNumber: fastPatient.documentNumber || '',
-      daysOff: 2
-    };
-
-    expect(certPayload.patientName).toBe('Carlos Eduardo Souza');
-    expect(certPayload.documentNumber).toBe('');
   });
 });
+

@@ -302,6 +302,121 @@ function cabecalhoSus(item: SusDocumentItem, timbre?: TimbreSus): string {
       </div>`;
 }
 
+function gradeTecnicaComplementarSus(item: SusDocumentItem, data: SusFilledFormData): string {
+  const caixaEstilo = 'border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; font-size: 10.5px; background-color: #FFFFFF; page-break-inside: avoid; break-inside: avoid;';
+  const tituloSecaoEstilo = 'margin: 0 0 5px 0; font-weight: bold; font-size: 11px; color: #0F172A; border-bottom: 1px solid #E2E8F0; padding-bottom: 3px; text-transform: uppercase;';
+
+  switch (item.id) {
+    case 'apac_complementar':
+      return `
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 3 — MODALIDADE DE IMAGEM, HISTÓRIA CLÍNICA E TRATAMENTOS PRÉVIOS</p>
+        <p style="margin: 3px 0;"><strong>Modalidade:</strong> [ ] TC &nbsp;&nbsp; [ ] RM &nbsp;&nbsp; [ ] Cintilografia &nbsp;&nbsp; [ ] Angio-TC / Angio-RM</p>
+        <p style="margin: 3px 0;"><strong>Tratamentos Prévios Realizados:</strong> [ ] Analgesia Escalonada / AINEs &nbsp;&nbsp; [ ] Fisioterapia Motora &nbsp;&nbsp; [ ] Outros</p>
+        <p style="margin: 3px 0;"><strong>Exames de Menor Complexidade Prévios:</strong> [ ] Radiografia Simples &nbsp;&nbsp; [ ] Ultrassonografia &nbsp;&nbsp; [ ] Tomografia Sem Contraste</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 4 — JUSTIFICATIVA DE MEIO DE CONTRASTE, FUNÇÃO RENAL E FATORES DE RISCO</p>
+        <p style="margin: 3px 0;"><strong>Uso de Contraste Endovenoso:</strong> ${data.isContrastNeeded ? '[X] Sim (Indicado para delimitação tecidual/vascular) &nbsp;&nbsp; [ ] Não' : '[ ] Sim &nbsp;&nbsp; [X] Não'}</p>
+        <p style="margin: 3px 0;"><strong>Função Renal:</strong> ${funcaoRenal(data)}</p>
+        <p style="margin: 3px 0;"><strong>Fatores de Risco Renal / Alergia:</strong> [ ] DRC &nbsp;&nbsp; [ ] Diabetes &nbsp;&nbsp; [ ] HAS &nbsp;&nbsp; [ ] Mieloma &nbsp;&nbsp; [ ] ICC &nbsp;&nbsp; [ ] Asma &nbsp;&nbsp; [ ] Uso de Metformina &nbsp;&nbsp; [ ] Alergia prévia ao contraste</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 5 — TRIAGEM DE SEGURANÇA EM CAMPO MAGNÉTICO (RM) E CIÊNCIA</p>
+        <p style="margin: 3px 0;">[ ] Dispositivo cardíaco eletrônico implantável (DCEI / CDI) &nbsp;&nbsp; [ ] Clipe de aneurisma cerebral ferromagnético &nbsp;&nbsp; [ ] Prótese valvar metálica</p>
+        <p style="margin: 3px 0;">[ ] Implante coclear / Neuroestimulador &nbsp;&nbsp; [ ] Fragmento metálico intraocular &nbsp;&nbsp; [ ] Ausência de implantes restritivos</p>
+      </div>`;
+
+    case 'sisreg_guia':
+      return `
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 3 — CLASSIFICAÇÃO DE RISCO REGULATÓRIO E MODALIDADE (SISREG III)</p>
+        <p style="margin: 3px 0;"><strong>Prioridade Clínica:</strong> [ ] Vermelho (Emergência / Alta Suspeita Oncológica) &nbsp;&nbsp; [ ] Amarelo (Prioritário) &nbsp;&nbsp; [ ] Verde (Moderada) &nbsp;&nbsp; [ ] Azul (Eletivo)</p>
+        <p style="margin: 3px 0;"><strong>Modalidade:</strong> [ ] 1ª Consulta Especializada &nbsp;&nbsp; [ ] Retorno / Seguimento &nbsp;&nbsp; [ ] Ecocardiograma / USG / RX Especializado &nbsp;&nbsp; [ ] Outro Exame</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 4 — REAVALIAÇÃO NA ATENÇÃO PRIMÁRIA E EXAMES BÁSICOS PRÉVIOS</p>
+        <p style="margin: 3px 0;"><strong>Recursos da APS já otimizados:</strong> [ ] Manejo farmacológico escalonado &nbsp;&nbsp; [ ] Exames laboratoriais / imagem de triagem anexados</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 5 — CAMPO DA CENTRAL DE REGULAÇÃO (SISREG) E CONTRARREFERÊNCIA</p>
+        <p style="margin: 3px 0;"><strong>Nº da Solicitação SISREG:</strong> ______________________ &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Status:</strong> [ ] Aprovado &nbsp; [ ] Pendente &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Agendamento:</strong> ___/___/_____ às ___:___ h</p>
+        <p style="margin: 3px 0;"><strong>Contrarreferência (Especialista &rarr; APS):</strong> Conduta e plano de seguimento na UBS: ____________________________________________________</p>
+      </div>`;
+
+    case 'siscan_citopatologico':
+      return `
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 3 — MOTIVO DO EXAME E ANAMNESE GINECOLÓGICA (SISCAN)</p>
+        <p style="margin: 3px 0;"><strong>Motivo do Exame:</strong> [ ] Rastreamento (25 a 64 anos) &nbsp;&nbsp; [ ] Repetição (ASC-US / Baixo Grau) &nbsp;&nbsp; [ ] Seguimento Pós-Tratamento</p>
+        <p style="margin: 3px 0;"><strong>DUM (Última Menstruação):</strong> ${data.gynecologyDum || VAZIO} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Exame Citopatológico Anterior:</strong> ${data.gynecologyPreviousExam || VAZIO}</p>
+        <p style="margin: 3px 0;"><strong>Condições:</strong> Usa DIU: [ ] Sim [ ] Não &nbsp;|&nbsp; Gestante: [ ] Sim [ ] Não &nbsp;|&nbsp; Menopausa / TRH: [ ] Sim [ ] Não &nbsp;|&nbsp; Vacina HPV: [ ] Sim [ ] Não &nbsp;|&nbsp; Sangramento pós-coito: [ ] Sim [ ] Não</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 4 — INSPEÇÃO CLÍNICA DO COLO UTERINO, COLETA E LAUDO BETHESDA</p>
+        <p style="margin: 3px 0;"><strong>Inspeção do Colo:</strong> [ ] Normal &nbsp;&nbsp; [ ] Ausente (Histerectomia) &nbsp;&nbsp; [ ] Ectopia / Erosão &nbsp;&nbsp; [ ] Atrofia &nbsp;&nbsp; [ ] Pólipo &nbsp;&nbsp; [ ] Lesão Suspeita</p>
+        <p style="margin: 3px 0;"><strong>Sinais de IST:</strong> [ ] Não [ ] Sim &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Adequabilidade / Bethesda (Laboratório):</strong> [ ] Satisfatória [ ] Insatisfatória &nbsp;|&nbsp; [ ] Normal [ ] Benigno [ ] ASC-US [ ] LSIL [ ] HSIL</p>
+      </div>`;
+
+    case 'gal_lacen_geral':
+      return `
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 3 — VIGILÂNCIA EPIDEMIOLÓGICA, AGRAVO SUSPEITO E NOTIFICAÇÃO SINAN</p>
+        <p style="margin: 3px 0;"><strong>Nº da Notificação SINAN:</strong> ${data.sinanNumber || VAZIO} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Início dos Sintomas (D1):</strong> ${data.symptomsStartDate || 'não informada'}</p>
+        <p style="margin: 3px 0;"><strong>Agravo Suspeito:</strong> [ ] Dengue &nbsp; [ ] Chikungunya &nbsp; [ ] Zika &nbsp; [ ] Oropouche/Mayaro &nbsp; [ ] Febre Amarela &nbsp; [ ] Malária &nbsp; [ ] Hepatite A/B/C &nbsp; [ ] HIV/Sífilis &nbsp; [ ] Leptospirose &nbsp; [ ] Vírus Respiratórios</p>
+        <p style="margin: 3px 0;"><strong>Sintomas:</strong> [ ] Febre &nbsp; [ ] Cefaleia &nbsp; [ ] Mialgia &nbsp; [ ] Artralgia &nbsp; [ ] Exantema &nbsp; [ ] Icterícia &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Finalidade:</strong> [ ] Caso Suspeito &nbsp; [ ] Surto &nbsp; [ ] Controle</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 4 — AMOSTRA BIOLÓGICA, METODOLOGIA E TRANSPORTE (GAL / LACEN)</p>
+        <p style="margin: 3px 0;"><strong>Material Biológico Coletado:</strong> ${data.specimenType || 'não informado'} &nbsp;&nbsp; ([ ] Soro &nbsp; [ ] Sangue Total &nbsp; [ ] Plasma &nbsp; [ ] LCR &nbsp; [ ] Swab &nbsp; [ ] Urina)</p>
+        <p style="margin: 3px 0;"><strong>Metodologia:</strong> [ ] RT-PCR / Biologia Molecular &nbsp;&nbsp; [ ] Sorologia (ELISA / IgM / IgG) &nbsp;&nbsp; [ ] Isolamento / Cultura &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Transporte:</strong> [ ] Refrigerada (2–8 °C) &nbsp; [ ] Congelada (-20 °C)</p>
+      </div>`;
+
+    case 'siscan_histopatologico':
+      return `
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 3 — TOPOGRAFIA DO MATERIAL, PROCEDIMENTO E FIXAÇÃO (SISCAN)</p>
+        <p style="margin: 3px 0;"><strong>Sítio / Origem:</strong> [ ] Colo do Útero — Biópsia &nbsp;&nbsp; [ ] Colo do Útero — CAF / LEEP / Conização &nbsp;&nbsp; [ ] Endométrio &nbsp;&nbsp; [ ] Mama — Core Biopsy (PAG) &nbsp;&nbsp; [ ] Mama — Peça Cirúrgica</p>
+        <p style="margin: 3px 0;"><strong>Topografia / Lateralidade da Amostra:</strong> ${data.specimenType || VAZIO} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Conservação:</strong> [ ] Formol Tamponado 10% &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Nº de Frascos:</strong> _____</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 4 — CORRELAÇÃO COLPOSCÓPICA OU RADIOLÓGICA PRÉVIA (BI-RADS)</p>
+        <p style="margin: 3px 0;"><strong>Mama (BI-RADS):</strong> [ ] 0 &nbsp; [ ] 3 &nbsp; [ ] 4A &nbsp; [ ] 4B &nbsp; [ ] 4C &nbsp; [ ] 5 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Colo (Citologia/Colposcopia):</strong> [ ] Normal &nbsp; [ ] LSIL &nbsp; [ ] HSIL &nbsp; [ ] Lesão vegetante/ulcerada</p>
+      </div>`;
+
+    case 'siscan_mamografia':
+      return `
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 3 — MODALIDADE DA MAMOGRAFIA, RAÇA/COR E RISCO FAMILIAR (SISCAN)</p>
+        <p style="margin: 3px 0;"><strong>Modalidade:</strong> [ ] Mamografia de Rastreamento (50 a 69 anos) &nbsp;&nbsp; [ ] Mamografia Diagnóstica (Lesão palpável / Controle radiológico)</p>
+        <p style="margin: 3px 0;"><strong>Raça/Cor:</strong> [ ] Branca &nbsp; [ ] Preta &nbsp; [ ] Parda &nbsp; [ ] Amarela &nbsp; [ ] Indígena &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Risco Elevado (1º Grau):</strong> [ ] Sim [ ] Não &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Mamografia Anterior:</strong> ${data.gynecologyPreviousExam || VAZIO}</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 4 — EXAME CLÍNICO DAS MAMAS (ECM) E LAUDO RADIOLÓGICO (BI-RADS)</p>
+        <p style="margin: 3px 0;"><strong>Mama Direita:</strong> [ ] Sem achados palpáveis &nbsp;&nbsp; [ ] Nódulo &nbsp;&nbsp; [ ] Espessamento &nbsp;&nbsp; [ ] Descarga papilar &nbsp;&nbsp; [ ] Linfonodo axilar</p>
+        <p style="margin: 3px 0;"><strong>Mama Esquerda:</strong> [ ] Sem achados palpáveis &nbsp;&nbsp; [ ] Nódulo &nbsp;&nbsp; [ ] Espessamento &nbsp;&nbsp; [ ] Descarga papilar &nbsp;&nbsp; [ ] Linfonodo axilar</p>
+        <p style="margin: 3px 0;"><strong>BI-RADS (Prestador):</strong> Mama D: [ ] 0 [ ] 1 [ ] 2 [ ] 3 [ ] 4 [ ] 5 [ ] 6 &nbsp;&nbsp;|&nbsp;&nbsp; Mama E: [ ] 0 [ ] 1 [ ] 2 [ ] 3 [ ] 4 [ ] 5 [ ] 6</p>
+      </div>`;
+
+    case 'gal_trm_tb':
+      return `
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 3 — PERFIL CLÍNICO-EPIDEMIOLÓGICO E POPULAÇÕES ESPECIAIS (SVSA / GAL)</p>
+        <p style="margin: 3px 0;"><strong>Tipo de Entrada:</strong> [ ] Sintomático Respiratório / Caso Novo &nbsp;&nbsp; [ ] Retratamento após Interrupção &nbsp;&nbsp; [ ] Recidiva &nbsp;&nbsp; [ ] Falência ao Esquema Básico</p>
+        <p style="margin: 3px 0;"><strong>População Vulnerável:</strong> [ ] População Geral &nbsp;&nbsp; [ ] PVHIV &nbsp;&nbsp; [ ] Privado de Liberdade (PPL) &nbsp;&nbsp; [ ] Situação de Rua &nbsp;&nbsp; [ ] Profissional de Saúde &nbsp;&nbsp; [ ] Indígena</p>
+        <p style="margin: 3px 0;"><strong>Comorbidades / Forma:</strong> [ ] HIV &nbsp; [ ] Diabetes &nbsp; [ ] Tabagismo &nbsp; [ ] Álcool/Drogas &nbsp;&nbsp;|&nbsp;&nbsp; [ ] Pulmonar &nbsp; [ ] Extrapulmonar &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Tosse:</strong> ${data.tuberculosisSymptomsDuration || 'não informada'} &nbsp;|&nbsp; <strong>SINAN:</strong> ${data.sinanNumber || VAZIO}</p>
+      </div>
+      <div style="${caixaEstilo}">
+        <p style="${tituloSecaoEstilo}">SEÇÃO 4 — AMOSTRA E ENSAIOS SOLICITADOS (TRM-TB / BAAR / CULTURA)</p>
+        <p style="margin: 3px 0;"><strong>Amostra:</strong> ${data.specimenType || 'não informada'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Coleta:</strong> [ ] 1ª Amostra (ato) &nbsp;&nbsp; [ ] 2ª Amostra (jejum) &nbsp;&nbsp; [ ] LBA / Líquido Pleural</p>
+        <p style="margin: 3px 0;"><strong>Exames:</strong> [ ] TRM-TB (GeneXpert MTB/RIF) &nbsp;&nbsp; [ ] Baciloscopia Direta (BAAR) &nbsp;&nbsp; [ ] Cultura para Micobactérias + TSA</p>
+      </div>`;
+
+    default:
+      return '';
+  }
+}
+
 export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormData, timbre?: TimbreSus): string {
   const today = new Date().toLocaleDateString('pt-BR');
   const fullAddress = [
@@ -320,7 +435,7 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
   return `
     <div class="sus-document-rendered" style="font-family: inherit; line-height: 1.5; color: #0F172A;">${cabecalhoSus(item, timbre)}
 
-      <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px;">
+      <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; font-size: 11px; page-break-inside: avoid; break-inside: avoid;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
           <span><strong>Unidade Solicitante:</strong> ${data.doctorClinicName || 'Unidade de Saúde'}</span>
           <span><strong>CNES:</strong> ${data.doctorCnes || '—'}</span>
@@ -331,18 +446,18 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
         </div>
       </div>
 
-      <div style="border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin-bottom: 14px; font-size: 11px;">
+      <div style="border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; font-size: 11px; page-break-inside: avoid; break-inside: avoid;">
         <p style="margin: 0 0 4px 0; font-weight: bold; font-size: 12px; color: #1E293B; border-bottom: 1px solid #E2E8F0; padding-bottom: 3px;">
-          IDENTIFICAÇÃO DO PACIENTE
+          SEÇÃO 1 — IDENTIFICAÇÃO DO PACIENTE
         </p>
         <p style="margin: 3px 0;"><strong>Paciente:</strong> ${data.patientName || 'Não identificado'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>CNS (Cartão SUS):</strong> ${data.patientCns || '—'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>CPF:</strong> ${data.patientCpf || '—'}</p>
         <p style="margin: 3px 0;"><strong>Nascimento:</strong> ${nascimento}${idade ? ` (${idade})` : ''} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Mãe:</strong> ${data.patientMotherName || '—'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Tel:</strong> ${data.patientPhone || '—'}</p>
         <p style="margin: 3px 0;"><strong>Endereço:</strong> ${fullAddress}</p>
       </div>
 
-      <div style="border: 1px solid #94A3B8; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; font-size: 11px;">
+      <div style="border: 1px solid #94A3B8; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; font-size: 11px; page-break-inside: avoid; break-inside: avoid;">
         <p style="margin: 0 0 6px 0; font-weight: bold; font-size: 12px; color: #0369A1; text-transform: uppercase;">
-          PROCEDIMENTO & DADOS CLÍNICOS REGULATÓRIOS
+          SEÇÃO 2 — PROCEDIMENTO &amp; DADOS CLÍNICOS REGULATÓRIOS
         </p>
         <p style="margin: 3px 0;"><strong>Procedimento SIGTAP:</strong> ${data.sigtapCode || VAZIO} — ${data.procedureName || VAZIO}</p>
         <p style="margin: 3px 0;"><strong>Diagnóstico / CID-10:</strong> ${data.cid10Code || VAZIO} ${data.cid10Description ? `(${data.cid10Description})` : ''}</p>
@@ -353,9 +468,9 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
           <p style="margin: 0 0 3px 0; font-weight: bold; color: #334155;">Justificativa Técnica (Anti-Glosa):</p>
           <p style="margin: 0; text-align: justify; color: #1E293B;">${data.clinicalJustification || VAZIO}</p>
         </div>
-      </div>
+      </div>${gradeTecnicaComplementarSus(item, data)}
 
-      <div style="margin-top: 32px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 11px;">
+      <div style="margin-top: 24px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 11px;">
         <div>
           <p style="margin: 0;">${data.patientCity ? `${data.patientCity}, ` : ''}${today}</p>
         </div>
@@ -369,3 +484,4 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
     </div>
   `;
 }
+

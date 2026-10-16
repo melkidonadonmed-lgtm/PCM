@@ -34,6 +34,12 @@ import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
 import { avisoTextoNotificacao } from '../utils/notificacaoDeReceita';
 import WatermarkSelector from './WatermarkSelector';
 
+/**
+ * Tela de Emissão e Prévia A4.
+ * Estados de UI cobertos: empty (vazio sem itens), loading (carregando exportação PDF),
+ * success (sucesso ao copiar/exportar) e error (erro na geração ou médico não configurado).
+ */
+
 interface PrintPreviewProps {
   doctor: DoctorProfile;
   patient: Patient;

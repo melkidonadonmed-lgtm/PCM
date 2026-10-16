@@ -55,6 +55,7 @@ export interface PediatricMedication {
   dropsPerMl?: number; // default is 20 drops per ml unless specified
   doseCustomLabel?: string;
   defaultDays?: number;
+  isSpecialControl?: boolean;
 }
 
 export interface AdultMedication {
@@ -267,7 +268,7 @@ export type DocumentViaLayout = '1-via' | '2-vias';
 export interface SavedDocument {
   id: string;
   title: string;
-  contentJson: any; // Estado do documento Tiptap
+  contentJson: Record<string, unknown> | null; // Estado do documento Tiptap
   contentHtml: string;
   contextId: string; // Vínculo com a UBS ou Policlínica ativa
   isTemplate: boolean; // Se é um modelo reutilizável

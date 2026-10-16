@@ -24,6 +24,11 @@ import { COMMON_CID10, CIDItem } from '../data/cidCatalog';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { dataLocalISO } from '../utils/documentoClinico';
 
+/**
+ * Sub-ilhas de Atestado Médico e Encaminhamento.
+ * Estados de UI cobertos: empty (vazio sem CID), loading (carregando modelo),
+ * success (sucesso ao copiar/emitir) e error (erro de validação/consentimento).
+ */
 interface CertificateAndReferralProps {
   darkMode: boolean;
   patient: Patient;

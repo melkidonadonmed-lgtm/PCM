@@ -1,6 +1,10 @@
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { calculatePediatricDose } from '../utils/doseCalculator';
 import { PEDIATRIC_MEDICATIONS } from '../data/pediatricMeds';
+import { CertificateAndReferral } from '../components/CertificateAndReferral';
+import { createDefaultCertificate, createDefaultReferral, DEFAULT_DOCTOR } from '../hooks/usePrescriptionSession';
 import { PrescriptionItem, Patient } from '../types';
 
 describe('Integração da Calculadora Pediátrica em Drawer e Ilhas de Documentos', () => {
@@ -18,13 +22,11 @@ describe('Integração da Calculadora Pediátrica em Drawer e Ilhas de Documento
     expect(amoxi).toBeDefined();
     if (!amoxi) return;
 
-    // Cálculo clínico real
     const calc = calculatePediatricDose(amoxi, dummyPatient.weightKg);
-    expect(calc.volumeText).toContain('5 mL'); // 15 kg * 16.67 mg/kg = 250 mg -> 5 mL
+    expect(calc.volumeText).toContain('5 mL');
 
-    // Simula a construção do item como é feita em PediatricCalculator.tsx
     const newItem: PrescriptionItem = {
-      id: `presc-${Date.now()}`,
+      id: 'presc-amoxi-15kg',
       name: amoxi.name,
       presentation: amoxi.presentation,
       route: amoxi.route,
@@ -46,13 +48,33 @@ describe('Integração da Calculadora Pediátrica em Drawer e Ilhas de Documento
   });
 
   it('deve respeitar a propriedade hideSubNav para erradicar abas duplicadas no Hub de Documentos', () => {
-    // Validação de contrato de tipos e props
-    const hubProps = {
-      initialSubTab: 'certificate' as const,
-      hideSubNav: true
+    const baseProps = {
+      darkMode: false,
+      patient: dummyPatient,
+      doctor: DEFAULT_DOCTOR,
+      certificate: createDefaultCertificate('Porto Velho - RO'),
+      onUpdateCertificate: vi.fn(),
+      referral: createDefaultReferral(),
+      onUpdateReferral: vi.fn(),
+      onNavigateToPrint: vi.fn()
     };
-    expect(hubProps.hideSubNav).toBe(true);
-    expect(hubProps.initialSubTab).toBe('certificate');
+
+    const htmlWithSubNav = renderToStaticMarkup(
+      React.createElement(CertificateAndReferral, {
+        ...baseProps,
+        hideSubNav: false
+      })
+    );
+    const htmlHiddenSubNav = renderToStaticMarkup(
+      React.createElement(CertificateAndReferral, {
+        ...baseProps,
+        hideSubNav: true
+      })
+    );
+
+    expect(htmlWithSubNav).toContain('max-w-sm mx-auto');
+    expect(htmlHiddenSubNav).not.toContain('max-w-sm mx-auto');
+    expect(htmlHiddenSubNav).toContain('Emissão de Atestado Médico');
   });
 
   it('deve manter teto de segurança ao prescrever gotas pediátricas no Drawer', () => {
@@ -60,14 +82,13 @@ describe('Integração da Calculadora Pediátrica em Drawer e Ilhas de Documento
     expect(paracetamol).toBeDefined();
     if (!paracetamol) return;
 
-    // Criança de 12 kg -> 12 gotas (1 gota/kg)
     const calc12 = calculatePediatricDose(paracetamol, 12);
     expect(calc12.calculatedDrops).toBe(12);
     expect(calc12.isMaxDoseReached).toBe(false);
 
-    // Criança pesada de 110 kg -> teto seguro de 100 gotas por dose
     const calc110 = calculatePediatricDose(paracetamol, 110);
     expect(calc110.calculatedDrops).toBe(100);
     expect(calc110.isMaxDoseReached).toBe(true);
   });
 });
+

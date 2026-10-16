@@ -14,6 +14,11 @@ import {
   FileCheck
 } from 'lucide-react';
 import { DoctorProfile } from '../types';
+/**
+ * Modal de Backup e Restauração Portátil (.pcm.json).
+ * Estados de UI cobertos: empty (nenhum arquivo selecionado), loading (carregando exportação/importação),
+ * success (sucesso na restauração/exportação) e error (erro de validação do arquivo).
+ */
 import { 
   getLocalDatabaseStats, 
   exportCompleteBackup, 
@@ -22,6 +27,7 @@ import {
   PresCMedBackup,
   BackupStats 
 } from '../services/backupService';
+import { ConfirmationModal } from './ConfirmationModal';
 
 interface BackupModalProps {
   isOpen: boolean;
@@ -59,6 +65,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
   const [isImporting, setIsImporting] = useState(false);
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [confirmReplaceOpen, setConfirmReplaceOpen] = useState(false);
 
   // Carrega estatísticas do banco local ao abrir
   useEffect(() => {
@@ -71,6 +78,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
       setParsedBackup(null);
       setValidationError(null);
       setImportSuccess(null);
+      setConfirmReplaceOpen(false);
     }
   }, [isOpen]);
 
@@ -93,12 +101,13 @@ export const BackupModal: React.FC<BackupModalProps> = ({
   const handleExport = async () => {
     setIsExporting(true);
     setExportFeedback(null);
+    setValidationError(null);
     try {
       const result = await exportCompleteBackup(doctor);
       setExportFeedback(`Arquivo gerado: ${result.filename} (${(result.sizeBytes / 1024).toFixed(1)} kB)`);
     } catch (err) {
       console.error('Falha ao exportar backup:', err);
-      alert('Ocorreu um erro ao exportar os dados.');
+      setValidationError('Ocorreu um erro ao exportar os dados.');
     } finally {
       setIsExporting(false);
     }
@@ -114,8 +123,8 @@ export const BackupModal: React.FC<BackupModalProps> = ({
     try {
       const validated = await parseAndValidateBackup(file);
       setParsedBackup(validated);
-    } catch (err: any) {
-      setValidationError(err.message || 'Arquivo inválido.');
+    } catch (err: unknown) {
+      setValidationError(err instanceof Error ? err.message : 'Arquivo inválido.');
     }
   };
 
@@ -135,17 +144,9 @@ export const BackupModal: React.FC<BackupModalProps> = ({
     }
   };
 
-  // Ação: Executar Restauração
-  const handleExecuteImport = async () => {
+  const performImport = async () => {
     if (!parsedBackup) return;
-
-    if (importStrategy === 'replace') {
-      const confirmed = window.confirm(
-        'ATENÇÃO: A opção "Substituir base local completa" apagará os dados atuais do navegador antes de restaurar o backup.\n\nDeseja prosseguir?'
-      );
-      if (!confirmed) return;
-    }
-
+    setConfirmReplaceOpen(false);
     setIsImporting(true);
     setValidationError(null);
 
@@ -175,12 +176,24 @@ export const BackupModal: React.FC<BackupModalProps> = ({
         setParsedBackup(null);
       }, 2500);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Falha na restauração do backup:', err);
-      setValidationError(err.message || 'Ocorreu um erro ao restaurar os dados.');
+      setValidationError(err instanceof Error ? err.message : 'Ocorreu um erro ao restaurar os dados.');
     } finally {
       setIsImporting(false);
     }
+  };
+
+  // Ação: Executar Restauração
+  const handleExecuteImport = async () => {
+    if (!parsedBackup) return;
+
+    if (importStrategy === 'replace') {
+      setConfirmReplaceOpen(true);
+      return;
+    }
+
+    await performImport();
   };
 
   return (
@@ -454,6 +467,18 @@ export const BackupModal: React.FC<BackupModalProps> = ({
           </button>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={confirmReplaceOpen}
+        title="Substituir base local completa?"
+        description="Esta opção apagará os dados atuais do navegador antes de restaurar o arquivo de backup selecionado. Deseja prosseguir?"
+        confirmLabel="Substituir e Restaurar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        darkMode={darkMode}
+        onConfirm={performImport}
+        onCancel={() => setConfirmReplaceOpen(false)}
+      />
     </div>
   );
 };

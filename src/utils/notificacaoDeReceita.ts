@@ -13,18 +13,20 @@ import { textoDoMedicamento, type MedicamentoClassificavel } from './isSpecialCo
  * Receita de Controle Especial em 2 vias — a folha que o app já emite:
  *  - codeína (até 100 mg por unidade posológica e até 2,5% nas formas
  *    indivisíveis) e tramadol (até 100 mg por unidade) — adendos da Lista A2.
- *    Acima desses limites a exigência é a Notificação A, e o app não detecta;
+ *    Acima de 100 mg por unidade posológica a exigência passa a ser a
+ *    Notificação de Receita A (amarela), que o app detecta e avisa;
  *  - fenobarbital (adendo da Lista B1);
  *  - toda a Lista C1 (antidepressivos, antipsicóticos, anticonvulsivantes).
  *
- * Também ficam de fora, sem aviso: tretinoína (C2; o uso corrente é tópico, sem
- * retenção de receita) e talidomida/lenalidomida (C3, com regras próprias).
+ * Também fica de fora, sem aviso: tretinoína (C2; o uso corrente é tópico, sem
+ * retenção de receita). A Lista C3 (talidomida/lenalidomida) recebe aviso de
+ * Notificação de Receita da Lista C3 com Termo de Responsabilidade.
  *
  * A busca é por nome: marca comercial que não esteja na tabela passa sem aviso.
  * Ausência de aviso não significa que a receita emitida pelo app basta.
  */
 export interface NotificacaoDeReceita {
-  lista: 'A1' | 'A3' | 'B1' | 'B2' | 'C2';
+  lista: 'A1' | 'A2' | 'A3' | 'B1' | 'B2' | 'C2' | 'C3';
   /** Nome do documento exigido, com a cor do talonário quando a portaria a define. */
   documento: string;
   /** Forma curta para selos: "Notificação A". */
@@ -40,6 +42,12 @@ const NOTIFICACAO_RETINOIDE: NotificacaoDeReceita = {
   documento: 'Notificação de Receita Especial de retinoides (branca)',
   rotuloCurto: 'Notificação Especial',
   ressalva: 'no uso sistêmico, com Termo de Consentimento Pós-Informação; o uso tópico não exige notificação'
+};
+const NOTIFICACAO_C3: NotificacaoDeReceita = {
+  lista: 'C3',
+  documento: 'Notificação de Receita da Lista C3 (branca)',
+  rotuloCurto: 'Notificação C3',
+  ressalva: 'com Termo de Responsabilidade e Esclarecimento obrigatório'
 };
 
 // `palavrasInteiras`: termos que só valem como palavra inteira ("morfina" não
@@ -91,7 +99,9 @@ const REGRAS: Array<{ termos: string[]; palavrasInteiras?: string[]; notificacao
     notificacao: { lista: 'B2', documento: 'Notificação de Receita B2', rotuloCurto: 'Notificação B2' }
   },
   // Lista C2 — retinoides
-  { termos: ['isotretinoina', 'roacutan', 'acitretina'], notificacao: NOTIFICACAO_RETINOIDE }
+  { termos: ['isotretinoina', 'roacutan', 'acitretina'], notificacao: NOTIFICACAO_RETINOIDE },
+  // Lista C3 — imunossupressores
+  { termos: ['talidomida', 'lenalidomida'], notificacao: NOTIFICACAO_C3 }
 ];
 
 /** Todos os termos que disparam o aviso (os testes conferem cada um contra o regime de controle especial). */
@@ -99,6 +109,38 @@ export const TERMOS_COM_NOTIFICACAO: string[] = REGRAS.flatMap(({ termos, palavr
   ...termos,
   ...palavrasInteiras
 ]);
+
+const TERMOS_ADENDO_A2_REGEX = /\b(?:codeina|tramadol|tramal|sylador)\b/;
+const DOSE_UNITARIA_MG_REGEX = /(\d+(?:[.,]\d+)?)\s*mg\b(?!\s*\/)/;
+
+/**
+ * Adendo da Lista A2 (Portaria SVS/MS nº 344/98): codeína e tramadol saem em
+ * Receita de Controle Especial quando até 100 mg por unidade posológica; acima
+ * de 100 mg por unidade, exigem Notificação de Receita A (amarela).
+ * Ignora concentrações líquidas (`mg/mL`, `mg/5 mL`) e isola cada fármaco em
+ * associações (`Paracetamol 500 mg + Fosfato de Codeína 30 mg`).
+ */
+function excedeAdendoListaA2(texto: string): NotificacaoDeReceita | null {
+  if (!TERMOS_ADENDO_A2_REGEX.test(texto)) return null;
+
+  const clausulas = texto.split(/\s*(?:\+|\bcom\b|\s\/\s)\s*/);
+  const trechosAlvo = clausulas.filter((trecho) => TERMOS_ADENDO_A2_REGEX.test(trecho));
+  const candidatos = trechosAlvo.length > 0 ? trechosAlvo : [texto];
+
+  for (const trecho of candidatos) {
+    const match = trecho.match(DOSE_UNITARIA_MG_REGEX);
+    if (!match) continue;
+    const mg = parseFloat(match[1].replace(',', '.'));
+    if (Number.isFinite(mg) && mg > 100) {
+      return {
+        lista: 'A2',
+        ...NOTIFICACAO_A,
+        ressalva: 'acima de 100 mg por unidade posológica (adendo da Lista A2)'
+      };
+    }
+  }
+  return null;
+}
 
 /**
  * Devolve a Notificação de Receita que o medicamento exige, ou `null` quando o
@@ -112,7 +154,8 @@ export function notificacaoExigida(med?: MedicamentoClassificavel): NotificacaoD
       termos.some((termo) => texto.includes(termo)) ||
       palavrasInteiras.some((termo) => new RegExp(`\\b${termo}\\b`).test(texto))
   );
-  return regra ? regra.notificacao : null;
+  if (regra) return regra.notificacao;
+  return excedeAdendoListaA2(texto);
 }
 
 /** Frase da exigência para a tela: "Notificação de Receita B (azul) — Lista B1". */

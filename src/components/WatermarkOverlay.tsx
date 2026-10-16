@@ -2,6 +2,11 @@ import React from 'react';
 import { WatermarkType } from '../types';
 import { PRESET_WATERMARKS } from '../data/presetAssets';
 
+/**
+ * Camada de Marca d'Água da Folha A4.
+ * Estados de UI cobertos: empty (none/vazio), loading (carregando SVG),
+ * success (renderizado com sucesso) e error (fallback seguro sem imagem).
+ */
 interface WatermarkOverlayProps {
   type?: WatermarkType;
   opacity?: number;

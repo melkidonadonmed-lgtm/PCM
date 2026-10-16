@@ -8,6 +8,11 @@ import {
   COMMON_CID10 
 } from '../data/cidCatalog';
 
+/**
+ * Busca preditiva de CID-10.
+ * Estados de UI cobertos: empty (nenhum CID selecionado), loading (carregando filtro fonético),
+ * success (código CID selecionado com sucesso) e error (nenhum resultado/erro de busca).
+ */
 interface CidSearchBarProps {
   darkMode: boolean;
   selectedCode?: string;

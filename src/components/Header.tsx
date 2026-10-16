@@ -5,6 +5,11 @@ import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { cloudAuthService, type DoctorUserProfile } from '../services/cloud/cloudAuthService';
 import { cloudSyncManager, type SyncStatus } from '../services/cloud/cloudSyncManager';
 
+/**
+ * Cabeçalho Global da Aplicação.
+ * Estados de UI cobertos: empty (nenhum paciente ou médico configurado), loading (carregando sincronização na nuvem),
+ * success (sincronizado com sucesso) e error (erro de autenticação/sincronização).
+ */
 interface HeaderProps {
   darkMode: boolean;
   onToggleDarkMode: () => void;

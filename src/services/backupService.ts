@@ -80,16 +80,18 @@ export async function exportCompleteBackup(doctorProfile?: DoctorProfile): Promi
  */
 export async function parseAndValidateBackup(file: File): Promise<PresCMedBackup> {
   const text = await file.text();
-  let json: any;
+  let parsed: unknown;
   try {
-    json = JSON.parse(text);
+    parsed = JSON.parse(text);
   } catch {
     throw new Error('O arquivo selecionado não é um arquivo JSON válido ou está corrompido.');
   }
 
-  if (!json || typeof json !== 'object') {
+  if (!parsed || typeof parsed !== 'object') {
     throw new Error('Estrutura de dados inválida no arquivo.');
   }
+
+  const json = parsed as Record<string, unknown>;
 
   if (json.system !== 'PresCMed') {
     throw new Error('Arquivo não reconhecido como um backup legítimo do PresCMed (.pcm.json).');
@@ -99,7 +101,8 @@ export async function parseAndValidateBackup(file: File): Promise<PresCMedBackup
     throw new Error('Conteúdo do backup vazio ou ilegível.');
   }
 
-  const { workContexts, savedDocuments } = json.data;
+  const dataObj = json.data as Record<string, unknown>;
+  const { workContexts, savedDocuments } = dataObj;
 
   if (!Array.isArray(workContexts) || !Array.isArray(savedDocuments)) {
     throw new Error('As tabelas institucionais e de modelos não estão em formato de lista válido.');
@@ -107,7 +110,7 @@ export async function parseAndValidateBackup(file: File): Promise<PresCMedBackup
 
   // Validação de integridade dos WorkContexts
   for (let i = 0; i < workContexts.length; i++) {
-    const ctx = workContexts[i];
+    const ctx = workContexts[i] as Record<string, unknown> | null;
     if (!ctx || typeof ctx !== 'object' || typeof ctx.id !== 'string' || typeof ctx.name !== 'string') {
       throw new Error(`O local de atendimento #${i + 1} contém campos obrigatórios ausentes.`);
     }
@@ -115,13 +118,13 @@ export async function parseAndValidateBackup(file: File): Promise<PresCMedBackup
 
   // Validação de integridade dos SavedDocuments
   for (let i = 0; i < savedDocuments.length; i++) {
-    const doc = savedDocuments[i];
+    const doc = savedDocuments[i] as Record<string, unknown> | null;
     if (!doc || typeof doc !== 'object' || typeof doc.id !== 'string' || typeof doc.title !== 'string') {
       throw new Error(`O documento #${i + 1} contém campos obrigatórios ausentes.`);
     }
   }
 
-  return json as PresCMedBackup;
+  return json as unknown as PresCMedBackup;
 }
 
 /**

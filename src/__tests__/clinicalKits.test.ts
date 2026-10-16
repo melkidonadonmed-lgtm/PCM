@@ -43,6 +43,12 @@ describe('Kits Clínicos e Montagem de Itens (montarItensDoKit)', () => {
     const dipirona = montarItensDoKit(kitComItem('dipirona_gotas'), { ...pacientePediatrico15kg, weightKg: 1 });
     expect(dipirona.some(i => i.doseCalculatedText === '1 gota' && i.instructions.includes('1 gota '))).toBe(true);
     expect([...amox, ...dipirona].every(i => i.scheduleTimes.length === 0)).toBe(true);
+
+    // Tetos pediátricos de segurança (20 mL máx para amoxicilina 250mg/5mL e prednisolona 3mg/mL em peso elevado)
+    const amoxPesado = montarItensDoKit(kitComItem('amoxicilina_susp'), { ...pacientePediatrico15kg, weightKg: 80 });
+    expect(amoxPesado.some(i => i.doseCalculatedText === '20 mL')).toBe(true);
+    const predPesado = montarItensDoKit(kitComItem('prednisolona_sol'), { ...pacientePediatrico15kg, weightKg: 80 });
+    expect(predPesado.some(i => i.doseCalculatedText === '20 mL')).toBe(true);
   });
 
   it('deve conter exatamente os 6 kits clínicos cadastrados', () => {

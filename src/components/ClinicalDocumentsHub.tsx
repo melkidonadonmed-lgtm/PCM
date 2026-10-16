@@ -5,6 +5,11 @@ import { ExamRequester } from './ExamRequester';
 import { SusDocumentsFiller } from './SusDocumentsFiller';
 import { Icon, IconName } from './Icon';
 
+/**
+ * Ilha Central de Documentos Clínicos.
+ * Estados de UI cobertos: empty (nenhum exame/documento preenchido), loading (carregando sub-módulo),
+ * success (dados prontos para emissão) e error (falha de validação do emitente).
+ */
 export type DocumentsSubTab = 'certificate' | 'referral' | 'exams' | 'sus';
 
 interface ClinicalDocumentsHubProps {

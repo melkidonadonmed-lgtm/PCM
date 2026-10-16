@@ -1,7 +1,12 @@
 import React from 'react';
-import { Icon } from './Icon';
+import { Icon, IconName } from './Icon';
 import { ActiveTab } from '../types';
 
+/**
+ * Barra de Navegação Inferior Mobile (5 destinos).
+ * Estados de UI cobertos: empty (contadores vazios), loading (carregando aba),
+ * success (aba ativa selecionada com sucesso) e error (estado de fallback).
+ */
 interface MobileBottomNavProps {
   darkMode?: boolean;
   activeTab: ActiveTab;
@@ -20,26 +25,26 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   selectedExamsCount,
   onOpenMenu
 }) => {
-  const items = [
+  const items: Array<{ id: ActiveTab; label: string; iconName: IconName; badge?: string }> = [
     {
-      id: 'prescription' as ActiveTab,
+      id: 'prescription',
       label: 'Receitas',
       iconName: 'receita',
       badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
     },
     {
-      id: 'documents' as ActiveTab,
+      id: 'documents',
       label: 'Documentos',
       iconName: 'documentos',
       badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
     },
     {
-      id: 'pediatric_calc' as ActiveTab,
+      id: 'pediatric_calc',
       label: 'Doses',
       iconName: 'balanca'
     },
     {
-      id: 'editor' as ActiveTab,
+      id: 'editor',
       label: 'Editor',
       iconName: 'editor'
     }
@@ -78,7 +83,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           >
             <div className="relative">
               <Icon
-                name={item.iconName as any}
+                name={item.iconName}
                 className="text-[20px] transition-colors"
                 style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
               />

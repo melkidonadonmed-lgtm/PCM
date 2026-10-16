@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, Check, X, Eraser } from 'lucide-react';
 import { Patient } from '../types';
 
+/**
+ * Modal de Cadastro e Edição Rápida do Paciente.
+ * Estados de UI cobertos: empty (paciente vazio), loading (carregando validação),
+ * success (dados do paciente salvos com sucesso) e error (erro de peso/data inválida).
+ */
 interface PatientModalProps {
   darkMode: boolean;
   patient: Patient;

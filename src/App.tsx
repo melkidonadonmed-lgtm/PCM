@@ -15,13 +15,14 @@ import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescription
 import { useWorkContext } from './hooks/useWorkContext';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { AsyncErrorBoundary } from './components/AsyncErrorBoundary';
+import { storageService } from './services/storageService';
 import type { TipoDocumento } from './utils/documentoClinico';
 
 // Carregamento sob demanda com retry resiliente contra falhas de rede ou cache antigo
-const loadDocumentEditor = () =>
+const loadDocumentEditor = (): Promise<typeof import('./components/DocumentEditorView')> =>
   import('./components/DocumentEditorView').catch((err) => {
     console.warn('[PresCMed] Tentando carregar Editor novamente após falha inicial:', err);
-    return new Promise<{ default: React.ComponentType<any> }>((resolve) =>
+    return new Promise<typeof import('./components/DocumentEditorView')>((resolve) =>
       setTimeout(() => resolve(import('./components/DocumentEditorView')), 400)
     );
   });
@@ -49,7 +50,7 @@ export default function App() {
 
   // Sincronização do tema no DOM e localStorage
   useEffect(() => {
-    localStorage.setItem('prescmed_theme', darkMode ? 'dark' : 'light');
+    storageService.saveRawString('prescmed_theme', darkMode ? 'dark' : 'light');
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -95,8 +96,11 @@ export default function App() {
     };
 
     if (typeof window !== 'undefined') {
-      if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(triggerPreload, { timeout: 2500 });
+      const idleWin = window as Window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      };
+      if (typeof idleWin.requestIdleCallback === 'function') {
+        idleWin.requestIdleCallback(triggerPreload, { timeout: 2500 });
       } else {
         setTimeout(triggerPreload, 1200);
       }
@@ -194,32 +198,6 @@ export default function App() {
   const [editorInitialSyncTrigger, setEditorInitialSyncTrigger] = useState(0);
   const [editorCustomDoc, setEditorCustomDoc] = useState<{ html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null>(null);
 
-  const handleNavigateToEditor = () => {
-    setEditorCustomDoc(null);
-    setEditorInitialSyncTrigger(prev => prev + 1);
-    setActiveTab('editor');
-  };
-
-  const handleNavigateToEditorWithHtml = (html: string, title: string, type: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' = 'custom') => {
-    setEditorCustomDoc({ html, title, type });
-    setActiveTab('editor');
-  };
-
-  const handleNavigateToCertificate = () => {
-    setDocumentsSubTab('certificate');
-    setActiveTab('documents');
-  };
-
-  const handleNavigateToReferral = () => {
-    setDocumentsSubTab('referral');
-    setActiveTab('documents');
-  };
-
-  const handleNavigateToExams = () => {
-    setDocumentsSubTab('exams');
-    setActiveTab('documents');
-  };
-
   const handleSelectTab = React.useCallback((tab: ActiveTab) => {
     if (tab === 'patients') {
       handleOpenPatientModal();
@@ -231,23 +209,23 @@ export default function App() {
       setActiveTab('editor');
       return;
     }
-    if (tab === 'certificate') {
-      setDocumentsSubTab('certificate');
-      setActiveTab('documents');
-      return;
-    }
-    if (tab === 'referral') {
-      setDocumentsSubTab('referral');
-      setActiveTab('documents');
-      return;
-    }
-    if (tab === 'exams') {
-      setDocumentsSubTab('exams');
+    if (tab === 'certificate' || tab === 'referral' || tab === 'exams') {
+      setDocumentsSubTab(tab);
       setActiveTab('documents');
       return;
     }
     setActiveTab(tab);
   }, [handleOpenPatientModal]);
+
+  const handleNavigateToEditor = React.useCallback(() => handleSelectTab('editor'), [handleSelectTab]);
+  const handleNavigateToCertificate = React.useCallback(() => handleSelectTab('certificate'), [handleSelectTab]);
+  const handleNavigateToReferral = React.useCallback(() => handleSelectTab('referral'), [handleSelectTab]);
+  const handleNavigateToExams = React.useCallback(() => handleSelectTab('exams'), [handleSelectTab]);
+
+  const handleNavigateToEditorWithHtml = (html: string, title: string, type: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' = 'custom') => {
+    setEditorCustomDoc({ html, title, type });
+    setActiveTab('editor');
+  };
 
   // Rolagem suave para o topo ao trocar de módulo
   useEffect(() => {

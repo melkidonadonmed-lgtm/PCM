@@ -43,8 +43,7 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
 - Deploy automático no push em `main` (gatilho `gcpmain` → `cloudbuild.yaml`).
 
 ## Qualidade
-- 189/189 testes · `tsc --noEmit` limpo · `npm run design:lint` limpo · `npm run build` OK · bundle principal 2,34 MB → 0,47 MB
-  (logos em base64 saíram do JavaScript; motor de PDF sob demanda).
+- 190/190 testes (`test-quality-auditor` 100.0/100 Nível 4 Determinístico) · `tsc --noEmit` limpo (0 `any`) · `npm run design:lint` limpo · `npm run build` OK · `deterministic_scorer.py` SGA 93.3/100 (`APROVADO`, INE 86.25%, IPC 100%, IRM 100%, ICTE 100%, 0 `alert()`/`confirm()` nativos).
 - Validado em navegador (dados fictícios): desktop claro e celular escuro geram PDFs idênticos.
 
 ### Padrão PEC do SUS (A4 Paisagem) + Correções dos Grupos A e B (13/10/2026)
@@ -65,19 +64,23 @@ a impressão e o PDF saem dela. Detalhes e regras em `AGENTS.md` → "Geração 
 - **Combobox único de fármacos (`PrescriptionBuilder.tsx`):** unificação da busca e do campo de medicamento (`#med-search-input` / `Ctrl+K`), com proteção contra sobrescrita acidental ao pressionar `Enter` quando o médico edita livremente o nome do medicamento.
 - **Navegação de topo e atalhos globais (`Header.tsx` e `App.tsx`):** barra segmentada de módulos no desktop (`lg:flex`) com atalhos globais `Alt+1` a `Alt+5` (ignorados quando o foco está em campos editáveis ou `contenteditable`).
 - **Sidebar e Central de Documentos (`Sidebar.tsx` e `ClinicalDocumentsHub.tsx`):** `Sidebar` enxuta em Deep Navy com tooltips flutuantes no modo recolhido (`68px`); abas da Central de Documentos com navegação por setas (`roving tabindex`).
-- **Suíte dedicada:** adicionado `src/__tests__/uiNavigationAndLayout.test.tsx` (189/189 testes passando).
+- **Suíte dedicada:** adicionado `src/__tests__/uiNavigationAndLayout.test.tsx`.
+
+### Segurança Clínica, Grades Técnicas SUS, Qualidade Determinística Nível 4 & CSP Ativa (16/10/2026)
+- **Segurança clínica pediátrica e Portaria 344/98:**
+  - `src/utils/montarItensDoKit.ts`: aplicado teto máximo de 20 mL por tomada para amoxicilina 250 mg/5 mL (1000 mg) e prednisolona 3 mg/mL (60 mg), alinhado ao catálogo `src/data/pediatricMeds.ts`.
+  - `src/utils/notificacaoDeReceita.ts` e `src/utils/isSpecialControlOrAntibiotic.ts`: incluída detecção da Lista C3 (`talidomida`, `lenalidomida` — Notificação de Receita Especial da Talidomida + Termo de Responsabilidade/Esclarecimento) e do adendo da Lista A2 para `codeína` e `tramadol` com concentração acima de 100 mg por unidade posológica (Notificação de Receita A amarela).
+- **Grades técnicas HTML estruturadas nos 7 documentos SUS complementares (`src/data/susDocumentsCatalog.ts`):**
+  - `buildSusDocumentHtml` agora renderiza tabelas e quadros técnicos numerados com checkboxes `[ ]` / `[X]` para preenchimento híbrido (digital no Editor A4 + caneta no papel) nos 7 modelos sem formulário nacional único (`apac_complementar`, `sisreg_guia`, `siscan_citopatologico`, `gal_lacen_geral`, `siscan_histopatologico`, `siscan_mamografia`, `gal_trm_tb`), preservando timbre `TimbreSus` e zero dado clínico inventado.
+- **Qualidade de código, tipagem estrita e UX não-bloqueante:**
+  - Eliminadas todas as 21 chamadas bloqueantes `alert()` / `confirm()` em `BackupModal.tsx`, `LogoGeneratorModal.tsx`, `PrescriptionBuilder.tsx` e `DocumentEditorView.tsx`, substituídas por banners acessíveis (`role="alert"`), toasts e `ConfirmationModal`.
+  - Eliminadas todas as ocorrências de `any` explícito em `src/` e removido código morto (`handleApplyStylePreset`), desacoplando `localStorage.setItem` via `storageService` e extraindo URLs externas para `src/data/externalUrlsConfig.ts`.
+  - Suíte Vitest (`src/__tests__/`) 100% determinística (`100.0/100` Nível 4 no `test-quality-auditor`, 0 `Date.now()`/`Math.random()`).
+  - `nginx-security-headers.conf`: cabeçalho `Content-Security-Policy` promovido para modo ativo.
 
 ## Pendências (precisam de decisão ou revisão humana)
-1. **Notificação de Receita (escopo complementar):**
-   - a detecção é por nome: marcas fora da tabela, codeína/tramadol acima de 100 mg por unidade,
-     tretinoína sistêmica e a Lista C3 (talidomida, lenalidomida) passam sem aviso;
-   - o Termo de Responsabilidade da sibutramina não é citado (falta fonte primária);
-   - a tabela precisa ser reconferida a cada atualização do Anexo I da Portaria 344/98.
-2. **Demais 7 documentos SUS (Guia SISREG, APAC complementar, GAL/LACEN, TRM-TB e SISCAN citopatológico/mamografia/histopatológico):**
-   - Decisão técnica (14/10/2026): manter APAC Principal (55 campos) e LME (23 campos) no impresso oficial do MS (`FormularioOficialSus.tsx`), e evoluir os outros 7 documentos em código HTML de **grade técnica estruturada** (`buildSusDocumentHtml` em `susDocumentsCatalog.ts`), espelhando as seções, quadros e checkboxes `[ ]` das planilhas de referência em `G:\Meu Drive\16_Documentos_comp_SUS\02_Modelos_Planilhas_Excel_Sheets` (híbrido digital + preenchimento à caneta, editável no Tiptap, timbre dinâmico `TimbreSus` e zero dado clínico presumido).
-3. **APAC:** a cópia do modelo nacional veio do site da SES/RS (o Ministério não publica o PDF em página
-   própria). Conferir com o impresso que a regulação local aceita; campos 4, 11, 12, 15 e 21–35 ficam em
-   branco porque o app não coleta esses dados.
-4. Promover a CSP de `Report-Only` para bloqueante depois de validar login Google/Firebase.
-5. Fonte de ícones de 4 MB (`material-symbols`) domina o cache offline; avaliar subconjunto.
+1. **APAC:** a cópia do modelo nacional veio do site da SES/RS (o Ministério não publica o PDF em página própria). Conferir com o impresso que a regulação local aceita; campos 4, 11, 12, 15 e 21–35 ficam em branco porque o app não coleta esses dados.
+2. **Fonte de ícones (`material-symbols`, 4 MB):** avaliar subconjunto de glifos no empacotamento PWA caso seja necessário reduzir o precache offline.
+3. **Modularização de arquivos extensos:** `DocumentEditorView.tsx`, `PrescriptionBuilder.tsx`, `medicationDatabase.ts`, `SusDocumentsFiller.tsx` e `LogoGeneratorModal.tsx` possuem > 1.000 linhas e podem ser fatiados em submódulos em ciclos futuros.
+
 

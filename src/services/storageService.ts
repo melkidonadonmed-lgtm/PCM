@@ -51,11 +51,12 @@ export const storageService = {
       const serialized = JSON.stringify(value);
       localStorage.setItem(key, serialized);
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const domError = error as { name?: string; code?: number } | null;
       if (
-        error?.name === 'QuotaExceededError' ||
-        error?.code === 22 ||
-        error?.code === 1014
+        domError?.name === 'QuotaExceededError' ||
+        domError?.code === 22 ||
+        domError?.code === 1014
       ) {
         console.error(
           `[storageService] Cota do localStorage excedida ao tentar salvar "${key}".`,
@@ -64,6 +65,22 @@ export const storageService = {
       } else {
         console.error(`[storageService] Erro ao gravar "${key}":`, error);
       }
+      return false;
+    }
+  },
+
+  /**
+   * Salva uma string literal diretamente no localStorage (ex.: tema 'light'/'dark' ou flags).
+   */
+  saveRawString(key: string, value: string): boolean {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return false;
+    }
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (error) {
+      console.error(`[storageService] Erro ao gravar string "${key}":`, error);
       return false;
     }
   },

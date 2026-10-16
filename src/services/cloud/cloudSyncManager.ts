@@ -1,7 +1,15 @@
+import type { Table } from 'dexie';
+import type {
+  Firestore,
+  collection as firestoreCollection,
+  doc as firestoreDoc,
+  writeBatch as firestoreWriteBatch,
+  getDocs as firestoreGetDocs
+} from 'firebase/firestore';
 import { getFirebaseInstances } from './firebaseClient';
 import { cloudAuthService, type DoctorUserProfile } from './cloudAuthService';
 import { db } from '../db';
-import type { WorkContext, SavedDocument } from '../../types';
+import type { SavedDocument } from '../../types';
 
 export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'offline' | 'error';
 export type SyncStatusListener = (status: SyncStatus, pendingCount: number) => void;
@@ -26,8 +34,8 @@ export function sanitizeForFirestore<T>(data: T): T {
   if (Array.isArray(data)) {
     return data.map(item => sanitizeForFirestore(item)) as unknown as T;
   }
-  const clean: Record<string, any> = {};
-  for (const [key, value] of Object.entries(data as Record<string, any>)) {
+  const clean: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
     if (value !== undefined) {
       clean[key] = sanitizeForFirestore(value);
     }
@@ -95,7 +103,7 @@ class CloudSyncManager {
         this.triggerSyncDebounced();
       });
 
-      db.workContexts.hook('updating', (modifications: any) => {
+      db.workContexts.hook('updating', (modifications: Record<string, unknown>) => {
         modifications.updatedAt = Date.now();
         this.triggerSyncDebounced();
       });
@@ -112,9 +120,9 @@ class CloudSyncManager {
         }
       });
 
-      db.savedDocuments.hook('updating', (modifications: any, _primKey, obj) => {
+      db.savedDocuments.hook('updating', (modifications: Record<string, unknown>, _primKey, obj) => {
         modifications.updatedAt = Date.now();
-        if (obj.isTemplate || modifications.isTemplate) {
+        if (obj.isTemplate || Boolean(modifications.isTemplate)) {
           this.triggerSyncDebounced();
         }
       });
@@ -214,12 +222,12 @@ class CloudSyncManager {
    */
   private async syncGenericCollection<T extends SyncableEntity>(params: {
     firestorePath: string;
-    localTable: any;
-    firestore: any;
-    collection: any;
-    doc: any;
-    writeBatch: any;
-    getDocs: any;
+    localTable: Table<T, string>;
+    firestore: Firestore;
+    collection: typeof firestoreCollection;
+    doc: typeof firestoreDoc;
+    writeBatch: typeof firestoreWriteBatch;
+    getDocs: typeof firestoreGetDocs;
     getLocalItems: () => Promise<T[]>;
   }): Promise<void> {
     const {
@@ -238,7 +246,7 @@ class CloudSyncManager {
     // 1. Obter registros da nuvem
     const cloudSnapshot = await getDocs(colRef);
     const cloudMap = new Map<string, T & SyncableEntity>();
-    cloudSnapshot.forEach((snap: any) => {
+    cloudSnapshot.forEach((snap) => {
       cloudMap.set(snap.id, { id: snap.id, ...snap.data() } as T & SyncableEntity);
     });
 

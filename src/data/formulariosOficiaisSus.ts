@@ -1,5 +1,6 @@
 import type { LmeMedicationRow, SusDocumentId, SusFilledFormData } from '../types';
 import { ajustarTexto, type Caixa, partesDaData, partesDoTelefone, soDigitos } from '../utils/formularioOficial';
+import { SUS_OFFICIAL_FORM_URLS } from './externalUrlsConfig';
 
 /**
  * Formulários oficiais do SUS emitidos sobre o próprio impresso do órgão.
@@ -93,8 +94,17 @@ export function medicamentosDaLme(d: SusFilledFormData): LmeMedicationRow[] {
 // APAC — Laudo para Solicitação/Autorização de Procedimento Ambulatorial
 // ---------------------------------------------------------------------------
 
+const MARGEM_X_CAIXA_APAC = 3;
+const MARGEM_TOPO_CAIXA_APAC = 4.2;
+const MARGEM_BASE_CAIXA_APAC = 1.2;
+
 /** Área útil de uma caixa da APAC: o rótulo do campo fica sobre a borda de cima. */
-const naCaixa = ([x0, y0, x1, y1]: Caixa): Caixa => [x0 + 3, y0 + 4.2, x1 - 3, y1 - 1.2];
+const naCaixa = ([x0, y0, x1, y1]: Caixa): Caixa => [
+  x0 + MARGEM_X_CAIXA_APAC,
+  y0 + MARGEM_TOPO_CAIXA_APAC,
+  x1 - MARGEM_X_CAIXA_APAC,
+  y1 - MARGEM_BASE_CAIXA_APAC
+];
 
 const passos = (inicio: number, passo: number, quantidade: number): number[] =>
   Array.from({ length: quantidade + 1 }, (_, i) => Math.round((inicio + passo * i) * 10) / 10);
@@ -244,7 +254,7 @@ export const FORMULARIOS_OFICIAIS_SUS: FormularioOficial[] = [
     pagina: [595, 842],
     fonte: {
       orgao: 'Ministério da Saúde (SIA/SUS) — modelo nacional de 55 campos, cópia publicada pela SES/RS',
-      url: 'http://www1.saude.rs.gov.br/dados/1199297634903Laudo%20de%20APAC%20-%20P%E1gina%20Principal%20%5Bfolha%201%5D.pdf',
+      url: SUS_OFFICIAL_FORM_URLS.apacLaudoPrincipal,
       conferidoEm: '2026-10-11'
     },
     montar: montarApac
@@ -256,7 +266,7 @@ export const FORMULARIOS_OFICIAIS_SUS: FormularioOficial[] = [
     pagina: [595.3, 841.9],
     fonte: {
       orgao: 'Ministério da Saúde — DAF/SECTICS (Componente Especializado da Assistência Farmacêutica)',
-      url: 'https://www.gov.br/saude/pt-br/composicao/sectics/daf/publicacoes/lme.pdf',
+      url: SUS_OFFICIAL_FORM_URLS.lmeMedicamentos,
       conferidoEm: '2026-10-11'
     },
     montar: montarLme

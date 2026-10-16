@@ -117,6 +117,35 @@ describe('Catálogo e Gerador de Documentos Regulatórios Oficiais do SUS', () =
     expect(md).toContain('A90');
   });
 
+  it('deve renderizar grades técnicas estruturadas com seções numeradas sequenciais e checkboxes nos 7 documentos complementares do SUS', () => {
+    const complementaryIds = [
+      'apac_complementar',
+      'sisreg_guia',
+      'siscan_citopatologico',
+      'gal_lacen_geral',
+      'siscan_histopatologico',
+      'siscan_mamografia',
+      'gal_trm_tb'
+    ];
+
+    for (const id of complementaryIds) {
+      const doc = SUS_DOCUMENTS_CATALOG.find(d => d.id === id)!;
+      const html = buildSusDocumentHtml(doc, dummyFormData);
+      expect(html, id).toContain('SEÇÃO 1 — IDENTIFICAÇÃO DO PACIENTE');
+      expect(html, id).toContain('SEÇÃO 2 — PROCEDIMENTO &amp; DADOS CLÍNICOS REGULATÓRIOS');
+      expect(html, id).toContain('SEÇÃO 3 —');
+      expect(html, id).toContain('SEÇÃO 4 —');
+      expect(html, id).toContain('page-break-inside: avoid');
+      expect(html, id).toContain('[ ]');
+    }
+
+    const apacComp = SUS_DOCUMENTS_CATALOG.find(d => d.id === 'apac_complementar')!;
+    expect(buildSusDocumentHtml(apacComp, dummyFormData)).toContain('SEÇÃO 5 — TRIAGEM DE SEGURANÇA EM CAMPO MAGNÉTICO (RM) E CIÊNCIA');
+
+    const sisreg = SUS_DOCUMENTS_CATALOG.find(d => d.id === 'sisreg_guia')!;
+    expect(buildSusDocumentHtml(sisreg, dummyFormData)).toContain('SEÇÃO 5 — CAMPO DA CENTRAL DE REGULAÇÃO (SISREG) E CONTRARREFERÊNCIA');
+  });
+
   it('deve permitir armazenamento e restauração íntegra de Modelos de Receita com PrescriptionItem[]', () => {
     const testItems: PrescriptionItem[] = [
       {
@@ -168,10 +197,10 @@ describe('Catálogo e Gerador de Documentos Regulatórios Oficiais do SUS', () =
     expect(modelDoc.prescriptionItems![1].isSpecialControl).toBe(true);
     expect(modelDoc.prescriptionItems![1].durationDays).toBe(7);
 
-    // Validação de desestruturação e clonagem segura para a receita ativa
-    const clonedItems = modelDoc.prescriptionItems!.map(item => ({
+    // Validação de desestruturação e clonagem segura determinística para a receita ativa
+    const clonedItems = modelDoc.prescriptionItems!.map((item, idx) => ({
       ...item,
-      id: `presc-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
+      id: `presc-clone-${idx + 1}`
     }));
 
     expect(clonedItems).toHaveLength(2);

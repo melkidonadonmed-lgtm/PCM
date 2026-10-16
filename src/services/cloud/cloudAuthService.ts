@@ -1,5 +1,6 @@
 import { getFirebaseInstances } from './firebaseClient';
 import type { User } from 'firebase/auth';
+import { storageService } from '../storageService';
 
 export interface DoctorUserProfile {
   uid: string;
@@ -37,11 +38,7 @@ class CloudAuthService {
       photoURL: user.photoURL
     };
 
-    try {
-      localStorage.setItem(CLOUD_AUTH_ACTIVE_KEY, 'true');
-    } catch {
-      // Ignora falhas de localStorage em navegação restrita
-    }
+    storageService.saveRawString(CLOUD_AUTH_ACTIVE_KEY, 'true');
 
     this.notifyListeners();
     return this.currentUser;
@@ -59,11 +56,7 @@ class CloudAuthService {
       console.warn('[CloudAuth] Falha ao desconectar sessão Firebase:', err);
     } finally {
       this.currentUser = null;
-      try {
-        localStorage.removeItem(CLOUD_AUTH_ACTIVE_KEY);
-      } catch {
-        // Ignora
-      }
+      storageService.removeItem(CLOUD_AUTH_ACTIVE_KEY);
       this.notifyListeners();
     }
   }
@@ -94,11 +87,7 @@ class CloudAuthService {
             };
           } else {
             this.currentUser = null;
-            try {
-              localStorage.removeItem(CLOUD_AUTH_ACTIVE_KEY);
-            } catch {
-              // Ignora
-            }
+            storageService.removeItem(CLOUD_AUTH_ACTIVE_KEY);
           }
           this.notifyListeners();
         });

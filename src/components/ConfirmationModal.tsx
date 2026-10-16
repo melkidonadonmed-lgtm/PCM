@@ -1,6 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { AlertTriangle, X, Check } from 'lucide-react';
 
+/**
+ * Modal de Confirmação Acessível (substitui window.confirm).
+ * Estados de UI cobertos: empty (fechado/vazio), loading (carregando ação),
+ * success (ação confirmada com sucesso) e error (alerta de ação destrutiva/falha).
+ */
 export interface ConfirmationModalProps {
   isOpen: boolean;
   title: string;

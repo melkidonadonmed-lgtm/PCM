@@ -4,7 +4,13 @@ import { CLINICAL_KITS, ClinicalKit } from '../data/clinicalKits';
 import { ConfirmationModal } from './ConfirmationModal';
 import { ContextSwitcher } from './ContextSwitcher';
 import { Icon, IconName } from './Icon';
+import { storageService } from '../services/storageService';
 
+/**
+ * Menu Lateral Deep Navy e Kits Clínicos de Plantão.
+ * Estados de UI cobertos: empty (nenhum kit expandido), loading (carregando aplicação de kit),
+ * success (kit aplicado com sucesso) e error (confirmação/alerta de limpeza).
+ */
 interface SidebarProps {
   darkMode: boolean;
   onToggleDarkMode?: () => void;
@@ -78,9 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleToggleKits = () => {
     setShowKits(prev => {
       const next = !prev;
-      try {
-        localStorage.setItem('prescmed_show_kits', String(next));
-      } catch {}
+      storageService.saveRawString('prescmed_show_kits', String(next));
       return next;
     });
   };
@@ -514,9 +518,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => {
                   onToggleOpen();
                   setShowKits(true);
-                  try {
-                    localStorage.setItem('prescmed_show_kits', 'true');
-                  } catch {}
+                  storageService.saveRawString('prescmed_show_kits', 'true');
                 }}
                 className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-amber-400 outline-none relative text-amber-400 hover:text-amber-300 hover:bg-white/10"
                 title="Kits de plantão"

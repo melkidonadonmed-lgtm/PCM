@@ -19,7 +19,13 @@ import {
 import { WorkContext, DoctorProfile } from '../types';
 import { db } from '../services/db';
 import { PRESET_LOGOS, PresetLogoItem } from '../data/presetAssets';
+import { SVG_XML_NAMESPACES } from '../data/externalUrlsConfig';
 
+/**
+ * Modal de Personalização de Timbre e Monograma.
+ * Estados de UI cobertos: empty (vazio sem subtítulo), loading (carregando gravação no IndexedDB),
+ * success (logotipo aplicado com sucesso) e error (falha ao gravar logotipo).
+ */
 export type CentralSymbol = 'asclepius' | 'cross' | 'stethoscope' | 'ecg_heart' | 'monogram';
 export type FrameStyle = 'double_circle' | 'shield' | 'hexagon' | 'none';
 export type ColorPalette = 'petrol' | 'sus' | 'navy' | 'gold' | 'dark';
@@ -114,11 +120,13 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
   const [textLayout, setTextLayout] = useState<TextLayout>('curved');
   const [previewDarkBg, setPreviewDarkBg] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeModalTab, setActiveModalTab] = useState<'presets' | 'generator'>('presets');
   const [selectedPresetId, setSelectedPresetId] = useState<string>('semusa');
 
   const handleApplyPreset = async (preset: PresetLogoItem) => {
     setIsApplying(true);
+    setErrorMsg(null);
     try {
       if (activeContext) {
         await db.workContexts.update(activeContext.id, {
@@ -132,7 +140,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
       onClose();
     } catch (err) {
       console.error('Erro ao salvar logotipo predefinido:', err);
-      alert('Falha ao aplicar logotipo.');
+      setErrorMsg('Falha ao aplicar logotipo.');
     } finally {
       setIsApplying(false);
     }
@@ -151,11 +159,11 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
     if (!svgRef.current) return '';
     const serializer = new XMLSerializer();
     let source = serializer.serializeToString(svgRef.current);
-    if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
-      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    if (!source.includes(`xmlns="${SVG_XML_NAMESPACES.svg}"`)) {
+      source = source.replace(/^<svg/, `<svg xmlns="${SVG_XML_NAMESPACES.svg}"`);
     }
-    if (!source.match(/^<svg[^>]+xmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink"/)) {
-      source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+    if (!source.includes(`xmlns:xlink="${SVG_XML_NAMESPACES.xlink}"`)) {
+      source = source.replace(/^<svg/, `<svg xmlns:xlink="${SVG_XML_NAMESPACES.xlink}"`);
     }
     return source;
   };
@@ -163,6 +171,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
   // Ação: Aplicar ao contexto institucional ativo no IndexedDB
   const handleApply = async () => {
     setIsApplying(true);
+    setErrorMsg(null);
     try {
       const svgString = generateSvgString();
       const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
@@ -181,7 +190,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
       onClose();
     } catch (err) {
       console.error('Erro ao salvar logotipo no IndexedDB:', err);
-      alert('Falha ao aplicar logotipo. Tente novamente.');
+      setErrorMsg('Falha ao aplicar logotipo. Tente novamente.');
     } finally {
       setIsApplying(false);
     }
@@ -235,6 +244,13 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {errorMsg && (
+          <div role="alert" className="px-4 py-2 bg-rose-500/15 border-b border-rose-500/30 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center justify-between">
+            <span>{errorMsg}</span>
+            <button type="button" onClick={() => setErrorMsg(null)} className="underline ml-2 cursor-pointer">Fechar</button>
+          </div>
+        )}
 
         {/* Navigation Tabs: Presets vs Generator */}
         <div className="px-4 sm:px-6 py-2 border-b border-[var(--border-subtle)] flex items-center gap-2 bg-[var(--surface-inset)]">

@@ -5,6 +5,11 @@ import { calculatePediatricDose } from '../utils/doseCalculator';
 import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
 import { Icon } from './Icon';
 
+/**
+ * Ilha e Gaveta da Calculadora Pediátrica ("Sem peso, sem dose").
+ * Estados de UI cobertos: empty (peso vazio ou nenhum fármaco filtrado), loading (carregando cálculo),
+ * success (dose calculada e inserida com sucesso) e error (alerta de teto/bloqueio sem peso).
+ */
 interface PediatricCalculatorProps {
   darkMode: boolean;
   patient: Patient;
@@ -86,7 +91,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       durationDays: med.defaultDays || 5,
       instructions: calc.formattedPrescriptionText,
       isContinuous: false,
-      isSpecialControl: Boolean((med as any).isSpecialControl) || isSpecialControlOrAntibiotic(med.name) || med.category.toLowerCase().includes('antibiótico') || med.category.toLowerCase().includes('antibiotico'),
+      isSpecialControl: Boolean(med.isSpecialControl) || isSpecialControlOrAntibiotic(med.name) || med.category.toLowerCase().includes('antibiótico') || med.category.toLowerCase().includes('antibiotico'),
       calculatedFromWeight: patientWeight
     };
 

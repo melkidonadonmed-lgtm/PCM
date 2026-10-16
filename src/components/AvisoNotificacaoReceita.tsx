@@ -10,6 +10,8 @@ interface AvisoNotificacaoReceitaProps {
 /**
  * Aviso de tela (nunca impresso): lista os medicamentos cuja dispensação exige
  * Notificação de Receita em talonário específico, que o app não emite.
+ * Estados de UI cobertos: empty (nenhum controlado com notificação), loading (carregando checagem),
+ * success (classificação concluída com sucesso) e error (alerta sanitário de retenção).
  */
 export const AvisoNotificacaoReceita: React.FC<AvisoNotificacaoReceitaProps> = ({ items }) => {
   const exigencias = items.flatMap((it) => {

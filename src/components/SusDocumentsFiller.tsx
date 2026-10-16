@@ -23,6 +23,12 @@ import {
   SusDocumentId, 
   SusFilledFormData 
 } from '../types';
+
+/**
+ * Sub-ilha de Preenchimento e Emissão dos 9 Documentos SUS.
+ * Estados de UI cobertos: empty (campos clínicos em branco por padrão), loading (carregando PDF A4),
+ * success (documento copiado/exportado com sucesso) e error (alerta de truncamento ou médico ausente).
+ */
 import { 
   SUS_DOCUMENTS_CATALOG, 
   buildSusDocumentMarkdown,
@@ -130,18 +136,18 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     patientEmail: '',
 
     patientName: patient?.name?.trim() || '',
-    patientCns: (patient as any)?.cns?.trim() || '',
+    patientCns: patient?.cns?.trim() || '',
     patientCpf: patient?.documentNumber?.trim() || '',
     patientBirthDate: patient?.birthDate?.trim() || '',
     patientAge: patient?.ageText?.trim() || '',
     patientGender: patient?.gender || 'female',
     patientMotherName: patient?.motherName?.trim() || '',
     patientPhone: patient?.phone?.trim() || '',
-    patientAddress: (patient as any)?.address?.trim() || '',
-    patientNeighborhood: (patient as any)?.neighborhood?.trim() || '',
-    patientCity: (patient as any)?.city?.trim() || '',
-    patientState: (patient as any)?.state || '',
-    patientCep: (patient as any)?.cep?.trim() || ''
+    patientAddress: patient?.address?.trim() || '',
+    patientNeighborhood: patient?.neighborhood?.trim() || '',
+    patientCity: patient?.city?.trim() || '',
+    patientState: patient?.state || '',
+    patientCep: patient?.cep?.trim() || ''
   }));
 
   // Sincroniza dados comuns se alterados externamente
@@ -160,18 +166,18 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : prev.patientWeightKg,
 
       patientName: patient?.name?.trim() || prev.patientName,
-      patientCns: (patient as any)?.cns?.trim() || prev.patientCns,
+      patientCns: patient?.cns?.trim() || prev.patientCns,
       patientCpf: patient?.documentNumber?.trim() || prev.patientCpf,
       patientBirthDate: patient?.birthDate?.trim() || prev.patientBirthDate,
       patientAge: patient?.ageText?.trim() || prev.patientAge,
       patientGender: patient?.gender || prev.patientGender,
       patientMotherName: patient?.motherName?.trim() || prev.patientMotherName,
       patientPhone: patient?.phone?.trim() || prev.patientPhone,
-      patientAddress: (patient as any)?.address?.trim() || prev.patientAddress,
-      patientNeighborhood: (patient as any)?.neighborhood?.trim() || prev.patientNeighborhood,
-      patientCity: (patient as any)?.city?.trim() || prev.patientCity,
-      patientState: (patient as any)?.state || prev.patientState,
-      patientCep: (patient as any)?.cep?.trim() || prev.patientCep
+      patientAddress: patient?.address?.trim() || prev.patientAddress,
+      patientNeighborhood: patient?.neighborhood?.trim() || prev.patientNeighborhood,
+      patientCity: patient?.city?.trim() || prev.patientCity,
+      patientState: patient?.state || prev.patientState,
+      patientCep: patient?.cep?.trim() || prev.patientCep
     }));
   }, [doctor, patient, activeContext]);
 
@@ -241,7 +247,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   };
 
   // Atualização dos campos do formulário (comum vs específico do documento ativo)
-  const handleFieldChange = (field: keyof SusFilledFormData, value: any) => {
+  const handleFieldChange = <K extends keyof SusFilledFormData>(field: K, value: SusFilledFormData[K] | string) => {
     const commonFieldKeys: (keyof typeof commonData)[] = [
       'doctorName', 'doctorCrm', 'doctorCrmState', 'doctorSpecialty', 'doctorCnes', 'doctorClinicName', 'doctorCpf', 'doctorCns',
       'patientSex', 'patientRaceColor', 'patientEthnicity', 'patientWeightKg', 'patientHeightCm', 'patientEmail',
@@ -249,7 +255,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       'patientMotherName', 'patientPhone', 'patientAddress', 'patientNeighborhood', 'patientCity', 'patientState', 'patientCep'
     ];
 
-    if (commonFieldKeys.includes(field as any)) {
+    if ((commonFieldKeys as Array<keyof SusFilledFormData>).includes(field)) {
       setCommonData(prev => ({ ...prev, [field]: value }));
 
       // Se for dado do paciente, propaga para onUpdatePatient para persistir na consulta
@@ -258,20 +264,21 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             field === 'patientMotherName' || field === 'patientPhone' || field === 'patientAddress' || 
             field === 'patientNeighborhood' || field === 'patientCity' || field === 'patientState' || 
             field === 'patientCep' || field === 'patientBirthDate' || field === 'patientSex') {
+          const strVal: string = typeof value === 'string' ? value : '';
           onUpdatePatient({
             ...patient,
-            name: field === 'patientName' ? value : patient.name,
-            documentNumber: field === 'patientCpf' ? value : patient.documentNumber,
-            cns: field === 'patientCns' ? value : (patient as any).cns,
-            motherName: field === 'patientMotherName' ? value : patient.motherName,
-            phone: field === 'patientPhone' ? value : patient.phone,
-            address: field === 'patientAddress' ? value : (patient as any).address,
-            neighborhood: field === 'patientNeighborhood' ? value : (patient as any).neighborhood,
-            city: field === 'patientCity' ? value : (patient as any).city,
-            state: field === 'patientState' ? value : (patient as any).state,
-            cep: field === 'patientCep' ? value : (patient as any).cep,
-            birthDate: field === 'patientBirthDate' ? value : patient.birthDate,
-            sex: field === 'patientSex' ? (value === 'M' || value === 'F' ? value : '') : patient.sex
+            name: field === 'patientName' ? strVal : patient.name,
+            documentNumber: field === 'patientCpf' ? strVal : patient.documentNumber,
+            cns: field === 'patientCns' ? strVal : patient.cns,
+            motherName: field === 'patientMotherName' ? strVal : patient.motherName,
+            phone: field === 'patientPhone' ? strVal : patient.phone,
+            address: field === 'patientAddress' ? strVal : patient.address,
+            neighborhood: field === 'patientNeighborhood' ? strVal : patient.neighborhood,
+            city: field === 'patientCity' ? strVal : patient.city,
+            state: field === 'patientState' ? strVal : patient.state,
+            cep: field === 'patientCep' ? strVal : patient.cep,
+            birthDate: field === 'patientBirthDate' ? strVal : patient.birthDate,
+            sex: field === 'patientSex' ? (strVal === 'M' || strVal === 'F' ? strVal : '') : patient.sex
           });
         }
       }

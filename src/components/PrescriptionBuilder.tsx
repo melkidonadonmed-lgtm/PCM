@@ -21,6 +21,7 @@ import { Icon } from './Icon';
 import { AcoesDaReceita } from './AcoesDaReceita';
 import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
 import { PediatricCalculator } from './PediatricCalculator';
+import { ConfirmationModal } from './ConfirmationModal';
 
 const REGIMES: RegimeReceita[] = ['simples', 'antimicrobiano', 'controle_especial'];
 
@@ -177,6 +178,17 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const [newModelName, setNewModelName] = useState('');
   const [savedPrescriptionModels, setSavedPrescriptionModels] = useState<SavedDocument[]>([]);
   const [prescriptionModelToast, setPrescriptionModelToast] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{
+    title: string;
+    description: string;
+    confirmLabel?: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const showNotice = useCallback((msg: string) => {
+    setPrescriptionModelToast(msg);
+    setTimeout(() => setPrescriptionModelToast(null), 3000);
+  }, []);
 
   // Estado para criar modelo diretamente sem precisar gerar receita na consulta
   const [isCreatingCustomModel, setIsCreatingCustomModel] = useState(false);
@@ -278,11 +290,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       setIsCreatingCustomModel(false);
       setCustomModelDraftTitle('');
       setCustomModelDraftItems([]);
-      setPrescriptionModelToast(`Modelo "${newDoc.title}" criado e salvo com sucesso!`);
-      setTimeout(() => setPrescriptionModelToast(null), 3000);
+      showNotice(`Modelo "${newDoc.title}" criado e salvo com sucesso!`);
     } catch (err) {
       console.error('Erro ao salvar modelo criado:', err);
-      alert('Falha ao salvar modelo no banco local.');
+      showNotice('Falha ao salvar modelo no banco local.');
     }
   };
 
@@ -303,31 +314,34 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     await db.savedDocuments.put(newDoc);
     setIsSaveModelModalOpen(false);
     setNewModelName('');
-    setPrescriptionModelToast(`Modelo "${newDoc.title}" salvo com sucesso!`);
+    showNotice(`Modelo "${newDoc.title}" salvo com sucesso!`);
     loadPrescriptionModels();
-    setTimeout(() => setPrescriptionModelToast(null), 3000);
   };
 
   const handleApplyPrescriptionModel = (model: SavedDocument, mode: 'replace' | 'append') => {
     if (!model.prescriptionItems || model.prescriptionItems.length === 0) return;
     if (mode === 'replace') {
       onUpdateItems([...model.prescriptionItems]);
-      setPrescriptionModelToast(`Modelo "${model.title}" aplicado na receita!`);
+      showNotice(`Modelo "${model.title}" aplicado na receita!`);
     } else {
       onUpdateItems([...items, ...model.prescriptionItems]);
-      setPrescriptionModelToast(`Medicamentos do modelo "${model.title}" adicionados à receita!`);
+      showNotice(`Medicamentos do modelo "${model.title}" adicionados à receita!`);
     }
     setIsLoadModelModalOpen(false);
-    setTimeout(() => setPrescriptionModelToast(null), 3000);
   };
 
-  const handleDeletePrescriptionModel = async (modelId: string, modelTitle: string) => {
-    if (confirm(`Deseja realmente excluir o modelo "${modelTitle}"?`)) {
-      await db.savedDocuments.delete(modelId);
-      loadPrescriptionModels();
-      setPrescriptionModelToast(`Modelo "${modelTitle}" excluído.`);
-      setTimeout(() => setPrescriptionModelToast(null), 3000);
-    }
+  const handleDeletePrescriptionModel = (modelId: string, modelTitle: string) => {
+    setConfirmAction({
+      title: 'Excluir modelo de receita?',
+      description: `Deseja realmente excluir o modelo "${modelTitle}" do banco local?`,
+      confirmLabel: 'Excluir modelo',
+      onConfirm: async () => {
+        setConfirmAction(null);
+        await db.savedDocuments.delete(modelId);
+        loadPrescriptionModels();
+        showNotice(`Modelo "${modelTitle}" excluído.`);
+      }
+    });
   };
 
   // Controle de expansão de dados extras do paciente (CPF e Peso)
@@ -564,11 +578,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   // Add Item to Prescription or Update existing item
   const handleAddMedicationToPrescription = () => {
     if (!selectedMedName.trim()) {
-      alert('Por favor, selecione ou digite o nome do medicamento.');
+      showNotice('Por favor, selecione ou digite o nome do medicamento.');
       return;
     }
     if (!selectedPosology.trim()) {
-      alert('Por favor, informe a posologia / instruções de uso.');
+      showNotice('Por favor, informe a posologia / instruções de uso.');
       return;
     }
 
@@ -718,7 +732,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     if (!medicoConfigurado(doctor)) return;
     const text = formatPrescriptionForWhatsApp();
     if (!text) {
-      alert('Adicione pelo menos um medicamento à receita antes de enviar.');
+      showNotice('Adicione pelo menos um medicamento à receita antes de enviar.');
       return;
     }
     const encoded = encodeURIComponent(text);
@@ -779,9 +793,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      if (window.confirm('Deseja limpar os dados deste paciente e reiniciar a consulta atual para segurança clínica?')) {
-                        onClearPatient();
-                      }
+                      setConfirmAction({
+                        title: 'Limpar atendimento e paciente?',
+                        description: 'Deseja limpar os dados deste paciente e reiniciar a consulta atual para segurança clínica?',
+                        confirmLabel: 'Limpar atendimento',
+                        onConfirm: () => {
+                          setConfirmAction(null);
+                          onClearPatient();
+                        }
+                      });
                     }}
                     className="text-xs text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1 cursor-pointer transition p-1 rounded focus-visible:ring-2 focus-visible:ring-rose-500"
                     title="Limpar paciente e reiniciar consulta"
@@ -2137,6 +2157,18 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={Boolean(confirmAction)}
+        title={confirmAction?.title || ''}
+        description={confirmAction?.description || ''}
+        confirmLabel={confirmAction?.confirmLabel || 'Confirmar'}
+        cancelLabel="Cancelar"
+        variant="danger"
+        darkMode={_darkMode}
+        onConfirm={() => confirmAction?.onConfirm()}
+        onCancel={() => setConfirmAction(null)}
+      />
 
     </div>
   );

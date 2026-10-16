@@ -41,7 +41,7 @@ export const DEFAULT_PATIENT: Patient = {
   allergies: []
 };
 
-const createDefaultCertificate = (cityState?: string): MedicalCertificate => {
+export const createDefaultCertificate = (cityState?: string): MedicalCertificate => {
   const hoje = new Date();
   const retorno = new Date(hoje);
   retorno.setDate(hoje.getDate() + 2);
@@ -66,7 +66,7 @@ const createDefaultCertificate = (cityState?: string): MedicalCertificate => {
   };
 };
 
-const createDefaultReferral = (): MedicalReferral => {
+export const createDefaultReferral = (): MedicalReferral => {
   return {
     id: 'ref-1',
     patientName: '',
@@ -83,6 +83,36 @@ const createDefaultReferral = (): MedicalReferral => {
 };
 
 export const DEFAULT_EXAM_INDICATION = 'Investigação clínica de rotina e controle metabólico.';
+
+export function syncPatientToDocuments(
+  patient: Patient,
+  certificate: MedicalCertificate,
+  referral: MedicalReferral
+): { certificate: MedicalCertificate; referral: MedicalReferral } {
+  return {
+    certificate: {
+      ...certificate,
+      patientName: patient.name || '',
+      documentNumber: patient.documentNumber || ''
+    },
+    referral: {
+      ...referral,
+      patientName: patient.name || '',
+      documentNumber: patient.documentNumber || ''
+    }
+  };
+}
+
+export function createCleanConsultationState(cityState?: string, nextPatientId = 'pat-clean') {
+  return {
+    patient: { ...DEFAULT_PATIENT, id: nextPatientId },
+    prescriptionItems: [] as PrescriptionItem[],
+    selectedExams: [] as ExamItem[],
+    examIndication: DEFAULT_EXAM_INDICATION,
+    certificate: createDefaultCertificate(cityState),
+    referral: createDefaultReferral()
+  };
+}
 
 export function usePrescriptionSession() {
   // 1. Doctor Profile
@@ -128,16 +158,8 @@ export function usePrescriptionSession() {
   useEffect(() => {
     storageService.saveItem('prescmed_patient', patient);
     // Sincroniza dados básicos do paciente com atestados e encaminhamentos
-    setCertificate(prev => ({
-      ...prev,
-      patientName: patient.name || '',
-      documentNumber: patient.documentNumber || ''
-    }));
-    setReferral(prev => ({
-      ...prev,
-      patientName: patient.name || '',
-      documentNumber: patient.documentNumber || ''
-    }));
+    setCertificate(prev => syncPatientToDocuments(patient, prev, referral).certificate);
+    setReferral(prev => syncPatientToDocuments(patient, certificate, prev).referral);
   }, [patient]);
 
   useEffect(() => {
@@ -162,12 +184,13 @@ export function usePrescriptionSession() {
 
   // Ação auxiliar: Iniciar Novo Atendimento (limpa paciente e dados clínicos, preservando perfil do médico)
   const startNewConsultation = useCallback(() => {
-    setPatient({ ...DEFAULT_PATIENT, id: `pat-${Date.now()}` });
-    setPrescriptionItems([]);
-    setSelectedExams([]);
-    setExamIndication(DEFAULT_EXAM_INDICATION);
-    setCertificate(createDefaultCertificate(doctor.cityState));
-    setReferral(createDefaultReferral());
+    const cleanState = createCleanConsultationState(doctor.cityState, `pat-${Date.now()}`);
+    setPatient(cleanState.patient);
+    setPrescriptionItems(cleanState.prescriptionItems);
+    setSelectedExams(cleanState.selectedExams);
+    setExamIndication(cleanState.examIndication);
+    setCertificate(cleanState.certificate);
+    setReferral(cleanState.referral);
 
     storageService.removeItem('prescmed_patient');
     storageService.removeItem('prescmed_prescription');

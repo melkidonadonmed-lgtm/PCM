@@ -3,6 +3,11 @@ import { ExamItem, Patient } from '../types';
 import { EXAM_CATALOG, EXAM_PACKAGES, ExamPackage } from '../data/examCatalog';
 import { Icon } from './Icon';
 
+/**
+ * Sub-ilha de Solicitação de Exames Laboratoriais e de Imagem.
+ * Estados de UI cobertos: empty (nenhum exame selecionado), loading (carregando painel/rotina),
+ * success (sucesso na montagem do pedido) e error (erro de busca sem correspondência).
+ */
 interface ExamRequesterProps {
   darkMode: boolean;
   patient: Patient;

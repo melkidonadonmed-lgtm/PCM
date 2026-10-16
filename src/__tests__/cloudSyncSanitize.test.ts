@@ -17,7 +17,7 @@ describe('sanitizeForFirestore - Blindagem de Persistência na Nuvem', () => {
       tags: ['ubs', undefined, 'sus']
     };
 
-    const clean = sanitizeForFirestore(rawData) as any;
+    const clean = sanitizeForFirestore(rawData);
 
     expect(clean).toHaveProperty('id', 'ctx-ubs');
     expect(clean).toHaveProperty('name', 'USF Osvaldo Piana');

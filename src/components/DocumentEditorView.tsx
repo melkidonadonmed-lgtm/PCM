@@ -71,16 +71,29 @@ import {
   PrescriptionStyle
 } from '../types';
 import { db, initializeDefaultTemplates } from '../services/db';
+import { storageService } from '../services/storageService';
 import { PRESET_LOGOS } from '../data/presetAssets';
 import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { resolverIdentidade, separarPorRegime } from '../utils/documentoClinico';
 import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
+import { ConfirmationModal } from './ConfirmationModal';
 import type { RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import LogoGeneratorModal from './LogoGeneratorModal';
 import WatermarkOverlay from './WatermarkOverlay';
 import WatermarkSelector from './WatermarkSelector';
+
+export type PresetQuickTemplateType =
+  | 'laudo'
+  | 'receita'
+  | 'receita_especial'
+  | 'parecer'
+  | 'risco'
+  | 'atestado'
+  | 'laudo_com_receita'
+  | 'relatorio_circunstanciado'
+  | 'declaracao_comparecimento';
 
 export const DEFAULT_PRESCRIPTION_STYLES: PrescriptionStyle[] = [
   {
@@ -160,23 +173,16 @@ const CustomUnderline = Mark.create({
       {
         style: 'text-decoration',
         consuming: false,
-        getAttrs: (style: any) => (typeof style === 'string' && style.includes('underline') ? {} : false),
+        getAttrs: (style: string | HTMLElement) => (typeof style === 'string' && style.includes('underline') ? {} : false),
       },
     ];
   },
   renderHTML({ HTMLAttributes }) {
     return ['u', HTMLAttributes, 0];
   },
-  addCommands() {
-    return {
-      toggleUnderline: () => ({ commands }: any) => {
-        return commands.toggleMark(this.name);
-      },
-    };
-  },
   addKeyboardShortcuts() {
     return {
-      'Mod-u': () => (this.editor as any).commands.toggleUnderline(),
+      'Mod-u': () => this.editor.commands.toggleMark(this.name),
     };
   },
 });
@@ -377,6 +383,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
   const [editingTemplateTitle, setEditingTemplateTitle] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    title: string;
+    description: string;
+    confirmLabel: string;
+    variant?: 'danger' | 'warning';
+    onConfirm: () => void;
+  } | null>(null);
 
   const [docWatermark, setDocWatermark] = useState<WatermarkType>(
     activeContext?.watermarkType || 'none'
@@ -384,12 +397,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
   // Estados para Estilos de Receita Salvos pelo Médico
   const [customStyles, setCustomStyles] = useState<PrescriptionStyle[]>(() => {
-    try {
-      const raw = localStorage.getItem('prescmed_custom_styles');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    return storageService.loadItem<PrescriptionStyle[]>('prescmed_custom_styles', []);
   });
   const [isSaveStyleModalOpen, setIsSaveStyleModalOpen] = useState(false);
   const [newStyleTitle, setNewStyleTitle] = useState('');
@@ -435,26 +443,26 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     };
     const updated = [...customStyles, newStyle];
     setCustomStyles(updated);
-    try {
-      localStorage.setItem('prescmed_custom_styles', JSON.stringify(updated));
-    } catch (err) {
-      console.error('Falha ao salvar estilo no localStorage:', err);
-    }
+    storageService.saveItem('prescmed_custom_styles', updated);
     setIsSaveStyleModalOpen(false);
     setNewStyleTitle('');
     showToast(`Estilo "${newStyle.name}" salvo com sucesso!`);
   };
 
   const handleDeleteCustomStyle = (id: string, name: string) => {
-    if (!confirm(`Deseja remover o estilo personalizado "${name}"?`)) return;
-    const updated = customStyles.filter(s => s.id !== id);
-    setCustomStyles(updated);
-    try {
-      localStorage.setItem('prescmed_custom_styles', JSON.stringify(updated));
-    } catch (err) {
-      console.error(err);
-    }
-    showToast(`Estilo "${name}" removido.`);
+    setConfirmDialog({
+      title: 'Remover Estilo Personalizado',
+      description: `Deseja remover o estilo personalizado "${name}"?`,
+      confirmLabel: 'Remover Estilo',
+      variant: 'danger',
+      onConfirm: () => {
+        const updated = customStyles.filter(s => s.id !== id);
+        setCustomStyles(updated);
+        storageService.saveItem('prescmed_custom_styles', updated);
+        setConfirmDialog(null);
+        showToast(`Estilo "${name}" removido.`);
+      },
+    });
   };
 
   const handleApplyStyle = (st: PrescriptionStyle) => {
@@ -512,8 +520,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     const pName = patient?.name?.trim() || '______________________________';
     const pAge = patient?.ageText || (patient?.birthDate ? patient.birthDate : '____ anos');
     const pDoc = patient?.documentNumber?.trim() || '____________________';
-    const pCns = (patient as any)?.cns?.trim() || '____________________';
-    const pAddressParts = [(patient as any)?.address, (patient as any)?.neighborhood, (patient as any)?.city ? `${(patient as any).city}${(patient as any).state ? `/${(patient as any).state}` : ''}` : ''].filter(Boolean);
+    const pCns = patient?.cns?.trim() || '____________________';
+    const pAddressParts = [patient?.address, patient?.neighborhood, patient?.city ? `${patient.city}${patient.state ? `/${patient.state}` : ''}` : ''].filter(Boolean);
     const pAddress = pAddressParts.join(', ') || '______________________________';
     const pWeight = patient?.weightKg ? `${patient.weightKg} kg` : '';
     const meds = formatPrescriptionItemsList(prescriptionItems);
@@ -577,7 +585,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
   // Função para salvar rascunho com debounce no IndexedDB (referência estável para evitar loops em useEffects)
   const triggerAutoSave = useCallback((
-    editorInstance: any,
+    editorInstance: { getJSON?: () => Record<string, unknown> | null; getHTML?: () => string } | null | undefined,
     updatedHeader?: DocumentHeaderConfig,
     updatedLogo?: DocumentLogoConfig,
     overrides?: Partial<{ title: string; fontSize: number; orientation: DocumentOrientation; viaLayout: DocumentViaLayout }>
@@ -970,7 +978,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   }, []);
 
   // Efeito para carregar documento inicial explicitamente passado via props (ex: SUS, Encaminhamento, Atestado)
-  const lastInitialDocRef = useRef<any>(null);
+  const lastInitialDocRef = useRef<DocumentEditorViewProps['initialDocumentToLoad']>(null);
   useEffect(() => {
     if (editor && initialDocumentToLoad && initialDocumentToLoad !== lastInitialDocRef.current) {
       lastInitialDocRef.current = initialDocumentToLoad;
@@ -1128,7 +1136,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   }, [loadSavedTemplates]);
 
   // Atualização de campos do cabeçalho em tempo real
-  const handleHeaderFieldChange = (field: keyof DocumentHeaderConfig, value: any) => {
+  const handleHeaderFieldChange = <K extends keyof DocumentHeaderConfig>(field: K, value: DocumentHeaderConfig[K]) => {
     setHeaderConfig(prev => {
       const next = { ...prev, [field]: value };
       if (editor) triggerAutoSave(editor, next, logoConfig);
@@ -1198,7 +1206,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         showToast(`Receita e modelo "${currentModel.title}" atualizados com sucesso!`);
       } catch (err) {
         console.error('Erro ao atualizar modelo existente:', err);
-        alert('Falha ao atualizar modelo no banco local.');
+        showToast('Falha ao atualizar modelo no banco local.');
       }
     } else {
       // Documento da consulta ou rascunho sem ID: confirma salvamento e sincronização com a receita
@@ -1254,7 +1262,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       showToast(`Modelo "${templateDoc.title}" salvo com sucesso!`);
     } catch (err) {
       console.error('Erro ao salvar modelo:', err);
-      alert('Falha ao salvar modelo no banco local.');
+      showToast('Falha ao salvar modelo no banco local.');
     }
   };
 
@@ -1339,82 +1347,56 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     showToast(`Modelo "${tpl.title}" carregado na folha A4.`);
   };
 
-  // Ação: Aplicar estilo visual de receita médica
-  const handleApplyStylePreset = (styleId: 'classico' | 'hospitalar' | 'sus' | 'especial_2vias' | 'pre_timbrado') => {
-    if (styleId === 'classico') {
-      setFontFamilyId('cormorant');
-      setBaseFontSize(12);
-      setPageOrientation('portrait');
-      setViaLayout('1-via');
-      setHeaderConfig(prev => ({ ...prev, showHeader: true, showFooter: true }));
-      setLogoConfig(prev => ({ ...prev, position: 'top-center', visible: true }));
-      showToast('Estilo Clássico Nobre aplicado!');
-    } else if (styleId === 'hospitalar') {
-      setFontFamilyId('jakarta');
-      setBaseFontSize(11);
-      setPageOrientation('portrait');
-      setViaLayout('1-via');
-      setHeaderConfig(prev => ({ ...prev, showHeader: true, showFooter: true }));
-      setLogoConfig(prev => ({ ...prev, position: 'top-left', visible: true }));
-      showToast('Estilo Hospitalar Moderno aplicado!');
-    } else if (styleId === 'sus') {
-      setFontFamilyId('inter');
-      setBaseFontSize(11);
-      setPageOrientation('portrait');
-      setViaLayout('1-via');
-      setHeaderConfig(prev => ({ ...prev, showHeader: true, showFooter: true }));
-      handleWatermarkChange('sus_double');
-      showToast("Estilo SUS / Atenção Básica aplicado!");
-    } else if (styleId === 'especial_2vias') {
-      setFontFamilyId('jakarta');
-      setBaseFontSize(10);
-      setPageOrientation('landscape');
-      setViaLayout('2-vias');
-      setHeaderConfig(prev => ({ ...prev, showHeader: true, showFooter: true, badgeText: 'RECEITUÁRIO DE CONTROLE ESPECIAL' }));
-      showToast('Estilo Receita Especial de 2 Vias (Paisagem) aplicado!');
-    } else if (styleId === 'pre_timbrado') {
-      setHeaderConfig(prev => ({ ...prev, showHeader: false, showFooter: false }));
-      setLogoConfig(prev => ({ ...prev, visible: false }));
-      showToast('Estilo Folha Pré-Timbrada: Cabeçalho e rodapé ocultados!');
-    }
-    setIsModelsDrawerOpen(false);
-    if (editor) triggerAutoSave(editor);
-  };
-
   // Ação: Iniciar novo documento em branco
   const handleStartNewDocument = () => {
     if (!editor) return;
-    if (confirm('Deseja iniciar um novo documento em branco na folha A4?')) {
-      editor.commands.setContent('<p><br></p>');
-      setEditorHtml('<p><br></p>');
-      setCurrentModel({
-        id: null,
-        title: 'Novo Documento Livre',
-        isPreset: false
-      });
-      setHeaderConfig(buildDefaultHeader());
-      triggerAutoSave(editor);
-      showToast('Folha A4 pronta para novo documento.');
-    }
+    setConfirmDialog({
+      title: 'Novo Documento em Branco',
+      description: 'Deseja iniciar um novo documento em branco na folha A4?',
+      confirmLabel: 'Iniciar em Branco',
+      variant: 'warning',
+      onConfirm: () => {
+        editor.commands.setContent('<p><br></p>');
+        setEditorHtml('<p><br></p>');
+        setCurrentModel({
+          id: null,
+          title: 'Novo Documento Livre',
+          isPreset: false
+        });
+        setHeaderConfig(buildDefaultHeader());
+        triggerAutoSave(editor);
+        setConfirmDialog(null);
+        showToast('Folha A4 pronta para novo documento.');
+      },
+    });
   };
 
   // Ação: Excluir modelo
-  const handleDeleteTemplate = async (id: string, title: string) => {
-    if (!confirm(`Deseja realmente excluir o modelo "${title}"?`)) return;
-    try {
-      await db.savedDocuments.delete(id);
-      await loadSavedTemplates();
-      if (currentModel.id === id) {
-        setCurrentModel({
-          id: null,
-          title: 'Documento Livre (Rascunho)',
-          isPreset: false
-        });
-      }
-      showToast('Modelo excluído.');
-    } catch (err) {
-      console.error('Erro ao excluir modelo:', err);
-    }
+  const handleDeleteTemplate = (id: string, title: string) => {
+    setConfirmDialog({
+      title: 'Excluir Modelo',
+      description: `Deseja realmente excluir o modelo "${title}"?`,
+      confirmLabel: 'Excluir Modelo',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await db.savedDocuments.delete(id);
+          await loadSavedTemplates();
+          if (currentModel.id === id) {
+            setCurrentModel({
+              id: null,
+              title: 'Documento Livre (Rascunho)',
+              isPreset: false
+            });
+          }
+          showToast('Modelo excluído.');
+        } catch (err) {
+          console.error('Erro ao excluir modelo:', err);
+        } finally {
+          setConfirmDialog(null);
+        }
+      },
+    });
   };
 
   // Ação: Iniciar renomeação de modelo
@@ -1458,18 +1440,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   // Modelos Rápidos de Fábrica com Dados Completos
-  const applyPresetTemplate = (
-    type: 
-      | 'laudo' 
-      | 'receita' 
-      | 'receita_especial'
-      | 'parecer' 
-      | 'risco' 
-      | 'atestado' 
-      | 'laudo_com_receita' 
-      | 'relatorio_circunstanciado' 
-      | 'declaracao_comparecimento'
-  ) => {
+  const applyPresetTemplate = (type: PresetQuickTemplateType) => {
     if (!editor) return;
     const patientName = patient?.name || '__________________________';
     const patientDoc = patient?.documentNumber || '________________';
@@ -1699,7 +1670,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG, WebP).');
+      showToast('Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG, WebP).');
       return;
     }
 
@@ -1726,7 +1697,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     };
     reader.onerror = () => {
       setLogoUploading(false);
-      alert('Falha ao processar o arquivo de imagem.');
+      showToast('Falha ao processar o arquivo de imagem.');
     };
     reader.readAsDataURL(file);
   };
@@ -1777,23 +1748,30 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   // Remover logotipo principal / esquerdo
-  const handleRemoveLogo = async () => {
-    if (confirm('Deseja remover o logotipo esquerdo deste documento?')) {
-      const updated: DocumentLogoConfig = {
-        ...logoConfig,
-        dataUrl: undefined,
-        visible: false
-      };
-      setLogoConfig(updated);
-      if (activeContext && onSaveContext) {
-        await onSaveContext({
-          ...activeContext,
-          logoDataUrl: undefined
-        });
-      }
-      if (editor) triggerAutoSave(editor, headerConfig, updated);
-      showToast('Logotipo esquerdo removido.');
-    }
+  const handleRemoveLogo = () => {
+    setConfirmDialog({
+      title: 'Remover Logotipo Esquerdo',
+      description: 'Deseja remover o logotipo esquerdo deste documento?',
+      confirmLabel: 'Remover Logotipo',
+      variant: 'danger',
+      onConfirm: async () => {
+        const updated: DocumentLogoConfig = {
+          ...logoConfig,
+          dataUrl: undefined,
+          visible: false
+        };
+        setLogoConfig(updated);
+        if (activeContext && onSaveContext) {
+          await onSaveContext({
+            ...activeContext,
+            logoDataUrl: undefined
+          });
+        }
+        if (editor) triggerAutoSave(editor, headerConfig, updated);
+        setConfirmDialog(null);
+        showToast('Logotipo esquerdo removido.');
+      },
+    });
   };
 
   // Upload de imagem para Logotipo Secundário (Direito)
@@ -1802,7 +1780,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG, WebP).');
+      showToast('Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG, WebP).');
       return;
     }
 
@@ -1830,7 +1808,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     };
     reader.onerror = () => {
       setSecondaryLogoUploading(false);
-      alert('Falha ao processar o arquivo de imagem.');
+      showToast('Falha ao processar o arquivo de imagem.');
     };
     reader.readAsDataURL(file);
   };
@@ -1866,23 +1844,30 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   // Remover Logotipo Secundário (Direito)
-  const handleRemoveSecondaryLogo = async () => {
-    if (confirm('Deseja remover o logotipo direito deste documento?')) {
-      const updated: DocumentLogoConfig = {
-        ...logoConfig,
-        secondaryDataUrl: undefined,
-        secondaryVisible: false
-      };
-      setLogoConfig(updated);
-      if (activeContext && onSaveContext) {
-        await onSaveContext({
-          ...activeContext,
-          secondaryLogoDataUrl: undefined
-        });
-      }
-      if (editor) triggerAutoSave(editor, headerConfig, updated);
-      showToast('Logotipo direito removido.');
-    }
+  const handleRemoveSecondaryLogo = () => {
+    setConfirmDialog({
+      title: 'Remover Logotipo Direito',
+      description: 'Deseja remover o logotipo direito deste documento?',
+      confirmLabel: 'Remover Logotipo',
+      variant: 'danger',
+      onConfirm: async () => {
+        const updated: DocumentLogoConfig = {
+          ...logoConfig,
+          secondaryDataUrl: undefined,
+          secondaryVisible: false
+        };
+        setLogoConfig(updated);
+        if (activeContext && onSaveContext) {
+          await onSaveContext({
+            ...activeContext,
+            secondaryLogoDataUrl: undefined
+          });
+        }
+        if (editor) triggerAutoSave(editor, headerConfig, updated);
+        setConfirmDialog(null);
+        showToast('Logotipo direito removido.');
+      },
+    });
   };
 
   // Handlers para Arrastar a Logo na Folha A4 (Drag and Drop em Tempo Real)
@@ -2754,10 +2739,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
         <button
           type="button"
-          onClick={() => (editor as any)?.chain().focus().toggleUnderline().run()}
+          onClick={() => editor?.chain().focus().toggleMark('underline').run()}
           disabled={!editor}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-            (editor as any)?.isActive('underline') 
+            editor?.isActive('underline') 
               ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
@@ -3948,7 +3933,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <div className="pt-1.5 border-t border-[var(--border-subtle)] flex items-center justify-between">
                           <button
                             type="button"
-                            onClick={() => applyPresetTemplate(item.id as any)}
+                            onClick={() => applyPresetTemplate(item.id as PresetQuickTemplateType)}
                             className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded-md px-1 py-0.5"
                           >
                             <FileText className="w-3.5 h-3.5" />
@@ -4395,6 +4380,19 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             if (editor) triggerAutoSave(editor, headerConfig, updatedLogo);
             showToast('Logotipo vetorial SVG aplicado com sucesso!');
           }}
+        />
+      )}
+
+      {confirmDialog && (
+        <ConfirmationModal
+          isOpen={true}
+          title={confirmDialog.title}
+          description={confirmDialog.description}
+          confirmLabel={confirmDialog.confirmLabel}
+          variant={confirmDialog.variant || 'danger'}
+          darkMode={darkMode}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
         />
       )}
     </div>

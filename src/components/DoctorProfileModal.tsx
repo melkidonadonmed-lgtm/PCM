@@ -4,6 +4,11 @@ import { DoctorProfile, WorkContext } from '../types';
 
 const LogoGeneratorModal = React.lazy(() => import('./LogoGeneratorModal'));
 
+/**
+ * Modal de Perfil e Identificação Médica.
+ * Estados de UI cobertos: empty (perfil vazio não configurado), loading (carregando gerador de logo),
+ * success (perfil salvo com sucesso) e error (erro de validação de CRM/nome).
+ */
 interface DoctorProfileModalProps {
   darkMode: boolean;
   doctor: DoctorProfile;

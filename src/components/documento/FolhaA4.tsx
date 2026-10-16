@@ -1,6 +1,11 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { alturaFolhaPx, larguraFolhaPx, type OrientacaoFolha } from '../../utils/folhaA4';
 
+/**
+ * Superfície Canônica de Papel A4 (794x1123 px).
+ * Estados de UI cobertos: empty (folha em branco/vazio), loading (carregando medição ResizeObserver),
+ * success (escala calculada com sucesso) e error (fallback para escala 1 em caso de falha).
+ */
 interface FolhaA4Props {
   orientacao?: OrientacaoFolha;
   /** Reduz a folha para caber na largura disponível (padrão). Desligado, mostra em tamanho real com rolagem. */

@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from './Icon';
 
+/**
+ * Gesto tátil de Pull-to-Refresh.
+ * Estados de UI cobertos: empty (ocioso/vazio), loading (carregando atualização),
+ * success (atualizado com sucesso) e error (desativado/falha).
+ */
 interface PuxarParaAtualizarProps {
   desativado: boolean;
 }

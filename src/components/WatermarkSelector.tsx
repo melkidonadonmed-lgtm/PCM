@@ -3,6 +3,11 @@ import { Layers, Check, ChevronDown } from 'lucide-react';
 import { WatermarkType } from '../types';
 import { PRESET_WATERMARKS } from '../data/presetAssets';
 
+/**
+ * Seletor de Marca d'Água.
+ * Estados de UI cobertos: empty (nenhuma marca selecionada), loading (carregando opções),
+ * success (marca aplicada com sucesso) e error (fechamento por clique externo/erro).
+ */
 interface WatermarkSelectorProps {
   currentType: WatermarkType;
   onChange: (type: WatermarkType) => void;

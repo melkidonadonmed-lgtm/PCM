@@ -48,13 +48,15 @@ export function montarItensDoKit(
         itemInstructions = `Administrar ${gotas(drops)} via oral de 8 em 8 horas após as refeições por 3 dias.`;
         itemDoseCalculatedText = `${gotas(drops)}`;
       } else if (kitItem.pediaDrugKey === 'amoxicilina_susp') {
-        const mlPerDose = parseFloat(((patientWeight * 50) / 3 / 50).toFixed(1));
+        // Teto de 20 mL por dose (1000 mg na suspensão 250 mg/5 mL, conforme pediatricMeds.ts)
+        const mlPerDose = Math.min(parseFloat(((patientWeight * 50) / 3 / 50).toFixed(1)), 20);
         itemName = 'Amoxicilina 250mg/5mL pó para suspensão oral (Amoxil)';
         itemPresentation = '1 frasco (150 mL)';
         itemInstructions = `Administrar ${ml(mlPerDose)} mL via oral de 8 em 8 horas durante 10 dias consecutivos.`;
         itemDoseCalculatedText = `${ml(mlPerDose)} mL`;
       } else if (kitItem.pediaDrugKey === 'prednisolona_sol') {
-        const mlPerDose = parseFloat(((patientWeight * 1) / 3).toFixed(1));
+        // Teto de 20 mL por dose (60 mg/dia na solução 3 mg/mL, conforme pediatricMeds.ts)
+        const mlPerDose = Math.min(parseFloat(((patientWeight * 1) / 3).toFixed(1)), 20);
         itemName = 'Fosfato Sódico de Prednisolona 3mg/mL solução oral (Prelone)';
         itemPresentation = '1 frasco (60 mL)';
         itemInstructions = `Administrar ${ml(mlPerDose)} mL via oral 1 vez ao dia, pela manhã, por 5 dias.`;
@@ -75,7 +77,7 @@ export function montarItensDoKit(
       scheduleTimes: [],
       instructions: itemInstructions,
       isContinuous: false,
-      isSpecialControl: Boolean((kitItem as any).isSpecial),
+      isSpecialControl: Boolean(kitItem.isSpecial),
       calculatedFromWeight: hasWeight ? patientWeight : undefined
     };
   });

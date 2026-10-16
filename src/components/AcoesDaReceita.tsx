@@ -1,6 +1,11 @@
 import React from 'react';
 import { Icon } from './Icon';
 
+/**
+ * Barra de Ações da Receita.
+ * Estados de UI cobertos: empty (nenhum item na receita), loading (carregando emissão),
+ * success (sucesso ao copiar texto) e error (alerta de médico não configurado).
+ */
 export interface AcoesDaReceitaProps {
   itemsCount: number;
   isMedicoConfigurado: boolean;

@@ -61,13 +61,15 @@ describe('Notificação de Receita (Portaria SVS/MS nº 344/98)', () => {
     });
   });
 
-  it('sibutramina (B2) e isotretinoína (C2) têm notificação própria', () => {
+  it('sibutramina (B2), isotretinoína (C2) e talidomida/lenalidomida (C3) têm notificação própria', () => {
     expect(notificacaoExigida('Sibutramina 15mg')).toMatchObject({ lista: 'B2', documento: 'Notificação de Receita B2' });
     expect(notificacaoExigida('Anfepramona 25mg')).toMatchObject({ lista: 'B2' });
     const retinoide = notificacaoExigida('Isotretinoína 20mg (Roacutan)');
     expect(retinoide).toMatchObject({ lista: 'C2' });
     expect(descreverNotificacao(retinoide!)).toContain('o uso tópico não exige notificação');
     expect(notificacaoExigida('Acitretina 25mg')).toMatchObject({ lista: 'C2' });
+    expect(notificacaoExigida('Talidomida 100mg')).toMatchObject({ lista: 'C3', rotuloCurto: 'Notificação C3' });
+    expect(notificacaoExigida('Lenalidomida 10mg')).toMatchObject({ lista: 'C3', rotuloCurto: 'Notificação C3' });
   });
 
   it('"morfina" e "frontal" só valem como palavra inteira', () => {
@@ -96,10 +98,17 @@ describe('Notificação de Receita (Portaria SVS/MS nº 344/98)', () => {
     expect(descreverNotificacao(notificacaoExigida('Clonazepam 2mg')!)).toBe('Notificação de Receita B (azul) — Lista B1');
   });
 
-  it('não avisa para quem sai em Receita de Controle Especial (C1 e adendos das listas A2 e B1) nem para receita comum', () => {
+  it('não avisa para quem sai em Receita de Controle Especial (C1 e adendos das listas A2 até 100mg e B1) nem para receita comum, mas avisa quando codeína/tramadol excedem 100mg', () => {
     [
       'Tramadol 50mg',
+      'Tramadol 100mg',
+      'Tramadol 100 mg/mL solução oral gotas',
+      'Cloridrato de Tramadol 200 mg/2 mL solução injetável',
+      'Fosfato de Codeína 150 mg/5 mL solução oral',
       'Codeína 30mg + Paracetamol 500mg (Tylex)',
+      'Paracetamol 500 mg + Fosfato de Codeína 30 mg (Paco)',
+      'Paracetamol 500 mg com Codeína 30 mg',
+      'Codeína 60mg',
       'Fenobarbital 100mg (Gardenal)',
       'Fluoxetina 20mg',
       'Amitriptilina 25mg',
@@ -110,6 +119,14 @@ describe('Notificação de Receita (Portaria SVS/MS nº 344/98)', () => {
       ''
     ].forEach((nome) => expect(notificacaoExigida(nome), nome).toBeNull());
     expect(notificacaoExigida(null)).toBeNull();
+    expect(notificacaoExigida('Tramadol 150mg')).toMatchObject({ lista: 'A2', rotuloCurto: 'Notificação A' });
+    expect(notificacaoExigida('Cloridrato de Tramadol cápsula de liberação prolongada 150 mg')).toMatchObject({ lista: 'A2', rotuloCurto: 'Notificação A' });
+    expect(notificacaoExigida('Tramadol (cloridrato) 150 mg')).toMatchObject({ lista: 'A2', rotuloCurto: 'Notificação A' });
+    expect(notificacaoExigida('Tramal Retard 150 mg')).toMatchObject({ lista: 'A2', rotuloCurto: 'Notificação A' });
+    expect(notificacaoExigida('Sylador 150 mg')).toMatchObject({ lista: 'A2', rotuloCurto: 'Notificação A' });
+    expect(notificacaoExigida({ name: 'Tramal 150 mg', activeIngredient: 'Cloridrato de Tramadol' })).toMatchObject({ lista: 'A2', rotuloCurto: 'Notificação A' });
+    expect(notificacaoExigida('Fosfato de Codeína 120mg')).toMatchObject({ lista: 'A2', rotuloCurto: 'Notificação A' });
+    expect(notificacaoExigida('Paracetamol 500 mg + Fosfato de Codeína 120 mg')).toMatchObject({ lista: 'A2', rotuloCurto: 'Notificação A' });
   });
 
   it('todo medicamento com notificação continua classificado como controle especial', () => {

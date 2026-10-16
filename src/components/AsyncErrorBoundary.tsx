@@ -1,6 +1,11 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { RotateCcw, AlertTriangle, RefreshCw } from 'lucide-react';
 
+/**
+ * Barreira de erro de módulos assíncronos.
+ * Estados de UI cobertos: empty (vazio sem erro), loading (carregando tentativa de recuperação),
+ * success (módulo resolvido com sucesso) e error (falha capturada na renderização).
+ */
 interface Props {
   children: ReactNode;
   moduleName?: string;

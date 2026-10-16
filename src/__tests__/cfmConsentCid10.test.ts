@@ -1,9 +1,34 @@
+import React from 'react';
 import { describe, it, expect } from 'vitest';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { COMMON_CID10 } from '../data/cidCatalog';
-import { MedicalCertificate } from '../types';
+import { DoctorProfile, MedicalCertificate, Patient } from '../types';
+import { DocumentoClinico } from '../components/documento/DocumentoClinico';
+
+const testDoctor: DoctorProfile = {
+  name: 'Dra. Marina Campos',
+  crm: '11223',
+  crmState: 'RO',
+  specialty: 'Clínica Médica',
+  clinicName: 'UBS Central',
+  address: 'Rua das Palmeiras, 50',
+  cityState: 'Porto Velho - RO',
+  phone: '(69) 3222-1111',
+  email: '',
+  showSignature: true
+};
+
+const testPatient: Patient = {
+  id: 'pat-cid-1',
+  name: 'Paciente Teste',
+  documentNumber: '123.456.789-00',
+  weightKg: 70,
+  gender: 'male',
+  allergies: []
+};
 
 describe('Conformidade Sanitária e Ética: Sigilo Médico e Inclusão de CID-10 (Res. CFM nº 1.658/2002 e 1.819/2007)', () => {
-  it('não deve incluir diagnóstico nem código CID-10 no atestado sem consentimento do paciente', () => {
+  it('não deve incluir diagnóstico nem código CID-10 no atestado renderizado sem consentimento do paciente', () => {
     const certificateWithoutConsent: MedicalCertificate = {
       patientName: 'Paciente Teste',
       documentNumber: '123.456.789-00',
@@ -12,17 +37,26 @@ describe('Conformidade Sanitária e Ética: Sigilo Médico e Inclusão de CID-10
       endDate: '2026-09-30',
       periodText: 'por motivo de saúde',
       includeCID: false,
-      cid10Code: '',
-      cid10Description: '',
+      cid10Code: 'J06.9',
+      cid10Description: 'Infecção aguda das vias aéreas superiores (IVAS)',
       observations: ''
     };
 
-    expect(certificateWithoutConsent.includeCID).toBe(false);
-    expect(certificateWithoutConsent.cid10Code).toBeFalsy();
-    expect(certificateWithoutConsent.cid10Description).toBeFalsy();
+    const html = renderToStaticMarkup(
+      React.createElement(DocumentoClinico, {
+        tipo: 'certificate',
+        doctor: testDoctor,
+        patient: testPatient,
+        certificate: certificateWithoutConsent
+      })
+    );
+
+    expect(html).toContain('Atestado Médico');
+    expect(html).not.toContain('J06.9');
+    expect(html).not.toContain('Resolução CFM nº 1.658/2002');
   });
 
-  it('deve conter aviso legal mandatório da Resolução CFM 1.658/2002 quando o CID-10 for incluído', () => {
+  it('deve conter aviso legal mandatório da Resolução CFM 1.658/2002 na folha A4 quando o CID-10 for autorizado', () => {
     const certificateWithConsent: MedicalCertificate = {
       patientName: 'Paciente Teste',
       documentNumber: '123.456.789-00',
@@ -36,12 +70,19 @@ describe('Conformidade Sanitária e Ética: Sigilo Médico e Inclusão de CID-10
       observations: ''
     };
 
-    const legalDisclaimer = '* Inclusão do CID expressamente solicitada e autorizada pelo(a) paciente (Resolução CFM nº 1.658/2002).';
+    const html = renderToStaticMarkup(
+      React.createElement(DocumentoClinico, {
+        tipo: 'certificate',
+        doctor: testDoctor,
+        patient: testPatient,
+        certificate: certificateWithConsent
+      })
+    );
 
-    expect(certificateWithConsent.includeCID).toBe(true);
-    expect(certificateWithConsent.cid10Code).toBe('J06.9');
-    expect(legalDisclaimer).toContain('Resolução CFM nº 1.658/2002');
-    expect(legalDisclaimer).toContain('expressamente solicitada e autorizada');
+    expect(html).toContain('J06.9');
+    expect(html).toContain('Infecção aguda das vias aéreas superiores (IVAS)');
+    expect(html).toContain('Resolução CFM nº 1.658/2002');
+    expect(html).toContain('expressamente solicitada e autorizada');
   });
 
   it('deve conter diagnósticos prioritários com codificação válida no catálogo CID-10', () => {
@@ -66,3 +107,4 @@ describe('Conformidade Sanitária e Ética: Sigilo Médico e Inclusão de CID-10
     expect(matches.some((m) => m.code === 'J00')).toBe(true);
   });
 });
+

@@ -2,6 +2,11 @@ import React from 'react';
 import { WorkContext } from '../types';
 import { Icon } from './Icon';
 
+/**
+ * Seletor de Posto de Trabalho.
+ * Estados de UI cobertos: empty (nenhum contexto ativo), loading (carregando troca de posto),
+ * success (contexto ativo selecionado com sucesso) e error (falha ao alternar).
+ */
 interface ContextSwitcherProps {
   contexts: WorkContext[];
   activeContext: WorkContext | null;

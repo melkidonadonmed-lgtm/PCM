@@ -69,8 +69,8 @@ const CONTROLADOS = [
   // Estimulantes do SNC (Lista A3; modafinila está na B1)
   'metilfenidato', 'ritalina', 'concerta', 'lisdexanfetamina', 'venvanse', 'modafinila', 'stavigile',
 
-  // Retinoides e anorexígenos
-  'isotretinoina', 'roacutan', 'acitretina', 'sibutramina', 'anfepramona', 'femproporex', 'mazindol'
+  // Retinoides, imunomoduladores (Lista C3) e anorexígenos
+  'isotretinoina', 'roacutan', 'acitretina', 'talidomida', 'lenalidomida', 'sibutramina', 'anfepramona', 'femproporex', 'mazindol'
 ];
 
 // Termos curtos só valem como palavra inteira, para não casar dentro de outras
@@ -99,7 +99,7 @@ export type MedicamentoClassificavel =
   | PrescriptionItem
   | AdultMedication
   | UnifiedMedication
-  | { name?: string; activeIngredient?: string; category?: string; isSpecialControl?: boolean; regimeReceita?: RegimeReceita }
+  | { name?: string; tradeName?: string; activeIngredient?: string; category?: string; isSpecialControl?: boolean; regimeReceita?: RegimeReceita }
   | string
   | null
   | undefined;
@@ -108,7 +108,7 @@ export type MedicamentoClassificavel =
 export function textoDoMedicamento(med?: MedicamentoClassificavel): string {
   if (!med) return '';
   if (typeof med === 'string') return normalizeText(med);
-  const obj = med as Record<string, any>;
+  const obj = med as { name?: string; tradeName?: string; activeIngredient?: string };
   return normalizeText(`${obj.name || obj.tradeName || ''} ${obj.activeIngredient || ''}`);
 }
 
@@ -120,7 +120,7 @@ export function textoDoMedicamento(med?: MedicamentoClassificavel): string {
 export function classificarReceita(med?: MedicamentoClassificavel): RegimeReceita {
   if (!med) return 'simples';
 
-  const obj = typeof med === 'string' ? null : (med as Record<string, any>);
+  const obj = typeof med === 'string' ? null : (med as { category?: string; isSpecialControl?: boolean; regimeReceita?: RegimeReceita });
   const texto = textoDoMedicamento(med);
 
   // O regime mais restritivo prevalece.
