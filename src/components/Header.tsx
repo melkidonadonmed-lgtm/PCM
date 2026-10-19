@@ -69,7 +69,7 @@ export const CloudAuthButton: React.FC = () => {
 
   if (user) {
     return (
-      <div 
+      <div data-state="idle" aria-busy={false} 
         className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-xl border text-xs shadow-tactile-sm transition bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)]"
         title={`Conectado à nuvem: ${user.email || user.displayName} | Status: ${syncStatus}`}
       >
@@ -81,15 +81,15 @@ export const CloudAuthButton: React.FC = () => {
             referrerPolicy="no-referrer"
           />
         ) : (
-          <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center text-[10px] text-white font-bold flex-shrink-0">
+          <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center text-xs text-white font-bold flex-shrink-0">
             {user.displayName ? user.displayName[0].toUpperCase() : 'M'}
           </div>
         )}
         <div className="flex flex-col items-start leading-tight min-w-0">
-          <span className="font-semibold text-[11px] max-w-[85px] sm:max-w-[110px] truncate hidden sm:inline">
+          <span className="font-semibold text-xs max-w-[85px] sm:max-w-[110px] truncate hidden sm:inline">
             {user.displayName?.split(' ')[0] || 'Dr(a).'}
           </span>
-          <div className="hidden sm:flex items-center gap-1 text-[9px]">
+          <div className="hidden sm:flex items-center gap-1 text-xs">
             {syncStatus === 'syncing' && (
               <span className="text-sky-500 font-medium flex items-center gap-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping" />
@@ -144,7 +144,7 @@ export const CloudAuthButton: React.FC = () => {
       aria-label="Conectar Nuvem"
     >
       <Icon name="cloud" size={16} className={`text-sky-600 dark:text-sky-400 ${loading ? 'animate-pulse' : ''}`} />
-      <span className="hidden 2xl:inline text-[11px] font-semibold">
+      <span className="hidden 2xl:inline text-xs font-semibold">
         {loading ? 'Conectando...' : 'Nuvem'}
       </span>
     </button>
@@ -217,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header 
       id="prescmed-header" 
-      className="sticky top-0 z-50 w-full border-b backdrop-blur-md transition-colors no-print isolate bg-[var(--surface-card)] border-[var(--border-subtle)]"
+      className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)] border-[var(--border-subtle)]"
       style={{
         boxShadow: darkMode 
           ? '0 10px 24px -6px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.06)'
@@ -260,9 +260,9 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
             <span className="hidden sm:flex items-center gap-1.5">
               <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">
-                PresC<span className="text-blue-600 dark:text-blue-400 font-black">Med</span>
+                PresC<span className="text-sky-600 dark:text-sky-400 font-black">Med</span>
               </span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded font-extrabold tracking-wider bg-blue-600/10 text-blue-700 dark:bg-blue-400/15 dark:text-blue-300 border border-blue-600/20 dark:border-blue-400/25">
+              <span className="text-xs px-1.5 py-0.5 rounded font-extrabold tracking-wider bg-sky-600/10 text-sky-700 dark:bg-sky-400/15 dark:text-blue-300 border border-info dark:border-info">
                 PRO
               </span>
             </span>
@@ -295,14 +295,14 @@ export const Header: React.FC<HeaderProps> = ({
                   <Icon
                     name={tab.icon}
                     size={16}
-                    className={isActive ? 'text-blue-600 dark:text-blue-400' : 'opacity-75'}
+                    className={isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'}
                   />
                   <span>{tab.label}</span>
                   {tab.badge && (
                     <span
-                      className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
+                      className={`text-xs font-extrabold px-1.5 py-0.2 rounded-full ${
                         isActive
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-sky-600 text-white'
                           : 'bg-[var(--surface-card)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
                       }`}
                     >
@@ -330,27 +330,27 @@ export const Header: React.FC<HeaderProps> = ({
             tabIndex={0}
             className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border transition cursor-pointer group w-full max-w-[220px] sm:max-w-[260px] xl:max-w-[280px] min-h-[38px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               hasPatient 
-                ? 'bg-emerald-500/5 dark:bg-emerald-950/20 border-emerald-500/30 text-emerald-900 dark:text-emerald-200' 
+                ? 'bg-emerald-500/5 dark:bg-emerald-950/20 border-clinical text-emerald-900 dark:text-emerald-200' 
                 : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
             }`}
             title="Clique para identificar o paciente, peso e histórico clínico"
           >
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 border ${
               hasPatient 
-                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40' 
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-clinical' 
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-subtle dark:border-strong'
             }`}>
               <Icon name={hasPatient ? 'person' : 'person_add'} size={15} />
             </div>
             <div className="text-left overflow-hidden min-w-0 flex-1">
-              <div className="text-[11px] sm:text-xs font-bold truncate text-slate-900 dark:text-white flex items-center justify-between gap-1">
+              <div className="text-xs sm:text-xs font-bold truncate text-slate-900 dark:text-white flex items-center justify-between gap-1">
                 <span className="truncate">
                   {hasPatient ? patientName : 'Identificar paciente'}
                 </span>
                 <Icon name="chevron_right" size={14} className="group-hover:translate-x-0.5 transition-transform opacity-60 flex-shrink-0 text-[var(--text-muted)]" />
               </div>
               {hasPatient && (patientWeight > 0 || patient?.ageText) && (
-                <div className="text-[10px] font-semibold flex items-center gap-1.5 truncate">
+                <div className="text-xs font-semibold flex items-center gap-1.5 truncate">
                   {patientWeight > 0 && (
                     <span className="text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-0.5">
                       <Icon name="scale" size={11} className="inline-block" />
@@ -376,7 +376,7 @@ export const Header: React.FC<HeaderProps> = ({
               className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 min-h-[38px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 isDoctorReady
                   ? 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)]'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-300 hover:bg-amber-500/15'
+                  : 'bg-amber-500/10 border-warning text-amber-800 dark:text-amber-300 hover:bg-amber-500/15'
               }`}
               title={
                 isDoctorReady
@@ -413,7 +413,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onInstallApp}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 min-h-[38px] rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
+              className="hidden lg:flex items-center gap-1.5 px-2.5 min-h-[38px] rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-emerald-500/10 border-clinical text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
               title="Instalar PresCMed como aplicativo offline"
               aria-label="Instalar Aplicativo PresCMed"
             >

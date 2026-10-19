@@ -89,17 +89,25 @@ export function syncPatientToDocuments(
   certificate: MedicalCertificate,
   referral: MedicalReferral
 ): { certificate: MedicalCertificate; referral: MedicalReferral } {
+  const nextName = patient.name || '';
+  const nextDoc = patient.documentNumber || '';
+  const certUnchanged = certificate.patientName === nextName && certificate.documentNumber === nextDoc;
+  const refUnchanged = referral.patientName === nextName && referral.documentNumber === nextDoc;
   return {
-    certificate: {
-      ...certificate,
-      patientName: patient.name || '',
-      documentNumber: patient.documentNumber || ''
-    },
-    referral: {
-      ...referral,
-      patientName: patient.name || '',
-      documentNumber: patient.documentNumber || ''
-    }
+    certificate: certUnchanged
+      ? certificate
+      : {
+          ...certificate,
+          patientName: nextName,
+          documentNumber: nextDoc
+        },
+    referral: refUnchanged
+      ? referral
+      : {
+          ...referral,
+          patientName: nextName,
+          documentNumber: nextDoc
+        }
   };
 }
 

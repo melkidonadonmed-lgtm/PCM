@@ -76,7 +76,7 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
           clinicName: 'Consultório Médico Particular',
           clinicAddress: 'Atendimento Ambulatorial Privado',
           cnes: '',
-          logoDataUrl: PRESET_LOGOS.sus.publicUrl,
+          logoDataUrl: '',
           logoAlignment: 'right',
           watermarkType: 'none',
           watermarkOpacity: 0.08,

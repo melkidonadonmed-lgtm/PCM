@@ -104,6 +104,11 @@ const REGRAS: Array<{ termos: string[]; palavrasInteiras?: string[]; notificacao
   { termos: ['talidomida', 'lenalidomida'], notificacao: NOTIFICACAO_C3 }
 ];
 
+const REGRAS_COMPILADAS = REGRAS.map((regra) => ({
+  ...regra,
+  palavrasInteirasRegex: (regra.palavrasInteiras || []).map((termo) => new RegExp(`\\b${termo}\\b`))
+}));
+
 /** Todos os termos que disparam o aviso (os testes conferem cada um contra o regime de controle especial). */
 export const TERMOS_COM_NOTIFICACAO: string[] = REGRAS.flatMap(({ termos, palavrasInteiras = [] }) => [
   ...termos,
@@ -149,10 +154,10 @@ function excedeAdendoListaA2(texto: string): NotificacaoDeReceita | null {
 export function notificacaoExigida(med?: MedicamentoClassificavel): NotificacaoDeReceita | null {
   const texto = textoDoMedicamento(med);
   if (!texto) return null;
-  const regra = REGRAS.find(
-    ({ termos, palavrasInteiras = [] }) =>
+  const regra = REGRAS_COMPILADAS.find(
+    ({ termos, palavrasInteirasRegex }) =>
       termos.some((termo) => texto.includes(termo)) ||
-      palavrasInteiras.some((termo) => new RegExp(`\\b${termo}\\b`).test(texto))
+      palavrasInteirasRegex.some((re) => re.test(texto))
   );
   if (regra) return regra.notificacao;
   return excedeAdendoListaA2(texto);

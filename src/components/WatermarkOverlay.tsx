@@ -33,7 +33,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
       style={{ opacity: effectiveOpacity }}
     >
       {type === 'sus_single' && (
-        <div className="w-full h-full flex items-center justify-center p-8">
+        <div data-state="idle" aria-busy={false} className="w-full h-full flex items-center justify-center p-8 surface-raised">
           <img 
             src={logoSrc} 
             alt="" 

@@ -54,6 +54,8 @@ import {
   Files
 } from 'lucide-react';
 import { exportarFolhaPdf } from '../utils/folhaA4';
+import { DOMPurify } from '../utils/sanitizeHtml';
+import { SIMBOLO_CORTE } from '../utils/compartilhamentoTexto';
 import { 
   DoctorProfile, 
   Patient, 
@@ -1927,7 +1929,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     <div className={`flex flex-col gap-4 mx-auto w-full pb-16 transition ${pageOrientation === 'landscape' ? 'max-w-[1240px]' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
       {/* Toast Feedback */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-slate-700 animate-tab-fade no-print">
+        <div data-state="idle" aria-busy={false} className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade no-print">
           <Check className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
@@ -1966,7 +1968,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     if (e.key === 'Escape') setIsEditingModelTitle(false);
                   }}
                   autoFocus
-                  className="px-2 py-0.5 text-xs font-bold rounded border border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-900 text-[var(--text-main)] outline-none"
+                  className="px-2 py-0.5 text-xs font-bold rounded border border-medium dark:border-strong bg-white dark:bg-slate-900 text-[var(--text-main)] outline-none"
                 />
                 <button
                   type="button"
@@ -2007,7 +2009,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           </div>
 
           {/* Indicador de Status Local-First */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-muted)] shrink-0 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-muted)] shrink-0 whitespace-nowrap">
             {saveStatus === 'saving' ? (
               <>
                 <Loader2 className="w-3 h-3 animate-spin text-slate-500" />
@@ -2068,7 +2070,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <FileText className="w-4 h-4 text-[var(--text-muted)]" />
               <span>Carregar da Consulta</span>
             </button>
-            <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-tactile-lg p-1.5 hidden group-hover:block z-50 animate-tab-fade">
+            <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-xl shadow-tactile-lg p-1.5 hidden group-hover:block z-50 animate-tab-fade">
               <button
                 type="button"
                 onClick={() => handleLoadActivePrescription(true)}
@@ -2093,7 +2095,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 <Award className="w-3.5 h-3.5 text-amber-600" />
                 <span>Atestado Médico Ativo</span>
               </button>
-              <div className="border-t border-slate-100 dark:border-slate-800 my-1"></div>
+              <div className="border-t border-slate-100 dark:border-strong my-1"></div>
               <button
                 type="button"
                 onClick={handleStartNewDocument}
@@ -2140,7 +2142,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <FolderOpen className="w-4 h-4 text-[var(--text-muted)]" />
             <span>Modelos</span>
             {savedTemplates.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold flex items-center justify-center">
                 {savedTemplates.length}
               </span>
             )}
@@ -2162,7 +2164,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       <div className="editor-toolbar no-print relative z-20 rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex flex-wrap items-center gap-2">
         {/* Seletor Rápido de Estilo de Receita Atual */}
         <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
-          <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
+          <span className="text-xs font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
           <select
             value=""
             onChange={(e) => {
@@ -2226,7 +2228,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={() => setPageOrientation('portrait')}
             className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              pageOrientation === 'portrait' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              pageOrientation === 'portrait' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
             title="Orientação Retrato (Vertical 210×297mm)"
           >
@@ -2237,7 +2239,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={() => setPageOrientation('landscape')}
             className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              pageOrientation === 'landscape' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              pageOrientation === 'landscape' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
             title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
           >
@@ -2252,7 +2254,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             type="button"
             onClick={() => setViaLayout('1-via')}
             className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              viaLayout === '1-via' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              viaLayout === '1-via' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
             title="Folha Única (1 Via Padrão)"
           >
@@ -2269,7 +2271,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               }
             }}
             className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-              viaLayout === '2-vias' ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              viaLayout === '2-vias' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
             title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
           >
@@ -2285,13 +2287,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             headerConfig.showHeader
               ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
-              : 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
+              : 'border-warning bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
           }`}
           title={headerConfig.showHeader ? "Cabeçalho visível. Clique para ocultar (ideal para papel já timbrado)" : "Cabeçalho ocultado. Clique para restaurar"}
         >
           {headerConfig.showHeader ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-amber-500" />}
           <span>Cabeçalho</span>
-          <span className="text-[10px] opacity-75">({headerConfig.showHeader ? 'Sim' : 'Não'})</span>
+          <span className="text-xs opacity-75">({headerConfig.showHeader ? 'Sim' : 'Não'})</span>
         </button>
 
         {/* Alternador de Visibilidade do Rodapé */}
@@ -2301,13 +2303,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             headerConfig.showFooter
               ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
-              : 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
+              : 'border-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
           }`}
           title={headerConfig.showFooter ? "Rodapé de carimbo visível. Clique para ocultar" : "Rodapé ocultado. Clique para restaurar"}
         >
           {headerConfig.showFooter ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-slate-400" />}
           <span>Rodapé</span>
-          <span className="text-[10px] opacity-75">({headerConfig.showFooter ? 'Sim' : 'Não'})</span>
+          <span className="text-xs opacity-75">({headerConfig.showFooter ? 'Sim' : 'Não'})</span>
         </button>
 
         {/* Botão CARREGAR RECEITA ATUAL */}
@@ -2321,7 +2323,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           <span className="hidden sm:inline">Carregar Receita Atual</span>
           <span className="sm:hidden">Receita</span>
           {prescriptionItems && prescriptionItems.length > 0 && (
-            <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
+            <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold flex items-center justify-center">
               {prescriptionItems.length}
             </span>
           )}
@@ -2334,7 +2336,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             onClick={() => setIsLogoMenuOpen(prev => !prev)}
             className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
               (logoConfig.dataUrl && logoConfig.visible) || (logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false)
-                ? 'border-slate-400 bg-slate-100 dark:bg-slate-800 text-[var(--text-main)] font-bold'
+                ? 'border-medium bg-slate-100 dark:bg-slate-800 text-[var(--text-main)] font-bold'
                 : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
             }`}
             title="Configurar logotipos (esquerdo e direito) no timbrado A4"
@@ -2342,7 +2344,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             <ImageIcon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
             <span>Logotipo</span>
             {(logoConfig.dataUrl || logoConfig.secondaryDataUrl) && (
-              <span className="text-[10px] px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 rounded font-bold uppercase">
+              <span className="text-xs px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 rounded font-bold uppercase">
                 {logoConfig.dataUrl && logoConfig.secondaryDataUrl ? 'Duplo' : '1 Logo'}
               </span>
             )}
@@ -2372,7 +2374,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   onClick={() => setActiveLogoTab('left')}
                   className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                     activeLogoTab === 'left'
-                      ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                      ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
@@ -2387,7 +2389,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   onClick={() => setActiveLogoTab('right')}
                   className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                     activeLogoTab === 'right'
-                      ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                      ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
@@ -2403,7 +2405,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 <div className="space-y-3">
                   {/* Posição do Logo Esquerdo */}
                   <div>
-                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                    <label className="text-xs font-bold text-[var(--text-secondary)] block mb-1">
                       Posição do Logo Esquerdo:
                     </label>
                     <div className="grid grid-cols-3 gap-1 text-xs">
@@ -2411,38 +2413,38 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         type="button"
                         onClick={() => handleChangeLogoPosition('header-left')}
                         className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                          logoConfig.position === 'header-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                          logoConfig.position === 'header-left' ? 'border-info bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                         }`}
                       >
-                        <span className="text-xs">🏢</span>
-                        <span className="text-[10px]">Header Esq.</span>
+                        <Building2 className="w-3.5 h-3.5" />
+                        <span className="text-xs">Header Esq.</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleChangeLogoPosition('top-left')}
                         className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                          logoConfig.position === 'top-left' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                          logoConfig.position === 'top-left' ? 'border-info bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                         }`}
                       >
                         <span className="text-xs">⇱</span>
-                        <span className="text-[10px]">Topo Esq.</span>
+                        <span className="text-xs">Topo Esq.</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleChangeLogoPosition('top-center')}
                         className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                          logoConfig.position === 'top-center' ? 'border-sky-500 bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                          logoConfig.position === 'top-center' ? 'border-info bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                         }`}
                       >
                         <span className="text-xs">⬌</span>
-                        <span className="text-[10px]">Topo Centro</span>
+                        <span className="text-xs">Topo Centro</span>
                       </button>
                     </div>
                   </div>
 
                   {/* Tamanho do Logo Esquerdo */}
                   <div>
-                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                    <label className="text-xs font-bold text-[var(--text-secondary)] block mb-1">
                       Tamanho do Logo Esquerdo:
                     </label>
                     <div className="grid grid-cols-4 gap-1 text-xs">
@@ -2453,7 +2455,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           onClick={() => handleChangeLogoSize(sz)}
                           className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                             logoConfig.size === sz 
-                              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
+                              ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border-navy-800 dark:border-info font-bold shadow-tactile-sm' 
                               : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                           }`}
                         >
@@ -2477,7 +2479,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={logoUploading}
-                        className="flex-1 py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                        className="flex-1 py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
                       >
                         <Upload className="w-3.5 h-3.5" />
                         <span>{logoUploading ? 'Carregando...' : 'Upload Logo Esq.'}</span>
@@ -2489,7 +2491,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           setIsLogoMenuOpen(false);
                           setIsLogoGeneratorOpen(true);
                         }}
-                        className="py-1.5 px-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                        className="py-1.5 px-2.5 rounded-xl border border-warning dark:border-warning bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
                         title="Criar brasão vetorial SVG"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
@@ -2499,26 +2501,26 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
                     {/* Presets Rápidos */}
                     <div>
-                      <span className="text-[10px] text-[var(--text-muted)] block mb-1">Brasões Rápidos:</span>
+                      <span className="text-xs text-[var(--text-muted)] block mb-1">Brasões Rápidos:</span>
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
-                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                          className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
                         >
                           SEMUSA
                         </button>
                         <button
                           type="button"
                           onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
-                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                          className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
                         >
                           SESAU
                         </button>
                         <button
                           type="button"
                           onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
-                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                          className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
                         >
                           SUS
                         </button>
@@ -2542,13 +2544,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               {/* CONTEÚDO DA ABA DIREITA */}
               {activeLogoTab === 'right' && (
                 <div className="space-y-3">
-                  <p className="text-[11px] text-[var(--text-muted)] leading-tight">
+                  <p className="text-xs text-[var(--text-muted)] leading-tight">
                     O logotipo secundário é exibido no canto superior direito do timbrado A4 (ao lado da data e selo do documento).
                   </p>
 
                   {/* Tamanho do Logo Direito */}
                   <div>
-                    <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                    <label className="text-xs font-bold text-[var(--text-secondary)] block mb-1">
                       Tamanho do Logo Direito:
                     </label>
                     <div className="grid grid-cols-4 gap-1 text-xs">
@@ -2559,7 +2561,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           onClick={() => handleChangeSecondaryLogoSize(sz)}
                           className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                             (logoConfig.secondarySize || 'md') === sz 
-                              ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400 font-bold shadow-tactile-sm' 
+                              ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border-navy-800 dark:border-info font-bold shadow-tactile-sm' 
                               : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                           }`}
                         >
@@ -2582,7 +2584,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       type="button"
                       onClick={() => secondaryFileInputRef.current?.click()}
                       disabled={secondaryLogoUploading}
-                      className="w-full py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                      className="w-full py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
                     >
                       <Upload className="w-3.5 h-3.5" />
                       <span>{secondaryLogoUploading ? 'Carregando...' : 'Upload Logo Direito (SUS / Clínica)'}</span>
@@ -2590,26 +2592,26 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
                     {/* Presets Rápidos para o lado direito */}
                     <div>
-                      <span className="text-[10px] text-[var(--text-muted)] block mb-1">Logos Rápidos para a Direita:</span>
+                      <span className="text-xs text-[var(--text-muted)] block mb-1">Logos Rápidos para a Direita:</span>
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
-                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer font-bold text-blue-600 dark:text-blue-400"
+                          className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer font-bold text-sky-600 dark:text-sky-400"
                         >
                           SUS
                         </button>
                         <button
                           type="button"
                           onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
-                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                          className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
                         >
                           SESAU
                         </button>
                         <button
                           type="button"
                           onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
-                          className="flex-1 text-[10px] py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-slate-400 text-center truncate cursor-pointer"
+                          className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
                         >
                           SEMUSA
                         </button>
@@ -2641,7 +2643,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       </div>
 
       {/* FORMATAÇÃO DO TEXTO: única barra fixa (sticky), numa linha só, logo acima da folha */}
-      <div className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 backdrop-blur-md rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex items-center gap-1.5 overflow-x-auto scrollbar-none touch-pan-x flex-nowrap lg:flex-wrap lg:overflow-visible">
+      <div className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex items-center gap-1.5 overflow-x-auto scrollbar-none touch-pan-x flex-nowrap lg:flex-wrap lg:overflow-visible">
         {/* Estilo do Parágrafo / Título */}
         <select
           value={
@@ -2708,7 +2710,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           disabled={!editor}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('bold') 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Negrito (Ctrl+B)"
@@ -2723,7 +2725,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           disabled={!editor}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('italic') 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Itálico (Ctrl+I)"
@@ -2738,7 +2740,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           disabled={!editor}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('underline') 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Sublinhado (Ctrl+U)"
@@ -2755,7 +2757,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           onClick={() => editor?.chain().focus().setTextAlign('left').run()}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'left' }) 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Alinhar à Esquerda"
@@ -2769,7 +2771,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           onClick={() => editor?.chain().focus().setTextAlign('center').run()}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'center' }) 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Centralizar"
@@ -2783,7 +2785,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           onClick={() => editor?.chain().focus().setTextAlign('right').run()}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'right' }) 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Alinhar à Direita"
@@ -2797,7 +2799,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'justify' }) 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Justificar"
@@ -2814,7 +2816,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           onClick={() => editor?.chain().focus().toggleBulletList().run()}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('bulletList') 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Lista com Marcadores"
@@ -2828,7 +2830,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           onClick={() => editor?.chain().focus().toggleOrderedList().run()}
           className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('orderedList') 
-              ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm font-bold' 
+              ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold' 
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
           }`}
           title="Lista Numerada"
@@ -2865,12 +2867,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
       {/* SELETOR RÁPIDO ENTRE RECEITAS QUANDO HOUVER ITENS SIMPLES E ESPECIAIS NA MESMA CONSULTA */}
       {regimesNaConsulta.length > 1 && (
-        <div className="no-print p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-tactile-sm">
+        <div className="no-print p-3 rounded-2xl bg-amber-500/10 border border-warning flex flex-col sm:flex-row items-center justify-between gap-3 shadow-tactile-sm">
           <div className="flex items-center gap-2 text-xs text-amber-900 dark:text-amber-200">
             <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <div>
               <span className="font-bold">Receitas separadas:</span>
-              <span className="ml-1 text-[11px] opacity-90">
+              <span className="ml-1 text-xs opacity-90">
                 esta consulta gera {regimesNaConsulta.length} receitas. Escolha a folha:
               </span>
             </div>
@@ -2884,8 +2886,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 aria-pressed={activeLoadedRecipeType === regime}
                 className={`flex-1 sm:flex-initial h-8 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 shadow-tactile-sm ${
                   activeLoadedRecipeType === regime
-                    ? 'bg-sky-600 text-white border border-sky-700'
-                    : 'bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800 hover:bg-sky-50'
+                    ? 'bg-sky-600 text-white border border-info'
+                    : 'bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-200 border border-info dark:border-info hover:bg-sky-50'
                 }`}
               >
                 <span>{RECEITA_NO_EDITOR[regime].botao} ({itensPorRegime[regime].length})</span>
@@ -2955,7 +2957,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               />
 
               {/* Controles Flutuantes da Logo (Visíveis na tela, ocultos na impressão) */}
-              <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-0 bg-slate-900 text-white rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-tactile-lg text-[10px] whitespace-nowrap">
+              <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-0 bg-slate-900 text-white rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-tactile-lg text-xs whitespace-nowrap">
                 <Move className="w-3 h-3 text-sky-400" />
                 <span>Arraste para onde quiser</span>
                 <button
@@ -2964,7 +2966,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     e.stopPropagation();
                     handleChangeLogoPosition('top-center');
                   }}
-                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[9px] cursor-pointer"
+                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-xs cursor-pointer"
                   title="Alinhar ao centro do topo"
                 >
                   Centralizar
@@ -2975,7 +2977,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
           {/* AVISO E RESTAURAÇÃO DE CABEÇALHO OCULTADO (no-print) */}
           {!headerConfig.showHeader && (
-            <div className="no-print mb-4 p-2.5 rounded-xl border border-dashed border-amber-300 bg-amber-50/70 text-amber-800 text-xs flex items-center justify-between">
+            <div className="no-print mb-4 p-2.5 rounded-xl border border-dashed border-warning bg-amber-50/70 text-amber-800 text-xs flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <EyeOff className="w-4 h-4 text-amber-600 shrink-0" />
                 <span><strong>Cabeçalho Ocultado:</strong> A folha será impressa sem cabeçalho (ideal para papel timbrado físico).</span>
@@ -2983,7 +2985,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => handleHeaderFieldChange('showHeader', true)}
-                className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>Restaurar Cabeçalho</span>
@@ -3000,7 +3002,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 {headerConfig.showHeader && (
                   <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition">
                     {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
-                    <div className="no-print mb-2 flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200">
+                    <div className="no-print mb-2 flex items-center justify-between text-xs text-slate-500 pb-1 border-b border-subtle">
                       <span className="flex items-center gap-1 text-slate-600 font-semibold">
                         <Pencil className="w-3 h-3 text-sky-600" />
                         <span>Clique em qualquer texto do cabeçalho para editar</span>
@@ -3040,7 +3042,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
                           />
                           {/* Alça rápida no-print para trocar posição ou tamanho */}
-                          <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-[9px] z-20">
+                          <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 left-0 bg-slate-900/90 text-white rounded-md px-2 py-0.5 flex items-center gap-1 text-xs z-20">
                             <button
                               type="button"
                               onClick={() => handleChangeLogoPosition('free')}
@@ -3096,7 +3098,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               placeholder="Nome do local de atendimento"
                               aria-label="Nome do local de atendimento"
                               style={{ fontFamily: 'inherit' }}
-                              className="text-sm sm:text-base font-bold uppercase tracking-tight text-slate-900 leading-snug w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
+                              className="text-sm sm:text-base font-bold uppercase tracking-tight text-slate-900 leading-snug w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
                               title="Clique para editar o nome do local de atendimento"
                             />
 
@@ -3108,7 +3110,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               placeholder="Endereço e informações de contato"
                               aria-label="Endereço e contato do local de atendimento"
                               style={{ fontFamily: 'inherit' }}
-                              className="text-[11px] font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-slate-200"
+                              className="text-xs font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
                               title="Clique para editar o endereço"
                             />
                           </div>
@@ -3150,7 +3152,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           placeholder="TIPO DE DOCUMENTO"
                           // Largura acompanha o texto: com a largura padrão do campo o selo saía cortado ("RECEITUÁRIO MÉDIC") na tela, na impressão e no PDF
                           style={{ fontFamily: 'inherit', width: `${Math.max(12, (headerConfig.badgeText || 'TIPO DE DOCUMENTO').length) * 0.8 + 2.5}em` }}
-                          className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 text-center hover:bg-slate-200/80 focus:bg-sky-50 focus:border-sky-500 outline-none transition max-w-[220px]"
+                          className="text-xs font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-medium text-center hover:bg-slate-200/80 focus:bg-sky-50 focus:border-info outline-none transition max-w-[220px]"
                           title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
                         />
 
@@ -3161,7 +3163,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
                           placeholder="Data de emissão"
                           style={{ fontFamily: 'inherit' }}
-                          className="text-[11px] text-slate-500 mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
+                          className="text-xs text-slate-500 mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
                           title="Clique para editar a data de emissão"
                         />
                       </div>
@@ -3171,7 +3173,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     {headerConfig.showPatientBanner && (
                       <div 
                         style={{ fontFamily: 'inherit' }}
-                        className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-700"
+                        className="mt-3 pt-2 border-t border-subtle flex items-center justify-between text-xs text-slate-700"
                       >
                         {patient?.name ? (
                           <>
@@ -3205,9 +3207,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 {headerConfig.showFooter && (
                   <footer 
                     style={{ fontFamily: 'inherit' }}
-                    className="border-t border-slate-300 pt-5 mt-6 flex flex-col items-center justify-center text-center relative z-10 group"
+                    className="border-t border-medium pt-5 mt-6 flex flex-col items-center justify-center text-center relative z-10 group"
                   >
-                    <div className="w-64 max-w-full border-b border-slate-400 mb-2" />
+                    <div className="w-64 max-w-full border-b border-medium mb-2" />
 
                     {/* Nome do Médico na Assinatura */}
                     <input
@@ -3225,7 +3227,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
                       onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
                       placeholder="Médico(a) — CRM-SP 00000"
-                      className="text-[11px] text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs mt-0.5 min-h-6 flex items-center justify-center"
+                      className="text-xs text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs mt-0.5 min-h-6 flex items-center justify-center"
                       title="Clique para editar CRM na assinatura"
                     />
 
@@ -3235,7 +3237,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
                       onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
                       placeholder="Especialidade"
-                      className="text-[11px] text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs min-h-6 flex items-center justify-center"
+                      className="text-xs text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs min-h-6 flex items-center justify-center"
                       title="Clique para editar a especialidade no carimbo"
                     />
 
@@ -3246,14 +3248,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       aria-label="Subtexto regulamentar CFM"
                       value={headerConfig.footerSubtext || ''}
                       onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
-                      className="text-[9px] text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-md min-h-6"
+                      className="text-xs text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-md min-h-6"
                     />
 
                     {/* Botão no-print para Ocultar Rodapé */}
                     <button
                       type="button"
                       onClick={() => handleHeaderFieldChange('showFooter', false)}
-                      className="no-print opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
+                      className="no-print opacity-0 group-hover:opacity-100 text-xs text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
                       title="Ocultar rodapé de assinatura"
                     >
                       <EyeOff className="w-2.5 h-2.5" />
@@ -3269,10 +3271,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 <div className="flex flex-col justify-between h-full pr-2 min-w-0">
                   {conteudoViaUnica}
                 </div>
-                <div className="flex flex-col items-center justify-center relative border-l border-dashed border-slate-400 px-1 select-none">
-                  <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                <div className="flex flex-col items-center justify-center relative border-l border-dashed border-medium px-1 select-none">
+                  <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
                     <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
-                    <span style={{ writingMode: 'vertical-rl' }}>✂ CORTE AQUI</span>
+                    <span style={{ writingMode: 'vertical-rl' }}>{SIMBOLO_CORTE} CORTE AQUI</span>
                   </div>
                 </div>
                 <div aria-hidden="true" />
@@ -3308,7 +3310,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                                 placeholder="DR(A). MÉDICO(A)"
                                 aria-label="Nome do médico emitente (1ª via)"
-                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-slate-200"
+                                className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
                               />
                               <input
                                 type="text"
@@ -3317,9 +3319,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 placeholder="CRM-SP 000000"
                                 aria-label="CRM do médico emitente (1ª via)"
                                 style={{ fontFamily: 'inherit' }}
-                                className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-slate-200"
+                                className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
                               />
-                              <p className="text-[10px] text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
+                              <p className="text-xs text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
                             <div className="text-right shrink-0 flex flex-col items-end gap-1">
                               {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
@@ -3329,14 +3331,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                   className="h-7 max-w-[72px] object-contain"
                                 />
                               )}
-                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
+                              <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-info block">
                                 {rotuloVia1}
                               </span>
-                              <span className="text-[9px] text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
+                              <span className="text-xs text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
                             </div>
                           </div>
                           {headerConfig.showPatientBanner && (
-                            <div className="mt-2 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between">
+                            <div className="mt-2 pt-1 border-t border-subtle text-xs text-slate-700 flex items-center justify-between">
                               <span><strong>Paciente:</strong> {patient?.name || headerConfig.patientCustomText || '_____________________'}</span>
                               {patient?.documentNumber && <span>Doc: {patient.documentNumber}</span>}
                             </div>
@@ -3353,12 +3355,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     {headerConfig.showFooter && (
                       <div className="mt-3 pt-2">
                         {/* Carimbo / Assinatura */}
-                        <div className="border-t border-slate-300 pt-1 flex flex-col items-center justify-center text-center">
-                          <div className="w-44 border-b border-slate-400 mb-0.5" />
-                          <p className="text-[10px] font-bold text-slate-900 uppercase">
+                        <div className="border-t border-medium pt-1 flex flex-col items-center justify-center text-center">
+                          <div className="w-44 border-b border-medium mb-0.5" />
+                          <p className="text-xs font-bold text-slate-900 uppercase">
                             {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
                           </p>
-                          <p className="text-[9px] text-slate-600 font-semibold">
+                          <p className="text-xs text-slate-600 font-semibold">
                             {headerConfig.footerCrm || headerConfig.doctorCrm || 'CRM'}
                           </p>
                         </div>
@@ -3367,8 +3369,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           <>
                             {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
                             <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
-                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              <div className="border border-medium rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                                   Identificação do Comprador
                                 </p>
                                 <div className="space-y-0.5">
@@ -3379,8 +3381,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 </div>
                               </div>
 
-                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              <div className="border border-medium rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                                   Identificação do Fornecedor
                                 </p>
                                 <div className="space-y-0.5">
@@ -3406,11 +3408,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     )}
                   </div>
 
-                  {/* LINHA DE CORTE VERTICAL ✂ */}
-                  <div className="flex flex-col items-center justify-center relative border-l border-dashed border-slate-400 px-1 select-none">
-                    <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                  {/* LINHA DE CORTE VERTICAL */}
+                  <div className="flex flex-col items-center justify-center relative border-l border-dashed border-medium px-1 select-none">
+                    <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
                       <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
-                      <span style={{ writingMode: 'vertical-rl' }}>✂ CORTE AQUI</span>
+                      <span style={{ writingMode: 'vertical-rl' }}>{SIMBOLO_CORTE} CORTE AQUI</span>
                     </div>
                   </div>
 
@@ -3437,7 +3439,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               >
                                 {headerConfig.doctorCrm || 'CRM'}
                               </p>
-                              <p className="text-[10px] text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
+                              <p className="text-xs text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                             </div>
                             <div className="text-right shrink-0 flex flex-col items-end gap-1">
                               {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
@@ -3447,14 +3449,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                   className="h-7 max-w-[72px] object-contain"
                                 />
                               )}
-                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
+                              <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-clinical block">
                                 {rotuloVia2}
                               </span>
-                              <span className="text-[9px] text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
+                              <span className="text-xs text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
                             </div>
                           </div>
                           {headerConfig.showPatientBanner && (
-                            <div className="mt-2 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between">
+                            <div className="mt-2 pt-1 border-t border-subtle text-xs text-slate-700 flex items-center justify-between">
                               <span><strong>Paciente:</strong> {patient?.name || headerConfig.patientCustomText || '_____________________'}</span>
                               {patient?.documentNumber && <span>Doc: {patient.documentNumber}</span>}
                             </div>
@@ -3466,7 +3468,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       <div className="text-slate-900 py-1">
                         <div 
                           className="ProseMirror via-preview-content outline-none leading-relaxed text-inherit" 
-                          dangerouslySetInnerHTML={{ __html: editorDomHtml || editorHtml || editor?.getHTML() || '' }}
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editorDomHtml || editorHtml || editor?.getHTML() || '') }}
                         />
                       </div>
                     </div>
@@ -3474,12 +3476,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     {headerConfig.showFooter && (
                       <div className="mt-3 pt-2">
                         {/* Carimbo / Assinatura */}
-                        <div className="border-t border-slate-300 pt-1 flex flex-col items-center justify-center text-center">
-                          <div className="w-44 border-b border-slate-400 mb-0.5" />
-                          <p className="text-[10px] font-bold text-slate-900 uppercase">
+                        <div className="border-t border-medium pt-1 flex flex-col items-center justify-center text-center">
+                          <div className="w-44 border-b border-medium mb-0.5" />
+                          <p className="text-xs font-bold text-slate-900 uppercase">
                             {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
                           </p>
-                          <p className="text-[9px] text-slate-600 font-semibold">
+                          <p className="text-xs text-slate-600 font-semibold">
                             {headerConfig.footerCrm || headerConfig.doctorCrm || 'CRM'}
                           </p>
                         </div>
@@ -3488,8 +3490,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           <>
                             {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
                             <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
-                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              <div className="border border-medium rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                                   Identificação do Comprador
                                 </p>
                                 <div className="space-y-0.5">
@@ -3500,8 +3502,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 </div>
                               </div>
 
-                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              <div className="border border-medium rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                                   Identificação do Fornecedor
                                 </p>
                                 <div className="space-y-0.5">
@@ -3520,7 +3522,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           </>
                         ) : (
                           <>
-                            <div className="mt-2 pt-1.5 border-t border-slate-300 text-[8px] text-slate-700 flex items-center justify-between gap-2">
+                            <div className="mt-2 pt-1.5 border-t border-medium text-[8px] text-slate-700 flex items-center justify-between gap-2">
                               <span><strong>Dispensação (farmácia):</strong> Data: ___/___/_____</span>
                               <span>Qtd aviada: _______</span>
                               <span>Lote: _______</span>
@@ -3564,14 +3566,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               />
                             </div>
                             <div className="text-right shrink-0">
-                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-sky-300 block">
+                              <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-info block">
                                 {rotuloVia1}
                               </span>
-                              <span className="text-[9px] text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
+                              <span className="text-xs text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
                             </div>
                           </div>
                           {headerConfig.showPatientBanner && (
-                            <div className="mt-1 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between">
+                            <div className="mt-1 pt-1 border-t border-subtle text-xs text-slate-700 flex items-center justify-between">
                               <span><strong>Paciente:</strong> {patient?.name || headerConfig.patientCustomText || '_____________________'}</span>
                               {patient?.documentNumber && <span>Doc: {patient.documentNumber}</span>}
                             </div>
@@ -3581,23 +3583,23 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
                       <div 
                         className="text-slate-900 py-1 font-inherit text-inherit leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: editorDomHtml || editorHtml }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editorDomHtml || editorHtml) }}
                       />
                     </div>
 
                     {headerConfig.showFooter && (
                       <div className="mt-2 pt-1">
-                        <div className="border-t border-slate-300 pt-1 flex flex-col items-center justify-center text-center">
-                          <div className="w-40 border-b border-slate-400 mb-0.5" />
-                          <p className="text-[10px] font-bold text-slate-900 uppercase">
+                        <div className="border-t border-medium pt-1 flex flex-col items-center justify-center text-center">
+                          <div className="w-40 border-b border-medium mb-0.5" />
+                          <p className="text-xs font-bold text-slate-900 uppercase">
                             {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
                           </p>
                         </div>
                         {viasDeControleEspecial ? (
                           <>
                             <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
-                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              <div className="border border-medium rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                                   Identificação do Comprador
                                 </p>
                                 <p><strong>Nome:</strong> _________________________</p>
@@ -3605,8 +3607,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 <p><strong>Endereço:</strong> _____________________</p>
                                 <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
                               </div>
-                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              <div className="border border-medium rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                                   Identificação do Fornecedor
                                 </p>
                                 <p><strong>Farmácia/Drogaria:</strong> _____________</p>
@@ -3628,11 +3630,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     )}
                   </div>
 
-                  {/* LINHA DE CORTE HORIZONTAL ✂ */}
-                  <div className="relative border-t border-dashed border-slate-400 my-1 flex items-center justify-center select-none">
-                    <span className="absolute bg-white px-3 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                  {/* LINHA DE CORTE HORIZONTAL */}
+                  <div className="relative border-t border-dashed border-medium my-1 flex items-center justify-center select-none">
+                    <span className="absolute bg-white px-3 text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
                       <Scissors className="w-3 h-3 text-slate-500" />
-                      <span>✂ CORTE AQUI</span>
+                      <span>{SIMBOLO_CORTE} CORTE AQUI</span>
                     </span>
                   </div>
 
@@ -3657,14 +3659,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               </p>
                             </div>
                             <div className="text-right shrink-0">
-                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 block">
+                              <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-clinical block">
                                 {rotuloVia2}
                               </span>
-                              <span className="text-[9px] text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
+                              <span className="text-xs text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
                             </div>
                           </div>
                           {headerConfig.showPatientBanner && (
-                            <div className="mt-1 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between">
+                            <div className="mt-1 pt-1 border-t border-subtle text-xs text-slate-700 flex items-center justify-between">
                               <span><strong>Paciente:</strong> {patient?.name || headerConfig.patientCustomText || '_____________________'}</span>
                               {patient?.documentNumber && <span>Doc: {patient.documentNumber}</span>}
                             </div>
@@ -3675,24 +3677,24 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       <div className="text-slate-900 py-1">
                         <div 
                           className="ProseMirror via-preview-content outline-none leading-relaxed text-inherit" 
-                          dangerouslySetInnerHTML={{ __html: editorDomHtml || editorHtml || editor?.getHTML() || '' }}
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editorDomHtml || editorHtml || editor?.getHTML() || '') }}
                         />
                       </div>
                     </div>
 
                     {headerConfig.showFooter && (
                       <div className="mt-2 pt-1">
-                        <div className="border-t border-slate-300 pt-1 flex flex-col items-center justify-center text-center">
-                          <div className="w-40 border-b border-slate-400 mb-0.5" />
-                          <p className="text-[10px] font-bold text-slate-900 uppercase">
+                        <div className="border-t border-medium pt-1 flex flex-col items-center justify-center text-center">
+                          <div className="w-40 border-b border-medium mb-0.5" />
+                          <p className="text-xs font-bold text-slate-900 uppercase">
                             {headerConfig.footerDocName || headerConfig.doctorName || 'Dr(a). Médico(a)'}
                           </p>
                         </div>
                         {viasDeControleEspecial ? (
                           <>
                             <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
-                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              <div className="border border-medium rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                                   Identificação do Comprador
                                 </p>
                                 <p><strong>Nome:</strong> _________________________</p>
@@ -3700,8 +3702,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 <p><strong>Endereço:</strong> _____________________</p>
                                 <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
                               </div>
-                              <div className="border border-slate-400 rounded p-1 bg-slate-50/50">
-                                <p className="font-bold text-[8px] uppercase border-b border-slate-300 pb-0.5 mb-0.5 text-slate-900">
+                              <div className="border border-medium rounded p-1 bg-slate-50/50">
+                                <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                                   Identificação do Fornecedor
                                 </p>
                                 <p><strong>Farmácia/Drogaria:</strong> _____________</p>
@@ -3716,7 +3718,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           </>
                         ) : (
                           <>
-                            <div className="mt-1 pt-1 border-t border-slate-300 text-[7.5px] text-slate-700 flex items-center justify-between gap-2">
+                            <div className="mt-1 pt-1 border-t border-medium text-[7.5px] text-slate-700 flex items-center justify-between gap-2">
                               <span><strong>Dispensação (farmácia):</strong> Data: ___/___/_____</span>
                               <span>Qtd aviada: _______</span>
                               <span>Lote: _______</span>
@@ -3736,7 +3738,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
           {/* AVISO E RESTAURAÇÃO DE RODAPÉ OCULTADO (no-print) */}
           {!headerConfig.showFooter && (
-            <div className="no-print mt-4 p-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-600 text-xs flex items-center justify-between">
+            <div className="no-print mt-4 p-2 rounded-xl border border-dashed border-medium bg-slate-50 text-slate-600 text-xs flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <EyeOff className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                 <span><strong>Rodapé Ocultado:</strong> Carimbo e assinatura não serão impressos.</span>
@@ -3744,7 +3746,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => handleHeaderFieldChange('showFooter', true)}
-                className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>Restaurar Rodapé</span>
@@ -3759,7 +3761,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         <div className="fixed inset-0 z-50 overflow-hidden flex justify-end no-print">
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity cursor-pointer"
+            className="fixed inset-0 bg-black/50 transition-opacity cursor-pointer"
             onClick={() => setIsModelsDrawerOpen(false)}
           />
 
@@ -3792,11 +3794,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 onClick={() => setDrawerTab('padrao')}
                 className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                   drawerTab === 'padrao'
-                    ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                    ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
                 }`}
               >
-                <span>📋</span>
+                <FileText className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">Modelos Padrão</span>
               </button>
               <button
@@ -3804,11 +3806,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 onClick={() => setDrawerTab('salvos')}
                 className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                   drawerTab === 'salvos'
-                    ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                    ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
                 }`}
               >
-                <span>💾</span>
+                <Save className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">Meus Modelos ({savedTemplates.length})</span>
               </button>
               <button
@@ -3816,11 +3818,11 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 onClick={() => setDrawerTab('estilos')}
                 className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                   drawerTab === 'estilos'
-                    ? 'bg-navy-900 text-white dark:bg-blue-600 shadow-tactile-sm'
+                    ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
                 }`}
               >
-                <span>🎨</span>
+                <LayoutTemplate className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">Estilos ({DEFAULT_PRESCRIPTION_STYLES.length + customStyles.length})</span>
               </button>
             </div>
@@ -3838,7 +3840,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       onChange={(e) => setTemplateSearch(e.target.value)}
                       placeholder="Buscar modelo padrão..."
                       aria-label="Buscar modelo padrão"
-                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 transition"
+                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 transition"
                     />
                   </div>
 
@@ -3877,7 +3879,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       badge: 'Declaração',
                       title: 'Declaração de Comparecimento com Receita',
                       desc: 'Comprovação de horário de atendimento com prescrição dos fármacos indicados.',
-                      badgeColor: 'bg-indigo-600'
+                      badgeColor: 'bg-sky-600'
                     },
                     {
                       id: 'laudo',
@@ -3898,7 +3900,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       badge: 'Especialista',
                       title: 'Parecer Especializado / Contra-Referência',
                       desc: 'Resposta ao médico da Atenção Básica com plano terapêutico e seguimento.',
-                      badgeColor: 'bg-purple-600'
+                      badgeColor: 'bg-sky-600'
                     },
                     {
                       id: 'atestado',
@@ -3912,17 +3914,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                     .map((item) => (
                       <div
                         key={item.id}
-                        className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition flex flex-col gap-1.5 shadow-tactile-sm"
+                        className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-info transition flex flex-col gap-1.5 shadow-tactile-sm"
                       >
                         <div className="flex items-center gap-1.5">
-                          <span className={`px-1.5 py-0.5 rounded text-white text-[9px] font-extrabold uppercase ${item.badgeColor}`}>
+                          <span className={`px-1.5 py-0.5 rounded text-white text-xs font-extrabold uppercase ${item.badgeColor}`}>
                             {item.badge}
                           </span>
                           <h4 className="text-xs font-bold text-[var(--text-main)]">
                             {item.title}
                           </h4>
                         </div>
-                        <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                           {item.desc}
                         </p>
                         <div className="pt-1.5 border-t border-[var(--border-subtle)] flex items-center justify-between">
@@ -3952,7 +3954,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         onChange={(e) => setTemplateSearch(e.target.value)}
                         placeholder="Buscar em meus modelos salvos..."
                         aria-label="Buscar em meus modelos salvos"
-                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 transition"
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 transition"
                       />
                     </div>
 
@@ -3978,7 +3980,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                         <>
                           <BookmarkPlus className="w-6 h-6 mx-auto mb-1.5 text-slate-400 opacity-60" />
                           <p className="font-medium">Nenhum modelo personalizado salvo ainda.</p>
-                          <p className="text-[11px] mt-1 opacity-80">
+                          <p className="text-xs mt-1 opacity-80">
                             Clique no botão acima para salvar a folha atual como um modelo reutilizável.
                           </p>
                         </>
@@ -3989,7 +3991,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       {filteredSavedTemplates.map((tpl) => (
                         <div
                           key={tpl.id}
-                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-300 dark:hover:border-sky-800 transition flex flex-col gap-2 group shadow-tactile-sm"
+                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-info dark:hover:border-info transition flex flex-col gap-2 group shadow-tactile-sm"
                         >
                           {editingTemplateId === tpl.id ? (
                             <div className="flex items-center gap-2">
@@ -3998,7 +4000,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 value={editingTemplateTitle}
                                 onChange={(e) => setEditingTemplateTitle(e.target.value)}
                                 aria-label="Editar título do modelo"
-                                className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-sky-500 bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                                className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-info bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                                 autoFocus
                               />
                               <button
@@ -4026,7 +4028,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                                 <h4 className="text-xs font-bold text-[var(--text-main)] group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                                   {tpl.title}
                                 </h4>
-                                <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)] mt-0.5">
+                                <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] mt-0.5">
                                   <span>
                                     {new Date(tpl.updatedAt).toLocaleDateString('pt-BR')} às{' '}
                                     {new Date(tpl.updatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
@@ -4086,10 +4088,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               {/* ABA 3: ESTILOS DE RECEITA (FORMATAÇÃO RÁPIDA & PERSONALIZADA) */}
               {drawerTab === 'estilos' && (
                 <div className="space-y-4">
-                  <div className="p-3 rounded-xl bg-sky-50/70 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/60 flex items-center justify-between gap-2">
+                  <div className="p-3 rounded-xl bg-sky-50/70 dark:bg-sky-950/30 border border-info dark:border-info flex items-center justify-between gap-2">
                     <div className="text-xs text-[var(--text-secondary)]">
                       <p className="font-bold text-sky-900 dark:text-sky-200">Personalize e Salve seu Estilo</p>
-                      <p className="text-[11px] text-[var(--text-muted)]">Guarde fonte, orientação e formato de vias atual</p>
+                      <p className="text-xs text-[var(--text-muted)]">Guarde fonte, orientação e formato de vias atual</p>
                     </div>
                     <button
                       type="button"
@@ -4108,15 +4110,15 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   {customStyles.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center justify-between">
-                        <span>💾 Meus Estilos Personalizados</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 font-bold">
+                        <span className="flex items-center gap-1.5"><Save className="w-3.5 h-3.5" /> Meus Estilos Personalizados</span>
+                        <span className="text-xs px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 font-bold">
                           {customStyles.length}
                         </span>
                       </h4>
                       {customStyles.map(st => (
                         <div
                           key={st.id}
-                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition flex flex-col gap-2 shadow-tactile-sm"
+                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-info transition flex flex-col gap-2 shadow-tactile-sm"
                         >
                           <div className="flex items-center justify-between">
                             <h5 className="text-xs font-bold text-[var(--text-main)] truncate">{st.name}</h5>
@@ -4130,7 +4132,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
-                          <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)] flex-wrap">
+                          <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] flex-wrap">
                             <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-semibold">{st.fontFamilyId} • {st.baseFontSize}pt</span>
                             <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-semibold">{st.pageOrientation === 'landscape' ? 'Paisagem' : 'Retrato'} • {st.viaLayout}</span>
                             {!st.showHeader && <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 font-bold">Sem Cabeçalho</span>}
@@ -4152,26 +4154,27 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
                   {/* Estilos Padrão do Sistema */}
                   <div className="space-y-2.5">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                      📋 Estilos Padrão de Fábrica
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Estilos Padrão de Fábrica</span>
                     </h4>
                     {DEFAULT_PRESCRIPTION_STYLES.map(st => (
                       <div
                         key={st.id}
-                        className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-sky-400 transition"
+                        className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-info transition"
                       >
                         <div className="flex items-center justify-between mb-1">
                           <h5 className="text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5">
-                            <span>{st.viaLayout === '2-vias' ? '📑' : st.watermarkType !== 'none' ? '⚕️' : '📄'}</span>
+                            {st.viaLayout === '2-vias' ? <Files className="w-3.5 h-3.5 text-sky-600" /> : st.watermarkType !== 'none' ? <Stethoscope className="w-3.5 h-3.5 text-sky-600" /> : <File className="w-3.5 h-3.5 text-sky-600" />}
                             <span>{st.name}</span>
                           </h5>
-                          <span className="text-[10px] px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 font-bold">
+                          <span className="text-xs px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 font-bold">
                             {st.baseFontSize}pt • {st.pageOrientation === 'landscape' ? 'Paisagem' : 'Retrato'}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                           {st.id === 'especial_2vias'
-                            ? 'Orientação Paisagem (297×210mm) com 2 vias na mesma folha e linha de corte ✂ para retenção na farmácia (Portaria 344/98).'
+                            ? 'Orientação Paisagem (297×210mm) com 2 vias na mesma folha e linha de corte central para retenção na farmácia (Portaria 344/98).'
                             : st.id === 'sus'
                             ? 'Configuração oficial para UBS/UPA com tipografia Inter e marca d’água do SUS.'
                             : st.id === 'classico'
@@ -4202,7 +4205,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
       {/* MODAL: Salvar como Modelo Personalizado */}
       {isSaveModelModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs no-print animate-tab-fade">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 no-print animate-tab-fade">
           <div className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative">
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-2">
@@ -4231,7 +4234,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   value={newModelTitle}
                   onChange={(e) => setNewModelTitle(e.target.value)}
                   placeholder="Ex: Laudo Cardiológico - Policlínica"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 font-medium transition"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 font-medium transition"
                   autoFocus
                 />
               </div>
@@ -4246,7 +4249,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   </span>
                 </div>
 
-                <label className="flex items-center gap-2 text-[11px] text-[var(--text-muted)] cursor-pointer mt-1">
+                <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] cursor-pointer mt-1">
                   <input
                     type="checkbox"
                     checked={saveAsGlobal}
@@ -4281,7 +4284,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
       {/* MODAL: Salvar como Estilo de Receita Personalizado */}
       {isSaveStyleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs no-print animate-tab-fade">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 no-print animate-tab-fade">
           <div className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative">
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-2">
@@ -4310,17 +4313,17 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   value={newStyleTitle}
                   onChange={(e) => setNewStyleTitle(e.target.value)}
                   placeholder="Ex: Minha Clínica • 2 Vias Azul"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 font-medium transition"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 font-medium transition"
                   autoFocus
                 />
               </div>
 
               {/* Resumo da Configuração Atual do Estilo */}
               <div className="p-3 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs space-y-1.5">
-                <span className="font-bold text-[var(--text-secondary)] block text-[11px] uppercase tracking-wider">
+                <span className="font-bold text-[var(--text-secondary)] block text-xs uppercase tracking-wider">
                   Configurações que serão salvas:
                 </span>
-                <div className="grid grid-cols-2 gap-2 text-[11px] text-[var(--text-muted)]">
+                <div className="grid grid-cols-2 gap-2 text-xs text-[var(--text-muted)]">
                   <div>• Tipografia: <strong className="text-[var(--text-main)] capitalize">{fontFamilyId}</strong></div>
                   <div>• Tamanho: <strong className="text-[var(--text-main)]">{baseFontSize} pt</strong></div>
                   <div>• Orientação: <strong className="text-[var(--text-main)]">{pageOrientation === 'landscape' ? 'Paisagem' : 'Retrato'}</strong></div>

@@ -211,8 +211,8 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-xs isolate animate-tab-fade"
+    <div data-state="idle" aria-busy={false} 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 isolate animate-tab-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="logo-modal-title"
@@ -283,9 +283,9 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
 
         {activeModalTab === 'presets' ? (
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar space-y-4">
-            <div className="bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800 rounded-xl p-3.5 text-xs text-sky-800 dark:text-sky-300">
+            <div className="bg-sky-50 dark:bg-sky-950/30 border border-info dark:border-info rounded-xl p-3.5 text-xs text-sky-800 dark:text-sky-300">
               <p className="font-bold">Logos Oficiais Salvos da Instituição</p>
-              <p className="text-[11px] mt-0.5 opacity-90">
+              <p className="text-xs mt-0.5 opacity-90">
                 Selecione o logotipo oficial correspondente ao local de atuação. A imagem é gravada localmente no IndexedDB e exibida automaticamente nos receituários e documentos A4.
               </p>
             </div>
@@ -303,12 +303,12 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                     aria-pressed={isSelected}
                     className={`p-4 rounded-2xl border transition cursor-pointer flex flex-col justify-between gap-3 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                       isSelected
-                        ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 shadow-tactile-sm ring-1 ring-sky-500'
+                        ? 'border-info bg-sky-50/50 dark:bg-sky-950/30 shadow-tactile-sm ring-1 ring-sky-500'
                         : 'border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)]'
                     }`}
                   >
                     <div>
-                      <div className="h-28 w-full bg-white rounded-xl border border-slate-200 flex items-center justify-center p-3 shadow-inner overflow-hidden mb-3">
+                      <div className="h-28 w-full bg-white rounded-xl border border-subtle flex items-center justify-center p-3 shadow-inner overflow-hidden mb-3">
                         <img
                           src={logo.publicUrl}
                           alt={logo.name}
@@ -324,7 +324,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                             {logo.description}
                           </p>
                         </div>
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 shrink-0">
+                        <span className="text-xs font-bold uppercase px-2 py-0.5 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 shrink-0">
                           {logo.sphere === 'municipal' ? 'Municipal' : logo.sphere === 'state' ? 'Estadual' : 'Federal'}
                         </span>
                       </div>
@@ -376,7 +376,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setSymbol('asclepius')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
                     symbol === 'asclepius'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
@@ -389,7 +389,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setSymbol('cross')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
                     symbol === 'cross'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
@@ -402,11 +402,11 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setSymbol('stethoscope')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
                     symbol === 'stethoscope'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
-                  <Activity className="w-4 h-4 text-indigo-600 shrink-0" />
+                  <Activity className="w-4 h-4 text-sky-600 shrink-0" />
                   <span className="truncate">Estetoscópio</span>
                 </button>
 
@@ -415,7 +415,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setSymbol('ecg_heart')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
                     symbol === 'ecg_heart'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
@@ -428,7 +428,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setSymbol('monogram')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer col-span-2 sm:col-span-1 ${
                     symbol === 'monogram'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
@@ -445,10 +445,10 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                     maxLength={4}
                     value={monogramText}
                     onChange={(e) => setMonogramText(e.target.value.toUpperCase())}
-                    className="w-24 px-2.5 py-1 text-xs font-bold uppercase rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-sky-500 text-center"
+                    className="w-24 px-2.5 py-1 text-xs font-bold uppercase rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info text-center"
                     placeholder="MD"
                   />
-                  <span className="text-[11px] text-[var(--text-muted)]">Até 4 caracteres</span>
+                  <span className="text-xs text-[var(--text-muted)]">Até 4 caracteres</span>
                 </div>
               )}
             </div>
@@ -464,7 +464,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setFrame('double_circle')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition cursor-pointer text-center ${
                     frame === 'double_circle'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
@@ -477,7 +477,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setFrame('shield')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition cursor-pointer text-center ${
                     frame === 'shield'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
@@ -490,7 +490,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setFrame('hexagon')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition cursor-pointer text-center ${
                     frame === 'hexagon'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
@@ -503,7 +503,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   onClick={() => setFrame('none')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition cursor-pointer text-center ${
                     frame === 'none'
-                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
+                      ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
                       : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
@@ -517,7 +517,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2 flex items-center justify-between">
                 <span>3. Paleta de Cores</span>
-                <span className="text-[11px] font-semibold text-sky-600 dark:text-sky-400 normal-case">
+                <span className="text-xs font-semibold text-sky-600 dark:text-sky-400 normal-case">
                   {currentPalette.name}
                 </span>
               </label>
@@ -532,7 +532,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                       onClick={() => setPaletteKey(key)}
                       className={`p-2 rounded-xl border transition cursor-pointer flex flex-col items-center gap-1.5 ${
                         isSelected
-                          ? 'border-sky-500 ring-2 ring-sky-500/40 bg-[var(--surface-hover)]'
+                          ? 'border-info ring-2 ring-sky-500/40 bg-[var(--surface-hover)]'
                           : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                       }`}
                     >
@@ -546,7 +546,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                           style={{ backgroundColor: pal.secondary }} 
                         />
                       </div>
-                      <span className="text-[10px] font-bold text-center leading-tight">
+                      <span className="text-xs font-bold text-center leading-tight">
                         {pal.name.split(' ')[0]}
                       </span>
                     </button>
@@ -562,7 +562,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
               </label>
 
               <div>
-                <span className="block text-[11px] font-medium text-[var(--text-muted)] mb-1">
+                <span className="block text-xs font-medium text-[var(--text-muted)] mb-1">
                   Nome da Instituição (Texto Superior / Principal)
                 </span>
                 <input
@@ -570,12 +570,12 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   value={institutionName}
                   onChange={(e) => setInstitutionName(e.target.value.toUpperCase())}
                   placeholder="SECRETARIA MUNICIPAL DE SAÚDE"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-sky-500 font-semibold"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info font-semibold"
                 />
               </div>
 
               <div>
-                <span className="block text-[11px] font-medium text-[var(--text-muted)] mb-1">
+                <span className="block text-xs font-medium text-[var(--text-muted)] mb-1">
                   Subtítulo / Esfera (Texto Inferior)
                 </span>
                 <input
@@ -583,7 +583,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   value={subtitle}
                   onChange={(e) => setSubtitle(e.target.value.toUpperCase())}
                   placeholder="ATENÇÃO BÁSICA — SUS"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-sky-500 font-semibold"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info font-semibold"
                 />
               </div>
 
@@ -626,7 +626,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
               <button
                 type="button"
                 onClick={() => setPreviewDarkBg(!previewDarkBg)}
-                className="text-[11px] hover:text-[var(--text-main)] underline cursor-pointer"
+                className="text-xs hover:text-[var(--text-main)] underline cursor-pointer"
               >
                 Fundo {previewDarkBg ? 'Claro' : 'Escuro'}
               </button>
@@ -635,7 +635,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             {/* SVG Render Box */}
             <div 
               className={`w-full aspect-square max-w-[280px] sm:max-w-[320px] rounded-2xl p-4 flex items-center justify-center transition-colors shadow-tactile-md border ${
-                previewDarkBg ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
+                previewDarkBg ? 'bg-slate-900 border-strong' : 'bg-white border-subtle'
               }`}
             >
               <svg
@@ -971,7 +971,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             </div>
 
             {/* Informações de Renderização Vetorial */}
-            <div className="w-full text-center text-[11px] text-[var(--text-muted)] space-y-0.5">
+            <div className="w-full text-center text-xs text-[var(--text-muted)] space-y-0.5">
               <p className="font-bold text-[var(--text-main)]">
                 Vetor SVG Puro • Escalabilidade Infinita
               </p>

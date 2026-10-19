@@ -8,6 +8,7 @@ import {
 } from '../../utils/documentoClinico';
 import { CabecalhoInstitucional } from './CabecalhoInstitucional';
 import { AssinaturaMedico } from './AssinaturaMedico';
+import { SIMBOLO_CORTE } from '../../utils/compartilhamentoTexto';
 
 /** Regime da receita em folha A4 paisagem: simples (1 via à esquerda), antimicrobiano (2 vias) ou controle especial (2 vias Portaria 344/98). */
 export type RegimeDuasVias = 'simples' | 'controle_especial' | 'antimicrobiano';
@@ -243,7 +244,7 @@ export const ReceitaDuasVias: React.FC<ReceitaDuasViasProps> = (props) => (
       aria-hidden="true"
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderLeft: `1px dashed ${FILETE}`, width: 0 }}
     >
-      <span style={{ padding: '6px 0', backgroundColor: '#FFFFFF', fontSize: 11, color: TINTA_APAGADA, transform: 'translateX(-0.5px)' }}>✂</span>
+      <span style={{ padding: '6px 0', backgroundColor: '#FFFFFF', fontSize: 11, color: TINTA_APAGADA, transform: 'translateX(-0.5px)' }}>{SIMBOLO_CORTE}</span>
     </div>
     {props.regime === 'simples' ? <div aria-hidden="true" /> : <Via via={2} {...props} />}
   </div>

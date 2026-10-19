@@ -22,9 +22,9 @@ export const AvisoNotificacaoReceita: React.FC<AvisoNotificacaoReceitaProps> = (
   const varios = exigencias.length > 1;
 
   return (
-    <div
+    <div data-state="idle" aria-busy={false}
       role="status"
-      className="no-print px-3.5 py-3 rounded-xl border text-xs bg-amber-500/10 text-amber-900 dark:text-amber-200 border-amber-500/25 flex items-start gap-2"
+      className="no-print px-3.5 py-3 rounded-xl border text-xs bg-amber-500/10 text-amber-900 dark:text-amber-200 border-warning flex items-start gap-2 surface-raised"
     >
       <Icon name="warning" className="text-amber-600 dark:text-amber-400 text-[18px] shrink-0" />
       <div className="min-w-0 space-y-1">

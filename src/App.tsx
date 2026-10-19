@@ -304,8 +304,8 @@ export default function App() {
   };
 
   return (
-    <div 
-      className="min-h-screen font-sans antialiased flex flex-col transition-colors duration-300"
+    <div data-state="idle" aria-busy={false} 
+      className="min-h-screen font-sans antialiased flex flex-col transition-colors duration-300 surface-raised"
       style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-main)' }}
     >
       {/* Puxar para atualizar (pull to refresh) desativado com menu ou modal aberto */}

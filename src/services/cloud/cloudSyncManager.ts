@@ -28,7 +28,7 @@ export function sanitizeForFirestore<T>(data: T): T {
   if (data === undefined || data === null) {
     return data;
   }
-  if (typeof data !== 'object') {
+  if (typeof data !== 'object' || data instanceof Date) {
     return data;
   }
   if (Array.isArray(data)) {
@@ -45,6 +45,7 @@ export function sanitizeForFirestore<T>(data: T): T {
 
 class CloudSyncManager {
   private isSyncing = false;
+  private isApplyingRemoteChanges = false;
   private currentStatus: SyncStatus = 'idle';
   private pendingChangesCount = 0;
   private listeners: Set<SyncStatusListener> = new Set();
@@ -99,21 +100,25 @@ class CloudSyncManager {
     try {
       // 1. Postos de Trabalho (WorkContexts)
       db.workContexts.hook('creating', (_primKey, obj) => {
+        if (this.isApplyingRemoteChanges) return;
         obj.updatedAt = Date.now();
         this.triggerSyncDebounced();
       });
 
       db.workContexts.hook('updating', (modifications: Record<string, unknown>) => {
+        if (this.isApplyingRemoteChanges) return;
         modifications.updatedAt = Date.now();
         this.triggerSyncDebounced();
       });
 
       db.workContexts.hook('deleting', () => {
+        if (this.isApplyingRemoteChanges) return;
         this.triggerSyncDebounced();
       });
 
       // 2. Documentos Salvos (Apenas templates/modelos - sigilo médico para prontuários)
       db.savedDocuments.hook('creating', (_primKey, obj) => {
+        if (this.isApplyingRemoteChanges) return;
         obj.updatedAt = Date.now();
         if (obj.isTemplate) {
           this.triggerSyncDebounced();
@@ -121,6 +126,7 @@ class CloudSyncManager {
       });
 
       db.savedDocuments.hook('updating', (modifications: Record<string, unknown>, _primKey, obj) => {
+        if (this.isApplyingRemoteChanges) return;
         modifications.updatedAt = Date.now();
         if (obj.isTemplate || Boolean(modifications.isTemplate)) {
           this.triggerSyncDebounced();
@@ -128,6 +134,7 @@ class CloudSyncManager {
       });
 
       db.savedDocuments.hook('deleting', (_primKey, obj) => {
+        if (this.isApplyingRemoteChanges) return;
         if (obj.isTemplate) {
           this.triggerSyncDebounced();
         }
@@ -285,18 +292,23 @@ class CloudSyncManager {
     }
 
     // 4. Processar Cloud -> Local (Downstream)
-    for (const [cloudId, cloudItem] of cloudMap.entries()) {
-      const localItem = localMap.get(cloudId);
-      const localTime = localItem?.updatedAt || 0;
-      const cloudTime = cloudItem.updatedAt || 0;
+    this.isApplyingRemoteChanges = true;
+    try {
+      for (const [cloudId, cloudItem] of cloudMap.entries()) {
+        const localItem = localMap.get(cloudId);
+        const localTime = localItem?.updatedAt || 0;
+        const cloudTime = cloudItem.updatedAt || 0;
 
-      if (!localItem || cloudTime > localTime) {
-        if (cloudItem._deleted) {
-          await localTable.delete(cloudId);
-        } else {
-          await localTable.put(cloudItem);
+        if (!localItem || cloudTime > localTime) {
+          if (cloudItem._deleted) {
+            await localTable.delete(cloudId);
+          } else {
+            await localTable.put(cloudItem);
+          }
         }
       }
+    } finally {
+      this.isApplyingRemoteChanges = false;
     }
   }
 

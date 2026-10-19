@@ -33,6 +33,12 @@
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
   --color-border: var(--border);
+  --color-subtle: var(--border-subtle);
+  --color-medium: var(--border-medium);
+  --color-strong: var(--border-strong);
+  --color-info: var(--accent-point);
+  --color-warning: var(--accent-amber);
+  --color-danger: var(--accent-rose);
   --color-text-primary: var(--text-primary);
   --color-text-muted: var(--text-muted);
   --color-primary: var(--primary);
@@ -114,7 +120,8 @@
     --radius-pill: 9999px;
 
     /* Transições de Física Tátil */
-    --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-smooth: all 0.3s var(--ease-spring);
     --transition-snap: all 0.15s ease-out;
 
     /* TEMA CLARO: Cirúrgico Minimalista (Clean Slate #F8FAFC + Branco Puro #FFFFFF) */
@@ -128,13 +135,21 @@
     --clinical: #0f766e;
     --clinical-hover: #115e59;
 
+    /* Hierarquia Tonal de 6 Níveis (DESIGN.md v4.5-soft) */
+    --surface-sunken: #E2E8F0;
+    --surface-canvas: #F8FAFC;
+    --surface-inset: #F1F5F9;
+    --surface-flat: #FFFFFF;
+    --surface-raised: #FFFFFF;
+    --surface-contrast: #0F172A;
+    --accent-point: #0284C7;
+
     --bg-canvas: #F8FAFC;
     --bg-app: #F8FAFC;
     --bg-surface: #FFFFFF;
     --surface-card: #FFFFFF;
     --bg-surface-elevated: #FFFFFF;
     --surface-elevated: #FFFFFF;
-    --surface-inset: #F1F5F9;
     --surface-hover: #F8FAFC;
     --surface-active: #E2E8F0;
 
@@ -201,7 +216,7 @@
     --elev-tactile-dark: 0 10px 25px -4px rgba(0, 0, 0, 0.45), 0 4px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     --elev-tactile-btn: 0 1px 2px rgba(15, 23, 42, 0.12), 0 2px 6px -2px rgba(15, 23, 42, 0.2);
     --elev-tactile-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(0, 0, 0, 0.04);
-    --elev-tactile-blue: 0 6px 16px -6px rgba(37, 99, 235, 0.35);
+    --elev-tactile-blue: 0 6px 16px -6px rgba(2, 132, 199, 0.35);
 
     --shadow-subtle: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
     --shadow-projected: 0 4px 14px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
@@ -235,10 +250,19 @@
     --border: #334155;
     --text-primary: #f8fafc;
     --text-muted: #94a3b8;
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
+    --primary: #0284c7;
+    --primary-hover: #0369a1;
     --clinical: #10b981;
     --clinical-hover: #059669;
+
+    /* Hierarquia Tonal de 6 Níveis (DESIGN.md v4.5-soft) */
+    --surface-sunken: #090E1A;
+    --surface-canvas: #0F172A;
+    --surface-inset: #0B1120;
+    --surface-flat: #1E293B;
+    --surface-raised: #27354A;
+    --surface-contrast: #0B1120;
+    --accent-point: #38BDF8;
 
     --bg-canvas: #0F172A;
     --bg-app: #0F172A;
@@ -246,7 +270,6 @@
     --surface-card: #1E293B;
     --bg-surface-elevated: #334155;
     --surface-elevated: #334155;
-    --surface-inset: #0B1120;
     --surface-hover: #27354A;
     --surface-active: #334155;
 
@@ -273,14 +296,14 @@
     --text-inverse: #0F172A;
 
     /* Acentos & Botões Primários */
-    --accent: #3B82F6;
-    --accent-hover: #60A5FA;
-    --nav-accent: #3B82F6;
+    --accent: #38BDF8;
+    --accent-hover: #7DD3FC;
+    --nav-accent: #38BDF8;
 
-    --accent-primary: #1E40AF;
-    --accent-primary-hover: #2563EB;
-    --accent-primary-subtle: rgba(59, 130, 246, 0.15);
-    --accent-primary-border: rgba(59, 130, 246, 0.35);
+    --accent-primary: #0369A1;
+    --accent-primary-hover: #0284C7;
+    --accent-primary-subtle: rgba(56, 189, 248, 0.15);
+    --accent-primary-border: rgba(56, 189, 248, 0.35);
 
     --accent-clinical: #0D9488;
     --accent-clinical-hover: #0F766E;
@@ -313,7 +336,7 @@
     --elev-tactile-dark: 0 10px 25px -4px rgba(0, 0, 0, 0.45), 0 4px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     --elev-tactile-btn: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
     --elev-tactile-inset: inset 0 2px 5px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.3);
-    --elev-tactile-blue: 0 6px 16px -6px rgba(37, 99, 235, 0.35);
+    --elev-tactile-blue: 0 6px 16px -6px rgba(2, 132, 199, 0.35);
 
     --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.35);
     --shadow-projected: 0 10px 25px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -411,7 +434,6 @@
     justify-content: space-between;
     padding: 0 1.5rem;
     z-index: 1000;
-    backdrop-filter: blur(12px);
   }
 
   .brand-badge {
@@ -683,7 +705,43 @@
     box-shadow: var(--elevation-z0);
   }
 
-  /* Utilitários Canônicos Táteis (DESIGN.md) */
+  /* Utilitários Canônicos Táteis (DESIGN.md v4.5-soft) */
+  .ui-card-soft {
+    background-color: var(--surface-flat);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-projected), var(--tactile-card-bevel);
+    border-radius: var(--radius-lg);
+    transition: box-shadow 0.25s var(--ease-spring), transform 0.25s var(--ease-spring);
+  }
+
+  .ui-btn-tactile {
+    box-shadow: var(--tactile-bevel);
+    transition: transform 0.15s var(--ease-spring), box-shadow 0.15s var(--ease-spring), background-color 0.18s ease;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .ui-btn-tactile:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: var(--elevation-z0);
+  }
+
+  .surface-inset {
+    background-color: var(--surface-inset);
+    box-shadow: var(--elevation-z0);
+  }
+
+  .surface-raised {
+    background-color: var(--surface-raised);
+    box-shadow: var(--elevation-z2);
+  }
+
+  #sidebar-active-tracker {
+    pointer-events: none;
+    transition: transform 0.28s var(--ease-spring), opacity 0.2s ease;
+  }
+
   .tactile-btn {
     box-shadow: var(--tactile-bevel);
     transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -743,11 +801,11 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
-  /* NO TEMA ESCURO: primário em azul vivo, sem moldura clara em volta */
+  /* NO TEMA ESCURO: primário em azul mineral vivo, sem moldura clara em volta */
   .dark .tactile-btn-primary,
   .dark .btn-tactile-primary,
   .dark .btn-primary-tactile {
-    background: #1D4ED8;
+    background: #0369A1;
     color: #FFFFFF !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
   }
@@ -756,7 +814,7 @@
     .dark .tactile-btn-primary:hover:not(:disabled),
     .dark .btn-tactile-primary:hover:not(:disabled),
     .dark .btn-primary-tactile:hover:not(:disabled) {
-      background: #2563EB;
+      background: #0284C7;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 10px -2px rgba(0, 0, 0, 0.55);
     }
   }
@@ -995,7 +1053,6 @@
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
   }
 
   .dark .tactile-dropdown {

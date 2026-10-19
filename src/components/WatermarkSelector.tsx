@@ -43,7 +43,7 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="h-9 px-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 hover:bg-slate-50 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+        className="h-9 px-3 rounded-xl border border-medium dark:border-navy-700 bg-white dark:bg-navy-900 hover:bg-slate-50 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
         title="Selecionar marca d'água de papel timbrado para a folha A4"
       >
         <Layers className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
@@ -54,12 +54,12 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1.5 w-72 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-tactile-lg p-2 z-50 animate-tab-fade font-sans">
+        <div data-state="idle" aria-busy={false} className="absolute right-0 top-full mt-1.5 w-72 rounded-2xl bg-white dark:bg-navy-900 border border-subtle dark:border-navy-700 shadow-tactile-lg p-2 z-50 animate-tab-fade font-sans surface-raised">
           <div className="px-2.5 py-1.5 mb-1 border-b border-slate-100 dark:border-navy-800">
-            <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+            <p className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
               Marca d'Água no Papel A4
             </p>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Imprime suavemente no fundo da folha médica
             </p>
           </div>
@@ -77,13 +77,13 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
                   }}
                   className={`w-full text-left p-2 rounded-xl text-xs flex items-center justify-between gap-2.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                     isSelected
-                      ? 'bg-sky-50 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 font-bold border border-sky-200 dark:border-sky-800'
+                      ? 'bg-sky-50 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 font-bold border border-info dark:border-info'
                       : 'hover:bg-slate-100 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-300 font-medium'
                   }`}
                 >
                   <div className="flex-1 min-w-0">
                     <p className="truncate text-xs leading-snug">{item.name}</p>
-                    <p className="text-[10px] text-[var(--text-muted)] dark:text-slate-400 truncate mt-0.5">
+                    <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 truncate mt-0.5">
                       {item.description}
                     </p>
                   </div>

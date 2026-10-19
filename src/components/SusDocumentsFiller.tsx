@@ -38,6 +38,7 @@ import {
 import { camposSemEspaco, formularioOficialDe } from '../data/formulariosOficiaisSus';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { exportarFolhaPdf } from '../utils/folhaA4';
+import { DOMPurify } from '../utils/sanitizeHtml';
 import { FolhaA4 } from './documento/FolhaA4';
 import { FormularioOficialSus } from './documento/FormularioOficialSus';
 
@@ -73,8 +74,8 @@ const camposIniciaisDoDocumento = (_doc: SusDocumentItem): Partial<SusFilledForm
   lmeResponsibleName: ''
 });
 
-const CAMPO_SUS = 'w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500';
-const ROTULO_SUS = 'text-[11px] font-semibold text-[var(--text-muted)] block mb-1';
+const CAMPO_SUS = 'w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info';
+const ROTULO_SUS = 'text-xs font-semibold text-[var(--text-muted)] block mb-1';
 
 interface SusDocumentsFillerProps {
   darkMode: boolean;
@@ -422,7 +423,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   };
 
   return (
-    <div id="sus-documents-filler-hub" className="space-y-4">
+    <div data-state="idle" aria-busy={false} id="sus-documents-filler-hub" className="space-y-4">
       {/* Toast Notification */}
       {toastMessage && (
         <div
@@ -447,7 +448,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             }}
           >
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white bg-blue-600 border border-blue-400/30 shadow-tactile-sm shrink-0">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white bg-sky-600 border border-info shadow-tactile-sm shrink-0">
                 <FileText className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -455,7 +456,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)]">
                     Documentos & Requisições Oficiais do SUS
                   </h2>
-                  <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30">
+                  <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-700 dark:text-blue-300 border border-info">
                     9 Documentos
                   </span>
                 </div>
@@ -495,7 +496,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-xl border transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 ${
                     selectedCategory === cat.id
-                      ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm'
+                      ? 'bg-sky-600 text-white border-info shadow-tactile-sm'
                       : 'bg-[var(--surface-inset)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-main)]'
                   }`}
                 >
@@ -512,7 +513,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                 placeholder="Buscar exame ou documento SUS..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder:text-[var(--text-placeholder)] focus:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500 outline-none transition"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder:text-[var(--text-placeholder)] focus:border-info focus-visible:ring-1 focus-visible:ring-sky-500 outline-none transition"
               />
             </div>
           </div>
@@ -526,8 +527,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   key={doc.id}
                   className={`tactile-card-interactive rounded-2xl p-4 flex flex-col justify-between border relative group ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-500/5 shadow-tactile-sm'
-                      : 'hover:border-blue-400/40'
+                      ? 'border-info bg-sky-500/5 shadow-tactile-sm'
+                      : 'hover:border-info'
                   }`}
                   style={{
                     backgroundColor: darkMode ? 'var(--surface-card)' : '#FFFFFF'
@@ -537,7 +538,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   <div>
                     {/* Header do Card com Checkbox e Badge */}
                     <div className="flex items-start justify-between gap-2 mb-2.5">
-                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                      <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-700 dark:text-blue-300 border border-info">
                         {doc.badge}
                       </span>
 
@@ -551,21 +552,21 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         }}
                         className={`w-6 h-6 rounded-lg flex items-center justify-center transition border cursor-pointer ${
                           isSelected
-                            ? 'bg-blue-600 border-blue-600 text-white shadow-tactile-sm'
-                            : 'border-slate-300 dark:border-slate-600 bg-[var(--surface-inset)] hover:border-blue-400 text-transparent'
+                            ? 'bg-sky-600 border-info text-white shadow-tactile-sm'
+                            : 'border-medium dark:border-strong bg-[var(--surface-inset)] hover:border-info text-transparent'
                         }`}
                       >
                         <Check className="w-3.5 h-3.5 stroke-[3]" />
                       </button>
                     </div>
 
-                    <h3 className="text-sm font-bold text-[var(--text-main)] group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                    <h3 className="text-sm font-bold text-[var(--text-main)] group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
                       {doc.title}
                     </h3>
-                    <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
                       Sistema: <span className="text-[var(--text-main)]">{doc.system}</span>
                     </p>
-                    <p className={`text-[11px] font-bold mt-1 ${formularioOficialDe(doc.id) ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'}`}>
+                    <p className={`text-xs font-bold mt-1 ${formularioOficialDe(doc.id) ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'}`}>
                       {formularioOficialDe(doc.id) ? 'Sai no impresso oficial' : 'Modelo do app, com os logos do SUS e do órgão'}
                     </p>
                     <p className="text-xs text-[var(--text-muted)] mt-2 line-clamp-3 leading-relaxed">
@@ -575,7 +576,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   {/* Rodapé com SIGTAP e Ação */}
                   <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
-                    <span className="text-[11px] font-mono text-slate-500">
+                    <span className="text-xs font-mono text-slate-500">
                       SIGTAP: {doc.defaultSigtap || 'Diversos'}
                     </span>
                     <button
@@ -584,7 +585,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         e.stopPropagation();
                         handleStartFillingSingle(doc.id);
                       }}
-                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <span>Preencher</span>
                       <Edit3 className="w-3 h-3" />
@@ -618,7 +619,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block">
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] block">
                   {formularioOficial ? 'Impresso oficial do Ministério da Saúde' : 'Modelo do PresCMed (sem impresso nacional único)'} • {currentDocItem.system}
                 </span>
                 <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] truncate max-w-lg">
@@ -630,7 +631,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             {/* Alternador de Documentos caso múltiplos estejam selecionados */}
             {selectedDocIds.length > 1 && (
               <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1">
-                <span className="text-[11px] font-bold text-slate-500 whitespace-nowrap mr-1">
+                <span className="text-xs font-bold text-slate-500 whitespace-nowrap mr-1">
                   Documento:
                 </span>
                 {selectedDocIds.map(id => {
@@ -643,7 +644,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       onClick={() => setActiveFormDocId(id)}
                       className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${
                         isActive
-                          ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm'
+                          ? 'bg-sky-600 text-white border-info shadow-tactile-sm'
                           : 'bg-[var(--surface-inset)] text-[var(--text-muted)] border-[var(--border-subtle)]'
                       }`}
                     >
@@ -669,18 +670,18 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               >
                 <div className="flex items-center justify-between mb-3 border-b border-[var(--border-subtle)] pb-2.5">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <ShieldCheck className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
                       1. Identificação do Médico & Unidade Solicitante
                     </h3>
                   </div>
                   {medicoConfigurado(doctor) ? (
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                       <Check className="w-3 h-3 stroke-[3]" />
                       Importado do Perfil
                     </span>
                   ) : (
-                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
                       Complete os dados
                     </span>
@@ -689,7 +690,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                    <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                       Nome do Médico(a)
                     </label>
                     <input
@@ -697,13 +698,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.doctorName}
                       onChange={e => handleFieldChange('doctorName', e.target.value)}
                       placeholder="Dr(a). Médico(a)"
-                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         CRM
                       </label>
                       <input
@@ -711,11 +712,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.doctorCrm}
                         onChange={e => handleFieldChange('doctorCrm', e.target.value)}
                         placeholder="000000"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         UF CRM
                       </label>
                       <input
@@ -723,13 +724,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.doctorCrmState}
                         onChange={e => handleFieldChange('doctorCrmState', e.target.value)}
                         placeholder="SP"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 uppercase"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                    <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                       Especialidade
                     </label>
                     <input
@@ -737,13 +738,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.doctorSpecialty}
                       onChange={e => handleFieldChange('doctorSpecialty', e.target.value)}
                       placeholder="Clínica Médica"
-                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         CNES Unidade
                       </label>
                       <input
@@ -751,11 +752,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.doctorCnes}
                         onChange={e => handleFieldChange('doctorCnes', e.target.value)}
                         placeholder="CNES (7 dígitos)"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         CPF do Médico (LME)
                       </label>
                       <input
@@ -763,13 +764,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.doctorCpf || ''}
                         onChange={e => handleFieldChange('doctorCpf', e.target.value)}
                         placeholder="000.000.000-00"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                       />
                     </div>
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                    <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                       Nome da Unidade / Estabelecimento Solicitante
                     </label>
                     <input
@@ -777,7 +778,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.doctorClinicName}
                       onChange={e => handleFieldChange('doctorClinicName', e.target.value)}
                       placeholder="Unidade Básica de Saúde / Policlínica"
-                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                     />
                   </div>
                 </div>
@@ -799,12 +800,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                     </h3>
                   </div>
                   {formData.patientAddress && formData.patientCns && formData.patientCity ? (
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                       <Check className="w-3 h-3 stroke-[3]" />
                       Dados do Paciente Completos
                     </span>
                   ) : (
-                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                    <span className="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-warning">
                       Faltante: {[!formData.patientAddress && 'Endereço', !formData.patientCns && 'Cartão SUS (CNS)', !formData.patientCity && 'Cidade'].filter(Boolean).join(', ')}
                     </span>
                   )}
@@ -812,7 +813,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div className="sm:col-span-2">
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                    <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                       Nome Completo do Paciente
                     </label>
                     <input
@@ -820,28 +821,28 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.patientName}
                       onChange={e => handleFieldChange('patientName', e.target.value)}
                       placeholder="Nome completo do paciente"
-                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 font-semibold"
+                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-[var(--text-muted)] flex items-center justify-between mb-1">
                       <span>Cartão SUS (CNS)</span>
-                      {!formData.patientCns && <span className="text-[9px] text-amber-500 font-bold uppercase">Faltante</span>}
+                      {!formData.patientCns && <span className="text-xs text-amber-500 font-bold uppercase">Faltante</span>}
                     </label>
                     <input
                       type="text"
                       value={formData.patientCns}
                       onChange={e => handleFieldChange('patientCns', e.target.value)}
                       placeholder="000 0000 0000 0000 (15 dígitos)"
-                      className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-blue-500 font-mono ${
-                        !formData.patientCns ? 'border-amber-400/50 bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
+                      className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-info font-mono ${
+                        !formData.patientCns ? 'border-warning bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
                       }`}
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                    <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                       CPF / Documento
                     </label>
                     <input
@@ -849,13 +850,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.patientCpf}
                       onChange={e => handleFieldChange('patientCpf', e.target.value)}
                       placeholder="000.000.000-00"
-                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 font-mono"
+                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         Nascimento
                       </label>
                       <input
@@ -863,11 +864,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.patientBirthDate}
                         onChange={e => handleFieldChange('patientBirthDate', e.target.value)}
                         placeholder="DD/MM/AAAA"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         Idade
                       </label>
                       <input
@@ -875,13 +876,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.patientAge}
                         onChange={e => handleFieldChange('patientAge', e.target.value)}
                         placeholder="Ex: 45 anos"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                    <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                       Nome da Mãe
                     </label>
                     <input
@@ -889,12 +890,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.patientMotherName}
                       onChange={e => handleFieldChange('patientMotherName', e.target.value)}
                       placeholder="Nome da mãe do paciente"
-                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                    <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                       Telefone de Contato
                     </label>
                     <input
@@ -902,7 +903,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.patientPhone}
                       onChange={e => handleFieldChange('patientPhone', e.target.value)}
                       placeholder="(69) 90000-0000"
-                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                     />
                   </div>
 
@@ -955,27 +956,27 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   {/* CAMPOS DE ENDEREÇO RESIDENCIAL (MANDATÓRIO NO SUS) */}
                   <div className="sm:col-span-2 pt-2 border-t border-[var(--border-subtle)]">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-2">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-2">
                       Endereço Residencial do Paciente (Obrigatório para SISREG / APAC / GAL):
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       <div className="sm:col-span-2">
-                        <label className="text-[10px] font-semibold text-[var(--text-muted)] flex items-center justify-between mb-0.5">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] flex items-center justify-between mb-0.5">
                           <span>Logradouro e Número</span>
-                          {!formData.patientAddress && <span className="text-[9px] text-amber-500 font-bold uppercase">Faltante</span>}
+                          {!formData.patientAddress && <span className="text-xs text-amber-500 font-bold uppercase">Faltante</span>}
                         </label>
                         <input
                           type="text"
                           value={formData.patientAddress}
                           onChange={e => handleFieldChange('patientAddress', e.target.value)}
                           placeholder="Rua / Avenida, Número e Complemento"
-                          className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-blue-500 ${
-                            !formData.patientAddress ? 'border-amber-400/50 bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
+                          className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-info ${
+                            !formData.patientAddress ? 'border-warning bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
                           }`}
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-semibold text-[var(--text-muted)] block mb-0.5">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] block mb-0.5">
                           Bairro
                         </label>
                         <input
@@ -983,26 +984,26 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.patientNeighborhood}
                           onChange={e => handleFieldChange('patientNeighborhood', e.target.value)}
                           placeholder="Bairro"
-                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-semibold text-[var(--text-muted)] flex items-center justify-between mb-0.5">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] flex items-center justify-between mb-0.5">
                           <span>Município</span>
-                          {!formData.patientCity && <span className="text-[9px] text-amber-500 font-bold uppercase">Faltante</span>}
+                          {!formData.patientCity && <span className="text-xs text-amber-500 font-bold uppercase">Faltante</span>}
                         </label>
                         <input
                           type="text"
                           value={formData.patientCity}
                           onChange={e => handleFieldChange('patientCity', e.target.value)}
                           placeholder="Cidade do paciente"
-                          className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-blue-500 ${
-                            !formData.patientCity ? 'border-amber-400/50 bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
+                          className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-info ${
+                            !formData.patientCity ? 'border-warning bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
                           }`}
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-semibold text-[var(--text-muted)] block mb-0.5">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] block mb-0.5">
                           UF
                         </label>
                         <input
@@ -1010,11 +1011,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.patientState}
                           onChange={e => handleFieldChange('patientState', e.target.value)}
                           placeholder="UF"
-                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 uppercase"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-semibold text-[var(--text-muted)] block mb-0.5">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] block mb-0.5">
                           CEP
                         </label>
                         <input
@@ -1022,7 +1023,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.patientCep}
                           onChange={e => handleFieldChange('patientCep', e.target.value)}
                           placeholder="00000-000"
-                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                         />
                       </div>
                     </div>
@@ -1040,12 +1041,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               >
                 <div className="flex items-center justify-between mb-3 border-b border-[var(--border-subtle)] pb-2.5">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <Sparkles className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
                       3. Dados Regulatórios • {currentDocItem.shortTitle}
                     </h3>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--surface-inset)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
+                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-[var(--surface-inset)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                     {currentDocItem.complexity}
                   </span>
                 </div>
@@ -1054,7 +1055,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   {/* A LME não tem campo de procedimento SIGTAP */}
                   <div className={`grid grid-cols-1 sm:grid-cols-3 gap-2 ${currentDocItem.id === 'lme_medicamentos' ? 'hidden' : ''}`}>
                     <div>
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         Código SIGTAP
                       </label>
                       <input
@@ -1062,11 +1063,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.sigtapCode}
                         onChange={e => handleFieldChange('sigtapCode', e.target.value)}
                         placeholder="00.00.00.000-0"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 font-mono"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono"
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         Descrição do Procedimento SIGTAP
                       </label>
                       <input
@@ -1074,13 +1075,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.procedureName}
                         onChange={e => handleFieldChange('procedureName', e.target.value)}
                         placeholder="Nome do procedimento oficial"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 font-semibold"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
                       />
                     </div>
                   </div>
 
                   {currentDocItem.id !== 'lme_medicamentos' && (!formData.sigtapCode?.trim() || !formData.procedureName?.trim()) && (currentDocItem.defaultSigtap || currentDocItem.defaultProcedure) && (
-                    <p className="text-[11px] text-[var(--text-muted)]">
+                    <p className="text-xs text-[var(--text-muted)]">
                       Procedimento em branco.{' '}
                       <button
                         type="button"
@@ -1088,7 +1089,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           if (currentDocItem.defaultSigtap) handleFieldChange('sigtapCode', currentDocItem.defaultSigtap);
                           if (currentDocItem.defaultProcedure) handleFieldChange('procedureName', currentDocItem.defaultProcedure);
                         }}
-                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                        className="font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
                       >
                         Usar o procedimento habitual deste documento ({currentDocItem.defaultSigtap})
                       </button>
@@ -1097,7 +1098,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         CID-10 Principal
                       </label>
                       <input
@@ -1105,11 +1106,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.cid10Code}
                         onChange={e => handleFieldChange('cid10Code', e.target.value)}
                         placeholder="Código"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 uppercase font-mono font-bold"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase font-mono font-bold"
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                      <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                         Descrição do Diagnóstico (CID-10)
                       </label>
                       <input
@@ -1117,18 +1118,18 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         value={formData.cid10Description || ''}
                         onChange={e => handleFieldChange('cid10Description', e.target.value)}
                         placeholder="Descrição diagnóstica"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                       />
                     </div>
                   </div>
 
                   {!formData.cid10Code?.trim() && currentDocItem.defaultCid10 && (
-                    <p className="text-[11px] text-[var(--text-muted)]">
+                    <p className="text-xs text-[var(--text-muted)]">
                       CID-10 em branco.{' '}
                       <button
                         type="button"
                         onClick={() => handleFieldChange('cid10Code', currentDocItem.defaultCid10 || '')}
-                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                        className="font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
                       >
                         Usar o código habitual deste documento ({currentDocItem.defaultCid10})
                       </button>
@@ -1137,9 +1138,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   {/* Campos Específicos para GAL / LACEN */}
                   {(currentDocItem.category === 'gal') && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-sky-500/5 border border-info">
                       <div>
-                        <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                           Nº da Notificação SINAN (Obrigatório GAL)
                         </label>
                         <input
@@ -1147,11 +1148,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.sinanNumber || ''}
                           onChange={e => handleFieldChange('sinanNumber', e.target.value)}
                           placeholder="Número SINAN (7 dígitos)"
-                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 font-mono"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                           Início dos Primeiros Sintomas (D1)
                         </label>
                         <input
@@ -1159,7 +1160,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.symptomsStartDate || ''}
                           onChange={e => handleFieldChange('symptomsStartDate', e.target.value)}
                           placeholder="DD/MM/AAAA"
-                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                         />
                       </div>
                     </div>
@@ -1167,9 +1168,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   {/* Campos Específicos para APAC Complementar */}
                   {(currentDocItem.id === 'apac_complementar') && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-sky-500/5 border border-info">
                       <div>
-                        <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                           Creatinina Sérica (mg/dL)
                         </label>
                         <input
@@ -1177,11 +1178,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.renalCreatinine || ''}
                           onChange={e => handleFieldChange('renalCreatinine', e.target.value)}
                           placeholder="Resultado do exame (ex.: 0,9)"
-                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                        <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                           Taxa de Filtração Glomerular (eTFG)
                         </label>
                         <input
@@ -1189,7 +1190,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.renalEtfg || ''}
                           onChange={e => handleFieldChange('renalEtfg', e.target.value)}
                           placeholder="Resultado em mL/min/1,73m²"
-                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                         />
                       </div>
                     </div>
@@ -1215,13 +1216,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   {/* Campos Específicos para LME Farmácia de Alto Custo (numeração do impresso oficial) */}
                   {(currentDocItem.id === 'lme_medicamentos') && (
-                    <div className="space-y-3 p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                    <div className="space-y-3 p-2.5 rounded-xl bg-sky-500/5 border border-info">
                       <div className="space-y-2">
                         <span className={ROTULO_SUS}>7 e 8 — Medicamento(s) e quantidade solicitada por mês</span>
                         {linhasDaLme.map((linha, indice) => (
                           <div key={indice} className="space-y-1.5">
                             <div className="flex items-center gap-1.5">
-                              <span className="w-4 text-[11px] font-bold text-[var(--text-muted)]">{indice + 1}</span>
+                              <span className="w-4 text-xs font-bold text-[var(--text-muted)]">{indice + 1}</span>
                               <input
                                 type="text"
                                 aria-label={`Medicamento ${indice + 1}`}
@@ -1234,7 +1235,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => handleFieldChange('lmeMedications', linhasDaLme.filter((_, i) => i !== indice))}
-                                  className="h-8 px-2 rounded-lg border border-[var(--border-subtle)] text-[11px] font-semibold text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
+                                  className="h-8 px-2 rounded-lg border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
                                   aria-label={`Remover medicamento ${indice + 1}`}
                                 >
                                   Remover
@@ -1254,7 +1255,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                                     quantities: MESES_DA_LME.map((_, i) => (i === m ? e.target.value : l.quantities[i] || ''))
                                   }))}
                                   placeholder={`${mes} mês`}
-                                  className="w-full px-1.5 py-1 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-blue-500"
+                                  className="w-full px-1.5 py-1 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-info"
                                 />
                               ))}
                             </div>
@@ -1262,7 +1263,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                               <button
                                 type="button"
                                 onClick={() => alterarLinhaDaLme(indice, (l) => ({ ...l, quantities: MESES_DA_LME.map(() => l.quantities[0]) }))}
-                                className="ml-5 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                                className="ml-5 text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
                               >
                                 Repetir a quantidade do 1º mês nos 6 meses
                               </button>
@@ -1334,14 +1335,14 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         <input id="lme-email" type="email" value={formData.patientEmail || ''} onChange={e => handleFieldChange('patientEmail', e.target.value)} className={CAMPO_SUS} />
                       </div>
 
-                      <p className="text-[11px] text-[var(--text-muted)]">
+                      <p className="text-xs text-[var(--text-muted)]">
                         Os campos 18 e 23 (quem preencheu os dados complementares e assinatura) ficam em branco para preenchimento à mão. A LME não tem campo de posologia: ela vai na receita que acompanha o laudo.
                       </p>
                     </div>
                   )}
 
                   <div>
-                    <label htmlFor="sus-justificativa" className="text-[11px] font-semibold text-[var(--text-muted)] block mb-1">
+                    <label htmlFor="sus-justificativa" className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                       Justificativa clínica e indicação técnica
                     </label>
                     <textarea
@@ -1350,7 +1351,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.clinicalJustification}
                       onChange={e => handleFieldChange('clinicalJustification', e.target.value)}
                       placeholder="Descreva o quadro do paciente: história, exame físico e o que já foi tentado."
-                      className="w-full p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-blue-500 leading-relaxed font-sans"
+                      className="w-full p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info leading-relaxed font-sans"
                     />
                     <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
                       <button
@@ -1361,7 +1362,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       >
                         {formData.clinicalJustification?.trim() ? 'Substituir pelo texto-modelo' : 'Inserir texto-modelo'}
                       </button>
-                      <span className="text-[11px] text-[var(--text-muted)]">
+                      <span className="text-xs text-[var(--text-muted)]">
                         O modelo é um ponto de partida: ajuste ao caso antes de emitir.
                       </span>
                     </div>
@@ -1381,13 +1382,13 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                 }}
               >
                 {pendenciasClinicas.length > 0 && (
-                  <p role="status" className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/25">
+                  <p role="status" className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-warning">
                     Em branco: {pendenciasClinicas.join(', ')}.
                   </p>
                 )}
 
                 {camposCortados.length > 0 && (
-                  <p role="alert" className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-rose-500/10 text-rose-900 dark:text-rose-200 border border-rose-500/30">
+                  <p role="alert" className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-900 dark:text-rose-200 border border-rose-500/30">
                     Texto cortado com […] {camposCortados.length > 1 ? 'nos campos' : 'no campo'} {camposCortados.join(', ')}.
                   </p>
                 )}
@@ -1439,7 +1440,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                     title={selectedDocIds.length > 1 ? `Abrir todos (${selectedDocIds.length}) no Editor A4` : 'Abrir no Editor A4'}
                     className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] flex items-center justify-center cursor-pointer transition active:scale-95 shrink-0"
                   >
-                    <Edit3 className="w-4 h-4 text-blue-500" />
+                    <Edit3 className="w-4 h-4 text-sky-500" />
                   </button>
 
                   {/* Copiar Texto Markdown (Ícone compacto) */}
@@ -1456,7 +1457,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               </div>
 
               {/* Folha Física A4 Prévia (Papel Branco com Tipografia Grafite) */}
-              <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/50">
+              <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-subtle dark:border-strong">
                 <FolhaA4
                   ref={folhaSusRef}
                   id="sus-document-print-sheet"
@@ -1466,7 +1467,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   {formularioOficial ? (
                     <FormularioOficialSus formulario={formularioOficial} dados={formData} />
                   ) : (
-                    <div dangerouslySetInnerHTML={{ __html: buildSusDocumentHtml(currentDocItem, formData, timbreDe(currentDocItem)) }} />
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(buildSusDocumentHtml(currentDocItem, formData, timbreDe(currentDocItem))) }} />
                   )}
                 </FolhaA4>
               </div>

@@ -49,8 +49,8 @@ export class AsyncErrorBoundary extends Component<Props, State> {
       const moduleTitle = this.props.moduleName || 'este módulo';
 
       return (
-        <div className="w-full max-w-xl mx-auto my-12 p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-800 shadow-tactile-lg text-center space-y-4">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+        <div data-state="idle" aria-busy={false} className="w-full max-w-xl mx-auto my-12 p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-warning dark:border-warning shadow-tactile-lg text-center space-y-4 surface-raised">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-100 dark:bg-amber-950/60 border border-warning dark:border-warning text-amber-600 dark:text-amber-400 flex items-center justify-center">
             <AlertTriangle className="w-6 h-6" />
           </div>
 

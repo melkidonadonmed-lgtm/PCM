@@ -54,10 +54,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   const isMoreActive = activeTab === 'protocols' || activeTab === 'print_preview';
 
   return (
-    <nav
+    <nav data-state="idle" aria-busy={false}
       id="mobile-bottom-nav"
       aria-label="Navegação Inferior Mobile"
-      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-1.5 sm:px-3 border-t backdrop-blur-md no-print pb-safe isolate panel-navy panel-projected-top overflow-x-hidden"
+      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-1.5 sm:px-3 border-t no-print pb-safe isolate panel-navy panel-projected-top overflow-x-hidden surface-raised"
       style={{
         borderColor: 'var(--surface-panel-border)'
       }}
@@ -94,7 +94,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               )}
             </div>
             <span
-              className="text-[9px] sm:text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-full text-center"
+              className="text-xs sm:text-xs font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-full text-center"
               style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
             >
               {item.label}
@@ -129,7 +129,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           />
         </div>
         <span
-          className="text-[9px] sm:text-[10px] font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-full text-center"
+          className="text-xs sm:text-xs font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-full text-center"
           style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
         >
           Mais

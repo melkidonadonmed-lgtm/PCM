@@ -23,6 +23,11 @@ import { CidSearchBar } from './CidSearchBar';
 import { COMMON_CID10, CIDItem } from '../data/cidCatalog';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { dataLocalISO } from '../utils/documentoClinico';
+import { escapeHtml } from '../utils/sanitizeHtml';
+import {
+  formatarAtestadoWhatsAppTexto,
+  formatarEncaminhamentoWhatsAppTexto
+} from '../utils/compartilhamentoTexto';
 
 /**
  * Sub-ilhas de Atestado Médico e Encaminhamento.
@@ -223,57 +228,27 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
   const handleSendCertificateWhatsApp = () => {
     if (!medicoConfigurado(doctor)) return;
-    const pName = certificate.patientName?.trim() || patient?.name?.trim() || 'Paciente';
-    const dateStr = certificate.date || new Date().toLocaleDateString('pt-BR');
-    const docLine = doctor?.name?.trim() ? `👨‍⚕️ *${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n` : '';
-    
-    let msg = `📋 *ATESTADO MÉDICO DIGITAL*\n${docLine}👤 *Paciente:* ${pName}\n📅 *Data:* ${dateStr}\n------------------------------------\n\n`;
-    msg += `Atesto para os devidos fins que o(a) paciente acima identificado(a) esteve sob atendimento médico nesta data (${dateStr}).\n\n`;
-    if (certificate.daysOff > 0) {
-      msg += `👉 *Recomendação:* Repouso e afastamento de suas atividades por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
-    }
-    if (certificate.includeCID && certificate.cid10Code) {
-      msg += `📌 *CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''}\n\n`;
-    }
-    if (certificate.observations) {
-      msg += `📝 *Observações:* ${certificate.observations}\n\n`;
-    }
-    msg += `------------------------------------\n_Documento emitido conforme Resolução CFM 1.658/2002._`;
-
+    const msg = formatarAtestadoWhatsAppTexto(doctor, patient, certificate);
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const handleSendReferralWhatsApp = () => {
     if (!medicoConfigurado(doctor)) return;
-    const pName = referral.patientName?.trim() || patient?.name?.trim() || 'Paciente';
-    const dateStr = referral.date || new Date().toLocaleDateString('pt-BR');
-    const docLine = doctor?.name?.trim() ? `👨‍⚕️ *${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n` : '';
-
-    let msg = `📋 *ENCAMINHAMENTO MÉDICO DIGITAL*\n${docLine}👤 *Paciente:* ${pName}\n📅 *Data:* ${dateStr}\n------------------------------------\n\n`;
-    msg += `Ao(À) Colega da especialidade *${referral.destinationSpecialty || 'Especialista'}*:\n\n`;
-    msg += `Encaminho o(a) paciente para avaliação e conduta clínica especializada.\n\n`;
-    if (referral.reason) {
-      msg += `📌 *Motivo / Hipótese Diagnóstica:* ${referral.reason}\n\n`;
-    }
-    if (referral.clinicalSummary) {
-      msg += `📝 *Resumo Clínico & Condutas Prévias:* ${referral.clinicalSummary}\n\n`;
-    }
-    msg += `------------------------------------\n_PrescMed — Referência e Contrarreferência Ambulatorial_`;
-
+    const msg = formatarEncaminhamentoWhatsAppTexto(doctor, patient, referral);
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const handleOpenCertificateInEditor = () => {
-    const pName = certificate.patientName?.trim() || patient?.name?.trim() || '______________________________';
-    const pDoc = certificate.documentNumber || patient?.documentNumber || '____________________';
+    const pName = escapeHtml(certificate.patientName?.trim() || patient?.name?.trim() || '______________________________');
+    const pDoc = escapeHtml(certificate.documentNumber || patient?.documentNumber || '____________________');
     const days = certificate.daysOff || 1;
-    const daysText = days === 1 ? '1 (um) dia' : `${days} dias`;
-    const period = certificate.periodText || 'por motivo de doença e necessidade de repouso';
-    const today = certificate.date || new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const daysText = escapeHtml(days === 1 ? '1 (um) dia' : `${days} dias`);
+    const period = escapeHtml(certificate.periodText || 'por motivo de doença e necessidade de repouso');
+    const today = escapeHtml(certificate.date || new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }));
     const cidText = certificate.includeCID && certificate.cid10Code 
-      ? `<p><strong>Diagnóstico (CID-10):</strong> ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''} <em>(Expressamente autorizado pelo paciente)</em></p><p></p>`
+      ? `<p><strong>Diagnóstico (CID-10):</strong> ${escapeHtml(certificate.cid10Code)}${certificate.cid10Description ? ` - ${escapeHtml(certificate.cid10Description)}` : ''} <em>(Expressamente autorizado pelo paciente)</em></p><p></p>`
       : '';
-    const obsText = certificate.observations ? `<p><strong>Observações:</strong> ${certificate.observations}</p><p></p>` : '';
+    const obsText = certificate.observations ? `<p><strong>Observações:</strong> ${escapeHtml(certificate.observations)}</p><p></p>` : '';
 
     const certHtml = `
       <p style="text-align: center;"><strong>ATESTADO MÉDICO</strong></p>
@@ -293,16 +268,17 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
   };
 
   const handleOpenReferralInEditor = () => {
-    const pName = referral.patientName?.trim() || patient?.name?.trim() || '______________________________';
-    const pDoc = referral.documentNumber || patient?.documentNumber || '____________________';
-    const pAge = patient?.ageText || (patient?.birthDate ? patient.birthDate : '');
-    const priorityLabel = (referral.priority || 'eletivo').toUpperCase();
-    const specialty = referral.destinationSpecialty || 'Especialidade Médica';
-    const institution = referral.destinationInstitution || 'Serviço de Referência / Atenção Especializada';
-    const reason = referral.reason || 'Avaliação e conduta especializada.';
-    const summary = referral.clinicalSummary || 'Quadro clínico em investigação.';
-    const exams = referral.relevantExams || 'Sem exames complementares anexados.';
-    const cid = referral.hypothesisCID || 'A esclarecer.';
+    const pName = escapeHtml(referral.patientName?.trim() || patient?.name?.trim() || '______________________________');
+    const pDoc = escapeHtml(referral.documentNumber || patient?.documentNumber || '____________________');
+    const pAge = escapeHtml(patient?.ageText || (patient?.birthDate ? patient.birthDate : ''));
+    const priorityLabel = escapeHtml((referral.priority || 'eletivo').toUpperCase());
+    const rawSpecialty = referral.destinationSpecialty || 'Especialidade Médica';
+    const specialty = escapeHtml(rawSpecialty);
+    const institution = escapeHtml(referral.destinationInstitution || 'Serviço de Referência / Atenção Especializada');
+    const reason = escapeHtml(referral.reason || 'Avaliação e conduta especializada.');
+    const summary = escapeHtml(referral.clinicalSummary || 'Quadro clínico em investigação.');
+    const exams = escapeHtml(referral.relevantExams || 'Sem exames complementares anexados.');
+    const cid = escapeHtml(referral.hypothesisCID || 'A esclarecer.');
 
     const referralHtml = `
       <p style="text-align: center;"><strong>GUIA DE ENCAMINHAMENTO MÉDICO</strong></p>
@@ -317,7 +293,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
       <p><strong>1. Motivo do Encaminhamento:</strong></p>
       <p style="margin-left: 15px; color: #1e293b;">${reason}</p>
       <p></p>
-      <p><strong>2. História Clínica & Exame Físico Relevante:</strong></p>
+      <p><strong>2. História Clínica &amp; Exame Físico Relevante:</strong></p>
       <p style="margin-left: 15px; color: #1e293b;">${summary}</p>
       <p></p>
       <p><strong>3. Exames Complementares Realizados:</strong></p>
@@ -330,14 +306,14 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
     `;
 
     if (onNavigateToEditorWithHtml) {
-      onNavigateToEditorWithHtml(referralHtml, `Encaminhamento - ${specialty}`, 'referral');
+      onNavigateToEditorWithHtml(referralHtml, `Encaminhamento - ${rawSpecialty}`, 'referral');
     }
   };
 
   const currentSpecialtySuggestions = specialtyCidSuggestions[referral.destinationSpecialty] || [];
 
   return (
-    <div id="certificate-and-referral-section" className="space-y-4 sm:space-y-5">
+    <div data-state="idle" aria-busy={false} id="certificate-and-referral-section" className="space-y-4 sm:space-y-5">
       {/* Subtabs Switcher (apenas quando não estiver sob o ClinicalDocumentsHub) */}
       {!hideSubNav && (
         <div 
@@ -352,7 +328,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             onClick={() => handleSwitchTab('certificate')}
             className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               currentSubTab === 'certificate'
-                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
+                ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border border-navy-800 dark:border-info shadow-tactile-navy dark:shadow-tactile-blue'
                 : darkMode
                 ? 'text-slate-400 hover:text-white'
                 : 'text-slate-600 hover:text-slate-900'
@@ -367,7 +343,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             onClick={() => handleSwitchTab('referral')}
             className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               currentSubTab === 'referral'
-                ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
+                ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border border-navy-800 dark:border-info shadow-tactile-navy dark:shadow-tactile-blue'
                 : darkMode
                 ? 'text-slate-400 hover:text-white'
                 : 'text-slate-600 hover:text-slate-900'
@@ -393,7 +369,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
               <div className="flex items-center gap-3">
                 <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-navy-900 dark:bg-blue-600 border border-white/12"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-navy-900 dark:bg-sky-600 border border-white/12"
                 >
                   <Award className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
                 </div>
@@ -442,7 +418,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             {/* Patient data for Certificate */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label htmlFor="certificate-patient-name" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="certificate-patient-name" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <User className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
                   <span>Nome do Paciente</span>
                 </label>
@@ -457,7 +433,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label htmlFor="certificate-patient-doc" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="certificate-patient-doc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <Hash className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
                   <span>Documento (RG / CPF)</span>
                 </label>
@@ -472,7 +448,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label htmlFor="certificate-period-select" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="certificate-period-select" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <FileText className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
                   <span>Finalidade / Motivo</span>
                 </label>
@@ -502,7 +478,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               }}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 flex items-center gap-1.5">
+                <span className="text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-sky-500" />
                   <span>Período de Afastamento:</span>
                 </span>
@@ -519,10 +495,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     onClick={() => handleDaysChange(d)}
                     className={`text-xs px-3 py-1.5 rounded-xl border font-bold transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                       certificate.daysOff === d
-                        ? 'bg-sky-700 dark:bg-sky-600 text-white border-sky-600 shadow-sm'
+                        ? 'bg-sky-700 dark:bg-sky-600 text-white border-info shadow-sm'
                         : darkMode
-                        ? 'bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'
+                        ? 'bg-slate-800/80 text-slate-300 border-strong hover:bg-slate-700 hover:text-white'
+                        : 'bg-white text-slate-700 border-subtle hover:bg-sky-50 hover:border-info'
                     }`}
                   >
                     {d} {d === 1 ? 'dia' : 'dias'}
@@ -532,7 +508,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                 <div>
-                  <label htmlFor="certificate-days-off" className="block text-[10px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Dias de Repouso (Manual)</label>
+                  <label htmlFor="certificate-days-off" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Dias de Repouso (Manual)</label>
                   <input
                     id="certificate-days-off"
                     aria-label="Dias de repouso manual"
@@ -551,7 +527,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="certificate-start-date" className="block text-[10px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                  <label htmlFor="certificate-start-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                     <Calendar className="w-3 h-3 text-[var(--text-muted)] dark:text-slate-400" />
                     <span>Data de Início</span>
                   </label>
@@ -571,7 +547,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="certificate-end-date" className="block text-[10px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                  <label htmlFor="certificate-end-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                     <Calendar className="w-3 h-3 text-[var(--text-muted)] dark:text-slate-400" />
                     <span>Data de Retorno Previsto</span>
                   </label>
@@ -615,7 +591,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   </label>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)] dark:text-slate-400">
+                <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] dark:text-slate-400">
                   <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
                   <span>Exige autorização expressa do paciente (Res. CFM 1.658/2002)</span>
                 </div>
@@ -639,7 +615,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   {/* Direct Code & Description manual inputs for fine-tuning */}
                   <div className="pt-2 grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div className="sm:col-span-1">
-                      <label htmlFor="certificate-cid-code" className="block text-[10px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Código CID-10</label>
+                      <label htmlFor="certificate-cid-code" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Código CID-10</label>
                       <input
                         id="certificate-cid-code"
                         aria-label="Código CID-10"
@@ -657,7 +633,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     </div>
 
                     <div className="sm:col-span-3">
-                      <label htmlFor="certificate-cid-desc" className="block text-[10px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Descrição do Diagnóstico (Edição Livre)</label>
+                      <label htmlFor="certificate-cid-desc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Descrição do Diagnóstico (Edição Livre)</label>
                       <input
                         id="certificate-cid-desc"
                         aria-label="Descrição do diagnóstico CID-10"
@@ -676,7 +652,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="p-3.5 rounded-xl border border-dashed border-slate-500/20 text-center text-xs text-[var(--text-muted)] dark:text-slate-400">
+                <div className="p-3.5 rounded-xl border border-dashed border-strong text-center text-xs text-[var(--text-muted)] dark:text-slate-400">
                   <span>Inclusão de CID desativada. O atestado será gerado sem a informação codificada da doença.</span>
                 </div>
               )}
@@ -684,7 +660,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             {/* Observations */}
             <div>
-              <label htmlFor="certificate-observations" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
+              <label htmlFor="certificate-observations" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
                 Observações Complementares / Recomendações (Opcional)
               </label>
               <textarea
@@ -760,7 +736,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             {/* Patient data for Referral */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label htmlFor="referral-patient-name" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="referral-patient-name" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <User className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
                   <span>Nome do Paciente</span>
                 </label>
@@ -775,7 +751,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label htmlFor="referral-patient-doc" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="referral-patient-doc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <Hash className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
                   <span>Documento (RG / CPF)</span>
                 </label>
@@ -793,7 +769,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             {/* Specialty & Destination */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label htmlFor="referral-destination-specialty" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="referral-destination-specialty" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <Stethoscope className="w-3.5 h-3.5 text-emerald-500" />
                   <span>Especialidade de Destino</span>
                 </label>
@@ -811,7 +787,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label htmlFor="referral-destination-institution" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                <label htmlFor="referral-destination-institution" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <Building2 className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
                   <span>Serviço / Hospital de Destino</span>
                 </label>
@@ -826,7 +802,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Grau de Prioridade</label>
+                <label className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Grau de Prioridade</label>
                 <div className="flex items-center gap-1.5">
                   {(['eletivo', 'prioritario', 'urgente'] as const).map((p) => (
                     <button
@@ -838,11 +814,11 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                           ? p === 'urgente'
                             ? 'bg-rose-700 text-white border-rose-600 shadow-sm'
                             : p === 'prioritario'
-                            ? 'bg-amber-700 text-white border-amber-600 shadow-sm'
-                            : 'bg-emerald-700 text-white border-emerald-600 shadow-sm'
+                            ? 'bg-amber-700 text-white border-warning shadow-sm'
+                            : 'bg-emerald-700 text-white border-clinical shadow-sm'
                           : darkMode
-                          ? 'bg-slate-800/80 text-slate-400 border-slate-700/60 hover:bg-slate-700 hover:text-slate-200'
-                          : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                          ? 'bg-slate-800/80 text-slate-400 border-strong hover:bg-slate-700 hover:text-slate-200'
+                          : 'bg-slate-100 text-slate-600 border-subtle hover:bg-slate-200'
                       }`}
                     >
                       {p}
@@ -854,7 +830,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             {/* Motivo & Resumo Clínico */}
             <div>
-              <label htmlFor="referral-reason" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Motivo do Encaminhamento</label>
+              <label htmlFor="referral-reason" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Motivo do Encaminhamento</label>
               <input
                 id="referral-reason"
                 type="text"
@@ -866,7 +842,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             </div>
 
             <div>
-              <label htmlFor="referral-clinical-summary" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Resumo da História Clínica & Exame Físico</label>
+              <label htmlFor="referral-clinical-summary" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Resumo da História Clínica & Exame Físico</label>
               <textarea
                 id="referral-clinical-summary"
                 rows={3}
@@ -879,7 +855,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label htmlFor="referral-relevant-exams" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Exames Relevantes Realizados</label>
+                <label htmlFor="referral-relevant-exams" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Exames Relevantes Realizados</label>
                 <textarea
                   id="referral-relevant-exams"
                   rows={3}
@@ -891,7 +867,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               <div>
-                <label htmlFor="referral-hypothesis-cid" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
+                <label htmlFor="referral-hypothesis-cid" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">
                   Texto da Hipótese Diagnóstica (CID-10)
                 </label>
                 <textarea
@@ -907,7 +883,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             {/* Integrated CID-10 Finder for Referral / Encaminhamento */}
             <div 
-              className="p-4 sm:p-5 rounded-2xl border space-y-3.5 bg-[var(--surface-inset)] border-emerald-500/20"
+              className="p-4 sm:p-5 rounded-2xl border space-y-3.5 bg-[var(--surface-inset)] border-clinical"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b pb-2.5" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
                 <div className="flex items-center gap-2">
@@ -916,7 +892,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     Buscador de CID-10 para Encaminhamento
                   </h4>
                 </div>
-                <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
+                <span className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
                   Clique no diagnóstico para preencher ou adicionar à hipótese
                 </span>
               </div>
@@ -924,7 +900,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               {/* Specialty suggestions bar */}
               {currentSpecialtySuggestions.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
                     Sugestões para {referral.destinationSpecialty}:
                   </span>
 
@@ -934,7 +910,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                         key={item.code}
                         type="button"
                         onClick={() => handleAppendCidForReferral({ code: item.code, description: item.label })}
-                        className="text-[11px] px-2.5 py-1 rounded-lg border font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
+                        className="text-xs px-2.5 py-1 rounded-lg border font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
                         style={{
                           backgroundColor: darkMode ? '#152E22' : 'var(--surface-card)',
                           borderColor: darkMode ? 'rgba(52, 211, 153, 0.3)' : 'rgba(21, 128, 61, 0.2)',

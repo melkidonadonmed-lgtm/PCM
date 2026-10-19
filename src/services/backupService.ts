@@ -124,6 +124,19 @@ export async function parseAndValidateBackup(file: File): Promise<PresCMedBackup
     }
   }
 
+  // Validação defensiva do perfil médico quando presente no backup
+  if (dataObj.doctorProfile !== undefined && dataObj.doctorProfile !== null) {
+    const docProf = dataObj.doctorProfile as Record<string, unknown>;
+    if (
+      typeof docProf !== 'object' ||
+      Array.isArray(docProf) ||
+      typeof docProf.name !== 'string' ||
+      typeof docProf.crm !== 'string'
+    ) {
+      throw new Error('O perfil médico no backup contém estrutura inválida.');
+    }
+  }
+
   return json as unknown as PresCMedBackup;
 }
 
@@ -156,7 +169,11 @@ export async function importBackupData(
   }
 
   if (activeContextId) {
-    localStorage.setItem('pcm_active_context_id', activeContextId);
+    try {
+      localStorage.setItem('pcm_active_context_id', activeContextId);
+    } catch (e) {
+      console.warn('[BackupService] Falha ao persistir contexto ativo no localStorage:', e);
+    }
   }
 
   return {

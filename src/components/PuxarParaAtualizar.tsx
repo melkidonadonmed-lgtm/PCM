@@ -233,16 +233,16 @@ export function PuxarParaAtualizar({ desativado }: PuxarParaAtualizarProps) {
   const isThreshold = status === 'limiar_atingido';
 
   return (
-    <div
+    <div data-state="idle" aria-busy={false}
       role="status"
       aria-live={isUpdating ? 'polite' : 'off'}
-      className="fixed top-16 left-1/2 z-40 pointer-events-none select-none transition-transform duration-100 ease-out"
+      className="fixed top-16 left-1/2 z-40 pointer-events-none select-none transition-transform duration-100 ease-out surface-raised"
       style={{
         transform: `translate(-50%, ${Math.max(8, pullDistance - 28)}px)`,
         opacity: pullDistance > 10 ? 1 : 0
       }}
     >
-      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-tactile-sm backdrop-blur-md bg-[var(--surface-card)] text-[var(--text-main)] border-[var(--border-subtle)] text-xs font-medium">
+      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-tactile-sm bg-[var(--surface-card)] text-[var(--text-main)] border-[var(--border-subtle)] text-xs font-medium">
         {isUpdating ? (
           <Icon
             name="sync"

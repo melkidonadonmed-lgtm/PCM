@@ -75,8 +75,12 @@ const CONTROLADOS = [
 
 // Termos curtos só valem como palavra inteira, para não casar dentro de outras
 // palavras ("astro" dentro de "gastro", por exemplo).
-const ANTIMICROBIANOS_PALAVRA_INTEIRA = ['cipro', 'astro'];
-const CONTROLADOS_PALAVRA_INTEIRA = ['bup', 'litio', 'tylex', 'paco', 'frontal'];
+const ANTIMICROBIANOS_PALAVRA_INTEIRA_REGEX = ['cipro', 'astro'].map(
+  (termo) => new RegExp(`\\b${termo}\\b`)
+);
+const CONTROLADOS_PALAVRA_INTEIRA_REGEX = ['bup', 'litio', 'tylex', 'paco', 'frontal'].map(
+  (termo) => new RegExp(`\\b${termo}\\b`)
+);
 
 /**
  * Normaliza um texto removendo acentuação e convertendo para minúsculas.
@@ -88,10 +92,10 @@ function normalizeText(text: string): string {
     .replace(/[̀-ͯ]/g, '');
 }
 
-function contemTermo(texto: string, termos: string[], palavrasInteiras: string[]): boolean {
+function contemTermo(texto: string, termos: string[], palavrasInteirasRegex: RegExp[]): boolean {
   return (
     termos.some((termo) => texto.includes(termo)) ||
-    palavrasInteiras.some((termo) => new RegExp(`\\b${termo}\\b`).test(texto))
+    palavrasInteirasRegex.some((re) => re.test(texto))
   );
 }
 
@@ -124,7 +128,7 @@ export function classificarReceita(med?: MedicamentoClassificavel): RegimeReceit
   const texto = textoDoMedicamento(med);
 
   // O regime mais restritivo prevalece.
-  if (contemTermo(texto, CONTROLADOS, CONTROLADOS_PALAVRA_INTEIRA)) return 'controle_especial';
+  if (contemTermo(texto, CONTROLADOS, CONTROLADOS_PALAVRA_INTEIRA_REGEX)) return 'controle_especial';
 
   // Tipo de receita escolhido pelo médico no formulário (nunca rebaixa um controlado detectado acima)
   if (obj?.regimeReceita === 'antimicrobiano' || obj?.regimeReceita === 'controle_especial') {
@@ -132,7 +136,7 @@ export function classificarReceita(med?: MedicamentoClassificavel): RegimeReceit
   }
 
   const categoria = obj && typeof obj.category === 'string' ? normalizeText(obj.category) : '';
-  if (categoria.includes('antibi') || contemTermo(texto, ANTIMICROBIANOS, ANTIMICROBIANOS_PALAVRA_INTEIRA)) {
+  if (categoria.includes('antibi') || contemTermo(texto, ANTIMICROBIANOS, ANTIMICROBIANOS_PALAVRA_INTEIRA_REGEX)) {
     return 'antimicrobiano';
   }
 

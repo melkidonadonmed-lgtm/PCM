@@ -86,8 +86,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs isolate animate-tab-fade"
+    <div data-state="idle" aria-busy={false} 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 isolate animate-tab-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="patient-modal-title"
@@ -111,7 +111,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
           }}
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-blue-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-sky-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
               <User className="w-4 h-4" strokeWidth={2} />
             </div>
             <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-white">
@@ -143,7 +143,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Ex.: Seu Melki"
-              className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-semibold focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+              className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-semibold focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
             />
           </div>
 
@@ -163,7 +163,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               <span className="text-xs font-bold block" style={{ color: darkMode ? '#F4F7FC' : '#0B132B' }}>
                 Cálculo de Dose por Peso (Pediátrico)
               </span>
-              <span className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 block">
+              <span className="text-xs text-[var(--text-muted)] dark:text-slate-400 block">
                 {formData.weightCalcEnabled ? 'Ativado: calcula gotas e mL/kg automaticamente' : 'Desativado: modo adulto / doses padrão'}
               </span>
             </div>
@@ -205,7 +205,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                   value={formData.weightKg || ''}
                   onChange={(e) => setFormData({ ...formData, weightKg: parseFloat(e.target.value) || 0 })}
                   placeholder={formData.weightCalcEnabled ? "Ex: 14.5" : "Opcional"}
-                  className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-bold focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-emerald-700 dark:text-emerald-400 transition"
+                  className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-bold focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-emerald-700 dark:text-emerald-400 transition"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--text-muted)] dark:text-slate-400">kg</span>
               </div>
@@ -222,7 +222,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.birthDate || formData.ageText || ''}
                 onChange={(e) => setFormData({ ...formData, birthDate: e.target.value, ageText: e.target.value })}
                 placeholder="Ex: 35 anos ou 2 anos..."
-                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
             </div>
 
@@ -234,7 +234,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 id="patient-modal-sex"
                 value={formData.sex || ''}
                 onChange={(e) => setFormData({ ...formData, sex: (e.target.value as '' | 'M' | 'F') })}
-                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               >
                 <option value="">Não informado</option>
                 <option value="F">Feminino</option>
@@ -255,7 +255,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.documentNumber || ''}
                 onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
                 placeholder="Ex: 542.189.708-44"
-                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
             </div>
 
@@ -272,7 +272,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="(11) 98765-4321"
-                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
             </div>
           </div>
@@ -288,7 +288,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               value={formData.allergies?.join(', ') || ''}
               onChange={(e) => setFormData({ ...formData, allergies: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
               placeholder="Ex: Penicilina, Dipirona, AINEs, Frutos do mar..."
-              className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-rose-700 dark:text-rose-400 transition"
+              className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-rose-700 dark:text-rose-400 transition"
             />
           </div>
 

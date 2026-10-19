@@ -1,6 +1,7 @@
 import { SusDocumentItem, SusFilledFormData } from '../types';
 import { medicamentosDaLme } from './formulariosOficiaisSus';
 import { LOGO_DO_ESTADO, LOGO_DO_SUS } from './presetAssets';
+import { escapeHtml } from '../utils/sanitizeHtml';
 
 export const SUS_DOCUMENTS_CATALOG: SusDocumentItem[] = [
   {
@@ -278,8 +279,8 @@ const LARGURA_DO_LOGO_PX = 130;
 
 function cabecalhoSus(item: SusDocumentItem, timbre?: TimbreSus): string {
   const titulo = `
-        <h2 style="font-size: 15px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">${item.title}</h2>
-        <p style="font-size: 11px; margin: 3px 0 0 0; color: #475569; font-weight: bold;">SISTEMA ÚNICO DE SAÚDE — ${item.system} &nbsp;|&nbsp; ${item.complexity}</p>`;
+        <h2 style="font-size: 15px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">${escapeHtml(item.title)}</h2>
+        <p style="font-size: 11px; margin: 3px 0 0 0; color: #475569; font-weight: bold;">SISTEMA ÚNICO DE SAÚDE — ${escapeHtml(item.system)} &nbsp;|&nbsp; ${escapeHtml(item.complexity)}</p>`;
 
   const logoLocal = timbre?.logoLocal && timbre.logoLocal !== timbre.logoSus ? timbre.logoLocal : '';
   const logoSus = timbre?.logoSus || '';
@@ -292,7 +293,7 @@ function cabecalhoSus(item: SusDocumentItem, timbre?: TimbreSus): string {
   // Cada lado ocupa a mesma largura (com ou sem logo), para o título ficar centralizado na folha.
   const lado = (src: string, alt: string, larguraMaxima: number) => `
         <div style="width: ${LARGURA_DO_LOGO_PX}px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-          ${src ? `<img src="${src}" alt="${alt}" style="max-width: ${larguraMaxima}px; max-height: 78px; object-fit: contain;" />` : ''}
+          ${src ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" style="max-width: ${larguraMaxima}px; max-height: 78px; object-fit: contain;" />` : ''}
         </div>`;
 
   return `
@@ -318,7 +319,7 @@ function gradeTecnicaComplementarSus(item: SusDocumentItem, data: SusFilledFormD
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 4 — JUSTIFICATIVA DE MEIO DE CONTRASTE, FUNÇÃO RENAL E FATORES DE RISCO</p>
         <p style="margin: 3px 0;"><strong>Uso de Contraste Endovenoso:</strong> ${data.isContrastNeeded ? '[X] Sim (Indicado para delimitação tecidual/vascular) &nbsp;&nbsp; [ ] Não' : '[ ] Sim &nbsp;&nbsp; [X] Não'}</p>
-        <p style="margin: 3px 0;"><strong>Função Renal:</strong> ${funcaoRenal(data)}</p>
+        <p style="margin: 3px 0;"><strong>Função Renal:</strong> ${escapeHtml(funcaoRenal(data))}</p>
         <p style="margin: 3px 0;"><strong>Fatores de Risco Renal / Alergia:</strong> [ ] DRC &nbsp;&nbsp; [ ] Diabetes &nbsp;&nbsp; [ ] HAS &nbsp;&nbsp; [ ] Mieloma &nbsp;&nbsp; [ ] ICC &nbsp;&nbsp; [ ] Asma &nbsp;&nbsp; [ ] Uso de Metformina &nbsp;&nbsp; [ ] Alergia prévia ao contraste</p>
       </div>
       <div style="${caixaEstilo}">
@@ -349,7 +350,7 @@ function gradeTecnicaComplementarSus(item: SusDocumentItem, data: SusFilledFormD
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 3 — MOTIVO DO EXAME E ANAMNESE GINECOLÓGICA (SISCAN)</p>
         <p style="margin: 3px 0;"><strong>Motivo do Exame:</strong> [ ] Rastreamento (25 a 64 anos) &nbsp;&nbsp; [ ] Repetição (ASC-US / Baixo Grau) &nbsp;&nbsp; [ ] Seguimento Pós-Tratamento</p>
-        <p style="margin: 3px 0;"><strong>DUM (Última Menstruação):</strong> ${data.gynecologyDum || VAZIO} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Exame Citopatológico Anterior:</strong> ${data.gynecologyPreviousExam || VAZIO}</p>
+        <p style="margin: 3px 0;"><strong>DUM (Última Menstruação):</strong> ${escapeHtml(data.gynecologyDum || VAZIO)} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Exame Citopatológico Anterior:</strong> ${escapeHtml(data.gynecologyPreviousExam || VAZIO)}</p>
         <p style="margin: 3px 0;"><strong>Condições:</strong> Usa DIU: [ ] Sim [ ] Não &nbsp;|&nbsp; Gestante: [ ] Sim [ ] Não &nbsp;|&nbsp; Menopausa / TRH: [ ] Sim [ ] Não &nbsp;|&nbsp; Vacina HPV: [ ] Sim [ ] Não &nbsp;|&nbsp; Sangramento pós-coito: [ ] Sim [ ] Não</p>
       </div>
       <div style="${caixaEstilo}">
@@ -362,13 +363,13 @@ function gradeTecnicaComplementarSus(item: SusDocumentItem, data: SusFilledFormD
       return `
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 3 — VIGILÂNCIA EPIDEMIOLÓGICA, AGRAVO SUSPEITO E NOTIFICAÇÃO SINAN</p>
-        <p style="margin: 3px 0;"><strong>Nº da Notificação SINAN:</strong> ${data.sinanNumber || VAZIO} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Início dos Sintomas (D1):</strong> ${data.symptomsStartDate || 'não informada'}</p>
+        <p style="margin: 3px 0;"><strong>Nº da Notificação SINAN:</strong> ${escapeHtml(data.sinanNumber || VAZIO)} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Início dos Sintomas (D1):</strong> ${escapeHtml(data.symptomsStartDate || 'não informada')}</p>
         <p style="margin: 3px 0;"><strong>Agravo Suspeito:</strong> [ ] Dengue &nbsp; [ ] Chikungunya &nbsp; [ ] Zika &nbsp; [ ] Oropouche/Mayaro &nbsp; [ ] Febre Amarela &nbsp; [ ] Malária &nbsp; [ ] Hepatite A/B/C &nbsp; [ ] HIV/Sífilis &nbsp; [ ] Leptospirose &nbsp; [ ] Vírus Respiratórios</p>
         <p style="margin: 3px 0;"><strong>Sintomas:</strong> [ ] Febre &nbsp; [ ] Cefaleia &nbsp; [ ] Mialgia &nbsp; [ ] Artralgia &nbsp; [ ] Exantema &nbsp; [ ] Icterícia &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Finalidade:</strong> [ ] Caso Suspeito &nbsp; [ ] Surto &nbsp; [ ] Controle</p>
       </div>
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 4 — AMOSTRA BIOLÓGICA, METODOLOGIA E TRANSPORTE (GAL / LACEN)</p>
-        <p style="margin: 3px 0;"><strong>Material Biológico Coletado:</strong> ${data.specimenType || 'não informado'} &nbsp;&nbsp; ([ ] Soro &nbsp; [ ] Sangue Total &nbsp; [ ] Plasma &nbsp; [ ] LCR &nbsp; [ ] Swab &nbsp; [ ] Urina)</p>
+        <p style="margin: 3px 0;"><strong>Material Biológico Coletado:</strong> ${escapeHtml(data.specimenType || 'não informado')} &nbsp;&nbsp; ([ ] Soro &nbsp; [ ] Sangue Total &nbsp; [ ] Plasma &nbsp; [ ] LCR &nbsp; [ ] Swab &nbsp; [ ] Urina)</p>
         <p style="margin: 3px 0;"><strong>Metodologia:</strong> [ ] RT-PCR / Biologia Molecular &nbsp;&nbsp; [ ] Sorologia (ELISA / IgM / IgG) &nbsp;&nbsp; [ ] Isolamento / Cultura &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Transporte:</strong> [ ] Refrigerada (2–8 °C) &nbsp; [ ] Congelada (-20 °C)</p>
       </div>`;
 
@@ -377,7 +378,7 @@ function gradeTecnicaComplementarSus(item: SusDocumentItem, data: SusFilledFormD
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 3 — TOPOGRAFIA DO MATERIAL, PROCEDIMENTO E FIXAÇÃO (SISCAN)</p>
         <p style="margin: 3px 0;"><strong>Sítio / Origem:</strong> [ ] Colo do Útero — Biópsia &nbsp;&nbsp; [ ] Colo do Útero — CAF / LEEP / Conização &nbsp;&nbsp; [ ] Endométrio &nbsp;&nbsp; [ ] Mama — Core Biopsy (PAG) &nbsp;&nbsp; [ ] Mama — Peça Cirúrgica</p>
-        <p style="margin: 3px 0;"><strong>Topografia / Lateralidade da Amostra:</strong> ${data.specimenType || VAZIO} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Conservação:</strong> [ ] Formol Tamponado 10% &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Nº de Frascos:</strong> _____</p>
+        <p style="margin: 3px 0;"><strong>Topografia / Lateralidade da Amostra:</strong> ${escapeHtml(data.specimenType || VAZIO)} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Conservação:</strong> [ ] Formol Tamponado 10% &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Nº de Frascos:</strong> _____</p>
       </div>
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 4 — CORRELAÇÃO COLPOSCÓPICA OU RADIOLÓGICA PRÉVIA (BI-RADS)</p>
@@ -389,7 +390,7 @@ function gradeTecnicaComplementarSus(item: SusDocumentItem, data: SusFilledFormD
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 3 — MODALIDADE DA MAMOGRAFIA, RAÇA/COR E RISCO FAMILIAR (SISCAN)</p>
         <p style="margin: 3px 0;"><strong>Modalidade:</strong> [ ] Mamografia de Rastreamento (50 a 69 anos) &nbsp;&nbsp; [ ] Mamografia Diagnóstica (Lesão palpável / Controle radiológico)</p>
-        <p style="margin: 3px 0;"><strong>Raça/Cor:</strong> [ ] Branca &nbsp; [ ] Preta &nbsp; [ ] Parda &nbsp; [ ] Amarela &nbsp; [ ] Indígena &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Risco Elevado (1º Grau):</strong> [ ] Sim [ ] Não &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Mamografia Anterior:</strong> ${data.gynecologyPreviousExam || VAZIO}</p>
+        <p style="margin: 3px 0;"><strong>Raça/Cor:</strong> [ ] Branca &nbsp; [ ] Preta &nbsp; [ ] Parda &nbsp; [ ] Amarela &nbsp; [ ] Indígena &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Risco Elevado (1º Grau):</strong> [ ] Sim [ ] Não &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Mamografia Anterior:</strong> ${escapeHtml(data.gynecologyPreviousExam || VAZIO)}</p>
       </div>
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 4 — EXAME CLÍNICO DAS MAMAS (ECM) E LAUDO RADIOLÓGICO (BI-RADS)</p>
@@ -404,11 +405,11 @@ function gradeTecnicaComplementarSus(item: SusDocumentItem, data: SusFilledFormD
         <p style="${tituloSecaoEstilo}">SEÇÃO 3 — PERFIL CLÍNICO-EPIDEMIOLÓGICO E POPULAÇÕES ESPECIAIS (SVSA / GAL)</p>
         <p style="margin: 3px 0;"><strong>Tipo de Entrada:</strong> [ ] Sintomático Respiratório / Caso Novo &nbsp;&nbsp; [ ] Retratamento após Interrupção &nbsp;&nbsp; [ ] Recidiva &nbsp;&nbsp; [ ] Falência ao Esquema Básico</p>
         <p style="margin: 3px 0;"><strong>População Vulnerável:</strong> [ ] População Geral &nbsp;&nbsp; [ ] PVHIV &nbsp;&nbsp; [ ] Privado de Liberdade (PPL) &nbsp;&nbsp; [ ] Situação de Rua &nbsp;&nbsp; [ ] Profissional de Saúde &nbsp;&nbsp; [ ] Indígena</p>
-        <p style="margin: 3px 0;"><strong>Comorbidades / Forma:</strong> [ ] HIV &nbsp; [ ] Diabetes &nbsp; [ ] Tabagismo &nbsp; [ ] Álcool/Drogas &nbsp;&nbsp;|&nbsp;&nbsp; [ ] Pulmonar &nbsp; [ ] Extrapulmonar &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Tosse:</strong> ${data.tuberculosisSymptomsDuration || 'não informada'} &nbsp;|&nbsp; <strong>SINAN:</strong> ${data.sinanNumber || VAZIO}</p>
+        <p style="margin: 3px 0;"><strong>Comorbidades / Forma:</strong> [ ] HIV &nbsp; [ ] Diabetes &nbsp; [ ] Tabagismo &nbsp; [ ] Álcool/Drogas &nbsp;&nbsp;|&nbsp;&nbsp; [ ] Pulmonar &nbsp; [ ] Extrapulmonar &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Tosse:</strong> ${escapeHtml(data.tuberculosisSymptomsDuration || 'não informada')} &nbsp;|&nbsp; <strong>SINAN:</strong> ${escapeHtml(data.sinanNumber || VAZIO)}</p>
       </div>
       <div style="${caixaEstilo}">
         <p style="${tituloSecaoEstilo}">SEÇÃO 4 — AMOSTRA E ENSAIOS SOLICITADOS (TRM-TB / BAAR / CULTURA)</p>
-        <p style="margin: 3px 0;"><strong>Amostra:</strong> ${data.specimenType || 'não informada'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Coleta:</strong> [ ] 1ª Amostra (ato) &nbsp;&nbsp; [ ] 2ª Amostra (jejum) &nbsp;&nbsp; [ ] LBA / Líquido Pleural</p>
+        <p style="margin: 3px 0;"><strong>Amostra:</strong> ${escapeHtml(data.specimenType || 'não informada')} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Coleta:</strong> [ ] 1ª Amostra (ato) &nbsp;&nbsp; [ ] 2ª Amostra (jejum) &nbsp;&nbsp; [ ] LBA / Líquido Pleural</p>
         <p style="margin: 3px 0;"><strong>Exames:</strong> [ ] TRM-TB (GeneXpert MTB/RIF) &nbsp;&nbsp; [ ] Baciloscopia Direta (BAAR) &nbsp;&nbsp; [ ] Cultura para Micobactérias + TSA</p>
       </div>`;
 
@@ -437,12 +438,12 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
 
       <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; font-size: 11px; page-break-inside: avoid; break-inside: avoid;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-          <span><strong>Unidade Solicitante:</strong> ${data.doctorClinicName || 'Unidade de Saúde'}</span>
-          <span><strong>CNES:</strong> ${data.doctorCnes || '—'}</span>
+          <span><strong>Unidade Solicitante:</strong> ${escapeHtml(data.doctorClinicName || 'Unidade de Saúde')}</span>
+          <span><strong>CNES:</strong> ${escapeHtml(data.doctorCnes || '—')}</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
-          <span><strong>Profissional:</strong> ${data.doctorName || 'Dr(a). Médico(a)'} &nbsp;|&nbsp; <strong>CRM:</strong> ${data.doctorCrm}-${data.doctorCrmState || 'SP'}</span>
-          <span><strong>Data:</strong> ${today}</span>
+          <span><strong>Profissional:</strong> ${escapeHtml(data.doctorName || 'Dr(a). Médico(a)')} &nbsp;|&nbsp; <strong>CRM:</strong> ${escapeHtml(data.doctorCrm)}-${escapeHtml(data.doctorCrmState || 'SP')}</span>
+          <span><strong>Data:</strong> ${escapeHtml(today)}</span>
         </div>
       </div>
 
@@ -450,34 +451,34 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
         <p style="margin: 0 0 4px 0; font-weight: bold; font-size: 12px; color: #1E293B; border-bottom: 1px solid #E2E8F0; padding-bottom: 3px;">
           SEÇÃO 1 — IDENTIFICAÇÃO DO PACIENTE
         </p>
-        <p style="margin: 3px 0;"><strong>Paciente:</strong> ${data.patientName || 'Não identificado'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>CNS (Cartão SUS):</strong> ${data.patientCns || '—'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>CPF:</strong> ${data.patientCpf || '—'}</p>
-        <p style="margin: 3px 0;"><strong>Nascimento:</strong> ${nascimento}${idade ? ` (${idade})` : ''} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Mãe:</strong> ${data.patientMotherName || '—'} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Tel:</strong> ${data.patientPhone || '—'}</p>
-        <p style="margin: 3px 0;"><strong>Endereço:</strong> ${fullAddress}</p>
+        <p style="margin: 3px 0;"><strong>Paciente:</strong> ${escapeHtml(data.patientName || 'Não identificado')} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>CNS (Cartão SUS):</strong> ${escapeHtml(data.patientCns || '—')} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>CPF:</strong> ${escapeHtml(data.patientCpf || '—')}</p>
+        <p style="margin: 3px 0;"><strong>Nascimento:</strong> ${escapeHtml(nascimento)}${idade ? ` (${escapeHtml(idade)})` : ''} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Mãe:</strong> ${escapeHtml(data.patientMotherName || '—')} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Tel:</strong> ${escapeHtml(data.patientPhone || '—')}</p>
+        <p style="margin: 3px 0;"><strong>Endereço:</strong> ${escapeHtml(fullAddress)}</p>
       </div>
 
       <div style="border: 1px solid #94A3B8; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; font-size: 11px; page-break-inside: avoid; break-inside: avoid;">
         <p style="margin: 0 0 6px 0; font-weight: bold; font-size: 12px; color: #0369A1; text-transform: uppercase;">
           SEÇÃO 2 — PROCEDIMENTO &amp; DADOS CLÍNICOS REGULATÓRIOS
         </p>
-        <p style="margin: 3px 0;"><strong>Procedimento SIGTAP:</strong> ${data.sigtapCode || VAZIO} — ${data.procedureName || VAZIO}</p>
-        <p style="margin: 3px 0;"><strong>Diagnóstico / CID-10:</strong> ${data.cid10Code || VAZIO} ${data.cid10Description ? `(${data.cid10Description})` : ''}</p>
-        ${data.sinanNumber ? `<p style="margin: 3px 0;"><strong>Nº Notificação SINAN:</strong> ${data.sinanNumber} &nbsp;|&nbsp; <strong>Início dos Sintomas (D1):</strong> ${data.symptomsStartDate || 'não informado'}</p>` : ''}
-        ${item.id === 'apac_complementar' || data.renalCreatinine || data.renalEtfg ? `<p style="margin: 3px 0;"><strong>Função Renal:</strong> ${funcaoRenal(data)}</p>` : ''}
+        <p style="margin: 3px 0;"><strong>Procedimento SIGTAP:</strong> ${escapeHtml(data.sigtapCode || VAZIO)} — ${escapeHtml(data.procedureName || VAZIO)}</p>
+        <p style="margin: 3px 0;"><strong>Diagnóstico / CID-10:</strong> ${escapeHtml(data.cid10Code || VAZIO)} ${data.cid10Description ? `(${escapeHtml(data.cid10Description)})` : ''}</p>
+        ${data.sinanNumber ? `<p style="margin: 3px 0;"><strong>Nº Notificação SINAN:</strong> ${escapeHtml(data.sinanNumber)} &nbsp;|&nbsp; <strong>Início dos Sintomas (D1):</strong> ${escapeHtml(data.symptomsStartDate || 'não informado')}</p>` : ''}
+        ${item.id === 'apac_complementar' || data.renalCreatinine || data.renalEtfg ? `<p style="margin: 3px 0;"><strong>Função Renal:</strong> ${escapeHtml(funcaoRenal(data))}</p>` : ''}
         
         <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed #CBD5E1;">
           <p style="margin: 0 0 3px 0; font-weight: bold; color: #334155;">Justificativa Técnica (Anti-Glosa):</p>
-          <p style="margin: 0; text-align: justify; color: #1E293B;">${data.clinicalJustification || VAZIO}</p>
+          <p style="margin: 0; text-align: justify; color: #1E293B;">${escapeHtml(data.clinicalJustification || VAZIO)}</p>
         </div>
       </div>${gradeTecnicaComplementarSus(item, data)}
 
       <div style="margin-top: 24px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 11px;">
         <div>
-          <p style="margin: 0;">${data.patientCity ? `${data.patientCity}, ` : ''}${today}</p>
+          <p style="margin: 0;">${data.patientCity ? `${escapeHtml(data.patientCity)}, ` : ''}${escapeHtml(today)}</p>
         </div>
         <div style="text-align: center; min-width: 240px;">
           <div style="border-top: 1px solid #0F172A; padding-top: 4px;">
-            <p style="font-size: 11px; font-weight: bold; margin: 0; text-transform: uppercase;">${data.doctorName || 'Dr(a). Médico(a)'}</p>
-            <p style="font-size: 10px; color: #475569; margin: 0;">CRM-${data.doctorCrmState || 'SP'} ${data.doctorCrm} • ${data.doctorSpecialty || 'Médico(a)'}</p>
+            <p style="font-size: 11px; font-weight: bold; margin: 0; text-transform: uppercase;">${escapeHtml(data.doctorName || 'Dr(a). Médico(a)')}</p>
+            <p style="font-size: 10px; color: #475569; margin: 0;">CRM-${escapeHtml(data.doctorCrmState || 'SP')} ${escapeHtml(data.doctorCrm)} • ${escapeHtml(data.doctorSpecialty || 'Médico(a)')}</p>
           </div>
         </div>
       </div>

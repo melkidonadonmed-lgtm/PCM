@@ -46,6 +46,36 @@ export function parsePrescriptionHtmlToItems(
   } | null = null;
   let itemIndex = 0;
 
+  const pushParsedItem = (
+    draft: {
+      name: string;
+      presentation: string;
+      route: string;
+      quantity: string;
+      instructions: string;
+    },
+    fallbackName?: string
+  ) => {
+    const original = originalItems[itemIndex];
+    parsedItems.push({
+      id: original?.id || `item-parsed-${Date.now()}-${itemIndex}`,
+      name: draft.name || fallbackName || 'Medicamento',
+      presentation: draft.presentation || original?.presentation || '',
+      route: draft.route || original?.route || 'Uso Oral',
+      quantity: draft.quantity || original?.quantity || 'Conforme posologia',
+      instructions: draft.instructions || original?.instructions || 'Conforme orientação médica.',
+      doseCalculatedText: original?.doseCalculatedText,
+      frequencyText: original?.frequencyText,
+      scheduleInterval: original?.scheduleInterval || 'Conforme posologia',
+      scheduleTimes: original?.scheduleTimes || [],
+      isContinuous: original?.isContinuous || false,
+      isSpecialControl: original?.isSpecialControl || false,
+      ...(original?.regimeReceita !== undefined ? { regimeReceita: original.regimeReceita } : {}),
+      ...(original?.calculatedFromWeight !== undefined ? { calculatedFromWeight: original.calculatedFromWeight } : {})
+    });
+    itemIndex++;
+  };
+
   for (let i = 0; i < lines.length; i++) {
     const text = lines[i]?.trim();
     if (!text) continue;
@@ -55,22 +85,7 @@ export function parsePrescriptionHtmlToItems(
     if (itemHeaderMatch) {
       // Salva item anterior se já estava em construção
       if (currentItem && currentItem.name) {
-        const original = originalItems[itemIndex];
-        parsedItems.push({
-          id: original?.id || `item-parsed-${Date.now()}-${itemIndex}`,
-          name: currentItem.name,
-          presentation: currentItem.presentation || original?.presentation || '',
-          route: currentItem.route || original?.route || 'Uso Oral',
-          quantity: currentItem.quantity || original?.quantity || 'Conforme posologia',
-          instructions: currentItem.instructions || original?.instructions || 'Conforme orientação médica.',
-          doseCalculatedText: original?.doseCalculatedText,
-          frequencyText: original?.frequencyText,
-          scheduleInterval: original?.scheduleInterval || 'Conforme posologia',
-          scheduleTimes: original?.scheduleTimes || [],
-          isContinuous: original?.isContinuous || false,
-          isSpecialControl: original?.isSpecialControl || false
-        });
-        itemIndex++;
+        pushParsedItem(currentItem);
       }
 
       const rawContent = itemHeaderMatch[2];
@@ -118,22 +133,7 @@ export function parsePrescriptionHtmlToItems(
         text.startsWith('USO INTERNO') ||
         text.startsWith('RECEITUÁRIO')
       ) {
-        const original = originalItems[itemIndex];
-        parsedItems.push({
-          id: original?.id || `item-parsed-${Date.now()}-${itemIndex}`,
-          name: currentItem.name || 'Medicamento',
-          presentation: currentItem.presentation || original?.presentation || '',
-          route: currentItem.route || original?.route || 'Uso Oral',
-          quantity: currentItem.quantity || original?.quantity || 'Conforme posologia',
-          instructions: currentItem.instructions || original?.instructions || 'Conforme orientação médica.',
-          doseCalculatedText: original?.doseCalculatedText,
-          frequencyText: original?.frequencyText,
-          scheduleInterval: original?.scheduleInterval || 'Conforme posologia',
-          scheduleTimes: original?.scheduleTimes || [],
-          isContinuous: original?.isContinuous || false,
-          isSpecialControl: original?.isSpecialControl || false
-        });
-        itemIndex++;
+        pushParsedItem(currentItem, 'Medicamento');
         currentItem = null;
         continue;
       }
@@ -149,21 +149,7 @@ export function parsePrescriptionHtmlToItems(
 
   // Salva o último item se o documento terminou sem marcador de encerramento
   if (currentItem && currentItem.name) {
-    const original = originalItems[itemIndex];
-    parsedItems.push({
-      id: original?.id || `item-parsed-${Date.now()}-${itemIndex}`,
-      name: currentItem.name,
-      presentation: currentItem.presentation || original?.presentation || '',
-      route: currentItem.route || original?.route || 'Uso Oral',
-      quantity: currentItem.quantity || original?.quantity || 'Conforme posologia',
-      instructions: currentItem.instructions || original?.instructions || 'Conforme orientação médica.',
-      doseCalculatedText: original?.doseCalculatedText,
-      frequencyText: original?.frequencyText,
-      scheduleInterval: original?.scheduleInterval || 'Conforme posologia',
-      scheduleTimes: original?.scheduleTimes || [],
-      isContinuous: original?.isContinuous || false,
-      isSpecialControl: original?.isSpecialControl || false
-    });
+    pushParsedItem(currentItem);
   }
 
   return parsedItems.length > 0 ? parsedItems : originalItems;

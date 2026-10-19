@@ -89,7 +89,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   }, [selectedCategory, searchTerm]);
 
   return (
-    <div id="exam-requester-section" className="space-y-4 sm:space-y-5">
+    <div data-state="idle" aria-busy={false} id="exam-requester-section" className="space-y-4 sm:space-y-5">
       {/* Top Header Card */}
       <div 
         className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -100,7 +100,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       >
         <div className="flex items-center gap-3">
           <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-blue-600 border border-white/12 shadow-sm"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-sky-600 border border-white/12 shadow-sm"
           >
             <Icon name="science" className="text-[20px] text-slate-100" />
           </div>
@@ -109,12 +109,12 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <h2 className="text-base sm:text-lg font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                 Solicitação de exames complementares
               </h2>
-              <span className="text-[11px] px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-blue-500/20 dark:text-blue-300 border border-navy-900/20 dark:border-blue-400/30 font-semibold">
+              <span className="text-xs px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-sky-500/20 dark:text-blue-300 border border-navy-900/20 dark:border-info font-semibold">
                 {selectedExams.length} selecionado(s)
               </span>
             </div>
             <p className="text-xs font-medium mt-0.5" style={{ color: darkMode ? '#8E9CAE' : '#64748B' }}>
-              Paciente: <span className="text-navy-900 dark:text-blue-400 font-semibold">{patient?.name?.trim() || 'Não identificado'}</span> • selecione exames individuais ou painéis rápidos.
+              Paciente: <span className="text-navy-900 dark:text-sky-400 font-semibold">{patient?.name?.trim() || 'Não identificado'}</span> • selecione exames individuais ou painéis rápidos.
             </p>
           </div>
         </div>
@@ -139,8 +139,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         }}
       >
         <div className="flex items-center gap-1.5 mb-2.5">
-          <Icon name="auto_awesome" className="text-[16px] text-blue-600 dark:text-blue-400" />
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+          <Icon name="auto_awesome" className="text-[16px] text-sky-600 dark:text-sky-400" />
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
             Painéis e pacotes clínicos:
           </span>
         </div>
@@ -150,7 +150,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               key={pkg.id}
               type="button"
               onClick={() => applyPackage(pkg)}
-              className="p-3 rounded-xl border text-left transition cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 flex flex-col justify-between group tactile-flat focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="p-3 rounded-xl border text-left transition cursor-pointer hover:border-medium dark:hover:border-strong flex flex-col justify-between group tactile-flat focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               style={{
                 backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
                 borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
@@ -161,15 +161,15 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   <span className="font-bold text-xs" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                     {pkg.name}
                   </span>
-                  <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  <span className="text-xs font-semibold px-1.5 py-0.2 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                     {pkg.badge}
                   </span>
                 </div>
-                <p className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 line-clamp-2">
+                <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 line-clamp-2">
                   {pkg.description}
                 </p>
               </div>
-              <div className="mt-2 text-[11px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+              <div className="mt-2 text-xs font-semibold text-sky-600 dark:text-sky-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                 <Icon name="add" className="text-[13px]" /> Incluir {pkg.examIds.length} exames
               </div>
             </button>
@@ -185,7 +185,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
         }}
       >
-        <label htmlFor="exam-clinical-indication" className="block text-[11px] font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1.5">
+        <label htmlFor="exam-clinical-indication" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1.5">
           Indicação clínica / hipótese diagnóstica (para o laboratório / convênio)
         </label>
         <input
@@ -244,10 +244,10 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 onClick={() => setSelectedCategory(cat)}
                 className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   selectedCategory === cat
-                    ? 'bg-navy-900 text-white dark:bg-blue-600 dark:text-white border-navy-800 dark:border-blue-400/30 shadow-tactile-navy dark:shadow-tactile-blue'
+                    ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border-navy-800 dark:border-info shadow-tactile-navy dark:shadow-tactile-blue'
                     : darkMode
-                    ? 'bg-slate-800/80 text-slate-300 border-slate-700/80 hover:bg-slate-700'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                    ? 'bg-slate-800/80 text-slate-300 border-strong hover:bg-slate-700'
+                    : 'bg-white text-slate-700 border-subtle hover:bg-slate-100'
                 }`}
               >
                 {cat}
@@ -284,14 +284,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   }}
                   className={`pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                     selected 
-                      ? 'bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/30 dark:border-blue-400/30' 
+                      ? 'bg-sky-500/10 dark:bg-sky-500/15 border border-info dark:border-info' 
                       : 'hover:bg-slate-500/5'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <div 
                       className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center transition ${
-                        selected ? 'bg-navy-900 dark:bg-blue-600 border-navy-900 dark:border-blue-500 text-white' : 'border-slate-400'
+                        selected ? 'bg-navy-900 dark:bg-sky-600 border-navy-900 dark:border-info text-white' : 'border-medium'
                       }`}
                     >
                       {selected && <Icon name="check" className="text-[12px]" />}
@@ -300,12 +300,12 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                       <div className="font-semibold text-xs truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                         {exam.name}
                       </div>
-                      <span className="text-[10px] text-[var(--text-muted)] dark:text-slate-400 font-medium">{exam.category}</span>
+                      <span className="text-xs text-[var(--text-muted)] dark:text-slate-400 font-medium">{exam.category}</span>
                     </div>
                   </div>
 
                   {exam.urgency === 'urgent' && (
-                    <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/20">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/20">
                       Urgência
                     </span>
                   )}
@@ -332,7 +332,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <button
                 type="button"
                 onClick={() => updateExams([])}
-                className="text-[11px] font-semibold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none rounded-md px-1 py-0.5"
+                className="text-xs font-semibold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none rounded-md px-1 py-0.5"
               >
                 Limpar
               </button>
@@ -358,7 +358,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     <div className="text-xs font-semibold truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                       {index + 1}. {exam.name}
                     </div>
-                    <span className="text-[9px] text-[var(--text-muted)] dark:text-slate-400 font-medium">{exam.category}</span>
+                    <span className="text-xs text-[var(--text-muted)] dark:text-slate-400 font-medium">{exam.category}</span>
                   </div>
                   <button
                     type="button"

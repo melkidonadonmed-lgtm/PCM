@@ -36,9 +36,9 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
   return (
     <div className={`space-y-2.5 ${className}`}>
       {isDisabledSemMedico && (
-        <div
+        <div data-state="idle" aria-busy={false}
           id={avisoId}
-          className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300 text-xs flex items-center justify-between gap-2"
+          className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-warning dark:border-amber-900/40 text-amber-800 dark:text-amber-300 text-xs flex items-center justify-between gap-2 surface-raised"
         >
           <div className="flex items-center gap-1.5 min-w-0">
             <Icon name="warning" className="text-amber-600 dark:text-amber-400 text-[18px] shrink-0" />
@@ -50,7 +50,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             <button
               type="button"
               onClick={onAbrirPerfilMedico}
-              className="px-2.5 py-1 rounded-lg bg-amber-700 hover:bg-amber-800 text-white font-bold text-[11px] transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500"
+              className="px-2.5 py-1 rounded-lg bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500"
             >
               Configurar médico
             </button>

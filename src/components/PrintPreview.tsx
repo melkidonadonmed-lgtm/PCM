@@ -31,7 +31,7 @@ import {
 import { FolhaA4 } from './documento/FolhaA4';
 import { DocumentoClinico } from './documento/DocumentoClinico';
 import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
-import { avisoTextoNotificacao } from '../utils/notificacaoDeReceita';
+import { formatarDocumentoPreviewTexto } from '../utils/compartilhamentoTexto';
 import WatermarkSelector from './WatermarkSelector';
 
 /**
@@ -151,70 +151,20 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
   // Texto formatado para WhatsApp e área de transferência
   const getFormattedDocumentText = (): string => {
-    if (!isConfigured) return '';
-
-    const dateStr = emissao.toLocaleDateString('pt-BR');
-    const docLine = `👨‍⚕️ *${identidade.medico.nome}* — ${identidade.medico.registro}\n`;
-    const patientLine = patientName !== 'Não identificado' ? `👤 *Paciente:* ${patientName}${patientWeight ? ` (${patientWeight} kg)` : ''}\n` : '';
-    const header = `📋 *DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}📅 *Data:* ${dateStr}\n------------------------------------\n`;
-
-    if (itensDoTipo(docType) !== null) {
-      if (itensDaFolha.length === 0) return '';
-      const docLabel = docType === 'special_prescription'
-        ? 'RECEITUÁRIO DE CONTROLE ESPECIAL (2 VIAS • PORTARIA 344/98)'
-        : docType === 'antimicrobial_prescription'
-          ? 'RECEITUÁRIO MÉDICO — ANTIMICROBIANO (2 VIAS • VÁLIDA POR 10 DIAS • RDC 471/2021)'
-          : 'RECEITUÁRIO MÉDICO';
-      let text = `${header}💊 *${docLabel}:*\n`;
-      itensDaFolha.forEach((it, idx) => {
-        text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
-      });
-      const avisoNotif = avisoTextoNotificacao(itensDaFolha);
-      if (avisoNotif) {
-        text += `\n${avisoNotif}\n`;
-      }
-      text += `\n------------------------------------\n⚠️ _Siga as instruções médicas e os horários informados._`;
-      return text;
-    }
-    if (docType === 'certificate') {
-      let text = `${header}📄 *ATESTADO MÉDICO*\n\n`;
-      text += `Atesto para os devidos fins que o(a) paciente *${patientName}* esteve sob atendimento médico nesta data (${dateStr}).\n\n`;
-      if (certificate?.daysOff) {
-        text += `👉 *Recomendação:* Repouso e afastamento das atividades laborais por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
-      }
-      // CID-10 somente com consentimento expresso do paciente (Res. CFM nº 1.658/2002)
-      if (certificate?.includeCID && certificate.cid10Code) {
-        text += `📌 *CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ' - ' + certificate.cid10Description : ''}\n\n`;
-      }
-      if (certificate?.observations) {
-        text += `📝 *Observação:* ${certificate.observations}\n\n`;
-      }
-      text += `------------------------------------\n${assinaturaTexto}`;
-      return text;
-    }
-    if (docType === 'referral') {
-      let text = `${header}🩺 *ENCAMINHAMENTO MÉDICO*\n\n`;
-      text += `Ao(À) Colega Especialista em *${referral?.destinationSpecialty || 'Medicina'}*:\n\n`;
-      text += `Encaminho o(a) paciente *${patientName}* para avaliação e conduta clínica.\n\n`;
-      if (referral?.reason) {
-        text += `📌 *Motivo / Hipótese:* ${referral.reason}\n\n`;
-      }
-      if (referral?.clinicalSummary) {
-        text += `📝 *Resumo Clínico:* ${referral.clinicalSummary}\n\n`;
-      }
-      text += `------------------------------------\n${assinaturaTexto}`;
-      return text;
-    }
-    if (exams.length === 0) return '';
-    let text = `${header}🧪 *SOLICITAÇÃO DE EXAMES COMPLEMENTARES*\n\n`;
-    exams.forEach((ex) => {
-      text += `• ${ex.name}\n`;
+    return formatarDocumentoPreviewTexto({
+      isConfigured,
+      docType,
+      emissao,
+      identidade,
+      patientName,
+      patientWeight,
+      ehReceita: itensDoTipo(docType) !== null,
+      itensDaFolha,
+      certificate,
+      referral,
+      exams,
+      examIndication
     });
-    if (examIndication) {
-      text += `\n📌 *Indicação Clínica:* ${examIndication}\n`;
-    }
-    text += `\n------------------------------------\n${assinaturaTexto}`;
-    return text;
   };
 
   const handleSendWhatsApp = () => {
@@ -262,7 +212,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     'btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 shrink-0 whitespace-nowrap transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none';
 
   return (
-    <div id="print-preview-section" className="space-y-4 sm:space-y-5 pb-12">
+    <div data-state="idle" aria-busy={false} id="print-preview-section" className="space-y-4 sm:space-y-5 pb-12">
       {/* Barra de ações */}
       <div className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 no-print bg-[var(--surface-card)] border-[var(--border-subtle)]">
         <div className="flex items-center gap-3">
@@ -287,7 +237,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           {!isConfigured && (
             <div
               role="status"
-              className="w-full flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold border bg-amber-500/10 text-amber-900 dark:text-amber-200 border-amber-500/25"
+              className="w-full flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold border bg-amber-500/10 text-amber-900 dark:text-amber-200 border-warning"
             >
               <span>Configure nome e CRM do médico para emitir documentos.</span>
               {onAbrirPerfilMedico && (
@@ -395,8 +345,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               aria-pressed={docType === id}
               className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                 docType === id
-                  ? 'bg-blue-600 text-white border-blue-500 shadow-tactile-sm font-bold'
-                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80'
+                  ? 'bg-sky-600 text-white border-info shadow-tactile-sm font-bold'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-subtle dark:border-strong hover:bg-slate-50 dark:hover:bg-slate-700/80'
               }`}
             >
               <Icone className="w-4 h-4" strokeWidth={1.75} />
@@ -422,7 +372,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
       {/* Mais de uma receita na mesma consulta: cada uma é um documento e precisa ser emitida */}
       {receitasComItens.length > 1 && itensDoTipo(docType) !== null && (
-        <div role="status" className="no-print px-4 py-2.5 rounded-xl border text-xs font-semibold bg-sky-500/10 text-sky-900 dark:text-sky-200 border-sky-500/25">
+        <div role="status" className="no-print px-4 py-2.5 rounded-xl border text-xs font-semibold bg-sky-500/10 text-sky-900 dark:text-sky-200 border-info">
           Esta consulta gera {receitasComItens.length} receitas separadas ({receitasComItens.map((r) => NOME_DO_REGIME[r]).join(', ')}).
           Emita cada uma pela sua aba.
         </div>
@@ -432,7 +382,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       {docType === 'special_prescription' && <AvisoNotificacaoReceita items={itensDaFolha} />}
 
       {/* Bancada com a folha A4: única fonte da prévia, da impressão e do PDF */}
-      <div className="p-3 sm:p-8 bg-slate-900/5 dark:bg-slate-950/40 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-tactile-inset dark:shadow-tactile-inset-dark">
+      <div className="p-3 sm:p-8 bg-slate-900/5 dark:bg-slate-950/40 rounded-2xl border border-subtle dark:border-strong shadow-tactile-inset dark:shadow-tactile-inset-dark">
         <FolhaA4
           ref={folhaRef}
           id="printable-a4-sheet"

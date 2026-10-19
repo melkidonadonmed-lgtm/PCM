@@ -197,8 +197,8 @@ export const BackupModal: React.FC<BackupModalProps> = ({
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-xs isolate animate-tab-fade"
+    <div data-state="idle" aria-busy={false} 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 isolate animate-tab-fade surface-raised"
       role="dialog"
       aria-modal="true"
       aria-labelledby="backup-modal-title"
@@ -250,11 +250,11 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
               {/* Badges de Contagem */}
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="px-2 py-1 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 text-[11px] font-bold flex items-center gap-1">
+                <span className="px-2 py-1 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1">
                   <Building2 className="w-3 h-3" />
                   <span>{stats.contextsCount} locais</span>
                 </span>
-                <span className="px-2 py-1 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-[11px] font-bold flex items-center gap-1">
+                <span className="px-2 py-1 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1">
                   <FileText className="w-3 h-3" />
                   <span>{stats.templatesCount} modelos</span>
                 </span>
@@ -277,7 +277,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
               </button>
 
               {exportFeedback && (
-                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5 animate-tab-fade">
+                <div className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5 animate-tab-fade">
                   <Check className="w-4 h-4 shrink-0" />
                   <span>{exportFeedback}</span>
                 </div>
@@ -317,10 +317,10 @@ export const BackupModal: React.FC<BackupModalProps> = ({
               aria-label="Selecionar arquivo de backup"
               className={`p-6 rounded-2xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                 isDragOver 
-                  ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30' 
+                  ? 'border-info bg-sky-50/50 dark:bg-sky-950/30' 
                   : selectedFile
-                  ? 'border-emerald-500/50 bg-emerald-50/20 dark:bg-emerald-950/20'
-                  : 'border-[var(--border-subtle)] hover:border-sky-400 hover:bg-[var(--surface-hover)]'
+                  ? 'border-clinical bg-emerald-50/20 dark:bg-emerald-950/20'
+                  : 'border-[var(--border-subtle)] hover:border-info hover:bg-[var(--surface-hover)]'
               }`}
             >
               <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
@@ -331,7 +331,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                 <p className="text-xs font-bold">
                   {selectedFile ? selectedFile.name : 'Clique para selecionar ou arraste o arquivo aqui'}
                 </p>
-                <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">
                   Suporta arquivos com extensão .pcm.json ou .json
                 </p>
               </div>
@@ -347,7 +347,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
             {/* Sucesso na Restauração */}
             {importSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2 animate-tab-fade">
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-clinical dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2 animate-tab-fade">
                 <Check className="w-4 h-4 shrink-0 text-emerald-500" />
                 <span>{importSuccess}</span>
               </div>
@@ -355,24 +355,24 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
             {/* Prévia dos Dados a Importar e Estratégia */}
             {parsedBackup && (
-              <div className="p-4 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/30 dark:bg-sky-950/20 space-y-3 animate-tab-fade">
+              <div className="p-4 rounded-xl border border-info dark:border-sky-900/60 bg-sky-50/30 dark:bg-sky-950/20 space-y-3 animate-tab-fade">
                 <div className="flex items-center justify-between text-xs pb-2 border-b border-sky-100 dark:border-sky-900/40">
                   <span className="font-bold text-sky-900 dark:text-sky-300 flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-sky-600" />
                     <span>Backup Válido ({parsedBackup.system})</span>
                   </span>
-                  <span className="text-[11px] text-[var(--text-muted)]">
+                  <span className="text-xs text-[var(--text-muted)]">
                     Exportado em: {new Date(parsedBackup.exportedAt).toLocaleDateString('pt-BR')} às {new Date(parsedBackup.exportedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
-                    <span className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block">Locais de Atendimento</span>
+                    <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Locais de Atendimento</span>
                     <strong className="text-sm font-bold text-[var(--text-main)]">{parsedBackup.data.workContexts?.length || 0}</strong>
                   </div>
                   <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
-                    <span className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block">Modelos e Documentos</span>
+                    <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Modelos e Documentos</span>
                     <strong className="text-sm font-bold text-[var(--text-main)]">{parsedBackup.data.savedDocuments?.length || 0}</strong>
                   </div>
                 </div>
@@ -397,7 +397,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                         <span className="font-bold text-[var(--text-main)] block">
                           Mesclar com dados atuais (Recomendado)
                         </span>
-                        <span className="text-[11px] text-[var(--text-muted)] block">
+                        <span className="text-xs text-[var(--text-muted)] block">
                           Insere os novos modelos e atualiza os existentes sem apagar nada local.
                         </span>
                       </div>
@@ -416,7 +416,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                         <span className="font-bold text-rose-600 dark:text-rose-400 block">
                           Substituir base local completa
                         </span>
-                        <span className="text-[11px] text-[var(--text-muted)] block">
+                        <span className="text-xs text-[var(--text-muted)] block">
                           Limpa o IndexedDB local e aplica exatamente o conteúdo do arquivo.
                         </span>
                       </div>
@@ -454,7 +454,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
         {/* Modal Footer */}
         <div className="p-4 sm:p-5 border-t border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-app)]">
-          <span className="text-[11px] text-[var(--text-muted)]">
+          <span className="text-xs text-[var(--text-muted)]">
             Operação 100% offline no navegador • Sem envio a servidores externos
           </span>
 
