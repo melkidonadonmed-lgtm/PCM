@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { AlertTriangle, X, Check } from 'lucide-react';
+import { Icon } from './Icon';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 /**
@@ -63,11 +63,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       onClick={onCancel}
     >
       <div 
-        className="w-full max-w-md rounded-2xl p-6 relative border shadow-tactile-lg isolate transition modal-surface-spring"
-        style={{
-          backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : '#E3D7BD'
-        }}
+        className="w-full max-w-md rounded-2xl p-6 relative border border-subtle dark:border-strong bg-[var(--surface-card)] shadow-tactile-lg isolate transition modal-surface-spring"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-4">
@@ -78,7 +74,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 : 'bg-sky-600/10 text-blue-800 dark:bg-sky-500/20 dark:text-blue-300 border-info dark:border-info'
             }`}
           >
-            <AlertTriangle className="w-6 h-6" />
+            <Icon name="warning" className="text-[24px]" />
           </div>
 
           <div className="flex-1 min-w-0">
@@ -101,7 +97,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             aria-label="Fechar modal de confirmação"
             className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
-            <X className="w-4 h-4" />
+            <Icon name="close" className="text-[18px]" />
           </button>
         </div>
 
@@ -126,7 +122,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 : 'bg-navy-900 hover:bg-navy-950 text-white dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white'
             }`}
           >
-            <Check className="w-4 h-4" />
+            <Icon name="check" className="text-[16px]" />
             <span>{confirmLabel}</span>
           </button>
         </div>

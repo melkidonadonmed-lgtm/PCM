@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { RotateCcw, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Icon } from './Icon';
 
 /**
  * Barreira de erro de módulos assíncronos.
@@ -51,7 +51,7 @@ export class AsyncErrorBoundary extends Component<Props, State> {
       return (
         <div data-state="idle" aria-busy={false} className="w-full max-w-xl mx-auto my-12 p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-warning dark:border-warning shadow-tactile-lg text-center space-y-4 surface-raised">
           <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-100 dark:bg-amber-950/60 border border-warning dark:border-warning text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <AlertTriangle className="w-6 h-6" />
+            <Icon name="warning" className="text-[24px]" />
           </div>
 
           <div className="space-y-1.5">
@@ -69,7 +69,7 @@ export class AsyncErrorBoundary extends Component<Props, State> {
               onClick={this.handleRetry}
               className="btn-tactile-primary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition active:scale-95"
             >
-              <RotateCcw className="w-4 h-4" />
+              <Icon name="restart_alt" className="text-[16px]" />
               <span>Tentar Carregar Novamente</span>
             </button>
 
@@ -78,7 +78,7 @@ export class AsyncErrorBoundary extends Component<Props, State> {
               onClick={this.handleHardReload}
               className="btn-tactile-secondary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition active:scale-95 text-slate-700 dark:text-slate-300"
             >
-              <RefreshCw className="w-4 h-4" />
+              <Icon name="refresh" className="text-[16px]" />
               <span>Recarregar Página</span>
             </button>
           </div>

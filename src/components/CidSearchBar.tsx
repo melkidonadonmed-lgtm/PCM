@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, Check, Tag, Sparkles, Filter, AlertCircle, ChevronDown } from 'lucide-react';
+import { Icon } from './Icon';
 import { 
   CIDItem, 
   CID_CATEGORIES, 
   CIDCategoryType, 
-  searchCID10, 
-  COMMON_CID10 
+  searchCID10
 } from '../data/cidCatalog';
 
 /**
@@ -115,14 +114,12 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
     { code: 'Z76.0', description: 'Receita repetição', category: 'Admin' }
   ];
 
-  const accentColor = variant === 'referral' ? 'emerald' : 'sky';
-
   return (
     <div data-state="idle" aria-busy={false} ref={containerRef} className="space-y-2.5">
       {/* Label and Helper Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
         <label className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5" style={{ color: darkMode ? '#94A3B8' : '#475569' }}>
-          <Search className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+          <Icon name="search" className="text-[14px] text-sky-600 dark:text-sky-400" />
           <span>{label}</span>
         </label>
         <span className="text-xs font-medium text-[var(--text-muted)] dark:text-slate-400">
@@ -182,7 +179,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 title="Remover CID selecionado"
                 className="p-1 rounded-lg text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
               >
-                <X className="w-4 h-4" />
+                <Icon name="close" className="text-[16px]" />
               </button>
             )}
           </div>
@@ -193,7 +190,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
       <div className="relative">
         <div className="relative flex items-center">
           <div className="absolute left-3 pointer-events-none text-[var(--text-muted)] dark:text-slate-400">
-            <Search className="w-4 h-4" />
+            <Icon name="search" className="text-[16px]" />
           </div>
 
           <input
@@ -226,7 +223,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 }}
                 className="p-1 rounded-md text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
-                <X className="w-3.5 h-3.5" />
+                <Icon name="close" className="text-[14px]" />
               </button>
             )}
 
@@ -236,7 +233,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               className="p-1 rounded-md text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               title="Abrir catálogo completo"
             >
-              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+              <Icon name="expand_more" className={`text-[16px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
           </div>
         </div>
@@ -254,12 +251,12 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
             <div 
               className="p-2 border-b overflow-x-auto flex items-center gap-1.5"
               style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : '#FAF7F1',
+                backgroundColor: darkMode ? 'var(--surface-inset)' : '#F8FAFC',
                 borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
               }}
             >
               <div className="flex items-center gap-1 text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 pl-1 pr-1 flex-shrink-0">
-                <Filter className="w-3 h-3" />
+                <Icon name="filter_list" className="text-[14px]" />
                 <span>Filtro:</span>
               </div>
 
@@ -339,7 +336,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
 
                         {isCurrent && (
                           <span className="text-sky-600 dark:text-sky-400">
-                            <Check className="w-4 h-4" />
+                            <Icon name="check" className="text-[16px]" />
                           </span>
                         )}
                       </div>
@@ -358,7 +355,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                       onClick={handleCustomSubmit}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <Icon name="auto_awesome" className="text-[14px]" />
                       <span>Usar diagnóstico digitado "{searchTerm}"</span>
                     </button>
                   )}
@@ -370,11 +367,11 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
             <div 
               className="p-2.5 border-t text-xs flex items-center justify-between text-[var(--text-muted)] dark:text-slate-400"
               style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : '#FAF7F1',
+                backgroundColor: darkMode ? 'var(--surface-inset)' : '#F8FAFC',
                 borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
               }}
             >
-              <span>{results.length} resultados no catálogo</span>
+              <span className="clinical-tabular-nums">{results.length} resultados no catálogo</span>
 
               <button
                 type="button"
@@ -392,7 +389,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
       {showQuickChips && (
         <div className="space-y-1.5 pt-0.5">
           <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400">
-            <Tag className="w-3 h-3 text-sky-500" />
+            <Icon name="sell" className="text-[14px] text-sky-500" />
             <span>Diagnósticos Mais Frequentes (1 clique):</span>
           </div>
 

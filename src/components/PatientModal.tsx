@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Check, X, Eraser } from 'lucide-react';
+import { Icon } from './Icon';
 import { Patient } from '../types';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
@@ -106,25 +106,14 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-md rounded-2xl border overflow-hidden shadow-tactile-lg isolate transition modal-surface-spring"
-        style={{
-          backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255,255,255,0.12)' : '#E3D7BD',
-          boxShadow: darkMode ? '0 24px 50px -8px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -8px rgba(20,32,50,0.18), inset 0 1px 0 rgba(255,255,255,0.95)'
-        }}
+        className="w-full max-w-md rounded-2xl border border-subtle dark:border-strong bg-[var(--surface-card)] overflow-hidden shadow-tactile-lg isolate transition modal-surface-spring"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div 
-          className="p-4 border-b flex items-center justify-between" 
-          style={{ 
-            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
-            backgroundColor: darkMode ? '#1E293B' : '#F8FAFC'
-          }}
-        >
+        <div className="p-4 border-b border-subtle dark:border-strong bg-[var(--surface-elevated)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-sky-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
-              <User className="w-4 h-4" strokeWidth={2} />
+              <Icon name="person" className="text-[18px]" />
             </div>
             <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-white">
               Dados do Paciente
@@ -136,7 +125,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             aria-label="Fechar modal de dados do paciente"
             className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
           >
-            <X className="w-5 h-5" strokeWidth={1.75} />
+            <Icon name="close" className="text-[20px]" />
           </button>
         </div>
 
@@ -304,14 +293,14 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             />
           </div>
 
-          <div className="pt-3 border-t flex items-center justify-between gap-2" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+          <div className="pt-3 border-t border-subtle dark:border-strong flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={handleClear}
               className="px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold text-navy-900 dark:text-slate-300 hover:bg-navy-900/10 dark:hover:bg-white/10 transition flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title="Limpar todos os campos para digitar novo paciente"
             >
-              <Eraser className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
+              <Icon name="ink_eraser" className="text-[16px]" />
               <span>Limpar</span>
             </button>
             <div className="flex items-center gap-2">
@@ -326,7 +315,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 type="submit"
                 className="btn-tactile-primary px-5 py-2.5 min-h-[44px] text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
               >
-                <Check className="w-4 h-4" strokeWidth={2} />
+                <Icon name="check" className="text-[16px]" />
                 <span>Salvar Paciente</span>
               </button>
             </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Icon } from './Icon';
+import { ActionButton } from './ui/ActionButton';
 
 /**
  * Barra de Ações da Receita.
@@ -61,52 +62,52 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Botão Primário: Imprimir / Gerar PDF (Comando Canônico de Emissão) */}
-          <button
-            type="button"
+          <ActionButton
+            variant="primary"
+            iconName="print"
             onClick={onNavigateToPrint}
             disabled={isActionDisabled}
             aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-            className="btn-tactile-primary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-2.5 rounded-xl font-bold shadow-tactile-btn"
             title={
               isDisabledSemMedico
                 ? 'Configure nome e CRM do médico para emitir documentos.'
                 : 'Emitir receita oficial: imprimir folha A4 ou gerar PDF'
             }
           >
-            <Icon name="print" className="text-[16px]" />
-            <span>Imprimir / Gerar PDF</span>
-          </button>
+            Imprimir / Gerar PDF
+          </ActionButton>
 
           {/* Botão Secundário: Editor de Folha A4 (para edições manuais livres de timbrado ou texto) */}
           {onNavigateToEditor && (
-            <button
-              type="button"
+            <ActionButton
+              variant="secondary"
+              iconName="description"
               onClick={onNavigateToEditor}
               disabled={itemsCount === 0}
-              className="btn-tactile-secondary px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 dark:text-slate-300"
+              className="px-3.5 py-2.5 rounded-xl font-bold shadow-tactile-sm text-slate-700 dark:text-slate-300"
               title="Abrir no Editor visual A4 para ajustes de texto livre, layout ou timbrados"
             >
-              <Icon name="description" className="text-[16px] text-slate-600 dark:text-slate-300" />
-              <span>Editor de Folha A4</span>
-            </button>
+              Editor de Folha A4
+            </ActionButton>
           )}
 
           {/* Botão Secundário: WhatsApp (sem fundo verde, com contorno secundário) */}
-          <button
-            type="button"
+          <ActionButton
+            variant="secondary"
+            iconName="send"
             onClick={onSendWhatsApp}
             disabled={isActionDisabled}
             aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-            className="btn-tactile-secondary px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-95 cursor-pointer shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-sky-500"
+            className="px-3.5 py-2.5 rounded-xl font-bold shadow-tactile-sm"
             title={
               isDisabledSemMedico
                 ? 'Configure nome e CRM do médico para emitir documentos.'
                 : 'Enviar receita no WhatsApp'
             }
           >
-            <Icon name="send" className="text-[16px]" />
-            <span>WhatsApp</span>
-          </button>
+            WhatsApp
+          </ActionButton>
         </div>
 
         {/* Botão Terciário: Copiar texto */}

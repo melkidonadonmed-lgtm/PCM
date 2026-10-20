@@ -24,6 +24,9 @@ export const Badge: React.FC<BadgeProps> = ({
   ...rest
 }) => (
   <span
+    data-state="idle"
+    aria-busy={false}
+    role={tone === 'danger' ? 'alert' : undefined}
     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-extrabold border shrink-0 ${
       TONE_CLASSES[tone]
     } ${tabular ? 'tabular-nums clinical-tabular-nums' : ''} ${className}`.trim()}

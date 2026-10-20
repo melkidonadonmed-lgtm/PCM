@@ -380,6 +380,7 @@ export default function App() {
             onOpenDoctorModal={handleOpenDoctorModal}
             onOpenPatientModal={handleOpenPatientModal}
             onOpenCommandPalette={handleOpenCommandPalette}
+            compactOnDesktop={activeTab === 'prescription'}
           />
           <div key={activeTab} className="animate-tab-fade">
             {activeTab === 'prescription' && (

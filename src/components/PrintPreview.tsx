@@ -1,20 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import {
-  Download,
-  FileText,
-  Award,
-  FlaskConical,
-  Share2,
-  Check,
-  Layers,
-  ArrowLeft,
-  Loader2,
-  Maximize2,
-  Minimize2,
-  Send,
-  Copy,
-  Printer
-} from 'lucide-react';
+import { Icon } from './Icon';
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext, WatermarkType } from '../types';
 import { exportarFolhaPdf } from '../utils/folhaA4';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
@@ -128,7 +113,6 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   const identidade = resolverIdentidade(doctor, activeContext);
   const patientName = nomeDoPaciente(patient, identidade.exemplo, [certificate?.patientName, referral?.patientName]);
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : null;
-  const assinaturaTexto = `_${identidade.medico.nome} — ${identidade.medico.registro}_`;
 
   const handleExportPDF = async () => {
     if (!isConfigured || !folhaRef.current) return;
@@ -193,18 +177,18 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
     window.print();
   };
 
-  const abas: Array<{ id: TipoDocumento; rotulo: string; icone: typeof FileText }> = [
-    { id: 'prescription', rotulo: `Receita Simples (${porRegime.simples.length})`, icone: FileText },
+  const abas: Array<{ id: TipoDocumento; rotulo: string; icone: string }> = [
+    { id: 'prescription', rotulo: `Receita Simples (${porRegime.simples.length})`, icone: 'description' },
     // As receitas de 2 vias só aparecem quando há medicamento desse regime na consulta
     ...(porRegime.antimicrobiano.length > 0
-      ? [{ id: 'antimicrobial_prescription' as const, rotulo: `Antimicrobiano • 2 Vias (${porRegime.antimicrobiano.length})`, icone: Layers }]
+      ? [{ id: 'antimicrobial_prescription' as const, rotulo: `Antimicrobiano • 2 Vias (${porRegime.antimicrobiano.length})`, icone: 'layers' }]
       : []),
     ...(porRegime.controle_especial.length > 0
-      ? [{ id: 'special_prescription' as const, rotulo: `Controle Especial • 2 Vias (${porRegime.controle_especial.length})`, icone: Layers }]
+      ? [{ id: 'special_prescription' as const, rotulo: `Controle Especial • 2 Vias (${porRegime.controle_especial.length})`, icone: 'layers' }]
       : []),
-    { id: 'exams', rotulo: `Exames (${exams.length})`, icone: FlaskConical },
-    { id: 'certificate', rotulo: 'Atestado', icone: Award },
-    { id: 'referral', rotulo: 'Encaminhamento', icone: Share2 }
+    { id: 'exams', rotulo: `Exames (${exams.length})`, icone: 'science' },
+    { id: 'certificate', rotulo: 'Atestado', icone: 'workspace_premium' },
+    { id: 'referral', rotulo: 'Encaminhamento', icone: 'share' }
   ];
 
   const tituloAcao = (texto: string) => (isConfigured ? texto : AVISO_SEM_MEDICO);
@@ -214,7 +198,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   return (
     <div data-state="idle" aria-busy={false} id="print-preview-section" className="space-y-4 sm:space-y-5 pb-12">
       {/* Barra de ações */}
-      <div className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 no-print bg-[var(--surface-card)] border-[var(--border-subtle)]">
+      <div className="tactile-card surface-card-minimal p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 no-print bg-[var(--surface-card)] border-[var(--border-subtle)]">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -223,7 +207,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             title="Voltar para edição"
             aria-label="Voltar para edição"
           >
-            <ArrowLeft className="w-5 h-5" strokeWidth={1.75} />
+            <Icon name="arrow_back" className="text-[20px]" />
           </button>
           <div>
             <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)]">Emitir documento</h2>
@@ -277,9 +261,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               title={tituloAcao('Copiar o texto do documento para o prontuário')}
             >
               {textoCopiado ? (
-                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" strokeWidth={2} />
+                <Icon name="check" className="text-[16px] text-emerald-600 dark:text-emerald-400 shrink-0" />
               ) : (
-                <Copy className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
+                <Icon name="content_copy" className="text-[16px] text-slate-500 dark:text-slate-400 shrink-0" />
               )}
               <span>{textoCopiado ? 'Copiado!' : 'Copiar texto'}</span>
             </button>
@@ -291,7 +275,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               className={`${classeBotaoSecundario} flex`}
               title={tituloAcao('Enviar o texto do documento pelo WhatsApp')}
             >
-              <Send className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
+              <Icon name="send" className="text-[16px] text-slate-500 dark:text-slate-400 shrink-0" />
               <span>WhatsApp</span>
             </button>
 
@@ -303,7 +287,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               className="btn-tactile-secondary w-10 sm:w-11 h-10 sm:h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl flex items-center justify-center shrink-0 transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               title={tituloAcao('Imprimir a folha (Ctrl+P)')}
             >
-              <Printer className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={1.75} />
+              <Icon name="print" className="text-[16px] text-slate-500 dark:text-slate-400 shrink-0" />
             </button>
 
             <button
@@ -315,17 +299,17 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             >
               {isExportingPdf ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                  <Icon name="sync" className="text-[16px] animate-spin shrink-0" />
                   <span>Gerando PDF...</span>
                 </>
               ) : exportSuccess ? (
                 <>
-                  <Check className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                  <Icon name="check" className="text-[16px] shrink-0" />
                   <span>PDF baixado</span>
                 </>
               ) : (
                 <>
-                  <Download className="w-4 h-4 shrink-0" strokeWidth={2} />
+                  <Icon name="download" className="text-[16px] shrink-0" />
                   <span>Baixar PDF</span>
                 </>
               )}
@@ -337,7 +321,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       {/* Tipo de documento, marca d'água e zoom */}
       <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 no-print">
         <div className="flex items-center gap-1.5 overflow-x-auto py-1">
-          {abas.map(({ id, rotulo, icone: Icone }) => (
+          {abas.map(({ id, rotulo, icone }) => (
             <button
               key={id}
               type="button"
@@ -349,7 +333,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                   : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-subtle dark:border-strong hover:bg-slate-50 dark:hover:bg-slate-700/80'
               }`}
             >
-              <Icone className="w-4 h-4" strokeWidth={1.75} />
+              <Icon name={icone} className="text-[16px]" />
               <span>{rotulo}</span>
             </button>
           ))}
@@ -364,7 +348,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             className="lg:hidden px-3 py-2 min-h-[40px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 btn-tactile-secondary transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             title={ajustarATela ? 'Ver em tamanho real' : 'Ajustar à tela'}
           >
-            {ajustarATela ? <Maximize2 className="w-4 h-4" strokeWidth={1.75} /> : <Minimize2 className="w-4 h-4" strokeWidth={1.75} />}
+            <Icon name={ajustarATela ? 'open_in_full' : 'close_fullscreen'} className="text-[16px]" />
             <span>{ajustarATela ? 'Tamanho real' : 'Ajustar'}</span>
           </button>
         </div>

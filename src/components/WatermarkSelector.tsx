@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Layers, Check, ChevronDown } from 'lucide-react';
+import { Icon } from './Icon';
 import { WatermarkType } from '../types';
 import { PRESET_WATERMARKS } from '../data/presetAssets';
 
@@ -46,11 +46,11 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
         className="h-9 px-3 rounded-xl border border-medium dark:border-navy-700 bg-white dark:bg-navy-900 hover:bg-slate-50 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
         title="Selecionar marca d'água de papel timbrado para a folha A4"
       >
-        <Layers className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+        <Icon name="layers" className="text-[15px] text-sky-600 dark:text-sky-400" />
         <span className="hidden sm:inline font-sans">
           {compact ? currentPreset.name.split('—')[0].trim() : `Marca d'água: ${currentPreset.name.split('—')[0].trim()}`}
         </span>
-        <ChevronDown className="w-3 h-3 text-[var(--text-muted)] dark:text-slate-400 ml-0.5" />
+        <Icon name="expand_more" className="text-[14px] text-[var(--text-muted)] dark:text-slate-400 ml-0.5" />
       </button>
 
       {isOpen && (
@@ -88,7 +88,7 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
                     </p>
                   </div>
                   {isSelected && (
-                    <Check className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+                    <Icon name="check" className="text-[16px] text-sky-600 dark:text-sky-400 shrink-0" />
                   )}
                 </button>
               );

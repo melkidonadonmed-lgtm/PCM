@@ -1,0 +1,205 @@
+import React from 'react';
+import { Patient } from '../../types';
+import { Icon } from '../Icon';
+import { Badge } from '../ui/Badge';
+
+export interface PatientQuickCardProps {
+  patient: Patient;
+  showExtraPatientFields: boolean;
+  onToggleExtraFields: () => void;
+  onUpdatePatient: (patient: Patient) => void;
+  onOpenPatientModal: () => void;
+  onRequestClearPatient?: () => void;
+  onNavigateToCertificate?: () => void;
+  onNavigateToReferral?: () => void;
+  onNavigateToExams?: () => void;
+  onNavigateToSus?: () => void;
+}
+
+/**
+ * Ilha Compacta de Identificação Rápida do Paciente (Camada prescription/).
+ * Aplica Compact Sizing e proporção 98/2 sem fugir do DESIGN.md.
+ */
+export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
+  patient,
+  showExtraPatientFields,
+  onToggleExtraFields,
+  onUpdatePatient,
+  onOpenPatientModal,
+  onRequestClearPatient,
+  onNavigateToCertificate,
+  onNavigateToReferral,
+  onNavigateToExams,
+  onNavigateToSus,
+}) => {
+  const patientName = patient?.name?.trim() || '';
+  const hasExtraData =
+    (patient.weightKg && patient.weightKg > 0) ||
+    Boolean(patient.documentNumber && patient.documentNumber.trim());
+
+  return (
+    <section
+      data-state={patientName ? 'pressed' : 'idle'}
+      aria-busy={false}
+      aria-label="Identificação rápida do paciente"
+      className="card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 space-y-2.5 border border-subtle dark:border-strong"
+    >
+      {/* Cabeçalho compacto em linha única */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Icon name="person" className="text-sky-600 dark:text-sky-400 text-[18px] shrink-0" />
+          <label
+            htmlFor="quick-patient-name"
+            className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white cursor-pointer truncate"
+          >
+            Identificação do paciente *
+          </label>
+          {patientName ? (
+            <Badge tone="clinical" tabular={false}>
+              Sincronizado
+            </Badge>
+          ) : (
+            <span className="text-xs text-[var(--text-muted)] hidden sm:inline">
+              (vazio — preencha para vincular aos documentos)
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onToggleExtraFields}
+            className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded px-1 py-0.5 clinical-tabular-nums"
+            title="Alternar exibição de CPF e Peso"
+          >
+            <Icon name={showExtraPatientFields ? 'expand_less' : 'expand_more'} className="text-[14px]" />
+            <span>
+              {showExtraPatientFields
+                ? 'Ocultar CPF / Peso'
+                : hasExtraData
+                  ? `Ver dados (${patient.weightKg > 0 ? `${patient.weightKg} kg` : ''}${patient.documentNumber ? ` • ${patient.documentNumber}` : ''})`
+                  : '+ CPF e Peso'}
+            </span>
+          </button>
+
+          {patientName && onRequestClearPatient && (
+            <button
+              type="button"
+              onClick={onRequestClearPatient}
+              className="text-xs text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1 cursor-pointer transition p-1 rounded focus-visible:ring-2 focus-visible:ring-rose-500"
+              title="Limpar paciente e reiniciar consulta"
+            >
+              <Icon name="delete" className="text-[14px]" />
+              <span className="hidden sm:inline">Limpar</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onOpenPatientModal}
+            className="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer p-1 rounded focus-visible:ring-2 focus-visible:ring-sky-500"
+            title="Abrir cadastro clínico detalhado"
+          >
+            <span>Cadastro completo</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Linha combinada: Input do Nome + Atalhos discretos em pílulas neutras (98/2) */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <input
+            id="quick-patient-name"
+            type="text"
+            value={patient.name || ''}
+            onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
+            placeholder="Ex.: Maria de Oliveira Santos"
+            className="w-full px-3.5 py-2 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+          />
+        </div>
+
+        <div className="flex items-center gap-1.5 flex-wrap shrink-0" aria-label="Atalhos de documentos do paciente">
+          {onNavigateToCertificate && (
+            <button
+              type="button"
+              onClick={onNavigateToCertificate}
+              className="chip-neutral text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              title="Abrir formulário de Atestado Médico para este paciente"
+            >
+              <Icon name="atestado" className="text-[14px] text-sky-600 dark:text-sky-400" />
+              <span>Atestado</span>
+            </button>
+          )}
+          {onNavigateToReferral && (
+            <button
+              type="button"
+              onClick={onNavigateToReferral}
+              className="chip-neutral text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              title="Abrir Encaminhamento Médico para este paciente"
+            >
+              <Icon name="encaminhamento" className="text-[14px] text-sky-600 dark:text-sky-400" />
+              <span>Encaminhamento</span>
+            </button>
+          )}
+          {onNavigateToExams && (
+            <button
+              type="button"
+              onClick={onNavigateToExams}
+              className="chip-neutral text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              title="Abrir Solicitação de Exames para este paciente"
+            >
+              <Icon name="exame" className="text-[14px] text-sky-600 dark:text-sky-400" />
+              <span>Exames</span>
+            </button>
+          )}
+          {onNavigateToSus && (
+            <button
+              type="button"
+              onClick={onNavigateToSus}
+              className="chip-neutral text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              title="Abrir Formulários SUS (LME, APAC, SISREG) para este paciente"
+            >
+              <Icon name="sus" className="text-[14px] text-sky-600 dark:text-sky-400" />
+              <span>Guias SUS</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Campos Extras Retráteis: CPF e Peso */}
+      {showExtraPatientFields && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-strong">
+          <div>
+            <label htmlFor="quick-patient-doc" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+              CPF / RG
+            </label>
+            <input
+              id="quick-patient-doc"
+              type="text"
+              value={patient.documentNumber || ''}
+              onChange={(e) => onUpdatePatient({ ...patient, documentNumber: e.target.value })}
+              placeholder="Ex.: 000.000.000-00"
+              className="w-full px-3 py-1.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+              Peso (kg)
+            </label>
+            <input
+              id="quick-patient-weight"
+              type="number"
+              step="0.1"
+              min="0"
+              value={patient.weightKg > 0 ? patient.weightKg : ''}
+              onChange={(e) => onUpdatePatient({ ...patient, weightKg: parseFloat(e.target.value) || 0 })}
+              placeholder="Ex.: 14.5"
+              className="w-full px-3 py-1.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+            />
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
