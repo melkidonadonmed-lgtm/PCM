@@ -26,6 +26,7 @@ interface HeaderProps {
   selectedExamsCount?: number;
   isInstallable?: boolean;
   onInstallApp?: () => void;
+  onOpenCommandPalette?: () => void;
 }
 
 export const CloudAuthButton: React.FC = () => {
@@ -68,9 +69,10 @@ export const CloudAuthButton: React.FC = () => {
   };
 
   if (user) {
+    const cloudState = loading || syncStatus === 'syncing' ? 'loading' : syncStatus === 'error' ? 'error' : 'idle';
     return (
-      <div data-state="idle" aria-busy={false} 
-        className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-xl border text-xs shadow-tactile-sm transition bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)]"
+      <div data-state={cloudState} aria-busy={cloudState === 'loading'} 
+        className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 min-h-[44px] rounded-xl border text-xs shadow-tactile-sm transition bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)]"
         title={`Conectado à nuvem: ${user.email || user.displayName} | Status: ${syncStatus}`}
       >
         {user.photoURL ? (
@@ -139,7 +141,9 @@ export const CloudAuthButton: React.FC = () => {
       type="button"
       onClick={handleToggleAuth}
       disabled={loading}
-      className="flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[38px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+      data-state={loading ? 'loading' : 'idle'}
+      aria-busy={loading || undefined}
+      className="flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[44px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
       title="Conectar Conta Google para sincronização em nuvem (opcional)"
       aria-label="Conectar Nuvem"
     >
@@ -166,7 +170,8 @@ export const Header: React.FC<HeaderProps> = ({
   prescriptionCount = 0,
   selectedExamsCount = 0,
   isInstallable = false,
-  onInstallApp
+  onInstallApp,
+  onOpenCommandPalette
 }) => {
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
   const hasPatient = Boolean(patient?.name?.trim());
@@ -198,7 +203,8 @@ export const Header: React.FC<HeaderProps> = ({
       id: 'pediatric_calc',
       label: 'Doses',
       icon: 'balanca',
-      shortcut: 'Alt+3'
+      shortcut: 'Alt+3',
+      badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
     },
     {
       id: 'protocols',
@@ -232,7 +238,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
-            className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
           >
             <Icon name="menu" size={20} />
           </button>
@@ -242,7 +248,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             aria-label="Início"
             onClick={onGoHome}
-            className="flex items-center gap-2 sm:gap-2.5 pr-1 sm:pr-2 rounded-xl transition cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
+            className="flex items-center gap-2 sm:gap-2.5 pr-1 sm:pr-2 min-h-[44px] rounded-xl transition cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
             title="Voltar ao início (Receitas)"
           >
             <span
@@ -277,7 +283,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {quickNavTabs.map((tab) => {
               const isActive = tab.id === 'documents'
-                ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
+                ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus')
                 : activeTab === tab.id;
               return (
                 <button
@@ -286,7 +292,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab(tab.id)}
                   aria-current={isActive ? 'page' : undefined}
                   title={`${tab.label} (${tab.shortcut})`}
-                  className={`px-2 xl:px-3 py-1.5 min-h-[34px] rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                  className={`px-2 xl:px-3 py-1.5 min-h-[38px] rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                     isActive
                       ? 'bg-[var(--surface-card)] text-[var(--text-main)] font-bold shadow-tactile-sm border border-[var(--border-subtle)]'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-main)] border border-transparent'
@@ -300,7 +306,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <span>{tab.label}</span>
                   {tab.badge && (
                     <span
-                      className={`text-xs font-extrabold px-1.5 py-0.2 rounded-full ${
+                      className={`text-xs font-extrabold px-1.5 py-0.2 rounded-full clinical-tabular-nums ${
                         isActive
                           ? 'bg-sky-600 text-white'
                           : 'bg-[var(--surface-card)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
@@ -328,7 +334,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="header-patient-chip"
             role="button"
             tabIndex={0}
-            className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border transition cursor-pointer group w-full max-w-[220px] sm:max-w-[260px] xl:max-w-[280px] min-h-[38px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+            className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border transition cursor-pointer group w-full max-w-[220px] sm:max-w-[260px] xl:max-w-[280px] min-h-[44px] min-w-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               hasPatient 
                 ? 'bg-emerald-500/5 dark:bg-emerald-950/20 border-clinical text-emerald-900 dark:text-emerald-200' 
                 : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
@@ -350,9 +356,9 @@ export const Header: React.FC<HeaderProps> = ({
                 <Icon name="chevron_right" size={14} className="group-hover:translate-x-0.5 transition-transform opacity-60 flex-shrink-0 text-[var(--text-muted)]" />
               </div>
               {hasPatient && (patientWeight > 0 || patient?.ageText) && (
-                <div className="text-xs font-semibold flex items-center gap-1.5 truncate">
+                <div className="text-xs font-semibold flex items-center gap-1.5 truncate clinical-tabular-nums">
                   {patientWeight > 0 && (
-                    <span className="text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-0.5">
+                    <span className="text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-0.5 clinical-tabular-nums">
                       <Icon name="scale" size={11} className="inline-block" />
                       <span>{patientWeight.toLocaleString('pt-BR')} kg</span>
                     </span>
@@ -368,12 +374,28 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right side: CRM Status, Atalhos & Alternador de Tema */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          {onOpenCommandPalette && (
+            <button
+              id="btn-open-command-palette"
+              type="button"
+              onClick={onOpenCommandPalette}
+              aria-label="Busca rápida e navegação global (Ctrl+K)"
+              title="Busca rápida de medicamentos, kits, protocolos e guias SUS (Ctrl+K)"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] xl:w-auto xl:px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            >
+              <Icon name="search" size={18} className="text-sky-600 dark:text-sky-400" />
+              <span className="hidden xl:inline text-xs font-bold text-[var(--text-muted)] clinical-tabular-nums">
+                Ctrl+K
+              </span>
+            </button>
+          )}
+
           {onOpenDoctorModal && (
             <button
               id="header-doctor-chip"
               type="button"
               onClick={onOpenDoctorModal}
-              className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 min-h-[38px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+              className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 min-h-[44px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 isDoctorReady
                   ? 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)]'
                   : 'bg-amber-500/10 border-warning text-amber-800 dark:text-amber-300 hover:bg-amber-500/15'
@@ -389,7 +411,7 @@ export const Header: React.FC<HeaderProps> = ({
                   isDoctorReady ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'
                 }`}
               />
-              <span className="truncate max-w-[115px] xl:max-w-[130px]">
+              <span className="truncate max-w-[115px] xl:max-w-[130px] clinical-tabular-nums">
                 {isDoctorReady ? `CRM ${doctor?.crm}/${doctor?.crmState || 'UF'}` : 'Configurar CRM'}
               </span>
             </button>
@@ -399,7 +421,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onNavigateToEditor}
-              className="hidden md:flex items-center gap-1.5 px-2.5 min-h-[38px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="hidden md:flex items-center gap-1.5 px-2.5 min-h-[44px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title="Abrir Editor Livre de Documentos A4"
             >
               <Icon name="editor" size={16} className="text-sky-600 dark:text-sky-400" />
@@ -413,7 +435,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onInstallApp}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 min-h-[38px] rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-emerald-500/10 border-clinical text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
+              className="hidden lg:flex items-center gap-1.5 px-2.5 min-h-[44px] rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-emerald-500/10 border-clinical text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
               title="Instalar PresCMed como aplicativo offline"
               aria-label="Instalar Aplicativo PresCMed"
             >
@@ -427,7 +449,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
             title={darkMode ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
           >
             {darkMode ? (

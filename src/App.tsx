@@ -14,6 +14,9 @@ import { UnifiedMedication } from './data/medicationDatabase';
 import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
 import { useWorkContext } from './hooks/useWorkContext';
 import { usePwaInstall } from './hooks/usePwaInstall';
+import { useNavigationSync, runTabViewTransition } from './hooks/useNavigationSync';
+import { CommandPaletteModal } from './components/layout/CommandPaletteModal';
+import { ConsultationReadinessBar } from './components/bento/ConsultationReadinessBar';
 import { AsyncErrorBoundary } from './components/AsyncErrorBoundary';
 import { storageService } from './services/storageService';
 import type { TipoDocumento } from './utils/documentoClinico';
@@ -123,6 +126,7 @@ export default function App() {
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
   // Hook desacoplado de sessão clínica e persistência
   const {
@@ -203,60 +207,59 @@ export default function App() {
       handleOpenPatientModal();
       return;
     }
-    if (tab === 'editor') {
-      setEditorCustomDoc(null);
-      setEditorInitialSyncTrigger(prev => prev + 1);
-      setActiveTab('editor');
-      return;
-    }
-    if (tab === 'certificate' || tab === 'referral' || tab === 'exams') {
-      setDocumentsSubTab(tab);
-      setActiveTab('documents');
-      return;
-    }
-    setActiveTab(tab);
+    runTabViewTransition(() => {
+      if (tab === 'editor') {
+        setEditorCustomDoc(null);
+        setEditorInitialSyncTrigger(prev => prev + 1);
+        setActiveTab('editor');
+        return;
+      }
+      if (tab === 'certificate' || tab === 'referral' || tab === 'exams' || tab === 'sus') {
+        setDocumentsSubTab(tab);
+        setActiveTab('documents');
+        return;
+      }
+      setActiveTab(tab);
+    });
   }, [handleOpenPatientModal]);
 
   const handleNavigateToEditor = React.useCallback(() => handleSelectTab('editor'), [handleSelectTab]);
   const handleNavigateToCertificate = React.useCallback(() => handleSelectTab('certificate'), [handleSelectTab]);
   const handleNavigateToReferral = React.useCallback(() => handleSelectTab('referral'), [handleSelectTab]);
   const handleNavigateToExams = React.useCallback(() => handleSelectTab('exams'), [handleSelectTab]);
+  const handleNavigateToSus = React.useCallback(() => handleSelectTab('sus'), [handleSelectTab]);
+  const handleOpenCommandPalette = React.useCallback(() => setIsCommandPaletteOpen(true), []);
+  const handleCloseCommandPalette = React.useCallback(() => setIsCommandPaletteOpen(false), []);
 
   const handleNavigateToEditorWithHtml = (html: string, title: string, type: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' = 'custom') => {
     setEditorCustomDoc({ html, title, type });
     setActiveTab('editor');
   };
 
-  // Rolagem suave para o topo ao trocar de módulo
+  // Rolagem para o topo ao trocar de módulo respeitando preferência vestibular
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const reducedMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
     }
   }, [activeTab]);
 
-  // Atalhos rápidos de navegação entre módulos (Alt+1 a Alt+5)
-  useEffect(() => {
-    const handleWorkspaceShortcuts = (e: KeyboardEvent) => {
-      if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-      if (isPatientModalOpen || isDoctorModalOpen || isBackupModalOpen) return;
-      if (typeof document !== 'undefined' && document.querySelector('[role="dialog"], [aria-modal="true"]')) return;
+  // Sincronização de navegação, hash leve e atalhos rápidos (Alt+1..6 e Ctrl+K)
+  useNavigationSync({
+    activeTab,
+    documentsSubTab,
+    onSelectTab: handleSelectTab,
+    onOpenCommandPalette: handleOpenCommandPalette,
+    isAnyModalOpen: isPatientModalOpen || isDoctorModalOpen || isBackupModalOpen || isCommandPaletteOpen,
+  });
 
-      const shortcutMap: Record<string, ActiveTab> = {
-        '1': 'prescription',
-        '2': 'documents',
-        '3': 'pediatric_calc',
-        '4': 'protocols',
-        '5': 'editor'
-      };
-      const targetTab = shortcutMap[e.key];
-      if (targetTab) {
-        e.preventDefault();
-        handleSelectTab(targetTab);
-      }
-    };
-    window.addEventListener('keydown', handleWorkspaceShortcuts);
-    return () => window.removeEventListener('keydown', handleWorkspaceShortcuts);
-  }, [handleSelectTab, isPatientModalOpen, isDoctorModalOpen, isBackupModalOpen]);
+  const documentsBadgeCount = React.useMemo(() => {
+    return (
+      selectedExams.length +
+      (certificate?.daysOff > 0 ? 1 : 0) +
+      (referral?.destinationSpecialty?.trim() ? 1 : 0)
+    );
+  }, [selectedExams.length, certificate?.daysOff, referral?.destinationSpecialty]);
 
   // Medicamento pendente vindo de outras telas (ex: Protocolos)
   const [medicamentoPendente, setMedicamentoPendente] = useState<UnifiedMedication | null>(null);
@@ -332,9 +335,10 @@ export default function App() {
         onOpenDoctorModal={handleOpenDoctorModal}
         onNavigateToEditor={handleNavigateToEditor}
         prescriptionCount={prescriptionItems.length}
-        selectedExamsCount={selectedExams.length}
+        selectedExamsCount={documentsBadgeCount}
         isInstallable={isInstallable}
         onInstallApp={installApp}
+        onOpenCommandPalette={handleOpenCommandPalette}
       />
 
       {/* Main Responsive Body Layout */}
@@ -351,7 +355,7 @@ export default function App() {
           doctor={doctor}
           patient={patient}
           prescriptionCount={prescriptionItems.length}
-          selectedExamsCount={selectedExams.length}
+          selectedExamsCount={documentsBadgeCount}
           contexts={workContexts}
           activeContext={activeContext}
           onSwitchContext={switchContext}
@@ -368,6 +372,15 @@ export default function App() {
 
         {/* Main Content Area */}
         <main className="flex-1 min-w-0 pb-20 lg:pb-6">
+          <ConsultationReadinessBar
+            doctor={doctor}
+            patient={patient}
+            prescriptionCount={prescriptionItems.length}
+            documentsCount={documentsBadgeCount}
+            onOpenDoctorModal={handleOpenDoctorModal}
+            onOpenPatientModal={handleOpenPatientModal}
+            onOpenCommandPalette={handleOpenCommandPalette}
+          />
           <div key={activeTab} className="animate-tab-fade">
             {activeTab === 'prescription' && (
               <PrescriptionBuilder
@@ -389,6 +402,7 @@ export default function App() {
                 onNavigateToCertificate={handleNavigateToCertificate}
                 onNavigateToReferral={handleNavigateToReferral}
                 onNavigateToExams={handleNavigateToExams}
+                onNavigateToSus={handleNavigateToSus}
                 onOpenDoctorModal={handleOpenDoctorModal}
                 onOpenPatientModal={handleOpenPatientModal}
                 medicamentoPendente={medicamentoPendente}
@@ -407,7 +421,7 @@ export default function App() {
               />
             )}
 
-            {(activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams') && (
+            {(activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus') && (
               <ClinicalDocumentsHub
                 darkMode={darkMode}
                 patient={patient}
@@ -426,8 +440,10 @@ export default function App() {
                 initialSubTab={
                   activeTab === 'certificate' ? 'certificate' :
                   activeTab === 'referral' ? 'referral' :
-                  activeTab === 'exams' ? 'exams' : documentsSubTab
+                  activeTab === 'exams' ? 'exams' :
+                  activeTab === 'sus' ? 'sus' : documentsSubTab
                 }
+                onSubTabChange={setDocumentsSubTab}
                 onNavigateToPrint={(type) => handleNavigateToPrint(type)}
               />
             )}
@@ -509,8 +525,20 @@ export default function App() {
         sidebarOpen={sidebarOpen}
         onSelectTab={handleSelectTab}
         prescriptionCount={prescriptionItems.length}
-        selectedExamsCount={selectedExams.length}
+        selectedExamsCount={documentsBadgeCount}
+        patientWeight={patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0}
         onOpenMenu={() => setSidebarOpen(true)}
+      />
+
+      {/* Command Palette Global (Ctrl+K) */}
+      <CommandPaletteModal
+        isOpen={isCommandPaletteOpen}
+        onClose={handleCloseCommandPalette}
+        onSelectTab={handleSelectTab}
+        onAplicarKit={handleAplicarKit}
+        onUsarMedicamento={handleUsarMedicamento}
+        onOpenPatientModal={handleOpenPatientModal}
+        onOpenDoctorModal={handleOpenDoctorModal}
       />
 
       {/* Modals */}

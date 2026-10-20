@@ -14,6 +14,7 @@ interface MobileBottomNavProps {
   onSelectTab: (tab: ActiveTab) => void;
   prescriptionCount: number;
   selectedExamsCount: number;
+  patientWeight?: number;
   onOpenMenu: () => void;
 }
 
@@ -23,6 +24,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onSelectTab,
   prescriptionCount,
   selectedExamsCount,
+  patientWeight = 0,
   onOpenMenu
 }) => {
   const items: Array<{ id: ActiveTab; label: string; iconName: IconName; badge?: string }> = [
@@ -41,7 +43,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     {
       id: 'pediatric_calc',
       label: 'Doses',
-      iconName: 'balanca'
+      iconName: 'balanca',
+      badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
     },
     {
       id: 'editor',
@@ -64,7 +67,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     >
       {items.map((item) => {
         const isActive = item.id === 'documents'
-          ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
+          ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus')
           : activeTab === item.id;
 
         return (
@@ -88,7 +91,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
               />
               {item.badge && (
-                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[8px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15">
+                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[8px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15 clinical-tabular-nums">
                   {item.badge}
                 </span>
               )}

@@ -185,6 +185,7 @@ export type ActiveTab =
   | 'exams' 
   | 'certificate' 
   | 'referral' 
+  | 'sus'
   | 'protocols'
   | 'editor'
   | 'print_preview' 

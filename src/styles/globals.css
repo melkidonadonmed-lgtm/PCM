@@ -1,0 +1,23 @@
+/**
+ * Camada de Tokens e Animações Globais (frontend-code-architect v5.0 + modern-web-guidance)
+ * Importada em src/index.css dentro de @layer base / @layer components.
+ */
+@layer base {
+  :root {
+    --ink-primary: var(--text-main, #0F172A);
+    --ink-secondary: var(--text-secondary, #334155);
+    --ink-muted: var(--text-muted, #5B6B80);
+    --rim-light: rgba(255, 255, 255, 0.92);
+    --shadow-sculpted: var(--shadow-tactile-card);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .dark,
+  [data-theme="dark"] {
+    --ink-primary: var(--text-main, #F8FAFC);
+    --ink-secondary: var(--text-secondary, #CBD5E1);
+    --ink-muted: var(--text-muted, #94A3B8);
+    --rim-light: rgba(255, 255, 255, 0.08);
+    --shadow-sculpted: var(--shadow-tactile-card-dark);
+  }
+}

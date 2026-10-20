@@ -9,6 +9,13 @@ import { ClinicalDocumentsHub } from '../components/ClinicalDocumentsHub';
 import { PediatricCalculator } from '../components/PediatricCalculator';
 import { ClinicalProtocolsView } from '../components/ClinicalProtocolsView';
 import { ExamRequester } from '../components/ExamRequester';
+import { CommandPaletteModal } from '../components/layout/CommandPaletteModal';
+import { ConsultationReadinessBar } from '../components/bento/ConsultationReadinessBar';
+import { SurfaceCard } from '../components/ui/SurfaceCard';
+import { ActionButton } from '../components/ui/ActionButton';
+import { Badge } from '../components/ui/Badge';
+import { PRESCMED_TOKENS } from '../config/tokens';
+import { runTabViewTransition } from '../hooks/useNavigationSync';
 import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
 import type { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral } from '../types';
 
@@ -350,5 +357,51 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
 
     expect(mobileHtml).toContain('panel-navy');
     expect(mobileHtml).toContain('material-symbols-outlined');
+  });
+
+  it('Arquitetura Atômica v5.0 (SurfaceCard, ActionButton, Badge, ConsultationReadinessBar, CommandPaletteModal e useNavigationSync) opera com estados FSM e tabular-nums', () => {
+    expect(PRESCMED_TOKENS.purpose).toBe('medtech_clinico');
+    const mockCallback = vi.fn();
+    runTabViewTransition(mockCallback);
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+
+    const readinessHtml = renderToStaticMarkup(
+      <ConsultationReadinessBar
+        patient={activePatient}
+        doctor={configuredDoctor}
+        prescriptionCount={2}
+        documentsCount={3}
+        onOpenPatientModal={vi.fn()}
+        onOpenDoctorModal={vi.fn()}
+        onOpenCommandPalette={vi.fn()}
+      />
+    );
+    expect(readinessHtml).toContain('Resumo rápido de prontidão da consulta');
+    expect(readinessHtml).toContain('18,5 kg');
+    expect(readinessHtml).toContain('Ctrl+K');
+
+    const paletteHtml = renderToStaticMarkup(
+      <CommandPaletteModal
+        isOpen={true}
+        onClose={vi.fn()}
+        onSelectTab={vi.fn()}
+        onAplicarKit={vi.fn()}
+        onUsarMedicamento={vi.fn()}
+        onOpenPatientModal={vi.fn()}
+        onOpenDoctorModal={vi.fn()}
+      />
+    );
+    expect(paletteHtml).toContain('Busca Rápida e Navegação Global');
+    expect(paletteHtml).toContain('id="global-command-palette-input"');
+
+    const primitivesHtml = renderToStaticMarkup(
+      <SurfaceCard title="Bloco Clínico" eyebrow="Status" state="idle">
+        <Badge tone="clinical" tabular>15 comp</Badge>
+        <ActionButton variant="primary" isLoading={false}>Confirmar</ActionButton>
+      </SurfaceCard>
+    );
+    expect(primitivesHtml).toContain('data-state="idle"');
+    expect(primitivesHtml).toContain('clinical-tabular-nums');
+    expect(primitivesHtml).toContain('Confirmar');
   });
 });

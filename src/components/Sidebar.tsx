@@ -251,7 +251,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const renderNavButton = (item: SidebarNavItem) => {
     const isActive = item.id === 'documents'
-      ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
+      ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus')
       : activeTab === item.id;
 
     if (!isOpen) {
@@ -262,9 +262,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           type="button"
           onClick={() => handleNavClick(item.id)}
           aria-current={isActive ? 'page' : undefined}
-          className={`w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative ${
+          className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl flex items-center justify-center transition cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative ${
             isActive
-              ? 'bg-sky-600/30 text-white border border-info shadow-tactile-sm font-bold'
+              ? 'nav-item-active bg-sky-600/30 text-white border border-info shadow-tactile-sm font-bold'
               : 'text-slate-300 hover:bg-white/10 hover:text-white'
           }`}
           title={item.fullLabel || item.label}
@@ -277,7 +277,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
           />
           {item.badge && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-sky-500 text-white text-xs font-black flex items-center justify-center shadow-sm border border-white/20">
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-sky-500 text-white text-xs font-black flex items-center justify-center shadow-sm border border-white/20 clinical-tabular-nums">
               {item.badge}
             </span>
           )}
@@ -295,9 +295,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => handleNavClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`w-full min-h-[40px] flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
+        className={`w-full min-h-[44px] flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
           isActive
-            ? 'bg-sky-600/30 text-white border border-info shadow-tactile-sm font-bold'
+            ? 'nav-item-active bg-sky-600/30 text-white border border-info shadow-tactile-sm font-bold'
             : 'text-slate-300 hover:bg-white/[0.06] hover:text-white border border-transparent'
         }`}
         title={item.label}
@@ -316,7 +316,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
         {item.badge && (
           <span 
-            className={`text-xs font-extrabold px-1.5 py-0.5 rounded-full flex-shrink-0 ml-1.5 ${
+            className={`text-xs font-extrabold px-1.5 py-0.5 rounded-full flex-shrink-0 ml-1.5 clinical-tabular-nums ${
               isActive ? 'bg-sky-500/30 text-sky-200 border border-info' : 'bg-white/10 text-slate-300'
             }`}
           >
@@ -378,7 +378,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               type="button"
               onClick={onClose || onToggleOpen}
               aria-label="Fechar menu lateral"
-              className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-xl flex items-center justify-center text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors"
             >
               <Icon name="close" size={18} />
             </button>
@@ -406,7 +406,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className="p-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] transition cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset"
+              className="p-2.5 min-h-[44px] rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] transition cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset"
               title="Clique para editar CRM e dados profissionais"
             >
               <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -417,7 +417,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <p className="text-xs font-bold truncate text-white">
                     {hasDoctor ? doctor?.name : 'Configurar médico'}
                   </p>
-                  <p className="text-xs text-slate-300 font-medium truncate">
+                  <p className="text-xs text-slate-300 font-medium truncate clinical-tabular-nums">
                     {hasDoctor 
                       ? `CRM ${doctor?.crm}/${doctor?.crmState || 'SP'}${doctor?.rqe ? ' • RQE ' + doctor.rqe : ''}` 
                       : 'Toque para informar CRM'}
@@ -430,7 +430,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={handleOpenDoctor}
-              className="w-11 h-11 mx-auto rounded-xl bg-white/10 text-sky-200 border border-white/15 hover:bg-white/15 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-white/10 text-sky-200 border border-white/15 hover:bg-white/15 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
               title={hasDoctor ? `Dr(a). ${doctor?.name} (CRM: ${doctor?.crm}/${doctor?.crmState})` : 'Configurar CRM / Perfil Médico'}
               aria-label="Perfil do Médico"
             >
@@ -443,7 +443,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Navegação por Grupos */}
           <div className={isOpen ? 'w-full space-y-3.5 relative' : 'w-full flex flex-col items-center space-y-2.5 relative'}>
-            <div id="sidebar-active-tracker" aria-hidden="true" className="sr-only" />
             {/* Grupo 1: Atendimento Clínico Principal */}
             <div>
               {isOpen && (
@@ -551,7 +550,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={handleTriggerResetAll}
-                  className="flex-1 min-h-[38px] flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-sky-200 bg-sky-500/15 hover:bg-sky-500/25 border border-info transition cursor-pointer shadow-tactile-sm active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                  className="flex-1 min-h-[44px] flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-sky-200 bg-sky-500/15 hover:bg-sky-500/25 border border-info transition cursor-pointer shadow-tactile-sm active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                   title="Iniciar uma nova consulta do zero"
                 >
                   <Icon name="refresh" size={16} />
@@ -561,7 +560,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={handleTriggerClearPrescription}
-                  className="w-9 h-[38px] rounded-xl border border-white/10 text-slate-300 hover:text-rose-300 hover:bg-rose-500/15 hover:border-rose-400/30 transition cursor-pointer flex items-center justify-center shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                  className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 text-slate-300 hover:text-rose-300 hover:bg-rose-500/15 hover:border-rose-400/30 transition cursor-pointer flex items-center justify-center shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
                   title="Zerar medicamentos da receita atual"
                   aria-label="Zerar Receita"
                 >
@@ -571,7 +570,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={handleTriggerClearPatient}
-                  className="w-9 h-[38px] rounded-xl border border-white/10 text-slate-300 hover:text-rose-300 hover:bg-rose-500/15 hover:border-rose-400/30 transition cursor-pointer flex items-center justify-center shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                  className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 text-slate-300 hover:text-rose-300 hover:bg-rose-500/15 hover:border-rose-400/30 transition cursor-pointer flex items-center justify-center shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
                   title="Limpar dados cadastrais do paciente"
                   aria-label="Limpar Paciente"
                 >
@@ -585,7 +584,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     type="button"
                     onClick={handleOpenBackup}
-                    className="flex-1 min-h-[36px] py-1.5 px-2.5 rounded-xl border border-white/10 text-slate-300 hover:text-amber-200 hover:bg-amber-500/10 transition cursor-pointer flex items-center justify-center gap-1.5 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                    className="flex-1 min-h-[44px] py-1.5 px-2.5 rounded-xl border border-white/10 text-slate-300 hover:text-amber-200 hover:bg-amber-500/10 transition cursor-pointer flex items-center justify-center gap-1.5 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                     title="Exportar ou restaurar arquivo de backup (.pcm.json)"
                   >
                     <Icon name="cloud_download" size={15} className="text-amber-400" />
@@ -597,7 +596,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     type="button"
                     onClick={onInstallApp}
-                    className="min-h-[36px] py-1.5 px-2.5 rounded-xl border border-clinical text-emerald-300 hover:bg-emerald-500/15 transition cursor-pointer flex items-center justify-center gap-1 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                    className="min-h-[44px] py-1.5 px-2.5 rounded-xl border border-clinical text-emerald-300 hover:bg-emerald-500/15 transition cursor-pointer flex items-center justify-center gap-1 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
                     title="Instalar PresCMed como aplicativo offline"
                   >
                     <Icon name="download" size={15} className="text-emerald-400" />
@@ -608,7 +607,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={onToggleOpen}
-                  className="hidden lg:flex w-9 h-[36px] rounded-xl border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none shrink-0"
+                  className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none shrink-0"
                   title="Recolher menu lateral"
                   aria-label="Recolher Menu"
                 >

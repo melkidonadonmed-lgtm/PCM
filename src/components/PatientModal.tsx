@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Check, X, Eraser } from 'lucide-react';
 import { Patient } from '../types';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 /**
  * Modal de Cadastro e Edição Rápida do Paciente.
@@ -23,6 +24,14 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   onClose
 }) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useModalAccessibility({
+    isOpen: true,
+    onClose,
+    containerRef: modalRef,
+    initialFocusRef: nameInputRef,
+  });
 
   const [formData, setFormData] = useState<Patient>({
     id: patient?.id || 'pat-' + Date.now(),
@@ -86,15 +95,18 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   };
 
   return (
-    <div data-state="idle" aria-busy={false} 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 isolate animate-tab-fade"
+    <div
+      ref={modalRef}
+      data-state="idle"
+      aria-busy={false}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 isolate animate-backdrop-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="patient-modal-title"
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-md rounded-2xl border overflow-hidden shadow-tactile-lg isolate transition"
+        className="w-full max-w-md rounded-2xl border overflow-hidden shadow-tactile-lg isolate transition modal-surface-spring"
         style={{
           backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
           borderColor: darkMode ? 'rgba(255,255,255,0.12)' : '#E3D7BD',

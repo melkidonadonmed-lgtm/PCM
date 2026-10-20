@@ -23,6 +23,7 @@ import { AvisoNotificacaoReceita } from './AvisoNotificacaoReceita';
 import { PediatricCalculator } from './PediatricCalculator';
 import { ConfirmationModal } from './ConfirmationModal';
 import { formatarReceitaCopiaTexto, formatarReceitaWhatsAppTexto } from '../utils/compartilhamentoTexto';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 const REGIMES: RegimeReceita[] = ['simples', 'antimicrobiano', 'controle_especial'];
 
@@ -113,6 +114,7 @@ interface PrescriptionBuilderProps {
   onNavigateToCertificate?: () => void;
   onNavigateToReferral?: () => void;
   onNavigateToExams?: () => void;
+  onNavigateToSus?: () => void;
   onOpenDoctorModal?: () => void;
   onOpenPatientModal: () => void;
   medicamentoPendente?: UnifiedMedication | null;
@@ -136,6 +138,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   onNavigateToCertificate,
   onNavigateToReferral,
   onNavigateToExams,
+  onNavigateToSus,
   onOpenDoctorModal,
   onOpenPatientModal,
   medicamentoPendente,
@@ -143,6 +146,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   onAbrirPerfilMedico
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const pediatricDrawerRef = useRef<HTMLDivElement>(null);
 
   // Mobile active tab ('composer' | 'preview')
   const [mobileSection, setMobileSection] = useState<'composer' | 'preview'>('composer');
@@ -172,6 +176,12 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const [copiedSuccess, setCopiedSuccess] = useState(false);
   const [itemAddedToast, setItemAddedToast] = useState(false);
   const [isPediatricDrawerOpen, setIsPediatricDrawerOpen] = useState(false);
+
+  useModalAccessibility({
+    isOpen: isPediatricDrawerOpen,
+    onClose: () => setIsPediatricDrawerOpen(false),
+    containerRef: pediatricDrawerRef,
+  });
 
   // Modelos de Prescrição Salvos
   const [isSaveModelModalOpen, setIsSaveModelModalOpen] = useState(false);
@@ -867,6 +877,17 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       <span>Exames</span>
                     </button>
                   )}
+                  {onNavigateToSus && (
+                    <button
+                      type="button"
+                      onClick={onNavigateToSus}
+                      className="text-xs px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-subtle dark:border-strong text-slate-700 dark:text-slate-300 hover:border-info hover:text-sky-600 dark:hover:text-sky-400 font-semibold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-sm"
+                      title="Abrir Formulários SUS (LME, APAC, SISREG) para este paciente"
+                    >
+                      <Icon name="sus" className="text-[14px] text-sky-600 dark:text-sky-400" />
+                      <span>Guias SUS</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -901,7 +922,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       value={patient.weightKg > 0 ? patient.weightKg : ''}
                       onChange={(e) => onUpdatePatient({ ...patient, weightKg: parseFloat(e.target.value) || 0 })}
                       placeholder="Ex.: 14.5"
-                      className="w-full px-3 py-2 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+                      className="w-full px-3 py-2 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
                     />
                   </div>
                 </div>
@@ -1086,7 +1107,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                           onClick={() => setSelectedRegime(regime)}
                           className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                             ativo
-                              ? 'bg-sky-600 text-white border-info shadow-xs'
+                              ? 'bg-sky-500/15 text-sky-900 dark:text-sky-200 border-info font-bold shadow-xs'
                               : 'bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-subtle dark:border-strong hover:border-medium'
                           }`}
                         >
@@ -1142,7 +1163,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       const val = parseFloat(e.target.value) || 1;
                       handleAtualizarConstrutor(val, doseUnit, doseFrequency, doseDays, isContinuousDose);
                     }}
-                    className="w-full px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-xs font-bold text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+                    className="w-full px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-xs font-bold text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
                   />
                 </div>
 
@@ -1235,10 +1256,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                     key={dias}
                     type="button"
                     onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, dias, false)}
-                    className={`text-xs px-2.5 py-0.5 rounded-md font-semibold transition cursor-pointer ${
+                    className={`text-xs px-2.5 py-0.5 rounded-md font-semibold border transition cursor-pointer clinical-tabular-nums ${
                       !isContinuousDose && doseDays === dias
-                        ? 'bg-sky-600 text-white shadow-tactile-sm'
-                        : 'bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-slate-700 dark:text-slate-300 hover:border-info'
+                        ? 'bg-sky-500/15 text-sky-900 dark:text-sky-200 border-info font-bold shadow-tactile-sm'
+                        : 'bg-white dark:bg-slate-900 border-subtle dark:border-strong text-slate-700 dark:text-slate-300 hover:border-info'
                     }`}
                   >
                     {dias} dias
@@ -1247,10 +1268,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                 <button
                   type="button"
                   onClick={() => handleAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, 0, true)}
-                  className={`text-xs px-2.5 py-0.5 rounded-md font-semibold transition cursor-pointer ${
+                  className={`text-xs px-2.5 py-0.5 rounded-md font-semibold border transition cursor-pointer ${
                     isContinuousDose
-                      ? 'bg-emerald-600 text-white shadow-tactile-sm'
-                      : 'bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-slate-700 dark:text-slate-300 hover:border-clinical'
+                      ? 'bg-emerald-500/15 text-emerald-900 dark:text-emerald-200 border-clinical font-bold shadow-tactile-sm'
+                      : 'bg-white dark:bg-slate-900 border-subtle dark:border-strong text-slate-700 dark:text-slate-300 hover:border-clinical'
                   }`}
                 >
                   Uso contínuo
@@ -1270,7 +1291,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                       value={selectedQuantity}
                       onChange={(e) => setSelectedQuantity(e.target.value)}
                       placeholder="Ex.: 30 comprimidos, 1 frasco..."
-                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm"
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm clinical-tabular-nums"
                     />
                   </div>
                   <div className="flex-1">
@@ -1286,10 +1307,10 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
                             key={qtdLabel}
                             type="button"
                             onClick={() => setSelectedQuantity(qtdValor)}
-                            className={`text-xs px-2 py-1 rounded-md font-semibold transition cursor-pointer ${
+                            className={`text-xs px-2 py-1 rounded-md font-semibold border transition cursor-pointer clinical-tabular-nums ${
                               isAtivo
-                                ? 'bg-sky-600 text-white shadow-tactile-sm'
-                                : 'bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-slate-700 dark:text-slate-300 hover:border-info'
+                                ? 'bg-sky-500/15 text-sky-900 dark:text-sky-200 border-info font-bold shadow-tactile-sm'
+                                : 'bg-white dark:bg-slate-900 border-subtle dark:border-strong text-slate-700 dark:text-slate-300 hover:border-info'
                             }`}
                           >
                             {qtdLabel}
@@ -1692,14 +1713,15 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       {/* Drawer Lateral Flutuante da Calculadora Pediátrica */}
       {isPediatricDrawerOpen && (
         <div 
+          ref={pediatricDrawerRef}
           role="dialog"
           aria-modal="true"
           aria-label="Calculadora pediátrica por peso"
-          className="fixed inset-0 z-50 flex justify-end bg-black/50 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex justify-end bg-black/50 animate-backdrop-fade"
           onClick={() => setIsPediatricDrawerOpen(false)}
         >
           <div 
-            className="w-full max-w-3xl h-full bg-[var(--surface-card)] shadow-2xl border-l border-[var(--border-subtle)] flex flex-col animate-in slide-in-from-right duration-300 overflow-hidden"
+            className="w-full max-w-3xl h-full bg-[var(--surface-card)] shadow-2xl border-l border-[var(--border-subtle)] flex flex-col animate-drawer-right overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header do Drawer */}
@@ -1713,8 +1735,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
               <button
                 type="button"
                 onClick={() => setIsPediatricDrawerOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                title="Fechar calculadora"
+                className="min-h-[44px] min-w-[44px] p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer inline-flex items-center justify-center"
+                title="Fechar calculadora (Esc)"
+                aria-label="Fechar calculadora"
               >
                 <Icon name="close" className="text-[20px]" />
               </button>
@@ -1741,7 +1764,11 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       )}
       {/* Toast de Notificação de Modelo de Receita */}
       {prescriptionModelToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade"
+        >
           <Icon name="check" className="text-[16px] text-emerald-400" />
           <span>{prescriptionModelToast}</span>
         </div>
@@ -1753,7 +1780,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           role="dialog"
           aria-modal="true"
           aria-label="Salvar como modelo de receita"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 animate-tab-fade"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 animate-backdrop-fade"
         >
           <div className="bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-tactile-lg space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-strong">

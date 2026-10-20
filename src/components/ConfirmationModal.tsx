@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { AlertTriangle, X, Check } from 'lucide-react';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 /**
  * Modal de Confirmação Acessível (substitui window.confirm).
@@ -30,26 +31,31 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onCancel
 }) => {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useModalAccessibility({
+    isOpen,
+    onClose: onCancel,
+    containerRef: modalRef,
+    initialFocusRef: confirmButtonRef,
+  });
 
   useEffect(() => {
     if (isOpen) {
-      // Foco no botão de confirmação e listener de Escape
       confirmButtonRef.current?.focus();
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') onCancel();
-      };
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
     }
-  }, [isOpen, onCancel]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   const isDanger = variant === 'danger';
 
   return (
-    <div data-state="idle" aria-busy={false} 
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 animate-tab-fade surface-raised"
+    <div
+      ref={modalRef}
+      data-state="idle"
+      aria-busy={false}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 animate-backdrop-fade surface-raised"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
@@ -57,7 +63,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       onClick={onCancel}
     >
       <div 
-        className="w-full max-w-md rounded-2xl p-6 relative border shadow-tactile-lg isolate transition"
+        className="w-full max-w-md rounded-2xl p-6 relative border shadow-tactile-lg isolate transition modal-surface-spring"
         style={{
           backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : '#E3D7BD'

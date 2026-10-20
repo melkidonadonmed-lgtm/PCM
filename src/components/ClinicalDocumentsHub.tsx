@@ -4,6 +4,8 @@ import { CertificateAndReferral } from './CertificateAndReferral';
 import { ExamRequester } from './ExamRequester';
 import { SusDocumentsFiller } from './SusDocumentsFiller';
 import { Icon, IconName } from './Icon';
+import { SoftCard } from './ui/SoftCard';
+import { SurfaceCard } from './ui/SurfaceCard';
 
 /**
  * Ilha Central de Documentos Clínicos.
@@ -27,6 +29,7 @@ interface ClinicalDocumentsHubProps {
   clinicalIndication: string;
   onUpdateClinicalIndication: (text: string) => void;
   initialSubTab?: DocumentsSubTab;
+  onSubTabChange?: (subTab: DocumentsSubTab) => void;
   onNavigateToPrint: (docType?: 'certificate' | 'referral' | 'exams') => void;
   onNavigateToEditorWithHtml?: (html: string, title: string, type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom') => void;
 }
@@ -46,10 +49,16 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
   clinicalIndication,
   onUpdateClinicalIndication,
   initialSubTab = 'certificate',
+  onSubTabChange,
   onNavigateToPrint,
   onNavigateToEditorWithHtml
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<DocumentsSubTab>(initialSubTab);
+
+  const handleChangeSubTab = React.useCallback((nextTab: DocumentsSubTab) => {
+    setActiveSubTab(nextTab);
+    onSubTabChange?.(nextTab);
+  }, [onSubTabChange]);
 
   // Sincroniza se o initialSubTab mudar externamente
   React.useEffect(() => {
@@ -97,7 +106,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
     if (targetIndex !== -1) {
       e.preventDefault();
       const nextTab = tabsList[targetIndex].id;
-      setActiveSubTab(nextTab);
+      handleChangeSubTab(nextTab);
       const tabElement = document.getElementById(`clinical-doc-tab-${nextTab}`);
       tabElement?.focus();
     }
@@ -107,9 +116,9 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
   const hasPatient = Boolean(patient?.name?.trim());
 
   return (
-    <div data-state="idle" aria-busy={false} id="clinical-documents-hub" className="max-w-7xl mx-auto space-y-4 sm:space-y-5 surface-raised">
+    <SurfaceCard as="div" state="idle" id="clinical-documents-hub" className="max-w-7xl mx-auto space-y-4 sm:space-y-5 !p-0 !bg-transparent !border-none !shadow-none">
       {/* Barra de Navegação Superior em Pílulas Táteis Minerais */}
-      <div className="card-surface p-2.5 sm:p-3 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <SoftCard variant="flat" className="card-surface p-2.5 sm:p-3 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Identificação do Contexto Clínico */}
         <div className="flex items-center gap-2.5 px-2">
           <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${hasPatient ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -140,9 +149,9 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                 aria-selected={isActive}
                 aria-controls={`clinical-doc-panel-${tab.id}`}
                 tabIndex={isActive ? 0 : -1}
-                onClick={() => setActiveSubTab(tab.id)}
+                onClick={() => handleChangeSubTab(tab.id)}
                 onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
-                className={`min-h-[40px] px-3.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                className={`min-h-[44px] px-3.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   isActive
                     ? 'bg-navy-900 border-navy-900 text-white dark:bg-sky-600 dark:border-info shadow-tactile-sm'
                     : 'bg-[var(--surface-card)] border-subtle dark:border-strong text-slate-600 dark:text-slate-300 hover:border-medium dark:hover:border-strong hover:text-slate-900 dark:hover:text-white'
@@ -157,7 +166,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span
-                    className={`text-xs font-bold px-1.5 py-0.5 rounded-full max-w-[90px] truncate ${
+                    className={`text-xs font-bold px-1.5 py-0.5 rounded-full max-w-[90px] truncate clinical-tabular-nums ${
                       isActive ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                     }`}
                   >
@@ -168,7 +177,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
             );
           })}
         </nav>
-      </div>
+      </SoftCard>
 
       {/* Renderização Condicional da Ilha Selecionada com Tabpanel Semântico */}
       <div 
@@ -190,7 +199,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
             referral={referral}
             onUpdateReferral={onUpdateReferral}
             activeSubTab={activeSubTab}
-            onSelectSubTab={(tab) => setActiveSubTab(tab)}
+            onSelectSubTab={(tab) => handleChangeSubTab(tab)}
             onNavigateToPrint={(docType) => onNavigateToPrint(docType)}
             onNavigateToEditorWithHtml={onNavigateToEditorWithHtml}
             hideSubNav={true}
@@ -222,6 +231,6 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
           />
         )}
       </div>
-    </div>
+    </SurfaceCard>
   );
 };

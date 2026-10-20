@@ -28,6 +28,7 @@ import {
   BackupStats 
 } from '../services/backupService';
 import { ConfirmationModal } from './ConfirmationModal';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 interface BackupModalProps {
   isOpen: boolean;
@@ -47,6 +48,13 @@ export const BackupModal: React.FC<BackupModalProps> = ({
   onBackupRestored
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useModalAccessibility({
+    isOpen,
+    onClose,
+    containerRef: modalRef,
+  });
 
   // Estados de estatísticas locais
   const [stats, setStats] = useState<BackupStats>({
@@ -197,15 +205,18 @@ export const BackupModal: React.FC<BackupModalProps> = ({
   };
 
   return (
-    <div data-state="idle" aria-busy={false} 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 isolate animate-tab-fade surface-raised"
+    <div
+      ref={modalRef}
+      data-state={isExporting || isImporting ? 'loading' : 'idle'}
+      aria-busy={isExporting || isImporting}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 isolate animate-backdrop-fade surface-raised"
       role="dialog"
       aria-modal="true"
       aria-labelledby="backup-modal-title"
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-2xl bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl border border-[var(--border-subtle)] shadow-tactile-lg overflow-hidden flex flex-col max-h-[92vh] animate-tab-fade"
+        className="w-full max-w-2xl bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl border border-[var(--border-subtle)] shadow-tactile-lg overflow-hidden flex flex-col max-h-[92vh] modal-surface-spring"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}

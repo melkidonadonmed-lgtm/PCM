@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { UserCheck, Check, X, Shield, Eraser, Building2, Phone, MapPin, Sparkles } from 'lucide-react';
 import { DoctorProfile, WorkContext } from '../types';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 const LogoGeneratorModal = React.lazy(() => import('./LogoGeneratorModal'));
 
@@ -27,7 +28,15 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
   onSaveContext
 }) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
+
+  useModalAccessibility({
+    isOpen: !isLogoModalOpen,
+    onClose,
+    containerRef: modalRef,
+    initialFocusRef: nameInputRef,
+  });
 
   const [formData, setFormData] = useState<DoctorProfile>({
     name: doctor?.name || '',
@@ -164,15 +173,18 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
   };
 
   return (
-    <div data-state="idle" aria-busy={false} 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 isolate animate-tab-fade surface-raised"
+    <div
+      ref={modalRef}
+      data-state={validationError ? 'error' : 'idle'}
+      aria-busy={false}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 isolate animate-backdrop-fade surface-raised"
       role="dialog"
       aria-modal="true"
       aria-labelledby="doctor-modal-title"
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-lg rounded-2xl border overflow-hidden shadow-tactile-lg animate-tab-fade"
+        className="w-full max-w-lg rounded-2xl border overflow-hidden shadow-tactile-lg modal-surface-spring"
         style={{
           backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
           borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : '#E3D7BD'

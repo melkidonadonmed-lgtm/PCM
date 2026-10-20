@@ -190,7 +190,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               Protocolos clínicos por patologia
             </h2>
             <p className="text-xs font-medium text-[var(--text-muted)]">
-              Condutas de 1ª linha acionáveis • dose pediátrica calculada para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
+              Condutas de 1ª linha acionáveis • dose pediátrica calculada para <span className="text-emerald-700 dark:text-emerald-400 font-semibold clinical-tabular-nums">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
             </p>
           </div>
         </div>
@@ -205,7 +205,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
           >
             <Icon name="balanca" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
             <span className="text-xs font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-              Peso: <span className="text-emerald-700 dark:text-emerald-400 font-bold">{patientWeight > 0 ? `${patientWeight} kg` : '—'}</span>
+              Peso: <span className="text-emerald-700 dark:text-emerald-400 font-bold clinical-tabular-nums">{patientWeight > 0 ? `${patientWeight} kg` : '—'}</span>
             </span>
           </div>
 
@@ -314,7 +314,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                               {med.name}
                             </span>
                             {isPed && (
-                              <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-clinical dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-clinical">
+                              <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-clinical dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-clinical clinical-tabular-nums">
                                 {patientWeight > 0 ? `Dose p/ ${patientWeight} kg` : 'Pediátrico'}
                               </span>
                             )}
@@ -324,10 +324,10 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                               </span>
                             )}
                           </div>
-                          <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 mt-0.5">
+                          <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 mt-0.5 clinical-tabular-nums">
                             {med.presentation}
                           </div>
-                          <div className="text-xs font-medium mt-0.5 leading-relaxed text-[var(--text-muted)]">
+                          <div className="text-xs font-medium mt-0.5 leading-relaxed text-[var(--text-muted)] clinical-tabular-nums">
                             {med.posology}
                           </div>
                         </div>
@@ -337,7 +337,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAddSingleMedication(med, protocol, idx)}
-                        className={`px-3 py-2 min-h-[38px] rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                        className={`px-3 py-2 min-h-[44px] rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                           isMedAdded 
                             ? 'bg-emerald-600 text-white shadow-sm' 
                             : 'btn-tactile-secondary hover:border-info'
@@ -495,7 +495,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               <button
                 type="button"
                 onClick={() => onUsarMedicamento?.(med)}
-                className="btn-tactile-secondary px-3.5 py-2 min-h-[40px] rounded-xl font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="btn-tactile-secondary px-3.5 py-2 min-h-[44px] rounded-xl font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                 title={`Usar ${med.name} na receita`}
               >
                 <span>Usar na receita</span>
@@ -580,17 +580,17 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                       borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
                     }}
                   >
-                    <span className="text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-300 tracking-wider block">
+                    <span className="text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-300 tracking-wider block clinical-tabular-nums">
                       Volume Calculado ({patientWeight} kg):
                     </span>
-                    <div className="text-lg sm:text-xl font-bold text-emerald-700 dark:text-emerald-400">
+                    <div className="text-lg sm:text-xl font-bold text-emerald-700 dark:text-emerald-400 clinical-tabular-nums">
                       {calc.volumeText}
                     </div>
-                    <div className="text-xs font-semibold" style={{ color: darkMode ? '#CBD5E1' : '#475569' }}>
+                    <div className="text-xs font-semibold clinical-tabular-nums" style={{ color: darkMode ? '#CBD5E1' : '#475569' }}>
                       {calc.detail}
                     </div>
                     {calc.rate && (
-                      <div className="text-xs font-semibold text-sky-700 dark:text-sky-400">
+                      <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 clinical-tabular-nums">
                         Taxa: {calc.rate}
                       </div>
                     )}

@@ -1,20 +1,24 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { 
-  FileText, 
-  FlaskConical, 
-  Check, 
-  Search, 
-  ArrowLeft, 
-  Download, 
-  Printer, 
-  Copy, 
-  Layers, 
-  ShieldCheck, 
-  UserCheck, 
-  AlertCircle, 
-  Sparkles,
-  Edit3
-} from 'lucide-react';
+import { Icon, type IconName } from './Icon';
+
+const makeIcon = (name: IconName) => ({ className = '', size }: { className?: string; size?: number }) => (
+  <Icon name={name} size={size} className={className} />
+);
+
+const FileText = makeIcon('description');
+const FlaskConical = makeIcon('science');
+const Check = makeIcon('check');
+const Search = makeIcon('search');
+const ArrowLeft = makeIcon('arrow_back');
+const Download = makeIcon('download');
+const Printer = makeIcon('print');
+const Copy = makeIcon('content_copy');
+const Layers = makeIcon('layers');
+const ShieldCheck = makeIcon('verified_user');
+const UserCheck = makeIcon('person');
+const AlertCircle = makeIcon('error');
+const Sparkles = makeIcon('auto_awesome');
+const Edit3 = makeIcon('edit_document');
 import { 
   DoctorProfile, 
   Patient, 
@@ -74,7 +78,7 @@ const camposIniciaisDoDocumento = (_doc: SusDocumentItem): Partial<SusFilledForm
   lmeResponsibleName: ''
 });
 
-const CAMPO_SUS = 'w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info';
+const CAMPO_SUS = 'w-full px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums';
 const ROTULO_SUS = 'text-xs font-semibold text-[var(--text-muted)] block mb-1';
 
 interface SusDocumentsFillerProps {
@@ -423,7 +427,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   };
 
   return (
-    <div data-state="idle" aria-busy={false} id="sus-documents-filler-hub" className="space-y-4">
+    <div
+      data-state={isExportingPdf ? 'loading' : 'idle'}
+      aria-busy={isExportingPdf}
+      id="sus-documents-filler-hub"
+      className="space-y-4"
+    >
       {/* Toast Notification */}
       {toastMessage && (
         <div
@@ -456,7 +465,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)]">
                     Documentos & Requisições Oficiais do SUS
                   </h2>
-                  <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-700 dark:text-blue-300 border border-info">
+                  <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-700 dark:text-blue-300 border border-info clinical-tabular-nums">
                     9 Documentos
                   </span>
                 </div>
@@ -470,7 +479,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               <button
                 type="button"
                 onClick={handleStartFillingMultiple}
-                className="btn-tactile-primary text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer shrink-0"
+                className="btn-tactile-primary text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer shrink-0 clinical-tabular-nums"
               >
                 <Layers className="w-4 h-4" />
                 <span>Preencher Selecionados ({selectedDocIds.length})</span>
@@ -494,7 +503,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-xl border transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 ${
+                  className={`text-xs font-semibold px-3 py-1.5 min-h-[44px] rounded-xl border transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 clinical-tabular-nums ${
                     selectedCategory === cat.id
                       ? 'bg-sky-600 text-white border-info shadow-tactile-sm'
                       : 'bg-[var(--surface-inset)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-main)]'
