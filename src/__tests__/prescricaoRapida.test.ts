@@ -12,6 +12,10 @@ describe('prescricaoRapida (Cálculo de Comprimidos Totais e Posologia)', () => 
     expect(getTomadasPorDia('8/8h')).toBe(3);
     expect(getTomadasPorDia('12/12h')).toBe(2);
     expect(getTomadasPorDia('24h')).toBe(1);
+    expect(getTomadasPorDia('1x/dia')).toBe(1);
+    expect(getTomadasPorDia('2x/dia')).toBe(2);
+    expect(getTomadasPorDia('3x/dia')).toBe(3);
+    expect(getTomadasPorDia('4x/dia')).toBe(4);
     expect(getTomadasPorDia('manha')).toBe(1);
     expect(getTomadasPorDia('noite')).toBe(1);
     expect(getTomadasPorDia('DU')).toBe(1);
@@ -97,5 +101,19 @@ describe('prescricaoRapida (Cálculo de Comprimidos Totais e Posologia)', () => 
     expect(res.quantidadeTotalNumero).toBe(12);
     expect(res.quantidadeTotalTexto).toBe('12 comprimidos');
     expect(res.posologiaTexto).toBe('Tomar 1 comprimido via oral de 6 em 6 horas (se dor ou febre) durante 3 dias.');
+  });
+
+  it('calcula frequências diárias separadas (ex.: 3x ao dia) sem misturar com intervalos em horas', () => {
+    const res = calcularPrescricaoRapida({
+      dose: 1,
+      unidade: 'comprimido',
+      frequencia: '3x/dia',
+      diasTratamento: 7,
+      via: 'Uso Oral'
+    });
+
+    expect(res.quantidadeTotalNumero).toBe(21);
+    expect(res.quantidadeTotalTexto).toBe('21 comprimidos');
+    expect(res.posologiaTexto).toBe('Tomar 1 comprimido via oral 3 vezes ao dia durante 7 dias.');
   });
 });

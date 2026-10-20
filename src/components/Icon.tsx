@@ -53,6 +53,7 @@ export type CanonicalIconName =
   | 'event_available'
   | 'description'
   | 'picture_as_pdf'
+  | 'download'
   | 'print'
   | 'content_copy'
   | 'qr_code_2'
@@ -192,8 +193,8 @@ export const ICON_ALIASES: Record<string, string> = {
   imprimir: 'print',
   printer: 'print',
   pdf: 'picture_as_pdf',
-  baixar: 'picture_as_pdf',
-  download: 'picture_as_pdf',
+  baixar: 'download',
+  instalar: 'download',
   copiar: 'content_copy',
   copy: 'content_copy',
   qrcode: 'qr_code_2',
@@ -344,7 +345,7 @@ export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
  */
 export const Icon: React.FC<IconProps> = ({
   name,
-  size = 'md',
+  size,
   filled = false,
   weight = 400,
   grade = 0,
@@ -356,7 +357,9 @@ export const Icon: React.FC<IconProps> = ({
   ...props
 }) => {
   const resolvedName = resolveIconName(name);
-  const pixelSize = typeof size === 'number' ? size : SIZE_MAP[size] || 20;
+  const classSizeMatch = size === undefined ? className.match(/text-\[(\d+)px\]/) : null;
+  const resolvedSize = size !== undefined ? size : classSizeMatch ? Number(classSizeMatch[1]) : 'md';
+  const pixelSize = typeof resolvedSize === 'number' ? resolvedSize : SIZE_MAP[resolvedSize] || 20;
   const opsz = opticalSize || (pixelSize <= 20 ? 20 : pixelSize <= 24 ? 24 : pixelSize <= 40 ? 40 : 48);
 
   const fontVariation = `'FILL' ${filled ? 1 : 0}, 'wght' ${weight}, 'GRAD' ${grade}, 'opsz' ${opsz}`;

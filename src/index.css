@@ -243,7 +243,7 @@
     /* Hierarquia Tonal de 6 Níveis (DESIGN.md v4.5-soft) */
     --surface-sunken: #090E1A;
     --surface-canvas: #0F172A;
-    --surface-inset: #0B1120;
+    --surface-inset: #131B2E;
     --surface-flat: #1E293B;
     --surface-raised: #27354A;
     --surface-contrast: #0B1120;
@@ -253,10 +253,10 @@
     --bg-app: #0F172A;
     --bg-surface: #1E293B;
     --surface-card: #1E293B;
-    --bg-surface-elevated: #334155;
-    --surface-elevated: #334155;
-    --surface-hover: #27354A;
-    --surface-active: #334155;
+    --bg-surface-elevated: #27354A;
+    --surface-elevated: #27354A;
+    --surface-hover: #334155;
+    --surface-active: #3B4961;
 
     /* Cores de Navegação no Dark (Deep Slate) */
     --nav-bg: #0B1120;
@@ -412,7 +412,7 @@
   }
 
   .chip-neutral {
-    background-color: var(--surface-card);
+    background-color: #F1F5F9;
     color: var(--text-secondary);
     border: 1px solid var(--border-subtle);
     border-radius: 10px;
@@ -420,18 +420,50 @@
     transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
   }
 
+  .dark .chip-neutral {
+    background-color: #27354A;
+    color: #E2E8F0;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
   .chip-neutral:hover:not(:disabled) {
-    background-color: var(--surface-hover);
+    background-color: #E2E8F0;
     border-color: var(--border-medium);
     color: var(--text-main);
   }
 
+  .dark .chip-neutral:hover:not(:disabled) {
+    background-color: #334155;
+    border-color: rgba(255, 255, 255, 0.16);
+    color: #FFFFFF;
+  }
+
   .chip-neutral[data-active="true"] {
-    background-color: var(--surface-inset);
+    background-color: #E2E8F0;
     color: var(--text-main);
-    border-color: var(--accent-point);
+    border-color: var(--border-medium);
     font-weight: 700;
     box-shadow: var(--elevation-z1);
+  }
+
+  .dark .chip-neutral[data-active="true"] {
+    background-color: #334155;
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Aviso discreto opaco (Cinza sobre Cinza com detalhe pontual, sem fundo transparente chamativo) */
+  .notice-discreet {
+    background-color: #F1F5F9;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 12px;
+  }
+
+  .dark .notice-discreet {
+    background-color: #27354A;
+    color: #CBD5E1;
+    border-color: rgba(255, 255, 255, 0.1);
   }
 
   /* 1. Z-0 Inset Tray / Form Input Fields (Micro-Cavidade Côncava) */
@@ -759,10 +791,10 @@
 
   .tactile-btn-secondary,
   .btn-tactile-secondary {
-    border: 1px solid var(--border-medium);
+    border: 1px solid #CBD5E1;
     box-shadow: var(--elevation-z1);
-    background-color: var(--surface-card);
-    color: var(--text-main);
+    background-color: #F1F5F9;
+    color: #0F172A;
     border-radius: 12px;
     padding: 0.5rem 0.875rem;
     font-weight: 600;
@@ -777,12 +809,26 @@
                 border-color 0.18s ease;
   }
 
+  .dark .tactile-btn-secondary,
+  .dark .btn-tactile-secondary {
+    background-color: #27354A;
+    color: #F1F5F9;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .tactile-btn-secondary:hover:not(:disabled),
     .btn-tactile-secondary:hover:not(:disabled) {
-      border-color: var(--border-strong);
-      background-color: var(--surface-hover);
+      border-color: #94A3B8;
+      background-color: #E2E8F0;
       box-shadow: var(--elevation-z1);
+    }
+
+    .dark .tactile-btn-secondary:hover:not(:disabled),
+    .dark .btn-tactile-secondary:hover:not(:disabled) {
+      border-color: rgba(255, 255, 255, 0.2);
+      background-color: #334155;
+      color: #FFFFFF;
     }
   }
 
@@ -1141,7 +1187,22 @@
   @media print {
     @page {
       size: auto;
-      margin: 6mm;
+      margin: 0;
+    }
+
+    html,
+    html.dark,
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #FFFFFF !important;
+      background-color: #FFFFFF !important;
+      color: #0F172A !important;
+    }
+
+    ::placeholder {
+      color: transparent !important;
+      opacity: 0 !important;
     }
 
     *, *::before, *::after {
@@ -1165,26 +1226,27 @@
 
     .a4-editor-canvas {
       zoom: 1 !important;
-      position: absolute !important;
+      position: relative !important;
       left: 0 !important;
       top: 0 !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      min-height: auto !important;
+      width: 210mm !important;
+      max-width: 210mm !important;
+      min-height: 296mm !important;
       margin: 0 !important;
-      padding: 10mm 15mm !important;
+      padding: 15mm !important;
       box-shadow: none !important;
       border: none !important;
+      border-radius: 0 !important;
       background: #ffffff !important;
       color: #0F172A !important;
       box-sizing: border-box !important;
     }
 
     .a4-editor-canvas.canvas-landscape {
-      width: 100% !important;
-      max-width: 100% !important;
-      min-height: auto !important;
-      padding: 8mm 12mm !important;
+      width: 297mm !important;
+      max-width: 297mm !important;
+      min-height: 209mm !important;
+      padding: 10mm 14mm !important;
       box-sizing: border-box !important;
     }
 

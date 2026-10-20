@@ -457,7 +457,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             }}
           >
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white bg-sky-600 border border-info shadow-tactile-sm shrink-0">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-[#0369A1] border border-white/12 shadow-tactile-sm shrink-0">
                 <FileText className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -465,7 +465,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)]">
                     Documentos & Requisições Oficiais do SUS
                   </h2>
-                  <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-700 dark:text-blue-300 border border-info clinical-tabular-nums">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-white/10 clinical-tabular-nums">
                     9 Documentos
                   </span>
                 </div>
@@ -503,10 +503,10 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`text-xs font-semibold px-3 py-1.5 min-h-[44px] rounded-xl border transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 clinical-tabular-nums ${
+                  className={`text-xs font-semibold px-3 py-1.5 min-h-[40px] rounded-xl border transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 clinical-tabular-nums ${
                     selectedCategory === cat.id
-                      ? 'bg-sky-600 text-white border-info shadow-tactile-sm'
-                      : 'bg-[var(--surface-inset)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-main)]'
+                      ? 'bg-navy-900 dark:bg-[#0369A1] text-white border-navy-900 dark:border-sky-500/30 shadow-tactile-sm'
+                      : 'bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-[#334155]'
                   }`}
                 >
                   {cat.label}
@@ -536,8 +536,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   key={doc.id}
                   className={`tactile-card-interactive rounded-2xl p-4 flex flex-col justify-between border relative group ${
                     isSelected
-                      ? 'border-info bg-sky-500/5 shadow-tactile-sm'
-                      : 'hover:border-info'
+                      ? 'border-slate-400 dark:border-white/25 bg-slate-100/80 dark:bg-[#27354A] shadow-tactile-sm'
+                      : 'hover:border-slate-300 dark:hover:border-white/15'
                   }`}
                   style={{
                     backgroundColor: darkMode ? 'var(--surface-card)' : '#FFFFFF'
@@ -547,7 +547,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                   <div>
                     {/* Header do Card com Checkbox e Badge */}
                     <div className="flex items-start justify-between gap-2 mb-2.5">
-                      <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-700 dark:text-blue-300 border border-info">
+                      <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#27354A] text-sky-700 dark:text-sky-300 border border-slate-300 dark:border-white/10">
                         {doc.badge}
                       </span>
 
@@ -561,8 +561,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                         }}
                         className={`w-6 h-6 rounded-lg flex items-center justify-center transition border cursor-pointer ${
                           isSelected
-                            ? 'bg-sky-600 border-info text-white shadow-tactile-sm'
-                            : 'border-medium dark:border-strong bg-[var(--surface-inset)] hover:border-info text-transparent'
+                            ? 'bg-navy-900 dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/40 text-white shadow-tactile-sm'
+                            : 'border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-[#27354A] hover:border-slate-400 text-transparent'
                         }`}
                       >
                         <Check className="w-3.5 h-3.5 stroke-[3]" />
@@ -653,8 +653,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       onClick={() => setActiveFormDocId(id)}
                       className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${
                         isActive
-                          ? 'bg-sky-600 text-white border-info shadow-tactile-sm'
-                          : 'bg-[var(--surface-inset)] text-[var(--text-muted)] border-[var(--border-subtle)]'
+                          ? 'bg-navy-900 dark:bg-[#0369A1] text-white border-navy-900 dark:border-sky-500/30 shadow-tactile-sm'
+                          : 'bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10'
                       }`}
                     >
                       {doc?.shortTitle || id}
@@ -814,7 +814,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       Dados do Paciente Completos
                     </span>
                   ) : (
-                    <span className="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-warning">
+                    <span className="text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#27354A] px-2.5 py-0.5 rounded-md border border-slate-300 dark:border-white/10">
                       Faltante: {[!formData.patientAddress && 'Endereço', !formData.patientCns && 'Cartão SUS (CNS)', !formData.patientCity && 'Cidade'].filter(Boolean).join(', ')}
                     </span>
                   )}
@@ -844,9 +844,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                       value={formData.patientCns}
                       onChange={e => handleFieldChange('patientCns', e.target.value)}
                       placeholder="000 0000 0000 0000 (15 dígitos)"
-                      className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-info font-mono ${
-                        !formData.patientCns ? 'border-warning bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
-                      }`}
+                      className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500 font-mono"
                     />
                   </div>
 
@@ -979,9 +977,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.patientAddress}
                           onChange={e => handleFieldChange('patientAddress', e.target.value)}
                           placeholder="Rua / Avenida, Número e Complemento"
-                          className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-info ${
-                            !formData.patientAddress ? 'border-warning bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
-                          }`}
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
                         />
                       </div>
                       <div>
@@ -993,7 +989,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.patientNeighborhood}
                           onChange={e => handleFieldChange('patientNeighborhood', e.target.value)}
                           placeholder="Bairro"
-                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
                         />
                       </div>
                       <div>
@@ -1006,9 +1002,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                           value={formData.patientCity}
                           onChange={e => handleFieldChange('patientCity', e.target.value)}
                           placeholder="Cidade do paciente"
-                          className={`w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border outline-none focus:border-info ${
-                            !formData.patientCity ? 'border-warning bg-amber-500/5' : 'border-[var(--border-subtle)] text-[var(--text-main)]'
-                          }`}
+                          className="w-full px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
                         />
                       </div>
                       <div>
@@ -1147,7 +1141,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   {/* Campos Específicos para GAL / LACEN */}
                   {(currentDocItem.category === 'gal') && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-sky-500/5 border border-info">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
                       <div>
                         <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                           Nº da Notificação SINAN (Obrigatório GAL)
@@ -1177,7 +1171,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   {/* Campos Específicos para APAC Complementar */}
                   {(currentDocItem.id === 'apac_complementar') && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-sky-500/5 border border-info">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
                       <div>
                         <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">
                           Creatinina Sérica (mg/dL)
@@ -1225,7 +1219,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
                   {/* Campos Específicos para LME Farmácia de Alto Custo (numeração do impresso oficial) */}
                   {(currentDocItem.id === 'lme_medicamentos') && (
-                    <div className="space-y-3 p-2.5 rounded-xl bg-sky-500/5 border border-info">
+                    <div className="space-y-3 p-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
                       <div className="space-y-2">
                         <span className={ROTULO_SUS}>7 e 8 — Medicamento(s) e quantidade solicitada por mês</span>
                         {linhasDaLme.map((linha, indice) => (
@@ -1391,27 +1385,28 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                 }}
               >
                 {pendenciasClinicas.length > 0 && (
-                  <p role="status" className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-warning">
+                  <p role="status" className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-white/10">
                     Em branco: {pendenciasClinicas.join(', ')}.
                   </p>
                 )}
 
                 {camposCortados.length > 0 && (
-                  <p role="alert" className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-900 dark:text-rose-200 border border-rose-500/30">
+                  <p role="alert" className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-[#27354A] text-rose-700 dark:text-rose-300 border border-slate-300 dark:border-white/10">
                     Texto cortado com […] {camposCortados.length > 1 ? 'nos campos' : 'no campo'} {camposCortados.join(', ')}.
                   </p>
                 )}
 
                 <div className="flex items-center gap-2">
-                  {/* Imprimir Folha A4 (Apenas ícone da impressora) */}
+                  {/* Imprimir Folha A4 (Com rótulo explícito Imprimir) */}
                   <button
                     type="button"
                     onClick={handlePrintSheet}
                     aria-label="Imprimir folha A4"
                     title="Imprimir folha A4 (Ctrl+P)"
-                    className="btn-tactile-primary w-11 h-11 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center cursor-pointer shrink-0"
+                    className="btn-tactile-primary h-11 min-h-[44px] px-4 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shrink-0 whitespace-nowrap"
                   >
-                    <Printer className="w-4 h-4" />
+                    <Printer className="w-4 h-4 shrink-0" />
+                    <span>Imprimir</span>
                   </button>
 
                   {/* Baixar PDF (Individual) */}

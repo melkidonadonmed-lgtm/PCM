@@ -109,7 +109,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               <h2 className="text-base sm:text-lg font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                 Solicitação de exames complementares
               </h2>
-              <span className="text-xs px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900 dark:bg-sky-500/20 dark:text-blue-300 border border-navy-900/20 dark:border-info font-semibold">
+              <span className="text-xs px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 dark:bg-[#27354A] dark:text-slate-200 border border-slate-300 dark:border-white/10 font-semibold clinical-tabular-nums">
                 {selectedExams.length} selecionado(s)
               </span>
             </div>
@@ -242,12 +242,10 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                className={`text-xs font-semibold px-3.5 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   selectedCategory === cat
-                    ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border-navy-800 dark:border-info shadow-tactile-navy dark:shadow-tactile-blue'
-                    : darkMode
-                    ? 'bg-slate-800/80 text-slate-300 border-strong hover:bg-slate-700'
-                    : 'bg-white text-slate-700 border-subtle hover:bg-slate-100'
+                    ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
+                    : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
                 }`}
               >
                 {cat}
@@ -282,16 +280,16 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                       toggleExam(exam);
                     }
                   }}
-                  className={`pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                  className={`pt-1.5 flex items-center justify-between p-2 rounded-xl cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none border ${
                     selected 
-                      ? 'bg-sky-500/10 dark:bg-sky-500/15 border border-info dark:border-info' 
-                      : 'hover:bg-slate-500/5'
+                      ? 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/15' 
+                      : 'border-transparent hover:bg-slate-100/70 dark:hover:bg-[#27354A]/60'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <div 
                       className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center transition ${
-                        selected ? 'bg-navy-900 dark:bg-sky-600 border-navy-900 dark:border-info text-white' : 'border-medium'
+                        selected ? 'bg-navy-900 dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/40 text-white' : 'border-slate-300 dark:border-white/20'
                       }`}
                     >
                       {selected && <Icon name="check" className="text-[12px]" />}
@@ -305,7 +303,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   </div>
 
                   {exam.urgency === 'urgent' && (
-                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/20">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-[#27354A] text-rose-700 dark:text-rose-400 border border-slate-300 dark:border-white/10">
                       Urgência
                     </span>
                   )}

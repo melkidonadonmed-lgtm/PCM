@@ -75,10 +75,10 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
                     onChange(item.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left p-2 rounded-xl text-xs flex items-center justify-between gap-2.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                  className={`w-full text-left p-2 rounded-xl text-xs flex items-center justify-between gap-2.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none border ${
                     isSelected
-                      ? 'bg-sky-50 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 font-bold border border-info dark:border-info'
-                      : 'hover:bg-slate-100 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-300 font-medium'
+                      ? 'bg-slate-100 dark:bg-[#27354A] text-slate-900 dark:text-slate-100 font-semibold border-slate-300 dark:border-white/15'
+                      : 'border-transparent hover:bg-slate-100 dark:hover:bg-[#27354A]/60 text-slate-700 dark:text-slate-300 font-medium'
                   }`}
                 >
                   <div className="flex-1 min-w-0">

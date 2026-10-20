@@ -253,13 +253,7 @@ export default function App() {
     isAnyModalOpen: isPatientModalOpen || isDoctorModalOpen || isBackupModalOpen || isCommandPaletteOpen,
   });
 
-  const documentsBadgeCount = React.useMemo(() => {
-    return (
-      selectedExams.length +
-      (certificate?.daysOff > 0 ? 1 : 0) +
-      (referral?.destinationSpecialty?.trim() ? 1 : 0)
-    );
-  }, [selectedExams.length, certificate?.daysOff, referral?.destinationSpecialty]);
+  const documentsBadgeCount = selectedExams.length;
 
   // Medicamento pendente vindo de outras telas (ex: Protocolos)
   const [medicamentoPendente, setMedicamentoPendente] = useState<UnifiedMedication | null>(null);

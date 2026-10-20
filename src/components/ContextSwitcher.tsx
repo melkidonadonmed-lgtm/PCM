@@ -29,8 +29,8 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
       className={`px-2.5 py-2 border border-white/10 bg-white/[0.05] surface-inset rounded-xl ${collapsed ? 'text-center' : ''}`}
     >
       {!collapsed && (
-        <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1 mb-1.5">
-          <Icon name="verified_user" className="text-[13px] text-emerald-400 shrink-0" />
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
+          <Icon name="verified_user" size={16} className="text-emerald-400 shrink-0" />
           <span className="truncate">Local de Atuação (SUS)</span>
         </span>
       )}
@@ -40,7 +40,7 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
           value={activeContext.id}
           onChange={(e) => onSwitchContext(e.target.value)}
           aria-label="Selecionar local de atuação institucional"
-          className="w-full text-xs font-semibold rounded-lg bg-white/10 text-white border border-white/15 py-1.5 pl-2.5 pr-7 appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 truncate shadow-tactile-sm hover:bg-white/15 transition-colors ui-btn-tactile"
+          className="w-full h-9 text-xs font-semibold rounded-lg bg-white/10 text-white border border-white/15 pl-2.5 pr-7 appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 truncate shadow-tactile-sm hover:bg-white/15 transition-colors ui-btn-tactile"
         >
           {contexts.map((ctx) => (
             <option key={ctx.id} value={ctx.id} className="bg-slate-900 text-white">
@@ -52,7 +52,8 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
         {!collapsed && (
           <Icon
             name="expand_more"
-            className="text-[15px] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"
+            size={16}
+            className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"
           />
         )}
       </div>

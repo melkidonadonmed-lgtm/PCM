@@ -66,6 +66,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
     >
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
+          <Icon name="prescriptions" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
             Medicamentos prescritos
           </h3>
@@ -83,13 +84,13 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
           <button
             type="button"
             onClick={onOpenModelsModal}
-            className="chip-neutral text-xs flex items-center gap-1.5 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1"
+            className="chip-neutral h-9 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5"
             title="Abrir biblioteca de modelos de receitas salvos"
           >
-            <Icon name="folder_open" className="text-[15px] text-amber-500" />
+            <Icon name="folder_open" size={15} className="text-sky-600 dark:text-sky-400" />
             <span>Modelos</span>
             {savedModelsCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold clinical-tabular-nums">
+              <span className="px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold clinical-tabular-nums">
                 {savedModelsCount}
               </span>
             )}
@@ -99,20 +100,20 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
             <button
               type="button"
               onClick={onOpenSaveModelModal}
-              className="chip-neutral text-xs flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1"
+              className="chip-neutral h-9 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5"
               title="Salvar esta combinação de medicamentos como um modelo reutilizável"
             >
-              <Icon name="bookmark_add" className="text-[15px] text-sky-600 dark:text-sky-400" />
+              <Icon name="bookmark_add" size={15} className="text-sky-600 dark:text-sky-400" />
               <span>Salvar modelo</span>
             </button>
           ) : (
             <button
               type="button"
               onClick={onOpenCreateCustomModel}
-              className="chip-neutral text-xs flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5 py-1"
+              className="chip-neutral h-9 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5"
               title="Criar e salvar um novo modelo de receita reutilizável mesmo sem receita ativa na consulta"
             >
-              <Icon name="add" className="text-[15px] text-sky-600 dark:text-sky-400" />
+              <Icon name="add" size={15} className="text-sky-600 dark:text-sky-400" />
               <span>Novo modelo</span>
             </button>
           )}
@@ -121,9 +122,9 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
             <button
               type="button"
               onClick={onClearPrescription}
-              className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer rounded-lg focus-visible:ring-2 focus-visible:ring-rose-500 px-2 py-1"
+              className="h-9 text-xs font-medium text-rose-500 hover:text-rose-600 inline-flex items-center gap-1 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-rose-500 px-2.5 transition"
             >
-              <Icon name="delete" className="text-[14px]" />
+              <Icon name="delete" size={15} />
               <span>Limpar</span>
             </button>
           )}
@@ -134,11 +135,11 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
       {regimesComItens.length > 1 && (
         <div
           role="alert"
-          className="p-3 rounded-xl bg-amber-500/10 border border-warning text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2.5"
+          className="px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs flex items-center gap-2.5"
         >
-          <Icon name="shield" className="text-amber-600 dark:text-amber-400 text-base shrink-0 mt-0.5" />
+          <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" aria-hidden="true" />
           <p className="flex-1 min-w-0 leading-relaxed font-medium">
-            <strong className="font-bold">Esta consulta gera {regimesComItens.length} receitas separadas: </strong>
+            <strong className="font-semibold">Esta consulta gera {regimesComItens.length} receitas separadas: </strong>
             {regimesComItens
               .map((regime) => `${regimeLabels[regime].rotulo.toLowerCase()} (${porRegime[regime].length})`)
               .join(', ')}
@@ -163,7 +164,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                 key={it.id}
                 className={`p-3 rounded-xl border flex items-start justify-between gap-3 shadow-tactile-sm transition ${
                   isEditing
-                    ? 'bg-sky-50/70 dark:bg-sky-950/40 border-info dark:border-info ring-2 ring-sky-400/40'
+                    ? 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/15 ring-1 ring-sky-500/40'
                     : 'bg-slate-50/80 dark:bg-slate-950/60 border border-subtle dark:border-strong'
                 }`}
               >

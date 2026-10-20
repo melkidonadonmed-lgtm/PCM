@@ -20,13 +20,13 @@ interface ClinicalProtocolsViewProps {
   onUsarMedicamento?: (med: UnifiedMedication) => void;
 }
 
-// Badges de categoria com contraste WCAG 2.2 AA (texto 800 sobre 50 no claro; texto 200/300 sobre 950 no escuro)
+// Badges de categoria em superfície tonal opaca com detalhe cromático no texto
 const CATEGORY_BADGE_CLASSES: { [category: string]: string } = {
-  'Infectológica': 'text-blue-800 bg-blue-50 border-info dark:text-blue-200 dark:bg-blue-950/60 dark:border-info',
-  'Cardiovascular': 'text-rose-800 bg-rose-50 border-rose-200 dark:text-rose-200 dark:bg-rose-950/60 dark:border-rose-800/60',
-  'Endocrinológica': 'text-emerald-800 bg-emerald-50 border-clinical dark:text-emerald-200 dark:bg-emerald-950/60 dark:border-clinical',
-  'Gastrointestinal': 'text-amber-800 bg-amber-50 border-warning dark:text-amber-200 dark:bg-amber-950/60 dark:border-warning',
-  'Ginecológica': 'text-emerald-800 bg-emerald-50 border-clinical dark:text-emerald-200 dark:bg-emerald-950/60 dark:border-clinical'
+  'Infectológica': 'text-sky-700 bg-slate-100 border-slate-300 dark:text-sky-300 dark:bg-[#27354A] dark:border-white/10',
+  'Cardiovascular': 'text-rose-700 bg-slate-100 border-slate-300 dark:text-rose-300 dark:bg-[#27354A] dark:border-white/10',
+  'Endocrinológica': 'text-emerald-700 bg-slate-100 border-slate-300 dark:text-emerald-300 dark:bg-[#27354A] dark:border-white/10',
+  'Gastrointestinal': 'text-amber-700 bg-slate-100 border-slate-300 dark:text-amber-300 dark:bg-[#27354A] dark:border-white/10',
+  'Ginecológica': 'text-emerald-700 bg-slate-100 border-slate-300 dark:text-emerald-300 dark:bg-[#27354A] dark:border-white/10'
 };
 
 export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
@@ -221,10 +221,10 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
       </div>
 
       {/* Aviso YMYL */}
-      <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-warning dark:border-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300 flex items-start gap-2">
-        <Icon name="info" className="text-[16px] flex-shrink-0 mt-0.5" />
+      <div className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-xs font-medium text-slate-600 dark:text-slate-300 flex items-start gap-2.5">
+        <Icon name="info" className="text-[15px] text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
         <span>
-          Os protocolos abaixo são <span className="font-bold">referências de apoio</span> baseadas em protocolos do Ministério da Saúde e diretrizes das sociedades de especialidade. A avaliação do paciente, a adaptação de doses e a <span className="font-bold">conduta final são de responsabilidade exclusiva do médico assistente</span>.
+          Os protocolos abaixo são <span className="font-semibold text-slate-800 dark:text-slate-100">referências de apoio</span> baseadas em protocolos do Ministério da Saúde e diretrizes das sociedades de especialidade. A avaliação do paciente, a adaptação de doses e a <span className="font-semibold text-slate-800 dark:text-slate-100">conduta final são de responsabilidade exclusiva do médico assistente</span>.
         </span>
       </div>
 
@@ -237,12 +237,10 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+              className={`text-xs font-semibold px-3.5 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                 isSelected
-                  ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border-navy-800 dark:border-info shadow-tactile-navy dark:shadow-tactile-blue'
-                  : darkMode
-                  ? 'bg-slate-800/80 text-slate-300 border-strong hover:bg-slate-700 hover:text-white'
-                  : 'bg-white text-slate-700 border-subtle hover:bg-slate-100'
+                  ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
+                  : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
               }`}
             >
               {cat}
@@ -270,13 +268,13 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <span 
                     className={`text-xs uppercase font-bold px-2 py-0.5 rounded border ${
-                      CATEGORY_BADGE_CLASSES[protocol.category] || 'text-blue-800 bg-blue-50 border-info dark:text-blue-200 dark:bg-blue-950/60 dark:border-info'
+                      CATEGORY_BADGE_CLASSES[protocol.category] || 'text-sky-700 bg-slate-100 border-slate-300 dark:text-sky-300 dark:bg-[#27354A] dark:border-white/10'
                     }`}
                   >
                     {protocol.category}
                   </span>
                   {protocol.pediatricRelevant && (
-                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-clinical dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-clinical flex items-center gap-1">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-emerald-700 border border-slate-300 dark:bg-[#27354A] dark:text-emerald-300 dark:border-white/10 flex items-center gap-1">
                       <Icon name="child_care" className="text-[12px]" /> Pediátrico
                     </span>
                   )}
@@ -314,12 +312,12 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                               {med.name}
                             </span>
                             {isPed && (
-                              <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-clinical dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-clinical clinical-tabular-nums">
+                              <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-emerald-700 border border-slate-300 dark:bg-[#27354A] dark:text-emerald-300 dark:border-white/10 clinical-tabular-nums">
                                 {patientWeight > 0 ? `Dose p/ ${patientWeight} kg` : 'Pediátrico'}
                               </span>
                             )}
                             {isAdult && (
-                              <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-sky-50 text-sky-800 border border-info dark:bg-sky-950/40 dark:text-sky-300 dark:border-info">
+                              <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-sky-700 border border-slate-300 dark:bg-[#27354A] dark:text-sky-300 dark:border-white/10">
                                 Adulto
                               </span>
                             )}
@@ -337,10 +335,10 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAddSingleMedication(med, protocol, idx)}
-                        className={`px-3 py-2 min-h-[44px] rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                        className={`px-3 py-2 min-h-[40px] rounded-xl font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                           isMedAdded 
-                            ? 'bg-emerald-600 text-white shadow-sm' 
-                            : 'btn-tactile-secondary hover:border-info'
+                            ? 'bg-navy-900 dark:bg-[#0369A1] text-white shadow-sm' 
+                            : 'btn-tactile-secondary'
                         }`}
                         title={`Adicionar apenas ${med.name} à receita`}
                       >
@@ -363,8 +361,8 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
 
               {/* Clinical Warning */}
               {protocol.clinicalWarning && (
-                <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-warning dark:border-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300 flex items-start gap-1.5">
-                  <Icon name="warning" className="text-[14px] flex-shrink-0 mt-0.5" />
+                <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-xs font-medium text-slate-700 dark:text-slate-300 flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0 mt-1.5" aria-hidden="true" />
                   <span>{protocol.clinicalWarning}</span>
                 </div>
               )}
@@ -441,12 +439,10 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setSelectedMedCategory(catKey)}
-                className={`text-xs font-bold px-3.5 py-2 min-h-[44px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                className={`text-xs font-semibold px-3.5 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                   isSelected
-                    ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border-navy-800 dark:border-info shadow-tactile-navy dark:shadow-tactile-blue'
-                    : darkMode
-                    ? 'bg-slate-800/80 text-slate-300 border-strong hover:bg-slate-700 hover:text-white'
-                    : 'bg-white text-slate-700 border-subtle hover:bg-slate-100'
+                    ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
+                    : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
                 }`}
               >
                 {catLabel}
@@ -476,12 +472,12 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                       {med.name}
                     </span>
                     {med.isSpecialControl && (
-                      <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-warning dark:bg-amber-950/40 dark:text-amber-300 dark:border-warning">
+                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-amber-700 border border-slate-300 dark:bg-[#27354A] dark:text-amber-300 dark:border-white/10">
                         Controle Especial
                       </span>
                     )}
                     {med.isPediatric && (
-                      <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-clinical dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-clinical">
+                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-emerald-700 border border-slate-300 dark:bg-[#27354A] dark:text-emerald-300 dark:border-white/10">
                         Pediátrico
                       </span>
                     )}
@@ -495,7 +491,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               <button
                 type="button"
                 onClick={() => onUsarMedicamento?.(med)}
-                className="btn-tactile-secondary px-3.5 py-2 min-h-[44px] rounded-xl font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="btn-tactile-secondary px-3.5 py-2 min-h-[40px] rounded-xl font-semibold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                 title={`Usar ${med.name} na receita`}
               >
                 <span>Usar na receita</span>
@@ -543,9 +539,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                 className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between space-y-3.5 relative overflow-hidden"
                 style={{
                   backgroundColor: 'var(--surface-card)',
-                  borderColor: isEmergency 
-                    ? (darkMode ? 'rgba(244, 63, 94, 0.3)' : 'rgba(190, 18, 60, 0.25)')
-                    : (darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)')
+                  borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
                 }}
               >
                 {/* Card Header */}
@@ -553,8 +547,8 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <span className={`text-xs uppercase font-bold px-2 py-0.5 rounded border ${
                       isEmergency 
-                        ? 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/50 dark:text-rose-200 dark:border-rose-800/40' 
-                        : 'bg-sky-50 text-sky-800 border-info dark:bg-sky-950/50 dark:text-sky-200 dark:border-info'
+                        ? 'bg-slate-100 text-rose-700 border-slate-300 dark:bg-[#27354A] dark:text-rose-300 dark:border-white/10' 
+                        : 'bg-slate-100 text-sky-700 border-slate-300 dark:bg-[#27354A] dark:text-sky-300 dark:border-white/10'
                     }`}>
                       {isEmergency ? 'Emergência Crítica' : 'Protocolo Clínico'}
                     </span>
@@ -630,8 +624,8 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-2 rounded-lg bg-amber-50 border border-warning dark:bg-amber-950/30 dark:border-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300">
-                    <span className="font-bold">Atenção Médica: </span>
+                  <div className="p-2.5 rounded-xl bg-slate-100 border border-slate-300 dark:bg-[#27354A] dark:border-white/10 text-xs font-medium text-slate-700 dark:text-slate-300">
+                    <span className="font-semibold text-amber-700 dark:text-amber-400">Atenção médica: </span>
                     {protocol.clinicalNotes}
                   </div>
                 </div>

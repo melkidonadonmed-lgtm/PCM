@@ -71,14 +71,12 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
     {
       id: 'certificate',
       label: 'Atestado médico',
-      icon: 'atestado',
-      badge: certificate?.daysOff > 0 ? `${certificate.daysOff}d` : undefined
+      icon: 'atestado'
     },
     {
       id: 'referral',
       label: 'Encaminhamento',
-      icon: 'encaminhamento',
-      badge: referral?.destinationSpecialty ? referral.destinationSpecialty.split(' ')[0] : undefined
+      icon: 'encaminhamento'
     },
     {
       id: 'exams',
@@ -86,7 +84,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
       icon: 'exame',
       badge: selectedExams?.length > 0 ? `${selectedExams.length}` : undefined
     },
-    { id: 'sus', label: 'Documentos SUS', icon: 'description', badge: '9' }
+    { id: 'sus', label: 'Documentos SUS', icon: 'description' }
   ];
 
   const handleTabKeyDown = (e: React.KeyboardEvent, currentId: DocumentsSubTab) => {
@@ -132,11 +130,11 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
           </div>
         </div>
 
-        {/* Abas dos documentos (WAI-ARIA APG Tabs com roving tabindex). */}
+        {/* Abas dos documentos no padrão normal (sem depressão interna) */}
         <nav
           role="tablist"
           aria-label="Documentos clínicos disponíveis"
-          className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-950/60 border border-subtle dark:border-strong overflow-x-auto scrollbar-none"
+          className="flex items-center gap-2 overflow-x-auto scrollbar-none"
         >
           {tabsList.map((tab) => {
             const isActive = activeSubTab === tab.id;
@@ -151,10 +149,10 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => handleChangeSubTab(tab.id)}
                 onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
-                className={`min-h-[44px] px-3.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                className={`h-10 min-h-[40px] px-3.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   isActive
-                    ? 'bg-navy-900 border-navy-900 text-white dark:bg-sky-600 dark:border-info shadow-tactile-sm'
-                    : 'bg-[var(--surface-card)] border-subtle dark:border-strong text-slate-600 dark:text-slate-300 hover:border-medium dark:hover:border-strong hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-navy-900 border-navy-900 text-white dark:bg-[#0369A1] dark:border-transparent shadow-tactile-sm'
+                    : 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#334155] hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <Icon
@@ -167,7 +165,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                 {tab.badge && (
                   <span
                     className={`text-xs font-bold px-1.5 py-0.5 rounded-full max-w-[90px] truncate clinical-tabular-nums ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                      isActive ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200'
                     }`}
                   >
                     {tab.badge}

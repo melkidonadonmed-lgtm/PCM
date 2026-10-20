@@ -1,7 +1,13 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { downloadPdfDoc } from './downloadPdf';
-import { alturaFolhaPx, larguraFolhaPx, type OpcoesExportacao, type OrientacaoFolha } from './folhaA4';
+import {
+  alturaFolhaPx,
+  converterCamposEditaveisEmTexto,
+  larguraFolhaPx,
+  type OpcoesExportacao,
+  type OrientacaoFolha
+} from './folhaA4';
 
 /**
  * Motor do caminho ÚNICO de exportação de PDF do PresCMed (os componentes o
@@ -46,50 +52,6 @@ async function aguardarRecursos(el: HTMLElement): Promise<void> {
   );
 }
 
-const ESTILOS_DE_TEXTO = [
-  'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight', 'letterSpacing',
-  'textAlign', 'textTransform', 'color', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'
-] as const;
-
-/**
- * Campos editáveis dentro da folha (cabeçalho do Editor A4) viram texto comum
- * na cópia capturada: a biblioteca de captura desenha <input> cortando o
- * conteúdo e ignorando caixa alta/alinhamento. Campo vazio não imprime nada
- * (o placeholder é só uma dica de tela).
- */
-function trocarCamposPorTexto(clonedDoc: Document, folha: HTMLElement): void {
-  const janela = clonedDoc.defaultView;
-  if (!janela) return;
-  folha.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach((campo) => {
-    const ehTextarea = campo.tagName === 'TEXTAREA';
-    if (!ehTextarea && !['text', 'search', 'tel', 'email', 'url', 'number', 'date', ''].includes((campo as HTMLInputElement).type)) {
-      return;
-    }
-    const estilo = janela.getComputedStyle(campo);
-    const texto = clonedDoc.createElement('div');
-    texto.textContent = campo.value;
-    ESTILOS_DE_TEXTO.forEach((prop) => {
-      texto.style[prop] = estilo[prop];
-    });
-    texto.style.display = estilo.display.startsWith('inline') ? 'inline-block' : 'block';
-    texto.style.boxSizing = 'border-box';
-    texto.style.minWidth = estilo.width;
-    texto.style.minHeight = estilo.height;
-    if (!ehTextarea) {
-      // Campo de uma linha centraliza o texto na vertical: reproduz com a altura de linha.
-      const interna = parseFloat(estilo.height) - parseFloat(estilo.paddingTop) - parseFloat(estilo.paddingBottom)
-        - parseFloat(estilo.borderTopWidth) - parseFloat(estilo.borderBottomWidth);
-      if (interna > 0) texto.style.lineHeight = `${interna}px`;
-    }
-    texto.style.marginTop = estilo.marginTop;
-    texto.style.marginRight = estilo.marginRight;
-    texto.style.marginBottom = estilo.marginBottom;
-    texto.style.marginLeft = estilo.marginLeft;
-    texto.style.whiteSpace = ehTextarea ? 'pre-wrap' : 'nowrap';
-    campo.replaceWith(texto);
-  });
-}
-
 async function capturarFolha(el: HTMLElement, orientation: OrientacaoFolha, scale: number): Promise<HTMLCanvasElement> {
   const largura = larguraFolhaPx(orientation);
   const alturaMinima = alturaFolhaPx(orientation);
@@ -106,7 +68,7 @@ async function capturarFolha(el: HTMLElement, orientation: OrientacaoFolha, scal
     // Controles de edição marcados como .no-print ficam fora do PDF, como na impressão.
     ignoreElements: (el) => el.classList.contains('no-print'),
     onclone: (clonedDoc, folha) => {
-      trocarCamposPorTexto(clonedDoc, folha);
+      converterCamposEditaveisEmTexto(clonedDoc, folha, el);
 
       // Papel é sempre claro: o tema escuro do app nunca entra no documento.
       clonedDoc.documentElement.classList.remove('dark');

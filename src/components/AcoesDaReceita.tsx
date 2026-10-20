@@ -39,10 +39,10 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
       {isDisabledSemMedico && (
         <div data-state="idle" aria-busy={false}
           id={avisoId}
-          className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-warning dark:border-amber-900/40 text-amber-800 dark:text-amber-300 text-xs flex items-center justify-between gap-2 surface-raised"
+          className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 text-xs flex items-center justify-between gap-2"
         >
-          <div className="flex items-center gap-1.5 min-w-0">
-            <Icon name="warning" className="text-amber-600 dark:text-amber-400 text-[18px] shrink-0" />
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
             <span className="font-medium truncate">
               Configure nome e CRM do médico para emitir documentos.
             </span>
@@ -51,7 +51,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             <button
               type="button"
               onClick={onAbrirPerfilMedico}
-              className="px-2.5 py-1 rounded-lg bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500"
+              className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#334155] hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-white/12 font-semibold text-xs transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             >
               Configurar médico
             </button>

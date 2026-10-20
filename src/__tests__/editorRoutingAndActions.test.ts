@@ -5,6 +5,9 @@ import { ActiveTab, DoctorProfile, Patient, PrescriptionItem } from '../types';
 import { AcoesDaReceita } from '../components/AcoesDaReceita';
 import { DocumentoClinico } from '../components/documento/DocumentoClinico';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
+import {
+  converterCamposEditaveisEmTexto
+} from '../utils/folhaA4';
 
 describe('Governança de Rotas e Navegação do Editor', () => {
   it('não deve possuir rotas órfãs ou duplicadas na união canônica de ActiveTab e deve bloquear ações sem médico configurado', () => {
@@ -142,6 +145,83 @@ describe('Governança de Rotas e Navegação do Editor', () => {
     expect(parsed).toHaveLength(2);
     expect(parsed[0].name).toContain('Dipirona Monoidratada 500 mg/mL');
     expect(parsed[1].name).toContain('Amoxicilina 500 mg');
+  });
+
+  it('deve preparar a folha para impressão nativa convertendo inputs com valor em texto quebrável e suprimindo placeholders vazios', () => {
+    const campoClinic = {
+      tagName: 'INPUT',
+      type: 'text',
+      value: 'UNIDADE DE SAÚDE DA FAMÍLIA',
+      removed: false,
+      replacedWith: null as unknown,
+      remove() {
+        this.removed = true;
+      },
+      replaceWith(el: unknown) {
+        this.replacedWith = el;
+      }
+    };
+
+    const campoPacienteVazio = {
+      tagName: 'INPUT',
+      type: 'text',
+      value: '   ',
+      placeholder: 'Identificação do paciente (opcional: digite o nome e documento aqui)',
+      removed: false,
+      replacedWith: null as unknown,
+      remove() {
+        this.removed = true;
+      },
+      replaceWith(el: unknown) {
+        this.replacedWith = el;
+      }
+    };
+
+    const fakeDoc = {
+      defaultView: {
+        getComputedStyle: () => ({
+          fontFamily: 'serif',
+          fontSize: '14px',
+          fontWeight: '700',
+          fontStyle: 'normal',
+          lineHeight: '1.3',
+          letterSpacing: '0px',
+          textAlign: 'left',
+          textTransform: 'uppercase',
+          color: '#0F172A',
+          paddingTop: '2px',
+          paddingRight: '4px',
+          paddingBottom: '2px',
+          paddingLeft: '4px',
+          display: 'block',
+          marginTop: '0px',
+          marginRight: '0px',
+          marginBottom: '0px',
+          marginLeft: '0px'
+        })
+      },
+      createElement: (tag: string) => ({
+        tagName: tag.toUpperCase(),
+        textContent: '',
+        style: {} as Record<string, string>
+      })
+    } as unknown as Document;
+
+    const fakeFolhaClonada = {
+      querySelectorAll: () => [campoClinic, campoPacienteVazio]
+    } as unknown as HTMLElement;
+
+    converterCamposEditaveisEmTexto(fakeDoc, fakeFolhaClonada);
+
+    expect(campoClinic.removed).toBe(false);
+    const blocoClinic = campoClinic.replacedWith as { textContent: string; style: Record<string, string> };
+    expect(blocoClinic).not.toBeNull();
+    expect(blocoClinic.textContent).toBe('UNIDADE DE SAÚDE DA FAMÍLIA');
+    expect(blocoClinic.style.whiteSpace).toBe('normal');
+    expect(blocoClinic.style.overflowWrap).toBe('break-word');
+
+    expect(campoPacienteVazio.removed).toBe(true);
+    expect(campoPacienteVazio.replacedWith).toBeNull();
   });
 });
 

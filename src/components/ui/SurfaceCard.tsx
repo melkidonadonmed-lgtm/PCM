@@ -112,7 +112,7 @@ export const SurfaceCard: React.FC<SurfaceCardProps> = ({
         <div
           role="alert"
           aria-live="assertive"
-          className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-warning text-amber-800 dark:text-amber-300 text-xs font-semibold"
+          className="p-3 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-medium"
         >
           {error}
         </div>

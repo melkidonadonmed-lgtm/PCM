@@ -53,7 +53,13 @@ import {
   File,
   Files
 } from 'lucide-react';
-import { alturaFolhaPx, exportarFolhaPdf, larguraFolhaPx } from '../utils/folhaA4';
+import {
+  alturaFolhaPx,
+  exportarFolhaPdf,
+  larguraFolhaPx,
+  limparRaizDeImpressao,
+  prepararRaizDeImpressao
+} from '../utils/folhaA4';
 import { DOMPurify } from '../utils/sanitizeHtml';
 import { 
   DoctorProfile, 
@@ -379,6 +385,56 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   }, [doctor, activeContext]);
 
   const [headerConfig, setHeaderConfig] = useState<DocumentHeaderConfig>(buildDefaultHeader);
+
+  // Mantém o cabeçalho e o rodapé sincronizados com o médico e local ativos quando ainda estiverem com placeholders padrão
+  useEffect(() => {
+    const fresh = buildDefaultHeader();
+    setHeaderConfig((prev) => {
+      const medicoEraPadrao =
+        !prev.doctorName ||
+        prev.doctorName === 'Dr(a). Médico(a)' ||
+        !prev.doctorCrm ||
+        prev.doctorCrm.includes('------');
+      const rodapeEraPadrao =
+        !prev.footerDocName ||
+        prev.footerDocName === 'Dr(a). Médico(a)' ||
+        !prev.footerCrm ||
+        prev.footerCrm.includes('------');
+      const clinicaEraPadrao =
+        !prev.clinicName || prev.clinicName === 'Dr(a). Médico(a)';
+
+      if (!medicoEraPadrao && !rodapeEraPadrao && !clinicaEraPadrao) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        doctorName: medicoEraPadrao ? fresh.doctorName : prev.doctorName,
+        doctorCrm: medicoEraPadrao ? fresh.doctorCrm : prev.doctorCrm,
+        doctorSpecialty: medicoEraPadrao ? fresh.doctorSpecialty : prev.doctorSpecialty,
+        footerDocName: rodapeEraPadrao ? fresh.footerDocName : prev.footerDocName,
+        footerCrm: rodapeEraPadrao ? fresh.footerCrm : prev.footerCrm,
+        footerSpecialty: rodapeEraPadrao ? fresh.footerSpecialty : prev.footerSpecialty,
+        clinicName: clinicaEraPadrao ? fresh.clinicName : prev.clinicName,
+        clinicAddress: clinicaEraPadrao ? fresh.clinicAddress : prev.clinicAddress
+      };
+    });
+  }, [buildDefaultHeader]);
+
+  // Isola a folha A4 do editor em #pcm-print-root na hora de imprimir (Ctrl+P ou botão Imprimir)
+  useEffect(() => {
+    const orientacao = pageOrientation === 'landscape' ? 'landscape' : 'portrait';
+    const preparar = () => prepararRaizDeImpressao(sheetRef.current, orientacao);
+    const limpar = () => limparRaizDeImpressao();
+
+    window.addEventListener('beforeprint', preparar);
+    window.addEventListener('afterprint', limpar);
+    return () => {
+      window.removeEventListener('beforeprint', preparar);
+      window.removeEventListener('afterprint', limpar);
+      limpar();
+    };
+  }, [pageOrientation]);
 
   // Estados da Logo em Tempo Real (Posição Livre, Arrastável, Alinhamento, Tamanho)
   const [logoConfig, setLogoConfig] = useState<DocumentLogoConfig>({
@@ -781,10 +837,14 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       ? ''
       : `<p><strong>Paciente:</strong> ${pName}${pDoc}${pAge}${pWeight}</p><p></p>`;
 
+    // Evita duplicidade: se o cabeçalho institucional estiver ativo, o selo já traz o título da receita
+    const tituloCorpoHtml = draftMetaRef.current.headerConfig.showHeader
+      ? ''
+      : `<p style="text-align: center;"><strong>${receita.titulo}</strong></p>`;
+
     const newHtml = `
-      <p style="text-align: center;"><strong>${receita.titulo}</strong></p>
+      ${tituloCorpoHtml}
       ${regime === 'antimicrobiano' ? '<p style="text-align: center; font-size: 0.85em; color: #475569;">Antimicrobiano — receita válida por 10 dias a contar da data de emissão (RDC Anvisa nº 471/2021).</p>' : ''}
-      <p></p>
       ${patientLineHtml}
       <p><strong>PRESCRIÇÃO:</strong></p>
       <p></p>
@@ -1631,29 +1691,8 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       showToast('Configure o nome e CRM do médico emitente para imprimir ou gerar PDF.');
       return;
     }
-    // Injeta estilo dinâmico de orientação no documento
-    const styleId = 'prescmed-dynamic-print-style';
-    let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
-    if (!styleEl) {
-      styleEl = document.createElement('style');
-      styleEl.id = styleId;
-      document.head.appendChild(styleEl);
-    }
-    styleEl.innerHTML = `
-      @page {
-        size: A4 ${pageOrientation};
-        margin: 6mm;
-      }
-    `;
-
-    if (pageOrientation === 'landscape') {
-      document.body.classList.add('print-landscape');
-      document.body.classList.remove('print-portrait');
-    } else {
-      document.body.classList.add('print-portrait');
-      document.body.classList.remove('print-landscape');
-    }
-
+    const orientacao = pageOrientation === 'landscape' ? 'landscape' : 'portrait';
+    prepararRaizDeImpressao(sheetRef.current, orientacao);
     window.print();
   };
 
@@ -2057,17 +2096,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
         {/* Botões de Ação de Impressão e Modelo */}
         <div className="flex items-center gap-2 flex-wrap min-w-0 max-w-full">
-          {/* Botão de Impressão Direta A4 Superior (Apenas ícone para zero poluição visual) */}
+          {/* Botão de Impressão Direta A4 Superior (Com rótulo explícito Imprimir) */}
           <button
             type="button"
             onClick={handlePrint}
             aria-label="Imprimir folha A4"
-            className={`btn-tactile-primary w-10 h-10 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 ${
+            className={`btn-tactile-primary h-10 min-h-[44px] px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
               !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
             }`}
-            title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica ou salvar como PDF' : 'Clique para configurar o médico emitente e imprimir'}
+            title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica (Ctrl+P)' : 'Clique para configurar o médico emitente e imprimir'}
           >
-            <Printer className="w-4 h-4" />
+            <Printer className="w-4 h-4 shrink-0" />
+            <span>Imprimir</span>
           </button>
 
           {/* Botão Baixar PDF Nativo de Alta Fidelidade (Preserva tipografia e layout) */}
@@ -3093,11 +3133,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                       </div>
                     )}
 
-                    <div className="flex flex-wrap sm:flex-nowrap items-start justify-between gap-3 sm:gap-4">
-                      {/* Lado Esquerdo: timbre do local de atendimento (o médico é identificado na assinatura) */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start gap-2.5 mb-1">
-                          {/* Logotipo integrado ao lado esquerdo OU Ícone de Saúde */}
+                    <div className="space-y-2">
+                      {/* Timbre institucional em largura total (sem truncar nome da unidade ou endereço) */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-2.5 flex-1 min-w-0">
                           {logoConfig.dataUrl && logoConfig.visible && (logoConfig.position === 'header-left' || logoConfig.secondaryDataUrl || (!logoConfig.position && !logoConfig.secondaryDataUrl)) ? (
                             <div className="relative group shrink-0">
                               <img 
@@ -3126,7 +3165,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                               placeholder="Nome do local de atendimento"
                               aria-label="Nome do local de atendimento"
                               style={{ fontFamily: 'inherit' }}
-                              className="text-sm sm:text-base font-bold uppercase tracking-tight text-slate-900 leading-snug w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
+                              className="text-sm font-bold uppercase tracking-tight text-slate-900 leading-snug w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
                               title="Clique para editar o nome do local de atendimento"
                             />
 
@@ -3143,12 +3182,10 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                             />
                           </div>
                         </div>
-                      </div>
 
-                      {/* Lado Direito: Logo (header-right ou secundário), Selo do Tipo de Documento & Data */}
-                      <div className="text-right flex flex-col items-end shrink-0 max-w-[220px]">
+                        {/* Logotipo Direito / Secundário (quando houver) */}
                         {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false ? (
-                          <div className="relative group mb-2">
+                          <div className="relative group shrink-0">
                             <img 
                               src={logoConfig.secondaryDataUrl} 
                               alt="Logotipo Secundário / Direito" 
@@ -3168,30 +3205,30 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                           <img 
                             src={logoConfig.dataUrl} 
                             alt="Logotipo" 
-                            className={`${getLogoSizeClass(logoConfig.size)} object-contain mb-2`}
+                            className={`${getLogoSizeClass(logoConfig.size)} object-contain shrink-0`}
                           />
                         ))}
+                      </div>
 
-                        {/* Badge Editável do Tipo de Documento */}
+                      {/* Linha de Selo do Tipo de Documento & Data de Emissão */}
+                      <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-subtle">
                         <input
                           type="text"
                           value={headerConfig.badgeText || ''}
                           onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
                           placeholder="TIPO DE DOCUMENTO"
-                          // Largura acompanha o texto: com a largura padrão do campo o selo saía cortado ("RECEITUÁRIO MÉDIC") na tela, na impressão e no PDF
-                          style={{ fontFamily: 'inherit', width: `${Math.max(12, (headerConfig.badgeText || 'TIPO DE DOCUMENTO').length) * 0.8 + 2.5}em` }}
-                          className="text-xs font-extrabold uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-medium text-center hover:bg-slate-200/80 focus:bg-sky-50 focus:border-info outline-none transition max-w-[220px]"
+                          style={{ fontFamily: 'inherit', width: `${Math.max(12, (headerConfig.badgeText || 'TIPO DE DOCUMENTO').length) * 0.72 + 2}em` }}
+                          className="text-[11px] font-extrabold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-medium text-left hover:bg-slate-200/80 focus:bg-sky-50 focus:border-info outline-none transition max-w-[65%]"
                           title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
                         />
 
-                        {/* Data Editável */}
                         <input
                           type="text"
                           value={headerConfig.dateText || ''}
                           onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
                           placeholder="Data de emissão"
                           style={{ fontFamily: 'inherit' }}
-                          className="text-xs text-slate-500 mt-1 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition w-full min-h-6"
+                          className="text-xs text-slate-500 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition flex-1 min-w-[110px] min-h-6"
                           title="Clique para editar a data de emissão"
                         />
                       </div>

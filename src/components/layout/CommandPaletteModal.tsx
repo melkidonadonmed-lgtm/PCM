@@ -298,10 +298,10 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                   aria-selected={isSelected}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   onClick={item.action}
-                  className={`w-full min-h-[48px] px-3.5 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition cursor-pointer ${
+                  className={`w-full min-h-[48px] px-3.5 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition cursor-pointer border ${
                     isSelected
-                      ? 'bg-sky-600/12 dark:bg-sky-500/20 border border-info text-[var(--text-main)] shadow-tactile-sm'
-                      : 'bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] border border-transparent text-[var(--text-secondary)]'
+                      ? 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/15 text-[var(--text-main)] shadow-tactile-sm'
+                      : 'bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] border-transparent text-[var(--text-secondary)]'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">

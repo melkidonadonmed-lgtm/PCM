@@ -42,26 +42,22 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
       data-state={patientName ? 'pressed' : 'idle'}
       aria-busy={false}
       aria-label="Identificação rápida do paciente"
-      className="card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 space-y-2.5 border border-subtle dark:border-strong"
+      className="card-surface surface-card-minimal rounded-2xl p-4 sm:p-5 space-y-3 border border-subtle dark:border-strong"
     >
       {/* Cabeçalho compacto em linha única */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <Icon name="person" className="text-sky-600 dark:text-sky-400 text-[18px] shrink-0" />
+          <Icon name="person" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
           <label
             htmlFor="quick-patient-name"
-            className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white cursor-pointer truncate"
+            className="text-sm font-semibold text-slate-900 dark:text-white cursor-pointer truncate"
           >
-            Identificação do paciente *
+            Identificação do paciente
           </label>
-          {patientName ? (
+          {patientName && (
             <Badge tone="clinical" tabular={false}>
               Sincronizado
             </Badge>
-          ) : (
-            <span className="text-xs text-[var(--text-muted)] hidden sm:inline">
-              (vazio — preencha para vincular aos documentos)
-            </span>
           )}
         </div>
 
@@ -69,15 +65,15 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           <button
             type="button"
             onClick={onToggleExtraFields}
-            className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded px-1 py-0.5 clinical-tabular-nums"
+            className="text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg px-2 py-1 clinical-tabular-nums transition"
             title="Alternar exibição de CPF e Peso"
           >
-            <Icon name={showExtraPatientFields ? 'expand_less' : 'expand_more'} className="text-[14px]" />
+            <Icon name={showExtraPatientFields ? 'expand_less' : 'expand_more'} size={15} />
             <span>
               {showExtraPatientFields
                 ? 'Ocultar CPF / Peso'
                 : hasExtraData
-                  ? `Ver dados (${patient.weightKg > 0 ? `${patient.weightKg} kg` : ''}${patient.documentNumber ? ` • ${patient.documentNumber}` : ''})`
+                  ? `Dados (${patient.weightKg > 0 ? `${patient.weightKg} kg` : ''}${patient.documentNumber ? ` • ${patient.documentNumber}` : ''})`
                   : '+ CPF e Peso'}
             </span>
           </button>
@@ -86,10 +82,10 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onRequestClearPatient}
-              className="text-xs text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1 cursor-pointer transition p-1 rounded focus-visible:ring-2 focus-visible:ring-rose-500"
+              className="text-xs text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1 cursor-pointer transition px-2 py-1 rounded-lg focus-visible:ring-2 focus-visible:ring-rose-500"
               title="Limpar paciente e reiniciar consulta"
             >
-              <Icon name="delete" className="text-[14px]" />
+              <Icon name="delete" size={15} />
               <span className="hidden sm:inline">Limpar</span>
             </button>
           )}
@@ -97,7 +93,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           <button
             type="button"
             onClick={onOpenPatientModal}
-            className="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer p-1 rounded focus-visible:ring-2 focus-visible:ring-sky-500"
+            className="text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center gap-1 cursor-pointer px-2 py-1 rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 transition"
             title="Abrir cadastro clínico detalhado"
           >
             <span>Cadastro completo</span>
@@ -114,7 +110,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             value={patient.name || ''}
             onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
             placeholder="Ex.: Maria de Oliveira Santos"
-            className="w-full px-3.5 py-2 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+            className="w-full h-10 px-3.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
           />
         </div>
 
@@ -123,10 +119,10 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToCertificate}
-              className="chip-neutral text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-9 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir formulário de Atestado Médico para este paciente"
             >
-              <Icon name="atestado" className="text-[14px] text-sky-600 dark:text-sky-400" />
+              <Icon name="atestado" size={15} className="text-sky-600 dark:text-sky-400" />
               <span>Atestado</span>
             </button>
           )}
@@ -134,10 +130,10 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToReferral}
-              className="chip-neutral text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-9 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir Encaminhamento Médico para este paciente"
             >
-              <Icon name="encaminhamento" className="text-[14px] text-sky-600 dark:text-sky-400" />
+              <Icon name="encaminhamento" size={15} className="text-sky-600 dark:text-sky-400" />
               <span>Encaminhamento</span>
             </button>
           )}
@@ -145,10 +141,10 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToExams}
-              className="chip-neutral text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-9 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir Solicitação de Exames para este paciente"
             >
-              <Icon name="exame" className="text-[14px] text-sky-600 dark:text-sky-400" />
+              <Icon name="exame" size={15} className="text-sky-600 dark:text-sky-400" />
               <span>Exames</span>
             </button>
           )}
@@ -156,10 +152,10 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToSus}
-              className="chip-neutral text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-9 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir Formulários SUS (LME, APAC, SISREG) para este paciente"
             >
-              <Icon name="sus" className="text-[14px] text-sky-600 dark:text-sky-400" />
+              <Icon name="sus" size={15} className="text-sky-600 dark:text-sky-400" />
               <span>Guias SUS</span>
             </button>
           )}
@@ -168,9 +164,9 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
 
       {/* Campos Extras Retráteis: CPF e Peso */}
       {showExtraPatientFields && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-strong">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-subtle dark:border-strong">
           <div>
-            <label htmlFor="quick-patient-doc" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+            <label htmlFor="quick-patient-doc" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
               CPF / RG
             </label>
             <input
@@ -179,12 +175,12 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
               value={patient.documentNumber || ''}
               onChange={(e) => onUpdatePatient({ ...patient, documentNumber: e.target.value })}
               placeholder="Ex.: 000.000.000-00"
-              className="w-full px-3 py-1.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+              className="w-full h-10 px-3 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
             />
           </div>
 
           <div>
-            <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+            <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
               Peso (kg)
             </label>
             <input
@@ -195,7 +191,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
               value={patient.weightKg > 0 ? patient.weightKg : ''}
               onChange={(e) => onUpdatePatient({ ...patient, weightKg: parseFloat(e.target.value) || 0 })}
               placeholder="Ex.: 14.5"
-              className="w-full px-3 py-1.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+              className="w-full h-10 px-3 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
             />
           </div>
         </div>

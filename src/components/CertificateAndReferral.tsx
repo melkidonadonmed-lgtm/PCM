@@ -469,112 +469,59 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
             </div>
 
-            {/* Days off presets and dates */}
-            <div 
-              className="p-4 rounded-xl border space-y-3 tactile-flat"
-              style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
-                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 flex items-center gap-1.5">
+            {/* Days off and dates */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div>
+                <label htmlFor="certificate-days-off" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5 text-sky-500" />
-                  <span>Período de Afastamento:</span>
-                </span>
-                <span className="text-xs font-bold text-sky-600 dark:text-sky-400">
-                  {certificate.daysOff} {certificate.daysOff === 1 ? 'dia de repouso' : 'dias de repouso'}
-                </span>
+                  <span>Dias de Repouso</span>
+                </label>
+                <input
+                  id="certificate-days-off"
+                  aria-label="Dias de repouso manual"
+                  type="number"
+                  min="0"
+                  max="180"
+                  value={certificate.daysOff}
+                  onChange={(e) => handleDaysChange(parseInt(e.target.value) || 0)}
+                  className="w-full p-3 rounded-xl font-bold text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center clinical-tabular-nums"
+                />
               </div>
 
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {[1, 2, 3, 5, 7, 10, 14, 15, 30].map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => handleDaysChange(d)}
-                    className={`text-xs px-3 py-1.5 rounded-xl border font-bold transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                      certificate.daysOff === d
-                        ? 'bg-sky-700 dark:bg-sky-600 text-white border-info shadow-sm'
-                        : darkMode
-                        ? 'bg-slate-800/80 text-slate-300 border-strong hover:bg-slate-700 hover:text-white'
-                        : 'bg-white text-slate-700 border-subtle hover:bg-sky-50 hover:border-info'
-                    }`}
-                  >
-                    {d} {d === 1 ? 'dia' : 'dias'}
-                  </button>
-                ))}
+              <div>
+                <label htmlFor="certificate-start-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
+                  <span>Data de Início</span>
+                </label>
+                <input
+                  id="certificate-start-date"
+                  aria-label="Data de início do atestado"
+                  type="date"
+                  value={certificate.startDate}
+                  onChange={(e) => onUpdateCertificate({ ...certificate, startDate: e.target.value })}
+                  className="w-full p-3 rounded-xl font-medium text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+                />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                <div>
-                  <label htmlFor="certificate-days-off" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Dias de Repouso (Manual)</label>
-                  <input
-                    id="certificate-days-off"
-                    aria-label="Dias de repouso manual"
-                    type="number"
-                    min="0"
-                    max="180"
-                    value={certificate.daysOff}
-                    onChange={(e) => handleDaysChange(parseInt(e.target.value) || 0)}
-                    className="w-full p-2.5 rounded-xl border font-bold text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center"
-                    style={{
-                      backgroundColor: 'var(--surface-card)',
-                      borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
-                      color: darkMode ? '#F1F5F9' : '#0F172A'
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="certificate-start-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-[var(--text-muted)] dark:text-slate-400" />
-                    <span>Data de Início</span>
-                  </label>
-                  <input
-                    id="certificate-start-date"
-                    aria-label="Data de início do atestado"
-                    type="date"
-                    value={certificate.startDate}
-                    onChange={(e) => onUpdateCertificate({ ...certificate, startDate: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border font-medium text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
-                    style={{
-                      backgroundColor: 'var(--surface-card)',
-                      borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
-                      color: darkMode ? '#F1F5F9' : '#0F172A'
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="certificate-end-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-[var(--text-muted)] dark:text-slate-400" />
-                    <span>Data de Retorno Previsto</span>
-                  </label>
-                  <input
-                    id="certificate-end-date"
-                    aria-label="Data de retorno previsto"
-                    type="date"
-                    value={certificate.endDate}
-                    onChange={(e) => onUpdateCertificate({ ...certificate, endDate: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border font-medium text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
-                    style={{
-                      backgroundColor: 'var(--surface-card)',
-                      borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
-                      color: darkMode ? '#F1F5F9' : '#0F172A'
-                    }}
-                  />
-                </div>
+              <div>
+                <label htmlFor="certificate-end-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
+                  <span>Data de Retorno Previsto</span>
+                </label>
+                <input
+                  id="certificate-end-date"
+                  aria-label="Data de retorno previsto"
+                  type="date"
+                  value={certificate.endDate}
+                  onChange={(e) => onUpdateCertificate({ ...certificate, endDate: e.target.value })}
+                  className="w-full p-3 rounded-xl font-medium text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+                />
               </div>
             </div>
 
             {/* CID-10 Section with Search Autocomplete Integration */}
             <div 
-              className="p-4 sm:p-5 rounded-2xl border space-y-4"
-              style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : '#FDFBF7',
-                borderColor: darkMode ? 'rgba(56, 142, 230, 0.2)' : 'rgba(15, 98, 146, 0.15)'
-              }}
+              className="p-4 sm:p-5 rounded-2xl border space-y-4 bg-slate-50/70 dark:bg-[var(--surface-inset)] border-subtle dark:border-white/10"
             >
               {/* Checkbox toggle */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
@@ -811,14 +758,8 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                       onClick={() => onUpdateReferral({ ...referral, priority: p })}
                       className={`flex-1 py-2.5 rounded-xl text-xs font-bold capitalize border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                         referral.priority === p
-                          ? p === 'urgente'
-                            ? 'bg-rose-700 text-white border-rose-600 shadow-sm'
-                            : p === 'prioritario'
-                            ? 'bg-amber-700 text-white border-warning shadow-sm'
-                            : 'bg-emerald-700 text-white border-clinical shadow-sm'
-                          : darkMode
-                          ? 'bg-slate-800/80 text-slate-400 border-strong hover:bg-slate-700 hover:text-slate-200'
-                          : 'bg-slate-100 text-slate-600 border-subtle hover:bg-slate-200'
+                          ? 'bg-navy-900 dark:bg-[#0369A1] text-white border-transparent shadow-sm'
+                          : 'bg-slate-100 dark:bg-[#27354A] text-slate-600 dark:text-slate-300 border-slate-300 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-[#334155]'
                       }`}
                     >
                       {p}
@@ -883,7 +824,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
             {/* Integrated CID-10 Finder for Referral / Encaminhamento */}
             <div 
-              className="p-4 sm:p-5 rounded-2xl border space-y-3.5 bg-[var(--surface-inset)] border-clinical"
+              className="p-4 sm:p-5 rounded-2xl border space-y-3.5 bg-slate-50/70 dark:bg-[var(--surface-inset)] border-subtle dark:border-white/10"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b pb-2.5" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
                 <div className="flex items-center gap-2">

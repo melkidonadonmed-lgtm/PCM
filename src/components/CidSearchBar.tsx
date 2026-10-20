@@ -265,12 +265,10 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold whitespace-nowrap transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold whitespace-nowrap transition cursor-pointer border focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                     selectedCategory === cat
-                      ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white font-bold shadow-tactile-navy dark:shadow-tactile-blue'
-                      : darkMode
-                      ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
-                      : 'bg-white text-slate-600 hover:bg-slate-200/70 border border-subtle'
+                      ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 font-bold shadow-xs'
+                      : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
                   }`}
                 >
                   {cat}
@@ -403,14 +401,12 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   onClick={() => onSelectCid({ code: pick.code, description: pick.description, category: pick.category })}
                   className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                     isSelected
-                      ? 'bg-sky-700 text-white border-info font-bold shadow-xs'
-                      : darkMode
-                      ? 'bg-slate-800/60 text-slate-300 border-strong hover:bg-slate-700 hover:text-white'
-                      : 'bg-white text-slate-700 border-subtle hover:bg-sky-50 hover:border-info'
+                      ? 'bg-navy-900 dark:bg-[#0369A1] text-white border-navy-900 dark:border-sky-500/30 font-semibold shadow-xs'
+                      : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
                   }`}
                   title={`${pick.code} - ${pick.description}`}
                 >
-                  <span className="font-mono font-bold text-sky-500 dark:text-sky-400 text-xs">{pick.code}</span>
+                  <span className={`font-mono font-bold text-xs ${isSelected ? 'text-sky-200' : 'text-sky-600 dark:text-sky-400'}`}>{pick.code}</span>
                   <span className="truncate max-w-[150px]">{pick.description.split('(')[0].trim()}</span>
                 </button>
               );

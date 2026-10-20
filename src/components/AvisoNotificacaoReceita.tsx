@@ -24,11 +24,11 @@ export const AvisoNotificacaoReceita: React.FC<AvisoNotificacaoReceitaProps> = (
   return (
     <div data-state="idle" aria-busy={false}
       role="status"
-      className="no-print px-3.5 py-3 rounded-xl border text-xs bg-amber-500/10 text-amber-900 dark:text-amber-200 border-warning flex items-start gap-2 surface-raised"
+      className="no-print px-3.5 py-3 rounded-xl border text-xs bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10 flex items-start gap-2.5 surface-raised"
     >
-      <Icon name="warning" className="text-amber-600 dark:text-amber-400 text-[18px] shrink-0" />
+      <Icon name="warning" className="text-amber-600 dark:text-amber-400 text-[18px] shrink-0 mt-0.5" />
       <div className="min-w-0 space-y-1">
-        <p className="font-bold">A folha de controle especial não substitui a Notificação de Receita</p>
+        <p className="font-bold text-slate-900 dark:text-white">A folha de controle especial não substitui a Notificação de Receita</p>
         <p className="font-medium">
           Pela Portaria SVS/MS nº 344/98, a dispensação {varios ? 'destes medicamentos' : 'deste medicamento'} em
           farmácia exige Notificação de Receita, em talonário específico que o PresCMed não emite. A notificação
@@ -38,7 +38,7 @@ export const AvisoNotificacaoReceita: React.FC<AvisoNotificacaoReceitaProps> = (
         <ul className="list-disc pl-4 space-y-0.5">
           {exigencias.map(({ id, nome, notificacao }) => (
             <li key={id}>
-              <span className="font-bold">{nome}</span>: {descreverNotificacao(notificacao)}.
+              <span className="font-bold text-slate-900 dark:text-white">{nome}</span>: {descreverNotificacao(notificacao)}.
             </li>
           ))}
         </ul>

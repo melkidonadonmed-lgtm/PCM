@@ -1,5 +1,11 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { alturaFolhaPx, larguraFolhaPx, type OrientacaoFolha } from '../../utils/folhaA4';
+import {
+  alturaFolhaPx,
+  larguraFolhaPx,
+  limparRaizDeImpressao,
+  prepararRaizDeImpressao,
+  type OrientacaoFolha
+} from '../../utils/folhaA4';
 
 /**
  * Superfície Canônica de Papel A4 (794x1123 px).
@@ -16,9 +22,6 @@ interface FolhaA4Props {
   className?: string;
   children: React.ReactNode;
 }
-
-const ID_RAIZ_IMPRESSAO = 'pcm-print-root';
-const CLASSE_IMPRIMINDO = 'pcm-imprimindo';
 
 /**
  * Folha de papel A4 em tamanho real (794 × 1123 px a 96 dpi; invertido em
@@ -64,30 +67,8 @@ export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
   useEffect(() => {
     if (!imprimivel) return;
 
-    const limpar = () => {
-      document.getElementById(ID_RAIZ_IMPRESSAO)?.remove();
-      document.body.classList.remove(CLASSE_IMPRIMINDO);
-    };
-
-    const preparar = () => {
-      limpar();
-      const folha = folhaRef.current;
-      if (!folha || folha.classList.contains('no-print')) return;
-
-      const raiz = document.createElement('div');
-      raiz.id = ID_RAIZ_IMPRESSAO;
-
-      const regraPagina = document.createElement('style');
-      regraPagina.textContent = `@page { size: A4 ${orientacao}; margin: 0; }`;
-      raiz.appendChild(regraPagina);
-
-      const copia = folha.cloneNode(true) as HTMLElement;
-      copia.removeAttribute('id');
-      raiz.appendChild(copia);
-
-      document.body.appendChild(raiz);
-      document.body.classList.add(CLASSE_IMPRIMINDO);
-    };
+    const preparar = () => prepararRaizDeImpressao(folhaRef.current, orientacao);
+    const limpar = () => limparRaizDeImpressao();
 
     window.addEventListener('beforeprint', preparar);
     window.addEventListener('afterprint', limpar);

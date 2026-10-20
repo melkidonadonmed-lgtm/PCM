@@ -250,6 +250,18 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     // Bancada A4 sticky no desktop e superfície padronizada
     expect(html).toContain('xl:sticky xl:top-20');
     expect(html).toContain('card-surface');
+
+    // Formulário limpo: sem seletor manual de tipo de receita, sem pílulas de quantidade quebrada e sem dropdown de posologia padrão
+    expect(html).not.toContain('Tipo de receita:');
+    expect(html).not.toContain('Atalhos de dispensação');
+    expect(html).not.toContain('Selecionar posologia padrão');
+    expect(html).not.toContain('comp (comprimido)');
+    expect(html).not.toContain('8/8h (3x/dia)');
+    expect(html).toContain('id="presc-duration-input"');
+    expect(html).toContain('id="presc-quantity-input"');
+    expect(html).toContain('>Comprimido<');
+    expect(html).toContain('>8/8h<');
+    expect(html).toContain('>3x ao dia<');
   });
 
   it('resolveMedicationKeyAction protege medicamentos personalizados contra sobrescrita acidental no Enter quando nenhuma opção foi destacada', () => {

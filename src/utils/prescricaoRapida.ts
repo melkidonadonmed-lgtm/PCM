@@ -11,6 +11,10 @@ export type FrequenciaHorario =
   | '8/8h'
   | '12/12h'
   | '24h'
+  | '1x/dia'
+  | '2x/dia'
+  | '3x/dia'
+  | '4x/dia'
   | 'manha'
   | 'noite'
   | 'DU'
@@ -50,12 +54,16 @@ export function getTomadasPorDia(frequencia: FrequenciaHorario): number {
     case '4/4h':
       return 6;
     case '6/6h':
+    case '4x/dia':
       return 4;
     case '8/8h':
+    case '3x/dia':
       return 3;
     case '12/12h':
+    case '2x/dia':
       return 2;
     case '24h':
+    case '1x/dia':
     case 'manha':
     case 'noite':
       return 1;
@@ -156,7 +164,19 @@ export function calcularPrescricaoRapida(params: PrescricaoRapidaParams): Prescr
       frequenciaStr = 'de 12 em 12 horas';
       break;
     case '24h':
+      frequenciaStr = 'a cada 24 horas';
+      break;
+    case '1x/dia':
       frequenciaStr = '1 vez ao dia';
+      break;
+    case '2x/dia':
+      frequenciaStr = '2 vezes ao dia';
+      break;
+    case '3x/dia':
+      frequenciaStr = '3 vezes ao dia';
+      break;
+    case '4x/dia':
+      frequenciaStr = '4 vezes ao dia';
       break;
     case 'manha':
       frequenciaStr = '1 vez ao dia, pela manhã';
