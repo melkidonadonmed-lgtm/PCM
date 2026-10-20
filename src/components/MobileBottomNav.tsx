@@ -75,7 +75,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             key={item.id}
             id={`mobile-nav-${item.id}`}
             onClick={() => onSelectTab(item.id)}
-            className={`flex flex-col items-center justify-center flex-1 max-w-[68px] min-w-0 min-h-[48px] h-12 px-0.5 sm:px-1 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none ${
+            className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none ${
               isActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
             }`}
             style={
@@ -97,7 +97,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               )}
             </div>
             <span
-              className="text-xs sm:text-xs font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-full text-center"
+              className="text-[11px] sm:text-xs font-bold mt-0.5 tracking-tight transition-colors whitespace-nowrap text-center leading-none"
               style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
             >
               {item.label}
@@ -115,7 +115,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         aria-expanded={sidebarOpen}
         aria-controls="prescmed-sidebar"
         aria-label="Mais opções"
-        className={`flex flex-col items-center justify-center flex-1 max-w-[68px] min-w-0 min-h-[48px] h-12 px-0.5 sm:px-1 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none ${
+        className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none ${
           isMoreActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
         }`}
         style={
@@ -132,7 +132,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           />
         </div>
         <span
-          className="text-xs sm:text-xs font-extrabold mt-0.5 tracking-tight transition-colors truncate max-w-full text-center"
+          className="text-[11px] sm:text-xs font-bold mt-0.5 tracking-tight transition-colors whitespace-nowrap text-center leading-none"
           style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
         >
           Mais

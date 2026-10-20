@@ -175,6 +175,10 @@ export const ICON_ALIASES: Record<string, string> = {
   termo: 'fact_check',
   consentimento: 'fact_check',
   cfm: 'fact_check',
+  sus: 'local_hospital',
+  guias_sus: 'clinical_notes',
+  verified: 'verified_user',
+  emergency: 'medical_services',
   
   // Aliases de Documentos
   atestado: 'workspace_premium',
@@ -251,6 +255,8 @@ export const ICON_ALIASES: Record<string, string> = {
   avancar: 'chevron_right',
   subir: 'expand_less',
   descer: 'expand_more',
+  arrow_downward: 'expand_more',
+  arrow_upward: 'expand_less',
   chevron_down: 'expand_more',
   chevron_up: 'expand_less',
   olho: 'visibility',
@@ -357,7 +363,7 @@ export const Icon: React.FC<IconProps> = ({
 
   return (
     <span
-      className={`material-symbols-outlined select-none shrink-0 ${spin ? 'icon-spin' : ''} ${className}`}
+      className={`material-symbols-outlined select-none shrink-0 overflow-hidden ${spin ? 'icon-spin' : ''} ${className}`}
       style={{
         fontSize: `${pixelSize}px`,
         width: `${pixelSize}px`,

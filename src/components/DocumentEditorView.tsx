@@ -53,9 +53,8 @@ import {
   File,
   Files
 } from 'lucide-react';
-import { exportarFolhaPdf } from '../utils/folhaA4';
+import { alturaFolhaPx, exportarFolhaPdf, larguraFolhaPx } from '../utils/folhaA4';
 import { DOMPurify } from '../utils/sanitizeHtml';
-import { SIMBOLO_CORTE } from '../utils/compartilhamentoTexto';
 import { 
   DoctorProfile, 
   Patient, 
@@ -299,7 +298,34 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
   const [logoUploading, setLogoUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const molduraEditorRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const [sheetZoom, setSheetZoom] = useState<number>(1);
+
+  const larguraFolhaEditor = larguraFolhaPx(pageOrientation);
+  const alturaFolhaEditor = alturaFolhaPx(pageOrientation);
+
+  useEffect(() => {
+    const moldura = molduraEditorRef.current;
+    if (!moldura) {
+      setSheetZoom(1);
+      return;
+    }
+    const medir = () => {
+      const disponivel = moldura.clientWidth;
+      if (disponivel > 0) {
+        setSheetZoom(Math.min(1, disponivel / larguraFolhaEditor));
+      }
+    };
+    medir();
+    if (typeof ResizeObserver !== 'undefined') {
+      const obs = new ResizeObserver(medir);
+      obs.observe(moldura);
+      return () => obs.disconnect();
+    }
+    window.addEventListener('resize', medir);
+    return () => window.removeEventListener('resize', medir);
+  }, [larguraFolhaEditor]);
 
   // Estados de Persistência Local-First & Auto-Save
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -2903,16 +2929,18 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       )}
 
       {/* ÁREA DA FOLHA A4 TÁTIL MILIMÉTRICA (210mm x 297mm) */}
-      <div className="flex justify-center w-full overflow-x-auto py-2">
+      <div ref={molduraEditorRef} className="w-full overflow-hidden py-2">
         <div
           ref={sheetRef}
           id="printable-a4-sheet"
-          className={`a4-editor-canvas bg-white text-slate-900 rounded-lg shadow-2xl relative transition duration-200 ${
+          className={`a4-editor-canvas shrink-0 bg-white text-slate-900 rounded-lg shadow-2xl relative transition duration-200 ${
             pageOrientation === 'landscape' ? 'canvas-landscape' : 'canvas-portrait'
           } ${viaLayout === '2-vias' ? 'vias-2' : ''}`}
           style={{
-            width: pageOrientation === 'landscape' ? '297mm' : '210mm',
-            minHeight: pageOrientation === 'landscape' ? '210mm' : '297mm',
+            width: `${larguraFolhaEditor}px`,
+            minHeight: `${alturaFolhaEditor}px`,
+            zoom: sheetZoom,
+            marginInline: 'auto',
             padding: pageOrientation === 'landscape' ? '10mm 14mm' : '20mm',
             boxSizing: 'border-box',
             backgroundColor: '#FFFFFF',
@@ -3274,7 +3302,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 <div className="flex flex-col items-center justify-center relative border-l border-dashed border-medium px-1 select-none">
                   <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
                     <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
-                    <span style={{ writingMode: 'vertical-rl' }}>{SIMBOLO_CORTE} CORTE AQUI</span>
+                    <span style={{ writingMode: 'vertical-rl' }}>CORTE AQUI</span>
                   </div>
                 </div>
                 <div aria-hidden="true" />
@@ -3412,7 +3440,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   <div className="flex flex-col items-center justify-center relative border-l border-dashed border-medium px-1 select-none">
                     <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
                       <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
-                      <span style={{ writingMode: 'vertical-rl' }}>{SIMBOLO_CORTE} CORTE AQUI</span>
+                      <span style={{ writingMode: 'vertical-rl' }}>CORTE AQUI</span>
                     </div>
                   </div>
 
@@ -3634,7 +3662,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                   <div className="relative border-t border-dashed border-medium my-1 flex items-center justify-center select-none">
                     <span className="absolute bg-white px-3 text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
                       <Scissors className="w-3 h-3 text-slate-500" />
-                      <span>{SIMBOLO_CORTE} CORTE AQUI</span>
+                      <span>CORTE AQUI</span>
                     </span>
                   </div>
 
