@@ -413,14 +413,15 @@ export const Header: React.FC<HeaderProps> = ({
 
           {isInstallable && onInstallApp && (
             <button
+              id="btn-header-install-pwa"
               type="button"
               onClick={onInstallApp}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="flex items-center justify-center gap-1.5 w-10 sm:w-auto sm:px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
               title="Instalar PresCMed como aplicativo offline"
               aria-label="Instalar Aplicativo PresCMed"
             >
               <Icon name="download" size={16} className="text-sky-600 dark:text-sky-400" />
-              <span className="hidden 2xl:inline">Instalar</span>
+              <span className="hidden sm:inline">Instalar</span>
             </button>
           )}
 

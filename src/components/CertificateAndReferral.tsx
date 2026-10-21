@@ -416,10 +416,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             </div>
 
             {/* Patient data for Certificate */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <div>
-                <label htmlFor="certificate-patient-name" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
-                  <User className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
+            <div className="grid grid-cols-2 sm:grid-cols-12 gap-2.5">
+              <div className="col-span-2 sm:col-span-5">
+                <label htmlFor="certificate-patient-name" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
+                  <User className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 shrink-0" />
                   <span>Nome do Paciente</span>
                 </label>
                 <input
@@ -428,13 +428,13 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   value={patient?.name ?? certificate.patientName ?? ''}
                   onChange={(e) => handlePatientNameChange(e.target.value)}
                   placeholder="Nome completo do paciente..."
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+                  className="w-full h-9 px-3 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                 />
               </div>
 
-              <div>
-                <label htmlFor="certificate-patient-doc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
-                  <Hash className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
+              <div className="col-span-1 sm:col-span-3">
+                <label htmlFor="certificate-patient-doc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
+                  <Hash className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 shrink-0" />
                   <span>Documento (RG / CPF)</span>
                 </label>
                 <input
@@ -442,14 +442,14 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="text"
                   value={patient?.documentNumber ?? certificate.documentNumber ?? ''}
                   onChange={(e) => handlePatientDocChange(e.target.value)}
-                  placeholder="Ex: RG 12.345.678-9 ou CPF..."
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+                  placeholder="Ex: RG ou CPF..."
+                  className="w-full h-9 px-2.5 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
                 />
               </div>
 
-              <div>
-                <label htmlFor="certificate-period-select" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
-                  <FileText className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
+              <div className="col-span-1 sm:col-span-4">
+                <label htmlFor="certificate-period-select" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
+                  <FileText className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 shrink-0" />
                   <span>Finalidade / Motivo</span>
                 </label>
                 <select
@@ -457,7 +457,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   aria-label="Finalidade ou motivo do atestado"
                   value={certificate.periodText}
                   onChange={(e) => onUpdateCertificate({ ...certificate, periodText: e.target.value })}
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input cursor-pointer"
+                  className="w-full h-9 px-2.5 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input cursor-pointer"
                 >
                   <option value="por motivo de doença e necessidade de repouso">Afastamento por motivo de doença / Repouso</option>
                   <option value="para fins de comparecimento a consulta médica e realização de exames">Comparecimento a consulta e exames</option>
@@ -469,11 +469,11 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
             </div>
 
-            {/* Days off and dates */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <div>
-                <label htmlFor="certificate-days-off" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-sky-500" />
+            {/* Days off and dates — Lado a Lado e Enxuto */}
+            <div className="grid grid-cols-12 gap-2 sm:gap-2.5">
+              <div className="col-span-4 sm:col-span-3">
+                <label htmlFor="certificate-days-off" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
+                  <Clock className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                   <span>Dias de Repouso</span>
                 </label>
                 <input
@@ -484,13 +484,13 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   max="180"
                   value={certificate.daysOff}
                   onChange={(e) => handleDaysChange(parseInt(e.target.value) || 0)}
-                  className="w-full p-3 rounded-xl font-bold text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center clinical-tabular-nums"
+                  className="w-full h-9 px-2.5 rounded-xl font-bold text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center clinical-tabular-nums"
                 />
               </div>
 
-              <div>
-                <label htmlFor="certificate-start-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
+              <div className="col-span-4 sm:col-span-4">
+                <label htmlFor="certificate-start-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
+                  <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 shrink-0" />
                   <span>Data de Início</span>
                 </label>
                 <input
@@ -499,13 +499,13 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="date"
                   value={certificate.startDate}
                   onChange={(e) => onUpdateCertificate({ ...certificate, startDate: e.target.value })}
-                  className="w-full p-3 rounded-xl font-medium text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+                  className="w-full h-9 px-2.5 rounded-xl font-medium text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
                 />
               </div>
 
-              <div>
-                <label htmlFor="certificate-end-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
+              <div className="col-span-4 sm:col-span-5">
+                <label htmlFor="certificate-end-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
+                  <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 shrink-0" />
                   <span>Data de Retorno Previsto</span>
                 </label>
                 <input
@@ -514,7 +514,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="date"
                   value={certificate.endDate}
                   onChange={(e) => onUpdateCertificate({ ...certificate, endDate: e.target.value })}
-                  className="w-full p-3 rounded-xl font-medium text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+                  className="w-full h-9 px-2.5 rounded-xl font-medium text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
                 />
               </div>
             </div>

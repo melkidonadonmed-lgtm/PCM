@@ -163,7 +163,7 @@ export default function App() {
   } = useWorkContext(doctorCredentials);
 
   // Capacidade de instalação do PWA
-  const { isInstallable, installApp } = usePwaInstall();
+  const { isInstallable, installApp, showInstallHelp, closeInstallHelp } = usePwaInstall();
 
   // Callbacks estáveis para modais
   const handleOpenDoctorModal = React.useCallback(() => setIsDoctorModalOpen(true), []);
@@ -573,6 +573,53 @@ export default function App() {
             onClose={handleCloseBackupModal}
           />
         </Suspense>
+      )}
+
+      {/* Modal de Instruções de Instalação PWA (Mobile / Navegadores sem prompt automático) */}
+      {showInstallHelp && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Como instalar o aplicativo PresCMed"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60"
+          onClick={closeInstallHelp}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] p-5 shadow-2xl space-y-4 text-[var(--text-main)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+              <h3 className="text-sm font-bold">Instalar PresCMed no Dispositivo</h3>
+              <button
+                type="button"
+                onClick={closeInstallHelp}
+                aria-label="Fechar instruções de instalação"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-3 text-xs leading-relaxed text-[var(--text-secondary)]">
+              <div className="p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-1">
+                <p className="font-bold text-[var(--text-main)]">No Android (Chrome / Edge / Samsung):</p>
+                <p>Toque no ícone de menu <strong>⋮</strong> (canto superior ou inferior do navegador) e selecione <strong>&ldquo;Instalar aplicativo&rdquo;</strong> ou <strong>&ldquo;Adicionar à tela inicial&rdquo;</strong>.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-1">
+                <p className="font-bold text-[var(--text-main)]">No iPhone / iPad (Safari):</p>
+                <p>Toque no botão <strong>Compartilhar</strong> na barra do navegador e escolha <strong>&ldquo;Adicionar à Tela de Início&rdquo;</strong>.</p>
+              </div>
+            </div>
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={closeInstallHelp}
+                className="btn-tactile-primary h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                Entendi
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Toast de Confirmação de Kit Adicionado */}

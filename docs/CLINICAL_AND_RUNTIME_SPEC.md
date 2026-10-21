@@ -18,16 +18,31 @@ src/
     Header.tsx                 # Header superior (fundo claro no Light, botão Início, perfil e nuvem)
     Sidebar.tsx                # Menu lateral de navegação e kits clínicos de plantão (deep navy contínuo)
     MobileBottomNav.tsx        # Barra de navegação inferior mobile com 5 destinos (Receitas, Documentos, Doses, Editor, Mais)
-    PrescriptionBuilder.tsx    # Construtor de receitas (busca, formulário de prescrição, lista e prévia A4)
+    PrescriptionBuilder.tsx    # Construtor de receitas (orquestrador: paciente, sessões, lista e gaveta pediátrica)
+    prescription/
+      MedicationComposerCard.tsx # Card de busca/composição rápida de medicamento, dose, horários e aviso de talonário
+      PrescriptionPreviewColumn.tsx # Coluna direita: alternância de regime (Simples/2 Vias), FolhaA4 e barra de ações
     AcoesDaReceita.tsx         # Barra de ações única da receita (Imprimir/PDF, Editor, WhatsApp, Copiar)
     PediatricCalculator.tsx    # Calculadora pediátrica dedicada por peso (mg/kg → mL/gotas)
     ExamRequester.tsx          # Solicitação de exames laboratoriais e diagnósticos por imagem
     CertificateAndReferral.tsx # Emissão de atestados médicos e encaminhamentos com conformidade CFM
     ClinicalDocumentsHub.tsx   # Central de Documentos: abas Atestado, Encaminhamento, Pedidos de Exames e Documentos SUS
-    SusDocumentsFiller.tsx     # Catálogo e preenchimento dos documentos SUS (APAC, LME, SISREG, GAL/LACEN, SISCAN, TRM-TB)
+    SusDocumentsFiller.tsx     # Catálogo e preenchimento dos documentos SUS (orquestrador de estado e impressão/PDF)
+    sus/
+      SusCatalogListView.tsx   # Grade filtrável dos 9 formulários SUS (APAC, LME, SISREG, GAL/LACEN, SISCAN, TRM-TB)
+      SusCommonIdentityFields.tsx # Campos comuns de identificação (unidade/CNES, paciente/CNS, CID-10 e justificativa)
+      SusRegulatorySpecificFields.tsx # Campos específicos de LME (anamnese, 1º–6º mês, incapaz) e APAC (procedimentos/oncologia/nefrologia)
     AvisoNotificacaoReceita.tsx # Aviso de tela (.no-print) para controlados que exigem Notificação de Receita
     ClinicalProtocolsView.tsx  # Protocolos de conduta clínica e catálogo por classes terapêuticas SUS/RENAME
-    DocumentEditorView.tsx     # Editor visual avançado para laudos e documentos médicos livres
+    DocumentEditorView.tsx     # Editor visual avançado para laudos e documentos médicos livres (orquestrador Tiptap)
+    editor/
+      editorConfigAndFormatters.ts # Constantes tipográficas, temas de documento e geradores HTML (1 via e 2 vias)
+      EditorTopActionsBar.tsx  # Barra superior do editor (alternância 1/2 vias, modelos, impressão, PDF e salvar)
+      EditorSheetConfigBar.tsx # Barra de configuração da folha (margens, espaçamento, timbre, logos, marca d'água e tema)
+      EditorTextFormattingToolbar.tsx # Barra de formatação rich-text Tiptap (fontes, alinhamento, listas, tabelas e imagem)
+      EditorSingleViaCanvas.tsx # Folha A4 retrato (1 via) com cabeçalho editável, corpo ProseMirror e rodapé de assinatura
+      EditorTwoViasCanvas.tsx  # Folha A4 paisagem (2 vias: Controle Especial Portaria 344/98 e Antimicrobiano RDC 471/2021)
+      EditorModelsAndStylesDrawer.tsx # Gaveta lateral de modelos salvos, modelos clínicos predefinidos e estilos visuais
     PrintPreview.tsx           # Tela de emissão: folha A4 + ações (baixar PDF, imprimir, WhatsApp, copiar)
     documento/
       FolhaA4.tsx              # Papel A4 em tamanho real (794×1123 px), reduzido por zoom para caber; impressão fiel
@@ -44,6 +59,8 @@ src/
     AsyncErrorBoundary.tsx     # Barreira de erro das telas carregadas sob demanda, com opção de tentar de novo
     ContextSwitcher.tsx        # Seletor rápido de postos de trabalho e contextos clínicos do médico
     LogoGeneratorModal.tsx     # Utilitário para personalização de cabeçalho e monograma de receituário
+    logo/
+      LogoSvgCanvas.tsx        # Renderizador SVG vetorial parametrizado para logotipos e monogramas médicos
     PuxarParaAtualizar.tsx     # Gesto tátil de pull-to-refresh para atualização em dispositivos móveis
     WatermarkOverlay.tsx       # Camada visual de marca d'água no preview de documentos
     WatermarkSelector.tsx      # Seletor de marcas d'água predefinidas e personalizadas
@@ -54,13 +71,23 @@ src/
     cidCatalog.ts              # Base de códigos e descrições CID-10 com termos de busca
     clinicalKits.ts            # Kits clínicos de plantão ambulatorial (amigdalite, GECA, IVAS, ITU, etc.)
     clinicalProtocols.ts       # Protocolos patológicos com doses de emergência e cálculo de hidratação
-    medicationDatabase.ts      # Base unificada de medicamentos (adulto e pediátrico) categorizada por classe SUS/RENAME
+    medicationDatabase.ts      # Ponto único de agregação (barrel) da base de medicamentos SUS/RENAME
+    medications/
+      analgesicsAndAntiInflammatories.ts # Analgésicos, antitérmicos, AINEs, corticoides e relaxantes musculares
+      antimicrobialsAndAntiparasitics.ts # Antibióticos, antifúngicos, antivirais e antiparasitários
+      cardioAndMetabolicMeds.ts # Anti-hipertensivos, antidiabéticos, hipolipemiantes, tireoide e vitaminas
+      respiratoryGastroAndCnsMeds.ts # Respiratórios, anti-histamínicos, gastrointestinais, psicotrópicos e tópicos
     exemplos.ts                # Dados fictícios de exemplo (Melki Donadon / Seu Melki) para prévia e placeholders
     presetAssets.ts            # Logos e marcas d'água predefinidos (apontam para arquivos em public/; nunca embutir base64 aqui)
     presetClinicalTemplates.ts # Modelos estruturados de documentos e atestados clínicos
     susDocumentsCatalog.ts     # Catálogo dos 9 documentos SUS, laudo copiável e HTML do modelo do app (`TimbreSus`)
     formulariosOficiaisSus.ts  # Campos numerados da APAC e da LME: coordenadas no impresso oficial e fonte conferida
   hooks/
+    useDocumentLogoManager.ts  # Estado e persistência de logotipos esquerdo/direito e estilos do Editor A4
+    useDocumentTemplatesAndStyles.ts # Gerenciamento de modelos personalizados, estilos visuais e sincronização com a receita
+    useModalAccessibility.ts   # Focus trap, restauração de foco e fechamento por Escape em modais
+    useNavigationSync.ts       # Sincronização de abas com URL hash e atalhos de teclado Alt+1..6 / Ctrl+K
+    usePrescriptionModels.ts   # Persistência local de modelos reutilizáveis de prescrição
     usePrescriptionSession.ts  # Gerenciamento de sessão, rascunhos e ciclo de vida da receita
     usePwaInstall.ts           # Detecção de suporte e acionamento de instalação como Progressive Web App
     useWorkContext.ts          # Controle de posto de trabalho ativo e alternância de contexto

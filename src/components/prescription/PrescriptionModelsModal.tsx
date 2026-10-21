@@ -283,21 +283,21 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                           </button>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                          <div>
-                            <label className="text-xs font-semibold text-slate-500 block mb-0.5">
+                        <div className="grid grid-cols-12 gap-2">
+                          <div className="col-span-4">
+                            <label className="text-xs font-semibold text-slate-500 block mb-0.5 truncate">
                               Quantidade
                             </label>
                             <input
                               type="text"
                               value={item.quantity}
                               onChange={(e) => onUpdateCustomModelItem(item.id, { quantity: e.target.value })}
-                              placeholder="Ex.: 30 comprimidos"
-                              className="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-slate-800 dark:text-slate-200 outline-none focus:border-info"
+                              placeholder="Ex.: 30 comp"
+                              className="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-slate-800 dark:text-slate-200 outline-none focus:border-info clinical-tabular-nums"
                             />
                           </div>
-                          <div className="sm:col-span-2">
-                            <label className="text-xs font-semibold text-slate-500 block mb-0.5">
+                          <div className="col-span-8">
+                            <label className="text-xs font-semibold text-slate-500 block mb-0.5 truncate">
                               Posologia / Instruções
                             </label>
                             <input

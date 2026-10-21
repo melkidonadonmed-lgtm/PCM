@@ -110,7 +110,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             value={patient.name || ''}
             onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
             placeholder="Ex.: Maria de Oliveira Santos"
-            className="w-full h-10 px-3.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
+            className="w-full h-9 px-3 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm"
           />
         </div>
 
@@ -119,7 +119,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToCertificate}
-              className="chip-neutral h-9 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-8 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir formulário de Atestado Médico para este paciente"
             >
               <Icon name="atestado" size={15} className="text-sky-600 dark:text-sky-400" />
@@ -130,7 +130,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToReferral}
-              className="chip-neutral h-9 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-8 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir Encaminhamento Médico para este paciente"
             >
               <Icon name="encaminhamento" size={15} className="text-sky-600 dark:text-sky-400" />
@@ -141,7 +141,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToExams}
-              className="chip-neutral h-9 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-8 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir Solicitação de Exames para este paciente"
             >
               <Icon name="exame" size={15} className="text-sky-600 dark:text-sky-400" />
@@ -152,7 +152,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToSus}
-              className="chip-neutral h-9 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-8 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
               title="Abrir Formulários SUS (LME, APAC, SISREG) para este paciente"
             >
               <Icon name="sus" size={15} className="text-sky-600 dark:text-sky-400" />
@@ -162,11 +162,11 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
         </div>
       </div>
 
-      {/* Campos Extras Retráteis: CPF e Peso */}
+      {/* Campos Extras Retráteis Lado a Lado: CPF e Peso */}
       {showExtraPatientFields && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-subtle dark:border-strong">
-          <div>
-            <label htmlFor="quick-patient-doc" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+        <div className="grid grid-cols-12 gap-2 pt-2 border-t border-subtle dark:border-strong">
+          <div className="col-span-7 sm:col-span-8">
+            <label htmlFor="quick-patient-doc" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
               CPF / RG
             </label>
             <input
@@ -175,12 +175,12 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
               value={patient.documentNumber || ''}
               onChange={(e) => onUpdatePatient({ ...patient, documentNumber: e.target.value })}
               placeholder="Ex.: 000.000.000-00"
-              className="w-full h-10 px-3 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+              className="w-full h-9 px-2.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
             />
           </div>
 
-          <div>
-            <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+          <div className="col-span-5 sm:col-span-4">
+            <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
               Peso (kg)
             </label>
             <input
@@ -191,7 +191,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
               value={patient.weightKg > 0 ? patient.weightKg : ''}
               onChange={(e) => onUpdatePatient({ ...patient, weightKg: parseFloat(e.target.value) || 0 })}
               placeholder="Ex.: 14.5"
-              className="w-full h-10 px-3 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+              className="w-full h-9 px-2.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
             />
           </div>
         </div>

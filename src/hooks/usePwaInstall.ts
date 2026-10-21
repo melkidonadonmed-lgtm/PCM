@@ -7,8 +7,8 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function usePwaInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
 
   useEffect(() => {
     // Verificar se já está executando como PWA instalado (Standalone)
@@ -25,13 +25,12 @@ export function usePwaInstall() {
       // Previne a minibarra nativa do navegador para controlar a exibição na UI
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setIsInstallable(true);
     };
 
     const handleAppInstalled = () => {
       setIsInstalled(true);
-      setIsInstallable(false);
       setDeferredPrompt(null);
+      setShowInstallHelp(false);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -44,20 +43,29 @@ export function usePwaInstall() {
   }, []);
 
   const installApp = async () => {
-    if (!deferredPrompt) return;
-    try {
-      await deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      if (choice.outcome === 'accepted') {
-        setIsInstalled(true);
+    if (deferredPrompt) {
+      try {
+        await deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          setIsInstalled(true);
+        }
+      } catch (err) {
+        console.error('Erro ao acionar prompt de instalação do PWA:', err);
+      } finally {
+        setDeferredPrompt(null);
       }
-    } catch (err) {
-      console.error('Erro ao acionar prompt de instalação do PWA:', err);
-    } finally {
-      setDeferredPrompt(null);
-      setIsInstallable(false);
+      return;
     }
+    // Em navegadores mobile (ex.: iOS Safari ou Chrome mobile sem evento imediato), exibe guia rápido de instalação
+    setShowInstallHelp(true);
   };
 
-  return { isInstallable, isInstalled, installApp };
+  return {
+    isInstallable: !isInstalled,
+    isInstalled,
+    installApp,
+    showInstallHelp,
+    closeInstallHelp: () => setShowInstallHelp(false),
+  };
 }

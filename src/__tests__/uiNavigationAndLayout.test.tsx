@@ -136,7 +136,7 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlUnconfigured).toContain('Identificar paciente');
     expect(htmlUnconfigured).toContain('Configurar CRM');
 
-    // 2. Estado com médico configurado, paciente com peso e contadores ativos
+    // 2. Estado com médico configurado, paciente com peso, contadores ativos e botão Instalar visível no mobile
     const htmlConfigured = renderToStaticMarkup(
       <Header
         darkMode={true}
@@ -151,6 +151,8 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
         onOpenDoctorModal={vi.fn()}
         prescriptionCount={3}
         selectedExamsCount={2}
+        isInstallable={true}
+        onInstallApp={vi.fn()}
       />
     );
 
@@ -158,6 +160,8 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlConfigured).toContain('18,5 kg');
     expect(htmlConfigured).toContain('CRM 54321/SP');
     expect(htmlConfigured).toContain('aria-current="page"');
+    expect(htmlConfigured).toContain('id="btn-header-install-pwa"');
+    expect(htmlConfigured).toContain('aria-label="Instalar Aplicativo PresCMed"');
   });
 
   it('Sidebar mantém acabamento Deep Navy (.panel-navy), permite tooltips flutuantes no modo recolhido (overflow-visible) e preserva botão PWA', () => {
@@ -181,12 +185,16 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
         onClearPatient={vi.fn()}
         onResetAll={vi.fn()}
         onAplicarKit={vi.fn()}
+        isInstallable={true}
+        onInstallApp={vi.fn()}
       />
     );
 
     expect(htmlExpanded).toContain('panel-navy');
     expect(htmlExpanded).toContain('Novo Atendimento');
     expect(htmlExpanded).toContain('Backup (.pcm)');
+    expect(htmlExpanded).toContain('id="btn-sidebar-install-pwa"');
+    expect(htmlExpanded).toContain('Instalar App');
     expect(htmlExpanded).toContain('Recolher Menu');
     expect(htmlExpanded).not.toContain('Paciente em Atendimento');
 

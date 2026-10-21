@@ -306,7 +306,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div 
         onClick={onClose || onToggleOpen}
         aria-label="Fechar menu lateral"
-        className={`fixed inset-0 z-50 bg-black/70 lg:hidden transition-opacity duration-300 cursor-pointer ${
+        className={`fixed inset-0 z-[55] bg-black/70 lg:hidden transition-opacity duration-300 cursor-pointer ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       />
@@ -318,7 +318,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         aria-label="Menu Lateral de Navegação"
         aria-hidden={!isOpen && !isDesktop}
         inert={!isOpen && !isDesktop ? true : undefined}
-        className={`panel-navy fixed top-0 left-0 h-dvh z-50 w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform transition-transform duration-300 ease-out ${
+        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full pointer-events-none'
         } lg:pointer-events-auto lg:sticky lg:top-20 lg:h-[calc(100dvh-6rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl lg:transition-[width] lg:duration-200 lg:ease-in-out ${
           isOpen
@@ -516,7 +516,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Pinned Footer: Ações da Consulta, Backup e Recolher Menu */}
         <div className={`shrink-0 border-t border-white/10 bg-black/15 rounded-b-2xl ${
-          isOpen ? 'p-3 space-y-2 pb-14 lg:pb-3' : 'py-2.5 px-1.5 space-y-2 flex flex-col items-center'
+          isOpen ? 'p-3 space-y-2 pb-5 lg:pb-3' : 'py-2.5 px-1.5 space-y-2 flex flex-col items-center'
         }`}>
           {isOpen ? (
             <>
@@ -547,13 +547,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                 {isInstallable && onInstallApp && (
                   <button
+                    id="btn-sidebar-install-pwa"
                     type="button"
-                    onClick={onInstallApp}
-                    className="h-9 px-2.5 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] transition cursor-pointer flex items-center justify-center gap-1.5 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400 whitespace-nowrap"
+                    onClick={() => {
+                      onInstallApp();
+                      if (!isDesktop) onClose?.();
+                    }}
+                    className="flex-1 h-9 px-2.5 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] transition cursor-pointer flex items-center justify-center gap-1.5 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400 whitespace-nowrap"
                     title="Instalar PresCMed como aplicativo offline"
                   >
-                    <Icon name="download" size={16} className="text-slate-300" />
-                    <span>Instalar</span>
+                    <Icon name="download" size={16} className="text-sky-300" />
+                    <span>Instalar App</span>
                   </button>
                 )}
 
