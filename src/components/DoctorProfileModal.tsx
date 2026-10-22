@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UserCheck, Check, X, Shield, Eraser, Building2, Phone, MapPin, Sparkles } from 'lucide-react';
+import { UserCheck, Check, X, Shield, Eraser, Building2, Phone, MapPin, Sparkles } from './Icon';
 import { DoctorProfile, WorkContext } from '../types';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 

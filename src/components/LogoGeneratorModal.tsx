@@ -14,7 +14,7 @@ import {
   RefreshCw,
   Building2,
   Download
-} from 'lucide-react';
+} from './Icon';
 import { WorkContext, DoctorProfile } from '../types';
 import { db } from '../services/db';
 import { PRESET_LOGOS, PresetLogoItem } from '../data/presetAssets';

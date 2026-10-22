@@ -188,6 +188,6 @@ export function avisoTextoNotificacao(items: Array<MedicamentoClassificavel & { 
     .map(({ nome, notif }) => `${nome} (${descreverNotificacao(notif)})`)
     .join('; ');
 
-  return `⚠️ Nota sanitária (Portaria SVS/MS nº 344/98): a dispensação de ${detalhes} exige talonário próprio de Notificação de Receita emitido presencialmente pelo médico.`;
+  return `Nota sanitária (Portaria SVS/MS nº 344/98): a dispensação de ${detalhes} exige talonário próprio de Notificação de Receita emitido presencialmente pelo médico.`;
 }
 

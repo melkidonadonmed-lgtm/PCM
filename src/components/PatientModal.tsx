@@ -48,6 +48,9 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     allergies: patient?.allergies || [],
     notes: patient?.notes || ''
   });
+  const [allergiesText, setAllergiesText] = useState<string>(() =>
+    patient?.allergies?.join(', ') || ''
+  );
 
   // Acessibilidade WCAG 2.1: Foco inicial executado apenas na montagem
   useEffect(() => {
@@ -83,6 +86,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       notes: ''
     };
     setFormData(emptyPat);
+    setAllergiesText('');
     if (onClearPatient) {
       onClearPatient();
     }
@@ -286,8 +290,15 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               id="patient-modal-allergies"
               type="text"
               enterKeyHint="done"
-              value={formData.allergies?.join(', ') || ''}
-              onChange={(e) => setFormData({ ...formData, allergies: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+              value={allergiesText}
+              onChange={(e) => {
+                const raw = e.target.value;
+                setAllergiesText(raw);
+                setFormData({
+                  ...formData,
+                  allergies: raw.split(',').map((s) => s.trim()).filter(Boolean),
+                });
+              }}
               placeholder="Ex: Penicilina, Dipirona, AINEs, Frutos do mar..."
               className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-rose-700 dark:text-rose-400 transition"
             />

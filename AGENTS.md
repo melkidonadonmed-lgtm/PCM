@@ -22,10 +22,12 @@ npm run build       # Build de produção em dist/
 ## 2. Mapa de Diretórios e Divulgação Progressiva
 
 - `src/App.tsx` e `src/types.ts` — Estado centralizado por abas (`activeTab`, sem `react-router` nem Redux/Zustand).
+- `src/core/` — Fundação multi-módulo (`domain/clinicalEntities.ts` e `storage/clinicalRepository.ts`) preparando a expansão do Módulo de Prescrição (`MOD-01`) para Evolução/PEP (`MOD-02`) e Hospitalar (`MOD-03`).
 - `src/components/documento/` — Motor de folha única A4 (`FolhaA4.tsx`, `DocumentoClinico.tsx`, `ReceitaDuasVias.tsx`, `FormularioOficialSus.tsx`).
+- `src/components/sus/` — Guias regulatórias do SUS e grade vetorial interativa 12 colunas (`SusInteractiveVectorSheet.tsx`, `SusCommonIdentityFields.tsx`, `SusRegulatorySpecificFields.tsx`).
 - `src/utils/` — Motores clínicos determinísticos (`doseCalculator.ts`, `isSpecialControlOrAntibiotic.ts`, `notificacaoDeReceita.ts`, `formularioOficial.ts`, `folhaA4.ts`).
 - `src/data/` — Catálogos clínicos (`pediatricMeds.ts`, `medicationDatabase.ts`, `clinicalKits.ts`, `formulariosOficiaisSus.ts`, `susDocumentsCatalog.ts`).
-- **Especificação Completa de Runtime, Árvore de 75 Arquivos, 11 Chaves `localStorage` e Regras SUS/CFM/Anvisa:** Leia [`docs/CLINICAL_AND_RUNTIME_SPEC.md`](docs/CLINICAL_AND_RUNTIME_SPEC.md).
+- **Especificação Completa de Runtime, Árvore de 112 Arquivos, 11 Chaves `localStorage` e Regras SUS/CFM/Anvisa:** Leia [`docs/CLINICAL_AND_RUNTIME_SPEC.md`](docs/CLINICAL_AND_RUNTIME_SPEC.md).
 - **Skills e Agente Revisor Local:** Para UI/impressão/PDF, consulte `.github/skills/ui-pdf-validation`. Para regras clínicas/doses, consulte `.github/skills/clinical-change-safety` e o agente `.github/agents/prescmed-clinical-reviewer`.
 
 ---

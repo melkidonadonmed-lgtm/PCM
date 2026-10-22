@@ -1,0 +1,2651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Regulatória SUS — SESAU-RO (9 Modelos Oficiais)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter (Tema Claro Editorial Médico - Ad Lucem) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================================
+           1. TEMA CLARO EDITORIAL MÉDICO (AD LUCEM — 98% NEUTRO / 2% VERDE ESMERALDA)
+           ============================================================================ */
+        :root {
+            --bg-canvas: #F4F5F7;
+            --bg-surface: #FFFFFF;
+            --bg-elevated: #F8FAFC;
+            --bg-subtle-pill: #EFEFF4;
+
+            --ink-primary: #111827;
+            --ink-secondary: #4B5563;
+            --ink-muted: #6B7280;
+            --ink-subtle: #9CA3AF;
+
+            --border-hairline: #E2E8F0;
+            --border-strong: #CBD5E1;
+
+            --shadow-card: 
+                0 1px 2px rgba(15, 23, 42, 0.03),
+                0 8px 24px -4px rgba(15, 23, 42, 0.05);
+
+            --font-sans: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-display: 'Plus Jakarta Sans', 'IBM Plex Sans', 'Inter', sans-serif;
+            --font-mono: 'IBM Plex Mono', 'JetBrains Mono', Consolas, monospace;
+            --rim-light: rgba(255, 255, 255, 0.85);
+            --shadow-sculpted: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 0 var(--rim-light);
+
+            /* Regra dos 2% de Cor Pontual (Verde Esmeralda Clínico) */
+            --punctual-accent: #059669;
+            --punctual-text: #065F46;
+            --punctual-soft: rgba(5, 150, 105, 0.10);
+            --punctual-border: rgba(5, 150, 105, 0.30);
+            --punctual-btn-ink: #FFFFFF;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--ink-primary);
+            font-family: var(--font-sans);
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: var(--font-display);
+            letter-spacing: -0.015em;
+        }
+
+        .tabular-nums-clean {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .surface-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-hairline);
+            border-radius: 14px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .accent-bg {
+            background-color: var(--punctual-accent);
+            color: var(--punctual-btn-ink);
+            font-weight: 600;
+        }
+
+        .accent-badge {
+            color: var(--punctual-text);
+            background-color: var(--punctual-soft);
+            border: 1px solid var(--punctual-border);
+            font-weight: 600;
+            padding: 0.15rem 0.55rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        /* Abas de Seleção dos 9 Modelos */
+        .doc-tab-btn {
+            font-family: var(--font-display);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--ink-secondary);
+            background-color: var(--bg-subtle-pill);
+            border: 1px solid transparent;
+            padding: 0.45rem 0.85rem;
+            border-radius: 10px;
+            white-space: nowrap;
+            transition: all 0.16s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .doc-tab-btn:hover {
+            background-color: #E4E4EB;
+            color: var(--ink-primary);
+        }
+        .doc-tab-btn.active {
+            background-color: var(--ink-primary);
+            color: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(17, 24, 39, 0.14);
+        }
+
+        /* Inputs Clínicos com Botão Individual de Limpar (×) */
+        .field-wrapper {
+            position: relative;
+        }
+        .label-clinical {
+            display: block;
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--ink-secondary);
+            margin-bottom: 0.25rem;
+        }
+        .input-clinical {
+            background-color: var(--bg-elevated);
+            color: var(--ink-primary);
+            border: 1px solid var(--border-hairline);
+            border-radius: 9px;
+            padding: 0.48rem 1.85rem 0.48rem 0.7rem;
+            font-size: 0.8125rem;
+            width: 100%;
+            transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+            outline: none;
+            font-variant-numeric: tabular-nums;
+        }
+        select.input-clinical {
+            padding-right: 1.5rem;
+        }
+        .input-clinical::placeholder {
+            color: #94A3B8;
+        }
+        .input-clinical:focus {
+            background-color: #FFFFFF;
+            border-color: var(--punctual-accent);
+            box-shadow: 0 0 0 3px var(--punctual-soft);
+        }
+        .field-clear-btn {
+            position: absolute;
+            right: 0.4rem;
+            top: 1.65rem;
+            width: 1.3rem;
+            height: 1.3rem;
+            border-radius: 9999px;
+            color: var(--ink-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: transparent;
+            border: none;
+        }
+        .field-clear-btn:hover {
+            background-color: #FEE2E2;
+            color: #DC2626;
+        }
+        .field-wrapper.is-empty .field-clear-btn {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ============================================================================
+           2. FOLHA OFICIAL A4 SIA/SUS BLOC-GRID (210mm x 297mm — fls. 1/1)
+           ============================================================================ */
+        .a4-stage-wrapper {
+            background-color: #E6E7EC;
+            background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .sus-a4-sheet {
+            width: 210mm;
+            min-height: 295mm;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            padding: 5.5mm 6.5mm;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 8.5pt;
+            line-height: 1.18;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.14);
+            position: relative;
+            border: 1px solid #CBD5E1;
+        }
+
+        .sus-triple-header {
+            display: grid;
+            grid-template-columns: 38mm 1fr 34mm;
+            border: 2px solid #000000;
+            margin-bottom: 1.5mm;
+            background: #FFFFFF;
+        }
+        .sus-header-left {
+            border-right: 1.5px solid #000000;
+            padding: 1.5mm 2mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .sus-logo-mark {
+            font-weight: 900;
+            font-size: 15pt;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            color: #000;
+        }
+        .sus-header-center {
+            padding: 1.5mm 2.5mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+        .sus-header-right {
+            border-left: 1.5px solid #000000;
+            padding: 1.5mm 2mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: right;
+            font-size: 7pt;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .sus-section-bar {
+            background-color: #1f1f1f !important;
+            color: #FFFFFF !important;
+            font-weight: 700;
+            font-size: 7.4pt;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            padding: 1mm 2mm;
+            border: 1.5px solid #000000;
+            border-bottom: none;
+            margin-top: 1.5mm;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .sus-grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            border-top: 1.5px solid #000000;
+            border-left: 1.5px solid #000000;
+        }
+
+        .sus-cell {
+            border-right: 1px solid #000000;
+            border-bottom: 1px solid #000000;
+            padding: 0.8mm 1.6mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            min-height: 9.2mm;
+            background: #FFFFFF;
+            position: relative;
+        }
+
+        .sus-cell-label {
+            font-size: 6pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #111111;
+            line-height: 1.05;
+            margin-bottom: 0.5mm;
+            user-select: none;
+        }
+
+        .sus-cell-val {
+            font-size: 8.5pt;
+            color: #000000;
+            min-height: 4.5mm;
+            outline: none;
+            word-break: break-word;
+            white-space: pre-wrap;
+            cursor: text;
+            border-radius: 2px;
+            transition: background-color 0.12s ease;
+        }
+        .sus-cell-val:hover {
+            background-color: rgba(5, 150, 105, 0.06);
+        }
+        .sus-cell-val:focus {
+            background-color: rgba(254, 240, 138, 0.45);
+            box-shadow: inset 0 -1.5px 0 var(--punctual-accent);
+        }
+        .sus-cell-val.code-num {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.01em;
+        }
+
+        .sus-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1.5px solid #000000;
+            font-size: 7.5pt;
+        }
+        .sus-table th {
+            background: #e5e5e5 !important;
+            color: #000000 !important;
+            border: 1px solid #000000;
+            padding: 0.8mm 1.2mm;
+            font-size: 6.3pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .sus-table td {
+            border: 1px solid #000000;
+            padding: 0.8mm 1.4mm;
+            color: #000000;
+        }
+
+        .sus-badge-box {
+            display: inline-block;
+            border: 1px solid #000;
+            padding: 0.2mm 1.2mm;
+            font-weight: 700;
+            font-size: 7pt;
+            margin-right: 1.5mm;
+            cursor: pointer;
+        }
+        .sus-badge-box.checked {
+            background: #000 !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ============================================================================
+           3. REGRAS ESTRITAS DE IMPRESSÃO A4 (fls. 1/1)
+           ============================================================================ */
+        @page {
+            size: A4 portrait;
+            margin: 5mm;
+        }
+        @media print {
+            html, body {
+                background: #FFFFFF !important;
+                color: #000000 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            .no-print, header, #left-workbench-panel, #toast-container, #a4-toolbar-bar {
+                display: none !important;
+            }
+            #main-workbench-grid {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            #right-a4-panel {
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+            }
+            .a4-stage-wrapper {
+                background: transparent !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+            .sus-a4-sheet {
+                width: 100% !important;
+                min-height: auto !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                page-break-after: avoid;
+                break-inside: avoid;
+            }
+        }
+
+        /* ============================================================================
+           4. ACESSIBILIDADE (:focus-visible, reduced-motion) & FALLBACK OFFLINE PURO
+           ============================================================================ */
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [contenteditable="true"]:focus-visible {
+            outline: 2px solid var(--punctual-accent);
+            outline-offset: 2px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        /* Fallback estrutural caso o computador esteja 100% sem internet (sem CDN) */
+        *, *::before, *::after { box-sizing: border-box; }
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .inline-flex { display: inline-flex; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .flex-1 { flex: 1 1 0%; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-1\.5 { gap: 0.375rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-2\.5 { gap: 0.625rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-5 { gap: 1.25rem; }
+        .grid { display: grid; }
+        .w-full { width: 100%; }
+        .max-w-\[1920px\] { max-width: 1920px; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .p-3 { padding: 0.75rem; }
+        .p-3\.5 { padding: 0.875rem; }
+        .p-4 { padding: 1rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-full { border-radius: 9999px; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .overflow-x-auto { overflow-x: auto; }
+        .shrink-0 { flex-shrink: 0; }
+        @media (min-width: 640px) {
+            .sm\:grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+            .sm\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .sm\:col-span-2 { grid-column: span 2 / span 2; }
+            .sm\:col-span-3 { grid-column: span 3 / span 3; }
+            .sm\:col-span-4 { grid-column: span 4 / span 4; }
+            .sm\:col-span-5 { grid-column: span 5 / span 5; }
+            .sm\:col-span-6 { grid-column: span 6 / span 6; }
+            .sm\:col-span-7 { grid-column: span 7 / span 7; }
+            .sm\:col-span-8 { grid-column: span 8 / span 8; }
+            .sm\:col-span-9 { grid-column: span 9 / span 9; }
+            .sm\:col-span-12 { grid-column: span 12 / span 12; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+            .lg\:col-span-5 { grid-column: span 5 / span 5; }
+            .lg\:col-span-7 { grid-column: span 7 / span 7; }
+        }
+
+    </style>
+</head>
+<body data-theme="ad-lucem" data-state="idle" class="min-h-screen flex flex-col selection:bg-emerald-500/15">
+
+    <!-- ============================================================================
+         CABEÇALHO SUPERIOR EDITORIAL MÉDICO (TEMA CLARO AD LUCEM)
+         ============================================================================ -->
+    <header class="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 no-print">
+        <div class="max-w-[1920px] mx-auto px-3 sm:px-6 py-3 flex flex-col gap-2.5">
+            
+            <!-- Linha 1: Identidade + Ações Rápidas -->
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-heading font-bold text-sm tracking-tight shadow-sm">
+                        SUS<span class="w-2 h-2 rounded-full ml-0.5" style="background: var(--punctual-accent)"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">SESAU-RO • MINISTÉRIO DA SAÚDE</span>
+                            <span class="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">Iniciado 100% em Branco</span>
+                        </div>
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight mt-0.5">
+                            Central Regulatória do SUS <span class="font-medium text-slate-500 text-sm">— Emissão e Preenchimento Oficial (9 Modelos)</span>
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Botões Principais de Controle -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Ponto de Cor (Regra dos 2%) -->
+                    <div class="bg-slate-100 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 border border-slate-200/80" title="Destaque Clínico (2%)">
+                        <span class="text-[11px] font-medium text-slate-500 mr-0.5 hidden xl:inline">Cor:</span>
+                        <button type="button" onclick="setAccentColor('#059669', '#065F46', 'rgba(5,150,105,0.10)', 'rgba(5,150,105,0.30)')" class="w-3.5 h-3.5 rounded-full bg-[#059669] ring-2 ring-white hover:scale-110 transition" title="Verde Esmeralda Clínico"></button>
+                        <button type="button" onclick="setAccentColor('#0284C7', '#075985', 'rgba(2,132,199,0.10)', 'rgba(2,132,199,0.30)')" class="w-3.5 h-3.5 rounded-full bg-[#0284C7] ring-2 ring-white hover:scale-110 transition" title="Azul Médico"></button>
+                        <button type="button" onclick="setAccentColor('#E11D48', '#9F1239', 'rgba(225,29,72,0.10)', 'rgba(225,29,72,0.30)')" class="w-3.5 h-3.5 rounded-full bg-[#E11D48] ring-2 ring-white hover:scale-110 transition" title="Carmim Regulatório"></button>
+                    </div>
+
+                    <!-- Botão 1: Deixar Tudo 100% em Branco -->
+                    <button type="button" onclick="clearAllBlank()" class="bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition" title="Zera todos os campos do formulário, da folha A4 e limpa qualquer memória do navegador">
+                        <span>Deixar 100% em Branco</span>
+                    </button>
+
+                    <!-- Botão 2: Limpar Apenas Paciente e Exame (Mantém Médico/Unidade se preenchidos) -->
+                    <button type="button" onclick="clearCaseOnlyKeepDoctor()" class="bg-amber-50 hover:bg-amber-100 text-amber-900 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-amber-200 transition" title="Apaga Paciente e Exame atual, mantendo apenas Unidade e Médico se você tiver preenchido">
+                        <span>Limpar Paciente/Exame</span>
+                    </button>
+
+                    <!-- Botão 3: Carregar Exemplo Clínico (Opcional) -->
+                    <button type="button" onclick="loadOptionalClinicalExample()" class="bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-200/80 transition" title="Preenche opcionalmente um caso exemplo editável e apagável">
+                        <span>Carregar Exemplo (Opcional)</span>
+                    </button>
+
+                    <!-- Botão 4: Baixar HTML A4 -->
+                    <button type="button" onclick="downloadStandaloneHTML()" class="bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-200/80 transition">
+                        <span>Baixar HTML A4</span>
+                    </button>
+
+                    <!-- Botão 5: Imprimir / Salvar PDF A4 -->
+                    <button type="button" onclick="window.print()" class="accent-bg px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 shadow-sm hover:opacity-95 transition">
+                        <span>Imprimir / Salvar PDF A4</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Linha 2: Barra de Abas dos 9 Modelos Oficiais do SUS -->
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5" id="model-selector-bar" role="tablist" aria-label="Modelos Oficiais do SUS">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================================
+         WORKBENCH SPLIT-SCREEN (COL-5 FORMULÁRIO INTERATIVO | COL-7 FOLHA A4 OFICIAL)
+         ============================================================================ -->
+    <main id="main-workbench-grid" class="flex-1 max-w-[1920px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 p-3 sm:p-6 items-start">
+        
+        <!-- PAINEL ESQUERDO: CONTROLES, PACIENTE, MÉDICO E CAMPOS DO MODELO (NO-PRINT) -->
+        <section id="left-workbench-panel" class="lg:col-span-5 flex flex-col gap-4 no-print">
+            
+            <!-- Barra de Controle Rápido no Topo do Formulário -->
+            <div class="surface-card p-3.5 flex flex-wrap items-center justify-between gap-2 bg-slate-50/80">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full" style="background: var(--punctual-accent)"></span>
+                    <span class="text-xs font-semibold text-slate-700">Sincronização Direta: O que você apaga aqui apaga na Folha A4</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="clearCurrentModelFields()" class="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition">
+                        Limpar Exame Atual
+                    </button>
+                    <button type="button" onclick="clearAllBlank()" class="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition">
+                        Zerar Tudo (100% em Branco)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 1: Estabelecimento Solicitante, Paciente e Médico -->
+            <div class="surface-card p-4 sm:p-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3.5 border-b border-slate-200">
+                    <div>
+                        <span class="accent-badge">Dados Compartilhados</span>
+                        <h2 class="text-sm sm:text-base font-bold text-slate-900 mt-1">1. Unidade de Saúde, Paciente e Solicitante</h2>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="clearSharedSection('all')" class="text-xs font-semibold text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition">
+                            Limpar Seção 1
+                        </button>
+                        <button type="button" onclick="toggleSection('shared-patient-body')" class="text-xs font-medium text-slate-500 hover:text-slate-800 px-2 py-1 rounded-lg bg-slate-100">
+                            Recolher/Expandir
+                        </button>
+                    </div>
+                </div>
+
+                <div id="shared-patient-body" class="space-y-4">
+                    <!-- Subbloco 1A: Unidade Solicitante -->
+                    <div class="p-3 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-700">1A. Estabelecimento de Saúde Solicitante</span>
+                            <button type="button" onclick="clearSharedSection('unit')" class="text-[11px] font-semibold text-rose-600 hover:underline transition">Limpar unidade</button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                            <div class="sm:col-span-12">
+                                <label class="label-clinical">Preenchimento Rápido Opcional (Unidades SESAU / SEMUSA-RO)</label>
+                                <select id="preset-unidade" onchange="applyUnitPreset(this.value)" class="input-clinical font-medium">
+                                    <option value="">— Em branco (digite abaixo ou escolha uma unidade) —</option>
+                                    <option value="HBAP">HBAP — Hospital de Base Dr. Ary Pinheiro (CNES 2494299)</option>
+                                    <option value="CEMETRON">CEMETRON — Centro de Medicina Tropical de RO (CNES 2494302)</option>
+                                    <option value="HICD">HICD — Hospital Infantil Cosme e Damião (CNES 2494329)</option>
+                                    <option value="POC">POC — Policlínica Oswaldo Cruz (CNES 2494353)</option>
+                                    <option value="HJPII">HJPII — Pronto Socorro João Paulo II (CNES 2494310)</option>
+                                    <option value="USF">USF Osvaldo Piana — SEMUSA Porto Velho (CNES 2807106)</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-6 field-wrapper is-empty">
+                                <label class="label-clinical">Nome do Estabelecimento Solicitante</label>
+                                <input type="text" data-shared="unidadeSolicitante" class="input-clinical" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('unidadeSolicitante')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-3 field-wrapper is-empty">
+                                <label class="label-clinical">Código CNES</label>
+                                <input type="text" data-shared="cnesSolicitante" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('cnesSolicitante')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-3 field-wrapper is-empty">
+                                <label class="label-clinical">UF / IBGE</label>
+                                <input type="text" data-shared="ufIbgeCabecalho" class="input-clinical tabular-nums-clean" placeholder="Ex: RO • 1100205">
+                                <button type="button" onclick="clearSingleSharedField('ufIbgeCabecalho')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subbloco 1B: Identificação do Paciente -->
+                    <div class="p-3 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-700">1B. Dados Cadastrais e Clínicos do Paciente</span>
+                            <button type="button" onclick="clearSharedSection('patient')" class="text-[11px] font-semibold text-rose-600 hover:underline transition">Limpar paciente</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                            <div class="sm:col-span-6 field-wrapper is-empty">
+                                <label class="label-clinical">Nome Completo do Paciente</label>
+                                <input type="text" data-shared="pacienteNome" class="input-clinical font-semibold" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteNome')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-4 field-wrapper is-empty">
+                                <label class="label-clinical">Cartão Nacional SUS (CNS)</label>
+                                <input type="text" data-shared="pacienteCns" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteCns')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">Prontuário</label>
+                                <input type="text" data-shared="pacienteProntuario" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteProntuario')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-12 gap-2.5">
+                            <div class="sm:col-span-3 field-wrapper is-empty">
+                                <label class="label-clinical">CPF do Paciente</label>
+                                <input type="text" data-shared="pacienteCpf" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteCpf')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-3 field-wrapper is-empty">
+                                <label class="label-clinical">Data de Nasc.</label>
+                                <input type="text" data-shared="pacienteNascimento" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteNascimento')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">Idade</label>
+                                <input type="text" data-shared="pacienteIdade" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteIdade')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">Sexo</label>
+                                <input type="text" data-shared="pacienteSexo" class="input-clinical" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteSexo')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">Raça/Cor</label>
+                                <input type="text" data-shared="pacienteRaca" class="input-clinical" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteRaca')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-12 gap-2.5">
+                            <div class="col-span-2 sm:col-span-5 field-wrapper is-empty">
+                                <label class="label-clinical">Nome Completo da Mãe</label>
+                                <input type="text" data-shared="pacienteMae" class="input-clinical" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteMae')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-3 field-wrapper is-empty">
+                                <label class="label-clinical">Telefone</label>
+                                <input type="text" data-shared="pacienteTelefone" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteTelefone')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">Peso (kg)</label>
+                                <input type="text" data-shared="pacientePeso" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacientePeso')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">Altura (cm)</label>
+                                <input type="text" data-shared="pacienteAltura" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteAltura')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-12 gap-2.5">
+                            <div class="col-span-2 sm:col-span-5 field-wrapper is-empty">
+                                <label class="label-clinical">Endereço Residencial (Rua, Nº, Bairro)</label>
+                                <input type="text" data-shared="pacienteEndereco" class="input-clinical" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteEndereco')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-3 field-wrapper is-empty">
+                                <label class="label-clinical">Município / UF</label>
+                                <input type="text" data-shared="pacienteMunicipio" class="input-clinical" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteMunicipio')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">IBGE / CEP</label>
+                                <input type="text" data-shared="pacienteIbgeCep" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteIbgeCep')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">Responsável</label>
+                                <input type="text" data-shared="pacienteResponsavel" class="input-clinical" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('pacienteResponsavel')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subbloco 1C: Médico / Profissional Solicitante -->
+                    <div class="p-3 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-700">1C. Profissional / Médico Solicitante</span>
+                            <button type="button" onclick="clearSharedSection('doctor')" class="text-[11px] font-semibold text-rose-600 hover:underline transition">Limpar solicitante</button>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-12 gap-2.5">
+                            <div class="col-span-2 sm:col-span-5 field-wrapper is-empty">
+                                <label class="label-clinical">Nome do Médico / Profissional</label>
+                                <input type="text" data-shared="medicoNome" class="input-clinical font-semibold" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('medicoNome')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">CRM / Conselho</label>
+                                <input type="text" data-shared="medicoCrm" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('medicoCrm')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-3 field-wrapper is-empty">
+                                <label class="label-clinical">CNS / CPF do Médico</label>
+                                <input type="text" data-shared="medicoCns" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('medicoCns')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                            <div class="sm:col-span-2 field-wrapper is-empty">
+                                <label class="label-clinical">Data da Solic.</label>
+                                <input type="text" data-shared="dataSolicitacao" class="input-clinical tabular-nums-clean" placeholder="Em branco">
+                                <button type="button" onclick="clearSingleSharedField('dataSolicitacao')" class="field-clear-btn" title="Limpar campo">×</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Modelos Clínicos Opcionais (Só preenche se clicar) -->
+            <div class="surface-card p-4 bg-slate-900 text-white border-slate-800">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full" style="background: var(--punctual-accent)"></span>
+                        <span class="text-xs font-bold tracking-wide text-slate-100">Modelos Clínicos Opcionais (Clique apenas se desejar preencher)</span>
+                    </div>
+                    <button type="button" onclick="clearCurrentModelFields()" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-rose-500/20 text-rose-200 hover:bg-rose-500/30 border border-rose-400/30 transition">
+                        Limpar Exame
+                    </button>
+                </div>
+                <div id="quick-templates-container" class="flex flex-wrap gap-1.5">
+                    <!-- Pílulas dinâmicas geradas via JS -->
+                </div>
+            </div>
+
+            <!-- Card 3: Campos Específicos do Documento Selecionado -->
+            <div class="surface-card p-4 sm:p-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3.5 border-b border-slate-200">
+                    <div>
+                        <span class="accent-badge" id="dynamic-form-subtitle">SIA/SUS • Alta Complexidade</span>
+                        <h2 class="text-sm sm:text-base font-bold text-slate-900 mt-1" id="dynamic-form-title">2. Preenchimento Específico do Documento</h2>
+                    </div>
+                    <button type="button" onclick="clearCurrentModelFields()" class="text-xs font-semibold text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition">
+                        Limpar Seção 2 (Deixar Exame em Branco)
+                    </button>
+                </div>
+
+                <!-- Container Dinâmico dos Campos do Modelo Ativo -->
+                <div id="dynamic-model-fields" class="space-y-3">
+                    <!-- Renderizado via JS -->
+                </div>
+            </div>
+
+            <!-- Card 4: Exportação JSON -->
+            <div class="surface-card p-3.5 flex items-center justify-between gap-3 text-xs text-slate-600">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background: var(--punctual-accent)"></span>
+                    <span><strong>Sem Dados Fantasmas:</strong> Todos os campos iniciam vazios. Você pode digitar no formulário à esquerda ou clicar em qualquer célula da folha A4 à direita.</span>
+                </div>
+                <button type="button" onclick="exportAllDataJSON()" class="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition">
+                    Exportar JSON
+                </button>
+            </div>
+        </section>
+
+        <!-- PAINEL DIREITO: PALCO A4 OFICIAL EM TEMPO REAL (COL-7) -->
+        <section id="right-a4-panel" class="lg:col-span-7 flex flex-col gap-3">
+            <!-- Barra de Status do Palco A4 -->
+            <div id="a4-toolbar-bar" class="surface-card px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 no-print">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <span class="text-xs font-bold text-slate-800" id="a4-preview-label">Visualização Oficial A4 (fls. 1/1)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="clearAllBlank()" class="text-xs font-semibold text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-md border border-rose-200 transition">
+                        Deixar Folha 100% em Branco
+                    </button>
+                    <button type="button" onclick="window.print()" class="accent-bg px-3.5 py-1 rounded-lg text-xs font-semibold shadow-sm hover:opacity-95 transition">
+                        Imprimir Folha A4
+                    </button>
+                </div>
+            </div>
+
+            <!-- Palco da Folha A4 -->
+            <div class="a4-stage-wrapper rounded-2xl p-2 sm:p-6 overflow-x-auto border border-slate-200/90 flex justify-center">
+                <div id="a4-document-canvas" class="sus-a4-sheet">
+                    <!-- Renderizado em tempo real via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Container de Notificações Clínicas -->
+    <div id="toast-container" role="status" aria-live="polite" aria-busy="false" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none no-print"></div>
+
+    <!-- ============================================================================
+         MOTOR JAVASCRIPT: INICIALIZAÇÃO 100% EM BRANCO E SINCRONIZAÇÃO BIDIRECIONAL PURA
+         ============================================================================ -->
+    <script>
+        // ----------------------------------------------------------------------------
+        // 0. GESTÃO DE PERSISTÊNCIA SEPARADA (MÉDICO/UNIDADE vs. PACIENTE/EXAME)
+        // ----------------------------------------------------------------------------
+        const STORAGE_KEY_DOCTOR_UNIT = 'pcm_sus_doctor_unit_v4';
+        const STORAGE_KEY_PATIENT_CASE = 'pcm_sus_patient_case_v4';
+        const DOCTOR_UNIT_KEYS = ['unidadeSolicitante', 'cnesSolicitante', 'ufIbgeCabecalho', 'medicoNome', 'medicoCrm', 'medicoCns', 'dataSolicitacao'];
+        const PATIENT_KEYS = [
+            'pacienteNome', 'pacienteCns', 'pacienteCpf', 'pacienteProntuario',
+            'pacienteNascimento', 'pacienteIdade', 'pacienteSexo', 'pacienteRaca',
+            'pacienteMae', 'pacienteResponsavel', 'pacienteTelefone', 'pacientePeso',
+            'pacienteAltura', 'pacienteEndereco', 'pacienteMunicipio', 'pacienteIbgeCep'
+        ];
+        try {
+            localStorage.removeItem('sesau_ro_sus_workbench_v1');
+            localStorage.removeItem('sesau_ro_sus_workbench_v2');
+            localStorage.removeItem('sesau_ro_blank_v3');
+        } catch (e) {}
+
+        function saveSeparateState() {
+            try {
+                const docUnit = {};
+                DOCTOR_UNIT_KEYS.forEach(k => docUnit[k] = appState.shared[k] || '');
+                localStorage.setItem(STORAGE_KEY_DOCTOR_UNIT, JSON.stringify(docUnit));
+
+                const patCase = { activeModel: appState.activeModel, patient: {}, models: appState.models };
+                PATIENT_KEYS.forEach(k => patCase.patient[k] = appState.shared[k] || '');
+                localStorage.setItem(STORAGE_KEY_PATIENT_CASE, JSON.stringify(patCase));
+            } catch (e) {}
+        }
+
+        function restoreSavedState() {
+            try {
+                const rawDoc = localStorage.getItem(STORAGE_KEY_DOCTOR_UNIT);
+                if (rawDoc) {
+                    const parsedDoc = JSON.parse(rawDoc);
+                    DOCTOR_UNIT_KEYS.forEach(k => {
+                        if (typeof parsedDoc[k] === 'string') appState.shared[k] = parsedDoc[k];
+                    });
+                }
+                const rawPat = localStorage.getItem(STORAGE_KEY_PATIENT_CASE);
+                if (rawPat) {
+                    const parsedPat = JSON.parse(rawPat);
+                    if (parsedPat.activeModel && appState.models[parsedPat.activeModel]) {
+                        appState.activeModel = parsedPat.activeModel;
+                    }
+                    if (parsedPat.patient) {
+                        PATIENT_KEYS.forEach(k => {
+                            if (typeof parsedPat.patient[k] === 'string') appState.shared[k] = parsedPat.patient[k];
+                        });
+                    }
+                    if (parsedPat.models) {
+                        Object.keys(appState.models).forEach(mId => {
+                            if (parsedPat.models[mId]) {
+                                Object.keys(appState.models[mId]).forEach(fKey => {
+                                    if (typeof parsedPat.models[mId][fKey] === 'string') {
+                                        appState.models[mId][fKey] = parsedPat.models[mId][fKey];
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // ----------------------------------------------------------------------------
+        // 1. CATÁLOGO DOS 9 MODELOS OFICIAIS SUS (SESAU-RO / MINISTÉRIO DA SAÚDE)
+        // ----------------------------------------------------------------------------
+        const SUS_MODELS = [
+            {
+                id: '01_APAC_Principal',
+                shortLabel: '1. APAC Principal',
+                badge: 'SIA/SUS • Alta Complexidade',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - SISTEMA DE INFORMAÇÕES AMBULATORIAIS (SIA/SUS)',
+                officialTitle: 'LAUDO PARA SOLICITAÇÃO/AUTORIZAÇÃO DE PROCEDIMENTO AMBULATORIAL (APAC)',
+                protocolPrefix: 'APAC-RO'
+            },
+            {
+                id: '02_APAC_Complementar',
+                shortLabel: '2. APAC Imagem e Risco Renal',
+                badge: 'Radiologia • TC / RM + CKD-EPI 2021',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - SIA/SUS - PROTOCOLO DE RADIOLOGIA E SEGURANÇA RENAL',
+                officialTitle: 'LAUDO COMPLEMENTAR DE IMAGEM (TC / RM / CINTILOGRAFIA) E AVALIAÇÃO DE RISCO RENAL',
+                protocolPrefix: 'IMG-RO'
+            },
+            {
+                id: '03_Guia_SISREG',
+                shortLabel: '3. Guia SISREG III',
+                badge: 'Regulação Ambulatorial por Risco',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - CENTRAL DE REGULAÇÃO AMBULATORIAL (SISREG III)',
+                officialTitle: 'GUIA DE REFERÊNCIA E CONTRARREFERÊNCIA AMBULATORIAL — CLASSIFICAÇÃO DE RISCO',
+                protocolPrefix: 'SISREG-RO'
+            },
+            {
+                id: '04_LME_Medicamentos',
+                shortLabel: '4. LME Medicamentos (CEAF)',
+                badge: 'Assistência Farmacêutica • PCDT',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - COMPONENTE ESPECIALIZADO DA ASSISTÊNCIA FARMACÊUTICA (CEAF-RO)',
+                officialTitle: 'LAUDO DE SOLICITAÇÃO, AVALIAÇÃO E AUTORIZAÇÃO DE MEDICAMENTOS (LME)',
+                protocolPrefix: 'CEAF-RO'
+            },
+            {
+                id: '05_SISCAN_Citopatologico',
+                shortLabel: '5. SISCAN Citopatológico',
+                badge: 'INCA • Colo do Útero',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - INSTITUTO NACIONAL DE CÂNCER (INCA) - SISCAN',
+                officialTitle: 'REQUISIÇÃO DE EXAME CITOPATOLÓGICO — COLO DO ÚTERO',
+                protocolPrefix: 'SISCAN-CITO'
+            },
+            {
+                id: '06_GAL_LACEN_Geral',
+                shortLabel: '6. GAL / LACEN-RO Geral',
+                badge: 'Vigilância • Arboviroses e Malária',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - SISTEMA GERENCIADOR DE AMBIENTE LABORATORIAL (GAL / LACEN-RO)',
+                officialTitle: 'FICHA DE REQUISIÇÃO DE EXAMES — VIGILÂNCIA LABORATORIAL / BIOLOGIA MÉDICA',
+                protocolPrefix: 'GAL-LACEN'
+            },
+            {
+                id: '07_SISCAN_Histopatologico',
+                shortLabel: '7. SISCAN Histopatológico',
+                badge: 'Biópsia • Mama / Colo / Peça',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - INSTITUTO NACIONAL DE CÂNCER (INCA) - SISCAN',
+                officialTitle: 'REQUISIÇÃO DE EXAME HISTOPATOLÓGICO — MAMA / COLO DO ÚTERO / PEÇAS CIRÚRGICAS',
+                protocolPrefix: 'SISCAN-HISTO'
+            },
+            {
+                id: '08_SISCAN_Mamografia',
+                shortLabel: '8. SISCAN Mamografia',
+                badge: 'Rastreamento e Diagnóstica',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - INSTITUTO NACIONAL DE CÂNCER (INCA) - SISCAN',
+                officialTitle: 'REQUISIÇÃO DE MAMOGRAFIA — RASTREAMENTO E DIAGNÓSTICA',
+                protocolPrefix: 'SISCAN-MMG'
+            },
+            {
+                id: '09_GAL_TRM_TB',
+                shortLabel: '9. GAL Tuberculose (TRM-TB)',
+                badge: 'GeneXpert MTB/RIF • BAAR • Cultura',
+                ministrySub: 'MINISTÉRIO DA SAÚDE - SECRETARIA DE VIGILÂNCIA EM SAÚDE E AMBIENTE (SVSA / LACEN-RO)',
+                officialTitle: 'REQUISIÇÃO DE DIAGNÓSTICO LABORATORIAL DA TUBERCULOSE (TRM-TB / BAAR / CULTURA)',
+                protocolPrefix: 'TB-LACEN'
+            }
+        ];
+
+        const RO_UNIT_PRESETS = {
+            HBAP: { nome: 'HOSPITAL DE BASE DR. ARY PINHEIRO (HBAP - SESAU/RO)', cnes: '2494299', ufibge: 'RO • IBGE 1100205' },
+            CEMETRON: { nome: 'CENTRO DE MEDICINA TROPICAL DE RONDÔNIA (CEMETRON)', cnes: '2494302', ufibge: 'RO • IBGE 1100205' },
+            HICD: { nome: 'HOSPITAL INFANTIL COSME E DAMIÃO (HICD - SESAU/RO)', cnes: '2494329', ufibge: 'RO • IBGE 1100205' },
+            POC: { nome: 'POLICLÍNICA OSWALDO CRUZ (POC - SESAU/RO)', cnes: '2494353', ufibge: 'RO • IBGE 1100205' },
+            HJPII: { nome: 'HOSPITAL E PRONTO SOCORRO JOÃO PAULO II (SESAU/RO)', cnes: '2494310', ufibge: 'RO • IBGE 1100205' },
+            USF: { nome: 'USF OSVALDO PIANA — SEMUSA PORTO VELHO', cnes: '2807106', ufibge: 'RO • IBGE 1100205' }
+        };
+
+        // ----------------------------------------------------------------------------
+        // 2. FÁBRICA DE ESTADO 100% EM BRANCO (ZERO DADOS PRÉ-PREENCHIDOS)
+        // ----------------------------------------------------------------------------
+        function createBlankState(keepActiveModel = '01_APAC_Principal') {
+            return {
+                activeModel: keepActiveModel,
+                shared: {
+                    unidadeSolicitante: '',
+                    cnesSolicitante: '',
+                    ufIbgeCabecalho: '',
+                    pacienteNome: '',
+                    pacienteCns: '',
+                    pacienteCpf: '',
+                    pacienteProntuario: '',
+                    pacienteNascimento: '',
+                    pacienteIdade: '',
+                    pacienteSexo: '',
+                    pacienteRaca: '',
+                    pacienteMae: '',
+                    pacienteResponsavel: '',
+                    pacienteTelefone: '',
+                    pacientePeso: '',
+                    pacienteAltura: '',
+                    pacienteEndereco: '',
+                    pacienteMunicipio: '',
+                    pacienteIbgeCep: '',
+                    medicoNome: '',
+                    medicoCrm: '',
+                    medicoCns: '',
+                    dataSolicitacao: ''
+                },
+                models: {
+                    '01_APAC_Principal': {
+                        sigtapPrincipal: '',
+                        procNomePrincipal: '',
+                        qtdePrincipal: '',
+                        sigtapSec1: '',
+                        procSec1: '',
+                        qtdeSec1: '',
+                        sigtapSec2: '',
+                        procSec2: '',
+                        qtdeSec2: '',
+                        descDiagnostico: '',
+                        cidPrincipal: '',
+                        cidSecundario: '',
+                        cidCausas: '',
+                        justificativa: '',
+                        docTipoMedico: '',
+                        executanteNome: '',
+                        executanteCnes: '',
+                        autorizadorNome: '',
+                        autorizadorCod: '',
+                        docAutorizador: '',
+                        dataAssinaturaAutorizador: '',
+                        numApac: '',
+                        validadeApac: ''
+                    },
+                    '02_APAC_Complementar': {
+                        sigtapExame: '',
+                        modalidade: '',
+                        regiaoAnatomica: '',
+                        usoContraste: '',
+                        creatinina: '',
+                        dataCreatinina: '',
+                        ureia: '',
+                        tfgEstimada: '',
+                        usaMetformina: '',
+                        fatoresRiscoRenal: '',
+                        alergiaContraste: '',
+                        segurancaMagnetica: '',
+                        justificativaContraste: '',
+                        preparoProfilaxia: ''
+                    },
+                    '03_Guia_SISREG': {
+                        unidadeExecutanteDesejada: '',
+                        codigoSigtapSisreg: '',
+                        cidSisreg: '',
+                        prioridadeCor: '',
+                        sinaisAlerta: '',
+                        quadroClinicoSisreg: '',
+                        examesRealizadosSisreg: '',
+                        tratamentoPrevioAps: '',
+                        parecerRegulador: '',
+                        contrarreferenciaResumo: ''
+                    },
+                    '04_LME_Medicamentos': {
+                        med1Nome: '',
+                        med1M1: '', med1M2: '', med1M3: '', med1M4: '', med1M5: '', med1M6: '',
+                        med2Nome: '',
+                        med2M1: '', med2M2: '', med2M3: '', med2M4: '', med2M5: '', med2M6: '',
+                        med3Nome: '',
+                        med3M1: '', med3M2: '', med3M3: '', med3M4: '', med3M5: '', med3M6: '',
+                        cidLme: '',
+                        diagnosticoLme: '',
+                        anamneseLme: '',
+                        examesPcdtLme: '',
+                        tratamentosPreviosLme: '',
+                        atestadoCapacidade: '',
+                        reciboDispensacao: ''
+                    },
+                    '05_SISCAN_Citopatologico': {
+                        motivoExame: '',
+                        fezPreventivo: '',
+                        usaDiu: '',
+                        gravida: '',
+                        usaPilula: '',
+                        usaHormonioMenopausa: '',
+                        fezRadioterapia: '',
+                        dumData: '',
+                        sangramentoRelacao: '',
+                        sangramentoMenopausa: '',
+                        inspecaoColo: '',
+                        sinaisIst: '',
+                        limiteJec: '',
+                        adequabilidadeBethesda: '',
+                        diagnosticoDescritivoBethesda: ''
+                    },
+                    '06_GAL_LACEN_Geral': {
+                        sinanNumero: '',
+                        agravoSuspeito: '',
+                        dataInicioSintomas: '',
+                        diaDoenca: '',
+                        sinaisSintomasGal: '',
+                        casoVinculo: '',
+                        materialBiologico: '',
+                        examesMetodologiaGal: '',
+                        dataHoraColetaGal: '',
+                        condicaoTransporteGal: '',
+                        codigoGalEtiqueta: '',
+                        recebimentoLacen: ''
+                    },
+                    '07_SISCAN_Histopatologico': {
+                        topografiaLesao: '',
+                        localizacaoDetalhada: '',
+                        tipoProcedimentoHisto: '',
+                        achadosClinicosImagem: '',
+                        linfonodosAxilares: '',
+                        numeroFrascosFragmentos: '',
+                        fixadorDataHora: '',
+                        estudoImunoHistoquimica: ''
+                    },
+                    '08_SISCAN_Mamografia': {
+                        modalidadeMamografia: '',
+                        noduloCaroco: '',
+                        riscoElevadoFamiliar: '',
+                        fezMamografiaAntes: '',
+                        radioterapiaPreviaMama: '',
+                        cirurgiaPreviaMama: '',
+                        indicacaoDetalhadaMmg: '',
+                        exameClinicoMamas: ''
+                    },
+                    '09_GAL_TRM_TB': {
+                        sinanTb: '',
+                        populacaoVulneravel: '',
+                        statusHiv: '',
+                        finalidadeExameTb: '',
+                        materialClinicoTb: '',
+                        examesSolicitadosTb: '',
+                        quadroClinicoRxTb: '',
+                        aspectoAmostraTb: '',
+                        dataColetaTb: '',
+                        resultadoLaboratorioTb: ''
+                    }
+                }
+            };
+        }
+
+        // Inicia SEMPRE 100% em branco ao abrir a página!
+        let appState = createBlankState('01_APAC_Principal');
+
+        // Helpers estritos: NUNCA usam fallback com texto fixo
+        function s(key) {
+            const val = appState.shared[key];
+            return (val === undefined || val === null) ? '' : String(val);
+        }
+
+        function v(key) {
+            const activeObj = appState.models[appState.activeModel] || {};
+            const val = activeObj[key];
+            return (val === undefined || val === null) ? '' : String(val);
+        }
+
+        // ----------------------------------------------------------------------------
+        // 3. SINCRONIZAÇÃO DOM CIRÚRGICA SEM RE-POPULAÇÃO E SEM PERDA DE FOCO
+        // ----------------------------------------------------------------------------
+        function syncSharedToDOM(key, newValue, source = 'form') {
+            appState.shared[key] = newValue;
+
+            // Se veio da folha A4 ou de um botão de limpar, atualiza o input da esquerda
+            if (source !== 'form') {
+                document.querySelectorAll(`[data-shared="${key}"]`).forEach(input => {
+                    if (input.value !== newValue) input.value = newValue;
+                });
+            }
+
+            // Se veio do input da esquerda ou de botão de limpar, atualiza todas as células vinculadas na folha A4
+            if (source !== 'a4') {
+                document.querySelectorAll(`[data-bind-shared="${key}"]`).forEach(cell => {
+                    if (cell.innerText !== newValue) cell.innerText = newValue;
+                });
+            }
+
+            // Atualiza linha de assinatura caso médico ou CRM mudem
+            if (key === 'medicoNome' || key === 'medicoCrm') {
+                updateSignatureDOM();
+            }
+
+            // Recalcula CKD-EPI apenas se idade ou sexo mudarem
+            if (key === 'pacienteIdade' || key === 'pacienteSexo') {
+                recalculateCKDEPI();
+            }
+
+            updateFieldEmptyClasses();
+            saveSeparateState();
+        }
+
+        function syncModelToDOM(key, newValue, source = 'form') {
+            const mId = appState.activeModel;
+            appState.models[mId][key] = newValue;
+
+            if (source !== 'form') {
+                document.querySelectorAll(`[data-model-field="${key}"]`).forEach(input => {
+                    if (input.value !== newValue) input.value = newValue;
+                });
+            }
+
+            if (source !== 'a4') {
+                document.querySelectorAll(`[data-bind-model="${key}"]`).forEach(cell => {
+                    if (cell.innerText !== newValue) cell.innerText = newValue;
+                });
+            }
+
+            if (mId === '02_APAC_Complementar' && key === 'creatinina') {
+                recalculateCKDEPI();
+            }
+
+            if (mId === '04_LME_Medicamentos' && (key === 'med1M1' || key === 'med2M1' || key === 'med3M1') && source === 'form') {
+                const prefix = key.slice(0, 4);
+                ['M2', 'M3', 'M4', 'M5', 'M6'].forEach(suffix => {
+                    const mKey = prefix + suffix;
+                    appState.models['04_LME_Medicamentos'][mKey] = newValue;
+                    document.querySelectorAll(`[data-bind-model="${mKey}"]`).forEach(c => {
+                        c.innerText = newValue;
+                    });
+                });
+            }
+
+            updateFieldEmptyClasses();
+            saveSeparateState();
+        }
+
+        function updateSignatureDOM() {
+            const sigText = formatSignatureLine(s('medicoNome'), s('medicoCrm'));
+            document.querySelectorAll('[data-bind-signature]').forEach(el => {
+                el.innerText = sigText;
+            });
+        }
+
+        // ----------------------------------------------------------------------------
+        // 4. CALCULADORA AUTOMÁTICA CKD-EPI 2021 (FICA EM BRANCO SE VAZIA)
+        // ----------------------------------------------------------------------------
+        function calculateCKDEPI2021(scrMgDl, ageYears, sex) {
+            const scrStr = String(scrMgDl ?? '').trim();
+            const ageStr = String(ageYears ?? '').trim();
+            if (!scrStr || !ageStr) return null;
+
+            const scr = parseFloat(scrStr.replace(',', '.'));
+            const age = parseFloat(ageStr);
+            if (isNaN(scr) || scr <= 0 || isNaN(age) || age <= 0) return null;
+
+            const isFemale = String(sex ?? '').toUpperCase().startsWith('F');
+            const kappa = isFemale ? 0.7 : 0.9;
+            const alpha = isFemale ? -0.241 : -0.302;
+            const femFactor = isFemale ? 1.012 : 1.0;
+
+            const ratio = scr / kappa;
+            const minPart = Math.pow(Math.min(ratio, 1), alpha);
+            const maxPart = Math.pow(Math.max(ratio, 1), -1.200);
+            const agePart = Math.pow(0.9938, age);
+
+            const egfr = 142 * minPart * maxPart * agePart * femFactor;
+            return Math.round(egfr * 10) / 10;
+        }
+
+        function recalculateCKDEPI() {
+            const m = appState.models['02_APAC_Complementar'];
+            const scrStr = String(m.creatinina ?? '').trim();
+            if (!scrStr) {
+                m.tfgEstimada = '';
+            } else {
+                const egfr = calculateCKDEPI2021(m.creatinina, appState.shared.pacienteIdade, appState.shared.pacienteSexo);
+                if (egfr === null) {
+                    m.tfgEstimada = '';
+                } else {
+                    let riskLabel = 'BAIXO RISCO (TFG >= 60)';
+                    if (egfr < 30) {
+                        riskLabel = 'ALTO RISCO DE NIC/FSN (TFG < 30)';
+                    } else if (egfr < 45) {
+                        riskLabel = 'RISCO MODERADO-ALTO (TFG 30-44)';
+                    } else if (egfr < 60) {
+                        riskLabel = 'RISCO MODERADO (TFG 45-59)';
+                    }
+                    m.tfgEstimada = `${egfr} mL/min/1,73m² — ${riskLabel}`;
+                }
+            }
+
+            // Sincroniza no input e na célula A4
+            const tfgInput = document.querySelector('[data-model-field="tfgEstimada"]');
+            if (tfgInput) tfgInput.value = m.tfgEstimada;
+            document.querySelectorAll('[data-bind-model="tfgEstimada"]').forEach(c => {
+                c.innerText = m.tfgEstimada;
+            });
+            updateFieldEmptyClasses();
+            saveSeparateState();
+        }
+
+        // ----------------------------------------------------------------------------
+        // 5. BIBLIOTECA DE TEMPLATES OPCIONAIS (SÓ PREENCHE SE O USUÁRIO CLICAR)
+        // ----------------------------------------------------------------------------
+        const QUICK_TEMPLATES = {
+            '01_APAC_Principal': [
+                {
+                    label: 'TC Abdome Oncológico (C18.7)',
+                    apply: () => {
+                        const m = appState.models['01_APAC_Principal'];
+                        m.sigtapPrincipal = '02.06.03.003-7';
+                        m.procNomePrincipal = 'TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL';
+                        m.qtdePrincipal = '01';
+                        m.sigtapSec1 = '02.06.01.007-9';
+                        m.procSec1 = 'TOMOGRAFIA COMPUTADORIZADA DE TÓRAX';
+                        m.qtdeSec1 = '01';
+                        m.descDiagnostico = 'NEOPLASIA MALIGNA DO CÓLON SIGMOIDE — ESTADIAMENTO ONCOLÓGICO';
+                        m.cidPrincipal = 'C18.7';
+                        m.cidSecundario = 'R10.4';
+                        m.cidCausas = 'D50.0';
+                        m.justificativa = 'Quadro de hematoquezia e perda ponderal em investigação/estadiamento de Adenocarcinoma de Cólon Sigmoide confirmado por biópsia. Solicito TC de Abdome Total e Tórax para estadiamento TNM pré-operatório.';
+                    }
+                },
+                {
+                    label: 'RM Coluna Lombar Radiculopatia (M51.1)',
+                    apply: () => {
+                        const m = appState.models['01_APAC_Principal'];
+                        m.sigtapPrincipal = '02.07.01.006-4';
+                        m.procNomePrincipal = 'RESSONÂNCIA MAGNÉTICA DE COLUNA LOMBO-SACRA';
+                        m.qtdePrincipal = '01';
+                        m.sigtapSec1 = '';
+                        m.procSec1 = '';
+                        m.qtdeSec1 = '';
+                        m.descDiagnostico = 'TRANSTORNO DO DISCO LOMBAR COM RADICULOPATIA REFRATÁRIA';
+                        m.cidPrincipal = 'M51.1';
+                        m.cidSecundario = 'M54.4';
+                        m.cidCausas = '';
+                        m.justificativa = 'Lombociatalgia irradiada para dermátomo L5-S1 com sinal de Lasègue positivo e déficit motor focal, refratária ao tratamento clínico e fisioterápico otimizado.';
+                    }
+                },
+                {
+                    label: 'Hemodiálise Crônica (N18.5)',
+                    apply: () => {
+                        const m = appState.models['01_APAC_Principal'];
+                        m.sigtapPrincipal = '03.05.01.010-7';
+                        m.procNomePrincipal = 'HEMODIÁLISE (MÁXIMO 3 SESSÕES POR SEMANA)';
+                        m.qtdePrincipal = '12';
+                        m.descDiagnostico = 'DOENÇA RENAL CRÔNICA ESTÁGIO 5 DIALÍTICO (TFG < 10 ML/MIN)';
+                        m.cidPrincipal = 'N18.5';
+                        m.cidSecundario = 'I12.0';
+                        m.justificativa = 'Paciente portador de DRC estágio G5 em programa regular de Terapia Renal Substitutiva (Hemodiálise 3 sessões semanais).';
+                    }
+                }
+            ],
+            '02_APAC_Complementar': [
+                {
+                    label: 'TC com Contraste Iodado',
+                    apply: () => {
+                        const m = appState.models['02_APAC_Complementar'];
+                        m.sigtapExame = '02.06.03.003-7 — TC DE ABDOME TOTAL';
+                        m.modalidade = 'TOMOGRAFIA COMPUTADORIZADA (TC)';
+                        m.regiaoAnatomica = 'ABDOME TOTAL E PELVE';
+                        m.usoContraste = 'COM CONTRASTE ENDOVENOSO (IODADO NÃO-IÔNICO)';
+                        m.creatinina = '0.88';
+                        m.dataCreatinina = '19/10/2026';
+                        m.usaMetformina = 'NÃO UTILIZA';
+                        m.segurancaMagnetica = 'Não aplicável (Exame Tomográfico)';
+                        m.justificativaContraste = 'Necessidade de estudo multifásico contrastado para avaliação vascular e parenquimatosa.';
+                        m.preparoProfilaxia = 'Jejum de 4 horas para sólidos e hidratação oral livre.';
+                        recalculateCKDEPI();
+                    }
+                },
+                {
+                    label: 'RM com Gadolínio',
+                    apply: () => {
+                        const m = appState.models['02_APAC_Complementar'];
+                        m.sigtapExame = '02.07.01.006-4 — RM DE ENCÉFALO';
+                        m.modalidade = 'RESSONÂNCIA MAGNÉTICA (RM 1.5T)';
+                        m.regiaoAnatomica = 'CRÂNIO / ENCÉFALO';
+                        m.usoContraste = 'COM CONTRASTE PARAMAGNÉTICO (GADOLÍNIO)';
+                        m.creatinina = '0.92';
+                        m.segurancaMagnetica = 'Marca-passo: NÃO | Clipes Aneurisma: NÃO | Implante Coclear: NÃO | Claustrofobia: NÃO';
+                        recalculateCKDEPI();
+                    }
+                }
+            ],
+            '03_Guia_SISREG': [
+                {
+                    label: 'Prioridade Vermelha (Oncologia / Urgência)',
+                    apply: () => {
+                        const m = appState.models['03_Guia_SISREG'];
+                        m.prioridadeCor = 'VERMELHO';
+                        m.codigoSigtapSisreg = '03.01.01.007-2 — CONSULTA EM ATENÇÃO ESPECIALIZADA';
+                        m.cidSisreg = 'C18.7';
+                        m.sinaisAlerta = 'Confirmação histopatológica de neoplasia maligna (Lei Federal 12.732/2012 - Prazo 60 dias).';
+                    }
+                },
+                {
+                    label: 'Prioridade Amarela (Cardiologia)',
+                    apply: () => {
+                        const m = appState.models['03_Guia_SISREG'];
+                        m.prioridadeCor = 'AMARELO';
+                        m.codigoSigtapSisreg = '03.01.01.007-2 — CONSULTA EM CARDIOLOGIA';
+                        m.cidSisreg = 'I20.8';
+                        m.sinaisAlerta = 'Dor torácica aos moderados esforços (CCS II) com teste provocativo isquêmico.';
+                    }
+                }
+            ],
+            '04_LME_Medicamentos': [
+                {
+                    label: 'Sacubitril/Valsartana + Dapagliflozina (I50.0)',
+                    apply: () => {
+                        const m = appState.models['04_LME_Medicamentos'];
+                        m.med1Nome = 'SACUBITRIL + VALSARTANA 97 MG + 103 MG (COMPRIMIDO)';
+                        m.med1M1 = '60'; m.med1M2 = '60'; m.med1M3 = '60'; m.med1M4 = '60'; m.med1M5 = '60'; m.med1M6 = '60';
+                        m.med2Nome = 'DAPAGLIFLOZINA 10 MG (COMPRIMIDO)';
+                        m.med2M1 = '30'; m.med2M2 = '30'; m.med2M3 = '30'; m.med2M4 = '30'; m.med2M5 = '30'; m.med2M6 = '30';
+                        m.cidLme = 'I50.0';
+                        m.diagnosticoLme = 'INSUFICIÊNCIA CARDÍACA COM FRAÇÃO DE EJEÇÃO REDUZIDA (ICFEr)';
+                    }
+                }
+            ],
+            '05_SISCAN_Citopatologico': [
+                {
+                    label: 'Rastreamento Rotina (25 a 64 anos)',
+                    apply: () => {
+                        const m = appState.models['05_SISCAN_Citopatologico'];
+                        m.motivoExame = '[X] Rastreamento (25 a 64 anos)   [ ] Repetição   [ ] Seguimento';
+                        m.inspecaoColo = '[X] Normal   [ ] Ausente   [ ] Alterado   [ ] Colo não visualizado';
+                        m.limiteJec = '[X] JEC visível (Ectocérvice + Endocérvice)';
+                    }
+                }
+            ],
+            '06_GAL_LACEN_Geral': [
+                {
+                    label: 'Oropouche / Arboviroses (RT-PCR até D5)',
+                    apply: () => {
+                        const m = appState.models['06_GAL_LACEN_Geral'];
+                        m.agravoSuspeito = 'FEBRE DO OROPOUCHE / MAYARO / DENGUE / ZIKA / CHIKUNGUNYA';
+                        m.diaDoenca = 'D3 (FASE VIRÊMICA AGUDA — RT-PCR)';
+                        m.examesMetodologiaGal = 'RT-PCR Multiplex Arboviroses (Oropouche, Mayaro, Dengue, Zika, Chikungunya) + Pesquisa de Malária.';
+                    }
+                }
+            ],
+            '07_SISCAN_Histopatologico': [
+                {
+                    label: 'Core Biopsy de Mama (BI-RADS 4)',
+                    apply: () => {
+                        const m = appState.models['07_SISCAN_Histopatologico'];
+                        m.topografiaLesao = '[X] Mama Esquerda   [ ] Mama Direita   [ ] Colo do Útero';
+                        m.tipoProcedimentoHisto = '[X] Core Biopsy (Agulha Grossa 14G guiada por USG)';
+                        m.fixadorDataHora = 'Formol Tamponado a 10% (Volume 10:1)';
+                    }
+                }
+            ],
+            '08_SISCAN_Mamografia': [
+                {
+                    label: 'Mamografia de Rastreamento (02.04.03.018-8)',
+                    apply: () => {
+                        const m = appState.models['08_SISCAN_Mamografia'];
+                        m.modalidadeMamografia = 'RASTREAMENTO (02.04.03.018-8 — POPULAÇÃO 50 A 69 ANOS)';
+                        m.noduloCaroco = '[X] Não apresenta nódulo ou sintoma (Assintomática)';
+                    }
+                },
+                {
+                    label: 'Mamografia Diagnóstica (02.04.03.003-0)',
+                    apply: () => {
+                        const m = appState.models['08_SISCAN_Mamografia'];
+                        m.modalidadeMamografia = 'DIAGNÓSTICA (02.04.03.003-0 — ALTERAÇÃO CLÍNICA)';
+                        m.noduloCaroco = '[X] Sim — Nódulo palpável';
+                    }
+                }
+            ],
+            '09_GAL_TRM_TB': [
+                {
+                    label: 'Diagnóstico Caso Novo (TRM-TB GeneXpert)',
+                    apply: () => {
+                        const m = appState.models['09_GAL_TRM_TB'];
+                        m.finalidadeExameTb = 'DIAGNÓSTICO CASO NOVO';
+                        m.examesSolicitadosTb = '[X] TRM-TB (GeneXpert MTB/RIF Ultra)   [X] Cultura   [X] TSA';
+                    }
+                },
+                {
+                    label: 'Controle Mensal (Apenas BAAR)',
+                    apply: () => {
+                        const m = appState.models['09_GAL_TRM_TB'];
+                        m.finalidadeExameTb = 'CONTROLE MENSAL DE TRATAMENTO';
+                        m.examesSolicitadosTb = '[X] Baciloscopia Direta (BAAR) de Controle Mensal (TRM-TB não indicado)';
+                    }
+                }
+            ]
+        };
+
+        // ----------------------------------------------------------------------------
+        // 6. UTILITÁRIOS DE UI E CONTROLES GERAIS
+        // ----------------------------------------------------------------------------
+        function setAccentColor(hex, textHex, softRgba, borderRgba) {
+            const root = document.documentElement;
+            root.style.setProperty('--punctual-accent', hex);
+            root.style.setProperty('--punctual-text', textHex);
+            root.style.setProperty('--punctual-soft', softRgba);
+            root.style.setProperty('--punctual-border', borderRgba);
+            showToast('Cor de destaque atualizada.');
+        }
+
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-900 text-white border border-slate-700 px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-medium pointer-events-auto transition-all duration-300';
+            toast.innerHTML = `<span class="w-2 h-2 rounded-full shrink-0" style="background: var(--punctual-accent)"></span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(6px)';
+                setTimeout(() => toast.remove(), 260);
+            }, 2400);
+        }
+
+        function updateFieldEmptyClasses() {
+            document.querySelectorAll('.field-wrapper').forEach(wrapper => {
+                const input = wrapper.querySelector('input, textarea');
+                if (input) {
+                    const isEmpty = !String(input.value || '').trim();
+                    wrapper.classList.toggle('is-empty', isEmpty);
+                }
+            });
+        }
+
+        function renderModelSelectorBar() {
+            const bar = document.getElementById('model-selector-bar');
+            bar.innerHTML = SUS_MODELS.map(model => {
+                const isActive = appState.activeModel === model.id;
+                return `
+                    <button type="button" role="tab" aria-selected="${isActive ? 'true' : 'false'}" data-state="${isActive ? 'pressed' : 'idle'}" tabindex="0" onclick="selectModel('${model.id}')" 
+                        class="doc-tab-btn ${isActive ? 'active' : ''}">
+                        <span class="w-2 h-2 rounded-full" style="background: ${isActive ? 'var(--punctual-accent)' : '#94A3B8'}"></span>
+                        <span>${model.shortLabel}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderQuickTemplatesBar() {
+            const container = document.getElementById('quick-templates-container');
+            const list = QUICK_TEMPLATES[appState.activeModel] || [];
+            container.innerHTML = list.map((tpl, idx) => `
+                <button type="button" onclick="applyQuickTemplate(${idx})" 
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-white border border-white/15 transition flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full" style="background: var(--punctual-accent)"></span>
+                    <span>${tpl.label}</span>
+                </button>
+            `).join('');
+        }
+
+        function applyQuickTemplate(idx) {
+            const list = QUICK_TEMPLATES[appState.activeModel] || [];
+            if (list[idx]) {
+                list[idx].apply();
+                renderDynamicModelForm();
+                renderA4Sheet();
+                showToast(`Modelo preenchido: ${list[idx].label}`);
+            }
+        }
+
+        function selectModel(modelId) {
+            appState.activeModel = modelId;
+            renderModelSelectorBar();
+            renderQuickTemplatesBar();
+            renderDynamicModelForm();
+            renderA4Sheet();
+        }
+
+        function applyUnitPreset(presetKey) {
+            if (!presetKey) {
+                syncSharedToDOM('unidadeSolicitante', '', 'preset');
+                syncSharedToDOM('cnesSolicitante', '', 'preset');
+                syncSharedToDOM('ufIbgeCabecalho', '', 'preset');
+                return;
+            }
+            const p = RO_UNIT_PRESETS[presetKey];
+            if (!p) return;
+            syncSharedToDOM('unidadeSolicitante', p.nome, 'preset');
+            syncSharedToDOM('cnesSolicitante', p.cnes, 'preset');
+            syncSharedToDOM('ufIbgeCabecalho', p.ufibge, 'preset');
+            showToast(`Unidade preenchida: ${p.nome}`);
+        }
+
+        // ----------------------------------------------------------------------------
+        // 7. BIND DOS CAMPOS COMPARTILHADOS (SEM PERDA DE FOCO)
+        // ----------------------------------------------------------------------------
+        function syncSharedInputsFromState() {
+            document.querySelectorAll('[data-shared]').forEach(el => {
+                const key = el.getAttribute('data-shared');
+                el.value = s(key);
+            });
+            updateFieldEmptyClasses();
+            saveSeparateState();
+        }
+
+        function bindSharedInputs() {
+            document.querySelectorAll('[data-shared]').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    const key = el.getAttribute('data-shared');
+                    syncSharedToDOM(key, e.target.value, 'form');
+                });
+            });
+        }
+
+        function clearSingleSharedField(key) {
+            if (key === 'unidadeSolicitante' || key === 'cnesSolicitante' || key === 'ufIbgeCabecalho') {
+                const presetSel = document.getElementById('preset-unidade');
+                if (presetSel) presetSel.value = '';
+            }
+            syncSharedToDOM(key, '', 'button');
+        }
+
+        function clearSingleModelField(key) {
+            syncModelToDOM(key, '', 'button');
+            if (appState.activeModel === '04_LME_Medicamentos' && (key === 'med1M1' || key === 'med2M1' || key === 'med3M1')) {
+                const prefix = key.slice(0, 4);
+                ['M1', 'M2', 'M3', 'M4', 'M5', 'M6'].forEach(suffix => {
+                    syncModelToDOM(prefix + suffix, '', 'button');
+                });
+            }
+        }
+
+        // ----------------------------------------------------------------------------
+        // 8. FORMULÁRIO ESPECÍFICO DINÂMICO (PAINEL ESQUERDO)
+        // ----------------------------------------------------------------------------
+        function fieldInputHTML(modelKey, label, colSpan = 'sm:col-span-6', isCode = false) {
+            const rawVal = v(modelKey);
+            const escapedVal = rawVal.replace(/"/g, '&quot;');
+            const isEmptyClass = !rawVal.trim() ? 'is-empty' : '';
+            return `
+                <div class="${colSpan} field-wrapper ${isEmptyClass}">
+                    <label class="label-clinical">${label}</label>
+                    <input type="text" data-model-field="${modelKey}" value="${escapedVal}" class="input-clinical ${isCode ? 'tabular-nums-clean font-medium' : ''}" placeholder="Em branco">
+                    <button type="button" onclick="clearSingleModelField('${modelKey}')" class="field-clear-btn" title="Limpar este campo">×</button>
+                </div>
+            `;
+        }
+
+        function fieldTextareaHTML(modelKey, label, rows = 3) {
+            const rawVal = v(modelKey);
+            const isEmptyClass = !rawVal.trim() ? 'is-empty' : '';
+            return `
+                <div class="sm:col-span-12 field-wrapper ${isEmptyClass}">
+                    <label class="label-clinical">${label}</label>
+                    <textarea data-model-field="${modelKey}" rows="${rows}" class="input-clinical" placeholder="Em branco">${rawVal}</textarea>
+                    <button type="button" onclick="clearSingleModelField('${modelKey}')" class="field-clear-btn" title="Limpar este campo">×</button>
+                </div>
+            `;
+        }
+
+        function renderDynamicModelForm() {
+            const currentMeta = SUS_MODELS.find(m => m.id === appState.activeModel);
+            document.getElementById('dynamic-form-subtitle').textContent = currentMeta.badge;
+            document.getElementById('dynamic-form-title').textContent = `2. Campos Específicos — ${currentMeta.shortLabel}`;
+            document.getElementById('a4-preview-label').textContent = `${currentMeta.officialTitle} (fls. 1/1)`;
+
+            const container = document.getElementById('dynamic-model-fields');
+            const mId = appState.activeModel;
+            const m = appState.models[mId];
+            let html = '';
+
+            if (mId === '01_APAC_Principal') {
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        ${fieldInputHTML('sigtapPrincipal', '-15- Código SIGTAP Principal', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('procNomePrincipal', '-16- Nome do Procedimento Principal', 'sm:col-span-6')}
+                        ${fieldInputHTML('qtdePrincipal', '-17- Qtde', 'sm:col-span-2', true)}
+                        ${fieldInputHTML('sigtapSec1', '-18- Código SIGTAP Secundário 1', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('procSec1', '-19- Procedimento Secundário 1', 'sm:col-span-6')}
+                        ${fieldInputHTML('qtdeSec1', '-20- Qtde', 'sm:col-span-2', true)}
+                        ${fieldInputHTML('sigtapSec2', '-21- Código SIGTAP Secundário 2', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('procSec2', '-22- Procedimento Secundário 2', 'sm:col-span-6')}
+                        ${fieldInputHTML('qtdeSec2', '-23- Qtde', 'sm:col-span-2', true)}
+                        ${fieldInputHTML('descDiagnostico', '-33- Descrição do Diagnóstico Definitivo ou Suspeito', 'sm:col-span-6')}
+                        ${fieldInputHTML('cidPrincipal', '-34- CID-10 Principal', 'sm:col-span-2', true)}
+                        ${fieldInputHTML('cidSecundario', '-35- CID-10 Secund.', 'sm:col-span-2', true)}
+                        ${fieldInputHTML('cidCausas', '-36- Causas Assoc.', 'sm:col-span-2', true)}
+                        ${fieldTextareaHTML('justificativa', '-37- Justificativa Clínica (Quadro Clínico + Exame Físico + Exames com Data + Conduta)', 4)}
+                        ${fieldInputHTML('docTipoMedico', '-40- Documento do Solicitante (CNS / CPF)', 'sm:col-span-4')}
+                        ${fieldInputHTML('executanteNome', '-51- Estabelecimento Executante', 'sm:col-span-5')}
+                        ${fieldInputHTML('executanteCnes', '-52- CNES Executante', 'sm:col-span-3', true)}
+                    </div>
+                `;
+            } else if (mId === '02_APAC_Complementar') {
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        ${fieldInputHTML('sigtapExame', 'Código SIGTAP e Exame de Imagem', 'sm:col-span-7', true)}
+                        ${fieldInputHTML('modalidade', 'Modalidade (TC / RM / Cintilografia)', 'sm:col-span-5')}
+                        ${fieldInputHTML('regiaoAnatomica', 'Região Anatômica / Fases do Estudo', 'sm:col-span-6')}
+                        ${fieldInputHTML('usoContraste', 'Indicação de Meio de Contraste', 'sm:col-span-6')}
+                        ${fieldInputHTML('creatinina', 'Creatinina Sérica (mg/dL)', 'sm:col-span-3', true)}
+                        ${fieldInputHTML('dataCreatinina', 'Data da Creatinina', 'sm:col-span-3', true)}
+                        ${fieldInputHTML('ureia', 'Ureia Sérica', 'sm:col-span-2', true)}
+                        ${fieldInputHTML('tfgEstimada', 'TFG Estimada CKD-EPI 2021', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('fatoresRiscoRenal', 'Fatores de Risco Renal Associados', 'sm:col-span-6')}
+                        ${fieldInputHTML('usaMetformina', 'Uso de Metformina e Conduta', 'sm:col-span-6')}
+                        ${fieldInputHTML('alergiaContraste', 'Histórico de Alergia ao Iodo / Gadolínio', 'sm:col-span-12')}
+                        ${fieldInputHTML('segurancaMagnetica', 'Rastreio de Segurança Magnética (Marca-passo, Clipes, Implantes)', 'sm:col-span-12')}
+                        ${fieldTextareaHTML('justificativaContraste', 'Justificativa Técnica da Necessidade de Contraste e Correlação Clínica', 3)}
+                        ${fieldInputHTML('preparoProfilaxia', 'Preparo Prévio / Profilaxia Renal Orientada', 'sm:col-span-12')}
+                    </div>
+                `;
+            } else if (mId === '03_Guia_SISREG') {
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        <div class="sm:col-span-12">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="label-clinical mb-0">Classificação de Risco Regulatório (SISREG III)</label>
+                                <button type="button" onclick="setSisregColor('')" class="text-[11px] font-semibold text-rose-600 hover:underline">Limpar cor</button>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                ${['VERMELHO', 'AMARELO', 'VERDE', 'AZUL'].map(cor => `
+                                    <button type="button" onclick="setSisregColor('${cor}')" 
+                                        class="px-3 py-1.5 rounded-lg text-xs font-bold border transition ${m.prioridadeCor === cor ? 'accent-bg border-transparent shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                                        ${cor}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ${fieldInputHTML('codigoSigtapSisreg', 'Código SIGTAP / Especialidade Solicitada', 'sm:col-span-7', true)}
+                        ${fieldInputHTML('cidSisreg', 'CID-10 Principal e Descrição', 'sm:col-span-5', true)}
+                        ${fieldInputHTML('unidadeExecutanteDesejada', 'Unidade Executante de Referência (SESAU/SEMUSA)', 'sm:col-span-12')}
+                        ${fieldInputHTML('sinaisAlerta', 'Sinais de Alerta (Red Flags) / Critério de Prioridade', 'sm:col-span-12')}
+                        ${fieldTextareaHTML('quadroClinicoSisreg', 'Anamnese, Tempo de Evolução e Exame Físico Objetivo', 3)}
+                        ${fieldTextareaHTML('examesRealizadosSisreg', 'Exames Complementares Já Realizados (Com Data e Resultado)', 2)}
+                        ${fieldInputHTML('tratamentoPrevioAps', 'Conduta / Tratamento Instituído na Atenção Primária', 'sm:col-span-12')}
+                        ${fieldInputHTML('contrarreferenciaResumo', 'Resumo de Contrarreferência (Opcional)', 'sm:col-span-12')}
+                    </div>
+                `;
+            } else if (mId === '04_LME_Medicamentos') {
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        ${fieldInputHTML('med1Nome', '1º Medicamento (DCB e Concentração)', 'sm:col-span-8')}
+                        ${fieldInputHTML('med1M1', 'Qtde Mensal (1º ao 6º Mês)', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('med2Nome', '2º Medicamento (DCB e Concentração)', 'sm:col-span-8')}
+                        ${fieldInputHTML('med2M1', 'Qtde Mensal (1º ao 6º Mês)', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('med3Nome', '3º Medicamento (Opcional)', 'sm:col-span-8')}
+                        ${fieldInputHTML('med3M1', 'Qtde Mensal (1º ao 6º Mês)', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('cidLme', '-14- CID-10 PCDT', 'sm:col-span-3', true)}
+                        ${fieldInputHTML('diagnosticoLme', 'Diagnóstico Clínico conforme PCDT', 'sm:col-span-9')}
+                        ${fieldTextareaHTML('anamneseLme', '-14- Anamnese Clínica, Sinais/Sintomas e Escore de Gravidade', 3)}
+                        ${fieldTextareaHTML('examesPcdtLme', '-15- Exames Obrigatórios do PCDT (Com Data e Laudo)', 2)}
+                        ${fieldTextareaHTML('tratamentosPreviosLme', '-16- Tratamentos Prévios Realizados e Motivo da Falha/Intolerância', 2)}
+                        ${fieldInputHTML('atestadoCapacidade', '-17- Atestado de Capacidade do Paciente', 'sm:col-span-12')}
+                    </div>
+                `;
+            } else if (mId === '05_SISCAN_Citopatologico') {
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        ${fieldInputHTML('motivoExame', '1. Motivo do Exame (Rastreamento / Repetição / Seguimento)', 'sm:col-span-12')}
+                        ${fieldInputHTML('fezPreventivo', '2. Fez preventivo anteriormente? Quando?', 'sm:col-span-6')}
+                        ${fieldInputHTML('dumData', '3. Data da Última Menstruação (DUM) ou Menopausa', 'sm:col-span-6')}
+                        ${fieldInputHTML('usaDiu', '4. Usa DIU?', 'sm:col-span-3')}
+                        ${fieldInputHTML('gravida', '5. Está Grávida?', 'sm:col-span-3')}
+                        ${fieldInputHTML('usaPilula', '6. Usa Anticoncepcional?', 'sm:col-span-3')}
+                        ${fieldInputHTML('usaHormonioMenopausa', '7. Usa Hormônio / TRH?', 'sm:col-span-3')}
+                        ${fieldInputHTML('fezRadioterapia', '8. Fez Radioterapia prévia?', 'sm:col-span-4')}
+                        ${fieldInputHTML('sangramentoRelacao', '9. Sangramento pós-coito?', 'sm:col-span-4')}
+                        ${fieldInputHTML('sangramentoMenopausa', '10. Sangramento pós-menopausa?', 'sm:col-span-4')}
+                        ${fieldInputHTML('inspecaoColo', '11. Exame Especular — Inspeção do Colo', 'sm:col-span-6')}
+                        ${fieldInputHTML('limiteJec', '12. Visualização da Junção Escamocolunar (JEC)', 'sm:col-span-6')}
+                        ${fieldInputHTML('sinaisIst', '13. Sinais sugestivos de IST / Observações', 'sm:col-span-12')}
+                        ${fieldInputHTML('adequabilidadeBethesda', 'Avaliação Pré-Analítica / Adequabilidade (Laboratório)', 'sm:col-span-12')}
+                        ${fieldTextareaHTML('diagnosticoDescritivoBethesda', 'Diagnóstico Descritivo Bethesda (Laboratório)', 2)}
+                    </div>
+                `;
+            } else if (mId === '06_GAL_LACEN_Geral') {
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        ${fieldInputHTML('sinanNumero', 'Nº da Notificação SINAN', 'sm:col-span-6', true)}
+                        ${fieldInputHTML('codigoGalEtiqueta', 'Código da Requisição / Etiqueta GAL-RO', 'sm:col-span-6', true)}
+                        ${fieldInputHTML('agravoSuspeito', 'Agravo(s) de Notificação Suspeito(s)', 'sm:col-span-12')}
+                        ${fieldInputHTML('dataInicioSintomas', 'Data de Início dos Sintomas (D1)', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('diaDoenca', 'Dia de Doença na Coleta', 'sm:col-span-4', true)}
+                        ${fieldInputHTML('casoVinculo', 'Vínculo Epidemiológico (Autóctone / Importado)', 'sm:col-span-4')}
+                        ${fieldTextareaHTML('sinaisSintomasGal', 'Sinais, Sintomas Clínicos e Dados Epidemiológicos', 2)}
+                        ${fieldInputHTML('materialBiologico', 'Material Biológico Coletado', 'sm:col-span-12')}
+                        ${fieldTextareaHTML('examesMetodologiaGal', 'Exames Solicitados no Sistema GAL (RT-PCR / Sorologia IgM / Gota Espessa)', 2)}
+                        ${fieldInputHTML('dataHoraColetaGal', 'Data e Hora da Coleta', 'sm:col-span-5', true)}
+                        ${fieldInputHTML('condicaoTransporteGal', 'Condição de Transporte (2°C a 8°C)', 'sm:col-span-7')}
+                    </div>
+                `;
+            } else if (mId === '07_SISCAN_Histopatologico') {
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        ${fieldInputHTML('topografiaLesao', 'Órgão / Topografia Principal da Lesão', 'sm:col-span-6')}
+                        ${fieldInputHTML('localizacaoDetalhada', 'Quadrante / Posição Horária / Zona Cervical', 'sm:col-span-6')}
+                        ${fieldInputHTML('tipoProcedimentoHisto', 'Tipo de Procedimento Cirúrgico / Biópsia', 'sm:col-span-12')}
+                        ${fieldTextareaHTML('achadosClinicosImagem', 'Achados Clínicos, Mamográficos (BI-RADS), USG ou Colposcópicos', 3)}
+                        ${fieldInputHTML('linfonodosAxilares', 'Avaliação Linfonodal Locorregional', 'sm:col-span-12')}
+                        ${fieldInputHTML('numeroFrascosFragmentos', 'Identificação dos Frascos e Nº de Fragmentos', 'sm:col-span-6')}
+                        ${fieldInputHTML('fixadorDataHora', 'Fixador (Formol 10%) e Hora da Imersão', 'sm:col-span-6', true)}
+                        ${fieldInputHTML('estudoImunoHistoquimica', 'Solicitação Complementar / Imuno-histoquímica', 'sm:col-span-12')}
+                    </div>
+                `;
+            } else if (mId === '08_SISCAN_Mamografia') {
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        <div class="sm:col-span-12">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="label-clinical mb-0">Modalidade SIGTAP da Mamografia</label>
+                                <button type="button" onclick="setMamografiaType('')" class="text-[11px] font-semibold text-rose-600 hover:underline">Limpar modalidade</button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <button type="button" onclick="setMamografiaType('RASTREAMENTO (02.04.03.018-8)')" 
+                                    class="px-3 py-2 rounded-lg text-xs font-bold border text-left transition ${m.modalidadeMamografia.includes('RASTREAMENTO') ? 'accent-bg border-transparent shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                                    02.04.03.018-8 • Rastreamento (50 a 69 anos)
+                                </button>
+                                <button type="button" onclick="setMamografiaType('DIAGNÓSTICA (02.04.03.003-0)')" 
+                                    class="px-3 py-2 rounded-lg text-xs font-bold border text-left transition ${m.modalidadeMamografia.includes('DIAGNÓSTICA') ? 'accent-bg border-transparent shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                                    02.04.03.003-0 • Diagnóstica (Lesão Palpável)
+                                </button>
+                            </div>
+                        </div>
+                        ${fieldInputHTML('modalidadeMamografia', 'Descrição da Modalidade SIGTAP', 'sm:col-span-12', true)}
+                        ${fieldInputHTML('noduloCaroco', '1. Apresenta Nódulo ou Caroço na Mama?', 'sm:col-span-6')}
+                        ${fieldInputHTML('riscoElevadoFamiliar', '2. Risco Elevado Familiar (CA de Mama/Ovário)?', 'sm:col-span-6')}
+                        ${fieldInputHTML('fezMamografiaAntes', '3. Fez Mamografia Anteriormente? Qual Ano/BI-RADS?', 'sm:col-span-6')}
+                        ${fieldInputHTML('radioterapiaPreviaMama', '4. Fez Radioterapia na Mama/Tórax?', 'sm:col-span-6')}
+                        ${fieldInputHTML('cirurgiaPreviaMama', '5. Cirurgia Mamária Prévia ou Implantes?', 'sm:col-span-12')}
+                        ${fieldTextareaHTML('exameClinicoMamas', 'Exame Físico das Mamas (Direita e Esquerda)', 2)}
+                        ${fieldTextareaHTML('indicacaoDetalhadaMmg', 'Indicação Clínica Detalhada', 2)}
+                    </div>
+                `;
+            } else if (mId === '09_GAL_TRM_TB') {
+                const isControle = m.finalidadeExameTb.toUpperCase().includes('CONTROLE');
+                html = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        <div class="sm:col-span-12">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="label-clinical mb-0">Finalidade Laboratorial (Protocolo SVSA)</label>
+                                <button type="button" onclick="setTbFinalidade('')" class="text-[11px] font-semibold text-rose-600 hover:underline">Limpar finalidade</button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                ${['DIAGNÓSTICO CASO NOVO', 'DIAGNÓSTICO RETRATAMENTO', 'CONTROLE MENSAL DE TRATAMENTO'].map(fin => `
+                                    <button type="button" onclick="setTbFinalidade('${fin}')" 
+                                        class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ${m.finalidadeExameTb === fin ? 'accent-bg border-transparent shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                                        ${fin}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ${isControle ? `
+                            <div class="sm:col-span-12 p-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-xs font-medium">
+                                <strong>Nota Técnica SVSA / LACEN-RO:</strong> O TRM-TB (GeneXpert) não deve ser solicitado para controle mensal de tratamento. Solicite apenas Baciloscopia Direta (BAAR).
+                            </div>
+                        ` : ''}
+                        ${fieldInputHTML('sinanTb', 'Nº de Notificação SINAN-TB', 'sm:col-span-5', true)}
+                        ${fieldInputHTML('statusHiv', 'Testagem para HIV / Status PVHA', 'sm:col-span-7')}
+                        ${fieldInputHTML('populacaoVulneravel', 'População de Risco / Vulnerabilidade', 'sm:col-span-12')}
+                        ${fieldInputHTML('finalidadeExameTb', 'Finalidade da Solicitação', 'sm:col-span-6')}
+                        ${fieldInputHTML('materialClinicoTb', 'Material Clínico Coletado', 'sm:col-span-6')}
+                        ${fieldInputHTML('examesSolicitadosTb', 'Exames Solicitados no GAL-RO', 'sm:col-span-12')}
+                        ${fieldTextareaHTML('quadroClinicoRxTb', 'Quadro Clínico Respiratório, Tempo de Tosse e Achados Radiológicos', 2)}
+                        ${fieldInputHTML('aspectoAmostraTb', 'Aspecto Macroscópico da Amostra', 'sm:col-span-6')}
+                        ${fieldInputHTML('dataColetaTb', 'Data, Hora da Coleta e Conservação', 'sm:col-span-6', true)}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            // Bind de eventos nos inputs do modelo ativo (Sincronização direta sem re-renderizar o form)
+            container.querySelectorAll('[data-model-field]').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    const fKey = el.getAttribute('data-model-field');
+                    syncModelToDOM(fKey, e.target.value, 'form');
+                });
+            });
+        }
+
+        function setSisregColor(cor) {
+            appState.models['03_Guia_SISREG'].prioridadeCor = cor;
+            renderDynamicModelForm();
+            renderA4Sheet();
+        }
+
+        function setMamografiaType(tipo) {
+            appState.models['08_SISCAN_Mamografia'].modalidadeMamografia = tipo;
+            renderDynamicModelForm();
+            renderA4Sheet();
+        }
+
+        function setTbFinalidade(fin) {
+            const m = appState.models['09_GAL_TRM_TB'];
+            m.finalidadeExameTb = fin;
+            if (!fin) {
+                m.examesSolicitadosTb = '';
+            } else if (fin.includes('CONTROLE')) {
+                m.examesSolicitadosTb = '[X] Baciloscopia Direta (BAAR) de Controle Mensal';
+            } else {
+                m.examesSolicitadosTb = '[X] TRM-TB (GeneXpert MTB/RIF Ultra)   [X] Cultura para Micobactérias   [X] TSA';
+            }
+            renderDynamicModelForm();
+            renderA4Sheet();
+        }
+
+        // ----------------------------------------------------------------------------
+        // 9. RENDERIZADOR DA FOLHA OFICIAL A4 (ZERO FALLBACKS HARDCODED!)
+        // ----------------------------------------------------------------------------
+        function cellShared(label, sharedKey, colSpan = 4, isCode = false, minHeight = '') {
+            return `
+                <div class="sus-cell" style="grid-column: span ${colSpan} / span ${colSpan}; ${minHeight ? `min-height:${minHeight};` : ''}">
+                    <div class="sus-cell-label">${label}</div>
+                    <div class="sus-cell-val ${isCode ? 'code-num' : ''}" contenteditable="true" data-bind-shared="${sharedKey}">${s(sharedKey)}</div>
+                </div>
+            `;
+        }
+
+        function cellModel(label, modelKey, colSpan = 4, isCode = false, minHeight = '') {
+            return `
+                <div class="sus-cell" style="grid-column: span ${colSpan} / span ${colSpan}; ${minHeight ? `min-height:${minHeight};` : ''}">
+                    <div class="sus-cell-label">${label}</div>
+                    <div class="sus-cell-val ${isCode ? 'code-num' : ''}" contenteditable="true" data-bind-model="${modelKey}">${v(modelKey)}</div>
+                </div>
+            `;
+        }
+
+        function formatSignatureLine(name, crm) {
+            const n = String(name ?? '').trim();
+            const c = String(crm ?? '').trim();
+            if (n && c) return `${n} — ${c}`;
+            if (n) return n;
+            if (c) return c;
+            return '';
+        }
+
+        function renderTripleHeaderHTML(meta) {
+            return `
+                <div class="sus-triple-header">
+                    <div class="sus-header-left">
+                        <div class="sus-logo-mark">SUS</div>
+                        <div style="font-size: 6pt; font-weight: 700; margin-top: 1px;">SISTEMA ÚNICO DE SAÚDE</div>
+                        <div style="font-size: 6pt; font-weight: 700;">SESAU - RONDÔNIA</div>
+                    </div>
+                    <div class="sus-header-center">
+                        <div style="font-size: 7.5pt; font-weight: 700; letter-spacing: 0.02em;">
+                            GOVERNO DO ESTADO DE RONDÔNIA - SECRETARIA DE ESTADO DA SAÚDE (SESAU-RO)
+                        </div>
+                        <div style="font-size: 6.8pt; font-weight: 700; margin: 1px 0;">
+                            ${meta.ministrySub}
+                        </div>
+                        <div style="font-size: 8.5pt; font-weight: 900; text-decoration: underline; margin-top: 1px;">
+                            ${meta.officialTitle}
+                        </div>
+                    </div>
+                    <div class="sus-header-right">
+                        <div style="font-weight: 700; font-size: 7.5pt; text-align: right;">fls. 1/1</div>
+                        <div class="sus-cell-val code-num" contenteditable="true" data-bind-shared="ufIbgeCabecalho" title="UF / Código IBGE">${s('ufIbgeCabecalho')}</div>
+                        <div class="sus-cell-val code-num" contenteditable="true" data-bind-shared="dataSolicitacao" title="Data">${s('dataSolicitacao')}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPatientCommonBlockHTML(numbered = true) {
+            const p = (n, txt) => numbered ? `-${n}- ${txt}` : txt;
+            return `
+                <div class="sus-section-bar">DADOS DO ESTABELECIMENTO SOLICITANTE E IDENTIFICAÇÃO DO PACIENTE (SUS / SESAU-RO)</div>
+                <div class="sus-grid">
+                    ${cellShared(p(1, 'NOME DO ESTABELECIMENTO SOLICITANTE'), 'unidadeSolicitante', 9)}
+                    ${cellShared(p(2, 'CÓDIGO CNES'), 'cnesSolicitante', 3, true)}
+                    ${cellShared(p(3, 'NOME COMPLETO DO PACIENTE'), 'pacienteNome', 7)}
+                    ${cellShared(p(4, 'Nº DO PRONTUÁRIO'), 'pacienteProntuario', 2, true)}
+                    ${cellShared(p(5, 'CARTÃO NACIONAL DE SAÚDE (CNS — 15 DÍGITOS)'), 'pacienteCns', 3, true)}
+                    ${cellShared(p(6, 'DATA DE NASCIMENTO'), 'pacienteNascimento', 2, true)}
+                    ${cellShared('IDADE', 'pacienteIdade', 1, true)}
+                    ${cellShared(p(7, 'SEXO'), 'pacienteSexo', 1, true)}
+                    ${cellShared(p(8, 'RAÇA / COR'), 'pacienteRaca', 2)}
+                    ${cellShared('CPF DO PACIENTE', 'pacienteCpf', 3, true)}
+                    ${cellShared(p(10, 'TELEFONE DE CONTATO'), 'pacienteTelefone', 3, true)}
+                    ${cellShared(p(9, 'NOME COMPLETO DA MÃE'), 'pacienteMae', 7)}
+                    ${cellShared(p(11, 'NOME DO RESPONSÁVEL'), 'pacienteResponsavel', 5)}
+                    ${cellShared(p(12, 'ENDEREÇO RESIDENCIAL (LOGRADOURO, Nº, BAIRRO)'), 'pacienteEndereco', 6)}
+                    ${cellShared(p(13, 'MUNICÍPIO DE RESIDÊNCIA / UF'), 'pacienteMunicipio', 3, true)}
+                    ${cellShared(p(14, 'CÓD. IBGE / CEP'), 'pacienteIbgeCep', 3, true)}
+                </div>
+            `;
+        }
+
+        function renderA4Sheet() {
+            const canvas = document.getElementById('a4-document-canvas');
+            const mId = appState.activeModel;
+            const meta = SUS_MODELS.find(x => x.id === mId);
+            const sigText = formatSignatureLine(s('medicoNome'), s('medicoCrm'));
+
+            let bodyHTML = renderTripleHeaderHTML(meta);
+
+            // 01: APAC PRINCIPAL
+            if (mId === '01_APAC_Principal') {
+                bodyHTML += renderPatientCommonBlockHTML(true);
+                bodyHTML += `
+                    <div class="sus-section-bar">PROCEDIMENTO SOLICITADO (TABELA SIGTAP — MINISTÉRIO DA SAÚDE)</div>
+                    <div class="sus-grid">
+                        ${cellModel('-15- CÓDIGO DO PROCEDIMENTO PRINCIPAL (SIGTAP)', 'sigtapPrincipal', 4, true)}
+                        ${cellModel('-16- NOME DO PROCEDIMENTO PRINCIPAL', 'procNomePrincipal', 6)}
+                        ${cellModel('-17- QTDE', 'qtdePrincipal', 2, true)}
+                    </div>
+
+                    <div class="sus-section-bar">PROCEDIMENTOS SECUNDÁRIOS / COMPLEMENTARES</div>
+                    <div class="sus-grid">
+                        ${cellModel('-18- CÓDIGO SIGTAP SECUNDÁRIO 1', 'sigtapSec1', 4, true)}
+                        ${cellModel('-19- NOME DO PROCEDIMENTO SECUNDÁRIO 1', 'procSec1', 6)}
+                        ${cellModel('-20- QTDE', 'qtdeSec1', 2, true)}
+                        ${cellModel('-21- CÓDIGO SIGTAP SECUNDÁRIO 2', 'sigtapSec2', 4, true)}
+                        ${cellModel('-22- NOME DO PROCEDIMENTO SECUNDÁRIO 2', 'procSec2', 6)}
+                        ${cellModel('-23- QTDE', 'qtdeSec2', 2, true)}
+                    </div>
+
+                    <div class="sus-section-bar">JUSTIFICATIVA DO(S) PROCEDIMENTO(S) SOLICITADO(S) E CODIFICAÇÃO CID-10</div>
+                    <div class="sus-grid">
+                        ${cellModel('-33- DESCRIÇÃO DO DIAGNÓSTICO DEFINITIVO / SUSPEITO', 'descDiagnostico', 6)}
+                        ${cellModel('-34- CID-10 PRINCIPAL', 'cidPrincipal', 2, true)}
+                        ${cellModel('-35- CID-10 SECUNDÁRIO', 'cidSecundario', 2, true)}
+                        ${cellModel('-36- CAUSAS ASSOCIADAS', 'cidCausas', 2, true)}
+                        ${cellModel('-37- OBSERVAÇÕES / JUSTIFICATIVA CLÍNICA (ANAMNESE, EXAME FÍSICO, EXAMES PRÉVIOS DATADOS E CONDUTA)', 'justificativa', 12, false, '36mm')}
+                    </div>
+
+                    <div class="sus-section-bar">SOLICITAÇÃO MÉDICA</div>
+                    <div class="sus-grid">
+                        ${cellShared('-38- NOME DO PROFISSIONAL SOLICITANTE', 'medicoNome', 5)}
+                        ${cellShared('-39- DATA DA SOLICITAÇÃO', 'dataSolicitacao', 2, true)}
+                        ${cellShared('CONSELHO / CRM', 'medicoCrm', 2, true)}
+                        ${cellShared('-41- Nº CNS / CPF DO PROFISSIONAL SOLICITANTE', 'medicoCns', 3, true)}
+                        ${cellModel('-40- DOCUMENTO UTILIZADO (CNS / CPF)', 'docTipoMedico', 4, true)}
+                        <div class="sus-cell" style="grid-column: span 8 / span 8; min-height: 15mm; justify-content: flex-end;">
+                            <div class="sus-cell-label">-42- ASSINATURA E CARIMBO DO PROFISSIONAL SOLICITANTE (Nº DO REGISTRO NO CONSELHO)</div>
+                            <div style="border-top: 1px dashed #000; width: 65%; margin: 5mm auto 0.5mm auto; text-align: center; font-size: 7pt; min-height: 3.5mm;" data-bind-signature>${sigText}</div>
+                        </div>
+                    </div>
+
+                    <div class="sus-section-bar">AUTORIZAÇÃO (USO EXCLUSIVO DO ÓRGÃO AUTORIZADOR — COMPLEXO REGULADOR SESAU-RO)</div>
+                    <div class="sus-grid">
+                        ${cellModel('-43- NOME DO PROFISSIONAL AUTORIZADOR', 'autorizadorNome', 5)}
+                        ${cellModel('-44- CÓD. ÓRGÃO EMISSOR', 'autorizadorCod', 2, true)}
+                        ${cellModel('-48- Nº DA AUTORIZAÇÃO (APAC — 13 DÍGITOS)', 'numApac', 5, true)}
+                        ${cellModel('-45- DOC. AUTORIZADOR (CNS / CPF)', 'docAutorizador', 4, true)}
+                        ${cellModel('-47- DATA E ASSINATURA DO AUTORIZADOR', 'dataAssinaturaAutorizador', 4, true)}
+                        ${cellModel('-50- PERÍODO DE VALIDADE DA APAC', 'validadeApac', 4, true)}
+                    </div>
+
+                    <div class="sus-section-bar">IDENTIFICAÇÃO DO ESTABELECIMENTO EXECUTANTE</div>
+                    <div class="sus-grid">
+                        ${cellModel('-51- NOME FANTASIA DO ESTABELECIMENTO DE SAÚDE EXECUTANTE', 'executanteNome', 9)}
+                        ${cellModel('-52- CÓDIGO CNES EXECUTANTE', 'executanteCnes', 3, true)}
+                    </div>
+                `;
+            }
+
+            // 02: APAC COMPLEMENTAR DE IMAGEM E RISCO RENAL
+            else if (mId === '02_APAC_Complementar') {
+                bodyHTML += renderPatientCommonBlockHTML(false);
+                bodyHTML += `
+                    <div class="sus-section-bar">ESPECIFICAÇÃO DO EXAME DE ALTA COMPLEXIDADE E MEIO DE CONTRASTE</div>
+                    <div class="sus-grid">
+                        ${cellModel('CÓDIGO SIGTAP E DESCRIÇÃO DO EXAME DE IMAGEM', 'sigtapExame', 7, true)}
+                        ${cellModel('MODALIDADE RADIOLÓGICA', 'modalidade', 5)}
+                        ${cellModel('REGIÃO ANATÔMICA E PROTOCOLO DE AQUISIÇÃO', 'regiaoAnatomica', 6)}
+                        ${cellModel('INDICAÇÃO DE USO DE CONTRASTE', 'usoContraste', 6, true)}
+                        ${cellShared('PESO ATUAL (KG)', 'pacientePeso', 3, true)}
+                        ${cellShared('ALTURA (CM)', 'pacienteAltura', 3, true)}
+                        ${cellModel('HISTÓRICO DE ALERGIA AO IODO / GADOLÍNIO / FÁRMACOS', 'alergiaContraste', 6)}
+                    </div>
+
+                    <div class="sus-section-bar">PROTOCOLO DE SEGURANÇA RENAL (PREVENÇÃO DE NEFROPATIA POR CONTRASTE E FSN — CKD-EPI 2021)</div>
+                    <div class="sus-grid">
+                        ${cellModel('CREATININA SÉRICA (MG/DL)', 'creatinina', 3, true)}
+                        ${cellModel('DATA DO EXAME', 'dataCreatinina', 2, true)}
+                        ${cellModel('UREIA SÉRICA', 'ureia', 2, true)}
+                        ${cellModel('TAXA DE FILTRAÇÃO GLOMERULAR ESTIMADA (TFGe CKD-EPI)', 'tfgEstimada', 5, true)}
+                        ${cellModel('FATORES DE RISCO RENAL ASSOCIADOS', 'fatoresRiscoRenal', 6, true)}
+                        ${cellModel('USO DE METFORMINA (SUSPENDER 48H SE TFG < 45 ML/MIN)', 'usaMetformina', 6)}
+                    </div>
+
+                    <div class="sus-section-bar">QUESTIONÁRIO DE BIOSSEGURANÇA MAGNÉTICA (RESSONÂNCIA MAGNÉTICA)</div>
+                    <div class="sus-grid">
+                        ${cellModel('RASTREIO DE IMPLANTES METÁLICOS, MARCA-PASSO, CLIPES DE ANEURISMA E CLAUSTROFOBIA', 'segurancaMagnetica', 12, true)}
+                    </div>
+
+                    <div class="sus-section-bar">JUSTIFICATIVA TÉCNICA DO CONTRASTE E ORIENTAÇÕES DE PREPARO</div>
+                    <div class="sus-grid">
+                        ${cellModel('JUSTIFICATIVA CLÍNICO-RADIOLÓGICA PARA ADMINISTRAÇÃO DE MEIO DE CONTRASTE', 'justificativaContraste', 12, false, '24mm')}
+                        ${cellModel('ORIENTAÇÕES DE JEJUM, HIDRATAÇÃO E PROFILAXIA PRÉ-EXAME', 'preparoProfilaxia', 12)}
+                    </div>
+
+                    <div class="sus-section-bar">TERMO DE CIÊNCIA DO PACIENTE E RESPONSABILIDADE MÉDICA</div>
+                    <div class="sus-grid">
+                        <div class="sus-cell" style="grid-column: span 6 / span 6; min-height: 18mm; justify-content: space-between;">
+                            <div class="sus-cell-label">DECLARAÇÃO DE CONSENTIMENTO DO PACIENTE / RESPONSÁVEL</div>
+                            <div class="sus-cell-val" contenteditable="true"></div>
+                            <div style="border-top: 1px solid #000; text-align: center; font-size: 6.5pt; padding-top: 1px;">Assinatura do Paciente ou Responsável Legal</div>
+                        </div>
+                        <div class="sus-cell" style="grid-column: span 6 / span 6; min-height: 18mm; justify-content: space-between;">
+                            <div class="sus-cell-label">MÉDICO SOLICITANTE — DATA, CARIMBO E ASSINATURA</div>
+                            <div style="font-size: 7.5pt; font-weight: 700; min-height: 4mm;" data-bind-signature>${sigText}</div>
+                            <div style="border-top: 1px solid #000; text-align: center; font-size: 6.5pt; padding-top: 1px;">Assinatura e Carimbo do Profissional Solicitante</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 03: GUIA SISREG III
+            else if (mId === '03_Guia_SISREG') {
+                const c = v('prioridadeCor');
+                bodyHTML += renderPatientCommonBlockHTML(false);
+                bodyHTML += `
+                    <div class="sus-section-bar">PROCEDIMENTO / CONSULTA ESPECIALIZADA SOLICITADA E CLASSIFICAÇÃO DE RISCO (SISREG III)</div>
+                    <div class="sus-grid">
+                        ${cellModel('CÓDIGO SIGTAP E ESPECIALIDADE / PROCEDIMENTO SOLICITADO', 'codigoSigtapSisreg', 8, true)}
+                        ${cellModel('CID-10 PRINCIPAL', 'cidSisreg', 4, true)}
+                        ${cellModel('UNIDADE EXECUTANTE DE REFERÊNCIA PREFERENCIAL', 'unidadeExecutanteDesejada', 12)}
+                        <div class="sus-cell" style="grid-column: span 12 / span 12;">
+                            <div class="sus-cell-label">CLASSIFICAÇÃO DE PRIORIDADE CLÍNICA REGULATÓRIA (CLIQUE PARA MARCAR OU DESMARCAR)</div>
+                            <div style="padding: 1mm 0; font-size: 7.5pt;">
+                                <span onclick="setSisregColor('${c === 'VERMELHO' ? '' : 'VERMELHO'}')" class="sus-badge-box ${c === 'VERMELHO' ? 'checked' : ''}">[${c === 'VERMELHO' ? 'X' : ' '}] VERMELHO — PRIORIDADE 0 (URGÊNCIA / ONCOLOGIA)</span>
+                                <span onclick="setSisregColor('${c === 'AMARELO' ? '' : 'AMARELO'}')" class="sus-badge-box ${c === 'AMARELO' ? 'checked' : ''}">[${c === 'AMARELO' ? 'X' : ' '}] AMARELO — PRIORIDADE 1</span>
+                                <span onclick="setSisregColor('${c === 'VERDE' ? '' : 'VERDE'}')" class="sus-badge-box ${c === 'VERDE' ? 'checked' : ''}">[${c === 'VERDE' ? 'X' : ' '}] VERDE — PRIORIDADE 2</span>
+                                <span onclick="setSisregColor('${c === 'AZUL' ? '' : 'AZUL'}')" class="sus-badge-box ${c === 'AZUL' ? 'checked' : ''}">[${c === 'AZUL' ? 'X' : ' '}] AZUL — PRIORIDADE 3 (ELETIVO)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sus-section-bar">JUSTIFICATIVA CLÍNICA ESTRUTURADA (REFERÊNCIA)</div>
+                    <div class="sus-grid">
+                        ${cellModel('SINAIS DE ALERTA (RED FLAGS) / CRITÉRIO DE PRIORIZAÇÃO', 'sinaisAlerta', 12)}
+                        ${cellModel('QUADRO CLÍNICO, HISTÓRIA DA DOENÇA ATUAL E EXAME FÍSICO OBJETIVO', 'quadroClinicoSisreg', 12, false, '26mm')}
+                        ${cellModel('EXAMES COMPLEMENTARES JÁ REALIZADOS (INFORMAR DATA E RESULTADO)', 'examesRealizadosSisreg', 12, false, '18mm')}
+                        ${cellModel('TRATAMENTO E CONDUTAS JÁ REALIZADOS NA ATENÇÃO PRIMÁRIA (APS)', 'tratamentoPrevioAps', 12)}
+                    </div>
+
+                    <div class="sus-section-bar">IDENTIFICAÇÃO DO SOLICITANTE E PARECER DO MÉDICO REGULADOR</div>
+                    <div class="sus-grid">
+                        ${cellShared('PROFISSIONAL SOLICITANTE', 'medicoNome', 5)}
+                        ${cellShared('CONSELHO / CRM', 'medicoCrm', 3, true)}
+                        ${cellShared('DATA DA SOLICITAÇÃO', 'dataSolicitacao', 4, true)}
+                        ${cellModel('PARECER DO MÉDICO REGULADOR (SESAU-RO / SEMUSA)', 'parecerRegulador', 6)}
+                        <div class="sus-cell" style="grid-column: span 6 / span 6; min-height: 15mm; justify-content: flex-end;">
+                            <div class="sus-cell-label">ASSINATURA E CARIMBO DO PROFISSIONAL SOLICITANTE</div>
+                            <div style="border-top: 1px dashed #000; text-align: center; font-size: 7pt; min-height: 3.5mm;" data-bind-signature>${sigText}</div>
+                        </div>
+                    </div>
+
+                    <div class="sus-section-bar">BLOCO DE CONTRARREFERÊNCIA (PREENCHIMENTO PELO ESPECIALISTA PARA A UBS / APS DE ORIGEM)</div>
+                    <div class="sus-grid">
+                        ${cellModel('RESUMO DO ATENDIMENTO ESPECIALIZADO, DIAGNÓSTICO FIRMADO E PLANO TERAPÊUTICO PARA SEGUIMENTO NA APS', 'contrarreferenciaResumo', 12, false, '20mm')}
+                    </div>
+                `;
+            }
+
+            // 04: LME — MEDICAMENTOS ESPECIALIZADOS (CEAF-RO)
+            else if (mId === '04_LME_Medicamentos') {
+                bodyHTML += `
+                    <div class="sus-section-bar">IDENTIFICAÇÃO DO ESTABELECIMENTO E DO PACIENTE (CEAF / SESAU-RO — CAMPOS -1- A -6-)</div>
+                    <div class="sus-grid">
+                        ${cellShared('-1- CÓDIGO CNES', 'cnesSolicitante', 3, true)}
+                        ${cellShared('-2- NOME DO ESTABELECIMENTO DE SAÚDE SOLICITANTE', 'unidadeSolicitante', 9)}
+                        ${cellShared('-3- NOME COMPLETO DO PACIENTE', 'pacienteNome', 6)}
+                        ${cellShared('CARTÃO NACIONAL DE SAÚDE (CNS)', 'pacienteCns', 3, true)}
+                        ${cellShared('CPF DO PACIENTE', 'pacienteCpf', 3, true)}
+                        ${cellShared('-4- NOME DA MÃE', 'pacienteMae', 6)}
+                        ${cellShared('-5- PESO (KG)', 'pacientePeso', 2, true)}
+                        ${cellShared('-6- ALTURA (CM)', 'pacienteAltura', 2, true)}
+                        ${cellShared('DATA NASC.', 'pacienteNascimento', 2, true)}
+                    </div>
+
+                    <div class="sus-section-bar">-7- MEDICAMENTOS SOLICITADOS (DCB, CONCENTRAÇÃO E QUANTIDADE MENSAL — 1º AO 6º MÊS)</div>
+                    <table class="sus-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 6%;">ITEM</th>
+                                <th style="width: 52%;">NOME DO MEDICAMENTO (DENOMINAÇÃO COMUM BRASILEIRA — DCB E CONCENTRAÇÃO)</th>
+                                <th style="width: 7%;">1º MÊS</th>
+                                <th style="width: 7%;">2º MÊS</th>
+                                <th style="width: 7%;">3º MÊS</th>
+                                <th style="width: 7%;">4º MÊS</th>
+                                <th style="width: 7%;">5º MÊS</th>
+                                <th style="width: 7%;">6º MÊS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align:center; font-weight:700;">-8-</td>
+                                <td><div class="sus-cell-val" contenteditable="true" data-bind-model="med1Nome">${v('med1Nome')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med1M1">${v('med1M1')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med1M2">${v('med1M2')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med1M3">${v('med1M3')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med1M4">${v('med1M4')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med1M5">${v('med1M5')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med1M6">${v('med1M6')}</div></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:center; font-weight:700;">-9-</td>
+                                <td><div class="sus-cell-val" contenteditable="true" data-bind-model="med2Nome">${v('med2Nome')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med2M1">${v('med2M1')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med2M2">${v('med2M2')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med2M3">${v('med2M3')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med2M4">${v('med2M4')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med2M5">${v('med2M5')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med2M6">${v('med2M6')}</div></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:center; font-weight:700;">-10-</td>
+                                <td><div class="sus-cell-val" contenteditable="true" data-bind-model="med3Nome">${v('med3Nome')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med3M1">${v('med3M1')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med3M2">${v('med3M2')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med3M3">${v('med3M3')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med3M4">${v('med3M4')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med3M5">${v('med3M5')}</div></td>
+                                <td><div class="sus-cell-val code-num" contenteditable="true" data-bind-model="med3M6">${v('med3M6')}</div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="sus-section-bar">JUSTIFICATIVA CLÍNICA CONFORME PROTOCOLO CLÍNICO E DIRETRIZES TERAPÊUTICAS (PCDT — MINISTÉRIO DA SAÚDE)</div>
+                    <div class="sus-grid">
+                        ${cellModel('-14- CID-10 PRINCIPAL', 'cidLme', 3, true)}
+                        ${cellModel('DESCRIÇÃO DO DIAGNÓSTICO CLÍNICO', 'diagnosticoLme', 9)}
+                        ${cellModel('-14- ANAMNESE CLÍNICA, SINAIS E SINTOMAS E ESCORE DE GRAVIDADE DO PCDT', 'anamneseLme', 12, false, '24mm')}
+                        ${cellModel('-15- EXAMES COMPROBATÓRIOS OBRIGATÓRIOS DO PCDT (COM DATA E LAUDO)', 'examesPcdtLme', 12, false, '20mm')}
+                        ${cellModel('-16- TRATAMENTOS PRÉVIOS REALIZADOS E FALHA TERAPÊUTICA / INTOLERÂNCIA DOCUMENTADA', 'tratamentosPreviosLme', 12, false, '18mm')}
+                        ${cellModel('-17- ATESTADO DE CAPACIDADE DO PACIENTE', 'atestadoCapacidade', 12, true)}
+                    </div>
+
+                    <div class="sus-section-bar">IDENTIFICAÇÃO DO MÉDICO SOLICITANTE (-18- A -22-) E RECEBIMENTO CEAF-RO (-23- A -25-)</div>
+                    <div class="sus-grid">
+                        ${cellShared('-18- NOME DO MÉDICO SOLICITANTE', 'medicoNome', 5)}
+                        ${cellShared('-19- Nº CNS DO MÉDICO', 'medicoCns', 3, true)}
+                        ${cellShared('-20- CRM', 'medicoCrm', 2, true)}
+                        ${cellShared('-21- DATA DA SOLICITAÇÃO', 'dataSolicitacao', 2, true)}
+                        ${cellModel('-23- A -25- RECIBO DE DISPENSAÇÃO / AVALIAÇÃO FARMACÊUTICA CEAF-RO', 'reciboDispensacao', 6)}
+                        <div class="sus-cell" style="grid-column: span 6 / span 6; min-height: 15mm; justify-content: flex-end;">
+                            <div class="sus-cell-label">-22- ASSINATURA E CARIMBO DO MÉDICO SOLICITANTE</div>
+                            <div style="border-top: 1px dashed #000; text-align: center; font-size: 7pt; min-height: 3.5mm;" data-bind-signature>${sigText}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 05: SISCAN — EXAME CITOPATOLÓGICO DO COLO DO ÚTERO
+            else if (mId === '05_SISCAN_Citopatologico') {
+                bodyHTML += renderPatientCommonBlockHTML(false);
+                bodyHTML += `
+                    <div class="sus-section-bar">INFORMAÇÕES DA ANAMNESE GINECOLÓGICA (SISCAN / INCA / MINISTÉRIO DA SAÚDE)</div>
+                    <div class="sus-grid">
+                        ${cellModel('1. MOTIVO DO EXAME CITOPATOLÓGICO', 'motivoExame', 12, true)}
+                        ${cellModel('2. FEZ O EXAME PREVENTIVO (PAPANICOLAOU) ALGUMA VEZ?', 'fezPreventivo', 6)}
+                        ${cellModel('3. DATA DA ÚLTIMA MENSTRUAÇÃO (DUM) OU MENOPAUSA', 'dumData', 6, true)}
+                        ${cellModel('4. USA DIU?', 'usaDiu', 3, true)}
+                        ${cellModel('5. ESTÁ GRÁVIDA?', 'gravida', 3, true)}
+                        ${cellModel('6. USA PÍLULA ANTICONCEPCIONAL?', 'usaPilula', 3, true)}
+                        ${cellModel('7. USA HORMÔNIO / TRH?', 'usaHormonioMenopausa', 3, true)}
+                        ${cellModel('8. JÁ FEZ TRATAMENTO POR RADIOTERAPIA?', 'fezRadioterapia', 4, true)}
+                        ${cellModel('9. SANGRAMENTO APÓS RELAÇÃO SEXUAL (SINUSORRAGIA)?', 'sangramentoRelacao', 4, true)}
+                        ${cellModel('10. SANGRAMENTO APÓS A MENOPAUSA?', 'sangramentoMenopausa', 4, true)}
+                    </div>
+
+                    <div class="sus-section-bar">EXAME CLÍNICO / ESPECULAR E DADOS DA COLETA</div>
+                    <div class="sus-grid">
+                        ${cellModel('11. INSPEÇÃO DO COLO NO EXAME ESPECULAR', 'inspecaoColo', 6, true)}
+                        ${cellModel('12. LIMITE VISÍVEL DA JUNÇÃO ESCAMOCOLUNAR (JEC)', 'limiteJec', 6, true)}
+                        ${cellModel('13. SINAIS SUGESTIVOS DE INFECÇÃO SEXUALMENTE TRANSMISSÍVEL (IST) / OBSERVAÇÕES CLÍNICAS', 'sinaisIst', 12)}
+                        ${cellShared('14. PROFISSIONAL RESPONSÁVEL PELA COLETA', 'medicoNome', 6)}
+                        ${cellShared('CONSELHO PROFISSIONAL (CRM / COREN)', 'medicoCrm', 3, true)}
+                        ${cellShared('DATA DA COLETA', 'dataSolicitacao', 3, true)}
+                    </div>
+
+                    <div class="sus-section-bar">LAUDO CITOPATOLÓGICO — NOMENCLATURA BRASILEIRA / SISTEMA BETHESDA (USO DO LABORATÓRIO)</div>
+                    <div class="sus-grid">
+                        ${cellModel('AVALIAÇÃO PRÉ-ANALÍTICA E ADEQUABILIDADE DA AMOSTRA', 'adequabilidadeBethesda', 12, true)}
+                        ${cellModel('DIAGNÓSTICO DESCRITIVO (EPITÉLIOS REPRESENTADOS, MICROBIOLOGIA E ATIPIAS CELULARES)', 'diagnosticoDescritivoBethesda', 12, false, '24mm')}
+                    </div>
+                `;
+            }
+
+            // 06: GAL / LACEN-RO — VIGILÂNCIA E BIOLOGIA MÉDICA
+            else if (mId === '06_GAL_LACEN_Geral') {
+                bodyHTML += renderPatientCommonBlockHTML(false);
+                bodyHTML += `
+                    <div class="sus-section-bar">DADOS EPIDEMIOLÓGICOS E NOTIFICAÇÃO COMPULSÓRIA SINAN (LACEN-RO)</div>
+                    <div class="sus-grid">
+                        ${cellModel('Nº DA NOTIFICAÇÃO SINAN', 'sinanNumero', 6, true)}
+                        ${cellModel('ETIQUETA / PROTOCOLO GAL-RO', 'codigoGalEtiqueta', 6, true)}
+                        ${cellModel('AGRAVO(S) DE NOTIFICAÇÃO SUSPEITO(S)', 'agravoSuspeito', 12, true)}
+                        ${cellModel('DATA DE INÍCIO DOS SINTOMAS (D1)', 'dataInicioSintomas', 3, true)}
+                        ${cellModel('DIA DE DOENÇA NA COLETA (JANELA METODOLÓGICA)', 'diaDoenca', 5, true)}
+                        ${cellModel('VÍNCULO EPIDEMIOLÓGICO / DESLOCAMENTO', 'casoVinculo', 4, true)}
+                        ${cellModel('SINAIS CLÍNICOS, SINTOMAS E DADOS RELEVANTES', 'sinaisSintomasGal', 12, false, '18mm')}
+                    </div>
+
+                    <div class="sus-section-bar">AMOSTRA BIOLÓGICA, METODOLOGIA RECOMENDADA E CADEIA DE FRIO</div>
+                    <div class="sus-grid">
+                        ${cellModel('MATERIAL BIOLÓGICO COLETADO', 'materialBiologico', 12, true)}
+                        ${cellModel('EXAMES SOLICITADOS NO GAL (RT-PCR / SOROLOGIA MAC-ELISA IgM / GOTA ESPESSA)', 'examesMetodologiaGal', 12, false, '22mm')}
+                        ${cellModel('DATA E HORA EXATA DA COLETA', 'dataHoraColetaGal', 4, true)}
+                        ${cellModel('ACONDICIONAMENTO E TRANSPORTE REFRIGERADO (2°C A 8°C)', 'condicaoTransporteGal', 8)}
+                    </div>
+
+                    <div class="sus-section-bar">IDENTIFICAÇÃO DO RESPONSÁVEL PELA SOLICITAÇÃO / COLETA E RECEBIMENTO NO LACEN-RO</div>
+                    <div class="sus-grid">
+                        ${cellShared('PROFISSIONAL RESPONSÁVEL', 'medicoNome', 5)}
+                        ${cellShared('CONSELHO / REGISTRO', 'medicoCrm', 3, true)}
+                        ${cellModel('RECEBIMENTO TRIAGEM LACEN-RO (DATA / HORA / TEMP °C)', 'recebimentoLacen', 4, true)}
+                    </div>
+                `;
+            }
+
+            // 07: SISCAN — EXAME HISTOPATOLÓGICO
+            else if (mId === '07_SISCAN_Histopatologico') {
+                bodyHTML += renderPatientCommonBlockHTML(false);
+                bodyHTML += `
+                    <div class="sus-section-bar">TOPOGRAFIA DA LESÃO E TIPO DE PROCEDIMENTO CIRÚRGICO / BIÓPSIA (SISCAN / INCA)</div>
+                    <div class="sus-grid">
+                        ${cellModel('ÓRGÃO / TOPOGRAFIA DA LESÃO', 'topografiaLesao', 6, true)}
+                        ${cellModel('LOCALIZAÇÃO TOPOGRÁFICA DETALHADA (QUADRANTE / UNIÃO / ZONA CERVICAL)', 'localizacaoDetalhada', 6)}
+                        ${cellModel('TIPO DE PROCEDIMENTO DE OBTENÇÃO DO ESPÉCIME', 'tipoProcedimentoHisto', 12, true)}
+                    </div>
+
+                    <div class="sus-section-bar">ACHADOS CLÍNICOS, RADIOLÓGICOS (BI-RADS) E COLPOSCÓPICOS</div>
+                    <div class="sus-grid">
+                        ${cellModel('DESCRIÇÃO CLÍNICA, DIMENSÕES DA LESÃO E CLASSIFICAÇÃO BI-RADS / COLPOSCOPIA PRÉVIA', 'achadosClinicosImagem', 12, false, '24mm')}
+                        ${cellModel('AVALIAÇÃO LINFONODAL LOCORREGIONAL (AXILAR / SUPRACLAVICULAR / INGUINAL)', 'linfonodosAxilares', 12)}
+                    </div>
+
+                    <div class="sus-section-bar">ACONDICIONAMENTO, FIXAÇÃO EM FORMOL TAMPONADO 10% E IDENTIFICAÇÃO DOS FRASCOS</div>
+                    <div class="sus-grid">
+                        ${cellModel('NÚMERO DE FRASCOS E QUANTIDADE DE FRAGMENTOS / PEÇAS ENVIADAS', 'numeroFrascosFragmentos', 6, true)}
+                        ${cellModel('FIXADOR UTILIZADO E DATA/HORA EXATA DA IMERSÃO', 'fixadorDataHora', 6, true)}
+                        ${cellModel('SOLICITAÇÃO COMPLEMENTAR / ESTUDO IMUNO-HISTOQUÍMICO (QUANDO INDICADO)', 'estudoImunoHistoquimica', 12)}
+                    </div>
+
+                    <div class="sus-section-bar">IDENTIFICAÇÃO DO MÉDICO RESPONSÁVEL PELO PROCEDIMENTO</div>
+                    <div class="sus-grid">
+                        ${cellShared('NOME DO MÉDICO CIRURGIÃO / MASTOLOGISTA / GINECOLOGISTA', 'medicoNome', 6)}
+                        ${cellShared('CRM', 'medicoCrm', 2, true)}
+                        ${cellShared('DATA DO PROCEDIMENTO', 'dataSolicitacao', 4, true)}
+                    </div>
+                `;
+            }
+
+            // 08: SISCAN — REQUISIÇÃO DE MAMOGRAFIA
+            else if (mId === '08_SISCAN_Mamografia') {
+                bodyHTML += renderPatientCommonBlockHTML(false);
+                bodyHTML += `
+                    <div class="sus-section-bar">MODALIDADE DA MAMOGRAFIA (TABELA SIGTAP — RASTREAMENTO vs DIAGNÓSTICA)</div>
+                    <div class="sus-grid">
+                        ${cellModel('MODALIDADE SOLICITADA E CÓDIGO SIGTAP', 'modalidadeMamografia', 12, true)}
+                    </div>
+
+                    <div class="sus-section-bar">ANAMNESE MAMÁRIA E FATORES DE RISCO (SISCAN / INCA / MINISTÉRIO DA SAÚDE)</div>
+                    <div class="sus-grid">
+                        ${cellModel('1. APRESENTA NÓDULO OU CAROÇO NA MAMA?', 'noduloCaroco', 6, true)}
+                        ${cellModel('2. APRESENTA RISCO ELEVADO (HISTÓRIA FAMILIAR 1º GRAU DE CA DE MAMA/OVÁRIO)?', 'riscoElevadoFamiliar', 6, true)}
+                        ${cellModel('3. FEZ MAMOGRAFIA ALGUMA VEZ? (INFORMAR ANO E CATEGORIA BI-RADS)', 'fezMamografiaAntes', 6)}
+                        ${cellModel('4. FEZ RADIOTERAPIA NA MAMA OU TÓRAX ANTERIORMENTE?', 'radioterapiaPreviaMama', 6, true)}
+                        ${cellModel('5. FEZ CIRURGIA NAS MAMAS ANTERIORMENTE OU POSSUI IMPLANTES?', 'cirurgiaPreviaMama', 12)}
+                    </div>
+
+                    <div class="sus-section-bar">ACHADOS DO EXAME CLÍNICO DAS MAMAS E INDICAÇÃO DETALHADA</div>
+                    <div class="sus-grid">
+                        ${cellModel('EXAME FÍSICO DAS MAMAS (INSPEÇÃO, PALPAÇÃO DOS QUADRANTES, PAPILAS E CADEIAS AXILARES)', 'exameClinicoMamas', 12, false, '20mm')}
+                        ${cellModel('INDICAÇÃO CLÍNICA DETALHADA / CONTROLE RADIOLÓGICO', 'indicacaoDetalhadaMmg', 12, false, '20mm')}
+                    </div>
+
+                    <div class="sus-section-bar">IDENTIFICAÇÃO DO PROFISSIONAL SOLICITANTE</div>
+                    <div class="sus-grid">
+                        ${cellShared('NOME DO PROFISSIONAL SOLICITANTE', 'medicoNome', 6)}
+                        ${cellShared('CRM / COREN', 'medicoCrm', 3, true)}
+                        ${cellShared('DATA DA SOLICITAÇÃO', 'dataSolicitacao', 3, true)}
+                    </div>
+                `;
+            }
+
+            // 09: GAL / LACEN-RO — TUBERCULOSE (TRM-TB / BAAR / CULTURA)
+            else if (mId === '09_GAL_TRM_TB') {
+                bodyHTML += renderPatientCommonBlockHTML(false);
+                bodyHTML += `
+                    <div class="sus-section-bar">VIGILÂNCIA EPIDEMIOLÓGICA DA TUBERCULOSE E POPULAÇÕES VULNERÁVEIS (SVSA / LACEN-RO)</div>
+                    <div class="sus-grid">
+                        ${cellModel('Nº DA NOTIFICAÇÃO SINAN-TB', 'sinanTb', 4, true)}
+                        ${cellModel('TESTAGEM PARA HIV / STATUS PVHA', 'statusHiv', 8, true)}
+                        ${cellModel('POPULAÇÕES ESPECIAIS / VULNERABILIDADE SOCIAL', 'populacaoVulneravel', 12, true)}
+                    </div>
+
+                    <div class="sus-section-bar">FINALIDADE DO EXAME, MATERIAL CLÍNICO E METODOLOGIAS SOLICITADAS</div>
+                    <div class="sus-grid">
+                        ${cellModel('FINALIDADE DA SOLICITAÇÃO', 'finalidadeExameTb', 6, true)}
+                        ${cellModel('MATERIAL CLÍNICO COLETADO', 'materialClinicoTb', 6, true)}
+                        ${cellModel('EXAMES SOLICITADOS NO SISTEMA GAL (TRM-TB GENEXPERT / BAAR / CULTURA / TSA)', 'examesSolicitadosTb', 12, true)}
+                        ${cellModel('QUADRO CLÍNICO RESPIRATÓRIO, TEMPO DE TOSSE E ACHADOS RADIOLÓGICOS DE TÓRAX', 'quadroClinicoRxTb', 12, false, '20mm')}
+                        ${cellModel('ASPECTO MACROSCÓPICO DA AMOSTRA DE ESCARRO', 'aspectoAmostraTb', 6, true)}
+                        ${cellModel('DATA, HORA DA COLETA E CONSERVAÇÃO REFRIGERADA', 'dataColetaTb', 6, true)}
+                    </div>
+
+                    <div class="sus-section-bar">IDENTIFICAÇÃO DO SOLICITANTE E RESULTADO LABORATORIAL (USO DO LACEN-RO)</div>
+                    <div class="sus-grid">
+                        ${cellShared('PROFISSIONAL SOLICITANTE', 'medicoNome', 5)}
+                        ${cellShared('REGISTRO / CONSELHO', 'medicoCrm', 3, true)}
+                        ${cellShared('DATA', 'dataSolicitacao', 4, true)}
+                        ${cellModel('RESULTADO TRM-TB / BACILOSCOPIA (USO EXCLUSIVO DO LABORATÓRIO EXECUTANTE LACEN-RO)', 'resultadoLaboratorioTb', 12)}
+                    </div>
+                `;
+            }
+
+            // Rodapé Institucional Oficial (MINISTÉRIO DA SAÚDE por extenso)
+            bodyHTML += `
+                <div style="margin-top: 2mm; display: flex; justify-content: space-between; font-size: 6.2pt; color: #222; border-top: 1px solid #000; padding-top: 1mm;">
+                    <span>GOVERNO DO ESTADO DE RONDÔNIA • SECRETARIA DE ESTADO DA SAÚDE (SESAU-RO)</span>
+                    <span>MINISTÉRIO DA SAÚDE • DOCUMENTO REGULATÓRIO OFICIAL (fls. 1/1)</span>
+                </div>
+            `;
+
+            canvas.innerHTML = bodyHTML;
+
+            // Bind de Edição Direta (Inline ContentEditable na Folha A4 -> atualiza State e Inputs da esquerda sem perder foco)
+            canvas.querySelectorAll('[data-bind-shared]').forEach(el => {
+                el.addEventListener('input', () => {
+                    const key = el.getAttribute('data-bind-shared');
+                    syncSharedToDOM(key, el.innerText, 'a4');
+                });
+            });
+
+            canvas.querySelectorAll('[data-bind-model]').forEach(el => {
+                el.addEventListener('input', () => {
+                    const key = el.getAttribute('data-bind-model');
+                    syncModelToDOM(key, el.innerText, 'a4');
+                });
+            });
+        }
+
+        // ----------------------------------------------------------------------------
+        // 10. FUNÇÕES DE LIMPEZA DEFINITIVA (NUNCA VOLTA DADOS ANTIGOS)
+        // ----------------------------------------------------------------------------
+
+        // Zera absolutamente tudo (todos os 9 modelos, paciente, unidade, médico e localStorage)
+        function clearAllBlank() {
+            try {
+                localStorage.clear();
+            } catch (e) {}
+
+            appState = createBlankState(appState.activeModel);
+
+            const presetSel = document.getElementById('preset-unidade');
+            if (presetSel) presetSel.value = '';
+
+            syncSharedInputsFromState();
+            renderDynamicModelForm();
+            renderA4Sheet();
+            showToast('Tudo limpo! Formulário e folha A4 estão 100% em branco.');
+        }
+
+        // Limpa seções específicas do bloco 1
+        function clearSharedSection(scope = 'all') {
+            const unitKeys = ['unidadeSolicitante', 'cnesSolicitante', 'ufIbgeCabecalho'];
+            const patientKeys = [
+                'pacienteNome', 'pacienteCns', 'pacienteCpf', 'pacienteProntuario',
+                'pacienteNascimento', 'pacienteIdade', 'pacienteSexo', 'pacienteRaca',
+                'pacienteMae', 'pacienteResponsavel', 'pacienteTelefone', 'pacientePeso',
+                'pacienteAltura', 'pacienteEndereco', 'pacienteMunicipio', 'pacienteIbgeCep'
+            ];
+            const doctorKeys = ['medicoNome', 'medicoCrm', 'medicoCns', 'dataSolicitacao'];
+
+            if (scope === 'unit' || scope === 'all') {
+                unitKeys.forEach(k => appState.shared[k] = '');
+                const presetSel = document.getElementById('preset-unidade');
+                if (presetSel) presetSel.value = '';
+            }
+            if (scope === 'patient' || scope === 'all') {
+                patientKeys.forEach(k => appState.shared[k] = '');
+            }
+            if (scope === 'doctor' || scope === 'all') {
+                doctorKeys.forEach(k => appState.shared[k] = '');
+            }
+
+            recalculateCKDEPI();
+            saveSeparateState();
+            syncSharedInputsFromState();
+            renderA4Sheet();
+            showToast('Seção limpa no formulário e na folha A4.');
+        }
+
+        // Limpa apenas os campos específicos do exame ativo (Seção 2)
+        function clearCurrentModelFields() {
+            const mId = appState.activeModel;
+            Object.keys(appState.models[mId]).forEach(k => {
+                appState.models[mId][k] = '';
+            });
+            renderDynamicModelForm();
+            renderA4Sheet();
+            showToast('Campos do exame limpos na folha A4.');
+        }
+
+        // Limpa Paciente + Exame atual, mantendo apenas Unidade e Médico se estiverem preenchidos
+        function clearCaseOnlyKeepDoctor() {
+            const patientKeys = [
+                'pacienteNome', 'pacienteCns', 'pacienteCpf', 'pacienteProntuario',
+                'pacienteNascimento', 'pacienteIdade', 'pacienteSexo', 'pacienteRaca',
+                'pacienteMae', 'pacienteResponsavel', 'pacienteTelefone', 'pacientePeso',
+                'pacienteAltura', 'pacienteEndereco', 'pacienteMunicipio', 'pacienteIbgeCep'
+            ];
+            patientKeys.forEach(k => appState.shared[k] = '');
+
+            const mId = appState.activeModel;
+            Object.keys(appState.models[mId]).forEach(k => {
+                appState.models[mId][k] = '';
+            });
+
+            try { localStorage.removeItem(STORAGE_KEY_PATIENT_CASE); } catch (e) {}
+            saveSeparateState();
+            syncSharedInputsFromState();
+            renderDynamicModelForm();
+            renderA4Sheet();
+            showToast('Paciente e exame apagados (Médico e Unidade mantidos).');
+        }
+
+        // Opcional: Carrega um exemplo clínico apenas quando o usuário clicar no botão "Carregar Exemplo (Opcional)"
+        function loadOptionalClinicalExample() {
+            appState.shared = {
+                unidadeSolicitante: 'HOSPITAL DE BASE DR. ARY PINHEIRO (HBAP - SESAU/RO)',
+                cnesSolicitante: '2494299',
+                ufIbgeCabecalho: 'RO • IBGE 1100205',
+                pacienteNome: 'PACIENTE EXEMPLO PARA TESTE (EDITÁVEL)',
+                pacienteCns: '704 8012 3948 1120',
+                pacienteCpf: '000.000.000-00',
+                pacienteProntuario: '10293',
+                pacienteNascimento: '14/05/1968',
+                pacienteIdade: '58',
+                pacienteSexo: 'F',
+                pacienteRaca: 'PARDA',
+                pacienteMae: 'NOME DA MÃE EXEMPLO',
+                pacienteResponsavel: 'O PRÓPRIO',
+                pacienteTelefone: '(69) 99999-0000',
+                pacientePeso: '68',
+                pacienteAltura: '162',
+                pacienteEndereco: 'AV. SETE DE SETEMBRO, PORTO VELHO',
+                pacienteMunicipio: 'PORTO VELHO - RO',
+                pacienteIbgeCep: '1100205',
+                medicoNome: 'DR. MÉDICO SOLICITANTE EXEMPLO',
+                medicoCrm: 'CRM-RO 0000',
+                medicoCns: '700 0000 0000 0000',
+                dataSolicitacao: '22/10/2026'
+            };
+
+            const list = QUICK_TEMPLATES[appState.activeModel] || [];
+            if (list[0]) list[0].apply();
+
+            syncSharedInputsFromState();
+            renderDynamicModelForm();
+            renderA4Sheet();
+            showToast('Exemplo opcional carregado. Clique em "Deixar 100% em Branco" quando quiser zerar.');
+        }
+
+        function exportAllDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", `DADOS_SUS_SESAU_RO_${appState.activeModel}.json`);
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast('Arquivo JSON exportado.');
+        }
+
+        function downloadStandaloneHTML() {
+            const sheetHTML = document.getElementById('a4-document-canvas').outerHTML;
+            const currentMeta = SUS_MODELS.find(m => m.id === appState.activeModel);
+            const standaloneDoc = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>${currentMeta.officialTitle} — SESAU-RO</title>
+<style>
+    @page { size: A4 portrait; margin: 5mm; }
+    body { background: #F4F5F7; margin: 0; padding: 20px; font-family: Arial, Helvetica, sans-serif; }
+    .toolbar { max-width: 210mm; margin: 0 auto 14px auto; background: #111827; color: #fff; padding: 10px 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .toolbar button { background: #059669; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .sus-a4-sheet { width: 210mm; min-height: 295mm; margin: 0 auto; background: #FFFFFF; color: #000000; padding: 5.5mm 6.5mm; box-sizing: border-box; font-size: 8.5pt; line-height: 1.18; border: 1px solid #000; }
+    .sus-triple-header { display: grid; grid-template-columns: 38mm 1fr 34mm; border: 2px solid #000; margin-bottom: 1.5mm; }
+    .sus-header-left { border-right: 1.5px solid #000; padding: 1.5mm 2mm; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+    .sus-logo-mark { font-weight: 900; font-size: 15pt; }
+    .sus-header-center { padding: 1.5mm 2.5mm; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+    .sus-header-right { border-left: 1.5px solid #000; padding: 1.5mm 2mm; text-align: right; font-size: 7pt; display: flex; flex-direction: column; justify-content: space-between; }
+    .sus-section-bar { background-color: #1f1f1f !important; color: #FFFFFF !important; font-weight: 700; font-size: 7.4pt; text-transform: uppercase; padding: 1mm 2mm; border: 1.5px solid #000; border-bottom: none; margin-top: 1.5mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .sus-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); border-top: 1.5px solid #000; border-left: 1.5px solid #000; }
+    .sus-cell { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 0.8mm 1.6mm; display: flex; flex-direction: column; min-height: 9.2mm; }
+    .sus-cell-label { font-size: 6pt; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5mm; }
+    .sus-cell-val { font-size: 8.5pt; outline: none; white-space: pre-wrap; min-height: 4.5mm; }
+    .sus-cell-val.code-num { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .sus-table { width: 100%; border-collapse: collapse; border: 1.5px solid #000; font-size: 7.5pt; }
+    .sus-table th { background: #e5e5e5 !important; border: 1px solid #000; padding: 0.8mm 1.2mm; font-size: 6.3pt; font-weight: 700; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .sus-table td { border: 1px solid #000; padding: 0.8mm 1.4mm; }
+    .sus-badge-box { display: inline-block; border: 1px solid #000; padding: 0.2mm 1.2mm; font-weight: 700; font-size: 7pt; margin-right: 1.5mm; }
+    .sus-badge-box.checked { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    @media print { body { background: #fff; padding: 0; } .toolbar { display: none !important; } .sus-a4-sheet { border: none; width: 100%; padding: 0; } }
+</style>
+</head>
+<body>
+    <div class="toolbar">
+        <span><strong>${currentMeta.officialTitle}</strong> — Documento editável pronto para impressão A4</span>
+        <button onclick="window.print()">Imprimir / Salvar PDF A4 (fls. 1/1)</button>
+    </div>
+    ${sheetHTML}
+</body>
+</html>`;
+
+            const blob = new Blob([standaloneDoc], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${appState.activeModel}_SESAU_RO.html`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            showToast(`Arquivo ${appState.activeModel}_SESAU_RO.html baixado.`);
+        }
+
+        // ----------------------------------------------------------------------------
+        // 11. INICIALIZAÇÃO AO CARREGAR A PÁGINA (100% EM BRANCO)
+        // ----------------------------------------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            restoreSavedState();
+            renderModelSelectorBar();
+            renderQuickTemplatesBar();
+            syncSharedInputsFromState();
+            bindSharedInputs();
+            renderDynamicModelForm();
+            renderA4Sheet();
+        });
+    </script>
+</body>
+</html>

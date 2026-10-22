@@ -13,6 +13,8 @@ import {
   type CampoDoFormulario
 } from '../data/formulariosOficiaisSus';
 import { FormularioOficialSus } from '../components/documento/FormularioOficialSus';
+import { SusCommonIdentityFields } from '../components/sus/SusCommonIdentityFields';
+import { SusRegulatorySpecificFields, linhaVaziaDaLme } from '../components/sus/SusRegulatorySpecificFields';
 import { ajustarTexto, partesDaData, partesDoTelefone } from '../utils/formularioOficial';
 import type { DoctorProfile, SusFilledFormData, WorkContext } from '../types';
 
@@ -354,5 +356,87 @@ describe('Encaixe do texto nas caixas do impresso', () => {
     expect(partesDoTelefone('3221-1122')).toEqual({ ddd: '', numero: '32211122' });
     // data fora do padrão não é descartada: vai como foi digitada, no campo inteiro
     expect(textoDe(apac.montar({ ...completo, patientBirthDate: 'março de 1990' }, EMISSAO), '6')).toEqual(['março de 1990']);
+  });
+});
+
+describe('Formulários de preenchimento SUS: preservação de espaços e campos regulatórios completos', () => {
+  const medicoIncompleto = { name: '', crm: '', crmState: 'RO' } as DoctorProfile;
+
+  it('preserva espaços ao final e entre palavras durante a digitação nos campos do paciente e médico', () => {
+    const docApac = SUS_DOCUMENTS_CATALOG.find((d) => d.id === 'apac_principal')!;
+    const dadosComEspaco: SusFilledFormData = {
+      ...soIdentificacao,
+      doctorName: 'Dra. Maria ',
+      patientName: 'João Carlos ',
+      patientMotherName: 'Ana Maria ',
+      patientAddress: 'Rua das Flores ',
+      patientNeighborhood: 'Centro ',
+      patientCity: 'Porto ',
+    };
+
+    const html = renderToStaticMarkup(
+      <SusCommonIdentityFields
+        darkMode={false}
+        doctor={medicoIncompleto}
+        currentDocItem={docApac}
+        formData={dadosComEspaco}
+        hasOfficialForm={true}
+        onFieldChange={() => {}}
+      />
+    );
+
+    expect(html).toContain('value="Dra. Maria "');
+    expect(html).toContain('value="João Carlos "');
+    expect(html).toContain('value="Ana Maria "');
+    expect(html).toContain('value="Rua das Flores "');
+    expect(html).toContain('value="Centro "');
+    expect(html).toContain('value="Porto "');
+  });
+
+  it('renderiza campos específicos de SISCAN, GAL/LACEN e APAC Complementar sem valores inventados', () => {
+    const siscanCito = SUS_DOCUMENTS_CATALOG.find((d) => d.id === 'siscan_citopatologico')!;
+    const galTb = SUS_DOCUMENTS_CATALOG.find((d) => d.id === 'gal_trm_tb')!;
+    const apacComp = SUS_DOCUMENTS_CATALOG.find((d) => d.id === 'apac_complementar')!;
+
+    const htmlSiscan = renderToStaticMarkup(
+      <SusRegulatorySpecificFields
+        darkMode={false}
+        currentDocItem={siscanCito}
+        formData={soIdentificacao}
+        linhasDaLme={[linhaVaziaDaLme()]}
+        onFieldChange={() => {}}
+        onAlterarLinhaDaLme={() => {}}
+      />
+    );
+    expect(htmlSiscan).toContain('id="sus-dum"');
+    expect(htmlSiscan).toContain('id="sus-prev-cito"');
+
+    const htmlGalTb = renderToStaticMarkup(
+      <SusRegulatorySpecificFields
+        darkMode={false}
+        currentDocItem={galTb}
+        formData={soIdentificacao}
+        linhasDaLme={[linhaVaziaDaLme()]}
+        onFieldChange={() => {}}
+        onAlterarLinhaDaLme={() => {}}
+      />
+    );
+    expect(htmlGalTb).toContain('id="sus-sinan"');
+    expect(htmlGalTb).toContain('id="sus-specimen"');
+    expect(htmlGalTb).toContain('id="sus-tb-duration"');
+
+    const htmlApacComp = renderToStaticMarkup(
+      <SusRegulatorySpecificFields
+        darkMode={false}
+        currentDocItem={apacComp}
+        formData={soIdentificacao}
+        linhasDaLme={[linhaVaziaDaLme()]}
+        onFieldChange={() => {}}
+        onAlterarLinhaDaLme={() => {}}
+      />
+    );
+    expect(htmlApacComp).toContain('id="sus-creatinina"');
+    expect(htmlApacComp).toContain('id="sus-etfg"');
+    expect(htmlApacComp).toContain('id="sus-contraste"');
   });
 });

@@ -278,7 +278,7 @@ export const ICON_ALIASES: Record<string, string> = {
   info: 'info',
   ajuda: 'help',
   
-  // Aliases Editor Tiptap
+  // Aliases Editor Tiptap & Compatibilidade Universal
   negrito: 'format_bold',
   bold: 'format_bold',
   italico: 'format_italic',
@@ -286,7 +286,37 @@ export const ICON_ALIASES: Record<string, string> = {
   lista: 'format_list_bulleted',
   list: 'format_list_bulleted',
   lista_numerada: 'format_list_numbered',
-  list_ordered: 'format_list_numbered'
+  list_ordered: 'format_list_numbered',
+  share2: 'send',
+  building2: 'domain',
+  sparkles: 'auto_awesome',
+  refresh_cw: 'refresh',
+  refreshcw: 'refresh',
+  calendar: 'calendar_today',
+  hash: 'tag',
+  alert_circle: 'warning',
+  alertcircle: 'warning',
+  alert_triangle: 'warning',
+  alerttriangle: 'warning',
+  check_circle_2: 'check_circle',
+  checkcircle2: 'check_circle',
+  file_text: 'description',
+  filetext: 'description',
+  file_check: 'fact_check',
+  filecheck: 'fact_check',
+  user_check: 'verified_user',
+  usercheck: 'verified_user',
+  shield_check: 'verified_user',
+  shieldcheck: 'verified_user',
+  hard_drive: 'hard_drive',
+  harddrive: 'hard_drive',
+  database: 'database',
+  upload: 'upload',
+  move: 'open_with',
+  activity: 'monitor_heart',
+  heart: 'favorite',
+  type: 'title',
+  trash2: 'delete'
 };
 
 /**
@@ -335,13 +365,6 @@ export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
  *
  * Utiliza o Google Material Design Icons (Material Symbols Outlined) de forma 100% offline,
  * com cache PWA e resolução inteligente de sinônimos/aliases para prevenir a mutação visual.
- *
- * Exemplo de uso:
- * ```tsx
- * <Icon name="prescriptions" size="lg" className="text-clinical-500" />
- * <Icon name="stethoscope" filled size="md" />
- * <Icon name="progress_activity" spin size="sm" />
- * ```
  */
 export const Icon: React.FC<IconProps> = ({
   name,
@@ -357,8 +380,13 @@ export const Icon: React.FC<IconProps> = ({
   ...props
 }) => {
   const resolvedName = resolveIconName(name);
-  const classSizeMatch = size === undefined ? className.match(/text-\[(\d+)px\]/) : null;
-  const resolvedSize = size !== undefined ? size : classSizeMatch ? Number(classSizeMatch[1]) : 'md';
+  const classSizeMatch = size === undefined ? className.match(/(?:text-\[(\d+)px\]|w-(\d+(?:\.\d+)?))/) : null;
+  const inferredPx = classSizeMatch
+    ? classSizeMatch[1]
+      ? Number(classSizeMatch[1])
+      : Math.round(Number(classSizeMatch[2]) * 4)
+    : undefined;
+  const resolvedSize = size !== undefined ? size : inferredPx !== undefined ? inferredPx : 'md';
   const pixelSize = typeof resolvedSize === 'number' ? resolvedSize : SIZE_MAP[resolvedSize] || 20;
   const opsz = opticalSize || (pixelSize <= 20 ? 20 : pixelSize <= 24 ? 24 : pixelSize <= 40 ? 40 : 48);
 
@@ -366,7 +394,7 @@ export const Icon: React.FC<IconProps> = ({
 
   return (
     <span
-      className={`material-symbols-outlined select-none shrink-0 overflow-hidden ${spin ? 'icon-spin' : ''} ${className}`}
+      className={`material-symbols-outlined select-none shrink-0 inline-flex items-center justify-center leading-none overflow-hidden ${spin ? 'icon-spin' : ''} ${className}`}
       style={{
         fontSize: `${pixelSize}px`,
         width: `${pixelSize}px`,
@@ -384,4 +412,55 @@ export const Icon: React.FC<IconProps> = ({
 };
 
 export const MaterialSymbol = Icon;
+
+export interface MappedIconProps extends Omit<IconProps, 'name'> {
+  strokeWidth?: number;
+}
+
+function createMaterialIcon(iconName: IconName): React.FC<MappedIconProps> {
+  const MappedIcon: React.FC<MappedIconProps> = ({ strokeWidth: _sw, ...rest }) => (
+    <Icon name={iconName} {...rest} />
+  );
+  MappedIcon.displayName = `MaterialIcon(${iconName})`;
+  return MappedIcon;
+}
+
+export const Award = createMaterialIcon('workspace_premium');
+export const Share2 = createMaterialIcon('send');
+export const Download = createMaterialIcon('download');
+export const CheckCircle2 = createMaterialIcon('check_circle');
+export const AlertCircle = createMaterialIcon('warning');
+export const FileText = createMaterialIcon('description');
+export const Building2 = createMaterialIcon('domain');
+export const Stethoscope = createMaterialIcon('stethoscope');
+export const Sparkles = createMaterialIcon('auto_awesome');
+export const RefreshCw = createMaterialIcon('refresh');
+export const Plus = createMaterialIcon('add');
+export const Trash2 = createMaterialIcon('delete');
+export const Calendar = createMaterialIcon('calendar_today');
+export const Clock = createMaterialIcon('schedule');
+export const User = createMaterialIcon('person');
+export const Hash = createMaterialIcon('tag');
+export const Send = createMaterialIcon('send');
+export const UserCheck = createMaterialIcon('verified_user');
+export const Check = createMaterialIcon('check');
+export const X = createMaterialIcon('close');
+export const Shield = createMaterialIcon('shield');
+export const Eraser = createMaterialIcon('ink_eraser');
+export const Phone = createMaterialIcon('call');
+export const MapPin = createMaterialIcon('location_on');
+export const Upload = createMaterialIcon('upload');
+export const Database = createMaterialIcon('database');
+export const AlertTriangle = createMaterialIcon('warning');
+export const ShieldCheck = createMaterialIcon('verified_user');
+export const HardDrive = createMaterialIcon('hard_drive');
+export const FileCheck = createMaterialIcon('fact_check');
+export const Activity = createMaterialIcon('monitor_heart');
+export const Heart = createMaterialIcon('favorite');
+export const Type = createMaterialIcon('title');
+export const Circle = createMaterialIcon('circle');
+export const Hexagon = createMaterialIcon('hexagon');
+export const Square = createMaterialIcon('square');
+export const Palette = createMaterialIcon('palette');
+
 export default Icon;

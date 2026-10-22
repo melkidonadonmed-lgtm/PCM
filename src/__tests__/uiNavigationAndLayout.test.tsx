@@ -17,6 +17,9 @@ import { Badge } from '../components/ui/Badge';
 import { PRESCMED_TOKENS } from '../config/tokens';
 import { runTabViewTransition } from '../hooks/useNavigationSync';
 import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
+import { SUS_DOCUMENTS_CATALOG } from '../data/susDocumentsCatalog';
+import { SusInteractiveVectorSheet } from '../components/sus/SusInteractiveVectorSheet';
+import { clinicalRepository } from '../core/storage/clinicalRepository';
 import type { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral } from '../types';
 
 const emptyDoctor: DoctorProfile = {
@@ -423,5 +426,43 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(primitivesHtml).toContain('data-state="idle"');
     expect(primitivesHtml).toContain('clinical-tabular-nums');
     expect(primitivesHtml).toContain('Confirmar');
+
+    // Validação da Grade Vetorial Interativa SUS (.sus-grid 12 colunas) e Fundação Multi-Módulo
+    const modules = clinicalRepository.listModules();
+    expect(modules.map((m) => m.id)).toEqual(['prescription', 'evolution_pep', 'hospital']);
+    expect(clinicalRepository.getActiveModule()).toBe('prescription');
+
+    const apacComp = SUS_DOCUMENTS_CATALOG.find((d) => d.id === 'apac_complementar')!;
+    const vectorHtml = renderToStaticMarkup(
+      <SusInteractiveVectorSheet
+        docItem={apacComp}
+        formData={{
+          doctorName: configuredDoctor.name,
+          doctorCrm: configuredDoctor.crm,
+          doctorCrmState: configuredDoctor.crmState,
+          doctorSpecialty: configuredDoctor.specialty,
+          doctorClinicName: configuredDoctor.clinicName,
+          doctorCnes: '1234567',
+          patientName: activePatient.name,
+          patientCns: '700000000000001',
+          patientCpf: '111.222.333-44',
+          patientBirthDate: '1990-01-01',
+          patientAge: '36',
+          patientGender: 'male',
+          patientMotherName: 'Maria Lima',
+          patientPhone: '(11) 99999-0000',
+          patientAddress: 'Rua A, 10',
+          patientNeighborhood: 'Centro',
+          patientCity: 'São Paulo',
+          patientState: 'SP',
+          patientCep: '01000-000',
+        }}
+        onFieldChange={vi.fn()}
+      />
+    );
+    expect(vectorHtml).toContain('1 - Nome do Estabelecimento de Saúde Solicitante');
+    expect(vectorHtml).toContain('16 - Código SIGTAP');
+    expect(vectorHtml).toContain('21 - Creatinina Sérica (mg/dL)');
+    expect(vectorHtml).toContain('Carlos Eduardo Lima');
   });
 });

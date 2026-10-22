@@ -331,8 +331,8 @@ export const Header: React.FC<HeaderProps> = ({
             tabIndex={0}
             className={`flex items-center gap-2 px-3 h-10 rounded-xl border transition cursor-pointer group max-w-[220px] xl:max-w-[260px] shrink-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               hasPatient 
-                ? 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/10 text-slate-900 dark:text-slate-100 hover:bg-slate-200/80 dark:hover:bg-[#334155]' 
-                : 'bg-[var(--bg-app)] dark:bg-[#27354A] border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                ? 'bg-sky-50/70 dark:bg-sky-950/35 border-sky-200 dark:border-sky-800/50 text-slate-900 dark:text-slate-100 hover:bg-sky-100/70 dark:hover:bg-sky-900/40' 
+                : 'bg-[var(--bg-app)] dark:bg-[#1E293B] border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
             }`}
             title="Clique para identificar o paciente, peso e histórico clínico"
           >
@@ -365,10 +365,10 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenCommandPalette}
               aria-label="Busca rápida e navegação global (Ctrl+K)"
               title="Busca rápida de medicamentos, kits, protocolos e guias SUS (Ctrl+K)"
-              className="w-10 h-10 xl:w-auto xl:px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] dark:bg-[#27354A] text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)]"
+              className="w-10 h-10 xl:w-auto xl:px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] dark:bg-[#1E293B] text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)]"
             >
               <Icon name="search" size={16} className="text-sky-600 dark:text-sky-400" />
-              <span className="hidden xl:inline text-xs font-semibold text-[var(--text-muted)] clinical-tabular-nums">
+              <span className="hidden xl:inline text-[11px] font-bold text-[var(--text-muted)] px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-white/10 clinical-tabular-nums">
                 Ctrl+K
               </span>
             </button>
@@ -379,7 +379,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="header-doctor-chip"
               type="button"
               onClick={onOpenDoctorModal}
-              className="hidden md:flex items-center gap-1.5 px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-200/80 dark:hover:bg-[#334155] hover:text-slate-900 dark:hover:text-white"
+              className="hidden md:flex items-center gap-1.5 px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] dark:bg-[#1E293B] border-[var(--border-subtle)] dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-[var(--surface-hover)] hover:text-slate-900 dark:hover:text-white"
               title={
                 isDoctorReady
                   ? `Médico emitente: ${doctor?.name} (CRM ${doctor?.crm}/${doctor?.crmState}) — clique para editar`

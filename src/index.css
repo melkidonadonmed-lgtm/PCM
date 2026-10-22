@@ -412,44 +412,46 @@
   }
 
   .chip-neutral {
-    background-color: #F1F5F9;
+    background-color: #FFFFFF;
     color: var(--text-secondary);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid #CBD5E1;
     border-radius: 10px;
     font-weight: 600;
-    transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
   }
 
   .dark .chip-neutral {
-    background-color: #27354A;
-    color: #E2E8F0;
+    background-color: #1E293B;
+    color: #CBD5E1;
     border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   }
 
   .chip-neutral:hover:not(:disabled) {
-    background-color: #E2E8F0;
-    border-color: var(--border-medium);
+    background-color: #F8FAFC;
+    border-color: #94A3B8;
     color: var(--text-main);
   }
 
   .dark .chip-neutral:hover:not(:disabled) {
-    background-color: #334155;
-    border-color: rgba(255, 255, 255, 0.16);
+    background-color: #27354A;
+    border-color: rgba(255, 255, 255, 0.2);
     color: #FFFFFF;
   }
 
   .chip-neutral[data-active="true"] {
-    background-color: #E2E8F0;
-    color: var(--text-main);
-    border-color: var(--border-medium);
+    background-color: #EFF6FF;
+    color: #1E3A8A;
+    border-color: #3B82F6;
     font-weight: 700;
-    box-shadow: var(--elevation-z1);
+    box-shadow: 0 1px 3px rgba(30, 58, 138, 0.12), inset 0 0 0 1px rgba(59, 130, 246, 0.15);
   }
 
   .dark .chip-neutral[data-active="true"] {
-    background-color: #334155;
-    color: #FFFFFF;
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(14, 165, 233, 0.16);
+    color: #7DD3FC;
+    border-color: rgba(56, 189, 248, 0.45);
   }
 
   /* Aviso discreto opaco (Cinza sobre Cinza com detalhe pontual, sem fundo transparente chamativo) */
@@ -792,8 +794,8 @@
   .tactile-btn-secondary,
   .btn-tactile-secondary {
     border: 1px solid #CBD5E1;
-    box-shadow: var(--elevation-z1);
-    background-color: #F1F5F9;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    background-color: #FFFFFF;
     color: #0F172A;
     border-radius: 12px;
     padding: 0.5rem 0.875rem;
@@ -802,6 +804,7 @@
     min-width: 44px;
     touch-action: manipulation;
     user-select: none;
+    cursor: pointer;
     isolation: isolate;
     transition: transform 0.14s cubic-bezier(0.2, 0, 0, 1), 
                 box-shadow 0.14s cubic-bezier(0.2, 0, 0, 1), 
@@ -811,23 +814,24 @@
 
   .dark .tactile-btn-secondary,
   .dark .btn-tactile-secondary {
-    background-color: #27354A;
+    background-color: #1E293B;
     color: #F1F5F9;
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.07);
   }
 
   @media (hover: hover) and (pointer: fine) {
     .tactile-btn-secondary:hover:not(:disabled),
     .btn-tactile-secondary:hover:not(:disabled) {
       border-color: #94A3B8;
-      background-color: #E2E8F0;
-      box-shadow: var(--elevation-z1);
+      background-color: #F8FAFC;
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.09), inset 0 1px 0 #FFFFFF;
     }
 
     .dark .tactile-btn-secondary:hover:not(:disabled),
     .dark .btn-tactile-secondary:hover:not(:disabled) {
-      border-color: rgba(255, 255, 255, 0.2);
-      background-color: #334155;
+      border-color: rgba(255, 255, 255, 0.24);
+      background-color: #27354A;
       color: #FFFFFF;
     }
   }
@@ -962,13 +966,14 @@
     font-family: var(--font-serif-doc);
   }
 
-  /* 8. Micro-Sculpted Icons with 135° Directional Contact Occlusion */
+  /* 8. Crisp Vector Icons (sem filtro raster drop-shadow para evitar blur sub-pixel no Windows) */
   .icon-sculpted {
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12));
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
   }
 
   .dark .icon-sculpted {
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    -webkit-font-smoothing: antialiased;
   }
 
   /* 9. Engraved Groove Separator (Double-Line: 1px Shadow + 1px Specular Reflection) */

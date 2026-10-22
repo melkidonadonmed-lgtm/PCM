@@ -12,7 +12,7 @@ import {
   RefreshCw,
   HardDrive,
   FileCheck
-} from 'lucide-react';
+} from './Icon';
 import { DoctorProfile } from '../types';
 /**
  * Modal de Backup e Restauração Portátil (.pcm.json).

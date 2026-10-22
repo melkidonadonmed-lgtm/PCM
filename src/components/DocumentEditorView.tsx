@@ -3,12 +3,7 @@ import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
-import {
-  Check,
-  Move,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+import { Icon } from './Icon';
 import {
   alturaFolhaPx,
   exportarFolhaPdf,
@@ -547,7 +542,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       {/* Toast Feedback */}
       {toastMessage && (
         <div data-state="idle" aria-busy={false} className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade no-print">
-          <Check className="w-4 h-4 text-emerald-400" />
+          <Icon name="check" size={16} className="text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -685,7 +680,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
               />
 
               <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-0 bg-slate-900 text-white rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-tactile-lg text-xs whitespace-nowrap">
-                <Move className="w-3 h-3 text-sky-400" />
+                <Icon name="move" size={12} className="text-sky-400" />
                 <span>Arraste para onde quiser</span>
                 <button
                   type="button"
@@ -706,7 +701,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           {!headerConfig.showHeader && (
             <div className="no-print mb-4 p-2.5 rounded-xl border border-dashed border-warning bg-amber-50/70 text-amber-800 text-xs flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <EyeOff className="w-4 h-4 text-amber-600 shrink-0" />
+                <Icon name="visibility_off" size={16} className="text-amber-600 shrink-0" />
                 <span><strong>Cabeçalho Ocultado:</strong> A folha será impressa sem cabeçalho (ideal para papel timbrado físico).</span>
               </div>
               <button
@@ -714,7 +709,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 onClick={() => handleHeaderFieldChange('showHeader', true)}
                 className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
               >
-                <Eye className="w-3.5 h-3.5" />
+                <Icon name="visibility" size={14} />
                 <span>Restaurar Cabeçalho</span>
               </button>
             </div>
@@ -755,7 +750,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           {!headerConfig.showFooter && (
             <div className="no-print mt-4 p-2 rounded-xl border border-dashed border-medium bg-slate-50 text-slate-600 text-xs flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <EyeOff className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                <Icon name="visibility_off" size={14} className="text-slate-500 shrink-0" />
                 <span><strong>Rodapé Ocultado:</strong> Carimbo e assinatura não serão impressos.</span>
               </div>
               <button
@@ -763,7 +758,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
                 onClick={() => handleHeaderFieldChange('showFooter', true)}
                 className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
               >
-                <Eye className="w-3.5 h-3.5" />
+                <Icon name="visibility" size={14} />
                 <span>Restaurar Rodapé</span>
               </button>
             </div>

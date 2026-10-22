@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { Header } from './components/Header';
+import { Icon } from './components/Icon';
 import { Sidebar } from './components/Sidebar';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { PediatricCalculator } from './components/PediatricCalculator';
@@ -374,7 +375,7 @@ export default function App() {
             onOpenDoctorModal={handleOpenDoctorModal}
             onOpenPatientModal={handleOpenPatientModal}
             onOpenCommandPalette={handleOpenCommandPalette}
-            compactOnDesktop={activeTab === 'prescription'}
+            compactOnDesktop={true}
           />
           <div key={activeTab} className="animate-tab-fade">
             {activeTab === 'prescription' && (
@@ -596,7 +597,7 @@ export default function App() {
                 aria-label="Fechar instruções de instalação"
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
               >
-                ✕
+                <Icon name="close" size={18} />
               </button>
             </div>
             <div className="space-y-3 text-xs leading-relaxed text-[var(--text-secondary)]">

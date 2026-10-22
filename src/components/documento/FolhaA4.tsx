@@ -42,6 +42,8 @@ export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
   const molduraRef = useRef<HTMLDivElement>(null);
   const folhaRef = useRef<HTMLDivElement | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [alturaNatural, setAlturaNatural] = useState<number>(0);
+  const [inspecaoReal, setInspecaoReal] = useState(false);
 
   const largura = larguraFolhaPx(orientacao);
   const altura = alturaFolhaPx(orientacao);
@@ -54,13 +56,21 @@ export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
     }
     const medir = () => {
       const disponivel = moldura.clientWidth;
-      if (disponivel > 0) setZoom(Math.min(1, disponivel / largura));
+      if (disponivel > 0) {
+        setZoom(Math.min(1, Number((disponivel / largura).toFixed(4))));
+      }
+      if (folhaRef.current) {
+        setAlturaNatural(folhaRef.current.offsetHeight || altura);
+      }
     };
     medir();
     const observador = new ResizeObserver(medir);
     observador.observe(moldura);
+    if (folhaRef.current) {
+      observador.observe(folhaRef.current);
+    }
     return () => observador.disconnect();
-  }, [ajustarALargura, largura]);
+  }, [ajustarALargura, largura, altura, children]);
 
   // Impressão fiel: na hora de imprimir, uma cópia da folha vira o único
   // conteúdo da página, em tamanho real e sem margens do navegador.
@@ -85,23 +95,49 @@ export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
     else if (ref) ref.current = no;
   };
 
+  const escalaEfetiva = inspecaoReal ? 1 : zoom;
+  const usandoEscalaReduzida = ajustarALargura && escalaEfetiva < 1;
+  const alturaMoldura = usandoEscalaReduzida
+    ? Math.ceil((alturaNatural || altura) * escalaEfetiva)
+    : undefined;
+
   return (
-    <div
-      ref={molduraRef}
-      className={`w-full ${ajustarALargura ? 'overflow-hidden' : 'overflow-x-auto custom-scrollbar'}`}
-    >
+    <div className="relative w-full group/folha">
+      {ajustarALargura && zoom < 0.92 && (
+        <div className="no-print absolute top-2.5 right-2.5 z-20 flex items-center gap-1 rounded-lg bg-slate-900/80 backdrop-blur-xs px-2 py-1 text-[11px] font-semibold text-white shadow-sm opacity-85 hover:opacity-100 transition-opacity">
+          <span className="clinical-tabular-nums text-slate-300 pr-1 border-r border-white/15">
+            {Math.round(escalaEfetiva * 100)}%
+          </span>
+          <button
+            type="button"
+            onClick={() => setInspecaoReal((v) => !v)}
+            className="px-1.5 py-0.5 rounded hover:bg-white/15 text-sky-300 font-bold cursor-pointer transition-colors"
+            title={inspecaoReal ? 'Ajustar folha à largura do painel' : 'Inspecionar folha em tamanho real (100%)'}
+          >
+            {inspecaoReal ? 'Ajustar' : '100%'}
+          </button>
+        </div>
+      )}
       <div
-        ref={atribuirRef}
-        id={id}
-        className={`folha-a4 paper-sheet-floating ${orientacao === 'landscape' ? 'folha-a4--paisagem' : ''} ${className}`}
-        style={{
-          width: `${largura}px`,
-          minHeight: `${altura}px`,
-          zoom,
-          marginInline: 'auto'
-        }}
+        ref={molduraRef}
+        className={`w-full ${ajustarALargura && !inspecaoReal ? 'overflow-hidden' : 'overflow-x-auto custom-scrollbar'}`}
+        style={alturaMoldura ? { height: `${alturaMoldura}px` } : undefined}
       >
-        {children}
+        <div
+          ref={atribuirRef}
+          id={id}
+          className={`folha-a4 paper-sheet-floating ${orientacao === 'landscape' ? 'folha-a4--paisagem' : ''} ${className}`}
+          style={{
+            width: `${largura}px`,
+            minHeight: `${altura}px`,
+            transform: usandoEscalaReduzida ? `scale(${escalaEfetiva})` : undefined,
+            transformOrigin: usandoEscalaReduzida ? 'top left' : undefined,
+            marginInline: usandoEscalaReduzida ? 0 : 'auto',
+            WebkitFontSmoothing: 'antialiased',
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

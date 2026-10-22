@@ -17,7 +17,7 @@ import {
   User,
   Hash,
   Send
-} from 'lucide-react';
+} from './Icon';
 import { MedicalCertificate, MedicalReferral, Patient, DoctorProfile } from '../types';
 import { CidSearchBar } from './CidSearchBar';
 import { COMMON_CID10, CIDItem } from '../data/cidCatalog';

@@ -43,7 +43,7 @@ export function formatarReceitaCopiaTexto(
   if (items.length === 0) return '';
   let text = '';
   regimesComItens.forEach((regime) => {
-    text += `📋 ${REGIME_INFO[regime].tituloTexto}\n------------------------------------\n`;
+    text += `${REGIME_INFO[regime].tituloTexto}\n------------------------------------\n`;
     porRegime[regime].forEach((it, idx) => {
       text += `${idx + 1}. ${it.name} (${it.route})\n   Qtd: ${it.quantity}\n   Posologia: ${it.instructions}\n\n`;
     });
@@ -69,19 +69,19 @@ export function formatarReceitaWhatsAppTexto(params: {
   if (items.length === 0) return '';
 
   const doctorLine = doctor?.name?.trim()
-    ? `👨‍⚕️ *${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n`
-    : '👨‍⚕️ *Receituário Médico*\n';
+    ? `*${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n`
+    : '*Receituário Médico*\n';
   const patientLine = patient?.name?.trim()
-    ? `👤 *Paciente:* ${patient.name.trim()}${patient?.weightKg && patient.weightKg > 0 ? ` (${patient.weightKg} kg)` : ''}\n`
+    ? `*Paciente:* ${patient.name.trim()}${patient?.weightKg && patient.weightKg > 0 ? ` (${patient.weightKg} kg)` : ''}\n`
     : '';
-  const dateLine = `📅 *Data:* ${new Date().toLocaleDateString('pt-BR')}\n`;
+  const dateLine = `*Data:* ${new Date().toLocaleDateString('pt-BR')}\n`;
 
-  let text = `📋 *RECEITUÁRIO MÉDICO DIGITAL*\n${doctorLine}${patientLine}${dateLine}------------------------------------\n`;
+  let text = `*RECEITUÁRIO MÉDICO DIGITAL*\n${doctorLine}${patientLine}${dateLine}------------------------------------\n`;
 
   regimesComItens.forEach((regime) => {
-    text += `\n💊 *${REGIME_INFO[regime].tituloTexto}:*\n`;
+    text += `\n*${REGIME_INFO[regime].tituloTexto}:*\n`;
     porRegime[regime].forEach((it, idx) => {
-      text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
+      text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   *Qtd:* ${it.quantity}\n   *Posologia:* ${it.instructions}\n`;
     });
   });
 
@@ -89,7 +89,7 @@ export function formatarReceitaWhatsAppTexto(params: {
   if (avisoNotif) {
     text += `\n${avisoNotif}\n`;
   }
-  text += `\n------------------------------------\n⚠️ _Documento de orientação terapêutica emitido pelo médico. Siga as orientações e horários informados. Para medicamentos controlados e antibióticos, a via da farmácia fica retida na dispensação._`;
+  text += `\n------------------------------------\n_Documento de orientação terapêutica emitido pelo médico. Siga as orientações e horários informados. Para medicamentos controlados e antibióticos, a via da farmácia fica retida na dispensação._`;
   return text;
 }
 
@@ -104,19 +104,19 @@ export function formatarAtestadoWhatsAppTexto(
   const pName = certificate.patientName?.trim() || patient?.name?.trim() || 'Paciente';
   const dateStr = certificate.date || new Date().toLocaleDateString('pt-BR');
   const docLine = doctor?.name?.trim()
-    ? `👨‍⚕️ *${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n`
+    ? `*${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n`
     : '';
 
-  let msg = `📋 *ATESTADO MÉDICO DIGITAL*\n${docLine}👤 *Paciente:* ${pName}\n📅 *Data:* ${dateStr}\n------------------------------------\n\n`;
+  let msg = `*ATESTADO MÉDICO DIGITAL*\n${docLine}*Paciente:* ${pName}\n*Data:* ${dateStr}\n------------------------------------\n\n`;
   msg += `Atesto para os devidos fins que o(a) paciente acima identificado(a) esteve sob atendimento médico nesta data (${dateStr}).\n\n`;
   if (certificate.daysOff > 0) {
-    msg += `👉 *Recomendação:* Repouso e afastamento de suas atividades por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
+    msg += `*Recomendação:* Repouso e afastamento de suas atividades por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
   }
   if (certificate.includeCID && certificate.cid10Code) {
-    msg += `📌 *CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''}\n\n`;
+    msg += `*CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''}\n\n`;
   }
   if (certificate.observations) {
-    msg += `📝 *Observações:* ${certificate.observations}\n\n`;
+    msg += `*Observações:* ${certificate.observations}\n\n`;
   }
   msg += `------------------------------------\n_Documento emitido conforme Resolução CFM 1.658/2002._`;
   return msg;
@@ -133,17 +133,17 @@ export function formatarEncaminhamentoWhatsAppTexto(
   const pName = referral.patientName?.trim() || patient?.name?.trim() || 'Paciente';
   const dateStr = referral.date || new Date().toLocaleDateString('pt-BR');
   const docLine = doctor?.name?.trim()
-    ? `👨‍⚕️ *${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n`
+    ? `*${doctor.name.trim()}* — CRM ${doctor.crm || '------'}/${doctor.crmState || 'SP'}\n`
     : '';
 
-  let msg = `📋 *ENCAMINHAMENTO MÉDICO DIGITAL*\n${docLine}👤 *Paciente:* ${pName}\n📅 *Data:* ${dateStr}\n------------------------------------\n\n`;
+  let msg = `*ENCAMINHAMENTO MÉDICO DIGITAL*\n${docLine}*Paciente:* ${pName}\n*Data:* ${dateStr}\n------------------------------------\n\n`;
   msg += `Ao(À) Colega da especialidade *${referral.destinationSpecialty || 'Especialista'}*:\n\n`;
   msg += `Encaminho o(a) paciente para avaliação e conduta clínica especializada.\n\n`;
   if (referral.reason) {
-    msg += `📌 *Motivo / Hipótese Diagnóstica:* ${referral.reason}\n\n`;
+    msg += `*Motivo / Hipótese Diagnóstica:* ${referral.reason}\n\n`;
   }
   if (referral.clinicalSummary) {
-    msg += `📝 *Resumo Clínico & Condutas Prévias:* ${referral.clinicalSummary}\n\n`;
+    msg += `*Resumo Clínico & Condutas Prévias:* ${referral.clinicalSummary}\n\n`;
   }
   msg += `------------------------------------\n_PrescMed — Referência e Contrarreferência Ambulatorial_`;
   return msg;
@@ -184,12 +184,12 @@ export function formatarDocumentoPreviewTexto(params: {
   if (!isConfigured) return '';
 
   const dateStr = emissao.toLocaleDateString('pt-BR');
-  const docLine = `👨‍⚕️ *${identidade.medico.nome}* — ${identidade.medico.registro}\n`;
+  const docLine = `*${identidade.medico.nome}* — ${identidade.medico.registro}\n`;
   const patientLine =
     patientName !== 'Não identificado'
-      ? `👤 *Paciente:* ${patientName}${patientWeight ? ` (${patientWeight} kg)` : ''}\n`
+      ? `*Paciente:* ${patientName}${patientWeight ? ` (${patientWeight} kg)` : ''}\n`
       : '';
-  const header = `📋 *DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}📅 *Data:* ${dateStr}\n------------------------------------\n`;
+  const header = `*DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}*Data:* ${dateStr}\n------------------------------------\n`;
   const assinaturaTexto = `_${identidade.medico.nome} — ${identidade.medico.registro}_`;
 
   if (ehReceita) {
@@ -200,55 +200,55 @@ export function formatarDocumentoPreviewTexto(params: {
         : docType === 'antimicrobial_prescription'
           ? 'RECEITUÁRIO MÉDICO — ANTIMICROBIANO (2 VIAS • VÁLIDA POR 10 DIAS • RDC 471/2021)'
           : 'RECEITUÁRIO MÉDICO';
-    let text = `${header}💊 *${docLabel}:*\n`;
+    let text = `${header}*${docLabel}:*\n`;
     itensDaFolha.forEach((it, idx) => {
-      text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   📦 *Qtd:* ${it.quantity}\n   👉 *Posologia:* ${it.instructions}\n`;
+      text += `\n*${idx + 1}. ${it.name}* (${it.route})\n   *Qtd:* ${it.quantity}\n   *Posologia:* ${it.instructions}\n`;
     });
     const avisoNotif = avisoTextoNotificacao(itensDaFolha);
     if (avisoNotif) {
       text += `\n${avisoNotif}\n`;
     }
-    text += `\n------------------------------------\n⚠️ _Siga as instruções médicas e os horários informados._`;
+    text += `\n------------------------------------\n_Siga as instruções médicas e os horários informados._`;
     return text;
   }
 
   if (docType === 'certificate') {
-    let text = `${header}📄 *ATESTADO MÉDICO*\n\n`;
+    let text = `${header}*ATESTADO MÉDICO*\n\n`;
     text += `Atesto para os devidos fins que o(a) paciente *${patientName}* esteve sob atendimento médico nesta data (${dateStr}).\n\n`;
     if (certificate?.daysOff) {
-      text += `👉 *Recomendação:* Repouso e afastamento das atividades laborais por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
+      text += `*Recomendação:* Repouso e afastamento das atividades laborais por *${certificate.daysOff} dia(s)* a contar desta data.\n\n`;
     }
     if (certificate?.includeCID && certificate.cid10Code) {
-      text += `📌 *CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ' - ' + certificate.cid10Description : ''}\n\n`;
+      text += `*CID-10:* ${certificate.cid10Code}${certificate.cid10Description ? ' - ' + certificate.cid10Description : ''}\n\n`;
     }
     if (certificate?.observations) {
-      text += `📝 *Observação:* ${certificate.observations}\n\n`;
+      text += `*Observação:* ${certificate.observations}\n\n`;
     }
     text += `------------------------------------\n${assinaturaTexto}`;
     return text;
   }
 
   if (docType === 'referral') {
-    let text = `${header}🩺 *ENCAMINHAMENTO MÉDICO*\n\n`;
+    let text = `${header}*ENCAMINHAMENTO MÉDICO*\n\n`;
     text += `Ao(À) Colega Especialista em *${referral?.destinationSpecialty || 'Medicina'}*:\n\n`;
     text += `Encaminho o(a) paciente *${patientName}* para avaliação e conduta clínica.\n\n`;
     if (referral?.reason) {
-      text += `📌 *Motivo / Hipótese:* ${referral.reason}\n\n`;
+      text += `*Motivo / Hipótese:* ${referral.reason}\n\n`;
     }
     if (referral?.clinicalSummary) {
-      text += `📝 *Resumo Clínico:* ${referral.clinicalSummary}\n\n`;
+      text += `*Resumo Clínico:* ${referral.clinicalSummary}\n\n`;
     }
     text += `------------------------------------\n${assinaturaTexto}`;
     return text;
   }
 
   if (exams.length === 0) return '';
-  let text = `${header}🧪 *SOLICITAÇÃO DE EXAMES COMPLEMENTARES*\n\n`;
+  let text = `${header}*SOLICITAÇÃO DE EXAMES COMPLEMENTARES*\n\n`;
   exams.forEach((ex) => {
     text += `• ${ex.name}\n`;
   });
   if (examIndication) {
-    text += `\n📌 *Indicação Clínica:* ${examIndication}\n`;
+    text += `\n*Indicação Clínica:* ${examIndication}\n`;
   }
   text += `\n------------------------------------\n${assinaturaTexto}`;
   return text;

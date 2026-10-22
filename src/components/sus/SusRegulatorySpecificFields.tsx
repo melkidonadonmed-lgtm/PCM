@@ -1,11 +1,32 @@
 import React from 'react';
 import { SusDocumentItem, SusFilledFormData } from '../../types';
 import { CAMPO_SUS, ROTULO_SUS } from './SusCommonIdentityFields';
+import { COMMON_CID10 } from '../../data/cidCatalog';
 import { Icon } from '../Icon';
 
 export const MESES_DA_LME = ['1º', '2º', '3º', '4º', '5º', '6º'];
 export const linhaVaziaDaLme = () => ({ name: '', quantities: MESES_DA_LME.map(() => '') });
 export type LmeMedicationRow = ReturnType<typeof linhaVaziaDaLme>;
+
+/** Descrições canônicas dos códigos CID-10 habituais do catálogo SUS. */
+const DESCRICOES_CID_PADRAO: Record<string, string> = {
+  'M54.5': 'Dor lombar baixa (Lombalgia)',
+  I10: 'Hipertensão essencial (primária)',
+  'M05.8': 'Outras artrites reumatoides soropositivas',
+  'Z12.4': 'Exame especial de rastreamento de neoplasia do colo do útero',
+  A90: 'Dengue (dengue clássico)',
+  'N87.2': 'Displasia cervical grave, não classificada em outra parte',
+  'Z12.3': 'Exame especial de rastreamento de neoplasia da mama',
+  'A15.0': 'Tuberculose pulmonar, com confirmação por exame microscópico da expectoração',
+};
+
+function buscarDescricaoCid(codigo?: string): string {
+  const limpo = (codigo || '').trim().toUpperCase();
+  if (!limpo) return '';
+  if (DESCRICOES_CID_PADRAO[limpo]) return DESCRICOES_CID_PADRAO[limpo];
+  const encontrado = COMMON_CID10.find((c) => c.code.toUpperCase() === limpo);
+  return encontrado?.description || '';
+}
 
 interface SusRegulatorySpecificFieldsProps {
   darkMode: boolean;
@@ -14,6 +35,7 @@ interface SusRegulatorySpecificFieldsProps {
   linhasDaLme: LmeMedicationRow[];
   onFieldChange: <K extends keyof SusFilledFormData>(field: K, value: SusFilledFormData[K] | string) => void;
   onAlterarLinhaDaLme: (indice: number, alterar: (linha: LmeMedicationRow) => LmeMedicationRow) => void;
+  onResetDoc?: () => void;
 }
 
 export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsProps> = ({
@@ -23,7 +45,26 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
   linhasDaLme,
   onFieldChange,
   onAlterarLinhaDaLme,
+  onResetDoc,
 }) => {
+  const handleCidCodeChange = (rawCode: string) => {
+    onFieldChange('cid10Code', rawCode);
+    const descSugerida = buscarDescricaoCid(rawCode);
+    if (descSugerida && !formData.cid10Description?.trim()) {
+      onFieldChange('cid10Description', descSugerida);
+    }
+  };
+
+  const handleApplyDefaultCid = () => {
+    const defaultCode = currentDocItem.defaultCid10 || '';
+    if (!defaultCode) return;
+    onFieldChange('cid10Code', defaultCode);
+    const descSugerida = buscarDescricaoCid(defaultCode);
+    if (descSugerida && !formData.cid10Description?.trim()) {
+      onFieldChange('cid10Description', descSugerida);
+    }
+  };
+
   return (
     <div
       className="tactile-card p-4 rounded-2xl border"
@@ -32,16 +73,36 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
         borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
       }}
     >
-      <div className="flex items-center justify-between mb-3 border-b border-[var(--border-subtle)] pb-2.5">
+      <datalist id="sus-cid10-datalist">
+        {COMMON_CID10.map((item) => (
+          <option key={item.code} value={item.code}>
+            {item.description}
+          </option>
+        ))}
+      </datalist>
+
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-[var(--border-subtle)] pb-2.5">
         <div className="flex items-center gap-2">
           <Icon name="auto_awesome" className="w-4 h-4 text-sky-600 dark:text-sky-400" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
             3. Dados Regulatórios • {currentDocItem.shortTitle}
           </h3>
         </div>
-        <span className="text-xs font-mono px-2 py-0.5 rounded bg-[var(--surface-inset)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
-          {currentDocItem.complexity}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-[var(--surface-inset)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
+            {currentDocItem.complexity}
+          </span>
+          {onResetDoc && (
+            <button
+              type="button"
+              onClick={onResetDoc}
+              className="text-xs font-semibold px-2 py-0.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-rose-600 cursor-pointer transition"
+              title="Limpar os dados clínicos deste documento"
+            >
+              Limpar campos
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-3 text-xs">
@@ -52,27 +113,29 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
           }`}
         >
           <div className={currentDocItem.id === 'apac_principal' ? 'col-span-4 sm:col-span-3' : 'col-span-4'}>
-            <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+            <label htmlFor="sus-sigtap-code" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
               Código SIGTAP
             </label>
             <input
+              id="sus-sigtap-code"
               type="text"
-              value={formData.sigtapCode}
+              value={formData.sigtapCode || ''}
               onChange={(e) => onFieldChange('sigtapCode', e.target.value)}
               placeholder="00.00.00.000-0"
-              className="w-full px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+              className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
             />
           </div>
           <div className={currentDocItem.id === 'apac_principal' ? 'col-span-5 sm:col-span-7' : 'col-span-8'}>
-            <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+            <label htmlFor="sus-sigtap-name" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
               Descrição do Procedimento SIGTAP
             </label>
             <input
+              id="sus-sigtap-name"
               type="text"
-              value={formData.procedureName}
+              value={formData.procedureName || ''}
               onChange={(e) => onFieldChange('procedureName', e.target.value)}
               placeholder="Nome do procedimento oficial"
-              className="w-full px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
+              className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
             />
           </div>
           {currentDocItem.id === 'apac_principal' && (
@@ -87,7 +150,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                 value={formData.procedureQuantity || ''}
                 onChange={(e) => onFieldChange('procedureQuantity', e.target.value)}
                 placeholder="Ex.: 01"
-                className="w-full px-2 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-info clinical-tabular-nums"
+                className="w-full min-h-[38px] px-2 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-info clinical-tabular-nums"
               />
             </div>
           )}
@@ -105,6 +168,8 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                     onFieldChange('sigtapCode', currentDocItem.defaultSigtap);
                   if (currentDocItem.defaultProcedure)
                     onFieldChange('procedureName', currentDocItem.defaultProcedure);
+                  if (currentDocItem.id === 'apac_principal' && !formData.procedureQuantity?.trim())
+                    onFieldChange('procedureQuantity', '01');
                 }}
                 className="font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
               >
@@ -115,27 +180,30 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
 
         <div className="grid grid-cols-12 gap-2">
           <div className="col-span-4 sm:col-span-3">
-            <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+            <label htmlFor="sus-cid10-code" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
               CID-10 Principal
             </label>
             <input
+              id="sus-cid10-code"
               type="text"
-              value={formData.cid10Code}
-              onChange={(e) => onFieldChange('cid10Code', e.target.value)}
+              list="sus-cid10-datalist"
+              value={formData.cid10Code || ''}
+              onChange={(e) => handleCidCodeChange(e.target.value)}
               placeholder="Código"
-              className="w-full px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase font-mono font-bold"
+              className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase font-mono font-bold"
             />
           </div>
           <div className="col-span-8 sm:col-span-9">
-            <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+            <label htmlFor="sus-cid10-desc" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
               Descrição do Diagnóstico (CID-10)
             </label>
             <input
+              id="sus-cid10-desc"
               type="text"
               value={formData.cid10Description || ''}
               onChange={(e) => onFieldChange('cid10Description', e.target.value)}
-              placeholder="Descrição diagnóstica"
-              className="w-full px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+              placeholder="Descrição diagnóstica (ex.: Dor lombar baixa)"
+              className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
             />
           </div>
         </div>
@@ -145,70 +213,229 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
             CID-10 em branco.{' '}
             <button
               type="button"
-              onClick={() => onFieldChange('cid10Code', currentDocItem.defaultCid10 || '')}
+              onClick={handleApplyDefaultCid}
               className="font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
             >
-              Usar o código habitual deste documento ({currentDocItem.defaultCid10})
+              Usar o código habitual deste documento ({currentDocItem.defaultCid10}
+              {buscarDescricaoCid(currentDocItem.defaultCid10)
+                ? ` — ${buscarDescricaoCid(currentDocItem.defaultCid10)}`
+                : ''}
+              )
             </button>
           </p>
         )}
 
-        {/* Campos Específicos para GAL / LACEN */}
+        {/* Campos Específicos para GAL / LACEN (Geral e TRM-TB) */}
         {currentDocItem.category === 'gal' && (
-          <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
-            <div>
-              <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
-                Nº da Notificação SINAN (Obrigatório GAL)
-              </label>
-              <input
-                type="text"
-                value={formData.sinanNumber || ''}
-                onChange={(e) => onFieldChange('sinanNumber', e.target.value)}
-                placeholder="Número SINAN (7 dígitos)"
-                className="w-full px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
-              />
+          <div className="space-y-2.5 p-3 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label htmlFor="sus-sinan" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                  Nº da Notificação SINAN (Obrigatório GAL)
+                </label>
+                <input
+                  id="sus-sinan"
+                  type="text"
+                  inputMode="numeric"
+                  value={formData.sinanNumber || ''}
+                  onChange={(e) => onFieldChange('sinanNumber', e.target.value)}
+                  placeholder="Número SINAN (7 dígitos)"
+                  className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+                />
+              </div>
+              <div>
+                <label htmlFor="sus-symptoms-date" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                  Início dos Primeiros Sintomas (D1)
+                </label>
+                <input
+                  id="sus-symptoms-date"
+                  type="text"
+                  value={formData.symptomsStartDate || ''}
+                  onChange={(e) => onFieldChange('symptomsStartDate', e.target.value)}
+                  placeholder="DD/MM/AAAA"
+                  className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
-                Início dos Primeiros Sintomas (D1)
-              </label>
-              <input
-                type="text"
-                value={formData.symptomsStartDate || ''}
-                onChange={(e) => onFieldChange('symptomsStartDate', e.target.value)}
-                placeholder="DD/MM/AAAA"
-                className="w-full px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
-              />
+
+            <div className={currentDocItem.id === 'gal_trm_tb' ? 'grid grid-cols-1 sm:grid-cols-2 gap-2' : ''}>
+              <div>
+                <label htmlFor="sus-specimen" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                  Material Biológico / Amostra Coletada
+                </label>
+                <input
+                  id="sus-specimen"
+                  type="text"
+                  value={formData.specimenType || ''}
+                  onChange={(e) => onFieldChange('specimenType', e.target.value)}
+                  placeholder={currentDocItem.id === 'gal_trm_tb' ? 'Ex.: Escarro (1ª amostra), LBA...' : 'Ex.: Soro, Sangue Total, Swab, LCR...'}
+                  className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                />
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {(currentDocItem.id === 'gal_trm_tb'
+                    ? ['Escarro espontâneo', 'Escarro induzido', 'Lavado broncoalveolar (LBA)', 'Líquido pleural']
+                    : ['Soro', 'Sangue Total', 'Plasma', 'Swab Nasofaríngeo', 'LCR', 'Urina']
+                  ).map((amostra) => (
+                    <button
+                      key={amostra}
+                      type="button"
+                      onClick={() => onFieldChange('specimenType', amostra)}
+                      className="px-2 py-0.5 rounded-md text-xs font-medium bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-[var(--text-main)] cursor-pointer transition"
+                    >
+                      {amostra}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {currentDocItem.id === 'gal_trm_tb' && (
+                <div>
+                  <label htmlFor="sus-tb-duration" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                    Duração da Tosse / Sintomas Respiratórios
+                  </label>
+                  <input
+                    id="sus-tb-duration"
+                    type="text"
+                    value={formData.tuberculosisSymptomsDuration || ''}
+                    onChange={(e) => onFieldChange('tuberculosisSymptomsDuration', e.target.value)}
+                    placeholder="Ex.: 3 semanas, 1 mês..."
+                    className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                  />
+                </div>
+              )}
             </div>
+          </div>
+        )}
+
+        {/* Campos Específicos para SISCAN (Citopatológico, Mamografia e Histopatológico) */}
+        {currentDocItem.category === 'siscan' && (
+          <div className="space-y-2.5 p-3 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
+            {currentDocItem.id === 'siscan_citopatologico' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label htmlFor="sus-dum" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                    Data da Última Menstruação (DUM)
+                  </label>
+                  <input
+                    id="sus-dum"
+                    type="text"
+                    value={formData.gynecologyDum || ''}
+                    onChange={(e) => onFieldChange('gynecologyDum', e.target.value)}
+                    placeholder="DD/MM/AAAA ou Menopausa"
+                    className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="sus-prev-cito" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                    Exame Citopatológico Anterior (Ano / Resultado)
+                  </label>
+                  <input
+                    id="sus-prev-cito"
+                    type="text"
+                    value={formData.gynecologyPreviousExam || ''}
+                    onChange={(e) => onFieldChange('gynecologyPreviousExam', e.target.value)}
+                    placeholder="Ex.: 2024 (Normal)"
+                    className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                  />
+                </div>
+              </div>
+            )}
+
+            {currentDocItem.id === 'siscan_mamografia' && (
+              <div>
+                <label htmlFor="sus-prev-mamo" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                  Mamografia Anterior (Ano / BI-RADS)
+                </label>
+                <input
+                  id="sus-prev-mamo"
+                  type="text"
+                  value={formData.gynecologyPreviousExam || ''}
+                  onChange={(e) => onFieldChange('gynecologyPreviousExam', e.target.value)}
+                  placeholder="Ex.: 2024 — BI-RADS 2"
+                  className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                />
+              </div>
+            )}
+
+            {currentDocItem.id === 'siscan_histopatologico' && (
+              <div>
+                <label htmlFor="sus-histo-specimen" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                  Topografia / Lateralidade da Amostra (Biópsia)
+                </label>
+                <input
+                  id="sus-histo-specimen"
+                  type="text"
+                  value={formData.specimenType || ''}
+                  onChange={(e) => onFieldChange('specimenType', e.target.value)}
+                  placeholder="Ex.: Colo uterino (12h), Mama direita (QSE)..."
+                  className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                />
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {[
+                    'Colo do útero — Biópsia',
+                    'Colo do útero — CAF / LEEP',
+                    'Endométrio',
+                    'Mama Direita — Core Biopsy',
+                    'Mama Esquerda — Core Biopsy',
+                  ].map((sitio) => (
+                    <button
+                      key={sitio}
+                      type="button"
+                      onClick={() => onFieldChange('specimenType', sitio)}
+                      className="px-2 py-0.5 rounded-md text-xs font-medium bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-[var(--text-main)] cursor-pointer transition"
+                    >
+                      {sitio}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Campos Específicos para APAC Complementar */}
         {currentDocItem.id === 'apac_complementar' && (
-          <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-3 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
             <div>
-              <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+              <label htmlFor="sus-creatinina" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
                 Creatinina Sérica (mg/dL)
               </label>
               <input
+                id="sus-creatinina"
                 type="text"
+                inputMode="decimal"
                 value={formData.renalCreatinine || ''}
                 onChange={(e) => onFieldChange('renalCreatinine', e.target.value)}
                 placeholder="Ex.: 0,9"
-                className="w-full px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
-                Taxa de Filtração Glomerular (eTFG)
+              <label htmlFor="sus-etfg" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                Taxa de Filtração (eTFG)
               </label>
               <input
+                id="sus-etfg"
                 type="text"
                 value={formData.renalEtfg || ''}
                 onChange={(e) => onFieldChange('renalEtfg', e.target.value)}
                 placeholder="mL/min/1,73m²"
-                className="w-full px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
               />
+            </div>
+            <div>
+              <label htmlFor="sus-contraste" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
+                Meio de Contraste EV
+              </label>
+              <select
+                id="sus-contraste"
+                value={formData.isContrastNeeded === false ? 'nao' : 'sim'}
+                onChange={(e) => onFieldChange('isContrastNeeded', e.target.value === 'sim')}
+                className={CAMPO_SUS}
+              >
+                <option value="sim">Sim (Indicado)</option>
+                <option value="nao">Não indicado</option>
+              </select>
             </div>
           </div>
         )}

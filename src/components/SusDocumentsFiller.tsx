@@ -26,6 +26,7 @@ import {
   SusRegulatorySpecificFields,
   linhaVaziaDaLme,
 } from './sus/SusRegulatorySpecificFields';
+import { SusInteractiveVectorSheet } from './sus/SusInteractiveVectorSheet';
 
 const makeIcon = (name: IconName) => ({ className = '', size }: { className?: string; size?: number }) => (
   <Icon name={name} size={size} className={className} />
@@ -119,15 +120,19 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     return map;
   });
 
-  // Dados comuns compartilhados (Médico e Paciente) — sem cidades ou UFs inventadas
+  // Rastreia atualizações internas do paciente para não sobrescrever espaços durante a digitação
+  const isInternalPatientUpdateRef = useRef(false);
+  const lastPatientIdRef = useRef(patient?.id || '');
+
+  // Dados comuns compartilhados (Médico e Paciente) — preserva espaços durante a digitação
   const [commonData, setCommonData] = useState(() => ({
-    doctorName: doctor?.name?.trim() || '',
-    doctorCrm: doctor?.crm?.trim() || '',
+    doctorName: doctor?.name ?? '',
+    doctorCrm: doctor?.crm ?? '',
     doctorCrmState: doctor?.crmState || 'SP',
-    doctorSpecialty: doctor?.specialty?.trim() || 'Clínica Médica',
+    doctorSpecialty: doctor?.specialty || 'Clínica Médica',
     doctorCnes: doctor?.cnes || activeContext?.cnes || '',
     doctorClinicName:
-      activeContext?.clinicName || doctor?.clinicName?.trim() || 'Unidade Básica de Saúde',
+      activeContext?.clinicName || doctor?.clinicName || 'Unidade Básica de Saúde',
     doctorCpf: doctor?.cpf || '',
     doctorCns: doctor?.cns || '',
 
@@ -139,52 +144,81 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     patientHeightCm: '',
     patientEmail: '',
 
-    patientName: patient?.name?.trim() || '',
-    patientCns: patient?.cns?.trim() || '',
-    patientCpf: patient?.documentNumber?.trim() || '',
-    patientBirthDate: patient?.birthDate?.trim() || '',
-    patientAge: patient?.ageText?.trim() || '',
+    patientName: patient?.name ?? '',
+    patientCns: patient?.cns ?? '',
+    patientCpf: patient?.documentNumber ?? '',
+    patientBirthDate: patient?.birthDate ?? '',
+    patientAge: patient?.ageText ?? '',
     patientGender: patient?.gender || 'female',
-    patientMotherName: patient?.motherName?.trim() || '',
-    patientPhone: patient?.phone?.trim() || '',
-    patientAddress: patient?.address?.trim() || '',
-    patientNeighborhood: patient?.neighborhood?.trim() || '',
-    patientCity: patient?.city?.trim() || '',
-    patientState: patient?.state || '',
-    patientCep: patient?.cep?.trim() || '',
+    patientMotherName: patient?.motherName ?? '',
+    patientPhone: patient?.phone ?? '',
+    patientAddress: patient?.address ?? '',
+    patientNeighborhood: patient?.neighborhood ?? '',
+    patientCity: patient?.city ?? '',
+    patientState: patient?.state ?? '',
+    patientCep: patient?.cep ?? '',
   }));
 
-  // Sincroniza dados comuns se alterados externamente
+  // Sincroniza dados do médico/unidade apenas quando alterados externamente (Perfil ou Posto de Trabalho)
   useEffect(() => {
     setCommonData((prev) => ({
       ...prev,
-      doctorName: doctor?.name?.trim() || prev.doctorName,
-      doctorCrm: doctor?.crm?.trim() || prev.doctorCrm,
+      doctorName: doctor?.name ?? prev.doctorName,
+      doctorCrm: doctor?.crm ?? prev.doctorCrm,
       doctorCrmState: doctor?.crmState || prev.doctorCrmState,
-      doctorSpecialty: doctor?.specialty?.trim() || prev.doctorSpecialty,
+      doctorSpecialty: doctor?.specialty || prev.doctorSpecialty,
       doctorCnes: doctor?.cnes || activeContext?.cnes || prev.doctorCnes,
       doctorClinicName:
-        activeContext?.clinicName || doctor?.clinicName?.trim() || prev.doctorClinicName,
-      doctorCpf: doctor?.cpf || prev.doctorCpf,
-      doctorCns: doctor?.cns || prev.doctorCns,
-      patientSex: patient?.sex || prev.patientSex,
-      patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : prev.patientWeightKg,
-
-      patientName: patient?.name?.trim() || prev.patientName,
-      patientCns: patient?.cns?.trim() || prev.patientCns,
-      patientCpf: patient?.documentNumber?.trim() || prev.patientCpf,
-      patientBirthDate: patient?.birthDate?.trim() || prev.patientBirthDate,
-      patientAge: patient?.ageText?.trim() || prev.patientAge,
-      patientGender: patient?.gender || prev.patientGender,
-      patientMotherName: patient?.motherName?.trim() || prev.patientMotherName,
-      patientPhone: patient?.phone?.trim() || prev.patientPhone,
-      patientAddress: patient?.address?.trim() || prev.patientAddress,
-      patientNeighborhood: patient?.neighborhood?.trim() || prev.patientNeighborhood,
-      patientCity: patient?.city?.trim() || prev.patientCity,
-      patientState: patient?.state || prev.patientState,
-      patientCep: patient?.cep?.trim() || prev.patientCep,
+        activeContext?.clinicName || doctor?.clinicName || prev.doctorClinicName,
+      doctorCpf: doctor?.cpf ?? prev.doctorCpf,
+      doctorCns: doctor?.cns ?? prev.doctorCns,
     }));
-  }, [doctor, patient, activeContext]);
+  }, [doctor, activeContext]);
+
+  // Sincroniza dados do paciente apenas quando alterados externamente (ex.: Modal do Paciente ou Nova Consulta)
+  useEffect(() => {
+    if (isInternalPatientUpdateRef.current) {
+      isInternalPatientUpdateRef.current = false;
+      lastPatientIdRef.current = patient?.id || '';
+      return;
+    }
+
+    const isNewConsultationReset =
+      patient?.id !== lastPatientIdRef.current && !patient?.name && !patient?.documentNumber;
+    lastPatientIdRef.current = patient?.id || '';
+
+    setCommonData((prev) => ({
+      ...prev,
+      patientSex: (patient?.sex || '') as SusFilledFormData['patientSex'],
+      patientRaceColor: isNewConsultationReset ? '' : prev.patientRaceColor,
+      patientEthnicity: isNewConsultationReset ? '' : prev.patientEthnicity,
+      patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : '',
+      patientHeightCm: isNewConsultationReset ? '' : prev.patientHeightCm,
+      patientEmail: isNewConsultationReset ? '' : prev.patientEmail,
+
+      patientName: patient?.name ?? '',
+      patientCns: patient?.cns ?? '',
+      patientCpf: patient?.documentNumber ?? '',
+      patientBirthDate: patient?.birthDate ?? '',
+      patientAge: patient?.ageText ?? '',
+      patientGender: patient?.gender || 'female',
+      patientMotherName: patient?.motherName ?? '',
+      patientPhone: patient?.phone ?? '',
+      patientAddress: patient?.address ?? '',
+      patientNeighborhood: patient?.neighborhood ?? '',
+      patientCity: patient?.city ?? '',
+      patientState: patient?.state ?? '',
+      patientCep: patient?.cep ?? '',
+    }));
+
+    if (isNewConsultationReset) {
+      const cleanMap: Record<string, Partial<SusFilledFormData>> = {};
+      SUS_DOCUMENTS_CATALOG.forEach((d) => {
+        cleanMap[d.id] = camposIniciaisDoDocumento(d);
+      });
+      setDocsSpecificData(cleanMap);
+    }
+  }, [patient]);
 
   // Documento atualmente selecionado para edição dos dados específicos
   const currentDocItem = useMemo(() => {
@@ -250,6 +284,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
   // Feedback Toast
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [modoFolhaSus, setModoFolhaSus] = useState<'padrao' | 'vetorial_interativo'>('vetorial_interativo');
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3200);
@@ -307,9 +342,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
           field === 'patientState' ||
           field === 'patientCep' ||
           field === 'patientBirthDate' ||
-          field === 'patientSex'
+          field === 'patientAge' ||
+          field === 'patientSex' ||
+          field === 'patientWeightKg'
         ) {
           const strVal: string = typeof value === 'string' ? value : '';
+          isInternalPatientUpdateRef.current = true;
           onUpdatePatient({
             ...patient,
             name: field === 'patientName' ? strVal : patient.name,
@@ -323,7 +361,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             state: field === 'patientState' ? strVal : patient.state,
             cep: field === 'patientCep' ? strVal : patient.cep,
             birthDate: field === 'patientBirthDate' ? strVal : patient.birthDate,
+            ageText: field === 'patientAge' ? strVal : patient.ageText,
             sex: field === 'patientSex' ? (strVal === 'M' || strVal === 'F' ? strVal : '') : patient.sex,
+            weightKg:
+              field === 'patientWeightKg'
+                ? parseFloat(strVal.replace(',', '.')) || 0
+                : patient.weightKg,
           });
         }
       }
@@ -336,6 +379,15 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         },
       }));
     }
+  };
+
+  // Ação: Limpar campos clínicos apenas do documento ativo
+  const handleResetActiveDoc = () => {
+    setDocsSpecificData((prev) => ({
+      ...prev,
+      [activeFormDocId]: camposIniciaisDoDocumento(currentDocItem),
+    }));
+    showToast('Campos clínicos do documento limpos.');
   };
 
   // Ação: Copiar Markdown / Laudo Estruturado
@@ -600,6 +652,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
                 linhasDaLme={linhasDaLme}
                 onFieldChange={handleFieldChange}
                 onAlterarLinhaDaLme={alterarLinhaDaLme}
+                onResetDoc={handleResetActiveDoc}
               />
             </div>
 
@@ -703,14 +756,58 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               </div>
 
               {/* Folha Física A4 Prévia (Papel Branco com Tipografia Grafite) */}
-              <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-subtle dark:border-strong">
+              <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-subtle dark:border-strong space-y-2">
+                <div className="no-print flex items-center justify-between gap-2 px-1">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <Icon name="layers" size={14} className="text-sky-600 dark:text-sky-400" />
+                    <span>Padrão de Folha SUS</span>
+                  </span>
+                  <div className="inline-flex items-center gap-1 p-0.5 rounded-lg bg-slate-200/80 dark:bg-slate-900 border border-slate-300/80 dark:border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setModoFolhaSus('vetorial_interativo')}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition cursor-pointer ${
+                        modoFolhaSus === 'vetorial_interativo'
+                          ? 'bg-white dark:bg-[#1E293B] text-sky-700 dark:text-sky-300 shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                      title="Grade Vetorial SIA/SUS 12 colunas com edição direta clicando na folha A4"
+                    >
+                      Grade Vetorial Interativa
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setModoFolhaSus('padrao')}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition cursor-pointer ${
+                        modoFolhaSus === 'padrao'
+                          ? 'bg-white dark:bg-[#1E293B] text-sky-700 dark:text-sky-300 shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                      title={
+                        formularioOficial
+                          ? 'Impresso oficial escaneado do Ministério da Saúde'
+                          : 'Laudo técnico estruturado clássico'
+                      }
+                    >
+                      {formularioOficial ? 'Impresso Oficial MS' : 'Laudo Clássico'}
+                    </button>
+                  </div>
+                </div>
+
                 <FolhaA4
                   ref={folhaSusRef}
                   id="sus-document-print-sheet"
                   imprimivel
-                  className={classeDaFolha(Boolean(formularioOficial))}
+                  className={classeDaFolha(Boolean(formularioOficial && modoFolhaSus === 'padrao'))}
                 >
-                  {formularioOficial ? (
+                  {modoFolhaSus === 'vetorial_interativo' ? (
+                    <SusInteractiveVectorSheet
+                      docItem={currentDocItem}
+                      formData={formData}
+                      timbre={timbreDe(currentDocItem)}
+                      onFieldChange={(key, val) => handleFieldChange(key, val as never)}
+                    />
+                  ) : formularioOficial ? (
                     <FormularioOficialSus formulario={formularioOficial} dados={formData} />
                   ) : (
                     <div

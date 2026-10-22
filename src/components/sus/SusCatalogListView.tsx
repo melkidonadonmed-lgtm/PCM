@@ -57,16 +57,29 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
           </div>
         </div>
 
-        {selectedDocIds.length > 0 && (
-          <button
-            type="button"
-            onClick={onStartFillingMultiple}
-            className="btn-tactile-primary text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer shrink-0 clinical-tabular-nums"
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <a
+            href="/formularios-sus-offline.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold px-3 py-2 min-h-[40px] rounded-xl border border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-[#27354A] text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-[#334155] transition flex items-center gap-2 clinical-tabular-nums"
+            title="Abrir Central Regulatória SUS A4 Vetorial (9 modelos editáveis diretos na folha)"
           >
-            <Icon name="layers" className="w-4 h-4" />
-            <span>Preencher Selecionados ({selectedDocIds.length})</span>
-          </button>
-        )}
+            <Icon name="print" className="w-4 h-4" />
+            <span>Central A4 Vetorial (9 Modelos)</span>
+          </a>
+
+          {selectedDocIds.length > 0 && (
+            <button
+              type="button"
+              onClick={onStartFillingMultiple}
+              className="btn-tactile-primary text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer shrink-0 clinical-tabular-nums"
+            >
+              <Icon name="layers" className="w-4 h-4" />
+              <span>Preencher Selecionados ({selectedDocIds.length})</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filtros e Barra de Busca */}
