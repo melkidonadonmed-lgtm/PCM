@@ -3,6 +3,7 @@ import { PEDIATRIC_MEDICATIONS } from '../data/pediatricMeds';
 import { PediatricMedication, PrescriptionItem, Patient } from '../types';
 import { calculatePediatricDose } from '../utils/doseCalculator';
 import { isSpecialControlOrAntibiotic } from '../utils/isSpecialControlOrAntibiotic';
+import { normalizeText } from '../utils/fuzzySearch';
 import { Icon } from './Icon';
 
 /**
@@ -55,15 +56,39 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
   ];
 
   const filteredMedications = useMemo(() => {
-    return PEDIATRIC_MEDICATIONS.filter(med => {
-      const matchCategory = selectedCategory === 'Todos' || med.category === selectedCategory;
-      const matchSearch = 
-        med.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        med.presentation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        med.observations.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        med.category.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchCategory && matchSearch;
-    });
+    const byCategory = PEDIATRIC_MEDICATIONS.filter(
+      (med) => selectedCategory === 'Todos' || med.category === selectedCategory
+    );
+    const term = normalizeText(searchTerm);
+    if (!term) return byCategory;
+
+    const scored = byCategory
+      .map((med, index) => {
+        const normName = normalizeText(med.name);
+        const normPres = normalizeText(med.presentation);
+        const normCat = normalizeText(med.category);
+        const normObs = normalizeText(med.observations);
+        const isCombo = med.name.includes('+');
+
+        let rank = 0;
+        if (normName.startsWith(term)) {
+          rank = isCombo ? 90 : 100;
+        } else if (normName.split(/\s+/).some((w) => w.startsWith(term))) {
+          rank = isCombo ? 80 : 88;
+        } else if (normName.includes(term)) {
+          rank = isCombo ? 70 : 75;
+        } else if (normPres.includes(term) || normCat.includes(term)) {
+          rank = 50;
+        } else if (normObs.includes(term)) {
+          rank = 30;
+        }
+
+        return { med, rank, index };
+      })
+      .filter((item) => item.rank > 0);
+
+    scored.sort((a, b) => (b.rank !== a.rank ? b.rank - a.rank : a.index - b.index));
+    return scored.map((item) => item.med);
   }, [selectedCategory, searchTerm]);
 
   const handleAddMedication = (med: PediatricMedication) => {

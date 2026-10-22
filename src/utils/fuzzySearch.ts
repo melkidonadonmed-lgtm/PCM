@@ -15,6 +15,88 @@ export const normalizeText = (text: string): string => {
 };
 
 /**
+ * Prefixos de sais e ésteres farmacêuticos que não devem impedir o match direto
+ * pelo nome da substância ativa principal (ex.: "Cloridrato de Metformina" -> "metformina",
+ * "Dipropionato de Beclometasona" -> "beclometasona").
+ */
+const SALT_AND_ESTER_PREFIXES: readonly string[] = [
+  'dipropionato + fosfato de ',
+  'fosfato dissodico de ',
+  'succinato sodico de ',
+  'fosfato sodico de ',
+  'hemitartarato de ',
+  'dicloridrato de ',
+  'butilbrometo de ',
+  'hemifumarato de ',
+  'dipropionato de ',
+  'cloridrato de ',
+  'bissulfato de ',
+  'propionato de ',
+  'tartarato de ',
+  'succinato de ',
+  'besilato de ',
+  'fumarato de ',
+  'valerato de ',
+  'maleato de ',
+  'brometo de ',
+  'oxalato de ',
+  'fosfato de ',
+  'hiclato de ',
+  'furoato de ',
+  'acetato de ',
+  'citrato de ',
+  'mucato de ',
+];
+
+/**
+ * Remove prefixos de sal/éster farmacêutico mantendo minerais onde o sal é o próprio nome
+ * usual de busca (ex.: "sulfato ferroso", "sulfato de zinco", "cloreto de sodio").
+ */
+export const stripSaltPrefix = (normalizedText: string): string => {
+  let clean = normalizedText.trim();
+  for (const prefix of SALT_AND_ESTER_PREFIXES) {
+    if (clean.startsWith(prefix)) {
+      return clean.slice(prefix.length).trim();
+    }
+  }
+  if (clean.startsWith('sulfato de ')) {
+    const rest = clean.slice('sulfato de '.length).trim();
+    if (!rest.startsWith('zinco') && !rest.startsWith('ferro') && !rest.startsWith('magnesio') && !rest.startsWith('bario')) {
+      return rest;
+    }
+  }
+  return clean;
+};
+
+/**
+ * Identifica se o medicamento é uma associação/combinação de múltiplos princípios ativos
+ * (ex.: "Dipirona + Orfenadrina + Cafeína", "Amoxicilina + Clavulanato").
+ */
+export const isCombinationMedication = (med: UnifiedMedication): boolean => {
+  const nameWithoutParens = med.name.replace(/\([^)]*\)/g, '');
+  if (med.activeIngredient.includes('+')) return true;
+  if (nameWithoutParens.includes('+')) return true;
+  return false;
+};
+
+/**
+ * Extrai a primeira palavra da substância ativa principal (sem prefixo de sal/éster).
+ * Ex.: "Dipirona Sódica 500mg comprimido (Novalgina)" -> "dipirona"
+ * Ex.: "Cloridrato de Metformina 850mg (Glifage)" -> "metformina"
+ * Ex.: "Dipropionato de Beclometasona 50mcg (Clenil)" -> "beclometasona"
+ */
+export const extractPrimarySubstanceWord = (med: UnifiedMedication): string => {
+  const nameHead = normalizeText(med.name.replace(/\([^)]*\)/g, '').split('+')[0] || '');
+  const activeHead = normalizeText(med.activeIngredient.split('+')[0] || '');
+
+  const coreFromActive = stripSaltPrefix(activeHead);
+  const coreFromName = stripSaltPrefix(nameHead);
+
+  const primary = coreFromActive || coreFromName;
+  return primary.split(/\s+/)[0] || '';
+};
+
+/**
  * Calcula distância de Damerau-Levenshtein entre duas strings (suporta inserções, deleções, substituições e transposições).
  */
 export const damerauLevenshteinDistance = (source: string, target: string): number => {
@@ -79,14 +161,12 @@ export const fuzzySubsequenceScore = (target: string, query: string): number => 
 
   let tIdx = 0;
   let qIdx = 0;
-  let matches = 0;
   let consecutive = 0;
   let maxConsecutive = 0;
   let wordBoundaryBonus = 0;
 
   while (tIdx < t.length && qIdx < q.length) {
     if (t[tIdx] === q[qIdx]) {
-      matches++;
       consecutive++;
       if (consecutive > maxConsecutive) maxConsecutive = consecutive;
       if (tIdx === 0 || t[tIdx - 1] === ' ' || t[tIdx - 1] === '-' || t[tIdx - 1] === '+') {
@@ -223,7 +303,35 @@ export interface ScoredUnifiedMedication {
 }
 
 /**
- * Avalia a pontuação de relevância de um medicamento em relação à query.
+ * Extrai nomes comerciais/marcas contidos entre parênteses no nome do medicamento,
+ * ignorando parênteses puramente posológicos/numéricos (ex.: "(1g)", "(160mg/5mL)").
+ */
+const extractCommercialBrands = (medName: string): string[] => {
+  const groups = Array.from(medName.matchAll(/\(([^)]+)\)/g)).map((m) => m[1]);
+  const brands: string[] = [];
+  for (const group of groups) {
+    const parts = group.split(/[,;/]/).map((p) => normalizeText(p)).filter(Boolean);
+    for (const part of parts) {
+      // Ignora grupos que começam apenas com números/unidades (ex: "1g", "2.5g", "160mg/5ml")
+      if (/^\d/.test(part)) continue;
+      brands.push(part);
+    }
+  }
+  return brands;
+};
+
+/**
+ * Avalia a pontuação de relevância clínica de um medicamento em relação à query.
+ *
+ * Princípios de priorização clínica:
+ * 1. Monofármacos (substância ativa isolada) têm prioridade sobre associações/combinações ("+")
+ *    quando o médico digita apenas o nome ou prefixo do fármaco principal (ex.: "dip" -> Dipirona Sódica
+ *    antes de Dorflex, Neosaldina ou Buscopan Composto).
+ * 2. A pontuação de prefixo do fármaco é calculada sobre a palavra da substância ativa principal
+ *    (ignorando prefixos de sais/ésteres como "Cloridrato de", "Dipropionato de" e o tamanho da
+ *    lista de marcas entre parênteses), evitando penalizar medicamentos com mais sinônimos comerciais.
+ * 3. Buscas multi-token (ex.: "dip gotas", "dip 1g", "amox clav", "amox susp") bonificam apresentações
+ *    que contemplam todos os termos digitados.
  */
 export const scoreUnifiedMedication = (
   med: UnifiedMedication,
@@ -237,61 +345,121 @@ export const scoreUnifiedMedication = (
   const normActive = normalizeText(med.activeIngredient);
   const normRoute = normalizeText(med.route);
 
-  // 1. MATCH EXATO NO NOME OU PRINCÍPIO ATIVO
-  if (normName === normQuery || normActive === normQuery) {
-    return { med, score: 110 };
-  }
+  const nameWithoutParens = normalizeText(med.name.replace(/\([^)]*\)/g, ''));
+  const coreName = stripSaltPrefix(nameWithoutParens);
+  const coreActive = stripSaltPrefix(normActive);
 
-  // 2. MATCH POR PREFIXO
-  if (normName.startsWith(normQuery)) {
-    return { med, score: 100 + Math.min(8, (normQuery.length / normName.length) * 8) };
-  }
-  if (normActive.startsWith(normQuery)) {
-    return { med, score: 98 + Math.min(8, (normQuery.length / normActive.length) * 8) };
-  }
+  const isCombination = isCombinationMedication(med);
+  const primaryWord = extractPrimarySubstanceWord(med);
+
+  // Ingredientes separados em caso de associação (ex: ["escopolamina", "dipirona"])
+  const activeIngredientsList = normActive
+    .split('+')
+    .map((part) => stripSaltPrefix(part.trim()))
+    .filter(Boolean);
+  const secondaryIngredients = activeIngredientsList.slice(1);
+
+  const brands = extractCommercialBrands(med.name);
+
+  // Tokens da query (sem '+' isolado)
+  const queryHasPlus = normQuery.includes('+');
+  const queryTokens = normQuery
+    .replace(/\+/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+  const headToken = queryTokens[0] || normQuery;
+
+  // Verifica se o usuário pediu explicitamente uma associação (digitou '+' ou múltiplos tokens de ingredientes distintos)
+  const matchesSecondaryIngredientOnExtraToken =
+    queryTokens.length > 1 &&
+    queryTokens.slice(1).some((tok) =>
+      secondaryIngredients.some((sec) => sec.startsWith(tok) || sec.split(/\s+/).some((w) => w.startsWith(tok)))
+    );
+  const userExplicitlyWantsCombination = queryHasPlus || matchesSecondaryIngredientOnExtraToken;
+
+  // Penalidade para associações quando o usuário busca apenas um fármaco simples
+  const combinationPenalty = isCombination && !userExplicitlyWantsCombination ? 12 : 0;
 
   let bestScore = 0;
 
-  // 3. MATCH EM NOMES COMERCIAIS / MARCAS (ex: conteúdo entre parênteses "Novalgina, Anador")
-  const brandMatches = med.name.match(/\(([^)]+)\)/);
-  if (brandMatches && brandMatches[1]) {
-    const brands = brandMatches[1].split(/[,;/]/).map(b => normalizeText(b));
-    for (const b of brands) {
-      if (b === normQuery) {
-        bestScore = Math.max(bestScore, 105);
-      } else if (b.startsWith(normQuery)) {
-        bestScore = Math.max(bestScore, 95 + Math.min(7, (normQuery.length / b.length) * 7));
-      } else if (b.includes(normQuery)) {
-        bestScore = Math.max(bestScore, 85);
-      }
+  // 1. MATCH EXATO NO NOME COMPLETO, PRINCÍPIO ATIVO OU SUBSTÂNCIA PRINCIPAL
+  if (normName === normQuery || normActive === normQuery || coreActive === normQuery) {
+    bestScore = 122 - combinationPenalty;
+  } else if (primaryWord && (primaryWord === normQuery || primaryWord === headToken && queryTokens.length === 1)) {
+    bestScore = 120 - combinationPenalty;
+  }
+
+  // 2. MATCH POR PREFIXO NA SUBSTÂNCIA ATIVA PRINCIPAL (ex: "dip" -> "dipirona", "metf" -> "metformina")
+  if (primaryWord && primaryWord.startsWith(headToken)) {
+    const prefixRatio = Math.min(1, headToken.length / primaryWord.length);
+    const primaryPrefixScore = 110 + prefixRatio * 8 - combinationPenalty;
+    bestScore = Math.max(bestScore, primaryPrefixScore);
+  } else if (coreName.startsWith(headToken) || coreActive.startsWith(headToken)) {
+    const refLen = Math.max(headToken.length, primaryWord.length || coreName.length);
+    const prefixRatio = Math.min(1, headToken.length / refLen);
+    const corePrefixScore = 108 + prefixRatio * 8 - combinationPenalty;
+    bestScore = Math.max(bestScore, corePrefixScore);
+  }
+
+  // 3. MATCH EM NOMES COMERCIAIS / MARCAS ENTRE PARÊNTESES (ex: "Novalgina", "Dorflex", "Clavulin", "Tylenol")
+  for (const brand of brands) {
+    const brandWords = brand.split(/\s+/);
+    const primaryBrandWord = brandWords[0] || brand;
+    if (brand === normQuery || brand === headToken || primaryBrandWord === headToken) {
+      // Se o médico digitou o nome exato da marca comercial (ex: "dorflex", "clavulin"), não penaliza combinação
+      bestScore = Math.max(bestScore, 109);
+    } else if (primaryBrandWord.startsWith(headToken) || brandWords.some((bw) => bw.startsWith(headToken))) {
+      const targetWord = brandWords.find((bw) => bw.startsWith(headToken)) || primaryBrandWord;
+      const ratio = Math.min(1, headToken.length / targetWord.length);
+      // Prefixo curto (< 4 letras, ex: "dip" em "diprospan") recebe penalidade de combinação se aplicável
+      const brandPenalty = headToken.length < 4 ? combinationPenalty * 0.5 : 0;
+      bestScore = Math.max(bestScore, 96 + ratio * 7 - brandPenalty);
+    } else if (brand.includes(headToken)) {
+      bestScore = Math.max(bestScore, 85);
     }
   }
 
-  // 4. MATCH NO INÍCIO DE QUALQUER PALAVRA
-  const words = normName.split(/\s+/).concat(normActive.split(/\s+/));
-  for (const w of words) {
-    if (w.startsWith(normQuery)) {
-      bestScore = Math.max(bestScore, 90 + Math.min(5, (normQuery.length / w.length) * 5));
+  // 4. MATCH EM SEGUNDO/TERCEIRO PRINCÍPIO ATIVO DE ASSOCIAÇÃO (ex: "dip" em "Escopolamina + Dipirona")
+  for (const secIng of secondaryIngredients) {
+    const secWords = secIng.split(/\s+/);
+    const secPrimary = secWords[0] || secIng;
+    if (secPrimary === headToken || secIng === headToken) {
+      bestScore = Math.max(bestScore, 96);
+    } else if (secPrimary.startsWith(headToken) || secWords.some((w) => w.startsWith(headToken))) {
+      const ratio = Math.min(1, headToken.length / secPrimary.length);
+      bestScore = Math.max(bestScore, 92 + ratio * 4);
     }
   }
 
-  // 5. SUBSTRING INCLUSION
-  if (normName.includes(normQuery) || normActive.includes(normQuery)) {
-    bestScore = Math.max(bestScore, 80);
-  } else if (normRoute.includes(normQuery)) {
-    bestScore = Math.max(bestScore, 70);
+  // 5. MATCH NO INÍCIO DE QUALQUER OUTRA PALAVRA (inclusive prefixo de sal/éster como "dipropionato", "cloridrato")
+  const allWords = normName.split(/\s+/).concat(normActive.split(/\s+/));
+  for (const w of allWords) {
+    if (w.startsWith(headToken)) {
+      const ratio = Math.min(1, headToken.length / w.length);
+      // Palavras secundárias ou de sal (quando não são a substância principal) pontuam abaixo da substância ativa
+      bestScore = Math.max(bestScore, 88 + ratio * 5 - (isCombination ? 4 : 0));
+    }
   }
 
-  // 6. CLASSES TERAPÊUTICAS E SINTOMAS
-  const matchingClass = THERAPEUTIC_CLASSES.find(tc => 
-    tc.keywords.some(kw => kw === normQuery || (normQuery.length >= 4 && kw.startsWith(normQuery)))
+  // 6. SUBSTRING INCLUSION
+  if (bestScore === 0) {
+    if (normName.includes(normQuery) || normActive.includes(normQuery)) {
+      bestScore = Math.max(bestScore, 80 - (isCombination ? 4 : 0));
+    } else if (normRoute.includes(normQuery)) {
+      bestScore = Math.max(bestScore, 70);
+    }
+  }
+
+  // 7. CLASSES TERAPÊUTICAS E SINTOMAS
+  const matchingClass = THERAPEUTIC_CLASSES.find((tc) =>
+    tc.keywords.some((kw) => kw === normQuery || (normQuery.length >= 4 && kw.startsWith(normQuery)))
   );
   if (matchingClass) {
     if (med.category === matchingClass.canonicalCategory) {
       bestScore = Math.max(bestScore, 75);
     } else {
-      const medKeywordsMatch = matchingClass.keywords.some(kw => 
-        normName.includes(kw) || normActive.includes(kw)
+      const medKeywordsMatch = matchingClass.keywords.some(
+        (kw) => normName.includes(kw) || normActive.includes(kw)
       );
       if (medKeywordsMatch) {
         bestScore = Math.max(bestScore, 72);
@@ -299,22 +467,54 @@ export const scoreUnifiedMedication = (
     }
   }
 
-  // 7. FUZZY SUBSEQUENCE E LEVENSHTEIN (tolerância a pequenos erros de digitação)
+  // 8. REFINAMENTO MULTI-TOKEN (ex.: "dip gotas", "dip 1g", "amox clav", "amox susp")
+  if (queryTokens.length > 1 && bestScore > 0) {
+    const extraTokens = queryTokens.slice(1);
+    const searchableOutsideParens = `${nameWithoutParens} ${normActive} ${normRoute}`;
+    const searchableFull = `${normName} ${normActive} ${normRoute}`;
+    const outsideWords = searchableOutsideParens.split(/\s+/);
+    const fullWords = searchableFull.split(/\s+/);
+
+    let matchedExtraCount = 0;
+    let extraBonus = 0;
+
+    for (const tok of extraTokens) {
+      const matchesOutsideWord = outsideWords.some((w) => w.startsWith(tok) || w.includes(tok));
+      const matchesFullWord = fullWords.some((w) => w.startsWith(tok) || w.includes(tok));
+
+      if (matchesOutsideWord) {
+        matchedExtraCount++;
+        extraBonus += 16;
+      } else if (matchesFullWord) {
+        matchedExtraCount++;
+        extraBonus += 12;
+      }
+    }
+
+    if (matchedExtraCount === extraTokens.length) {
+      bestScore += extraBonus;
+    } else {
+      const missingCount = extraTokens.length - matchedExtraCount;
+      bestScore = Math.max(0, bestScore - missingCount * 28 + extraBonus);
+    }
+  }
+
+  // 9. FUZZY SUBSEQUENCE E LEVENSHTEIN (tolerância a pequenos erros de digitação)
   if (normQuery.length >= 3 && bestScore < 70) {
     const subScore = Math.max(
       fuzzySubsequenceScore(normName, normQuery),
       fuzzySubsequenceScore(normActive, normQuery)
     );
     if (subScore > 0) {
-      bestScore = Math.max(bestScore, subScore);
+      bestScore = Math.max(bestScore, subScore - (isCombination ? 4 : 0));
     }
 
     // Levenshtein nas palavras principais
-    for (const w of words) {
+    for (const w of allWords) {
       if (w.length >= 4 && normQuery.length >= 3 && Math.abs(w.length - normQuery.length) <= 2) {
         const sim = calculateStringSimilarity(w, normQuery);
         if (sim >= 0.75) {
-          bestScore = Math.max(bestScore, 60 + Math.round(sim * 20));
+          bestScore = Math.max(bestScore, 60 + Math.round(sim * 20) - (isCombination ? 4 : 0));
         }
       }
     }
@@ -328,7 +528,9 @@ export const scoreUnifiedMedication = (
 };
 
 /**
- * Busca inteligente e fuzzy de medicamentos com classificação por relevância.
+ * Busca inteligente e fuzzy de medicamentos com classificação por relevância clínica.
+ * Em caso de empate de pontuação (ex.: diferentes apresentações do mesmo monofármaco),
+ * preserva a prioridade de monofármaco sobre combinação e a ordem canônica do catálogo clínico.
  */
 export const searchUnifiedMedicationsFuzzy = (
   medications: UnifiedMedication[],
@@ -339,29 +541,37 @@ export const searchUnifiedMedicationsFuzzy = (
 
   let pool = medications;
   if (categoryFilter && categoryFilter !== 'all') {
-    pool = pool.filter(m => m.category === categoryFilter);
+    pool = pool.filter((m) => m.category === categoryFilter);
   }
 
   if (!normQuery) {
     return pool;
   }
 
-  const scored: ScoredUnifiedMedication[] = [];
+  const scored: Array<ScoredUnifiedMedication & { catalogIndex: number; isCombination: boolean }> = [];
 
-  for (const med of pool) {
+  for (let idx = 0; idx < pool.length; idx++) {
+    const med = pool[idx];
     const result = scoreUnifiedMedication(med, normQuery);
     if (result) {
-      scored.push(result);
+      scored.push({
+        ...result,
+        catalogIndex: idx,
+        isCombination: isCombinationMedication(med),
+      });
     }
   }
 
-  // Ordena por maior pontuação (relevância); desempate por nome alfabético
   scored.sort((a, b) => {
-    if (b.score !== a.score) {
-      return b.score - a.score;
+    const scoreDiff = b.score - a.score;
+    if (Math.abs(scoreDiff) > 0.001) {
+      return scoreDiff;
     }
-    return a.med.name.localeCompare(b.med.name, 'pt-BR');
+    if (a.isCombination !== b.isCombination) {
+      return a.isCombination ? 1 : -1;
+    }
+    return a.catalogIndex - b.catalogIndex;
   });
 
-  return scored.map(s => s.med);
+  return scored.map((s) => s.med);
 };

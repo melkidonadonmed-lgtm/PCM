@@ -4,6 +4,7 @@ import { ActiveTab } from '../../types';
 import { CLINICAL_KITS, ClinicalKit } from '../../data/clinicalKits';
 import { SUS_DOCUMENTS_CATALOG } from '../../data/susDocumentsCatalog';
 import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../../data/medicationDatabase';
+import { searchUnifiedMedicationsFuzzy } from '../../utils/fuzzySearch';
 import { Badge } from '../ui/Badge';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
@@ -175,37 +176,37 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       },
     }));
 
-    const medOptions: CommandOption[] = UNIFIED_MEDICATIONS.slice(0, 60).map((med) => ({
-      id: `med-${med.id}`,
-      group: 'Medicamentos (RENAME/SUS)',
-      title: med.name,
-      subtitle: `${med.defaultPosology} (${med.defaultQuantity})`,
-      badge: med.route,
-      icon: 'pill',
-      action: () => {
-        onUsarMedicamento(med);
-        onClose();
-      },
-    }));
-
-    return [...navOptions, ...susOptions, ...kitOptions, ...medOptions];
-  }, [onAplicarKit, onClose, onOpenDoctorModal, onOpenPatientModal, onSelectTab, onUsarMedicamento]);
+    return [...navOptions, ...susOptions, ...kitOptions];
+  }, [onAplicarKit, onClose, onOpenDoctorModal, onOpenPatientModal, onSelectTab]);
 
   const filteredOptions = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) {
-      return allOptions.filter((opt) => opt.group !== 'Medicamentos (RENAME/SUS)').slice(0, 14);
+      return allOptions.slice(0, 14);
     }
-    return allOptions
-      .filter(
-        (opt) =>
-          opt.title.toLowerCase().includes(q) ||
-          opt.subtitle.toLowerCase().includes(q) ||
-          opt.group.toLowerCase().includes(q) ||
-          (opt.badge && opt.badge.toLowerCase().includes(q))
-      )
-      .slice(0, 18);
-  }, [allOptions, query]);
+    const matchedNonMeds = allOptions.filter(
+      (opt) =>
+        opt.title.toLowerCase().includes(q) ||
+        opt.subtitle.toLowerCase().includes(q) ||
+        opt.group.toLowerCase().includes(q) ||
+        (opt.badge && opt.badge.toLowerCase().includes(q))
+    );
+    const matchedMeds: CommandOption[] = searchUnifiedMedicationsFuzzy(UNIFIED_MEDICATIONS, query, 'all')
+      .slice(0, 12)
+      .map((med) => ({
+        id: `med-${med.id}`,
+        group: 'Medicamentos (RENAME/SUS)',
+        title: med.name,
+        subtitle: `${med.defaultPosology} (${med.defaultQuantity})`,
+        badge: med.route,
+        icon: 'pill',
+        action: () => {
+          onUsarMedicamento(med);
+          onClose();
+        },
+      }));
+    return [...matchedNonMeds, ...matchedMeds].slice(0, 18);
+  }, [allOptions, onClose, onUsarMedicamento, query]);
 
   useEffect(() => {
     setSelectedIndex(0);
