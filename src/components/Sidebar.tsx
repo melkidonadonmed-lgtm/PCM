@@ -62,6 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeContext = null,
   onSwitchContext,
   onOpenDoctorModal,
+  onOpenPatientModal,
   onOpenBackupModal,
   isInstallable = false,
   onInstallApp,
@@ -72,6 +73,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
   const hasDoctor = Boolean(doctor?.name?.trim());
+  const hasPatient = Boolean(patient?.name?.trim());
+  const patientName = patient?.name?.trim() || '';
 
   // Estado de recolhimento dos Kits de Plantão (salvo no localStorage, padrão recolhido)
   const [showKits, setShowKits] = useState<boolean>(() => {
@@ -222,6 +225,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleOpenDoctor = () => {
     onOpenDoctorModal?.();
+    if (!isDesktop) onClose?.();
+  };
+
+  const handleOpenPatient = () => {
+    onOpenPatientModal?.();
     if (!isDesktop) onClose?.();
   };
 
@@ -461,6 +469,85 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span>CRM</span>
               <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 {hasDoctor ? `Dr(a). ${doctor?.name}` : 'Configurar CRM'}
+              </span>
+            </button>
+          )}
+
+          {/* Patient Identification Badge Compacto — Prioridade 3 no Topo */}
+          {isOpen ? (
+            <div
+              id="sidebar-patient-chip"
+              onClick={handleOpenPatient}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleOpenPatient();
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              className={`px-2 py-1.5 min-h-[38px] rounded-xl border transition cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset ${
+                hasPatient
+                  ? 'border-sky-400/30 bg-sky-500/[0.10] hover:bg-sky-500/[0.16]'
+                  : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.08]'
+              }`}
+              title="Clique para identificar o paciente, peso e histórico clínico"
+            >
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <div
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 shadow-tactile-sm border ${
+                    hasPatient
+                      ? 'bg-sky-500/20 text-sky-200 border-sky-400/30'
+                      : 'bg-white/10 text-slate-300 border-white/15'
+                  }`}
+                >
+                  <Icon name={hasPatient ? 'person' : 'person_add'} size={14} filled={hasPatient} />
+                </div>
+                <div className="overflow-hidden min-w-0 flex-1 leading-tight">
+                  <p className="text-[11px] font-bold truncate text-white">
+                    {hasPatient ? patientName : 'Identificar paciente'}
+                  </p>
+                  <p className="text-[10px] text-slate-300 font-medium truncate clinical-tabular-nums">
+                    {hasPatient
+                      ? patientWeight > 0
+                        ? `Peso: ${patientWeight.toLocaleString('pt-BR')} kg${patient?.documentNumber ? ' • ' + patient.documentNumber : ''}`
+                        : patient?.documentNumber
+                          ? `CPF/CNS: ${patient.documentNumber}`
+                          : 'Toque para editar dados ou peso'
+                      : 'Nome, peso (kg) e CPF/CNS'}
+                  </p>
+                </div>
+              </div>
+              {hasPatient && patientWeight > 0 ? (
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-sky-500/25 text-sky-200 border border-sky-400/30 shrink-0 clinical-unit clinical-tabular-nums">
+                  {patientWeight.toLocaleString('pt-BR')} kg
+                </span>
+              ) : (
+                <Icon name="edit" size={14} className="text-slate-400 group-hover:text-white transition-colors shrink-0" />
+              )}
+            </div>
+          ) : (
+            <button
+              id="sidebar-patient-chip"
+              type="button"
+              onClick={handleOpenPatient}
+              className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl border flex items-center justify-center shadow-tactile-sm transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group ${
+                hasPatient
+                  ? 'bg-sky-500/20 text-sky-200 border-sky-400/30 hover:bg-sky-500/30'
+                  : 'bg-white/[0.06] text-slate-300 border-white/10 hover:bg-white/15 hover:text-white'
+              }`}
+              aria-label="Identificar paciente"
+            >
+              <Icon name={hasPatient ? 'person' : 'person_add'} size={20} filled={hasPatient} />
+              {hasPatient && patientWeight > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-sky-500 text-white text-[9px] font-black flex items-center justify-center shadow-sm border border-white/20 clinical-unit clinical-tabular-nums">
+                  {patientWeight.toLocaleString('pt-BR')}kg
+                </span>
+              )}
+              <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+                {hasPatient
+                  ? `${patientName}${patientWeight > 0 ? ` • ${patientWeight.toLocaleString('pt-BR')} kg` : ''}`
+                  : 'Identificar paciente'}
               </span>
             </button>
           )}

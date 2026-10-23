@@ -121,7 +121,7 @@ const defaultReferral: MedicalReferral = {
 };
 
 describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
-  it('Header exibe botão Início unificado, barra de módulos visível a partir de lg (1024px) com atalhos Alt+1..5 e chips de Paciente e CRM', () => {
+  it('Header exibe botão Início unificado, barra de módulos visível a partir de lg (1024px) com atalhos Alt+1..6 e mantém frente limpa sem duplicar Paciente e CRM', () => {
     // 1. Estado inicial sem médico nem paciente configurados
     const htmlUnconfigured = renderToStaticMarkup(
       <Header
@@ -148,10 +148,10 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlUnconfigured).toContain('Alt+1');
     expect(htmlUnconfigured).toContain('Alt+6');
     expect(htmlUnconfigured).toContain('Guias SUS');
-    expect(htmlUnconfigured).toContain('Identificar paciente');
-    expect(htmlUnconfigured).toContain('Configurar CRM');
+    expect(htmlUnconfigured).not.toContain('id="header-patient-chip"');
+    expect(htmlUnconfigured).not.toContain('id="header-doctor-chip"');
 
-    // 2. Estado com médico configurado, paciente com peso, contadores ativos e botão Instalar visível no mobile
+    // 2. Estado com paciente com peso, contadores ativos e botão Instalar visível
     const htmlConfigured = renderToStaticMarkup(
       <Header
         darkMode={true}
@@ -171,16 +171,15 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
       />
     );
 
-    expect(htmlConfigured).toContain('Carlos Eduardo Lima');
-    expect(htmlConfigured).toContain('18,5 kg');
+    expect(htmlConfigured).toContain('18.5kg');
     expect(htmlConfigured).toContain('clinical-unit');
-    expect(htmlConfigured).toContain('CRM 54321/SP');
     expect(htmlConfigured).toContain('aria-current="page"');
     expect(htmlConfigured).toContain('id="btn-header-install-pwa"');
     expect(htmlConfigured).toContain('aria-label="Instalar Aplicativo PresCMed"');
+    expect(htmlConfigured).not.toContain('id="header-doctor-chip"');
   });
 
-  it('Sidebar mantém acabamento Deep Navy (.panel-navy), barra luminosa vertical (.sidebar-active-bar), permite tooltips flutuantes no modo recolhido (overflow-visible) e preserva botão PWA', () => {
+  it('Sidebar mantém acabamento Deep Navy (.panel-navy), cards de Médico e Paciente (#sidebar-patient-chip), barra luminosa vertical (.sidebar-active-bar), tooltips no modo recolhido e botão PWA', () => {
     const htmlExpanded = renderToStaticMarkup(
       <Sidebar
         darkMode={false}
@@ -209,6 +208,9 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlExpanded).toContain('panel-navy');
     expect(htmlExpanded).toContain('sidebar-active-surface');
     expect(htmlExpanded).toContain('sidebar-active-bar');
+    expect(htmlExpanded).toContain('id="sidebar-patient-chip"');
+    expect(htmlExpanded).toContain('Carlos Eduardo Lima');
+    expect(htmlExpanded).toContain('18,5 kg');
     expect(htmlExpanded).toContain('Guias Oficiais SUS');
     expect(htmlExpanded).toContain('MOD-01 Ativo');
     expect(htmlExpanded).toContain('Novo Atendimento');
@@ -228,7 +230,7 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
         onToggleOpen={vi.fn()}
         onClose={vi.fn()}
         doctor={configuredDoctor}
-        patient={activePatient}
+        patient={emptyPatient}
         prescriptionCount={1}
         selectedExamsCount={2}
         onOpenDoctorModal={vi.fn()}
@@ -245,6 +247,8 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
 
     expect(htmlCollapsed).toContain('lg:w-[68px]');
     expect(htmlCollapsed).toContain('overflow-visible');
+    expect(htmlCollapsed).toContain('id="sidebar-patient-chip"');
+    expect(htmlCollapsed).toContain('Identificar paciente');
     expect(htmlCollapsed).toContain('Instalar App');
   });
 

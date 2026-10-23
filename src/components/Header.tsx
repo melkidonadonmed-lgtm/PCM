@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from './Icon';
 import { ActiveTab, DoctorProfile, Patient } from '../types';
-import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { cloudAuthService, type DoctorUserProfile } from '../services/cloud/cloudAuthService';
 import { cloudSyncManager, type SyncStatus } from '../services/cloud/cloudSyncManager';
 
@@ -172,10 +171,7 @@ export const Header: React.FC<HeaderProps> = ({
   isSidebarOpen = false,
   activeTab = 'prescription',
   onSelectTab,
-  doctor,
-  onOpenDoctorModal,
   patient,
-  onOpenPatientModal,
   onNavigateToEditor,
   prescriptionCount = 0,
   selectedExamsCount = 0,
@@ -184,9 +180,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenCommandPalette
 }) => {
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
-  const hasPatient = Boolean(patient?.name?.trim());
-  const patientName = patient?.name?.trim() || '';
-  const isDoctorReady = medicoConfigurado(doctor);
 
   const quickNavTabs: Array<{
     id: ActiveTab;
@@ -356,47 +349,8 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
         )}
 
-        {/* Right Command & Context Cluster: Paciente, Busca Ctrl+K, CRM, Nuvem e Tema */}
+        {/* Right Command & Context Cluster: Busca Ctrl+K, Nuvem, Instalar e Tema */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 justify-end">
-          {/* Active Patient Chip com Peso Integrado */}
-          <div 
-            onClick={onOpenPatientModal}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onOpenPatientModal?.();
-              }
-            }}
-            id="header-patient-chip"
-            role="button"
-            tabIndex={0}
-            className={`flex items-center gap-1.5 px-2 xl:px-2.5 h-9 xl:h-10 rounded-xl border transition cursor-pointer group max-w-[135px] xl:max-w-[165px] 2xl:max-w-[220px] shrink-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-              hasPatient 
-                ? 'bg-sky-50/80 dark:bg-sky-950/40 border-sky-200/90 dark:border-sky-800/60 text-slate-900 dark:text-slate-100 hover:bg-sky-100/80 dark:hover:bg-sky-900/50' 
-                : 'bg-[var(--surface-inset)] dark:bg-[#1E293B] border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
-            }`}
-            title="Clique para identificar o paciente, peso e histórico clínico"
-          >
-            <Icon
-              name={hasPatient ? 'person' : 'person_add'}
-              size={15}
-              filled={hasPatient}
-              className={hasPatient ? 'text-sky-600 dark:text-sky-400' : 'text-[var(--text-muted)]'}
-            />
-            <div className="text-left overflow-hidden min-w-0 flex-1">
-              <div className="text-xs font-semibold truncate text-slate-900 dark:text-white flex items-center gap-1">
-                <span className="truncate whitespace-nowrap">
-                  {hasPatient ? patientName : 'Identificar paciente'}
-                </span>
-                {hasPatient && patientWeight > 0 && (
-                  <span className="text-sky-700 dark:text-sky-300 font-bold shrink-0 clinical-unit clinical-tabular-nums">
-                    • {patientWeight.toLocaleString('pt-BR')} kg
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
           {onOpenCommandPalette && (
             <button
               id="btn-open-command-palette"
@@ -404,39 +358,14 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenCommandPalette}
               aria-label="Busca rápida e navegação global (Ctrl+K)"
               title="Busca rápida de medicamentos, kits, protocolos e guias SUS (Ctrl+K)"
-              className="w-9 h-9 xl:w-10 xl:h-10 2xl:w-auto 2xl:px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
+              className="w-9 h-9 sm:w-auto sm:px-2.5 xl:h-10 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
             >
               <Icon name="search" size={16} className="text-sky-600 dark:text-sky-400" />
-              <span className="hidden 2xl:inline text-xs font-medium text-[var(--text-muted)]">
+              <span className="hidden sm:inline text-xs font-medium text-[var(--text-muted)]">
                 Buscar
               </span>
-              <span className="hidden 2xl:inline kbd-shortcut-chip font-bold text-[var(--text-secondary)] bg-white/80 dark:bg-white/10 border border-[var(--border-subtle)] dark:border-white/10 clinical-tabular-nums">
+              <span className="hidden md:inline kbd-shortcut-chip font-bold text-[var(--text-secondary)] bg-white/80 dark:bg-white/10 border border-[var(--border-subtle)] dark:border-white/10 clinical-tabular-nums">
                 Ctrl+K
-              </span>
-            </button>
-          )}
-
-          {onOpenDoctorModal && (
-            <button
-              id="header-doctor-chip"
-              type="button"
-              onClick={onOpenDoctorModal}
-              className={`${
-                isSidebarOpen ? 'hidden md:flex lg:hidden 2xl:flex' : 'hidden md:flex'
-              } items-center gap-1.5 px-2 xl:px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] border-[var(--border-subtle)] dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-[var(--surface-hover)] hover:text-slate-900 dark:hover:text-white shrink-0`}
-              title={
-                isDoctorReady
-                  ? `Médico emitente: ${doctor?.name} (CRM ${doctor?.crm}/${doctor?.crmState}) — clique para editar`
-                  : 'Configurar nome e CRM do médico emitente'
-              }
-            >
-              <span
-                className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                  isDoctorReady ? 'bg-emerald-500' : 'bg-amber-500'
-                }`}
-              />
-              <span className="truncate max-w-[110px] xl:max-w-[125px] clinical-tabular-nums">
-                {isDoctorReady ? `CRM ${doctor?.crm}/${doctor?.crmState || 'UF'}` : 'Configurar CRM'}
               </span>
             </button>
           )}
