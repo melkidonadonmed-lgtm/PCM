@@ -975,4 +975,59 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(builderHtml).toContain('h-11 min-h-[44px]');
     expect(builderHtml).toContain('overflow-hidden');
   });
+
+  it('previne encavalamento de textos no PatientQuickCard, corte das abas na Central de Documentos e excesso de pílulas de CID-10 no mobile', () => {
+    // 1. Central de Documentos: grade 2x2 no mobile (grid grid-cols-2 sm:flex) para exibir todas as 4 abas sem cortar "Pedidos de exames" ou ocultar "Documentos SUS"
+    const hubHtml = renderToStaticMarkup(
+      <ClinicalDocumentsHub
+        darkMode={false}
+        patient={activePatient}
+        doctor={configuredDoctor}
+        certificate={defaultCertificate}
+        onUpdateCertificate={vi.fn()}
+        referral={defaultReferral}
+        onUpdateReferral={vi.fn()}
+        selectedExams={sampleExams}
+        onUpdateSelectedExams={vi.fn()}
+        clinicalIndication=""
+        onUpdateClinicalIndication={vi.fn()}
+        initialSubTab="certificate"
+        onNavigateToPrint={vi.fn()}
+      />
+    );
+    expect(hubHtml).toContain('grid grid-cols-2 sm:flex sm:items-center gap-1 p-1 rounded-2xl nav-segmented-track');
+
+    // 2. PatientQuickCard: cabeçalho com flex-wrap (evita colisão entre badge "Sincronizado" e "Ocultar CPF / Peso") e atalhos em grid-cols-2 sm:flex sem shrink-0 estourando o card
+    const patientSyncHtml = renderToStaticMarkup(
+      <PatientQuickCard
+        patient={activePatient}
+        showExtraPatientFields={true}
+        onToggleExtraFields={vi.fn()}
+        onUpdatePatient={vi.fn()}
+        onOpenPatientModal={vi.fn()}
+        onRequestClearPatient={vi.fn()}
+        onNavigateToCertificate={vi.fn()}
+        onNavigateToReferral={vi.fn()}
+        onNavigateToExams={vi.fn()}
+        onNavigateToSus={vi.fn()}
+      />
+    );
+    expect(patientSyncHtml).toContain('flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5');
+    expect(patientSyncHtml).toContain('grid grid-cols-2 sm:flex sm:items-center gap-1.5 w-full sm:w-auto min-w-0');
+    expect(patientSyncHtml).toContain('Sincronizado');
+    expect(patientSyncHtml).toContain('Ocultar CPF / Peso');
+
+    // 3. CidSearchBar: substitui o bloco de 10 pílulas soltas pelo botão compacto que abre pop-up em lista (#btn-cid-frequent-popup)
+    const cidHtml = renderToStaticMarkup(
+      <CidSearchBar
+        darkMode={false}
+        onSelectCid={vi.fn()}
+        showQuickChips={true}
+      />
+    );
+    expect(cidHtml).toContain('id="btn-cid-frequent-popup"');
+    expect(cidHtml).toContain('aria-haspopup="dialog"');
+    expect(cidHtml).toContain('Diagnósticos frequentes');
+    expect(cidHtml).not.toContain('Diagnósticos Mais Frequentes (1 clique):');
+  });
 });

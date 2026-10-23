@@ -22,16 +22,19 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
   children,
   ...rest
-}) => (
-  <span
-    data-state="idle"
-    aria-busy={false}
-    role={tone === 'danger' ? 'alert' : undefined}
-    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold tracking-tight border shrink-0 select-none ${
-      TONE_CLASSES[tone]
-    } ${tabular ? 'tabular-nums clinical-tabular-nums' : ''} ${className}`.trim()}
-    {...rest}
-  >
-    {children}
-  </span>
-);
+}) => {
+  const hasResponsiveDisplay = /\bhidden\b/.test(className);
+  return (
+    <span
+      data-state="idle"
+      aria-busy={false}
+      role={tone === 'danger' ? 'alert' : undefined}
+      className={`${hasResponsiveDisplay ? '' : 'inline-flex '}items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold tracking-tight border shrink-0 select-none ${
+        TONE_CLASSES[tone]
+      } ${tabular ? 'tabular-nums clinical-tabular-nums' : ''} ${className}`.trim()}
+      {...rest}
+    >
+      {children}
+    </span>
+  );
+};

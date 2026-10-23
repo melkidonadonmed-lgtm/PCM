@@ -42,16 +42,18 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<CIDCategoryType>('Todos');
   const [isOpen, setIsOpen] = useState(false);
+  const [isQuickListOpen, setIsQuickListOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const results = searchCID10(searchTerm, selectedCategory);
 
-  // Close dropdown on outside click
+  // Close dropdown and quick list popup on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setIsQuickListOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -116,15 +118,115 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
 
   return (
     <div data-state="idle" aria-busy={false} ref={containerRef} className="space-y-2.5">
-      {/* Label and Helper Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+      {/* Label and Quick Diagnoses Pop-up Trigger */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <label className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5" style={{ color: darkMode ? '#94A3B8' : '#475569' }}>
           <Icon name="search" className="text-[14px] text-sky-600 dark:text-sky-400" />
           <span>{label}</span>
         </label>
-        <span className="text-xs font-medium text-[var(--text-muted)] dark:text-slate-400">
-          Pesquisa inteligente por código ou termo diagnóstico
-        </span>
+
+        {showQuickChips && (
+          <div className="relative">
+            <button
+              id="btn-cid-frequent-popup"
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={isQuickListOpen}
+              onClick={() => {
+                setIsQuickListOpen((prev) => !prev);
+                setIsOpen(false);
+              }}
+              className="chip-neutral h-8 px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              title="Abrir lista rápida de diagnósticos mais frequentes"
+            >
+              <Icon name="sell" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <span>Diagnósticos frequentes</span>
+              <Icon
+                name="expand_more"
+                size={15}
+                className={`text-[var(--text-muted)] transition-transform duration-150 ${isQuickListOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {isQuickListOpen && (
+              <div
+                role="dialog"
+                aria-label="Diagnósticos mais frequentes"
+                className="absolute right-0 left-auto z-40 top-full mt-1.5 w-72 sm:w-80 max-w-[calc(100vw-2.5rem)] rounded-2xl border shadow-tactile-lg overflow-hidden animate-tab-fade"
+                style={{
+                  backgroundColor: 'var(--surface-card)',
+                  borderColor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)'
+                }}
+              >
+                <div
+                  className="px-3 py-2 border-b flex items-center justify-between gap-2"
+                  style={{
+                    backgroundColor: darkMode ? 'var(--surface-inset)' : '#F8FAFC',
+                    borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
+                  }}
+                >
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400">
+                    Diagnósticos frequentes (1 clique)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsQuickListOpen(false)}
+                    aria-label="Fechar lista de diagnósticos frequentes"
+                    className="p-0.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                  >
+                    <Icon name="close" size={14} />
+                  </button>
+                </div>
+
+                <ul className="max-h-64 overflow-y-auto divide-y divide-slate-500/10" role="listbox" aria-label="Lista de diagnósticos mais frequentes">
+                  {quickPicks.map((pick) => {
+                    const isSelected = selectedCode.toUpperCase() === pick.code.toUpperCase();
+                    return (
+                      <li key={pick.code}>
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          onClick={() => {
+                            onSelectCid({ code: pick.code, description: pick.description, category: pick.category });
+                            setIsQuickListOpen(false);
+                          }}
+                          className={`w-full px-3 py-2 text-left flex items-center justify-between gap-2.5 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 outline-none ${
+                            isSelected
+                              ? darkMode
+                                ? 'bg-sky-950/50 text-white'
+                                : 'bg-sky-50 text-slate-900'
+                              : 'hover:bg-slate-500/10'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span
+                              className={`px-1.5 py-0.5 rounded font-mono font-bold text-xs shrink-0 clinical-tabular-nums ${
+                                isSelected
+                                  ? 'bg-sky-600 text-white'
+                                  : darkMode
+                                    ? 'bg-slate-800 text-sky-400'
+                                    : 'bg-sky-100 text-sky-800'
+                              }`}
+                            >
+                              {pick.code}
+                            </span>
+                            <span className="text-xs font-medium text-[var(--text-main)] truncate">
+                              {pick.description}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <Icon name="check" size={15} className="text-sky-600 dark:text-sky-400 shrink-0" />
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Selected CID Visual Summary Card (if present and in single selection mode) */}
@@ -200,8 +302,12 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setIsOpen(true);
+              setIsQuickListOpen(false);
             }}
-            onFocus={() => setIsOpen(true)}
+            onFocus={() => {
+              setIsOpen(true);
+              setIsQuickListOpen(false);
+            }}
             placeholder={placeholder}
             className="w-full pl-9 pr-20 py-2.5 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40 tactile-input transition"
             style={{
@@ -382,38 +488,6 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
           </div>
         )}
       </div>
-
-      {/* Quick Picks / Top Diagnósticos Bar */}
-      {showQuickChips && (
-        <div className="space-y-1.5 pt-0.5">
-          <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400">
-            <Icon name="sell" className="text-[14px] text-sky-500" />
-            <span>Diagnósticos Mais Frequentes (1 clique):</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {quickPicks.map((pick) => {
-              const isSelected = selectedCode.toUpperCase() === pick.code.toUpperCase();
-              return (
-                <button
-                  key={pick.code}
-                  type="button"
-                  onClick={() => onSelectCid({ code: pick.code, description: pick.description, category: pick.category })}
-                  className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
-                    isSelected
-                      ? 'bg-navy-900 dark:bg-[#0369A1] text-white border-navy-900 dark:border-sky-500/30 font-semibold shadow-xs'
-                      : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
-                  }`}
-                  title={`${pick.code} - ${pick.description}`}
-                >
-                  <span className={`font-mono font-bold text-xs ${isSelected ? 'text-sky-200' : 'text-sky-600 dark:text-sky-400'}`}>{pick.code}</span>
-                  <span className="truncate max-w-[150px]">{pick.description.split('(')[0].trim()}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

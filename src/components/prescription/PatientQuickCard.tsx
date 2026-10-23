@@ -45,13 +45,13 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
       aria-label="Identificação rápida do paciente"
       className="card-surface surface-card-minimal rounded-2xl p-4 sm:p-5 space-y-3 border border-subtle dark:border-strong"
     >
-      {/* Cabeçalho compacto em linha única */}
-      <div className="flex items-center justify-between gap-2">
+      {/* Cabeçalho compacto com quebra responsiva limpa (evita colisão entre Sincronizado e ações no mobile) */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
         <div className="flex items-center gap-2 min-w-0">
           <Icon name="person" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
           <label
             htmlFor="quick-patient-name"
-            className="text-sm font-semibold text-slate-900 dark:text-white cursor-pointer truncate"
+            className="text-sm font-semibold text-slate-900 dark:text-white cursor-pointer whitespace-nowrap"
           >
             Identificação do paciente
           </label>
@@ -62,7 +62,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
           <button
             type="button"
             onClick={onToggleExtraFields}
@@ -70,7 +70,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             title="Alternar exibição de CPF e Peso"
           >
             <Icon name={showExtraPatientFields ? 'expand_less' : 'expand_more'} size={15} />
-            <span>
+            <span className="truncate max-w-[180px] sm:max-w-none">
               {showExtraPatientFields
                 ? 'Ocultar CPF / Peso'
                 : hasExtraData
@@ -83,7 +83,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onRequestClearPatient}
-              className="text-xs text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1 cursor-pointer transition px-2 py-1 rounded-lg focus-visible:ring-2 focus-visible:ring-rose-500"
+              className="text-xs text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1 cursor-pointer transition px-2 py-1 rounded-lg whitespace-nowrap focus-visible:ring-2 focus-visible:ring-rose-500"
               title="Limpar paciente e reiniciar consulta"
             >
               <Icon name="delete" size={15} />
@@ -94,7 +94,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           <button
             type="button"
             onClick={onOpenPatientModal}
-            className="text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center gap-1 cursor-pointer px-2 py-1 rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500 transition"
+            className="text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center gap-1 cursor-pointer px-2 py-1 rounded-lg whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 transition"
             title="Abrir cadastro clínico detalhado"
           >
             <span>Cadastro completo</span>
@@ -115,49 +115,49 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           />
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap shrink-0" aria-label="Atalhos de documentos do paciente">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 w-full sm:w-auto min-w-0" aria-label="Atalhos de documentos do paciente">
           {onNavigateToCertificate && (
             <button
               type="button"
               onClick={onNavigateToCertificate}
-              className="chip-neutral h-8 text-[11px] sm:text-xs px-2 rounded-xl inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-8 text-[11px] sm:text-xs px-2.5 rounded-xl inline-flex items-center justify-center sm:justify-start gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
               title="Abrir formulário de Atestado Médico para este paciente"
             >
-              <Icon name="atestado" size={14} className="text-sky-600 dark:text-sky-400" />
-              <span>Atestado</span>
+              <Icon name="atestado" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <span className="truncate">Atestado</span>
             </button>
           )}
           {onNavigateToReferral && (
             <button
               type="button"
               onClick={onNavigateToReferral}
-              className="chip-neutral h-8 text-[11px] sm:text-xs px-2 rounded-xl inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-8 text-[11px] sm:text-xs px-2.5 rounded-xl inline-flex items-center justify-center sm:justify-start gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
               title="Abrir Encaminhamento Médico para este paciente"
             >
-              <Icon name="encaminhamento" size={14} className="text-sky-600 dark:text-sky-400" />
-              <span>Encaminhamento</span>
+              <Icon name="encaminhamento" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <span className="truncate">Encaminhamento</span>
             </button>
           )}
           {onNavigateToExams && (
             <button
               type="button"
               onClick={onNavigateToExams}
-              className="chip-neutral h-8 text-[11px] sm:text-xs px-2 rounded-xl inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-8 text-[11px] sm:text-xs px-2.5 rounded-xl inline-flex items-center justify-center sm:justify-start gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
               title="Abrir Solicitação de Exames para este paciente"
             >
-              <Icon name="exame" size={14} className="text-sky-600 dark:text-sky-400" />
-              <span>Exames</span>
+              <Icon name="exame" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <span className="truncate">Exames</span>
             </button>
           )}
           {onNavigateToSus && (
             <button
               type="button"
               onClick={onNavigateToSus}
-              className="chip-neutral h-8 text-[11px] sm:text-xs px-2 rounded-xl inline-flex items-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="chip-neutral h-8 text-[11px] sm:text-xs px-2.5 rounded-xl inline-flex items-center justify-center sm:justify-start gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
               title="Abrir Formulários SUS (LME, APAC, SISREG) para este paciente"
             >
-              <Icon name="sus" size={14} className="text-sky-600 dark:text-sky-400" />
-              <span>Guias SUS</span>
+              <Icon name="sus" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <span className="truncate">Guias SUS</span>
             </button>
           )}
         </div>

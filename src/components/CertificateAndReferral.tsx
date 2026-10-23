@@ -486,9 +486,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
             </div>
 
-            {/* Days off and dates — Lado a Lado e Enxuto */}
+            {/* Days off and dates — Lado a Lado e Enxuto (sem corte em telas mobile) */}
             <div className="grid grid-cols-12 gap-2 sm:gap-2.5">
-              <div className="col-span-4 sm:col-span-3">
+              <div className="col-span-12 sm:col-span-3">
                 <label htmlFor="certificate-days-off" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
                   <Clock className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                   <span>Dias de Repouso</span>
@@ -505,7 +505,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 />
               </div>
 
-              <div className="col-span-4 sm:col-span-4">
+              <div className="col-span-6 sm:col-span-4">
                 <label htmlFor="certificate-start-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
                   <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 shrink-0" />
                   <span>Data de Início</span>
@@ -520,7 +520,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 />
               </div>
 
-              <div className="col-span-4 sm:col-span-5">
+              <div className="col-span-6 sm:col-span-5">
                 <label htmlFor="certificate-end-date" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1 truncate">
                   <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400 shrink-0" />
                   <span>Data de Retorno Previsto</span>
@@ -577,9 +577,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   />
 
                   {/* Direct Code & Description manual inputs for fine-tuning */}
-                  <div className="pt-2 grid grid-cols-1 sm:grid-cols-4 gap-3">
-                    <div className="sm:col-span-1">
-                      <label htmlFor="certificate-cid-code" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Código CID-10</label>
+                  <div className="pt-1 grid grid-cols-12 gap-2.5 sm:gap-3">
+                    <div className="col-span-4 sm:col-span-3">
+                      <label htmlFor="certificate-cid-code" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate">Código CID-10</label>
                       <input
                         id="certificate-cid-code"
                         aria-label="Código CID-10"
@@ -596,8 +596,8 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                       />
                     </div>
 
-                    <div className="sm:col-span-3">
-                      <label htmlFor="certificate-cid-desc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Descrição do Diagnóstico (Edição Livre)</label>
+                    <div className="col-span-8 sm:col-span-9">
+                      <label htmlFor="certificate-cid-desc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate">Descrição do Diagnóstico (Edição Livre)</label>
                       <input
                         id="certificate-cid-desc"
                         aria-label="Descrição do diagnóstico CID-10"
@@ -855,33 +855,31 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 </span>
               </div>
 
-              {/* Specialty suggestions bar */}
+              {/* Specialty suggestions in compact select list */}
               {currentSpecialtySuggestions.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
-                    Sugestões para {referral.destinationSpecialty}:
-                  </span>
-
-                  <div className="flex items-center gap-1.5 flex-wrap">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <label htmlFor="referral-specialty-cid-select" className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 shrink-0">
+                    Sugestões ({referral.destinationSpecialty}):
+                  </label>
+                  <select
+                    id="referral-specialty-cid-select"
+                    aria-label={`Sugestões de CID-10 para ${referral.destinationSpecialty}`}
+                    value=""
+                    onChange={(e) => {
+                      const found = currentSpecialtySuggestions.find((item) => item.code === e.target.value);
+                      if (found) {
+                        handleAppendCidForReferral({ code: found.code, description: found.label });
+                      }
+                    }}
+                    className="w-full sm:flex-1 h-9 px-2.5 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 tactile-input cursor-pointer"
+                  >
+                    <option value="">Selecionar diagnóstico frequente da especialidade...</option>
                     {currentSpecialtySuggestions.map((item) => (
-                      <button
-                        key={item.code}
-                        type="button"
-                        onClick={() => handleAppendCidForReferral({ code: item.code, description: item.label })}
-                        className="text-xs px-2.5 py-1 rounded-lg border font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
-                        style={{
-                          backgroundColor: darkMode ? '#152E22' : 'var(--surface-card)',
-                          borderColor: darkMode ? 'rgba(52, 211, 153, 0.3)' : 'rgba(21, 128, 61, 0.2)',
-                          color: darkMode ? '#6EE7B7' : '#166534'
-                        }}
-                        title={`Adicionar ${item.code} - ${item.label}`}
-                      >
-                        <span className="font-mono font-bold">{item.code}</span>
-                        <span>{item.label}</span>
-                        <Plus className="w-3 h-3 text-emerald-500" />
-                      </button>
+                      <option key={item.code} value={item.code}>
+                        {item.code} — {item.label}
+                      </option>
                     ))}
-                  </div>
+                  </select>
                 </div>
               )}
 

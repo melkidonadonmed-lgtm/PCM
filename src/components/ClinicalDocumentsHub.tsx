@@ -163,7 +163,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
         <nav
           role="tablist"
           aria-label="Documentos clínicos disponíveis"
-          className="flex items-center gap-1 p-1 rounded-2xl nav-segmented-track overflow-x-auto scrollbar-none"
+          className="grid grid-cols-2 sm:flex sm:items-center gap-1 p-1 rounded-2xl nav-segmented-track w-full lg:w-auto"
         >
           {tabsList.map((tab) => {
             const isActive = activeSubTab === tab.id;
@@ -178,7 +178,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => handleChangeSubTab(tab.id)}
                 onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
-                className={`h-9 min-h-[38px] px-3 sm:px-3.5 rounded-xl border text-xs flex items-center gap-2 transition-all cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                className={`h-9 min-h-[38px] w-full sm:w-auto min-w-0 px-2.5 sm:px-3.5 rounded-xl border text-xs flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 transition-all cursor-pointer sm:shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   isActive
                     ? 'bg-navy-900 border-navy-900 text-white dark:bg-[#0369A1] dark:border-sky-400/30 font-bold shadow-tactile-sm'
                     : 'bg-transparent border-transparent text-[var(--text-secondary)] hover:text-[var(--text-main)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] font-semibold'
@@ -188,12 +188,12 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                   name={tab.icon}
                   size={16}
                   filled={isActive}
-                  className={isActive ? 'text-sky-300 dark:text-white' : 'text-sky-600 dark:text-sky-400 opacity-85'}
+                  className={`shrink-0 ${isActive ? 'text-sky-300 dark:text-white' : 'text-sky-600 dark:text-sky-400 opacity-85'}`}
                 />
-                <span>{tab.label}</span>
+                <span className="truncate">{tab.label}</span>
                 {tab.badge && (
                   <span
-                    className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full max-w-[90px] truncate clinical-unit clinical-tabular-nums ${
+                    className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full max-w-[90px] truncate shrink-0 clinical-unit clinical-tabular-nums ${
                       isActive ? 'bg-white/20 text-white' : 'bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)]'
                     }`}
                   >
