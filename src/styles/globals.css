@@ -93,22 +93,22 @@
 
   /* Indicador Luminoso Vertical na Sidebar Deep Navy */
   .sidebar-active-surface {
-    background: linear-gradient(90deg, rgba(14, 165, 233, 0.22) 0%, rgba(14, 165, 233, 0.08) 65%, rgba(14, 165, 233, 0.02) 100%);
-    border: 1px solid rgba(56, 189, 248, 0.28);
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.22) 0%, rgba(14, 165, 233, 0.08) 70%, rgba(14, 165, 233, 0.02) 100%);
+    border: 1px solid rgba(56, 189, 248, 0.32);
     box-shadow:
-      0 2px 8px -2px rgba(2, 132, 199, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      0 4px 12px -2px rgba(2, 132, 199, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
   }
 
   .sidebar-active-bar {
     position: absolute;
-    left: 0;
+    left: 3px;
     top: 22%;
     bottom: 22%;
     width: 3px;
-    border-radius: 0 9999px 9999px 0;
+    border-radius: 9999px;
     background-color: #38BDF8;
-    box-shadow: 0 0 8px rgba(56, 189, 248, 0.65);
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.75);
   }
 
   /* Micro-chip Técnico para Atalhos de Teclado (Alt+1..6 / Ctrl+K) */

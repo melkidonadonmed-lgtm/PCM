@@ -96,7 +96,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         title: 'Calculadora Pediátrica por Peso',
         subtitle: 'Cálculo determinístico mg/kg → mL e gotas',
         shortcut: 'Alt+3',
-        icon: 'balanca',
+        icon: 'calculate',
         action: () => {
           onSelectTab('pediatric_calc');
           onClose();

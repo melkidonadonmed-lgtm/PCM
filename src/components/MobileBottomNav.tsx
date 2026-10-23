@@ -43,7 +43,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     {
       id: 'pediatric_calc',
       label: 'Doses',
-      iconName: 'balanca',
+      iconName: 'calculate',
       badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
     },
     {

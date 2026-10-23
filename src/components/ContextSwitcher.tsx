@@ -26,15 +26,15 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
     <div
       data-state="idle"
       aria-busy={false}
-      className={`px-2 py-1.5 border border-white/10 bg-white/[0.05] surface-inset rounded-xl ${collapsed ? 'text-center' : ''}`}
+      className={`px-2.5 py-2 border border-white/10 bg-white/[0.05] hover:border-white/20 transition-colors surface-inset rounded-xl ${collapsed ? 'text-center' : ''}`}
     >
       {!collapsed && (
-        <div className="flex items-center justify-between gap-1 mb-1 min-w-0">
+        <div className="flex items-center justify-between gap-1 mb-1.5 min-w-0">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1 min-w-0">
             <Icon name="verified_user" size={14} className="text-emerald-400 shrink-0" />
             <span className="truncate">Local de Atuação (SUS)</span>
           </span>
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-white/10 text-sky-200 border border-white/15 shrink-0 whitespace-nowrap leading-none shadow-xs">
+          <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-white/10 text-sky-200 border border-white/15 shrink-0 whitespace-nowrap leading-none shadow-xs">
             {activeContext.documentFormatting?.prescriptionViaCount || 1} {activeContext.documentFormatting?.prescriptionViaCount === 1 ? 'VIA' : 'VIAS'}
           </span>
         </div>
@@ -45,7 +45,7 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
           value={activeContext.id}
           onChange={(e) => onSwitchContext(e.target.value)}
           aria-label="Selecionar local de atuação institucional"
-          className="w-full h-7 text-[11px] font-semibold rounded-lg bg-white/10 text-white border border-white/15 pl-2 pr-6 appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 truncate shadow-tactile-sm hover:bg-white/15 transition-colors ui-btn-tactile"
+          className="w-full h-8 text-[11px] font-semibold rounded-lg bg-white/[0.08] text-white border border-white/15 pl-2.5 pr-6 appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 truncate shadow-tactile-sm hover:bg-white/[0.14] hover:border-white/25 transition-all duration-150 ui-btn-tactile"
         >
           {contexts.map((ctx) => (
             <option key={ctx.id} value={ctx.id} className="bg-slate-900 text-white">

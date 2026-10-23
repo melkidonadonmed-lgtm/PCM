@@ -91,10 +91,10 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
         <button
           type="button"
           onClick={onOpenPediatricDrawer}
-          className="chip-neutral h-8 text-xs px-2.5 rounded-xl inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500"
+          className="chip-neutral h-8 text-xs px-3 rounded-xl inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500"
           title="Abrir Calculadora Pediátrica em painel lateral sem sair da receita"
         >
-          <Icon name="balanca" size={15} className="text-emerald-600 dark:text-emerald-400" />
+          <Icon name="calculate" size={15} className="text-emerald-600 dark:text-emerald-400" />
           <span>Calcular dose pelo peso</span>
         </button>
       </div>
@@ -120,9 +120,9 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
 
       {/* Linha 1: Fármaco e Quantidade a Dispensar Lado a Lado (Enxuto) */}
       <div>
-        <div className="grid grid-cols-12 gap-2 items-start">
+        <div className="grid grid-cols-12 gap-2 items-end">
           {/* Coluna Esquerda: Fármaco (7 cols no mobile, 8 cols no desktop) */}
-          <div className="col-span-7 sm:col-span-8">
+          <div className="col-span-7 sm:col-span-8 flex flex-col justify-end min-w-0">
             <div className="flex items-center justify-between mb-1">
               <label htmlFor="med-search-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
                 Fármaco ou princípio ativo *
@@ -384,7 +384,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
 
       {/* Linha 3: Posologia Compacta + Ação Primária Lado a Lado no Desktop */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
-        <div className={editingItemId ? 'sm:col-span-7' : 'sm:col-span-8'}>
+        <div className={`flex flex-col justify-end min-w-0 ${editingItemId ? 'sm:col-span-7' : 'sm:col-span-8'}`}>
           <label htmlFor="presc-posology-textarea" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 truncate">
             Posologia e orientações ao paciente
           </label>
@@ -394,7 +394,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             value={selectedPosology}
             onChange={(e) => onChangePosology(e.target.value)}
             placeholder="Ex.: Tomar 1 comprimido VO de 8/8h por 5 dias"
-            className="w-full h-11 min-h-[44px] py-3 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm resize-none leading-tight overflow-hidden"
+            className="block w-full h-11 min-h-[44px] py-3 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm resize-none leading-tight overflow-hidden"
           />
         </div>
 

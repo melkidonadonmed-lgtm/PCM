@@ -203,7 +203,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
             }}
           >
-            <Icon name="balanca" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
+            <Icon name="calculate" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
             <span className="text-xs font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
               Peso: <span className="text-emerald-700 dark:text-emerald-400 font-bold clinical-tabular-nums">{patientWeight > 0 ? `${patientWeight} kg` : '—'}</span>
             </span>

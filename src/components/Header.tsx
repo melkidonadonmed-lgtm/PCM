@@ -215,7 +215,7 @@ export const Header: React.FC<HeaderProps> = ({
     {
       id: 'pediatric_calc',
       label: 'Doses',
-      icon: 'balanca',
+      icon: 'calculate',
       shortcut: 'Alt+3',
       shortKey: '3',
       badge: patientWeight > 0 ? `${patientWeight}kg` : undefined

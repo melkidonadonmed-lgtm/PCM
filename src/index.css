@@ -103,12 +103,15 @@
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 
-    /* Dimensões Estruturais */
+    /* Dimensões Estruturais (escala monotônica compatível com Tailwind v4) */
     --sidebar-width: 280px;
     --navbar-height: 72px;
-    --radius-sm: 8px;
-    --radius-md: 14px;
-    --radius-lg: 20px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+    --radius-2xl: 16px;
+    --radius-card: 18px;
     --radius-pill: 9999px;
 
     /* Transições de Física Tátil */
@@ -405,7 +408,7 @@
   .surface-card-minimal {
     background-color: var(--surface-card);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-projected), var(--tactile-card-bevel);
   }
 
@@ -413,29 +416,37 @@
     background-color: #FFFFFF;
     color: var(--text-secondary);
     border: 1px solid #CBD5E1;
-    border-radius: 10px;
+    border-radius: var(--radius-lg);
     font-weight: 600;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-    transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.16s var(--ease-spring);
   }
 
   .dark .chip-neutral {
     background-color: #1E293B;
     color: #CBD5E1;
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
   .chip-neutral:hover:not(:disabled) {
     background-color: #F8FAFC;
     border-color: #94A3B8;
     color: var(--text-main);
+    transform: translate3d(0, -1px, 0);
+    box-shadow: 0 3px 6px -1px rgba(15, 23, 42, 0.08), inset 0 1px 0 #FFFFFF;
   }
 
   .dark .chip-neutral:hover:not(:disabled) {
     background-color: #27354A;
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.22);
     color: #FFFFFF;
+    transform: translate3d(0, -1px, 0);
+    box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .chip-neutral:active:not(:disabled) {
+    transform: translate3d(0, 0, 0) scale(0.98);
   }
 
   .chip-neutral[data-active="true"] {
@@ -472,15 +483,15 @@
     background-color: #FFFFFF;
     color: #0F172A;
     border: 1px solid rgba(15, 23, 42, 0.12);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xl);
     box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.8);
     transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
                 box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
                 background-color 0.2s ease;
   }
-  .tactile-input:not(.h-8):not(.h-9):not(.h-10),
-  .tactile-inset:not(.h-8):not(.h-9):not(.h-10) {
-    min-height: 46px;
+  .tactile-input:not(.h-8):not(.h-9):not(.h-10):not(.h-11),
+  .tactile-inset:not(.h-8):not(.h-9):not(.h-10):not(.h-11) {
+    min-height: 44px;
   }
 
   .tactile-input:focus {
@@ -509,7 +520,7 @@
     background-color: var(--bg-surface);
     border: 1px solid var(--border-subtle);
     box-shadow: var(--shadow-subtle), var(--tactile-card-bevel);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-2xl);
     position: relative;
     isolation: isolate;
   }
@@ -523,7 +534,7 @@
     background-color: var(--bg-surface);
     border: 1px solid rgba(15, 23, 42, 0.08);
     box-shadow: var(--shadow-projected), var(--tactile-card-bevel);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-2xl);
     padding: 1.5rem;
     position: relative;
     overflow: hidden;
@@ -933,28 +944,15 @@
     transform: translateX(4px);
   }
 
-  /* Item de navegação ativo: bisel interno + glow + barra de acento lateral escultural */
+  /* Item de navegação ativo: bisel interno + glow (sem duplicar barra com .sidebar-active-bar) */
   .nav-item-active {
     position: relative;
-    background: var(--surface-panel-2) !important;
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.20) 0%, rgba(14, 165, 233, 0.07) 75%, rgba(14, 165, 233, 0.02) 100%);
     color: #FFFFFF !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 
-      0 8px 20px rgba(0, 0, 0, 0.4),
-      var(--bevel-tactile-nav),
-      var(--nav-active-glow);
-  }
-
-  .nav-item-active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 20%;
-    height: 60%;
-    width: 4px;
-    border-radius: 0 9999px 9999px 0;
-    background: var(--nav-accent);
-    box-shadow: 0 0 12px var(--nav-accent);
+    border: 1px solid rgba(56, 189, 248, 0.30);
+    box-shadow:
+      0 4px 14px -2px rgba(2, 132, 199, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
   }
 
   /* Tipografia editorial para títulos de página */

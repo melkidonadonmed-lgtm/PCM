@@ -10,7 +10,7 @@ describe('Icon Component — Anti-Mutation & Alias Resolution', () => {
     expect(resolveIconName('gotas')).toBe('water_drop');
     expect(resolveIconName('vacina')).toBe('vaccines');
     expect(resolveIconName('estetoscopio')).toBe('stethoscope');
-    expect(resolveIconName('balanca')).toBe('scale');
+    expect(resolveIconName('balanca')).toBe('calculate');
     expect(resolveIconName('pediatria')).toBe('child_care');
   });
 

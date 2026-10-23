@@ -246,7 +246,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         {/* Quick Weight Range Presets */}
         <div className="mt-2.5 pt-2.5 border-t flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-0.5 max-w-full scrollbar-none fade-scroll-x" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)' }}>
           <span className="text-xs font-bold whitespace-nowrap text-[var(--text-muted)] dark:text-slate-400 flex items-center gap-1 flex-shrink-0">
-            <Icon name="balanca" className="text-[16px] text-sky-500" /> Faixas:
+            <Icon name="calculate" className="text-[16px] text-sky-500" /> Faixas:
           </span>
           {weightPresets.map((p) => (
             <button
