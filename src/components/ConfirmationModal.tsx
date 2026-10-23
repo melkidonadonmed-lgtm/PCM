@@ -60,7 +60,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
       aria-describedby="confirm-modal-desc"
-      onClick={onCancel}
+      onClick={(e) => {
+        e.stopPropagation();
+        onCancel();
+      }}
     >
       <div 
         className="w-full max-w-md rounded-2xl p-6 relative border border-subtle dark:border-strong bg-[var(--surface-card)] shadow-tactile-lg isolate transition modal-surface-spring"

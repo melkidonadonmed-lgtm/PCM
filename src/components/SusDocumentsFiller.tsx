@@ -549,7 +549,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-2xl border border-white/10 flex items-center gap-2 animate-bounce-short"
+          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-2xl border border-white/10 flex items-center gap-2 animate-tab-fade"
         >
           <Check className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>

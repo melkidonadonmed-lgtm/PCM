@@ -59,8 +59,8 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-2.5">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {/* Botão Primário: Imprimir / Gerar PDF (Comando Canônico de Emissão) */}
           <ActionButton
             variant="primary"
@@ -68,7 +68,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             onClick={onNavigateToPrint}
             disabled={isActionDisabled}
             aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-            className="px-4 py-2.5 rounded-xl font-bold shadow-tactile-btn"
+            className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-btn"
             title={
               isDisabledSemMedico
                 ? 'Configure nome e CRM do médico para emitir documentos.'
@@ -85,7 +85,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
               iconName="description"
               onClick={onNavigateToEditor}
               disabled={itemsCount === 0}
-              className="px-3.5 py-2.5 rounded-xl font-bold shadow-tactile-sm text-slate-700 dark:text-slate-300"
+              className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm text-slate-700 dark:text-slate-300"
               title="Abrir no Editor visual A4 para ajustes de texto livre, layout ou timbrados"
             >
               Editor de Folha A4
@@ -99,7 +99,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             onClick={onSendWhatsApp}
             disabled={isActionDisabled}
             aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-            className="px-3.5 py-2.5 rounded-xl font-bold shadow-tactile-sm"
+            className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm"
             title={
               isDisabledSemMedico
                 ? 'Configure nome e CRM do médico para emitir documentos.'

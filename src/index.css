@@ -87,7 +87,7 @@
     /* ==========================================================================
        OPTICAL PHYSICS ENGINE: 135° DIRECTIONAL LIGHT MATRIX (2026 LUXURY)
        Infinite Point Light Source at Top-Left (-45° / 135° Incident Vector)
-       TEMA CLARO: Fundo Baunilha/Creme com Profundidade & Botões Azul Marinho Nobre
+       TEMA CLARO: Clean Slate Mineral (#F8FAFC) & Botões Azul Marinho Nobre (#0F172A)
        ========================================================================== */
 
     /* Tipografia de Alta Precisão */
@@ -95,6 +95,13 @@
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-serif-doc: 'Cormorant Garamond', Georgia, Cambria, 'Times New Roman', Times, serif;
+
+    /* Scrollbar base e variáveis */
+    --scrollbar-thumb: rgba(142, 156, 174, 0.35);
+    --scrollbar-thumb-hover: rgba(142, 156, 174, 0.55);
+    --scrollbar-track: transparent;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 
     /* Dimensões Estruturais */
     --sidebar-width: 280px;
@@ -373,15 +380,6 @@
     text-wrap: pretty;
   }
 
-  /* Scrollbar base e variáveis */
-  :root {
-    --scrollbar-thumb: rgba(142, 156, 174, 0.35);
-    --scrollbar-thumb-hover: rgba(142, 156, 174, 0.55);
-    --scrollbar-track: transparent;
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-  }
-
   /* Filtro de profundidade mobile adaptativo */
   @media (max-width: 767px) {
     :root {
@@ -475,11 +473,14 @@
     color: #0F172A;
     border: 1px solid rgba(15, 23, 42, 0.12);
     border-radius: var(--radius-md);
-    min-height: 46px;
     box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.8);
     transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
                 box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
                 background-color 0.2s ease;
+  }
+  .tactile-input:not(.h-8):not(.h-9):not(.h-10),
+  .tactile-inset:not(.h-8):not(.h-9):not(.h-10) {
+    min-height: 46px;
   }
 
   .tactile-input:focus {

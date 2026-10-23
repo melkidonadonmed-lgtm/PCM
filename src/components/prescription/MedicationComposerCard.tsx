@@ -252,9 +252,9 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
       </div>
 
       {/* Linha 2: Grade Compacta Lado a Lado de Dose, Apresentação, Frequência, Duração e Via */}
-      <div className="grid grid-cols-12 gap-1.5 sm:gap-2">
-        {/* 1. Dose (3 cols mobile, 2 cols sm) */}
-        <div className="col-span-3 sm:col-span-2">
+      <div className="grid grid-cols-12 sm:grid-cols-[minmax(44px,0.5fr)_minmax(108px,1.35fr)_minmax(82px,0.95fr)_minmax(86px,0.95fr)_minmax(96px,1.1fr)] gap-1.5 sm:gap-2">
+        {/* 1. Dose */}
+        <div className="col-span-3 sm:col-span-1">
           <label htmlFor="presc-dose-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 truncate">
             Dose
           </label>
@@ -268,12 +268,12 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = parseFloat(e.target.value) || 1;
               onAtualizarConstrutor(val, doseUnit, doseFrequency, doseDays, isContinuousDose);
             }}
-            className="w-full h-9 px-2 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+            className="w-full h-9 px-1 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
           />
         </div>
 
-        {/* 2. Apresentação (5 cols mobile, 3 cols sm) */}
-        <div className="col-span-5 sm:col-span-3">
+        {/* 2. Apresentação */}
+        <div className="col-span-5 sm:col-span-1">
           <label htmlFor="presc-unit-select" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 truncate">
             Apresentação
           </label>
@@ -284,7 +284,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = e.target.value as UnidadeDose;
               onAtualizarConstrutor(doseAmount, val, doseFrequency, doseDays, isContinuousDose);
             }}
-            className="w-full h-9 px-2 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+            className="w-full h-9 px-1.5 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
           >
             <option value="comprimido">Comprimido</option>
             <option value="cápsula">Cápsula</option>
@@ -297,8 +297,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           </select>
         </div>
 
-        {/* 3. Frequência / Horário (4 cols mobile, 3 cols sm) */}
-        <div className="col-span-4 sm:col-span-3">
+        {/* 3. Frequência / Horário */}
+        <div className="col-span-4 sm:col-span-1">
           <label htmlFor="presc-frequency-select" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 truncate">
             Frequência
           </label>
@@ -309,7 +309,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = e.target.value as FrequenciaHorario;
               onAtualizarConstrutor(doseAmount, doseUnit, val, doseDays, isContinuousDose);
             }}
-            className="w-full h-9 px-2 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+            className="w-full h-9 px-1.5 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium text-slate-900 dark:text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
           >
             <option value="8/8h">8/8h</option>
             <option value="12/12h">12/12h</option>
@@ -327,8 +327,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           </select>
         </div>
 
-        {/* 4. Duração em dias (4 cols mobile, 2 cols sm) */}
-        <div className="col-span-4 sm:col-span-2">
+        {/* 4. Duração em dias */}
+        <div className="col-span-4 sm:col-span-1">
           <label htmlFor="presc-duration-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 truncate">
             Duração (dias)
           </label>
@@ -338,7 +338,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             min="0"
             max="365"
             value={isContinuousDose ? '' : (doseDays || '')}
-            placeholder="Contínuo"
+            placeholder="Ex.: 7"
             onChange={(e) => {
               const raw = e.target.value.trim();
               if (!raw || parseInt(raw, 10) <= 0) {
@@ -348,12 +348,12 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                 onAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, dias, false);
               }
             }}
-            className="w-full h-9 px-2 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+            className="w-full h-9 px-1.5 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium text-slate-900 dark:text-slate-100 text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
           />
         </div>
 
-        {/* 5. Via de administração (8 cols mobile, 2 cols sm) */}
-        <div className="col-span-8 sm:col-span-2">
+        {/* 5. Via de administração */}
+        <div className="col-span-8 sm:col-span-1">
           <label htmlFor="presc-route-select" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 truncate">
             Via
           </label>
@@ -365,7 +365,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               onChangeRoute(novaVia);
               onAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, doseDays, isContinuousDose, novaVia);
             }}
-            className="w-full h-9 px-2 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm cursor-pointer"
+            className="w-full h-9 px-1.5 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm cursor-pointer"
           >
             <option value="Uso Oral">Uso Oral</option>
             <option value="Uso Tópico">Uso Tópico</option>
@@ -393,8 +393,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             rows={1}
             value={selectedPosology}
             onChange={(e) => onChangePosology(e.target.value)}
-            placeholder="Preenchida automaticamente ou digite orientações adicionais..."
-            className="w-full h-9 py-2 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm resize-none leading-tight"
+            placeholder="Ex.: Tomar 1 comprimido VO de 8/8h por 5 dias"
+            className="w-full h-11 min-h-[44px] py-3 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-slate-900 dark:text-slate-100 shadow-tactile-sm resize-none leading-tight overflow-hidden"
           />
         </div>
 
@@ -402,7 +402,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           <button
             type="button"
             onClick={onSubmitMedication}
-            className={`flex-1 h-9 px-3 rounded-xl font-semibold text-xs inline-flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 whitespace-nowrap ${
+            className={`flex-1 h-11 min-h-[44px] px-3 rounded-xl font-semibold text-xs inline-flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 whitespace-nowrap ${
               editingItemId
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                 : 'btn-tactile-primary'
@@ -425,7 +425,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             <button
               type="button"
               onClick={onCancelEdit}
-              className="h-9 px-3 rounded-xl border border-medium dark:border-strong bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs cursor-pointer shadow-tactile-sm transition shrink-0"
+              className="h-11 min-h-[44px] px-3 rounded-xl border border-medium dark:border-strong bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs cursor-pointer shadow-tactile-sm transition shrink-0"
               title="Cancelar edição e voltar ao modo de inserção"
             >
               Cancelar

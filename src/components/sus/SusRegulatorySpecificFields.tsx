@@ -121,7 +121,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               type="text"
               value={formData.sigtapCode || ''}
               onChange={(e) => onFieldChange('sigtapCode', e.target.value)}
-              placeholder="00.00.00.000-0"
+              placeholder="Ex.: 00.00.00.000-0"
               className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
             />
           </div>
@@ -134,7 +134,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               type="text"
               value={formData.procedureName || ''}
               onChange={(e) => onFieldChange('procedureName', e.target.value)}
-              placeholder="Nome do procedimento oficial"
+              placeholder="Ex.: Ressonância magnética de coluna..."
               className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
             />
           </div>
@@ -189,7 +189,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               list="sus-cid10-datalist"
               value={formData.cid10Code || ''}
               onChange={(e) => handleCidCodeChange(e.target.value)}
-              placeholder="Código"
+              placeholder="Ex.: M54.5"
               className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase font-mono font-bold"
             />
           </div>
@@ -202,7 +202,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               type="text"
               value={formData.cid10Description || ''}
               onChange={(e) => onFieldChange('cid10Description', e.target.value)}
-              placeholder="Descrição diagnóstica (ex.: Dor lombar baixa)"
+              placeholder="Ex.: Dor lombar baixa"
               className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
             />
           </div>
@@ -239,7 +239,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   inputMode="numeric"
                   value={formData.sinanNumber || ''}
                   onChange={(e) => onFieldChange('sinanNumber', e.target.value)}
-                  placeholder="Número SINAN (7 dígitos)"
+                  placeholder="Ex.: 0000000 (7 dígitos)"
                   className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
                 />
               </div>
@@ -252,7 +252,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   type="text"
                   value={formData.symptomsStartDate || ''}
                   onChange={(e) => onFieldChange('symptomsStartDate', e.target.value)}
-                  placeholder="DD/MM/AAAA"
+                  placeholder="Ex.: DD/MM/AAAA"
                   className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
                 />
               </div>
@@ -321,7 +321,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                     type="text"
                     value={formData.gynecologyDum || ''}
                     onChange={(e) => onFieldChange('gynecologyDum', e.target.value)}
-                    placeholder="DD/MM/AAAA ou Menopausa"
+                    placeholder="Ex.: DD/MM/AAAA ou Menopausa"
                     className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                   />
                 </div>
@@ -419,7 +419,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                 type="text"
                 value={formData.renalEtfg || ''}
                 onChange={(e) => onFieldChange('renalEtfg', e.target.value)}
-                placeholder="mL/min/1,73m²"
+                placeholder="Ex.: > 60 mL/min/1,73m²"
                 className="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
               />
             </div>
@@ -458,7 +458,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                       onChange={(e) =>
                         onAlterarLinhaDaLme(indice, (l) => ({ ...l, name: e.target.value }))
                       }
-                      placeholder="Medicamento, concentração e forma (como no PCDT)"
+                      placeholder="Ex.: Atorvastatina 40 mg comprimido"
                       className={`${CAMPO_SUS} font-semibold`}
                     />
                     {linhasDaLme.length > 1 && (
@@ -493,8 +493,8 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                             ),
                           }))
                         }
-                        placeholder={`${mes} mês`}
-                        className="w-full px-1.5 py-1 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-info"
+                        placeholder={`Ex.: ${mes}`}
+                        className="w-full px-1.5 py-1 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-info clinical-tabular-nums"
                       />
                     ))}
                   </div>
@@ -538,7 +538,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   inputMode="decimal"
                   value={formData.patientWeightKg || ''}
                   onChange={(e) => onFieldChange('patientWeightKg', e.target.value)}
-                  className={CAMPO_SUS}
+                  className={`${CAMPO_SUS} clinical-tabular-nums`}
                 />
               </div>
               <div>
@@ -551,7 +551,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   inputMode="numeric"
                   value={formData.patientHeightCm || ''}
                   onChange={(e) => onFieldChange('patientHeightCm', e.target.value)}
-                  className={CAMPO_SUS}
+                  className={`${CAMPO_SUS} clinical-tabular-nums`}
                 />
               </div>
               <div className="col-span-2">
@@ -564,8 +564,8 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   inputMode="numeric"
                   value={formData.doctorCns || ''}
                   onChange={(e) => onFieldChange('doctorCns', e.target.value)}
-                  placeholder="15 dígitos"
-                  className={`${CAMPO_SUS} font-mono`}
+                  placeholder="Ex.: 700 0000 0000 0000"
+                  className={`${CAMPO_SUS} font-mono clinical-tabular-nums`}
                 />
               </div>
             </div>
@@ -665,7 +665,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
             rows={4}
             value={formData.clinicalJustification}
             onChange={(e) => onFieldChange('clinicalJustification', e.target.value)}
-            placeholder="Descreva o quadro do paciente: história, exame físico e o que já foi tentado."
+            placeholder="Ex.: Descreva o quadro do paciente: história, exame físico e o que já foi tentado."
             className="w-full p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info leading-relaxed font-sans"
           />
           <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">

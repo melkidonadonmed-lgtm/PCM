@@ -1,6 +1,6 @@
 import React from 'react';
 import { EditorContent, type Editor } from '@tiptap/react';
-import { Scissors } from 'lucide-react';
+import { Scissors } from '../Icon';
 import { DOMPurify } from '../../utils/sanitizeHtml';
 import {
   DocumentHeaderConfig,

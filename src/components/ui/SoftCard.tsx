@@ -1,8 +1,9 @@
 import React from 'react';
+import type { UIState } from '../../types/index';
 
 export interface SoftCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'flat' | 'raised' | 'inset';
-  state?: 'idle' | 'loading' | 'error' | 'pressed';
+  state?: UIState;
 }
 
 export const SoftCard: React.FC<SoftCardProps> = ({

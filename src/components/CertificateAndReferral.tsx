@@ -214,14 +214,31 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
   const handleDaysChange = (days: number) => {
     const validDays = Math.max(0, isNaN(days) ? 0 : days);
-    const startBase = certificate.startDate ? certificate.startDate + 'T00:00:00' : undefined;
+    const startBase = certificate.startDate ? certificate.startDate + 'T12:00:00' : undefined;
     const start = startBase ? new Date(startBase) : new Date();
     const end = new Date(start);
     end.setDate(start.getDate() + (validDays > 0 ? validDays - 1 : 0));
-    
+
     onUpdateCertificate({
       ...certificate,
       daysOff: validDays,
+      endDate: dataLocalISO(end)
+    });
+  };
+
+  const handleStartDateChange = (newStartDate: string) => {
+    if (!newStartDate) {
+      onUpdateCertificate({ ...certificate, startDate: newStartDate });
+      return;
+    }
+    const validDays = Math.max(0, Number(certificate.daysOff) || 0);
+    const start = new Date(newStartDate + 'T12:00:00');
+    const end = new Date(start);
+    end.setDate(start.getDate() + (validDays > 0 ? validDays - 1 : 0));
+
+    onUpdateCertificate({
+      ...certificate,
+      startDate: newStartDate,
       endDate: dataLocalISO(end)
     });
   };
@@ -427,7 +444,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="text"
                   value={patient?.name ?? certificate.patientName ?? ''}
                   onChange={(e) => handlePatientNameChange(e.target.value)}
-                  placeholder="Nome completo do paciente..."
+                  placeholder="Ex.: Maria de Oliveira Santos"
                   className="w-full h-9 px-3 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                 />
               </div>
@@ -442,7 +459,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="text"
                   value={patient?.documentNumber ?? certificate.documentNumber ?? ''}
                   onChange={(e) => handlePatientDocChange(e.target.value)}
-                  placeholder="Ex: RG ou CPF..."
+                  placeholder="Ex.: 000.000.000-00"
                   className="w-full h-9 px-2.5 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
                 />
               </div>
@@ -498,7 +515,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   aria-label="Data de início do atestado"
                   type="date"
                   value={certificate.startDate}
-                  onChange={(e) => onUpdateCertificate({ ...certificate, startDate: e.target.value })}
+                  onChange={(e) => handleStartDateChange(e.target.value)}
                   className="w-full h-9 px-2.5 rounded-xl font-medium text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
                 />
               </div>
@@ -554,7 +571,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     onSelectCid={handleSelectCidForCertificate}
                     onClearCid={handleClearCidCertificate}
                     label="Buscador Inteligente de CID-10 (Preenchimento Automático)"
-                    placeholder="Digite o diagnóstico ou código (ex: J00, Asma, Lombalgia, Dengue, A09, Ansiedade, R50)..."
+                    placeholder="Ex.: J00, Asma, Lombalgia, Dengue, A09, Ansiedade, R50..."
                     showQuickChips={true}
                     variant="certificate"
                   />
@@ -569,8 +586,8 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                         type="text"
                         value={certificate.cid10Code || ''}
                         onChange={(e) => onUpdateCertificate({ ...certificate, cid10Code: e.target.value.toUpperCase() })}
-                        placeholder="Ex: J00"
-                        className="w-full p-2.5 rounded-xl border text-xs sm:text-sm font-mono font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center"
+                        placeholder="Ex.: J00"
+                        className="w-full p-2.5 rounded-xl border text-xs sm:text-sm font-mono font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center clinical-tabular-nums"
                         style={{
                           backgroundColor: 'var(--surface-card)',
                           borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
@@ -587,7 +604,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                         type="text"
                         value={certificate.cid10Description || ''}
                         onChange={(e) => onUpdateCertificate({ ...certificate, cid10Description: e.target.value })}
-                        placeholder="Ex: Nasofaringite aguda (resfriado comum)..."
+                        placeholder="Ex.: Nasofaringite aguda (resfriado comum)..."
                         className="w-full p-2.5 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                         style={{
                           backgroundColor: 'var(--surface-card)',
@@ -616,7 +633,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 rows={2}
                 value={certificate.observations}
                 onChange={(e) => onUpdateCertificate({ ...certificate, observations: e.target.value })}
-                placeholder="Ex: Paciente esteve sob cuidados médicos das 08h às 11h. Recomenda-se repouso domiciliar e hidratação oral..."
+                placeholder="Ex.: Paciente esteve sob cuidados médicos das 08h às 11h. Recomenda-se repouso domiciliar e hidratação oral..."
                 className="w-full p-3 rounded-xl text-xs sm:text-sm font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input leading-relaxed"
               />
             </div>
@@ -692,7 +709,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="text"
                   value={patient?.name ?? referral.patientName ?? ''}
                   onChange={(e) => handlePatientNameChange(e.target.value)}
-                  placeholder="Nome completo do paciente..."
+                  placeholder="Ex.: Maria de Oliveira Santos"
                   className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                 />
               </div>
@@ -707,8 +724,8 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="text"
                   value={patient?.documentNumber ?? referral.documentNumber ?? ''}
                   onChange={(e) => handlePatientDocChange(e.target.value)}
-                  placeholder="Ex: RG 12.345.678-9 ou CPF..."
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+                  placeholder="Ex.: 000.000.000-00"
+                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
                 />
               </div>
             </div>
@@ -743,7 +760,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="text"
                   value={referral.destinationInstitution || ''}
                   onChange={(e) => onUpdateReferral({ ...referral, destinationInstitution: e.target.value })}
-                  placeholder="Ex: Ambulatório de Especialidades / HU..."
+                  placeholder="Ex.: Ambulatório de Especialidades / HU..."
                   className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                 />
               </div>
@@ -777,7 +794,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 type="text"
                 value={referral.reason}
                 onChange={(e) => onUpdateReferral({ ...referral, reason: e.target.value })}
-                placeholder="Ex: Avaliação especializada e conduta terapêutica..."
+                placeholder="Ex.: Avaliação especializada e conduta terapêutica..."
                 className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
               />
             </div>
@@ -789,7 +806,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 rows={3}
                 value={referral.clinicalSummary}
                 onChange={(e) => onUpdateReferral({ ...referral, clinicalSummary: e.target.value })}
-                placeholder="Ex: Paciente com história de episódios recorrentes de broncoespasmo..."
+                placeholder="Ex.: Paciente com história de episódios recorrentes de broncoespasmo..."
                 className="w-full p-3 rounded-xl text-xs sm:text-sm font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input leading-relaxed"
               />
             </div>
@@ -802,7 +819,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   rows={3}
                   value={referral.relevantExams}
                   onChange={(e) => onUpdateReferral({ ...referral, relevantExams: e.target.value })}
-                  placeholder="Ex: Hemograma completo sem alterações, RX de tórax com hiperinsuflação discreta..."
+                  placeholder="Ex.: Hemograma completo sem alterações, RX de tórax com hiperinsuflação discreta..."
                   className="w-full p-3 rounded-xl text-xs sm:text-sm font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input leading-relaxed"
                 />
               </div>
@@ -816,7 +833,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   rows={3}
                   value={referral.hypothesisCID}
                   onChange={(e) => onUpdateReferral({ ...referral, hypothesisCID: e.target.value })}
-                  placeholder="Ex: J45.9 - Asma não especificada / J30.4 - Rinite alérgica..."
+                  placeholder="Ex.: J45.9 - Asma não especificada / J30.4 - Rinite alérgica..."
                   className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input leading-relaxed font-sans"
                 />
               </div>
@@ -876,7 +893,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 onSelectCid={handleSelectCidForReferral}
                 onAppendCid={handleAppendCidForReferral}
                 label="Pesquisar Qualquer Diagnóstico CID-10"
-                placeholder="Buscar diagnóstico CID para o encaminhamento (ex: Pneumonia, Asma, Enxaqueca, Fibromialgia, G43, J45)..."
+                placeholder="Ex.: Pneumonia, Asma, Enxaqueca, Fibromialgia, G43, J45..."
                 showQuickChips={false}
                 variant="referral"
               />

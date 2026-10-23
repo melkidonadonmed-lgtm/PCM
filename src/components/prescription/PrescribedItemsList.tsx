@@ -59,7 +59,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
 }) => {
   return (
     <section
-      data-state={editingItemId ? 'pressed' : 'idle'}
+      data-state={items.length === 0 ? 'empty' : 'idle'}
       aria-busy={false}
       aria-label="Medicamentos prescritos na consulta"
       className="card-surface surface-card-minimal rounded-2xl p-4 sm:p-5 border border-subtle dark:border-strong space-y-3"
@@ -90,7 +90,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
             <Icon name="folder_open" size={15} className="text-sky-600 dark:text-sky-400" />
             <span>Modelos</span>
             {savedModelsCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold clinical-tabular-nums">
+              <span className="px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold clinical-tabular-nums">
                 {savedModelsCount}
               </span>
             )}
@@ -217,7 +217,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                   <button
                     type="button"
                     onClick={() => onStartEdit(it)}
-                    className={`p-1 rounded-lg transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
+                    className={`p-1.5 rounded-lg transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
                       isEditing
                         ? 'bg-sky-600 text-white shadow-tactile-sm'
                         : 'hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
@@ -231,8 +231,9 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                     type="button"
                     onClick={() => onMoveItem(idx, 'up')}
                     disabled={idx === 0}
-                    className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
                     title="Mover para cima"
+                    aria-label={`Mover ${it.name} para cima`}
                   >
                     <Icon name="expand_less" className="text-[16px]" />
                   </button>
@@ -240,16 +241,18 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                     type="button"
                     onClick={() => onMoveItem(idx, 'down')}
                     disabled={idx === items.length - 1}
-                    className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
                     title="Mover para baixo"
+                    aria-label={`Mover ${it.name} para baixo`}
                   >
                     <Icon name="expand_more" className="text-[16px]" />
                   </button>
                   <button
                     type="button"
                     onClick={() => onRemoveItem(it.id)}
-                    className="p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
                     title="Remover medicamento"
+                    aria-label={`Remover ${it.name}`}
                   >
                     <Icon name="delete" className="text-[16px]" />
                   </button>

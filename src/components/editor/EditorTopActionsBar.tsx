@@ -17,7 +17,7 @@ import {
   Save,
   BookmarkPlus,
   FolderOpen,
-} from 'lucide-react';
+} from '../Icon';
 import { DoctorProfile, SavedDocument } from '../../types';
 import { medicoConfigurado } from '../../utils/medicoConfigurado';
 
@@ -206,46 +206,53 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
         <div className="relative group">
           <button
             type="button"
-            className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap"
+            aria-haspopup="menu"
+            className="h-10 px-3 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
             title="Carregar documentos e dados da consulta ativa para edição"
           >
             <FileText className="w-4 h-4 text-[var(--text-muted)]" />
             <span>Carregar da Consulta</span>
           </button>
-          <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-xl shadow-tactile-lg p-1.5 hidden group-hover:block z-50 animate-tab-fade">
-            <button
-              type="button"
-              onClick={() => handleLoadActivePrescription(true)}
-              className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer"
-            >
-              <Pill className="w-3.5 h-3.5 text-sky-600" />
-              <span>Receita Médica Ativa</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleLoadActiveReferral(true)}
-              className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer"
-            >
-              <Stethoscope className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Encaminhamento Ativo</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleLoadActiveCertificate(true)}
-              className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer"
-            >
-              <Award className="w-3.5 h-3.5 text-amber-600" />
-              <span>Atestado Médico Ativo</span>
-            </button>
-            <div className="border-t border-slate-100 dark:border-strong my-1"></div>
-            <button
-              type="button"
-              onClick={handleStartNewDocument}
-              className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-2 text-slate-700 dark:text-slate-300 cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5 text-slate-500" />
-              <span>Documento em Branco</span>
-            </button>
+          <div className="absolute right-0 top-full pt-1 w-52 hidden group-hover:block group-focus-within:block z-50 animate-tab-fade">
+            <div role="menu" className="bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-xl shadow-tactile-lg p-1.5">
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => handleLoadActivePrescription(true)}
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              >
+                <Pill className="w-3.5 h-3.5 text-sky-600" />
+                <span>Receita Médica Ativa</span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => handleLoadActiveReferral(true)}
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              >
+                <Stethoscope className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Encaminhamento Ativo</span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => handleLoadActiveCertificate(true)}
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              >
+                <Award className="w-3.5 h-3.5 text-amber-600" />
+                <span>Atestado Médico Ativo</span>
+              </button>
+              <div className="border-t border-slate-100 dark:border-strong my-1"></div>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={handleStartNewDocument}
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-2 text-slate-700 dark:text-slate-300 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+              >
+                <Plus className="w-3.5 h-3.5 text-slate-500" />
+                <span>Documento em Branco</span>
+              </button>
+            </div>
           </div>
         </div>
 

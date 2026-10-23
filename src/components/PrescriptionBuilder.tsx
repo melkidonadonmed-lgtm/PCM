@@ -242,38 +242,28 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const isDoctorConfigured = medicoConfigurado(doctor);
   const handleAbrirPerfilMedico = onAbrirPerfilMedico || onOpenDoctorModal;
 
-  // Atalhos de Teclado Globais: '/', 'Ctrl+K' para busca, e 'Escape' para fechar o Drawer ou Modais
+  // Atalhos de Teclado Globais: '/' e 'Ctrl+K' para busca (Escape e Focus Trap de modais/drawers gerenciados por useModalAccessibility)
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isPediatricDrawerOpen) {
-          e.preventDefault();
-          setIsPediatricDrawerOpen(false);
-          return;
-        }
-        if (isSaveModelModalOpen) {
-          e.preventDefault();
-          setIsSaveModelModalOpen(false);
-          return;
-        }
-        if (isLoadModelModalOpen) {
-          e.preventDefault();
-          setIsLoadModelModalOpen(false);
-          setIsCreatingCustomModel(false);
-          return;
-        }
+      // Não intercepta atalhos de busca se houver qualquer modal/drawer aberto (ex.: Command Palette Ctrl+K)
+      if (document.querySelector('[role="dialog"], [aria-modal="true"]')) {
+        return;
       }
 
       const activeTag = (document.activeElement?.tagName || '').toLowerCase();
-      const isEditing = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
+      const isEditing =
+        activeTag === 'input' ||
+        activeTag === 'textarea' ||
+        activeTag === 'select' ||
+        (document.activeElement as HTMLElement | null)?.isContentEditable;
 
-      // Ctrl+K ou Cmd+K sempre foca na busca
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setMobileSection('composer');
-        searchInputRef.current?.focus();
-        searchInputRef.current?.select();
-        setShowSuggestions(true);
+      // Ctrl+K seleciona o texto do campo de fármaco quando ele já está focado com texto (caso contrário o useNavigationSync abre a Command Palette global)
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'k') {
+        if (document.activeElement === searchInputRef.current && searchInputRef.current?.value.trim()) {
+          e.preventDefault();
+          searchInputRef.current.select();
+          setShowSuggestions(true);
+        }
         return;
       }
 
@@ -289,7 +279,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isPediatricDrawerOpen, isSaveModelModalOpen, isLoadModelModalOpen]);
+  }, []);
 
   // Autocomplete suggestions (top 8)
   const searchSuggestions = useMemo(() => {
@@ -414,7 +404,14 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     setDoseUnit(unit);
 
     if (searchInputRef.current) {
-      searchInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      searchInputRef.current.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        block: 'center',
+      });
     }
   };
 
@@ -598,7 +595,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       </div>
 
       {/* Main Grid: Left Controls & Right A4 Simulation */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-5 items-start">
         
         {/* LEFT COLUMN: Composer, Search and Prescribed Items */}
         <div className={`xl:col-span-7 space-y-4 ${mobileSection === 'preview' ? 'hidden md:block' : 'block'}`}>
@@ -762,7 +759,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade"
+          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade"
         >
           <Icon name="check" className="text-[16px] text-emerald-400" />
           <span>{prescriptionModelToast}</span>

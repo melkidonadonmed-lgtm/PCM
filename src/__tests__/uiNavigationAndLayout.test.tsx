@@ -19,6 +19,14 @@ import { runTabViewTransition } from '../hooks/useNavigationSync';
 import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
 import { SUS_DOCUMENTS_CATALOG } from '../data/susDocumentsCatalog';
 import { SusInteractiveVectorSheet } from '../components/sus/SusInteractiveVectorSheet';
+import { PrescriptionModelsModal } from '../components/prescription/PrescriptionModelsModal';
+import { PrescribedItemsList } from '../components/prescription/PrescribedItemsList';
+import { PatientQuickCard } from '../components/prescription/PatientQuickCard';
+import { LogoGeneratorModal } from '../components/LogoGeneratorModal';
+import { EditorModelsAndStylesDrawer } from '../components/editor/EditorModelsAndStylesDrawer';
+import { SusCatalogListView } from '../components/sus/SusCatalogListView';
+import { CidSearchBar } from '../components/CidSearchBar';
+import { registerModalInStack, getActiveModalStackSize } from '../hooks/useModalAccessibility';
 import { clinicalRepository } from '../core/storage/clinicalRepository';
 import type { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral } from '../types';
 
@@ -473,5 +481,494 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(vectorHtml).toContain('16 - Código SIGTAP');
     expect(vectorHtml).toContain('21 - Creatinina Sérica (mg/dL)');
     expect(vectorHtml).toContain('Carlos Eduardo Lima');
+  });
+
+  it('valida casos de borda de acessibilidade (WAI-ARIA), FSM data-state canônico e invariante Sem peso, sem dose (weightKg = 0)', () => {
+    const zeroWeightPatient: Patient = {
+      ...activePatient,
+      weightKg: 0,
+    };
+
+    const pediaZeroHtml = renderToStaticMarkup(
+      <PediatricCalculator
+        darkMode={false}
+        patient={zeroWeightPatient}
+        onUpdatePatientWeight={vi.fn()}
+        onAddPrescriptionItem={vi.fn()}
+        onNavigateToPrescription={vi.fn()}
+      />
+    );
+    expect(pediaZeroHtml).toContain('value=""');
+    expect(pediaZeroHtml).toContain('Informe o peso do paciente para calcular as doses.');
+    expect(pediaZeroHtml).not.toContain('py-0.2');
+
+    const regimeLabels = {
+      simples: { rotulo: 'Receita Simples', detalhe: '1 via', tituloTexto: 'RECEITUÁRIO' },
+      antimicrobiano: { rotulo: 'Antimicrobiano', detalhe: '2 vias', tituloTexto: 'RECEITUÁRIO DE ANTIMICROBIANO' },
+      controle_especial: { rotulo: 'Controle Especial', detalhe: '2 vias', tituloTexto: 'RECEITUÁRIO DE CONTROLE ESPECIAL' },
+    };
+
+    const emptyListHtml = renderToStaticMarkup(
+      <PrescribedItemsList
+        items={[]}
+        editingItemId={null}
+        regimesComItens={[]}
+        porRegime={{ simples: [], antimicrobiano: [], controle_especial: [] }}
+        itensEmDuasVias={0}
+        regimeLabels={regimeLabels}
+        savedModelsCount={0}
+        isDoctorConfigured={true}
+        copiedSuccess={false}
+        onOpenModelsModal={vi.fn()}
+        onOpenSaveModelModal={vi.fn()}
+        onOpenCreateCustomModel={vi.fn()}
+        onStartEdit={vi.fn()}
+        onMoveItem={vi.fn()}
+        onRemoveItem={vi.fn()}
+        onNavigateToPrint={vi.fn()}
+        onSendWhatsApp={vi.fn()}
+        onCopyText={vi.fn()}
+      />
+    );
+    expect(emptyListHtml).toContain('data-state="empty"');
+    expect(emptyListHtml).not.toContain('data-state="pressed"');
+
+    const twoItems: PrescriptionItem[] = [
+      ...sampleItems,
+      {
+        ...sampleItems[0],
+        id: 'rx-2',
+        name: 'Paracetamol 500 mg',
+      },
+    ];
+
+    const populatedListHtml = renderToStaticMarkup(
+      <PrescribedItemsList
+        items={twoItems}
+        editingItemId={null}
+        regimesComItens={['simples']}
+        porRegime={{ simples: twoItems, antimicrobiano: [], controle_especial: [] }}
+        itensEmDuasVias={0}
+        regimeLabels={regimeLabels}
+        savedModelsCount={1}
+        isDoctorConfigured={true}
+        copiedSuccess={false}
+        onOpenModelsModal={vi.fn()}
+        onOpenSaveModelModal={vi.fn()}
+        onOpenCreateCustomModel={vi.fn()}
+        onStartEdit={vi.fn()}
+        onMoveItem={vi.fn()}
+        onRemoveItem={vi.fn()}
+        onNavigateToPrint={vi.fn()}
+        onSendWhatsApp={vi.fn()}
+        onCopyText={vi.fn()}
+      />
+    );
+    expect(populatedListHtml).toContain('data-state="idle"');
+    expect(populatedListHtml).toContain('aria-label="Mover Dipirona 500 mg para cima"');
+    expect(populatedListHtml).toContain('aria-label="Remover Dipirona 500 mg"');
+    expect(populatedListHtml).not.toContain('py-0.2');
+
+    const patientCardHtml = renderToStaticMarkup(
+      <PatientQuickCard
+        patient={activePatient}
+        showExtraPatientFields={false}
+        onToggleExtraFields={vi.fn()}
+        onUpdatePatient={vi.fn()}
+        onOpenPatientModal={vi.fn()}
+      />
+    );
+    expect(patientCardHtml).toContain('data-state="idle"');
+    expect(patientCardHtml).not.toContain('data-state="pressed"');
+
+    const modelsModalHtml = renderToStaticMarkup(
+      <PrescriptionModelsModal
+        isSaveModelModalOpen={true}
+        isLoadModelModalOpen={true}
+        isCreatingCustomModel={false}
+        items={sampleItems}
+        newModelName="Analgesia Padrão"
+        savedPrescriptionModels={[
+          {
+            id: 'mod-1',
+            title: 'Modelo Teste',
+            contentJson: null,
+            contentHtml: '',
+            contextId: 'default',
+            isTemplate: true,
+            prescriptionItems: sampleItems,
+            updatedAt: Date.now(),
+            createdAt: Date.now(),
+          },
+        ]}
+        customModelDraftTitle=""
+        customModelDraftItems={[]}
+        customModelSearchTerm=""
+        customModelSuggestions={[]}
+        onChangeNewModelName={vi.fn()}
+        onSavePrescriptionModel={vi.fn()}
+        onCloseSaveModelModal={vi.fn()}
+        onCloseLoadModelModal={vi.fn()}
+        onStartCreateCustomModel={vi.fn()}
+        onExitCreateCustomModel={vi.fn()}
+        onChangeCustomModelDraftTitle={vi.fn()}
+        onCustomModelSearchChange={vi.fn()}
+        onAddCustomModelItem={vi.fn()}
+        onRemoveCustomModelItem={vi.fn()}
+        onUpdateCustomModelItem={vi.fn()}
+        onSaveCustomCreatedModel={vi.fn()}
+        onApplyPrescriptionModel={vi.fn()}
+        onDeletePrescriptionModel={vi.fn()}
+      />
+    );
+    expect(modelsModalHtml).toContain('role="dialog"');
+    expect(modelsModalHtml).toContain('aria-modal="true"');
+    expect(modelsModalHtml).toContain('aria-label="Excluir modelo Modelo Teste"');
+  });
+
+  it('registerModalInStack gerencia pilha LIFO de modais aninhados (Escape fecha apenas o modal do topo, preserva foco anterior e aplica Focus Trap Tab/Shift+Tab)', () => {
+    const keydownListeners = new Set<(e: KeyboardEvent) => void>();
+    const fakeWin = {
+      addEventListener: (_type: string, fn: EventListenerOrEventListenerObject) => {
+        keydownListeners.add(fn as (e: KeyboardEvent) => void);
+      },
+      removeEventListener: (_type: string, fn: EventListenerOrEventListenerObject) => {
+        keydownListeners.delete(fn as (e: KeyboardEvent) => void);
+      },
+    } as unknown as Pick<Window, 'addEventListener' | 'removeEventListener'>;
+
+    let currentActive: HTMLElement | null = null;
+    const makeEl = (name: string): HTMLElement => {
+      const el = {
+        name,
+        focus: vi.fn(() => {
+          currentActive = el;
+        }),
+        hasAttribute: () => false,
+        getAttribute: () => null,
+        offsetParent: {},
+        getClientRects: () => [{}],
+      } as unknown as HTMLElement;
+      return el;
+    };
+
+    const pageTriggerBtn = makeEl('page-trigger');
+    const parentFirstInput = makeEl('parent-first');
+    const parentSubModalBtn = makeEl('parent-submodal-btn');
+    const childFirstBtn = makeEl('child-first');
+    const childLastBtn = makeEl('child-last');
+
+    const fakeDoc = {
+      get activeElement() {
+        return currentActive;
+      },
+    } as unknown as Pick<Document, 'activeElement'>;
+
+    const makeContainer = (nodes: HTMLElement[]): HTMLElement =>
+      ({
+        querySelector: () => nodes[0] || null,
+        querySelectorAll: () => nodes,
+        contains: (target: Node | null) => nodes.includes(target as HTMLElement),
+      }) as unknown as HTMLElement;
+
+    const parentContainer = makeContainer([parentFirstInput, parentSubModalBtn]);
+    const childContainer = makeContainer([childFirstBtn, childLastBtn]);
+
+    const onCloseParent = vi.fn();
+    const onCloseChild = vi.fn();
+
+    // 1. Usuário foca botão na página e abre modal pai (ex.: DoctorProfileModal)
+    pageTriggerBtn.focus();
+    const cleanupParent = registerModalInStack({
+      getOnClose: () => onCloseParent,
+      getContainer: () => parentContainer,
+      getInitialFocus: () => parentFirstInput,
+      doc: fakeDoc,
+      win: fakeWin,
+    });
+    expect(getActiveModalStackSize()).toBe(1);
+
+    // 2. Usuário foca botão interno do modal pai e abre submodal (ex.: LogoGeneratorModal / ConfirmationModal)
+    parentSubModalBtn.focus();
+    const cleanupChild = registerModalInStack({
+      getOnClose: () => onCloseChild,
+      getContainer: () => childContainer,
+      getInitialFocus: () => childFirstBtn,
+      doc: fakeDoc,
+      win: fakeWin,
+    });
+    expect(getActiveModalStackSize()).toBe(2);
+
+    // 3. Ciclo de Tab e Shift+Tab no modal filho (Focus Trap)
+    childLastBtn.focus();
+    const tabForwardEvent = {
+      key: 'Tab',
+      shiftKey: false,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+    } as unknown as KeyboardEvent;
+    keydownListeners.forEach((fn) => fn(tabForwardEvent));
+    expect(tabForwardEvent.preventDefault).toHaveBeenCalledTimes(1);
+    expect(currentActive).toBe(childFirstBtn);
+
+    const tabBackwardEvent = {
+      key: 'Tab',
+      shiftKey: true,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+    } as unknown as KeyboardEvent;
+    keydownListeners.forEach((fn) => fn(tabBackwardEvent));
+    expect(tabBackwardEvent.preventDefault).toHaveBeenCalledTimes(1);
+    expect(currentActive).toBe(childLastBtn);
+
+    // 4. Pressionar Escape com submodal aberto fecha APENAS o submodal (não o modal pai)
+    const escape1 = {
+      key: 'Escape',
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      stopImmediatePropagation: vi.fn(),
+    } as unknown as KeyboardEvent;
+    keydownListeners.forEach((fn) => fn(escape1));
+    expect(onCloseChild).toHaveBeenCalledTimes(1);
+    expect(onCloseParent).not.toHaveBeenCalled();
+
+    // 5. Desmontar submodal restaura o foco para o botão dentro do modal pai
+    cleanupChild();
+    expect(getActiveModalStackSize()).toBe(1);
+    expect(currentActive).toBe(parentSubModalBtn);
+
+    // 6. Pressionar Escape novamente fecha o modal pai e restaura o foco para o botão original da página
+    const escape2 = {
+      key: 'Escape',
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      stopImmediatePropagation: vi.fn(),
+    } as unknown as KeyboardEvent;
+    keydownListeners.forEach((fn) => fn(escape2));
+    expect(onCloseParent).toHaveBeenCalledTimes(1);
+    cleanupParent();
+    expect(getActiveModalStackSize()).toBe(0);
+    expect(currentActive).toBe(pageTriggerBtn);
+  });
+
+  it('LogoGeneratorModal, EditorModelsAndStylesDrawer, SusCatalogListView e CidSearchBar cumprem WAI-ARIA e placeholders Ex.: sem classes inválidas', () => {
+    const logoModalHtml = renderToStaticMarkup(
+      <LogoGeneratorModal
+        isOpen={true}
+        onClose={vi.fn()}
+        activeContext={null}
+        doctor={configuredDoctor}
+      />
+    );
+    expect(logoModalHtml).toContain('role="dialog"');
+    expect(logoModalHtml).toContain('aria-modal="true"');
+    expect(logoModalHtml).toContain('aria-labelledby="logo-modal-title"');
+    expect(logoModalHtml).toContain('aria-label="Fechar gerador de logotipo"');
+
+    const editorDrawerHtml = renderToStaticMarkup(
+      <EditorModelsAndStylesDrawer
+        isModelsDrawerOpen={true}
+        setIsModelsDrawerOpen={vi.fn()}
+        drawerTab="padrao"
+        setDrawerTab={vi.fn()}
+        savedTemplates={[]}
+        filteredSavedTemplates={[]}
+        customStyles={[]}
+        templateSearch=""
+        setTemplateSearch={vi.fn()}
+        applyPresetTemplate={vi.fn()}
+        currentModel={{
+          id: 'doc-1',
+          title: 'Rascunho',
+          isPreset: false,
+        }}
+        setNewModelTitle={vi.fn()}
+        setIsSaveModelModalOpen={vi.fn()}
+        editingTemplateId={null}
+        editingTemplateTitle=""
+        setEditingTemplateTitle={vi.fn()}
+        handleSaveRename={vi.fn()}
+        setEditingTemplateId={vi.fn()}
+        handleStartRename={vi.fn()}
+        handleDeleteTemplate={vi.fn()}
+        handleApplyTemplate={vi.fn()}
+        setNewStyleTitle={vi.fn()}
+        setIsSaveStyleModalOpen={vi.fn()}
+        handleDeleteCustomStyle={vi.fn()}
+        handleApplyStyle={vi.fn()}
+        isSaveModelModalOpen={true}
+        handleSaveAsTemplate={vi.fn()}
+        newModelTitle=""
+        activeContext={null}
+        saveAsGlobal={true}
+        setSaveAsGlobal={vi.fn()}
+        isSaveStyleModalOpen={true}
+        handleSaveCustomStyle={vi.fn()}
+        newStyleTitle=""
+        fontFamilyId="inter"
+        baseFontSize={11}
+        pageOrientation="portrait"
+        viaLayout="1-via"
+        headerConfig={{
+          showHeader: true,
+          showFooter: true,
+          showPatientBanner: true,
+          clinicName: '',
+          clinicAddress: '',
+          doctorName: '',
+          doctorCrm: '',
+          doctorSpecialty: '',
+          badgeText: 'RECEITUÁRIO',
+          dateText: '',
+          footerDocName: '',
+          footerCrm: '',
+          footerSpecialty: '',
+          footerSubtext: '',
+          patientCustomText: '',
+        }}
+      />
+    );
+    expect(editorDrawerHtml).toContain('aria-labelledby="editor-models-drawer-title"');
+    expect(editorDrawerHtml).toContain('aria-labelledby="editor-save-model-modal-title"');
+    expect(editorDrawerHtml).toContain('aria-labelledby="editor-save-style-modal-title"');
+    expect(editorDrawerHtml).toContain('placeholder="Ex.: Relatório médico, atestado, encaminhamento..."');
+    expect(editorDrawerHtml).toContain('placeholder="Ex.: Laudo Cardiológico - Policlínica"');
+    expect(editorDrawerHtml).toContain('placeholder="Ex.: Minha Clínica • 2 Vias Azul"');
+    expect(editorDrawerHtml).not.toContain('py-0.2');
+
+    const susCatalogHtml = renderToStaticMarkup(
+      <SusCatalogListView
+        darkMode={false}
+        selectedCategory="all"
+        searchTerm=""
+        filteredCatalog={SUS_DOCUMENTS_CATALOG.slice(0, 2)}
+        selectedDocIds={[]}
+        onSelectCategory={vi.fn()}
+        onSearchTermChange={vi.fn()}
+        onToggleDocSelection={vi.fn()}
+        onStartFillingSingle={vi.fn()}
+        onStartFillingMultiple={vi.fn()}
+      />
+    );
+    expect(susCatalogHtml).toContain('aria-label="Buscar exame ou documento SUS"');
+    expect(susCatalogHtml).toContain('placeholder="Ex.: APAC, LME, Tomografia, Mamografia, Dengue..."');
+
+    const cidSearchHtml = renderToStaticMarkup(
+      <CidSearchBar
+        darkMode={false}
+        onSelectCid={vi.fn()}
+      />
+    );
+    expect(cidSearchHtml).toContain('placeholder="Ex.: Asma, Lombalgia, J00, Dengue, A09, Cefaleia, ITU..."');
+  });
+
+  it('previne sobreposição no Header (shrink-0 + min-w-0), vazamento horizontal no rodapé da Sidebar, fonte incorreta no + CPF e Peso e desalinhamento de altura na posologia (h-11 min-h-[44px])', () => {
+    const headerHtml = renderToStaticMarkup(
+      <Header
+        darkMode={false}
+        onToggleDarkMode={vi.fn()}
+        onToggleSidebar={vi.fn()}
+        onGoHome={vi.fn()}
+        activeTab="prescription"
+        onSelectTab={vi.fn()}
+        patient={activePatient}
+        onOpenPatientModal={vi.fn()}
+        doctor={configuredDoctor}
+        onOpenDoctorModal={vi.fn()}
+        prescriptionCount={2}
+        selectedExamsCount={1}
+        isInstallable={true}
+        onInstallApp={vi.fn()}
+      />
+    );
+    // Nav central deve permitir encolhimento seguro (min-w-0 overflow-x-auto) e o cluster direito nunca deve encolher sobre as abas (shrink-0 justify-end)
+    expect(headerHtml).toContain('nav-segmented-track min-w-0 max-w-full overflow-x-auto');
+    expect(headerHtml).toContain('flex items-center gap-1.5 sm:gap-2 shrink-0 justify-end');
+    expect(headerHtml).not.toContain('min-w-0 flex-1 lg:flex-initial justify-end');
+
+    // Quando a Sidebar está aberta no desktop (isSidebarOpen={true}), CRM e Instalar App ficam ocultos no Header (lg:hidden) para liberar espaço para as 6 abas centrais
+    const headerWithOpenSidebarHtml = renderToStaticMarkup(
+      <Header
+        darkMode={false}
+        onToggleDarkMode={vi.fn()}
+        onToggleSidebar={vi.fn()}
+        isSidebarOpen={true}
+        onGoHome={vi.fn()}
+        activeTab="prescription"
+        onSelectTab={vi.fn()}
+        patient={activePatient}
+        onOpenPatientModal={vi.fn()}
+        doctor={configuredDoctor}
+        onOpenDoctorModal={vi.fn()}
+        prescriptionCount={2}
+        selectedExamsCount={1}
+        isInstallable={true}
+        onInstallApp={vi.fn()}
+      />
+    );
+    expect(headerWithOpenSidebarHtml).toContain('lg:hidden');
+
+    // Rodapé da Sidebar aberta deve conter min-w-0 flex-1 nos botões Backup e Instalar App para nunca vazar da borda direita
+    const sidebarHtml = renderToStaticMarkup(
+      <Sidebar
+        darkMode={false}
+        onToggleDarkMode={vi.fn()}
+        activeTab="prescription"
+        onSelectTab={vi.fn()}
+        isOpen={true}
+        onToggleOpen={vi.fn()}
+        onClose={vi.fn()}
+        doctor={configuredDoctor}
+        patient={activePatient}
+        prescriptionCount={1}
+        selectedExamsCount={0}
+        onOpenDoctorModal={vi.fn()}
+        onOpenPatientModal={vi.fn()}
+        onOpenBackupModal={vi.fn()}
+        onClearPrescription={vi.fn()}
+        onClearPatient={vi.fn()}
+        onResetAll={vi.fn()}
+        onAplicarKit={vi.fn()}
+        isInstallable={true}
+        onInstallApp={vi.fn()}
+      />
+    );
+    expect(sidebarHtml).toContain('flex-1 min-w-0 h-8 px-1 rounded-xl');
+    expect(sidebarHtml).toContain('lg:w-[260px]');
+
+    // PatientQuickCard com campos extras recolhidos e paciente sem peso: botão "+ CPF e Peso" usa fonte sans-serif (clinical-tabular-nums) e não monospace (clinical-unit), e input do paciente possui largura mínima garantida (min-w-[185px])
+    const patientNoWeightHtml = renderToStaticMarkup(
+      <PatientQuickCard
+        patient={emptyPatient}
+        showExtraPatientFields={false}
+        onToggleExtraFields={vi.fn()}
+        onUpdatePatient={vi.fn()}
+        onOpenPatientModal={vi.fn()}
+      />
+    );
+    expect(patientNoWeightHtml).toContain('+ CPF e Peso');
+    expect(patientNoWeightHtml).toContain('whitespace-nowrap clinical-tabular-nums');
+    expect(patientNoWeightHtml).not.toContain('clinical-unit">+ CPF e Peso');
+    expect(patientNoWeightHtml).toContain('flex-1 min-w-[185px]');
+
+    // MedicationComposerCard via PrescriptionBuilder: textarea #presc-posology-textarea e botão + Inserir na receita compartilham h-11 min-h-[44px] sem barra de rolagem interna (overflow-hidden)
+    const builderHtml = renderToStaticMarkup(
+      <PrescriptionBuilder
+        darkMode={false}
+        doctor={configuredDoctor}
+        patient={activePatient}
+        onUpdatePatient={vi.fn()}
+        items={sampleItems}
+        onUpdateItems={vi.fn()}
+        onNavigateToPrint={vi.fn()}
+        onNavigateToCertificate={vi.fn()}
+        onNavigateToReferral={vi.fn()}
+        onNavigateToExams={vi.fn()}
+        onOpenPatientModal={vi.fn()}
+      />
+    );
+    expect(builderHtml).toContain('id="presc-posology-textarea"');
+    expect(builderHtml).toContain('h-11 min-h-[44px]');
+    expect(builderHtml).toContain('overflow-hidden');
   });
 });

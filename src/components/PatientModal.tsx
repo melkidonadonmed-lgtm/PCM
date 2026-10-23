@@ -51,23 +51,12 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   const [allergiesText, setAllergiesText] = useState<string>(() =>
     patient?.allergies?.join(', ') || ''
   );
+  const [weightDraft, setWeightDraft] = useState<string | null>(null);
 
-  // Acessibilidade WCAG 2.1: Foco inicial executado apenas na montagem
+  // Acessibilidade WCAG 2.1: Foco inicial executado apenas na montagem (Escape e Focus Trap gerenciados por useModalAccessibility)
   useEffect(() => {
     nameInputRef.current?.focus();
   }, []);
-
-  // Listener da tecla Escape desacoplado do foco
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
 
   const handleClear = () => {
     const emptyPat: Patient = {
@@ -87,6 +76,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     };
     setFormData(emptyPat);
     setAllergiesText('');
+    setWeightDraft(null);
     if (onClearPatient) {
       onClearPatient();
     }
@@ -207,12 +197,18 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                   required={formData.weightCalcEnabled}
                   inputMode="decimal"
                   enterKeyHint="next"
-                  value={formData.weightKg || ''}
-                  onChange={(e) => setFormData({ ...formData, weightKg: parseFloat(e.target.value) || 0 })}
-                  placeholder={formData.weightCalcEnabled ? "Ex: 14.5" : "Opcional"}
-                  className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-bold focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-emerald-700 dark:text-emerald-400 transition"
+                  value={weightDraft !== null ? weightDraft : formData.weightKg > 0 ? String(formData.weightKg) : ''}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    setWeightDraft(raw);
+                    const parsed = parseFloat(raw.replace(',', '.'));
+                    setFormData({ ...formData, weightKg: Number.isNaN(parsed) || parsed < 0 ? 0 : parsed });
+                  }}
+                  onBlur={() => setWeightDraft(null)}
+                  placeholder="Ex.: 14,5"
+                  className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-bold focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-emerald-700 dark:text-emerald-400 transition clinical-tabular-nums"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--text-muted)] dark:text-slate-400">kg</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--text-muted)] dark:text-slate-400 clinical-unit">kg</span>
               </div>
             </div>
 
@@ -226,7 +222,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 enterKeyHint="next"
                 value={formData.birthDate || formData.ageText || ''}
                 onChange={(e) => setFormData({ ...formData, birthDate: e.target.value, ageText: e.target.value })}
-                placeholder="Ex: 35 anos ou 2 anos..."
+                placeholder="Ex.: 35 anos ou 2 anos..."
                 className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
             </div>
@@ -259,8 +255,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 enterKeyHint="next"
                 value={formData.documentNumber || ''}
                 onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
-                placeholder="Ex: 542.189.708-44"
-                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+                placeholder="Ex.: 542.189.708-44"
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition clinical-tabular-nums"
               />
             </div>
 
@@ -276,8 +272,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 enterKeyHint="next"
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="(11) 98765-4321"
-                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+                placeholder="Ex.: (11) 98765-4321"
+                className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition clinical-tabular-nums"
               />
             </div>
           </div>
@@ -299,7 +295,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                   allergies: raw.split(',').map((s) => s.trim()).filter(Boolean),
                 });
               }}
-              placeholder="Ex: Penicilina, Dipirona, AINEs, Frutos do mar..."
+              placeholder="Ex.: Penicilina, Dipirona, AINEs, Frutos do mar..."
               className="w-full p-3 min-h-[44px] rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-rose-700 dark:text-rose-400 transition"
             />
           </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Eye } from 'lucide-react';
+import { Download, Eye } from '../Icon';
 
 export type CentralSymbol = 'asclepius' | 'cross' | 'stethoscope' | 'ecg_heart' | 'monogram';
 export type FrameStyle = 'double_circle' | 'shield' | 'hexagon' | 'none';

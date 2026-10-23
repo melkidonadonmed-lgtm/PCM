@@ -15,7 +15,7 @@ import {
   Upload,
   Sparkles,
   Trash2,
-} from 'lucide-react';
+} from '../Icon';
 import {
   DocumentHeaderConfig,
   DocumentLogoConfig,
@@ -286,7 +286,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
           <ImageIcon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
           <span>Logotipo</span>
           {(logoConfig.dataUrl || logoConfig.secondaryDataUrl) && (
-            <span className="text-xs px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 rounded font-bold uppercase">
+            <span className="text-xs px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded font-bold uppercase">
               {logoConfig.dataUrl && logoConfig.secondaryDataUrl ? 'Duplo' : '1 Logo'}
             </span>
           )}

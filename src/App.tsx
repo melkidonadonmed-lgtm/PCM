@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { Header } from './components/Header';
 import { Icon } from './components/Icon';
 import { Sidebar } from './components/Sidebar';
@@ -16,6 +16,7 @@ import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescription
 import { useWorkContext } from './hooks/useWorkContext';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { useNavigationSync, runTabViewTransition } from './hooks/useNavigationSync';
+import { useModalAccessibility } from './hooks/useModalAccessibility';
 import { CommandPaletteModal } from './components/layout/CommandPaletteModal';
 import { ConsultationReadinessBar } from './components/bento/ConsultationReadinessBar';
 import { AsyncErrorBoundary } from './components/AsyncErrorBoundary';
@@ -251,7 +252,20 @@ export default function App() {
     documentsSubTab,
     onSelectTab: handleSelectTab,
     onOpenCommandPalette: handleOpenCommandPalette,
-    isAnyModalOpen: isPatientModalOpen || isDoctorModalOpen || isBackupModalOpen || isCommandPaletteOpen,
+    isAnyModalOpen:
+      isPatientModalOpen ||
+      isDoctorModalOpen ||
+      isBackupModalOpen ||
+      isCommandPaletteOpen ||
+      showInstallHelp,
+  });
+
+  const installHelpModalRef = useRef<HTMLDivElement>(null);
+
+  useModalAccessibility({
+    isOpen: showInstallHelp,
+    onClose: closeInstallHelp,
+    containerRef: installHelpModalRef,
   });
 
   const documentsBadgeCount = selectedExams.length;
@@ -273,7 +287,10 @@ export default function App() {
   const handleGoHome = () => {
     setActiveTab('prescription');
     if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const reducedMotion =
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
       if (window.innerWidth < 1024) {
         setSidebarOpen(false);
       }
@@ -288,7 +305,10 @@ export default function App() {
       if (window.innerWidth < 1024) {
         setSidebarOpen(false);
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const reducedMotion =
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
     }
     setKitToast(`Kit ${kit.name} adicionado à receita.`);
   };
@@ -312,7 +332,9 @@ export default function App() {
           (sidebarOpen && (typeof window !== 'undefined' ? window.innerWidth < 1024 : false)) ||
           isPatientModalOpen ||
           isDoctorModalOpen ||
-          isBackupModalOpen
+          isBackupModalOpen ||
+          isCommandPaletteOpen ||
+          showInstallHelp
         }
       />
 
@@ -321,6 +343,7 @@ export default function App() {
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        isSidebarOpen={sidebarOpen}
         onGoHome={handleGoHome}
         activeTab={activeTab}
         onSelectTab={handleSelectTab}
@@ -337,7 +360,7 @@ export default function App() {
       />
 
       {/* Main Responsive Body Layout */}
-      <div className="flex-1 w-full max-w-screen-2xl container mx-auto px-2.5 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-5 flex gap-4 lg:gap-6 relative min-h-0">
+      <div className="flex-1 w-full max-w-screen-2xl container mx-auto px-2.5 sm:px-4 lg:px-4 xl:px-6 py-3 sm:py-4 flex gap-3 lg:gap-4 xl:gap-5 relative min-h-0">
         {/* Desktop & Tablet Persistent Sidebar */}
         <Sidebar
           darkMode={darkMode}
@@ -458,8 +481,14 @@ export default function App() {
             {activeTab === 'editor' && (
               <AsyncErrorBoundary moduleName="o Editor de Prescrições e Documentos">
                 <Suspense fallback={
-                  <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
-                    <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    aria-busy="true"
+                    data-state="loading"
+                    className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5"
+                  >
+                    <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
                     <span className="font-medium text-slate-600 dark:text-slate-300">
                       Carregando processador de texto clínico e canvas A4...
                     </span>
@@ -488,8 +517,14 @@ export default function App() {
             {activeTab === 'print_preview' && (
               <AsyncErrorBoundary moduleName="a Prévia de Impressão">
                 <Suspense fallback={
-                  <div className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5">
-                    <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    aria-busy="true"
+                    data-state="loading"
+                    className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5"
+                  >
+                    <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
                     <span className="font-medium text-slate-600 dark:text-slate-300">
                       Carregando visualização médica e módulos de exportação...
                     </span>
@@ -581,21 +616,24 @@ export default function App() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Como instalar o aplicativo PresCMed"
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60"
+          data-state="idle"
+          aria-busy={false}
+          aria-labelledby="install-help-modal-title"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 animate-backdrop-fade"
           onClick={closeInstallHelp}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] p-5 shadow-2xl space-y-4 text-[var(--text-main)]"
+            ref={installHelpModalRef}
+            className="w-full max-w-md rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] p-5 shadow-2xl space-y-4 text-[var(--text-main)] modal-surface-spring"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <h3 className="text-sm font-bold">Instalar PresCMed no Dispositivo</h3>
+              <h3 id="install-help-modal-title" className="text-sm font-bold">Instalar PresCMed no Dispositivo</h3>
               <button
                 type="button"
                 onClick={closeInstallHelp}
                 aria-label="Fechar instruções de instalação"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
                 <Icon name="close" size={18} />
               </button>
@@ -614,7 +652,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={closeInstallHelp}
-                className="btn-tactile-primary h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer"
+                className="btn-tactile-primary h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
                 Entendi
               </button>

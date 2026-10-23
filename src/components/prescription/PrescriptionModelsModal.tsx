@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { PrescriptionItem } from '../../types';
 import { SavedDocument } from '../../services/db';
 import { UnifiedMedication } from '../../data/medicationDatabase';
 import { Icon } from '../Icon';
 import { ActionButton } from '../ui/ActionButton';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 export interface PrescriptionModelsModalProps {
   isSaveModelModalOpen: boolean;
@@ -61,6 +62,21 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
   onApplyPrescriptionModel,
   onDeletePrescriptionModel,
 }) => {
+  const saveModalRef = useRef<HTMLDivElement>(null);
+  const loadModalRef = useRef<HTMLDivElement>(null);
+
+  useModalAccessibility({
+    isOpen: isSaveModelModalOpen,
+    onClose: onCloseSaveModelModal,
+    containerRef: saveModalRef,
+  });
+
+  useModalAccessibility({
+    isOpen: isLoadModelModalOpen,
+    onClose: onCloseLoadModelModal,
+    containerRef: loadModalRef,
+  });
+
   if (!isSaveModelModalOpen && !isLoadModelModalOpen) {
     return null;
   }
@@ -69,14 +85,19 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
     <>
       {isSaveModelModalOpen && (
         <div
+          ref={saveModalRef}
           role="dialog"
           aria-modal="true"
           aria-busy={false}
           data-state="idle"
           aria-label="Salvar como modelo de receita"
+          onClick={onCloseSaveModelModal}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 animate-backdrop-fade"
         >
-          <div className="bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-tactile-lg space-y-4">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-tactile-lg space-y-4 modal-surface-spring"
+          >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-strong">
               <div className="flex items-center gap-2">
                 <Icon name="bookmark_add" className="text-[20px] text-sky-600" />
@@ -88,14 +109,14 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                 type="button"
                 onClick={onCloseSaveModelModal}
                 aria-label="Fechar modal"
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
                 <Icon name="close" className="text-[20px]" />
               </button>
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Este modelo salvará os <strong>{items.length} medicamentos</strong> prescritos para reutilização em 1 clique.
+              Este modelo salvará os <strong className="clinical-tabular-nums">{items.length} medicamentos</strong> prescritos para reutilização em 1 clique.
             </p>
 
             <div>
@@ -145,21 +166,27 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
 
       {isLoadModelModalOpen && (
         <div
+          ref={loadModalRef}
           role="dialog"
           aria-modal="true"
           aria-busy={false}
           data-state="idle"
           aria-label="Modelos de receitas salvos"
+          onClick={onCloseLoadModelModal}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 animate-tab-fade"
         >
-          <div className="bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-tactile-lg">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-tactile-lg modal-surface-spring"
+          >
             <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 dark:border-strong">
               {isCreatingCustomModel ? (
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={onExitCreateCustomModel}
-                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    aria-label="Voltar para a lista de modelos"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                     title="Voltar para a lista de modelos"
                   >
                     <Icon name="arrow_back" className="text-[18px]" />
@@ -182,7 +209,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   <button
                     type="button"
                     onClick={onStartCreateCustomModel}
-                    className="chip-neutral px-2.5 py-1 text-xs font-bold rounded-lg cursor-pointer flex items-center gap-1 transition"
+                    className="chip-neutral px-2.5 py-1 text-xs font-bold rounded-lg cursor-pointer flex items-center gap-1 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                   >
                     <Icon name="add" className="text-[14px] text-sky-600 dark:text-sky-400" />
                     <span>+ Criar modelo</span>
@@ -192,7 +219,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   type="button"
                   onClick={onCloseLoadModelModal}
                   aria-label="Fechar biblioteca de modelos"
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                 >
                   <Icon name="close" className="text-[20px]" />
                 </button>
@@ -276,7 +303,8 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                           <button
                             type="button"
                             onClick={() => onRemoveCustomModelItem(item.id)}
-                            className="p-1 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded"
+                            aria-label={`Remover ${item.name} do modelo`}
+                            className="p-1.5 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
                             title="Remover do modelo"
                           >
                             <Icon name="delete" className="text-[14px]" />
@@ -349,7 +377,8 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                         <button
                           type="button"
                           onClick={() => onDeletePrescriptionModel(model.id, model.title)}
-                          className="p-1 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded"
+                          aria-label={`Excluir modelo ${model.title}`}
+                          className="p-1.5 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
                           title="Excluir este modelo"
                         >
                           <Icon name="delete" className="text-[14px]" />

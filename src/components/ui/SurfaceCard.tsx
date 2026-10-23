@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { UIState } from '../../types/index';
 
 export type { UIState };
@@ -40,14 +40,10 @@ export const SurfaceCard: React.FC<SurfaceCardProps> = ({
   headerRight,
   className = '',
   children,
-  onMouseDown,
-  onMouseUp,
-  onMouseLeave,
   ...rest
 }) => {
-  const [isPressed, setIsPressed] = useState(false);
   const resolvedState: UIState =
-    state ?? (error ? 'error' : isLoading ? 'loading' : isPressed ? 'pressed' : 'idle');
+    state ?? (error ? 'error' : isLoading ? 'loading' : 'idle');
 
   const spanClass = colSpan ? COL_SPAN_MAP[colSpan] : '';
   const variantClass =
@@ -67,18 +63,6 @@ export const SurfaceCard: React.FC<SurfaceCardProps> = ({
       data-state={resolvedState}
       aria-busy={resolvedState === 'loading'}
       aria-label={title || rest['aria-label']}
-      onMouseDown={(e) => {
-        if (interactive) setIsPressed(true);
-        onMouseDown?.(e);
-      }}
-      onMouseUp={(e) => {
-        if (interactive) setIsPressed(false);
-        onMouseUp?.(e);
-      }}
-      onMouseLeave={(e) => {
-        if (interactive) setIsPressed(false);
-        onMouseLeave?.(e);
-      }}
       className={`${variantClass} ${spanClass} ${className}`.trim()}
       {...rest}
     >

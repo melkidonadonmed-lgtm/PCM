@@ -161,7 +161,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   <span className="font-bold text-xs" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                     {pkg.name}
                   </span>
-                  <span className="text-xs font-semibold px-1.5 py-0.2 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                     {pkg.badge}
                   </span>
                 </div>

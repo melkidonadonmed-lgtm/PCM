@@ -33,7 +33,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
   onSelectCid,
   onClearCid,
   label = 'Buscador de Diagnóstico & Código CID-10',
-  placeholder = 'Digite o diagnóstico ou código (ex: Asma, Lombalgia, J00, Dengue, A09, Cefaleia, ITU)...',
+  placeholder = 'Ex.: Asma, Lombalgia, J00, Dengue, A09, Cefaleia, ITU...',
   showQuickChips = true,
   allowCustomEntry = true,
   variant = 'certificate',

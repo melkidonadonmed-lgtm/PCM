@@ -114,7 +114,8 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
           <Icon name="search" className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar exame ou documento SUS..."
+            aria-label="Buscar exame ou documento SUS"
+            placeholder="Ex.: APAC, LME, Tomografia, Mamografia, Dengue..."
             value={searchTerm}
             onChange={(e) => onSearchTermChange(e.target.value)}
             className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder:text-[var(--text-placeholder)] focus:border-info focus-visible:ring-1 focus-visible:ring-sky-500 outline-none transition"

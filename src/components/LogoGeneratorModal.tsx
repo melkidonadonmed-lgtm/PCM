@@ -27,6 +27,7 @@ import {
   type ColorPalette,
   type TextLayout,
 } from './logo/LogoSvgCanvas';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 /**
  * Modal de Personalização de Timbre e Monograma.
@@ -51,7 +52,14 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
   onApplyLogo
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const modalContainerRef = useRef<HTMLDivElement>(null);
   const uniqueId = useId().replace(/:/g, '_');
+
+  useModalAccessibility({
+    isOpen,
+    onClose,
+    containerRef: modalContainerRef,
+  });
 
   // Inicializa valores com base no contexto ativo ou médico
   const defaultInstitution = activeContext?.name?.toUpperCase() || 
@@ -172,13 +180,20 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
   };
 
   return (
-    <div data-state="idle" aria-busy={false} 
+    <div
+      data-state="idle"
+      aria-busy={false}
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 isolate animate-tab-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="logo-modal-title"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClose();
+      }}
     >
-      <div 
+      <div
+        ref={modalContainerRef}
         className="w-full max-w-4xl bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl border border-[var(--border-subtle)] shadow-tactile-lg overflow-hidden flex flex-col max-h-[92vh] animate-tab-fade"
         onClick={(e) => e.stopPropagation()}
       >
@@ -200,6 +215,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Fechar gerador de logotipo"
             className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             <X className="w-5 h-5" />
@@ -404,10 +420,11 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                   <input
                     type="text"
                     maxLength={4}
+                    aria-label="Iniciais do monograma"
                     value={monogramText}
                     onChange={(e) => setMonogramText(e.target.value.toUpperCase())}
                     className="w-24 px-2.5 py-1 text-xs font-bold uppercase rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info text-center"
-                    placeholder="MD"
+                    placeholder="Ex.: MD"
                   />
                   <span className="text-xs text-[var(--text-muted)]">Até 4 caracteres</span>
                 </div>
@@ -528,9 +545,10 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                 </span>
                 <input
                   type="text"
+                  aria-label="Nome da Instituição"
                   value={institutionName}
                   onChange={(e) => setInstitutionName(e.target.value.toUpperCase())}
-                  placeholder="SECRETARIA MUNICIPAL DE SAÚDE"
+                  placeholder="Ex.: SECRETARIA MUNICIPAL DE SAÚDE"
                   className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info font-semibold"
                 />
               </div>
@@ -541,9 +559,10 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                 </span>
                 <input
                   type="text"
+                  aria-label="Subtítulo ou esfera institucional"
                   value={subtitle}
                   onChange={(e) => setSubtitle(e.target.value.toUpperCase())}
-                  placeholder="ATENÇÃO BÁSICA — SUS"
+                  placeholder="Ex.: ATENÇÃO BÁSICA — SUS"
                   className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info font-semibold"
                 />
               </div>

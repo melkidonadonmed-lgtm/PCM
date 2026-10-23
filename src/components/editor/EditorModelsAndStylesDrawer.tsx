@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   FolderOpen,
   X,
@@ -14,7 +14,7 @@ import {
   Stethoscope,
   File,
   Building2,
-} from 'lucide-react';
+} from '../Icon';
 import {
   DocumentHeaderConfig,
   DocumentOrientation,
@@ -23,6 +23,7 @@ import {
   SavedDocument,
   WorkContext,
 } from '../../types';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import {
   DEFAULT_PRESCRIPTION_STYLES,
   PresetQuickTemplateType,
@@ -187,22 +188,52 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
   viaLayout,
   headerConfig,
 }) => {
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const saveModelModalRef = useRef<HTMLDivElement>(null);
+  const saveStyleModalRef = useRef<HTMLDivElement>(null);
+
+  useModalAccessibility({
+    isOpen: isModelsDrawerOpen,
+    onClose: () => setIsModelsDrawerOpen(false),
+    containerRef: drawerRef,
+  });
+
+  useModalAccessibility({
+    isOpen: isSaveModelModalOpen,
+    onClose: () => setIsSaveModelModalOpen(false),
+    containerRef: saveModelModalRef,
+  });
+
+  useModalAccessibility({
+    isOpen: isSaveStyleModalOpen,
+    onClose: () => setIsSaveStyleModalOpen(false),
+    containerRef: saveStyleModalRef,
+  });
+
   return (
     <>
       {/* DRAWER LATERAL: Modelos & Histórico Clínico */}
       {isModelsDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end no-print">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="editor-models-drawer-title"
+          className="fixed inset-0 z-50 overflow-hidden flex justify-end no-print"
+        >
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/50 transition-opacity cursor-pointer"
             onClick={() => setIsModelsDrawerOpen(false)}
           />
 
-          <div className="relative w-full max-w-md bg-[var(--surface-card)] text-[var(--text-main)] shadow-tactile-lg border-l border-[var(--border-subtle)] flex flex-col h-full z-10 animate-tab-fade">
+          <div
+            ref={drawerRef}
+            className="relative w-full max-w-md bg-[var(--surface-card)] text-[var(--text-main)] shadow-tactile-lg border-l border-[var(--border-subtle)] flex flex-col h-full z-10 animate-tab-fade"
+          >
             {/* Header do Drawer */}
             <div className="p-4 sm:p-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
               <div>
-                <h2 className="text-base font-bold flex items-center gap-2">
+                <h2 id="editor-models-drawer-title" className="text-base font-bold flex items-center gap-2">
                   <FolderOpen className="w-5 h-5 text-amber-500" />
                   <span>Modelos & Estilos</span>
                 </h2>
@@ -271,7 +302,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                       type="text"
                       value={templateSearch}
                       onChange={(e) => setTemplateSearch(e.target.value)}
-                      placeholder="Buscar modelo padrão..."
+                      placeholder="Ex.: Relatório médico, atestado, encaminhamento..."
                       aria-label="Buscar modelo padrão"
                       className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 transition"
                     />
@@ -320,7 +351,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                         type="text"
                         value={templateSearch}
                         onChange={(e) => setTemplateSearch(e.target.value)}
-                        placeholder="Buscar em meus modelos salvos..."
+                        placeholder="Ex.: Laudo cardiológico, receita padrão..."
                         aria-label="Buscar em meus modelos salvos"
                         className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 transition"
                       />
@@ -479,7 +510,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                     <div className="space-y-2">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center justify-between">
                         <span className="flex items-center gap-1.5"><Save className="w-3.5 h-3.5" /> Meus Estilos Personalizados</span>
-                        <span className="text-xs px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 font-bold">
+                        <span className="text-xs px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 font-bold clinical-tabular-nums">
                           {customStyles.length}
                         </span>
                       </h4>
@@ -573,12 +604,22 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
 
       {/* MODAL: Salvar como Modelo Personalizado */}
       {isSaveModelModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 no-print animate-tab-fade">
-          <div className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="editor-save-model-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 no-print animate-tab-fade"
+          onClick={() => setIsSaveModelModalOpen(false)}
+        >
+          <div
+            ref={saveModelModalRef}
+            className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-2">
                 <BookmarkPlus className="w-5 h-5 text-sky-600" />
-                <h3 className="text-base font-bold">Salvar como Modelo</h3>
+                <h3 id="editor-save-model-modal-title" className="text-base font-bold">Salvar como Modelo</h3>
               </div>
               <button
                 type="button"
@@ -601,7 +642,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                   required
                   value={newModelTitle}
                   onChange={(e) => setNewModelTitle(e.target.value)}
-                  placeholder="Ex: Laudo Cardiológico - Policlínica"
+                  placeholder="Ex.: Laudo Cardiológico - Policlínica"
                   className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 font-medium transition"
                   autoFocus
                 />
@@ -652,12 +693,22 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
 
       {/* MODAL: Salvar como Estilo de Receita Personalizado */}
       {isSaveStyleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 no-print animate-tab-fade">
-          <div className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="editor-save-style-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 no-print animate-tab-fade"
+          onClick={() => setIsSaveStyleModalOpen(false)}
+        >
+          <div
+            ref={saveStyleModalRef}
+            className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-2">
                 <BookmarkPlus className="w-5 h-5 text-sky-600" />
-                <h3 className="text-base font-bold">Salvar Estilo da Receita</h3>
+                <h3 id="editor-save-style-modal-title" className="text-base font-bold">Salvar Estilo da Receita</h3>
               </div>
               <button
                 type="button"
@@ -680,7 +731,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                   required
                   value={newStyleTitle}
                   onChange={(e) => setNewStyleTitle(e.target.value)}
-                  placeholder="Ex: Minha Clínica • 2 Vias Azul"
+                  placeholder="Ex.: Minha Clínica • 2 Vias Azul"
                   className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 font-medium transition"
                   autoFocus
                 />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { EditorContent, type Editor } from '@tiptap/react';
-import { Pencil, RotateCcw, EyeOff, Move, Scissors } from 'lucide-react';
+import { Pencil, RotateCcw, EyeOff, Move, Scissors } from '../Icon';
 import {
   DocumentHeaderConfig,
   DocumentLogoConfig,
@@ -187,6 +187,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
             <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-subtle">
               <input
                 type="text"
+                aria-label="Tipo de documento"
                 value={headerConfig.badgeText || ''}
                 onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
                 placeholder="TIPO DE DOCUMENTO"
@@ -197,6 +198,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
 
               <input
                 type="text"
+                aria-label="Data de emissão"
                 value={headerConfig.dateText || ''}
                 onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
                 placeholder="Data de emissão"
@@ -252,6 +254,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
           {/* Nome do Médico na Assinatura */}
           <input
             type="text"
+            aria-label="Nome do médico na assinatura"
             value={headerConfig.footerDocName || headerConfig.doctorName || ''}
             onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
             placeholder="Dr(a). Médico(a)"
@@ -262,6 +265,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
           {/* CRM na Assinatura */}
           <input
             type="text"
+            aria-label="CRM na assinatura"
             value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
             onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
             placeholder="Médico(a) — CRM-SP 00000"
@@ -272,6 +276,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
           {/* Especialidade na Assinatura */}
           <input
             type="text"
+            aria-label="Especialidade na assinatura"
             value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
             onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
             placeholder="Especialidade"

@@ -32,7 +32,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
   const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
 
   useModalAccessibility({
-    isOpen: !isLogoModalOpen,
+    isOpen: true,
     onClose,
     containerRef: modalRef,
     initialFocusRef: nameInputRef,
@@ -59,22 +59,10 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
 
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Acessibilidade WCAG 2.1: Foco inicial executado apenas na montagem
+  // Acessibilidade WCAG 2.1: Foco inicial executado apenas na montagem (Escape e Focus Trap gerenciados por useModalAccessibility)
   useEffect(() => {
     nameInputRef.current?.focus();
   }, []);
-
-  // Listener da tecla Escape desacoplado do foco
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
 
   const [showAdvancedClinic, setShowAdvancedClinic] = useState(
     Boolean(doctor?.clinicName || doctor?.address || doctor?.cityState || doctor?.phone || doctor?.cns || doctor?.cpf || doctor?.cnes)
@@ -187,7 +175,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
         className="w-full max-w-lg rounded-2xl border overflow-hidden shadow-tactile-lg modal-surface-spring"
         style={{
           backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : '#E3D7BD'
+          borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'var(--border-subtle)'
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -292,7 +280,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   value={formData.crm}
                   onChange={(e) => setFormData({ ...formData, crm: e.target.value })}
                   placeholder="Ex.: 123456"
-                  className="w-full px-3.5 py-2 rounded-xl border text-sm font-bold text-sky-700 dark:text-sky-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700"
+                  className="w-full px-3.5 py-2 rounded-xl border text-sm font-bold text-sky-700 dark:text-sky-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 clinical-tabular-nums"
                 />
               </div>
 
@@ -323,7 +311,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   type="text"
                   value={formData.specialty}
                   onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-                  placeholder="Ex: Clínica Médica / Pediatria"
+                  placeholder="Ex.: Clínica Médica / Pediatria"
                   className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100"
                 />
               </div>
@@ -337,8 +325,8 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   type="text"
                   value={formData.rqe || ''}
                   onChange={(e) => setFormData({ ...formData, rqe: e.target.value })}
-                  placeholder="Ex: 67890"
-                  className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100"
+                  placeholder="Ex.: 67890"
+                  className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 clinical-tabular-nums"
                 />
               </div>
             </div>
@@ -371,7 +359,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                     type="text"
                     value={formData.clinicName || ''}
                     onChange={(e) => setFormData({ ...formData, clinicName: e.target.value })}
-                    placeholder="Ex: USF Hamilton Gondim / Consultório Particular"
+                    placeholder="Ex.: USF Hamilton Gondim / Consultório Particular"
                     className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   />
                 </div>
@@ -386,7 +374,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                       type="text"
                       value={formData.cityState || ''}
                       onChange={(e) => setFormData({ ...formData, cityState: e.target.value })}
-                      placeholder="Ex: Porto Velho - RO"
+                      placeholder="Ex.: Porto Velho - RO"
                       className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                     />
                   </div>
@@ -399,8 +387,8 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                       type="text"
                       value={formData.phone || ''}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="Ex: (69) 99999-9999"
-                      className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                      placeholder="Ex.: (69) 99999-9999"
+                      className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums"
                     />
                   </div>
                 </div>
@@ -414,7 +402,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                     type="text"
                     value={formData.address || ''}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="Ex: Av. 7 de Setembro, 1200 - Sala 04"
+                    placeholder="Ex.: Av. 7 de Setembro, 1200 - Sala 04"
                     className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   />
                 </div>
@@ -434,8 +422,8 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                         inputMode="numeric"
                         value={formData.cns || ''}
                         onChange={(e) => setFormData({ ...formData, cns: e.target.value })}
-                        placeholder="15 dígitos"
-                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                        placeholder="Ex.: 700 0000 0000 0000"
+                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 font-mono clinical-tabular-nums"
                       />
                     </div>
                     <div>
@@ -448,8 +436,8 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                         inputMode="numeric"
                         value={formData.cpf || ''}
                         onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                        placeholder="000.000.000-00"
-                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                        placeholder="Ex.: 000.000.000-00"
+                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 font-mono clinical-tabular-nums"
                       />
                     </div>
                     <div>
@@ -462,8 +450,8 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                         inputMode="numeric"
                         value={formData.cnes || ''}
                         onChange={(e) => setFormData({ ...formData, cnes: e.target.value })}
-                        placeholder="7 dígitos"
-                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                        placeholder="Ex.: 1234567"
+                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 font-mono clinical-tabular-nums"
                       />
                     </div>
                   </div>

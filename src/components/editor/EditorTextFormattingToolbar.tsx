@@ -13,7 +13,7 @@ import {
   Undo,
   Redo,
   ShieldCheck,
-} from 'lucide-react';
+} from '../Icon';
 import { PrescriptionItem } from '../../types';
 import type { RegimeReceita } from '../../utils/isSpecialControlOrAntibiotic';
 import { AvisoNotificacaoReceita } from '../AvisoNotificacaoReceita';

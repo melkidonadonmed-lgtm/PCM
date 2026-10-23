@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Icon } from '../Icon';
 import type { UIState } from './SurfaceCard';
 
@@ -34,14 +34,10 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   disabled,
   className = '',
   children,
-  onMouseDown,
-  onMouseUp,
-  onMouseLeave,
   ...rest
 }) => {
-  const [isPressed, setIsPressed] = useState(false);
   const resolvedState: UIState =
-    state ?? (isLoading ? 'loading' : isPressed ? 'pressed' : 'idle');
+    state ?? (isLoading ? 'loading' : 'idle');
 
   return (
     <button
@@ -50,18 +46,6 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       data-state={resolvedState}
       aria-busy={isLoading || undefined}
       disabled={disabled || isLoading}
-      onMouseDown={(e) => {
-        setIsPressed(true);
-        onMouseDown?.(e);
-      }}
-      onMouseUp={(e) => {
-        setIsPressed(false);
-        onMouseUp?.(e);
-      }}
-      onMouseLeave={(e) => {
-        setIsPressed(false);
-        onMouseLeave?.(e);
-      }}
       className={`min-h-[44px] min-w-[44px] btn-anti-squish inline-flex items-center justify-center gap-1.5 text-xs focus-visible:ring-2 focus-visible:ring-sky-500 outline-none disabled:opacity-40 disabled:cursor-not-allowed ${
         VARIANT_CLASSES[variant]
       } ${tabular ? 'tabular-nums clinical-tabular-nums' : ''} ${className}`.trim()}

@@ -50,12 +50,6 @@ export const BackupModal: React.FC<BackupModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  useModalAccessibility({
-    isOpen,
-    onClose,
-    containerRef: modalRef,
-  });
-
   // Estados de estatísticas locais
   const [stats, setStats] = useState<BackupStats>({
     contextsCount: 0,
@@ -75,6 +69,12 @@ export const BackupModal: React.FC<BackupModalProps> = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [confirmReplaceOpen, setConfirmReplaceOpen] = useState(false);
 
+  useModalAccessibility({
+    isOpen,
+    onClose,
+    containerRef: modalRef,
+  });
+
   // Carrega estatísticas do banco local ao abrir
   useEffect(() => {
     if (isOpen) {
@@ -89,19 +89,6 @@ export const BackupModal: React.FC<BackupModalProps> = ({
       setConfirmReplaceOpen(false);
     }
   }, [isOpen]);
-
-  // Listener de tecla Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -237,6 +224,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Fechar modal de backup"
             className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             <X className="w-5 h-5" />
@@ -261,11 +249,11 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
               {/* Badges de Contagem */}
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="px-2 py-1 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1">
+                <span className="px-2 py-1 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 text-xs font-bold flex items-center gap-1 clinical-tabular-nums">
                   <Building2 className="w-3 h-3" />
                   <span>{stats.contextsCount} locais</span>
                 </span>
-                <span className="px-2 py-1 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1">
+                <span className="px-2 py-1 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1 clinical-tabular-nums">
                   <FileText className="w-3 h-3" />
                   <span>{stats.templatesCount} modelos</span>
                 </span>
@@ -380,11 +368,11 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Locais de Atendimento</span>
-                    <strong className="text-sm font-bold text-[var(--text-main)]">{parsedBackup.data.workContexts?.length || 0}</strong>
+                    <strong className="text-sm font-bold text-[var(--text-main)] clinical-tabular-nums">{parsedBackup.data.workContexts?.length || 0}</strong>
                   </div>
                   <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Modelos e Documentos</span>
-                    <strong className="text-sm font-bold text-[var(--text-main)]">{parsedBackup.data.savedDocuments?.length || 0}</strong>
+                    <strong className="text-sm font-bold text-[var(--text-main)] clinical-tabular-nums">{parsedBackup.data.savedDocuments?.length || 0}</strong>
                   </div>
                 </div>
 
