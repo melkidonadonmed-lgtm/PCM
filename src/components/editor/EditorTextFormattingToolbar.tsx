@@ -13,8 +13,9 @@ import {
   Undo,
   Redo,
   ShieldCheck,
+  Icon,
 } from '../Icon';
-import { PrescriptionItem } from '../../types';
+import { DocumentViaLayout, PrescriptionItem } from '../../types';
 import type { RegimeReceita } from '../../utils/isSpecialControlOrAntibiotic';
 import { AvisoNotificacaoReceita } from '../AvisoNotificacaoReceita';
 import { RECEITA_NO_EDITOR } from './editorConfigAndFormatters';
@@ -27,6 +28,9 @@ export interface EditorTextFormattingToolbarProps {
   activeLoadedRecipeType: RegimeReceita | null;
   itensPorRegime: Record<RegimeReceita, PrescriptionItem[]>;
   handleLoadActivePrescription: (showToastMsg?: boolean, targetMode?: 'auto' | RegimeReceita) => void;
+  viaLayout?: DocumentViaLayout;
+  isSheetConfigOpen?: boolean;
+  onToggleSheetConfig?: () => void;
 }
 
 export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarProps> = ({
@@ -37,11 +41,75 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
   activeLoadedRecipeType,
   itensPorRegime,
   handleLoadActivePrescription,
+  viaLayout = '1-via',
+  isSheetConfigOpen = false,
+  onToggleSheetConfig,
 }) => {
   return (
     <>
-      {/* FORMATAÇÃO DO TEXTO: única barra fixa (sticky), numa linha só, logo acima da folha */}
-      <div className="editor-toolbar no-print sticky top-[72px] sm:top-[76px] z-30 rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex items-center gap-1.5 overflow-x-auto scrollbar-none touch-pan-x flex-nowrap lg:flex-wrap lg:overflow-visible">
+      {/* BARRA UNIFICADA ESTILO GOOGLE DOCS: linha única rolável no celular, fixa acima da folha A4 */}
+      <div className="editor-toolbar no-print sticky top-[68px] sm:top-[72px] z-30 rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex items-center gap-1 overflow-x-auto scrollbar-none touch-pan-x flex-nowrap lg:flex-wrap lg:overflow-visible">
+        {/* Gatilho Retrátil de Configuração da Folha & Timbrado (Evita poluição visual no mobile) */}
+        {onToggleSheetConfig && (
+          <>
+            <button
+              id="btn-toggle-sheet-config"
+              type="button"
+              aria-expanded={isSheetConfigOpen}
+              onClick={onToggleSheetConfig}
+              className={`h-8 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                isSheetConfigOpen
+                  ? 'bg-navy-900 text-white dark:bg-sky-600 border-navy-900 dark:border-sky-500/40 shadow-tactile-sm font-bold'
+                  : 'bg-sky-500/10 border-sky-500/25 text-sky-700 dark:text-sky-300 hover:bg-sky-500/15'
+              }`}
+              title="Abrir ou recolher ajustes de página, orientação, 1/2 vias, cabeçalho, logotipos e marca d'água"
+            >
+              <Icon name="tune" size={14} className="shrink-0" />
+              <span>Folha & Timbrado</span>
+              <span
+                className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md clinical-tabular-nums ${
+                  isSheetConfigOpen
+                    ? 'bg-white/20 text-white'
+                    : 'bg-sky-600/15 dark:bg-sky-400/20 text-sky-800 dark:text-sky-200'
+                }`}
+              >
+                {viaLayout === '2-vias' ? '2 Vias' : '1 Via'}
+              </span>
+              <Icon
+                name="expand_more"
+                size={14}
+                className={`transition-transform duration-150 ${isSheetConfigOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
+          </>
+        )}
+
+        {/* Desfazer / Refazer logo no início (padrão Google Docs Mobile & Desktop) */}
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().undo().run()}
+          disabled={!editor?.can().undo()}
+          className="p-1.5 rounded-lg hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition shrink-0"
+          title="Desfazer (Ctrl+Z)"
+          aria-label="Desfazer"
+        >
+          <Undo className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().redo().run()}
+          disabled={!editor?.can().redo()}
+          className="p-1.5 rounded-lg hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition shrink-0"
+          title="Refazer (Ctrl+Y)"
+          aria-label="Refazer"
+        >
+          <Redo className="w-4 h-4" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
+
         {/* Estilo do Parágrafo / Título */}
         <select
           value={
@@ -56,18 +124,18 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
             else if (val === 'h2') editor?.chain().focus().toggleHeading({ level: 2 }).run();
             else if (val === 'h3') editor?.chain().focus().toggleHeading({ level: 3 }).run();
           }}
-          className="bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)] rounded-xl px-2.5 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          className="bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)] rounded-xl px-2 py-1 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shrink-0"
           title="Estilo de texto (Parágrafo ou Título)"
           aria-label="Estilo de texto"
         >
-          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="p">Texto Normal</option>
-          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h1">Título 1 (Grande)</option>
-          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h2">Título 2 (Médio)</option>
-          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h3">Título 3 (Pequeno)</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="p">Normal</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h1">Título 1</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h2">Título 2</option>
+          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="h3">Título 3</option>
         </select>
 
         {/* Ajuste Fino do Tamanho da Fonte (Docs Style: [-] 11 pt [+]) */}
-        <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] px-1 py-0.5 text-xs">
+        <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] px-1 py-0.5 text-xs shrink-0">
           <button
             type="button"
             onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
@@ -80,7 +148,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           <select
             value={baseFontSize}
             onChange={(e) => setBaseFontSize(Number(e.target.value))}
-            className="bg-transparent text-[var(--text-main)] px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer"
+            className="bg-transparent text-[var(--text-main)] px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer clinical-tabular-nums"
             title="Tamanho da fonte em pontos (pt)"
             aria-label="Tamanho da fonte em pontos (pt)"
           >
@@ -99,14 +167,14 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           </button>
         </div>
 
-        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
         {/* Formatação básica: Negrito, Itálico, Sublinhado */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleBold().run()}
           disabled={!editor}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('bold')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -121,7 +189,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           type="button"
           onClick={() => editor?.chain().focus().toggleItalic().run()}
           disabled={!editor}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('italic')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -136,7 +204,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           type="button"
           onClick={() => editor?.chain().focus().toggleMark('underline').run()}
           disabled={!editor}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('underline')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -147,13 +215,13 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           <UnderlineIcon className="w-4 h-4" />
         </button>
 
-        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
         {/* Alinhamento de Texto */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'left' })
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -167,7 +235,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'center' })
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -181,7 +249,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'right' })
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -195,7 +263,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'justify' })
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -206,13 +274,13 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           <AlignJustify className="w-4 h-4" />
         </button>
 
-        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
+        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
         {/* Listas */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleBulletList().run()}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('bulletList')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -226,7 +294,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-          className={`p-2 rounded-xl transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('orderedList')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -235,31 +303,6 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           aria-label="Lista Numerada"
         >
           <ListOrdered className="w-4 h-4" />
-        </button>
-
-        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" />
-
-        {/* Desfazer / Refazer */}
-        <button
-          type="button"
-          onClick={() => editor?.chain().focus().undo().run()}
-          disabled={!editor?.can().undo()}
-          className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
-          title="Desfazer (Ctrl+Z)"
-          aria-label="Desfazer"
-        >
-          <Undo className="w-4 h-4" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => editor?.chain().focus().redo().run()}
-          disabled={!editor?.can().redo()}
-          className="p-2 rounded-xl hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
-          title="Refazer (Ctrl+Y)"
-          aria-label="Refazer"
-        >
-          <Redo className="w-4 h-4" />
         </button>
       </div>
 

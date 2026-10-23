@@ -195,6 +195,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
   const [isLogoGeneratorOpen, setIsLogoGeneratorOpen] = useState(false);
   const [isModelsDrawerOpen, setIsModelsDrawerOpen] = useState(false);
+  const [isSheetConfigOpen, setIsSheetConfigOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<EditorConfirmDialogState | null>(null);
 
@@ -538,7 +539,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   return (
-    <div className={`flex flex-col gap-4 mx-auto w-full pb-16 transition ${pageOrientation === 'landscape' ? 'max-w-[1240px]' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
+    <div className={`flex flex-col gap-2.5 mx-auto w-full pb-16 transition ${pageOrientation === 'landscape' ? 'max-w-[1240px]' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
       {/* Toast Feedback */}
       {toastMessage && (
         <div
@@ -579,47 +580,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         setIsModelsDrawerOpen={setIsModelsDrawerOpen}
       />
 
-      <EditorSheetConfigBar
-        customStyles={customStyles}
-        handleApplyStyle={handleApplyStyle}
-        setIsSaveStyleModalOpen={setIsSaveStyleModalOpen}
-        fontFamilyId={fontFamilyId}
-        onChangeFontFamily={(id) => {
-          setFontFamilyId(id);
-          if (editor) triggerAutoSave(editor);
-        }}
-        pageOrientation={pageOrientation}
-        setPageOrientation={setPageOrientation}
-        viaLayout={viaLayout}
-        setViaLayout={setViaLayout}
-        showToast={showToast}
-        headerConfig={headerConfig}
-        handleHeaderFieldChange={handleHeaderFieldChange}
-        handleLoadActivePrescription={handleLoadActivePrescription}
-        prescriptionItems={prescriptionItems}
-        logoConfig={logoConfig}
-        isLogoMenuOpen={isLogoMenuOpen}
-        setIsLogoMenuOpen={setIsLogoMenuOpen}
-        activeLogoTab={activeLogoTab}
-        setActiveLogoTab={setActiveLogoTab}
-        handleChangeLogoPosition={handleChangeLogoPosition}
-        handleChangeLogoSize={handleChangeLogoSize}
-        fileInputRef={fileInputRef}
-        handleLogoUpload={handleLogoUpload}
-        logoUploading={logoUploading}
-        setIsLogoGeneratorOpen={setIsLogoGeneratorOpen}
-        handleApplyPresetLogo={handleApplyPresetLogo}
-        handleRemoveLogo={handleRemoveLogo}
-        handleChangeSecondaryLogoSize={handleChangeSecondaryLogoSize}
-        secondaryFileInputRef={secondaryFileInputRef}
-        handleSecondaryLogoUpload={handleSecondaryLogoUpload}
-        secondaryLogoUploading={secondaryLogoUploading}
-        handleApplySecondaryPresetLogo={handleApplySecondaryPresetLogo}
-        handleRemoveSecondaryLogo={handleRemoveSecondaryLogo}
-        docWatermark={docWatermark}
-        handleWatermarkChange={handleWatermarkChange}
-      />
-
       <EditorTextFormattingToolbar
         editor={editor}
         baseFontSize={baseFontSize}
@@ -628,7 +588,54 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
         activeLoadedRecipeType={activeLoadedRecipeType}
         itensPorRegime={itensPorRegime}
         handleLoadActivePrescription={handleLoadActivePrescription}
+        viaLayout={viaLayout}
+        isSheetConfigOpen={isSheetConfigOpen}
+        onToggleSheetConfig={() => setIsSheetConfigOpen((prev) => !prev)}
       />
+
+      {isSheetConfigOpen && (
+        <EditorSheetConfigBar
+          customStyles={customStyles}
+          handleApplyStyle={handleApplyStyle}
+          setIsSaveStyleModalOpen={setIsSaveStyleModalOpen}
+          fontFamilyId={fontFamilyId}
+          onChangeFontFamily={(id) => {
+            setFontFamilyId(id);
+            if (editor) triggerAutoSave(editor);
+          }}
+          pageOrientation={pageOrientation}
+          setPageOrientation={setPageOrientation}
+          viaLayout={viaLayout}
+          setViaLayout={setViaLayout}
+          showToast={showToast}
+          headerConfig={headerConfig}
+          handleHeaderFieldChange={handleHeaderFieldChange}
+          handleLoadActivePrescription={handleLoadActivePrescription}
+          prescriptionItems={prescriptionItems}
+          logoConfig={logoConfig}
+          isLogoMenuOpen={isLogoMenuOpen}
+          setIsLogoMenuOpen={setIsLogoMenuOpen}
+          activeLogoTab={activeLogoTab}
+          setActiveLogoTab={setActiveLogoTab}
+          handleChangeLogoPosition={handleChangeLogoPosition}
+          handleChangeLogoSize={handleChangeLogoSize}
+          fileInputRef={fileInputRef}
+          handleLogoUpload={handleLogoUpload}
+          logoUploading={logoUploading}
+          setIsLogoGeneratorOpen={setIsLogoGeneratorOpen}
+          handleApplyPresetLogo={handleApplyPresetLogo}
+          handleRemoveLogo={handleRemoveLogo}
+          handleChangeSecondaryLogoSize={handleChangeSecondaryLogoSize}
+          secondaryFileInputRef={secondaryFileInputRef}
+          handleSecondaryLogoUpload={handleSecondaryLogoUpload}
+          secondaryLogoUploading={secondaryLogoUploading}
+          handleApplySecondaryPresetLogo={handleApplySecondaryPresetLogo}
+          handleRemoveSecondaryLogo={handleRemoveSecondaryLogo}
+          docWatermark={docWatermark}
+          handleWatermarkChange={handleWatermarkChange}
+          onClose={() => setIsSheetConfigOpen(false)}
+        />
+      )}
 
       {/* ÁREA DA FOLHA A4 TÁTIL MILIMÉTRICA (210mm x 297mm) */}
       <div ref={molduraEditorRef} className="w-full overflow-hidden py-2">

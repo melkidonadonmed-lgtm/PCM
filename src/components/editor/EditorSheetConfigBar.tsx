@@ -66,6 +66,7 @@ export interface EditorSheetConfigBarProps {
   handleRemoveSecondaryLogo: () => void;
   docWatermark: WatermarkType;
   handleWatermarkChange: (newType: WatermarkType) => void;
+  onClose?: () => void;
 }
 
 export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
@@ -104,9 +105,10 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
   handleRemoveSecondaryLogo,
   docWatermark,
   handleWatermarkChange,
+  onClose,
 }) => {
   return (
-    <div className="editor-toolbar no-print relative z-20 rounded-2xl p-2.5 sm:p-3 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex flex-wrap items-center gap-2">
+    <div className="editor-toolbar no-print relative z-20 rounded-2xl p-2 sm:p-2.5 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex flex-wrap items-center gap-1.5 animate-tab-fade">
       {/* Seletor Rápido de Estilo de Receita Atual */}
       <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
         <span className="text-xs font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
@@ -294,7 +296,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
 
         {/* Dropdown de Gestão do Logotipo com Abas: Esquerdo e Direito */}
         {isLogoMenuOpen && (
-          <div className="absolute right-0 top-11 w-84 sm:w-90 bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-2xl shadow-tactile-lg p-4 z-50 flex flex-col gap-3 animate-tab-fade">
+          <div className="fixed inset-x-3 top-24 sm:absolute sm:inset-x-auto sm:right-0 sm:top-11 sm:w-88 max-w-[calc(100vw-1.5rem)] bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-2xl shadow-tactile-lg p-4 z-50 flex flex-col gap-3 animate-tab-fade">
             <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-1.5">
                 <ImageIcon className="w-4 h-4 text-slate-600 dark:text-slate-300" />
@@ -582,6 +584,19 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
         currentType={docWatermark}
         onChange={handleWatermarkChange}
       />
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Recolher ajustes da folha"
+          title="Recolher barra de ajustes da folha"
+          className="ml-auto h-8 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition shrink-0"
+        >
+          <X className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Fechar</span>
+        </button>
+      )}
     </div>
   );
 };

@@ -24,6 +24,8 @@ import { PrescribedItemsList } from '../components/prescription/PrescribedItemsL
 import { PatientQuickCard } from '../components/prescription/PatientQuickCard';
 import { LogoGeneratorModal } from '../components/LogoGeneratorModal';
 import { EditorModelsAndStylesDrawer } from '../components/editor/EditorModelsAndStylesDrawer';
+import { EditorTopActionsBar } from '../components/editor/EditorTopActionsBar';
+import { EditorTextFormattingToolbar } from '../components/editor/EditorTextFormattingToolbar';
 import { SusCatalogListView } from '../components/sus/SusCatalogListView';
 import { CidSearchBar } from '../components/CidSearchBar';
 import { registerModalInStack, getActiveModalStackSize } from '../hooks/useModalAccessibility';
@@ -386,7 +388,12 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
       />
     );
     expect(examsHtml).toContain('Solicitação de exames complementares');
+    expect(examsHtml).toContain('Seleção de exames individuais');
+    expect(examsHtml).toContain('id="btn-exam-packages-menu"');
+    expect(examsHtml).toContain('aria-haspopup="dialog"');
+    expect(examsHtml).toContain('Kits e painéis prontos');
     expect(examsHtml).toContain('Exames no pedido (2)');
+    expect(examsHtml).not.toContain('Painéis e pacotes clínicos:');
 
     const mobileHtml = renderToStaticMarkup(
       <MobileBottomNav
@@ -856,6 +863,9 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     );
     expect(susCatalogHtml).toContain('aria-label="Buscar exame ou documento SUS"');
     expect(susCatalogHtml).toContain('placeholder="Ex.: APAC, LME, Tomografia, Mamografia, Dengue..."');
+    expect(susCatalogHtml).toContain('APAC Laudo Principal');
+    expect(susCatalogHtml).toContain('Impresso MS');
+    expect(susCatalogHtml).not.toContain('line-clamp-3');
 
     const cidSearchHtml = renderToStaticMarkup(
       <CidSearchBar
@@ -1029,5 +1039,54 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(cidHtml).toContain('aria-haspopup="dialog"');
     expect(cidHtml).toContain('Diagnósticos frequentes');
     expect(cidHtml).not.toContain('Diagnósticos Mais Frequentes (1 clique):');
+
+    // 4. Editor A4 (Google Docs Mobile-First): barra superior compacta em 1 linha (#btn-editor-actions-menu) e ajustes de folha retráteis (#btn-toggle-sheet-config)
+    const editorTopHtml = renderToStaticMarkup(
+      <EditorTopActionsBar
+        doctor={configuredDoctor}
+        currentModel={{ id: 'doc-1', title: 'Receituário Clínico', isPreset: false }}
+        isEditingModelTitle={false}
+        setIsEditingModelTitle={vi.fn()}
+        tempModelTitle="Receituário Clínico"
+        setTempModelTitle={vi.fn()}
+        handleSaveCurrentModelTitle={vi.fn()}
+        saveStatus="saved"
+        lastSavedTime="12:30"
+        isExportingPdf={false}
+        savedTemplates={[]}
+        onNavigateBack={vi.fn()}
+        syncWithActivePrescription={vi.fn()}
+        handlePrint={vi.fn()}
+        handleDownloadPdf={vi.fn()}
+        handleLoadActivePrescription={vi.fn()}
+        handleLoadActiveReferral={vi.fn()}
+        handleLoadActiveCertificate={vi.fn()}
+        handleStartNewDocument={vi.fn()}
+        handleSaveModelDirectly={vi.fn()}
+        setNewModelTitle={vi.fn()}
+        setIsSaveModelModalOpen={vi.fn()}
+        setIsModelsDrawerOpen={vi.fn()}
+      />
+    );
+    expect(editorTopHtml).toContain('id="btn-editor-actions-menu"');
+    expect(editorTopHtml).toContain('Receituário Clínico');
+
+    const editorToolbarHtml = renderToStaticMarkup(
+      <EditorTextFormattingToolbar
+        editor={null}
+        baseFontSize={11}
+        setBaseFontSize={vi.fn()}
+        regimesNaConsulta={[]}
+        activeLoadedRecipeType={null}
+        itensPorRegime={{ simples: [], antimicrobiano: [], controle_especial: [] }}
+        handleLoadActivePrescription={vi.fn()}
+        viaLayout="1-via"
+        isSheetConfigOpen={false}
+        onToggleSheetConfig={vi.fn()}
+      />
+    );
+    expect(editorToolbarHtml).toContain('id="btn-toggle-sheet-config"');
+    expect(editorToolbarHtml).toContain('Folha &amp; Timbrado');
+    expect(editorToolbarHtml).toContain('1 Via');
   });
 });
