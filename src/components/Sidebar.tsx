@@ -43,6 +43,7 @@ interface SidebarNavItem {
   fullLabel?: string;
   shortLabel: string;
   iconName: IconName;
+  shortcut?: string;
   badge?: string;
 }
 
@@ -150,29 +151,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  // Grupo 1: Atendimento Clínico Principal (4 Hubs Canônicos)
+  // Grupo 1: Atendimento Clínico Principal (5 Destinos Canônicos)
   const coreHubNavItems: SidebarNavItem[] = [
     {
       id: 'prescription',
       label: 'Receitas Médicas',
       shortLabel: 'Receitas',
       iconName: 'receita',
+      shortcut: 'Alt+1',
       badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
     },
     {
       id: 'documents',
       label: 'Central de Documentos',
-      fullLabel: 'Central de Documentos (Atestados, Encaminhamentos, Exames e SUS)',
+      fullLabel: 'Central de Documentos (Atestados, Encaminhamentos e Exames)',
       shortLabel: 'Documentos',
       iconName: 'documentos',
+      shortcut: 'Alt+2',
       badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
+    },
+    {
+      id: 'sus',
+      label: 'Guias Oficiais SUS',
+      fullLabel: 'Guias Oficiais SUS (APAC, LME, SISREG, GAL/LACEN, SISCAN, TRM-TB)',
+      shortLabel: 'Guias SUS',
+      iconName: 'sus',
+      shortcut: 'Alt+6'
     },
     {
       id: 'editor',
       label: 'Editor A4 & Timbrados',
       fullLabel: 'Editor de Prescrições e Laudos A4',
       shortLabel: 'Editor',
-      iconName: 'editor'
+      iconName: 'editor',
+      shortcut: 'Alt+5'
     },
     {
       id: 'print_preview',
@@ -189,13 +201,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Calculadora Pediátrica',
       shortLabel: 'Doses',
       iconName: 'balanca',
+      shortcut: 'Alt+3',
       badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
     },
     {
       id: 'protocols',
       label: 'Protocolos Clínicos',
       shortLabel: 'Protocolos',
-      iconName: 'coracao'
+      iconName: 'coracao',
+      shortcut: 'Alt+4'
     }
   ];
 
@@ -223,7 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const renderNavButton = (item: SidebarNavItem) => {
     const isActive = item.id === 'documents'
-      ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus')
+      ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
       : activeTab === item.id;
 
     if (!isOpen) {
@@ -237,24 +251,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
           aria-label={item.fullLabel || item.label}
           className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl flex items-center justify-center transition cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative ${
             isActive
-              ? 'nav-item-active bg-sky-600/30 text-white border border-info shadow-tactile-sm font-bold'
-              : 'text-slate-300 hover:bg-white/10 hover:text-white'
+              ? 'nav-item-active sidebar-active-surface text-white font-bold'
+              : 'text-slate-300 hover:bg-white/10 hover:text-white border border-transparent'
           }`}
         >
+          {isActive && <span aria-hidden="true" className="sidebar-active-bar" />}
           <Icon
             name={item.iconName}
             size={20}
+            filled={isActive}
             className={`transition-transform group-hover:scale-105 ${
               isActive ? 'text-sky-300' : 'text-slate-300 group-hover:text-white'
             }`}
           />
           {item.badge && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-sky-500 text-white text-xs font-black flex items-center justify-center shadow-sm border border-white/20 clinical-tabular-nums">
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-sky-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm border border-white/20 clinical-unit clinical-tabular-nums">
               {item.badge}
             </span>
           )}
-          <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
-            {item.label}
+          <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50 flex items-center gap-2">
+            <span>{item.label}</span>
+            {item.shortcut && (
+              <span className="kbd-shortcut-chip bg-white/10 text-sky-300 font-bold">
+                {item.shortcut}
+              </span>
+            )}
           </span>
         </button>
       );
@@ -267,19 +288,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => handleNavClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`w-full h-10 flex items-center justify-between px-3 rounded-xl text-xs transition cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
+        className={`relative w-full h-10 flex items-center justify-between px-3 rounded-xl text-xs transition cursor-pointer group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
           isActive
-            ? 'nav-item-active bg-sky-600/30 text-white font-semibold'
+            ? 'nav-item-active sidebar-active-surface text-white font-semibold'
             : 'text-slate-300 hover:bg-white/[0.06] hover:text-white font-medium border border-transparent'
         }`}
-        title={item.label}
+        title={item.shortcut ? `${item.label} (${item.shortcut})` : item.label}
       >
+        {isActive && <span aria-hidden="true" className="sidebar-active-bar" />}
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="w-5 h-5 flex items-center justify-center shrink-0">
             <Icon 
               name={item.iconName}
               size={18}
               opticalSize={20}
+              filled={isActive}
               className={isActive ? 'text-sky-300' : 'text-slate-300 group-hover:text-white'} 
             />
           </span>
@@ -287,15 +310,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {item.label}
           </span>
         </div>
-        {item.badge && (
+        {item.badge ? (
           <span 
-            className={`text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ml-1.5 clinical-tabular-nums ${
-              isActive ? 'bg-sky-500/25 text-sky-200' : 'bg-white/10 text-slate-300'
+            className={`text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ml-1.5 clinical-unit clinical-tabular-nums ${
+              isActive ? 'bg-sky-500/30 text-sky-100 border border-sky-400/30' : 'bg-white/10 text-slate-300'
             }`}
           >
             {item.badge}
           </span>
-        )}
+        ) : item.shortcut ? (
+          <span
+            aria-hidden="true"
+            className={`kbd-shortcut-chip flex-shrink-0 ml-1.5 transition-opacity ${
+              isActive
+                ? 'bg-sky-400/20 text-sky-200 font-bold'
+                : 'text-slate-400/80 group-hover:text-slate-200 bg-white/[0.03]'
+            }`}
+          >
+            {item.shortcut}
+          </span>
+        ) : null}
       </button>
     );
   };
@@ -342,13 +376,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             : 'overflow-visible py-3 px-1.5 space-y-2.5 flex flex-col items-center'
         }`}>
           
-          {/* Header da Janela de Navegação (Mobile & Desktop Expandido) */}
+          {/* Header da Navegação Clínica (Mobile & Desktop Expandido) */}
           {isOpen ? (
             <div className="flex items-center justify-between pb-2.5 pt-0.5 border-b border-white/10">
               <div className="flex items-center gap-2 min-w-0">
                 <Icon name="layers" size={16} className="text-sky-400 shrink-0" />
                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-200 truncate">
-                  Janela de Navegação
+                  Navegação Clínica
                 </span>
               </div>
               <button
@@ -369,54 +403,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <Icon name="menu_open" size={20} className="rotate-180" />
               <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
-                Abrir Janela de Navegação
+                Expandir Navegação Clínica
               </span>
             </button>
           )}
 
-          {/* Seletor de Macro-Módulos da Plataforma (Visível quando a Janela de Navegação está aberta) */}
-          {isOpen && (
-            <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10 space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1.5 pb-0.5">
-                Módulos do Ecossistema
-              </p>
-              <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-sky-500/20 border border-sky-400/30 text-white text-xs font-semibold">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Icon name="stethoscope" size={15} className="text-sky-300 shrink-0" />
-                  <span className="truncate">01. Clínico & Prescrição</span>
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-300 border border-emerald-400/30 shrink-0">
-                  Ativo
-                </span>
-              </div>
-              <div
-                className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-slate-400 text-xs font-medium opacity-75 select-none"
-                title="Módulo de Evolução Ambulatorial (PEP / SOAP) — Arquitetura pronta para ativação futura"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <Icon name="clinical_notes" size={15} className="text-slate-400 shrink-0" />
-                  <span className="truncate">02. Evolução / PEP</span>
-                </div>
-                <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-slate-400 shrink-0">
-                  Futuro
-                </span>
-              </div>
-              <div
-                className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-slate-400 text-xs font-medium opacity-75 select-none"
-                title="Módulo Hospitalar (Internação, Prescrição por Horário e Alta) — Arquitetura pronta para ativação futura"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <Icon name="local_hospital" size={15} className="text-slate-400 shrink-0" />
-                  <span className="truncate">03. Hospitalar</span>
-                </div>
-                <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-slate-400 shrink-0">
-                  Futuro
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Context Switcher (SUS Multi-Instituição) */}
+          {/* Context Switcher (SUS Multi-Instituição) — Prioridade 1 no Topo */}
           {contexts && contexts.length > 0 && activeContext && onSwitchContext && (
             <ContextSwitcher
               contexts={contexts}
@@ -426,7 +418,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           )}
 
-          {/* Doctor Profile Badge Compacto */}
+          {/* Doctor Profile Badge Compacto — Prioridade 2 no Topo */}
           {isOpen ? (
             <div
               onClick={handleOpenDoctor}
@@ -442,7 +434,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               title="Clique para editar CRM e dados profissionais"
             >
               <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <div className="w-8 h-8 rounded-lg bg-white/10 text-sky-200 border border-white/15 flex items-center justify-center font-bold text-xs shrink-0 shadow-tactile-sm">
+                <div className="w-8 h-8 rounded-lg bg-sky-500/15 text-sky-200 border border-sky-400/25 flex items-center justify-center font-bold text-xs shrink-0 shadow-tactile-sm">
                   CRM
                 </div>
                 <div className="overflow-hidden min-w-0 flex-1">
@@ -462,7 +454,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={handleOpenDoctor}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-white/10 text-sky-200 border border-white/15 hover:bg-white/15 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-sky-500/15 text-sky-200 border border-sky-400/25 hover:bg-sky-500/25 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
               aria-label="Perfil do Médico"
             >
               <span>CRM</span>
@@ -538,7 +530,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           <span className="text-xs font-medium text-slate-200 group-hover:text-white truncate">
                             {kit.name}
                           </span>
-                          <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/10 text-slate-300 shrink-0">
+                          <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/10 text-slate-300 shrink-0 clinical-tabular-nums">
                             {kit.badge}
                           </span>
                         </div>
@@ -567,6 +559,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   Kits de plantão
                 </span>
               </button>
+            )}
+
+            {/* Seletor Compacto de Macro-Módulos do Ecossistema (MOD-01 Ativo | MOD-02 PEP | MOD-03 Hospitalar) */}
+            {isOpen && (
+              <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Ecossistema Clínico
+                  </span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-1.5 py-0.5 rounded clinical-tabular-nums">
+                    MOD-01 Ativo
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-sky-500/15 border border-sky-400/25 text-white text-xs font-semibold">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Icon name="stethoscope" size={14} className="text-sky-300 shrink-0" />
+                    <span className="truncate">01. Clínico & Prescrição</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-1">
+                  <div
+                    className="flex items-center justify-between px-2 py-1 rounded-lg bg-white/[0.02] border border-white/5 text-slate-400 text-[11px] font-medium opacity-75 select-none"
+                    title="Módulo de Evolução Ambulatorial (PEP / SOAP) — Arquitetura pronta para ativação futura"
+                  >
+                    <span className="truncate">02. PEP / SOAP</span>
+                    <span className="text-[9px] font-semibold uppercase text-slate-400 shrink-0">Futuro</span>
+                  </div>
+                  <div
+                    className="flex items-center justify-between px-2 py-1 rounded-lg bg-white/[0.02] border border-white/5 text-slate-400 text-[11px] font-medium opacity-75 select-none"
+                    title="Módulo Hospitalar (Internação, Prescrição por Horário e Alta) — Arquitetura pronta para ativação futura"
+                  >
+                    <span className="truncate">03. Hospitalar</span>
+                    <span className="text-[9px] font-semibold uppercase text-slate-400 shrink-0">Futuro</span>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

@@ -569,29 +569,31 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   return (
     <div data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto space-y-5 surface-raised">
       
-      {/* Top Mobile View Switcher */}
-      <div className="flex md:hidden items-center justify-between p-1 rounded-xl bg-slate-200/80 dark:bg-slate-900 border border-medium dark:border-strong">
+      {/* Top Mobile View Switcher em Trilho Segmentado Esculpido */}
+      <div className="flex md:hidden items-center justify-between p-1 rounded-2xl nav-segmented-track gap-1">
         <button
           type="button"
           onClick={() => setMobileSection('composer')}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
+          className={`flex-1 py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
             mobileSection === 'composer'
-              ? 'bg-navy-800 text-white shadow-tactile-btn'
-              : 'text-slate-600 dark:text-slate-400'
+              ? 'nav-segmented-pill-active font-bold'
+              : 'text-[var(--text-secondary)] font-semibold'
           }`}
         >
-          Prescrever medicamentos
+          <Icon name="medication" size={15} filled={mobileSection === 'composer'} className={mobileSection === 'composer' ? 'text-sky-600 dark:text-sky-400' : 'opacity-70'} />
+          <span>Prescrever medicamentos</span>
         </button>
         <button
           type="button"
           onClick={() => setMobileSection('preview')}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
+          className={`flex-1 py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer clinical-tabular-nums ${
             mobileSection === 'preview'
-              ? 'bg-navy-800 text-white shadow-tactile-btn'
-              : 'text-slate-600 dark:text-slate-400'
+              ? 'nav-segmented-pill-active font-bold'
+              : 'text-[var(--text-secondary)] font-semibold'
           }`}
         >
-          Visualizar receita ({items.length})
+          <Icon name="description" size={15} filled={mobileSection === 'preview'} className={mobileSection === 'preview' ? 'text-sky-600 dark:text-sky-400' : 'opacity-70'} />
+          <span>Visualizar receita ({items.length})</span>
         </button>
       </div>
 

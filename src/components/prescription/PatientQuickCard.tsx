@@ -65,7 +65,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           <button
             type="button"
             onClick={onToggleExtraFields}
-            className="text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg px-2 py-1 clinical-tabular-nums transition"
+            className="text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg px-2 py-1 clinical-unit clinical-tabular-nums transition"
             title="Alternar exibição de CPF e Peso"
           >
             <Icon name={showExtraPatientFields ? 'expand_less' : 'expand_more'} size={15} />

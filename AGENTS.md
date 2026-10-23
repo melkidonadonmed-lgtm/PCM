@@ -27,7 +27,7 @@ npm run build       # Build de produção em dist/
 - `src/components/sus/` — Guias regulatórias do SUS e grade vetorial interativa 12 colunas (`SusInteractiveVectorSheet.tsx`, `SusCommonIdentityFields.tsx`, `SusRegulatorySpecificFields.tsx`).
 - `src/utils/` — Motores clínicos determinísticos (`doseCalculator.ts`, `isSpecialControlOrAntibiotic.ts`, `notificacaoDeReceita.ts`, `formularioOficial.ts`, `folhaA4.ts`).
 - `src/data/` — Catálogos clínicos (`pediatricMeds.ts`, `medicationDatabase.ts`, `clinicalKits.ts`, `formulariosOficiaisSus.ts`, `susDocumentsCatalog.ts`).
-- **Especificação Completa de Runtime, Árvore de 112 Arquivos, 11 Chaves `localStorage` e Regras SUS/CFM/Anvisa:** Leia [`docs/CLINICAL_AND_RUNTIME_SPEC.md`](docs/CLINICAL_AND_RUNTIME_SPEC.md).
+- **Especificação Completa de Runtime, Árvore de 134 Arquivos, 11 Chaves `localStorage` e Regras SUS/CFM/Anvisa:** Leia [`docs/CLINICAL_AND_RUNTIME_SPEC.md`](docs/CLINICAL_AND_RUNTIME_SPEC.md).
 - **Skills e Agente Revisor Local:** Para UI/impressão/PDF, consulte `.github/skills/ui-pdf-validation`. Para regras clínicas/doses, consulte `.github/skills/clinical-change-safety` e o agente `.github/agents/prescmed-clinical-reviewer`.
 
 ---

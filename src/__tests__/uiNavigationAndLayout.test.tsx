@@ -135,7 +135,11 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlUnconfigured).toContain('aria-label="Início"');
     expect(htmlUnconfigured).toContain('aria-label="Navegação rápida entre áreas clínicas"');
     expect(htmlUnconfigured).toContain('hidden lg:flex');
+    expect(htmlUnconfigured).toContain('nav-segmented-track');
+    expect(htmlUnconfigured).toContain('nav-segmented-pill-active');
     expect(htmlUnconfigured).toContain('Alt+1');
+    expect(htmlUnconfigured).toContain('Alt+6');
+    expect(htmlUnconfigured).toContain('Guias SUS');
     expect(htmlUnconfigured).toContain('Identificar paciente');
     expect(htmlUnconfigured).toContain('Configurar CRM');
 
@@ -161,13 +165,14 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
 
     expect(htmlConfigured).toContain('Carlos Eduardo Lima');
     expect(htmlConfigured).toContain('18,5 kg');
+    expect(htmlConfigured).toContain('clinical-unit');
     expect(htmlConfigured).toContain('CRM 54321/SP');
     expect(htmlConfigured).toContain('aria-current="page"');
     expect(htmlConfigured).toContain('id="btn-header-install-pwa"');
     expect(htmlConfigured).toContain('aria-label="Instalar Aplicativo PresCMed"');
   });
 
-  it('Sidebar mantém acabamento Deep Navy (.panel-navy), permite tooltips flutuantes no modo recolhido (overflow-visible) e preserva botão PWA', () => {
+  it('Sidebar mantém acabamento Deep Navy (.panel-navy), barra luminosa vertical (.sidebar-active-bar), permite tooltips flutuantes no modo recolhido (overflow-visible) e preserva botão PWA', () => {
     const htmlExpanded = renderToStaticMarkup(
       <Sidebar
         darkMode={false}
@@ -194,6 +199,10 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     );
 
     expect(htmlExpanded).toContain('panel-navy');
+    expect(htmlExpanded).toContain('sidebar-active-surface');
+    expect(htmlExpanded).toContain('sidebar-active-bar');
+    expect(htmlExpanded).toContain('Guias Oficiais SUS');
+    expect(htmlExpanded).toContain('MOD-01 Ativo');
     expect(htmlExpanded).toContain('Novo Atendimento');
     expect(htmlExpanded).toContain('Backup (.pcm)');
     expect(htmlExpanded).toContain('id="btn-sidebar-install-pwa"');

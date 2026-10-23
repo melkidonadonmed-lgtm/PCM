@@ -67,25 +67,35 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
     }
   }, [initialSubTab]);
 
-  const tabsList: { id: DocumentsSubTab; label: string; icon: IconName; badge?: string }[] = [
+  const tabsList: { id: DocumentsSubTab; label: string; regulatoryTag: string; icon: IconName; badge?: string }[] = [
     {
       id: 'certificate',
       label: 'Atestado médico',
+      regulatoryTag: 'Res. CFM 1.658/2002',
       icon: 'atestado'
     },
     {
       id: 'referral',
       label: 'Encaminhamento',
+      regulatoryTag: 'Regulação Clínica',
       icon: 'encaminhamento'
     },
     {
       id: 'exams',
       label: 'Pedidos de exames',
+      regulatoryTag: 'SADT • Lab & Imagem',
       icon: 'exame',
       badge: selectedExams?.length > 0 ? `${selectedExams.length}` : undefined
     },
-    { id: 'sus', label: 'Documentos SUS', icon: 'description' }
+    {
+      id: 'sus',
+      label: 'Documentos SUS',
+      regulatoryTag: 'APAC • LME • SISREG',
+      icon: 'description'
+    }
   ];
+
+  const activeTabInfo = tabsList.find(t => t.id === activeSubTab) || tabsList[0];
 
   const handleTabKeyDown = (e: React.KeyboardEvent, currentId: DocumentsSubTab) => {
     const currentIndex = tabsList.findIndex(t => t.id === currentId);
@@ -115,26 +125,45 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
 
   return (
     <SurfaceCard as="div" state="idle" id="clinical-documents-hub" className="max-w-7xl mx-auto space-y-4 sm:space-y-5 !p-0 !bg-transparent !border-none !shadow-none">
-      {/* Barra de Navegação Superior em Pílulas Táteis Minerais */}
-      <SoftCard variant="flat" className="card-surface p-2.5 sm:p-3 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Identificação do Contexto Clínico */}
-        <div className="flex items-center gap-2.5 px-2">
-          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${hasPatient ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+      {/* Barra de Navegação Superior em Trilho Segmentado Esculpido */}
+      <SoftCard variant="flat" className="card-surface p-2.5 sm:p-3.5 rounded-2xl border border-subtle dark:border-strong flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        {/* Identificação do Contexto Clínico em 3 Níveis (Squint Test) */}
+        <div className="flex items-center gap-3 px-1.5 min-w-0">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
+            hasPatient
+              ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-600 dark:text-emerald-400'
+              : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-muted)]'
+          }`}>
+            <Icon name={activeTabInfo.icon} size={18} filled />
+          </div>
           <div className="min-w-0">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] block">
-              Central de documentos clínicos
-            </span>
-            <span className="text-xs sm:text-sm font-bold text-[var(--text-main)] truncate block">
-              {hasPatient ? patientName : 'Vincule um paciente para emissão'}
-            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                Central de documentos clínicos
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 clinical-tabular-nums">
+                {activeTabInfo.regulatoryTag}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className={`w-2 h-2 rounded-full shrink-0 ${hasPatient ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+              <span className="text-xs sm:text-sm font-bold text-[var(--text-main)] truncate">
+                {hasPatient ? patientName : 'Vincule um paciente para emissão'}
+              </span>
+              {hasPatient && patient.weightKg > 0 && (
+                <span className="text-xs font-bold text-sky-700 dark:text-sky-300 clinical-unit clinical-tabular-nums shrink-0">
+                  • {patient.weightKg.toLocaleString('pt-BR')} kg
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Abas dos documentos no padrão normal (sem depressão interna) */}
+        {/* Abas dos documentos em Trilho Segmentado Esculpido (.nav-segmented-track) */}
         <nav
           role="tablist"
           aria-label="Documentos clínicos disponíveis"
-          className="flex items-center gap-2 overflow-x-auto scrollbar-none"
+          className="flex items-center gap-1 p-1 rounded-2xl nav-segmented-track overflow-x-auto scrollbar-none"
         >
           {tabsList.map((tab) => {
             const isActive = activeSubTab === tab.id;
@@ -149,23 +178,23 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => handleChangeSubTab(tab.id)}
                 onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
-                className={`h-10 min-h-[40px] px-3.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                className={`h-9 min-h-[38px] px-3 sm:px-3.5 rounded-xl border text-xs flex items-center gap-2 transition-all cursor-pointer shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   isActive
-                    ? 'bg-navy-900 border-navy-900 text-white dark:bg-[#0369A1] dark:border-transparent shadow-tactile-sm'
-                    : 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#334155] hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-navy-900 border-navy-900 text-white dark:bg-[#0369A1] dark:border-sky-400/30 font-bold shadow-tactile-sm'
+                    : 'bg-transparent border-transparent text-[var(--text-secondary)] hover:text-[var(--text-main)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] font-semibold'
                 }`}
               >
                 <Icon
                   name={tab.icon}
-                  size={17}
+                  size={16}
                   filled={isActive}
-                  className={isActive ? 'text-white' : 'text-sky-600 dark:text-sky-400'}
+                  className={isActive ? 'text-sky-300 dark:text-white' : 'text-sky-600 dark:text-sky-400 opacity-85'}
                 />
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span
-                    className={`text-xs font-bold px-1.5 py-0.5 rounded-full max-w-[90px] truncate clinical-tabular-nums ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200'
+                    className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full max-w-[90px] truncate clinical-unit clinical-tabular-nums ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-[var(--surface-card)] text-[var(--text-main)] border border-[var(--border-subtle)]'
                     }`}
                   >
                     {tab.badge}

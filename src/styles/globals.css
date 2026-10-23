@@ -1,23 +1,124 @@
 /**
- * Camada de Tokens e Animações Globais (frontend-code-architect v5.0 + modern-web-guidance)
- * Importada em src/index.css dentro de @layer base / @layer components.
+ * Camada de Tokens Semânticos, Escala Tipográfica Fluida e Primitivas de Navegação
+ * Conformidade: design-md v5.0.0 + frontend-code-architect v3.0.0 + design-interface-medica-minimalista v4.0.0
  */
 @layer base {
   :root {
+    /* 1. Tokens Semânticos de 3 Camadas (Superfície, Tinta e Acento 90/8/2) */
+    --bg-canvas: var(--bg-app, #F8FAFC);
+    --bg-surface: var(--surface-card, #FFFFFF);
+    --bg-elevated: #FFFFFF;
+    --bg-subtle: var(--surface-inset, #F1F5F9);
+
     --ink-primary: var(--text-main, #0F172A);
     --ink-secondary: var(--text-secondary, #334155);
     --ink-muted: var(--text-muted, #5B6B80);
-    --rim-light: rgba(255, 255, 255, 0.92);
+
+    --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* 2. Escala Tipográfica Modular e Fluida (clamp) */
+    --text-xs: clamp(0.6875rem, 0.65rem + 0.15vw, 0.75rem);
+    --text-sm: clamp(0.8125rem, 0.78rem + 0.2vw, 0.875rem);
+    --text-base: clamp(0.9375rem, 0.9rem + 0.25vw, 1rem);
+    --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+    --text-xl: clamp(1.375rem, 1.25rem + 0.6vw, 1.625rem);
+    --text-2xl: clamp(1.75rem, 1.5rem + 1.2vw, 2.25rem);
+
+    /* 3. Física Óptica a 135° e Curvas de Transição */
+    --rim-light: rgba(255, 255, 255, 0.94);
     --shadow-sculpted: var(--shadow-tactile-card);
+    --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .dark,
   [data-theme="dark"] {
+    --bg-canvas: var(--bg-app, #0F172A);
+    --bg-surface: var(--surface-card, #1E293B);
+    --bg-elevated: #27354A;
+    --bg-subtle: var(--surface-inset, #131B2E);
+
     --ink-primary: var(--text-main, #F8FAFC);
     --ink-secondary: var(--text-secondary, #CBD5E1);
     --ink-muted: var(--text-muted, #94A3B8);
+
     --rim-light: rgba(255, 255, 255, 0.08);
     --shadow-sculpted: var(--shadow-tactile-card-dark);
+  }
+}
+
+@layer components {
+  /* Blindagem de Unidades Clínicas (design-interface-medica-minimalista v4.0.0) */
+  .clinical-unit {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Trilho Côncavo Esculpido para Navegação Segmentada (Header & Central de Documentos) */
+  .nav-segmented-track {
+    background-color: var(--surface-inset);
+    border: 1px solid var(--border-subtle);
+    box-shadow:
+      inset 0 1px 2px rgba(15, 23, 42, 0.06),
+      0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .dark .nav-segmented-track {
+    background-color: rgba(15, 23, 42, 0.65);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Pílula Ativa em Relevo Óptico dentro do Trilho Segmentado */
+  .nav-segmented-pill-active {
+    background-color: var(--surface-card);
+    color: var(--ink-primary);
+    border: 1px solid var(--border-subtle);
+    box-shadow:
+      0 2px 6px -1px rgba(15, 23, 42, 0.08),
+      0 1px 2px -1px rgba(15, 23, 42, 0.04),
+      inset 0 1px 0 var(--rim-light);
+  }
+
+  .dark .nav-segmented-pill-active {
+    background-color: #1E293B;
+    color: #F8FAFC;
+    border-color: rgba(56, 189, 248, 0.28);
+    box-shadow:
+      0 4px 10px -2px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Indicador Luminoso Vertical na Sidebar Deep Navy */
+  .sidebar-active-surface {
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.22) 0%, rgba(14, 165, 233, 0.08) 65%, rgba(14, 165, 233, 0.02) 100%);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    box-shadow:
+      0 2px 8px -2px rgba(2, 132, 199, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .sidebar-active-bar {
+    position: absolute;
+    left: 0;
+    top: 22%;
+    bottom: 22%;
+    width: 3px;
+    border-radius: 0 9999px 9999px 0;
+    background-color: #38BDF8;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.65);
+  }
+
+  /* Micro-chip Técnico para Atalhos de Teclado (Alt+1..6 / Ctrl+K) */
+  .kbd-shortcut-chip {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    padding: 3px 5px;
+    border-radius: 6px;
   }
 }

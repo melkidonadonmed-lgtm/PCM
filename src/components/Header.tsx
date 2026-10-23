@@ -183,6 +183,7 @@ export const Header: React.FC<HeaderProps> = ({
     label: string;
     icon: string;
     shortcut: string;
+    shortKey: string;
     badge?: string;
   }> = [
     {
@@ -190,6 +191,7 @@ export const Header: React.FC<HeaderProps> = ({
       label: 'Receitas',
       icon: 'receita',
       shortcut: 'Alt+1',
+      shortKey: '1',
       badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined
     },
     {
@@ -197,33 +199,44 @@ export const Header: React.FC<HeaderProps> = ({
       label: 'Documentos',
       icon: 'documentos',
       shortcut: 'Alt+2',
+      shortKey: '2',
       badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
+    },
+    {
+      id: 'sus',
+      label: 'Guias SUS',
+      icon: 'sus',
+      shortcut: 'Alt+6',
+      shortKey: '6'
     },
     {
       id: 'pediatric_calc',
       label: 'Doses',
       icon: 'balanca',
       shortcut: 'Alt+3',
+      shortKey: '3',
       badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
     },
     {
       id: 'protocols',
       label: 'Protocolos',
       icon: 'coracao',
-      shortcut: 'Alt+4'
+      shortcut: 'Alt+4',
+      shortKey: '4'
     },
     {
       id: 'editor',
       label: 'Editor',
       icon: 'editor',
-      shortcut: 'Alt+5'
+      shortcut: 'Alt+5',
+      shortKey: '5'
     }
   ];
 
   return (
     <header 
       id="prescmed-header" 
-      className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)] border-[var(--border-subtle)]"
+      className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)]/95 backdrop-blur-md border-[var(--border-subtle)]"
       style={{
         boxShadow: darkMode 
           ? '0 10px 24px -6px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.06)'
@@ -238,7 +251,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            className="w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
           >
             <Icon name="menu" size={18} />
           </button>
@@ -248,14 +261,14 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             aria-label="Início"
             onClick={onGoHome}
-            className="flex items-center gap-2 px-1.5 h-10 rounded-xl transition cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
-            title="Voltar ao início (Receitas)"
+            className="flex items-center gap-2.5 px-1.5 h-10 rounded-xl transition cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
+            title="Voltar ao início (Receitas — Alt+1)"
           >
             <span
-              className="w-9 h-9 rounded-xl flex items-center justify-center relative overflow-hidden flex-shrink-0 border transition group-hover:brightness-110"
+              className="w-9 h-9 rounded-xl flex items-center justify-center relative overflow-hidden flex-shrink-0 border transition group-hover:brightness-110 shadow-tactile-sm"
               style={{
                 backgroundColor: 'var(--nav-bg, #0F172A)',
-                borderColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.12)'
+                borderColor: darkMode ? 'rgba(255, 255, 255, 0.14)' : 'rgba(15, 23, 42, 0.16)'
               }}
             >
               <img 
@@ -264,9 +277,14 @@ export const Header: React.FC<HeaderProps> = ({
                 className="w-6 h-6 object-contain rounded-md select-none" 
               />
             </span>
-            <span className="hidden sm:inline font-bold text-base tracking-tight text-slate-900 dark:text-white">
-              PresCMed
-            </span>
+            <div className="hidden sm:flex flex-col items-start leading-none">
+              <span className="font-bold text-[15px] tracking-tight text-slate-900 dark:text-white">
+                PresCMed
+              </span>
+              <span className="hidden 2xl:inline text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] mt-0.5">
+                PEC • CFM • A4
+              </span>
+            </div>
           </button>
         </div>
 
@@ -274,11 +292,11 @@ export const Header: React.FC<HeaderProps> = ({
         {onSelectTab && (
           <nav
             aria-label="Navegação rápida entre áreas clínicas"
-            className="hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] flex-shrink-0"
+            className="hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 rounded-2xl nav-segmented-track flex-shrink-0"
           >
             {quickNavTabs.map((tab) => {
               const isActive = tab.id === 'documents'
-                ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus')
+                ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
                 : activeTab === tab.id;
               return (
                 <button
@@ -287,27 +305,39 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab(tab.id)}
                   aria-current={isActive ? 'page' : undefined}
                   title={`${tab.label} (${tab.shortcut})`}
-                  className={`px-2 xl:px-3 py-1.5 min-h-[38px] rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                  className={`px-2.5 xl:px-3 py-1.5 min-h-[38px] rounded-xl text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                     isActive
-                      ? 'bg-[var(--surface-card)] text-[var(--text-main)] font-bold shadow-tactile-sm border border-[var(--border-subtle)]'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] border border-transparent'
+                      ? 'nav-segmented-pill-active font-bold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] font-semibold border border-transparent'
                   }`}
                 >
                   <Icon
                     name={tab.icon}
                     size={16}
+                    filled={isActive}
                     className={isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'}
                   />
                   <span>{tab.label}</span>
-                  {tab.badge && (
+                  {tab.badge ? (
                     <span
-                      className={`text-xs font-extrabold px-1.5 py-0.2 rounded-full clinical-tabular-nums ${
+                      className={`text-[11px] font-extrabold px-1.5 py-0.5 rounded-full clinical-unit clinical-tabular-nums ${
                         isActive
-                          ? 'bg-sky-600 text-white'
-                          : 'bg-[var(--surface-card)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
+                          ? 'bg-sky-600 text-white shadow-xs'
+                          : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
                       }`}
                     >
                       {tab.badge}
+                    </span>
+                  ) : (
+                    <span
+                      aria-hidden="true"
+                      className={`hidden 2xl:inline-flex kbd-shortcut-chip ${
+                        isActive
+                          ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-[var(--text-muted)] opacity-60'
+                      }`}
+                    >
+                      {tab.shortcut}
                     </span>
                   )}
                 </button>
@@ -316,8 +346,9 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
         )}
 
-        {/* Middle: Active Patient Chip com Peso Integrado */}
-        <div className="flex items-center gap-2 min-w-0 flex-1 justify-center lg:justify-end">
+        {/* Right Command & Context Cluster: Paciente, Busca Ctrl+K, CRM, Nuvem e Tema */}
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 lg:flex-initial justify-end">
+          {/* Active Patient Chip com Peso Integrado */}
           <div 
             onClick={onOpenPatientModal}
             onKeyDown={(e) => {
@@ -329,16 +360,17 @@ export const Header: React.FC<HeaderProps> = ({
             id="header-patient-chip"
             role="button"
             tabIndex={0}
-            className={`flex items-center gap-2 px-3 h-10 rounded-xl border transition cursor-pointer group max-w-[220px] xl:max-w-[260px] shrink-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+            className={`flex items-center gap-2 px-3 h-10 rounded-xl border transition cursor-pointer group max-w-[210px] xl:max-w-[250px] shrink-0 shadow-tactile-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
               hasPatient 
-                ? 'bg-sky-50/70 dark:bg-sky-950/35 border-sky-200 dark:border-sky-800/50 text-slate-900 dark:text-slate-100 hover:bg-sky-100/70 dark:hover:bg-sky-900/40' 
-                : 'bg-[var(--bg-app)] dark:bg-[#1E293B] border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                ? 'bg-sky-50/80 dark:bg-sky-950/40 border-sky-200/90 dark:border-sky-800/60 text-slate-900 dark:text-slate-100 hover:bg-sky-100/80 dark:hover:bg-sky-900/50' 
+                : 'bg-[var(--surface-inset)] dark:bg-[#1E293B] border-[var(--border-subtle)] dark:border-white/10 text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
             }`}
             title="Clique para identificar o paciente, peso e histórico clínico"
           >
             <Icon
               name={hasPatient ? 'person' : 'person_add'}
               size={16}
+              filled={hasPatient}
               className={hasPatient ? 'text-sky-600 dark:text-sky-400' : 'text-[var(--text-muted)]'}
             />
             <div className="text-left overflow-hidden min-w-0 flex-1">
@@ -347,17 +379,14 @@ export const Header: React.FC<HeaderProps> = ({
                   {hasPatient ? patientName : 'Identificar paciente'}
                 </span>
                 {hasPatient && patientWeight > 0 && (
-                  <span className="text-sky-700 dark:text-sky-300 font-bold shrink-0 clinical-tabular-nums">
+                  <span className="text-sky-700 dark:text-sky-300 font-bold shrink-0 clinical-unit clinical-tabular-nums">
                     • {patientWeight.toLocaleString('pt-BR')} kg
                   </span>
                 )}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Right side: CRM Status, Atalhos & Alternador de Tema */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           {onOpenCommandPalette && (
             <button
               id="btn-open-command-palette"
@@ -365,10 +394,13 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenCommandPalette}
               aria-label="Busca rápida e navegação global (Ctrl+K)"
               title="Busca rápida de medicamentos, kits, protocolos e guias SUS (Ctrl+K)"
-              className="w-10 h-10 xl:w-auto xl:px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] dark:bg-[#1E293B] text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)]"
+              className="w-10 h-10 xl:w-auto xl:px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
             >
               <Icon name="search" size={16} className="text-sky-600 dark:text-sky-400" />
-              <span className="hidden xl:inline text-[11px] font-bold text-[var(--text-muted)] px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-white/10 clinical-tabular-nums">
+              <span className="hidden xl:inline text-xs font-medium text-[var(--text-muted)]">
+                Buscar
+              </span>
+              <span className="hidden xl:inline kbd-shortcut-chip font-bold text-[var(--text-secondary)] bg-white/80 dark:bg-white/10 border border-[var(--border-subtle)] dark:border-white/10 clinical-tabular-nums">
                 Ctrl+K
               </span>
             </button>
@@ -379,7 +411,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="header-doctor-chip"
               type="button"
               onClick={onOpenDoctorModal}
-              className="hidden md:flex items-center gap-1.5 px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] dark:bg-[#1E293B] border-[var(--border-subtle)] dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-[var(--surface-hover)] hover:text-slate-900 dark:hover:text-white"
+              className="hidden md:flex items-center gap-1.5 px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] border-[var(--border-subtle)] dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-[var(--surface-hover)] hover:text-slate-900 dark:hover:text-white shrink-0"
               title={
                 isDoctorReady
                   ? `Médico emitente: ${doctor?.name} (CRM ${doctor?.crm}/${doctor?.crmState}) — clique para editar`
@@ -401,7 +433,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onNavigateToEditor}
-              className="hidden md:flex items-center gap-1.5 px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="hidden md:flex items-center gap-1.5 px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
               title="Abrir Editor Livre de Documentos A4"
             >
               <Icon name="editor" size={16} className="text-sky-600 dark:text-sky-400" />
@@ -416,7 +448,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="btn-header-install-pwa"
               type="button"
               onClick={onInstallApp}
-              className="flex items-center justify-center gap-1.5 w-10 sm:w-auto sm:px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
+              className="flex items-center justify-center gap-1.5 w-10 sm:w-auto sm:px-2.5 h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
               title="Instalar PresCMed como aplicativo offline"
               aria-label="Instalar Aplicativo PresCMed"
             >
@@ -430,7 +462,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            className="w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
             title={darkMode ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
           >
             {darkMode ? (

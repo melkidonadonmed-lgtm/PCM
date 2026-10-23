@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Árvore Completa de Código (`src/`)
+## 1. Árvore Completa de Código (`src/` — 134 Arquivos)
 
 ```text
 index.html                     # Entry HTML com script inline de tema e fontes
@@ -13,14 +13,37 @@ src/
   main.tsx                     # Bootstrap React (StrictMode)
   App.tsx                      # Estado global da aplicação + roteamento por abas (activeTab)
   types.ts                     # Interfaces de domínio (DoctorProfile, Patient, PrescriptionItem, etc.)
+  types/
+    index.ts                   # Contratos de estado finito (UIState) e reexportações de tipos
+  config/
+    tokens.ts                  # Registro canônico de tokens semânticos, propósito e densidade
+  styles/
+    globals.css                # Tokens semânticos CSS (:root), escala tipográfica clamp(), .clinical-unit e curvas de transição
+  core/
+    domain/
+      clinicalEntities.ts      # Registro de macro-módulos (MOD-01..03) e contratos SOAP/PEP e Hospitalar
+    storage/
+      clinicalRepository.ts    # Repositório desacoplado (IClinicalRepository / LocalDexieClinicalRepository)
   index.css                    # Tailwind v4, tokens CSS, componentes em @layer e utilitários @utility
   components/
-    Header.tsx                 # Header superior (fundo claro no Light, botão Início, perfil e nuvem)
-    Sidebar.tsx                # Menu lateral de navegação e kits clínicos de plantão (deep navy contínuo)
+    Header.tsx                 # Header superior (fundo claro no Light, Command Bar unificada, perfil e nuvem)
+    Sidebar.tsx                # Menu lateral de navegação, macro-módulos e kits clínicos de plantão (deep navy contínuo)
     MobileBottomNav.tsx        # Barra de navegação inferior mobile com 5 destinos (Receitas, Documentos, Doses, Editor, Mais)
+    ui/
+      SurfaceCard.tsx          # Primitiva de superfície com estados FSM (idle, loading, success, empty, error)
+      SoftCard.tsx             # Cartão tátil leve com variantes flat, raised e inset
+      ActionButton.tsx         # Botão semântico reutilizável com variantes e estado de loading
+      Badge.tsx                # Pílula de status com suporte a alinhamento tabular (tabular-nums)
+    layout/
+      CommandPaletteModal.tsx  # Paleta de comandos global (Ctrl+K) para medicamentos, kits, protocolos e guias SUS
+    bento/
+      ConsultationReadinessBar.tsx # Barra de prontidão clínica (Emitente, Paciente/Peso, Conduta e Busca Ctrl+K)
     PrescriptionBuilder.tsx    # Construtor de receitas (orquestrador: paciente, sessões, lista e gaveta pediátrica)
     prescription/
+      PatientQuickCard.tsx     # Card compacto de identificação rápida do paciente e atalhos de documentos
       MedicationComposerCard.tsx # Card de busca/composição rápida de medicamento, dose, horários e aviso de talonário
+      PrescribedItemsList.tsx  # Lista reordenável de medicamentos prescritos por regime sanitário e modelos
+      PrescriptionModelsModal.tsx # Modal de biblioteca e criação de modelos reutilizáveis de prescrição
       PrescriptionPreviewColumn.tsx # Coluna direita: alternância de regime (Simples/2 Vias), FolhaA4 e barra de ações
     AcoesDaReceita.tsx         # Barra de ações única da receita (Imprimir/PDF, Editor, WhatsApp, Copiar)
     PediatricCalculator.tsx    # Calculadora pediátrica dedicada por peso (mg/kg → mL/gotas)
@@ -32,6 +55,7 @@ src/
       SusCatalogListView.tsx   # Grade filtrável dos 9 formulários SUS (APAC, LME, SISREG, GAL/LACEN, SISCAN, TRM-TB)
       SusCommonIdentityFields.tsx # Campos comuns de identificação (unidade/CNES, paciente/CNS, CID-10 e justificativa)
       SusRegulatorySpecificFields.tsx # Campos específicos de LME (anamnese, 1º–6º mês, incapaz) e APAC (procedimentos/oncologia/nefrologia)
+      SusInteractiveVectorSheet.tsx # Grade vetorial interativa de 12 colunas (.sus-grid) para edição direta na folha SUS
     AvisoNotificacaoReceita.tsx # Aviso de tela (.no-print) para controlados que exigem Notificação de Receita
     ClinicalProtocolsView.tsx  # Protocolos de conduta clínica e catálogo por classes terapêuticas SUS/RENAME
     DocumentEditorView.tsx     # Editor visual avançado para laudos e documentos médicos livres (orquestrador Tiptap)
@@ -101,7 +125,7 @@ src/
       firebaseClient.ts        # Inicialização dos serviços Firebase/Firestore
   utils/
     doseCalculator.ts          # Motor de cálculo pediátrico, volumes, gotas e horários de tomada
-    fuzzySearch.ts             # Algoritmo de busca textual fonética/aproximada para medicamentos e CIDs
+    fuzzySearch.ts             # Algoritmo de busca textual fonética/aproximada com priorização de monofármacos
     medicoConfigurado.ts       # Validador de obrigatoriedade de identificação médica (nome e CRM)
     montarItensDoKit.ts        # Montagem inteligente e cálculo por peso de kits clínicos de plantão
     documentoClinico.ts        # Regras de conteúdo dos documentos (identidade do cabeçalho, título, orientação, textos)
@@ -113,7 +137,9 @@ src/
     formularioOficial.ts       # Encaixe e quebra de linha do texto nas caixas do impresso oficial
     prescricaoRapida.ts        # Prescrição rápida: posologia estruturada e total de comprimidos a dispensar
     parsePrescriptionHtml.ts   # Converte o HTML do Editor A4 de volta em itens tipados da receita
-  __tests__/                   # Suíte Vitest cobrindo cálculo pediátrico, Portaria 344/98, RDC 471/2021, CFM CID-10 e APAC/LME
+    sanitizeHtml.ts            # Sanitizador anti-XSS (DOMPurify + escapeHtml preservando operadores < e >)
+    compartilhamentoTexto.ts   # Formatadores puros de texto para cópia e WhatsApp por regime sanitário
+  __tests__/                   # 23 suítes Vitest (215+ testes Nível 4) cobrindo cálculo pediátrico, Portaria 344/98, RDC 471/2021, CFM CID-10, APAC/LME e UI/A11y
 ```
 
 ---

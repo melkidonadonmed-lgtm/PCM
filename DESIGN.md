@@ -1,7 +1,7 @@
 ---
 name: PresCMed Design System
 version: "alpha"
-description: "Sistema de Prescrição Médica Digital ambulatorial brasileira. Interface física com iluminação óptica a 135°, Deep Navy na Sidebar e MobileBottomNav, Header integrado com fundo claro no tema claro, canvas duplo (Clean Slate #F8FAFC no Claro e Deep Slate #0F172A no Escuro) e folha A4 clínica imutável."
+description: "Sistema de Prescrição Médica Digital ambulatorial brasileira (design-md v5.0.0 + design-interface-medica-minimalista v4.0.0). Interface clínica de precisão cirúrgica com iluminação óptica a 135°, tokens semânticos em 3 camadas, hierarquia Squint Test em 3 níveis, equilíbrio 90/8/2, Command Bar integrada no Header, Deep Navy escultural na Sidebar/MobileBottomNav, proteção .clinical-unit e folha A4 vetorial imutável."
 colors:
   primary: "#1E3A8A"
   on-primary: "#FFFFFF"
@@ -123,137 +123,129 @@ components:
 
 ## Overview
 
-O **PresCMed** expressa uma identidade visual de **alta precisão cirúrgica, minimalismo funcional e resposta tátil controlada**.
+O **PresCMed (`PCM`)** expressa uma identidade visual de **precisão cirúrgica, ergonomia assistencial anti-TDAH e física óptica direcional a 135°**, governada conjuntamente pelas especificações `design-md v5.0.0` e `design-interface-medica-minimalista v4.0.0`.
 
-Diferente de interfaces genéricas de software, o PresCMed utiliza um sistema de elevação em camadas suaves com **física óptica direcional** (incidência superior sutil a 135°), conferindo relevo tátil, bordas chanfradas e profundidade sem qualquer excesso ou ruído visual.
-
-### Princípios Cardeais
-1. **Chrome Estrutural Equilibrado (Deep Navy na Sidebar e Navegação Inferior; Header Integrado)**: A navegação lateral (`Sidebar`) e a barra inferior mobile (`MobileBottomNav`) ancoram o sistema em tons profundos e serenos de Deep Navy nos dois temas. O `Header` superior adota superfície clara no tema claro (`bg-[var(--surface-card)]`) e escura no tema escuro, integrando-se suavemente ao canvas da aplicação. O logo atua como botão "Início" funcional (retorna à aba Receitas e rola ao topo), sem tagline decorativa.
-2. **Dualidade Cirúrgica de Superfície**: No tema Claro, o fundo cirúrgico Clean Slate (`#F8FAFC`) acomoda cards em branco puro (`#FFFFFF`) com bordas delicadas (`#E2E8F0`). No tema Escuro, o ambiente adota Deep Slate acetinado (`#0F172A` / `#1E293B`), eliminando pretos abissais e garantindo percepção natural de sombra e relevo.
-3. **Imutabilidade da Folha Médica A4**: A folha de impressão (`printable-a4-sheet`) simula papel físico real de 75-90g/m². É **sempre branca (#FFFFFF) com tipografia grafite/preta**, independentemente de o usuário operar em modo claro ou escuro.
+### Diagnóstico de Propósito e Atmosfera
+1. **Tarefa Primária do Médico**: Prescrever medicamentos (Simples, Antimicrobiano RDC 471/2021 e Controle Especial Portaria 344/98), calcular doses pediátricas por peso (`mg/kg -> mL/gotas`) e emitir documentos clínicos/SUS em folha A4 única com zero carga cognitiva supérflua.
+2. **Polaridade Luminosa Assistencial (`clinical-day` & `clinical-night`)**:
+   - **Modo Diurno (`clinical-day`)**: Superfície Clean Slate (`#F8FAFC`) com cartões em branco puro (`#FFFFFF`) e contraste `>= 10:1` para doses, nomes de fármacos e alertas sanitários.
+   - **Modo Plantão Noturno (`clinical-night`)**: Superfície Deep Slate acetinada (`#0F172A` / `#1E293B`), reduzindo o ofuscamento em plantões noturnos sem recorrer a pretos abissais `#000000` que apagam bordas e sombras.
+3. **Chrome Estrutural Esculpido & Navegação Não-Genérica**:
+   - **Header Command Bar**: Superfície clara no tema claro (`--surface-card`) e escura no escuro, integrando o **Segmented Workspace Track** (`Alt+1..6` com indicador ativo esculpido) e o **Command & Context Cluster** (Paciente + Peso + Busca `Ctrl+K` + CRM + Nuvem + Tema agrupados em trilho coeso).
+   - **Sidebar & MobileBottomNav em Deep Navy**: Ancoram o perímetro de navegação nos dois temas (`#0F172A` / `#0B1120`), com indicador luminoso vertical (`3px` em `#38BDF8`), atalhos visíveis em `tabular-nums` e seletor compacto de Macro-Módulos (`MOD-01` Ativo, `MOD-02` PEP, `MOD-03` Hospitalar).
+4. **Imutabilidade da Folha Física A4 (`printable-a4-sheet` & `.sus-grid`)**: A folha médica simula papel físico real (`794x1123px` retrato / `1123x794px` paisagem) e é **sempre branca (`#FFFFFF`) com tinta escura**, tanto na tela quanto em `@media print` e PDF.
 
 ---
 
 ## Colors
 
-A paleta é fundamentada na autoridade institucional médica e no contraste acessível (WCAG AA):
+A arquitetura cromática opera em **3 camadas de tokens semânticos (`:root`)** e respeita a **Regra de Equilíbrio 90 / 8 / 2** (`90%` superfícies neutras, `8%` estrutura/bordas sutis e `2%` acento reservado ao único CTA primário da vista):
 
-- **Primary (`#1E3A8A`)**: Azul-marinho equilibrado para títulos de alta relevância e botões de ação principal.
-- **Secondary (`#334155`)**: Slate neutro para bordas de contenção, ações secundárias e elementos de apoio.
-- **Neutral (`#F8FAFC`)**: Canvas cinza cirúrgico claro que reduz o ofuscamento e confere visual límpido de consultório moderno.
-- **Surface (`#FFFFFF`)**: Branco puro de alta definição para cards de prescrição, áreas de digitação e documentos.
-- **Clinical (`#0F766E`)**: Verde azulado (Teal clínico) com contraste WCAG AA superior a 4.5:1 para confirmação de posologia, ações de envio e cálculos de dose.
-- **Obsidian (`#0F172A`)**: Base Deep Slate do modo escuro. Absorve reflexos e preserva sombras e separação de planos.
-- **Rose (`#BE123C`)**: Acento de alerta farmacêutico de alto contraste para interações de risco, exclusões e contraindicações.
+### 1. Tokens Semânticos de Superfície e Tinta
+- **Superfícies (`--bg-canvas`, `--bg-surface`, `--bg-elevated`, `--surface-inset`)**:
+  - Light (`clinical-day`): Canvas `#F8FAFC`, Surface `#FFFFFF`, Inset `#F1F5F9`, Contrast `#0F172A`.
+  - Dark (`clinical-night`): Canvas `#0F172A`, Surface `#1E293B`, Elevated `#27354A`, Inset `#131B2E`.
+- **Tinta / Tipografia (`--ink-primary`, `--ink-secondary`, `--ink-muted`)**:
+  - `--ink-primary`: `#0F172A` (Light) / `#F8FAFC` (Dark) — contraste `> 13:1` (WCAG AAA) para títulos, fármacos e doses.
+  - `--ink-secondary`: `#334155` (Light) / `#CBD5E1` (Dark) — contraste `> 7:1` (WCAG AAA) para posologias e controles.
+  - `--ink-muted`: `#5B6B80` (Light) / `#94A3B8` (Dark) — contraste `>= 4.6:1` (WCAG AA) para metadados, carimbos e placeholders (`Ex.:`).
+
+### 2. Paleta de Autoridade Clínica e Semântica Estrita
+- **Primary (`#1E3A8A`)**: Azul-marinho institucional para o único CTA primário de emissão/impressão da área e indicadores de foco.
+- **Secondary (`#334155`)**: Slate estrutural para ações secundárias, barras segmentadas e botões de apoio.
+- **Clinical (`#0F766E`)**: Teal clínico (contraste WCAG AA `> 4.5:1`) para confirmação de posologia, inclusão na receita e selos de prontidão.
+- **Rose (`#BE123C`)**: Vermelho farmacêutico **estritamente reservado** a alergias, doses acima do teto seguro, interações graves e ações destrutivas (nunca em navegação neutra).
 
 ---
 
 ## Typography
 
-A tipografia do PresCMed é dual-engine e obedece a regras estritas de hierarquia textual:
+A tipografia combina 3 motores especializados com **escala modular fluida (`clamp()`)** e **alinhamento numérico tabular obrigatório**:
 
-1. **Plus Jakarta Sans (UI Engine)**:
-   - Utilizada em toda a interface de aplicação, botões, modais, formulários de dosagem e dashboards.
-   - Sua clareza geométrica nas pontuações, números e diacríticos em português assegura que frações, miligramas (mg) e volumes (mL/gotas) nunca sejam confundidos.
-   - Pesos estruturais: `400` (corpo e posologias), `500`/`600` (rótulos e subtítulos) e `700` (títulos e doses de destaque).
-   - **Títulos de Cartão em Sentence Case**: Títulos de cards e seções são redigidos em sentence case (apenas a primeira letra maiúscula, ex.: "Medicamentos prescritos", "Dados do paciente"). A caixa alta é reservada exclusivamente para rótulos curtos de seção e badges (ex.: "PRO", "SUS / RENAME", "1ª VIA FARMÁCIA").
-   - **Sem Subtítulos Decorativos**: É vedado o uso de subtítulos meramente decorativos sob títulos de cards; mantêm-se apenas avisos regulamentares legais e orientações clínicas essenciais.
-
-2. **Cormorant Garamond (Document Engine)**:
-   - Reservada exclusivamente para a folha A4 e emissão de receituários, atestados e laudos impressos.
-   - Evoca a tradição e solenidade dos receituários médicos clássicos brasileiros, conferindo elegância ao documento entregue ao paciente.
+1. **Plus Jakarta Sans (`--font-sans` — UI Engine)**:
+   - Interface, modais, barras de navegação e formulários clínicos (`line-height: 1.5`, largura de leitura `60ch–75ch`).
+   - Escala Fluida: `--text-xs` (`11–12px`), `--text-sm` (`13–14px`), `--text-base` (`15–16px`), `--text-lg` (`18–20px`), `--text-xl` (`22–26px`) e `--text-2xl` (`28–36px`).
+   - **Hierarquia em 3 Níveis (Squint Test)**:
+     - *Nível 1 (Âncora Primária)*: Título da vista, dose calculada e o único CTA sólido.
+     - *Nível 2 (Agrupamentos Operacionais)*: Títulos de cartão em **sentence case** (`600`/`700`, ex.: `"Identificação do paciente"`, `"Medicamentos prescritos"`), sem subtítulos decorativos.
+     - *Nível 3 (Micro-rótulos e Badges)*: Caixa alta compacta (`0.6875rem–0.75rem`, `letter-spacing: 0.05em`) reservada a siglas regulatórias (`SUS / RENAME`, `1ª VIA FARMÁCIA`, `CRM`, `MOD-01`).
+2. **JetBrains Mono / IBM Plex Mono (`--font-mono` — Precision Tabular Engine)**:
+   - Obrigatório com `font-variant-numeric: tabular-nums` (`.clinical-tabular-nums` e `.clinical-unit`) em todas as dosagens (`mg`, `mL`, `gotas`), pesos (`kg`), códigos `CID-10`/`SIGTAP`, `CNS`/`CNES` e atalhos (`Alt+1..6`, `Ctrl+K`).
+   - **Blindagem de Unidades (`.clinical-unit`)**: Unidades (`mg/kg`, `mg/dL`, `mL/h`, `gotas`) usam `white-space: nowrap; flex-shrink: 0` para jamais quebrar linha separadas do valor numérico.
+3. **Cormorant Garamond (`--font-serif-doc` — Document Engine)**:
+   - Exclusiva da folha A4 de receituários, atestados e encaminhamentos clássicos.
 
 ---
 
 ## Layout & Spacing
 
-A arquitetura espacial obedece a uma grade rígida de 8px com micro-passos de 4px:
+A composição espacial utiliza primitivas intrínsecas em grade **Base-4 / Base-8 (`4px, 8px, 12px, 16px, 24px, 32px, 64px`)**:
 
-- **Sidebar de Navegação**: Largura fixa de `280px` com transição elástica suave, alinhamento simétrico rigoroso de ícones e botões, mantendo acabamento Deep Navy contínuo nos dois temas.
-- **Header Superior**: Altura de `64px` (`h-16`) com alinhamento vertical central rigoroso. Superfície em `bg-[var(--surface-card)]` (clara no tema claro, escura no tema escuro). Contém o disparador do menu, o botão Início (logo sem tagline), chip central do paciente ativo e controles de tema e sincronização em nuvem à direita.
-- **Breakpoint Mobile & MobileBottomNav**: Fixado em `1024px` (`lg`). Abaixo desse limite, a Sidebar é recolhida e a navegação migra para o `MobileBottomNav` ergonômico no rodapé da viewport, em acabamento Deep Navy, contendo exatamente 5 destinos (Receitas, Doses, Exames, Editor, Mais). O botão "Mais" abre a Sidebar como gaveta modal (`dialog`). A opção de exportar/backup fica alocada na Sidebar.
-- **Contenção e Respiro**: Espaçamentos internos de cartões priorizam `24px` (`lg`) para isolar visualmente diferentes grupos medicamentosos e prescrições.
+- **Split-View Assimétrico (`12 Colunas`)**: No `PrescriptionBuilder`, a coluna esquerda (`xl:col-span-7`) concentra o fluxo vertical (`Stack`) de identificação, composição e lista prescrita, enquanto a coluna direita (`xl:col-span-5`, `xl:sticky xl:top-20`) ancora a bancada A4 em tempo real e a gaveta pediátrica (`@container`).
+- **Header Command Bar (`64px` / `h-16`)**: Alinhamento simétrico contendo gatilho da Sidebar, botão Início unificado, **Segmented Workspace Track** (`Receitas`, `Documentos`, `Doses`, `Protocolos`, `Editor` com atalhos `Alt+1..5`) e **Command & Context Cluster** à direita.
+- **Sidebar Deep Navy (`256px` expandida / `68px` recolhida)**: Topo imediato com Posto de Atuação SUS (`ContextSwitcher`) e Perfil CRM, seguido por `Atendimento` e `Apoio clínico` com barra de acento vertical no item ativo, `Kits de plantão` retráteis e rodapé de Macro-Módulos + utilitários (`Novo Atendimento`, `Backup .pcm`, `Instalar App`).
+- **Breakpoint Mobile (`1024px` / `lg`) & `MobileBottomNav`**: Abaixo de `1024px`, a navegação migra para o `MobileBottomNav` (`h-16`, Deep Navy) com 5 destinos (`Receitas`, `Documentos`, `Doses`, `Editor`, `Mais`), alvos `>= 44x44px` e `whitespace-nowrap`.
 
 ---
 
 ## Elevation & Depth
 
-A profundidade no PresCMed utiliza **sombras táteis multicamadas com canal alfa suavizado**, declaradas em `@utility` para compor perfeitamente com os anéis de foco do Tailwind:
+A profundidade utiliza **iluminação direcional a 135° (`--rim-light` superior + oclusão multicamada)** declarada em `@utility`:
 
-- **Sombras Táteis (Light)**:
+- **Sombras Táteis Esculpidas (Light)**:
   - `shadow-tactile-sm`: `0 2px 4px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03)`
   - `shadow-tactile-md`: `0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04)`
-  - `shadow-tactile-card`: `0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 4px 8px -2px rgba(15, 23, 42, 0.03)`
-- **Sombras Táteis (Dark)**:
-  - Anéis de luz sutil interna (`inset 0 1px 0 rgba(255, 255, 255, 0.05)`) combinados com oclusão profunda (`0 10px 25px -4px rgba(0, 0, 0, 0.5)`).
-- **Campos Vazios**: Inputs no estado `:placeholder-shown` recebem microcavidade côncava com fundo sutil (`--surface-inset`).
-- **Folha A4 Flutuante**: Sombra suave simulando papel físico sobre a bancada cirúrgica.
+  - `shadow-tactile-card`: `0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 4px 8px -2px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.95)`
+- **Sombras Táteis Esculpidas (Dark)**:
+  - Chanfro superior (`inset 0 1px 0 rgba(255, 255, 255, 0.06)`) + oclusão (`0 12px 30px -4px rgba(0, 0, 0, 0.5)`).
+- **Trilhos Segmentados e Campos Vazios (`--surface-inset`)**: Barras de abas (`nav-segmented-track`) e inputs em `:placeholder-shown` recebem microcavidade côncava sutil, destacando o item ativo ou preenchido por contraste de elevação.
 
 ---
 
 ## Shapes
 
-O vocabulário geométrico expressa segurança e precisão farmacêutica:
-
-- **Contêineres e Cards (`14px` - `20px`)**: Curvatura balanceada que suaviza a tela sem perder a sensação estruturada de software clínico.
-- **Inputs e Botões (`8px` - `14px`)**: Bordas definidas para rápido reconhecimento de áreas clicáveis e zonas de digitação.
-- **Chips e Badges de Status (`9999px` - Full Pill)**: Formato pílula integral para selos de vias da receita (1ª via Farmácia / 2ª via Paciente), alertas da Portaria 344/98 e consentimento de CID-10.
+- **Cartões e Painéis Clínicos (`16px` – `20px` / `rounded-2xl`)**: Contenção suave com borda hairline de `1px` (`--border-subtle`).
+- **Trilhos de Navegação e Controles (`10px` – `14px` / `rounded-xl`)**: Geometria precisa para botões, inputs e itens da Sidebar.
+- **Badges e Selos Regulatórios (`9999px` / `rounded-full`)**: Formato pílula para contadores tabulares, vias da Portaria 344/98 e status de sincronização.
 
 ---
 
 ## Components
 
-Os botões, campos e cartões obedecem a uma hierarquia estrita de relevo e foco:
+Todos os componentes interativos operam sob **Máquina de Estados Finitos (`UIState = 'idle' | 'loading' | 'success' | 'empty' | 'error'`)** via `data-state` e `aria-busy`:
 
-- **Uma Ação Primária por Área**: Cada bloco visual ou área de trabalho possui exatamente uma ação primária em destaque (ex.: botão Imprimir/PDF na barra de ações da receita `AcoesDaReceita.tsx`).
-- **Botão Primário (`button-primary`)**: Azul-marinho profundo (`#1E3A8A`), texto branco, raio de 14px, relevo tátil com micro-compressão ao clique.
-- **Botão Secundário / Outline (`button-secondary`)**: Fundo neutro com borda sutil (`#E2E8F0` / `#334155`) e texto em cinza escuro/claro. Ações em linhas de tabelas ou listas (como "Usar na receita" no catálogo SUS/RENAME) são obrigatoriamente secundárias.
-- **Botão Clínico (`button-clinical`)**: Fundo Teal clínico (`#0F766E`) com texto branco para ações afirmativas de prescrição, dosagem e cálculos de conferência.
-- **Botão de Risco (`button-danger`)**: Fundo rose escuro (`#BE123C`) com texto branco para deleções e suspensão de tratamentos.
-- **Campos de Formulário e Placeholders**:
-  - Todo placeholder deve obrigatoriamente iniciar com o prefixo "Ex.:" (ex.: "Ex.: Amoxicilina 500mg").
-  - O estilo do placeholder é visualmente distinto do dado preenchido (cor `--text-placeholder`, peso 400).
-  - Campo vazio (`:placeholder-shown`) assume fundo de microcavidade côncava `--surface-inset`.
-- **Regra Sem Peso, Sem Dose**:
-  - A calculadora pediátrica e os protocolos de urgência bloqueiam a exibição de doses ou volumes calculados até que o peso do paciente seja informado.
-- **Folha de Impressão A4 (`printable-a4-sheet`)**: Base retangular branca de `210mm x 297mm`, margens regulamentares de 15mm a 20mm, cabeçalho institucional (logo e local de atendimento) e assinatura do médico com CRM/UF. A prévia, a impressão e o PDF usam a mesma folha.
+- **Isolamento de Acento (Uma Ação Primária por Área)**: Cada vista exibe apenas **1 botão sólido primário** (`button-primary` `#1E3A8A` ou `button-clinical` `#0F766E`). Demais ações usam `button-secondary` ou `.btn-ghost`.
+- **Segmented Workspace & Document Tracks**: Na `Header` e na `ClinicalDocumentsHub`, as abas operam dentro de um trilho unificado (`bg-[var(--surface-inset)] p-1 rounded-xl border border-[var(--border-subtle)]`), onde a aba ativa recebe superfície elevada, sombra tátil e indicador de acento.
+- **Placeholders Padronizados (`Ex.:`)**: Todo campo de entrada inicia seu placeholder obrigatoriamente com `"Ex.:"` e aplica `--text-placeholder` distinto do valor digitado.
+- **Invariante Sem Peso, Sem Dose**: `PediatricCalculator` e `ClinicalProtocolsView` bloqueiam cálculos de volume/gotas enquanto `weightKg <= 0`.
+- **Folha A4 Única (`FolhaA4.tsx` + `SusInteractiveVectorSheet.tsx`)**: Renderização vetorial idêntica entre preview, impressão nativa e exportação PDF (`html2canvas-pro`).
 
 ---
 
 ## Do's and Don'ts
 
 ### Do's (Práticas Obrigatórias)
-- **Do** manter o Header com fundo claro no tema claro (`bg-[var(--surface-card)]`) e escuro no escuro, reservando o Deep Navy para Sidebar e MobileBottomNav.
-- **Do** manter a folha A4 e todo documento médico em fundo branco `#FFFFFF` e texto escuro, mesmo quando a aplicação estiver no modo escuro.
-- **Do** escrever títulos de cartão em sentence case, utilizando caixa alta exclusivamente para rótulos curtos de seção e badges.
-- **Do** limitar a interface a exatamente uma única ação primária por área ou card, configurando ações em linhas de listas ou tabelas como secundárias.
-- **Do** iniciar placeholders de formulário obrigatoriamente com o prefixo "Ex.:", assegurando distinção visual imediata de campos já preenchidos.
-- **Do** seguir rigorosamente o princípio "sem peso, sem dose", não exibindo doses ou volumes na calculadora pediátrica ou protocolos sem peso cadastrado.
-- **Do** manter a Sidebar e o Header perfeitamente simétricos e alinhados verticalmente na cota de 64px (`h-16`).
-- **Do** utilizar sempre o componente canônico `<Icon name="..." />` (`src/components/Icon.tsx`) para renderizar ícones baseados no Google Material Design Symbols.
-- **Do** formatar números e medidas no padrão brasileiro (vírgula decimal, sem separador de milhar em doses em mg como "1000 mg", e singular "1 gota").
-- **Do** declarar componentes dentro de `@layer components` e sombras em `@utility`, respeitando a diretiva de acessibilidade `prefers-reduced-motion`.
-- **Do** assegurar contraste WCAG AA mínimo (4.5:1 para texto normal, 3:1 para UI) em qualquer elemento interativo.
+- **Do** manter o `Header` com superfície clara no tema claro (`--surface-card`) e escura no escuro, reservando o acabamento Deep Navy (`.panel-navy`) para `Sidebar` e `MobileBottomNav`.
+- **Do** manter a folha A4 (`FolhaA4` e `.sus-grid`) estritamente em fundo `#FFFFFF` e tinta escura nos dois temas.
+- **Do** aplicar `font-variant-numeric: tabular-nums` e `.clinical-unit` (`white-space: nowrap`) em todas as doses, pesos, contadores e atalhos.
+- **Do** escrever títulos de cartão em sentence case e reservar caixa alta para micro-rótulos e badges regulatórios.
+- **Do** limitar cada seção a 1 único CTA primário sólido (regra `90 / 8 / 2`) e iniciar todo placeholder com `"Ex.:"`.
+- **Do** garantir alvos de toque `>= 44x44px`, anel `:focus-visible` nítido e suporte a `@media (prefers-reduced-motion: reduce)`.
+- **Do** formatar doses em miligramas com vírgula decimal e zero separador de milhar (`"7,5 mg"`, `"1000 mg"`).
 
 ### Don'ts (Práticas Proibidas)
-- **Don't** aplicar fundo escuro ou azul profundo no Header no tema claro.
-- **Don't** adicionar subtítulos decorativos sob títulos de cartão (manter exclusivamente avisos clínicos e legais regulamentares).
-- **Don't** colocar mais de uma ação primária no mesmo bloco de trabalho ou card.
-- **Don't** aplicar classes de modo escuro (`dark:bg-*` ou texto invertido) dentro da área de impressão A4.
-- **Don't** escrever regras de CSS fora de camadas (`@layer`), para não anular a especificidade dos anéis de foco e acessibilidade.
-- **Don't** utilizar pretos 100% saturados que eliminem o relevo e a profundidade de sombra dos menus e dropdowns no tema escuro.
-- **Don't** emitir documentos médicos (PDF, impressão, WhatsApp, cópia) sem médico configurado com nome e CRM válidos.
-- **Don't** utilizar dados fictícios de exemplo em documentos emitidos reais.
-- **Don't** incluir código CID-10 em atestados sem o consentimento explícito do paciente registrado.
-- **Don't** omitir a indicação obrigatória de via (1ª via Farmácia / 2ª via Paciente) em medicamentos controlados pela Portaria SVS/MS 344/98.
+- **Don't** usar emojis decorativos em controles, alertas, cabeçalhos ou badges (`AUDIT-VIS-EMOJI`).
+- **Don't** embutir ativos Base64 pesados (`> 50 KB`) no código ou substituir grades `.sus-grid` vetoriais por imagens estáticas (`AUDIT-VIS-BLOAT`).
+- **Don't** espalhar múltiplos botões sólidos primários competindo na mesma barra ou cartão.
+- **Don't** usar classes responsivas (`sm:`, `md:`) ou `dark:` dentro do interior da `FolhaA4`.
+- **Don't** incluir CID-10 em atestados sem `authorizedByPatient === true` (Res. CFM 1.658/2002) ou inventar dados clínicos não preenchidos em guias SUS.
 
 ---
 
 ## Iconography
 
-O sistema de ícones do PresCMed adota exclusivamente o padrão **Google Material Design Symbols**:
+O PresCMed utiliza exclusivamente o **Google Material Design Symbols** empacotado offline (`material-symbols`):
 
-- **Distribuição**: 100% offline via pacote `material-symbols` (fonte woff2 de alta performance empacotada no PWA).
-- **Componente Canônico**: `<Icon name="receita" size={20} />` (`src/components/Icon.tsx`).
-- **Prevenção de Mutação**: O componente conta com tipagem estrita e resolução de aliases clínicos em português (`receita`, `medicamento`, `gotas`, `vacina`, `estetoscopio`, `balanca`, `exame`, `atestado`, `alerta`, `imprimir`, etc.).
-- **Regra**: Nunca utilize classes de ícones soltas ou elementos SVG inline não padronizados.
+- **Componente Canônico**: `<Icon name="receita" size={20} />` (`src/components/Icon.tsx`), com container blindado (`overflow-hidden`, `select-none`, `aria-hidden="true"`).
+- **Resolução Determinística de Aliases**: Mapeamento tipado de termos clínicos em português (`receita`, `documentos`, `balanca`, `coracao`, `editor`, `sus`, `guias_sus`, `atestado`, `encaminhamento`, `exame`, `imprimir`, `verified`).
+- **Regra**: Proibido usar emojis ou tags de ícone soltas fora do componente `<Icon />`.

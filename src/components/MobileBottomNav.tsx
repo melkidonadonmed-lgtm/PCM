@@ -75,23 +75,26 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             key={item.id}
             id={`mobile-nav-${item.id}`}
             onClick={() => onSelectTab(item.id)}
+            aria-current={isActive ? 'page' : undefined}
             className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none ${
-              isActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
+              isActive ? 'nav-item-active sidebar-active-surface' : 'opacity-80 hover:opacity-100'
             }`}
-            style={
-              isActive
-                ? { backgroundColor: 'var(--surface-panel-hover)' }
-                : {}
-            }
           >
+            {isActive && (
+              <span
+                aria-hidden="true"
+                className="absolute top-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.8)]"
+              />
+            )}
             <div className="relative">
               <Icon
                 name={item.iconName}
+                filled={isActive}
                 className="text-[20px] transition-colors"
-                style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
+                style={{ color: isActive ? '#38BDF8' : 'var(--surface-panel-muted)' }}
               />
               {item.badge && (
-                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[8px] flex items-center justify-center bg-white/10 text-slate-200 border border-white/15 clinical-tabular-nums">
+                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[8px] flex items-center justify-center bg-sky-500/30 text-sky-100 border border-sky-400/30 clinical-unit clinical-tabular-nums">
                   {item.badge}
                 </span>
               )}
