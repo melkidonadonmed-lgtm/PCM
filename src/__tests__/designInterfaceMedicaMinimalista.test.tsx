@@ -93,6 +93,9 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
     expect(html).not.toContain('max-w-[68px]');
     expect(html).toContain('whitespace-nowrap');
     expect(html).toContain('Documentos');
+    expect(html).toContain('id="mobile-nav-hospital"');
+    expect(html).toContain('Hospitalar');
+    expect(html).not.toContain('id="mobile-nav-pediatric_calc"');
   });
 
   it('renderiza badges de categoria na Calculadora Pediátrica em linha única (inline-flex whitespace-nowrap) e controles compactos de peso', () => {

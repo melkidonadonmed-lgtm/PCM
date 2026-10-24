@@ -75,7 +75,7 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 - **Chrome de Navegação**:
   - `Sidebar` e `MobileBottomNav`: **sempre Deep Navy** (`.panel-navy`) em **ambos os temas**, com tipografia clara.
   - `Header`: superfície de cartão (`--surface-card`), clara no tema claro e escura no tema escuro.
-  - `MobileBottomNav`: 5 destinos (Receitas, Documentos, Doses, Editor, Mais).
+  - `MobileBottomNav`: 5 destinos (Receitas, Documentos, Hospitalar, Editor, Mais).
 - **Tema Claro**:
   - Fundo da aplicação: slate claro (`--bg-app: #F8FAFC`).
   - Cards e superfícies: branco (`--surface-card: #FFFFFF`).

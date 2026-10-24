@@ -24,7 +24,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onSelectTab,
   prescriptionCount,
   selectedExamsCount,
-  patientWeight = 0,
   onOpenMenu
 }) => {
   const items: Array<{ id: ActiveTab; label: string; iconName: IconName; badge?: string }> = [
@@ -41,10 +40,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       badge: selectedExamsCount > 0 ? `${selectedExamsCount}` : undefined
     },
     {
-      id: 'pediatric_calc',
-      label: 'Doses',
-      iconName: 'calculate',
-      badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
+      id: 'hospital',
+      label: 'Hospitalar',
+      iconName: 'local_hospital'
     },
     {
       id: 'editor',
@@ -53,8 +51,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     }
   ];
 
-  // Itens secundários (Protocolos e Exportar) acessíveis via "Mais"
-  const isMoreActive = activeTab === 'protocols' || activeTab === 'print_preview';
+  // Itens secundários (Doses, Protocolos, Escores e Exportar) acessíveis via "Mais"
+  const isMoreActive =
+    activeTab === 'pediatric_calc' ||
+    activeTab === 'protocols' ||
+    activeTab === 'scores' ||
+    activeTab === 'print_preview';
 
   return (
     <nav data-state="idle" aria-busy={false}

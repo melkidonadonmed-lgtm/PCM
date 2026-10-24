@@ -28,7 +28,7 @@ src/
   components/
     Header.tsx                 # Header superior (fundo claro no Light, Command Bar unificada, perfil e nuvem)
     Sidebar.tsx                # Menu lateral de navegação, macro-módulos e kits clínicos de plantão (deep navy contínuo)
-    MobileBottomNav.tsx        # Barra de navegação inferior mobile com 5 destinos (Receitas, Documentos, Doses, Editor, Mais)
+    MobileBottomNav.tsx        # Barra de navegação inferior mobile com 5 destinos (Receitas, Documentos, Hospitalar, Editor, Mais)
     ui/
       SurfaceCard.tsx          # Primitiva de superfície com estados FSM (idle, loading, success, empty, error)
       SoftCard.tsx             # Cartão tátil leve com variantes flat, raised e inset
