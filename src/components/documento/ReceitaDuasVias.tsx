@@ -38,7 +38,7 @@ const rotulo: React.CSSProperties = {
 };
 
 const quadro: React.CSSProperties = {
-  padding: '5px 8px 6px',
+  padding: '4px 8px',
   border: `1px solid ${FILETE}`,
   borderRadius: 3,
   fontSize: 9.5,
@@ -130,7 +130,7 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
       <div style={{ marginTop: 9, flex: 1 }}>
         <p style={{ ...rotulo, fontSize: 8, color: TINTA_SUAVE }}>Prescrição</p>
         {items.length === 0 ? (
-          <p style={{ margin: '28px 0', textAlign: 'center', fontFamily: SERIFA, fontStyle: 'italic', fontSize: 13, color: TINTA_APAGADA }}>
+          <p style={{ margin: '24px 0', textAlign: 'center', fontFamily: SERIFA, fontStyle: 'italic', fontSize: 13, color: TINTA_APAGADA }}>
             {controleEspecial
               ? 'Nenhum medicamento de controle especial prescrito.'
               : simples

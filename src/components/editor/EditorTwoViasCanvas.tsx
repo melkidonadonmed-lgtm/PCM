@@ -51,7 +51,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                       <img
                         src={logoConfig.dataUrl}
                         alt="Logotipo Institucional"
-                        className="h-9 max-w-[84px] object-contain shrink-0"
+                        className="h-9 max-w-20 object-contain shrink-0"
                       />
                     )}
                     <div className="flex-1 min-w-0">
@@ -79,7 +79,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         <img
                           src={logoConfig.secondaryDataUrl}
                           alt="Logotipo Secundário"
-                          className="h-7 max-w-[72px] object-contain"
+                          className="h-7 max-w-18 object-contain"
                         />
                       )}
                       <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-info block">
@@ -177,7 +177,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                       <img
                         src={logoConfig.dataUrl}
                         alt="Logotipo Institucional"
-                        className="h-9 max-w-[84px] object-contain shrink-0"
+                        className="h-9 max-w-20 object-contain shrink-0"
                       />
                     )}
                     <div className="flex-1 min-w-0">
@@ -197,7 +197,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         <img
                           src={logoConfig.secondaryDataUrl}
                           alt="Logotipo Secundário"
-                          className="h-7 max-w-[72px] object-contain"
+                          className="h-7 max-w-18 object-contain"
                         />
                       )}
                       <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-clinical block">

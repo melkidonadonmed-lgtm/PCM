@@ -48,7 +48,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
   return (
     <>
       {/* BARRA UNIFICADA ESTILO GOOGLE DOCS: linha única rolável no celular, fixa acima da folha A4 */}
-      <div className="editor-toolbar no-print sticky top-[68px] sm:top-[72px] z-30 rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex items-center gap-1 overflow-x-auto scrollbar-none touch-pan-x flex-nowrap lg:flex-wrap lg:overflow-visible">
+      <div className="editor-toolbar no-print sticky top-16 sm:top-18 z-30 rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex items-center gap-1 overflow-x-auto scrollbar-none touch-pan-x flex-nowrap lg:flex-wrap lg:overflow-visible">
         {/* Gatilho Retrátil de Configuração da Folha & Timbrado (Evita poluição visual no mobile) */}
         {onToggleSheetConfig && (
           <>

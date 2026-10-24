@@ -263,7 +263,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
               type="button"
               onClick={() => setQuery('')}
               aria-label="Limpar busca"
-              className="btn-tactile-icon !w-9 !h-9 !min-w-[36px] !min-h-[36px]"
+              className="btn-tactile-icon !w-9 !h-9 !min-w-9 !min-h-9"
             >
               <Icon name="close" size={16} />
             </button>

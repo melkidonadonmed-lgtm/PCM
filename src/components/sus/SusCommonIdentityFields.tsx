@@ -4,7 +4,7 @@ import { medicoConfigurado } from '../../utils/medicoConfigurado';
 import { Icon } from '../Icon';
 
 export const CAMPO_SUS =
-  'w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500/30 transition clinical-tabular-nums';
+  'w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500/30 transition clinical-tabular-nums';
 export const ROTULO_SUS = 'text-xs font-semibold text-[var(--text-muted)] block mb-1';
 
 const UFS_BRASIL = [
@@ -106,7 +106,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                 value={formData.doctorName}
                 onChange={(e) => onFieldChange('doctorName', e.target.value)}
                 placeholder="Ex.: Dr(a). Médico(a)"
-                className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
               />
             </div>
 
@@ -121,7 +121,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                   value={formData.doctorCrm}
                   onChange={(e) => onFieldChange('doctorCrm', e.target.value)}
                   placeholder="Ex.: 000000"
-                  className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                  className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
                 />
               </div>
               <div>
@@ -136,7 +136,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                   value={formData.doctorCrmState}
                   onChange={(e) => onFieldChange('doctorCrmState', e.target.value.toUpperCase())}
                   placeholder="Ex.: SP"
-                  className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase"
+                  className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase"
                 />
               </div>
             </div>
@@ -151,7 +151,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                 value={formData.doctorSpecialty}
                 onChange={(e) => onFieldChange('doctorSpecialty', e.target.value)}
                 placeholder="Ex.: Clínica Médica"
-                className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
               />
             </div>
 
@@ -166,7 +166,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                 value={formData.doctorCnes}
                 onChange={(e) => onFieldChange('doctorCnes', e.target.value)}
                 placeholder="Ex.: 0000000 (7 dígitos)"
-                className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+                className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
               />
             </div>
 
@@ -181,7 +181,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                 value={formData.doctorCpf || ''}
                 onChange={(e) => onFieldChange('doctorCpf', e.target.value)}
                 placeholder="Ex.: 000.000.000-00"
-                className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+                className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
               />
             </div>
 
@@ -196,7 +196,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                 value={formData.doctorCns || ''}
                 onChange={(e) => onFieldChange('doctorCns', e.target.value)}
                 placeholder="Ex.: 700 0000 0000 0000"
-                className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+                className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
               />
             </div>
 
@@ -210,7 +210,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                 value={formData.doctorClinicName}
                 onChange={(e) => onFieldChange('doctorClinicName', e.target.value)}
                 placeholder="Ex.: Unidade Básica de Saúde / Policlínica"
-                className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
               />
             </div>
           </div>
@@ -263,7 +263,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
               value={formData.patientName}
               onChange={(e) => onFieldChange('patientName', e.target.value)}
               placeholder="Ex.: Maria de Oliveira Santos"
-              className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
+              className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
             />
           </div>
 
@@ -281,7 +281,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
               value={formData.patientCns}
               onChange={(e) => onFieldChange('patientCns', e.target.value)}
               placeholder="Ex.: 000 0000 0000 0000"
-              className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500 font-mono clinical-tabular-nums"
+              className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500 font-mono clinical-tabular-nums"
             />
           </div>
 
@@ -295,7 +295,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
               value={formData.patientCpf}
               onChange={(e) => onFieldChange('patientCpf', e.target.value)}
               placeholder="Ex.: 000.000.000-00"
-              className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+              className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
             />
           </div>
 
@@ -310,7 +310,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                 value={formData.patientBirthDate}
                 onChange={(e) => onFieldChange('patientBirthDate', e.target.value)}
                 placeholder="Ex.: DD/MM/AAAA"
-                className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
               />
             </div>
             <div>
@@ -323,7 +323,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                 value={formData.patientAge}
                 onChange={(e) => onFieldChange('patientAge', e.target.value)}
                 placeholder="Ex.: 45 anos"
-                className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
               />
             </div>
           </div>
@@ -338,7 +338,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
               value={formData.patientPhone}
               onChange={(e) => onFieldChange('patientPhone', e.target.value)}
               placeholder="Ex.: (69) 90000-0000"
-              className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+              className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
             />
           </div>
 
@@ -352,7 +352,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
               value={formData.patientMotherName}
               onChange={(e) => onFieldChange('patientMotherName', e.target.value)}
               placeholder="Ex.: Ana de Oliveira Santos"
-              className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+              className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
             />
           </div>
 
@@ -430,7 +430,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                   value={formData.patientAddress}
                   onChange={(e) => onFieldChange('patientAddress', e.target.value)}
                   placeholder="Ex.: Rua das Flores, 450, Apto 12"
-                  className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
+                  className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
                 />
               </div>
               <div className="sm:col-span-4">
@@ -443,7 +443,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                   value={formData.patientNeighborhood}
                   onChange={(e) => onFieldChange('patientNeighborhood', e.target.value)}
                   placeholder="Ex.: Centro"
-                  className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
+                  className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
                 />
               </div>
               <div className="sm:col-span-6">
@@ -459,7 +459,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                   value={formData.patientCity}
                   onChange={(e) => onFieldChange('patientCity', e.target.value)}
                   placeholder="Ex.: Porto Velho"
-                  className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
+                  className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-sky-500"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -474,7 +474,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                   value={formData.patientState}
                   onChange={(e) => onFieldChange('patientState', e.target.value.toUpperCase())}
                   placeholder="Ex.: RO"
-                  className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase text-center"
+                  className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase text-center"
                 />
               </div>
               <div className="sm:col-span-4">
@@ -488,7 +488,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
                   value={formData.patientCep}
                   onChange={(e) => onFieldChange('patientCep', e.target.value)}
                   placeholder="Ex.: 00000-000"
-                  className="w-full min-h-[38px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+                  className="w-full min-h-[40px] px-3 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
                 />
               </div>
             </div>

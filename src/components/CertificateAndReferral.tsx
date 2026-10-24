@@ -276,7 +276,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
       <p></p>
       ${cidText}
       ${obsText}
-      <p style="text-align: right; margin-top: 25px;">${today}.</p>
+      <p style="text-align: right; margin-top: 24px;">${today}.</p>
     `;
 
     if (onNavigateToEditorWithHtml) {
@@ -308,16 +308,16 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
       <p></p>
       <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 12px 0;" />
       <p><strong>1. Motivo do Encaminhamento:</strong></p>
-      <p style="margin-left: 15px; color: #1e293b;">${reason}</p>
+      <p style="margin-left: 16px; color: #1e293b;">${reason}</p>
       <p></p>
       <p><strong>2. História Clínica &amp; Exame Físico Relevante:</strong></p>
-      <p style="margin-left: 15px; color: #1e293b;">${summary}</p>
+      <p style="margin-left: 16px; color: #1e293b;">${summary}</p>
       <p></p>
       <p><strong>3. Exames Complementares Realizados:</strong></p>
-      <p style="margin-left: 15px; color: #1e293b;">${exams}</p>
+      <p style="margin-left: 16px; color: #1e293b;">${exams}</p>
       <p></p>
       <p><strong>4. Hipótese Diagnóstica (CID-10):</strong></p>
-      <p style="margin-left: 15px; color: #1e293b;">${cid}</p>
+      <p style="margin-left: 16px; color: #1e293b;">${cid}</p>
       <p></p>
       <p>Agradeço a atenção e coloco-me à disposição para discussão do caso.</p>
     `;

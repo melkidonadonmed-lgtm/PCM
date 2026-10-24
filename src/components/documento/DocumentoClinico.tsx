@@ -63,7 +63,7 @@ const Secao: React.FC<{ titulo: string; children: React.ReactNode }> = ({ titulo
 );
 
 const Vazio: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p style={{ margin: '72px 0', textAlign: 'center', fontFamily: SERIFA, fontStyle: 'italic', fontSize: 16, color: TINTA_APAGADA }}>
+  <p style={{ margin: '64px 0', textAlign: 'center', fontFamily: SERIFA, fontStyle: 'italic', fontSize: 16, color: TINTA_APAGADA }}>
     {children}
   </p>
 );
@@ -236,7 +236,7 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
             const dias = Math.max(1, certificate.daysOff || 1);
             const documento = certificate.documentNumber?.trim() || documentoPaciente;
             return (
-              <div style={{ marginTop: 34, padding: '0 14px', fontFamily: SERIFA, color: TINTA }}>
+              <div style={{ marginTop: 34, padding: '0 16px', fontFamily: SERIFA, color: TINTA }}>
                 <p style={{ margin: 0, fontSize: 18, lineHeight: 2, textAlign: 'justify', textIndent: 44 }}>
                   Atesto para os devidos fins de direito que o(a) paciente{' '}
                   <strong style={{ fontWeight: 700, textTransform: 'uppercase' }}>{certificate.patientName?.trim() || paciente}</strong>,{' '}

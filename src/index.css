@@ -74,6 +74,13 @@
     min-height: 100vh;
     transition: background-color 0.25s ease, color 0.25s ease;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .dark body,
@@ -116,8 +123,8 @@
 
     /* Transições de Física Tátil */
     --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-smooth: all 0.3s var(--ease-spring);
-    --transition-snap: all 0.15s ease-out;
+    --transition-smooth: transform 0.3s var(--ease-spring), opacity 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring), background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    --transition-snap: transform 0.15s ease-out, opacity 0.15s ease-out, box-shadow 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
 
     /* TEMA CLARO: Cirúrgico Minimalista (Clean Slate #F8FAFC + Branco Puro #FFFFFF) */
     --canvas: #f8fafc;
@@ -679,7 +686,7 @@
 
   .tactile-btn {
     box-shadow: var(--tactile-bevel);
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     cursor: pointer;
     user-select: none;
   }
@@ -740,7 +747,7 @@
   .dark .tactile-btn-primary,
   .dark .btn-tactile-primary,
   .dark .btn-primary-tactile {
-    background: #0369A1;
+    background: #075985;
     color: #FFFFFF !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
   }
@@ -749,7 +756,7 @@
     .dark .tactile-btn-primary:hover:not(:disabled),
     .dark .btn-tactile-primary:hover:not(:disabled),
     .dark .btn-primary-tactile:hover:not(:disabled) {
-      background: #0284C7;
+      background: #0369A1;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 10px -2px rgba(0, 0, 0, 0.55);
     }
   }
@@ -835,8 +842,9 @@
   @media (hover: hover) and (pointer: fine) {
     .tactile-btn-secondary:hover:not(:disabled),
     .btn-tactile-secondary:hover:not(:disabled) {
-      border-color: #94A3B8;
       background-color: #F8FAFC;
+      color: #0F172A;
+      border-color: #94A3B8;
       box-shadow: 0 2px 5px rgba(15, 23, 42, 0.09), inset 0 1px 0 #FFFFFF;
     }
 

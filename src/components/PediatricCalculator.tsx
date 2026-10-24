@@ -192,7 +192,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             </button>
 
             {/* Bloco do Peso com Rótulo Associado */}
-            <div className="px-1.5 sm:px-3 text-center min-w-[88px] sm:min-w-[110px]">
+            <div className="px-1.5 sm:px-3 text-center min-w-[80px] sm:min-w-[96px]">
               <label 
                 htmlFor="peso-paciente"
                 className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 block cursor-pointer whitespace-nowrap"
@@ -253,7 +253,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               key={p.label}
               type="button"
               onClick={() => handleWeightDirectChange(p.weight)}
-              className={`text-xs px-3 py-1.5 min-h-[38px] sm:min-h-[40px] rounded-xl border font-semibold whitespace-nowrap transition cursor-pointer flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums ${
+              className={`text-xs px-3 py-1.5 min-h-[40px] sm:min-h-[40px] rounded-xl border font-semibold whitespace-nowrap transition cursor-pointer flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums ${
                 patientWeight === p.weight
                   ? 'bg-navy-900 text-white dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/30 shadow-sm'
                   : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
@@ -331,7 +331,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               weightInputRef.current?.focus();
               weightInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }}
-            className="btn-tactile-secondary px-3 py-1.5 min-h-[38px] text-xs font-semibold whitespace-nowrap cursor-pointer self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-sky-500"
+            className="btn-tactile-secondary px-3 py-1.5 min-h-[40px] text-xs font-semibold whitespace-nowrap cursor-pointer self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-sky-500"
           >
             Definir peso
           </button>

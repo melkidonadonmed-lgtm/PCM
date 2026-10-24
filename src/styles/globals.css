@@ -115,10 +115,10 @@
   .kbd-shortcut-chip {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1;
     letter-spacing: -0.01em;
-    padding: 3px 5px;
+    padding: 2px 4px;
     border-radius: 6px;
   }
 }

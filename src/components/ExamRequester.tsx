@@ -147,7 +147,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           type="button"
           onClick={onNavigateToPrint}
           disabled={selectedExams.length === 0}
-          className="btn-tactile-primary text-xs font-semibold px-3.5 py-2 min-h-[38px] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0 clinical-tabular-nums"
+          className="btn-tactile-primary text-xs font-semibold px-3.5 py-2 min-h-[40px] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0 clinical-tabular-nums"
         >
           <Icon name="download" size={15} />
           <span>Visualizar e baixar PDF ({selectedExams.length})</span>
@@ -180,7 +180,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   aria-haspopup="dialog"
                   aria-expanded={isPackagesMenuOpen}
                   onClick={() => setIsPackagesMenuOpen((prev) => !prev)}
-                  className="chip-neutral h-8 min-h-[34px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none border border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300"
+                  className="chip-neutral h-8 min-h-[32px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none border border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300"
                   title="Abrir lista de kits e painéis clínicos prontos"
                 >
                   <Icon name="auto_awesome" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
@@ -345,7 +345,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             tabIndex={0}
             role="region"
             aria-label="Lista de exames"
-            className="tactile-card p-2.5 rounded-2xl max-h-[420px] sm:max-h-[480px] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="tactile-card p-2.5 rounded-2xl max-h-96 sm:max-h-120 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             style={{
               backgroundColor: 'var(--surface-card)',
               borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
@@ -374,13 +374,13 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <div 
+                    <span 
                       className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center shrink-0 transition ${
                         selected ? 'bg-navy-900 dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/40 text-white' : 'border-slate-300 dark:border-white/20'
                       }`}
                     >
                       {selected && <Icon name="check" size={12} />}
-                    </div>
+                    </span>
                     <span
                       title={exam.name}
                       className="font-semibold text-xs truncate"
@@ -390,17 +390,15 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 shrink-0">
-                    {exam.urgency === 'urgent' ? (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
-                        Urgência
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-[var(--text-muted)] dark:text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/70">
-                        {exam.category.split(' ')[0]}
-                      </span>
-                    )}
-                  </div>
+                  {exam.urgency === 'urgent' ? (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 shrink-0">
+                      Urgência
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-[var(--text-muted)] dark:text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/70 shrink-0">
+                      {exam.category.split(' ')[0]}
+                    </span>
+                  )}
                 </div>
               );
             })}
@@ -459,7 +457,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 Nenhum exame selecionado ainda. Marque exames avulsos na lista ou abra o menu <strong>Kits e painéis prontos</strong>.
               </div>
             ) : (
-              <div className="space-y-1 max-h-[340px] overflow-y-auto">
+              <div className="space-y-1 max-h-80 overflow-y-auto">
                 {selectedExams.map((exam, index) => (
                   <div 
                     key={exam.id}

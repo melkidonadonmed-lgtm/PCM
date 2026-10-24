@@ -120,7 +120,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
           <img
             src={logoLocal}
             alt="Logotipo do órgão do local de atendimento"
-            className="h-10 max-w-[120px] object-contain shrink-0"
+            className="h-10 max-w-[128px] object-contain shrink-0"
           />
         ) : (
           <div className="px-2.5 py-1 border border-black font-black text-xs tracking-wider shrink-0">
@@ -490,7 +490,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
           onFieldChange={onFieldChange}
         />
 
-        <div className="col-span-4 border-r border-b border-black p-2 flex flex-col justify-between bg-white min-h-[68px]">
+        <div className="col-span-4 border-r border-b border-black p-2 flex flex-col justify-between bg-white min-h-[64px]">
           <span className="text-[8px] font-bold uppercase tracking-tight text-slate-800 leading-none">
             29 - Data da Solicitação
           </span>
@@ -498,7 +498,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
             {todayFormatted}
           </span>
         </div>
-        <div className="col-span-8 border-r border-b border-black p-2 flex flex-col justify-end items-center bg-white min-h-[68px]">
+        <div className="col-span-8 border-r border-b border-black p-2 flex flex-col justify-end items-center bg-white min-h-[64px]">
           <div className="w-64 border-t border-black pt-1 text-center">
             <div className="text-[10px] font-bold text-slate-950 leading-tight">
               {formData.doctorName || 'Assinatura e Carimbo do Médico Solicitante'}

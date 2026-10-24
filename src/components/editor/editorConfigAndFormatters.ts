@@ -202,15 +202,15 @@ export const INITIAL_EDITOR_CONTENT = `
 export function getLogoSizeClass(size: DocumentLogoConfig['size']): string {
   switch (size) {
     case 'sm':
-      return 'max-h-12 max-w-[120px]';
+      return 'max-h-12 max-w-[128px]';
     case 'md':
-      return 'max-h-16 max-w-[170px]';
+      return 'max-h-16 max-w-44';
     case 'lg':
       return 'max-h-24 max-w-[240px]';
     case 'xl':
-      return 'max-h-32 max-w-[300px]';
+      return 'max-h-32 max-w-[280px]';
     default:
-      return 'max-h-16 max-w-[170px]';
+      return 'max-h-16 max-w-44';
   }
 }
 
@@ -477,16 +477,16 @@ export function buildActiveReferralPayload(
     <p></p>
     <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 12px 0;" />
     <p><strong>1. Motivo do Encaminhamento:</strong></p>
-    <p style="margin-left: 15px; color: #1e293b;">${reason}</p>
+    <p style="margin-left: 16px; color: #1e293b;">${reason}</p>
     <p></p>
     <p><strong>2. História Clínica & Exame Físico Relevante:</strong></p>
-    <p style="margin-left: 15px; color: #1e293b;">${summary}</p>
+    <p style="margin-left: 16px; color: #1e293b;">${summary}</p>
     <p></p>
     <p><strong>3. Exames Complementares Realizados:</strong></p>
-    <p style="margin-left: 15px; color: #1e293b;">${exams}</p>
+    <p style="margin-left: 16px; color: #1e293b;">${exams}</p>
     <p></p>
     <p><strong>4. Hipótese Diagnóstica (CID-10):</strong></p>
-    <p style="margin-left: 15px; color: #1e293b;">${cid}</p>
+    <p style="margin-left: 16px; color: #1e293b;">${cid}</p>
     <p></p>
     <p>Agradeço a atenção e coloco-me à disposição para discussão do caso.</p>
   `;
@@ -539,7 +539,7 @@ export function buildActiveCertificatePayload(
     <p></p>
     ${cidText}
     ${obsText}
-    <p style="text-align: right; margin-top: 25px;">${addr ? `${addr.split('-')[0].trim()}, ` : ''}${today}.</p>
+    <p style="text-align: right; margin-top: 24px;">${addr ? `${addr.split('-')[0].trim()}, ` : ''}${today}.</p>
   `;
 
   const nextHeader: DocumentHeaderConfig = {

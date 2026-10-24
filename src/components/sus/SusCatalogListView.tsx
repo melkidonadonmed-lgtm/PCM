@@ -63,7 +63,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
               href="/formularios-sus-offline.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-semibold px-2.5 py-1.5 min-h-[36px] rounded-xl border border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-[#27354A] text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-[#334155] transition flex items-center gap-1.5 clinical-tabular-nums"
+              className="text-xs font-semibold px-2.5 py-1.5 min-h-[40px] rounded-xl border border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-[#27354A] text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-[#334155] transition flex items-center gap-1.5 clinical-tabular-nums"
               title="Abrir Central Regulatória SUS A4 Vetorial (9 modelos editáveis diretos na folha)"
             >
               <Icon name="print" size={14} />
@@ -74,7 +74,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
               <button
                 type="button"
                 onClick={onStartFillingMultiple}
-                className="btn-tactile-primary text-xs font-semibold px-3 py-1.5 min-h-[36px] flex items-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
+                className="btn-tactile-primary text-xs font-semibold px-3 py-1.5 min-h-[40px] flex items-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
               >
                 <Icon name="layers" size={14} />
                 <span>Preencher ({selectedDocIds.length})</span>
@@ -111,7 +111,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
           </div>
 
           {/* Campo de Busca */}
-          <div className="relative min-w-[220px] md:w-64">
+          <div className="relative min-w-[240px] md:w-64">
             <Icon name="search" size={14} className="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
@@ -119,7 +119,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
               placeholder="Ex.: APAC, LME, Tomografia, Mamografia, Dengue..."
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 min-h-[34px] text-xs rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder:text-[var(--text-placeholder)] focus:border-info focus-visible:ring-1 focus-visible:ring-sky-500 outline-none transition"
+              className="w-full pl-8 pr-3 py-1.5 min-h-[32px] text-xs rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder:text-[var(--text-placeholder)] focus:border-info focus-visible:ring-1 focus-visible:ring-sky-500 outline-none transition"
             />
           </div>
         </div>

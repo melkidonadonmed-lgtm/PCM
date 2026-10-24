@@ -37,7 +37,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
           <img 
             src={logoSrc} 
             alt="" 
-            className="w-[55%] max-w-[340px] max-h-[340px] object-contain filter grayscale-20"
+            className="w-[55%] max-w-80 max-h-80 object-contain filter grayscale-20"
             draggable={false}
           />
         </div>
@@ -49,7 +49,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[65%] max-w-[210px] max-h-[210px] object-contain filter grayscale-20"
+              className="w-[65%] max-w-52 max-h-52 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -57,7 +57,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[65%] max-w-[210px] max-h-[210px] object-contain filter grayscale-20"
+              className="w-[65%] max-w-52 max-h-52 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -70,7 +70,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[75%] max-w-[140px] max-h-[140px] object-contain filter grayscale-20"
+              className="w-[75%] max-w-36 max-h-36 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -78,7 +78,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[75%] max-w-[140px] max-h-[140px] object-contain filter grayscale-20"
+              className="w-[75%] max-w-36 max-h-36 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -86,7 +86,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[75%] max-w-[140px] max-h-[140px] object-contain filter grayscale-20"
+              className="w-[75%] max-w-36 max-h-36 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -98,7 +98,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
           <img 
             src="/logos/rondonia-brasao.svg" 
             alt="" 
-            className="w-[65%] max-w-[400px] max-h-[500px] object-contain filter"
+            className="w-[65%] max-w-96 max-h-125 object-contain filter"
             draggable={false}
           />
         </div>
@@ -109,7 +109,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
           <img 
             src={customDataUrl} 
             alt="" 
-            className="w-[55%] max-w-[340px] object-contain"
+            className="w-[55%] max-w-80 object-contain"
             draggable={false}
           />
         </div>

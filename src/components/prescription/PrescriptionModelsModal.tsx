@@ -401,7 +401,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                         <button
                           type="button"
                           onClick={() => onApplyPrescriptionModel(model, 'replace')}
-                          className="btn-tactile-primary px-3 py-1 min-h-[34px] rounded-lg text-xs font-bold cursor-pointer transition"
+                          className="btn-tactile-primary px-3 py-1 min-h-9 rounded-lg text-xs font-bold cursor-pointer transition"
                           title="Substituir todos os medicamentos da receita por este modelo"
                         >
                           Substituir receita

@@ -104,7 +104,7 @@ export const LogoSvgCanvas: React.FC<LogoSvgCanvasProps> = ({
 
       {/* SVG Render Box */}
       <div
-        className={`w-full aspect-square max-w-[280px] sm:max-w-[320px] rounded-2xl p-4 flex items-center justify-center transition-colors shadow-tactile-md border ${
+        className={`w-full aspect-square max-w-[280px] sm:max-w-80 rounded-2xl p-4 flex items-center justify-center transition-colors shadow-tactile-md border ${
           previewDarkBg ? 'bg-slate-900 border-strong' : 'bg-white border-subtle'
         }`}
       >

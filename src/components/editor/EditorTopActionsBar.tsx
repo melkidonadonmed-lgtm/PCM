@@ -165,7 +165,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
               className="flex items-center gap-1.5 min-w-0 text-left cursor-pointer group focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded"
               title={`Documento: ${currentModel.title} (clique para renomear)`}
             >
-              <span className="font-bold text-[var(--text-main)] truncate max-w-[115px] sm:max-w-[200px] md:max-w-[260px]">
+              <span className="font-bold text-[var(--text-main)] truncate max-w-28 sm:max-w-48 md:max-w-64">
                 {currentModel.title}
               </span>
               <Pencil className="w-3 h-3 text-[var(--text-muted)] group-hover:text-[var(--text-main)] shrink-0" />
@@ -340,7 +340,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
           onClick={handleDownloadPdf}
           disabled={isExportingPdf}
           aria-label="Baixar PDF"
-          className="btn-tactile-secondary h-9 min-h-[36px] px-2.5 sm:px-3 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+          className="btn-tactile-secondary h-9 min-h-9 px-2.5 sm:px-3 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
           title="Baixar documento em PDF preservando rigorosamente a tipografia e o layout visual do editor"
         >
           {isExportingPdf ? (
@@ -356,7 +356,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
           type="button"
           onClick={handlePrint}
           aria-label="Imprimir folha A4"
-          className={`btn-tactile-primary h-9 min-h-[36px] px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
+          className={`btn-tactile-primary h-9 min-h-9 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
             !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
           }`}
           title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica (Ctrl+P)' : 'Clique para configurar o médico emitente e imprimir'}

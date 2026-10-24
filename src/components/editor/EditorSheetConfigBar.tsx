@@ -120,7 +120,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
             const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
             if (found) handleApplyStyle(found);
           }}
-          className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[155px] truncate"
+          className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-40 truncate"
           title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
           aria-label="Selecionar estilo visual da receita"
         >
@@ -154,7 +154,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
         <select
           value={fontFamilyId}
           onChange={(e) => onChangeFontFamily(e.target.value)}
-          className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-[170px] truncate"
+          className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-44 truncate"
           aria-label="Família Tipográfica da Folha A4"
           title="Trocar fonte da receita médica estilo Google Docs"
         >

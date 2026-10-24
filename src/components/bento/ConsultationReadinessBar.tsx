@@ -56,7 +56,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
             size={15}
             className={isDoctorOk ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-500'}
           />
-          <span className="truncate max-w-[115px] sm:max-w-[180px]">
+          <span className="truncate max-w-28 sm:max-w-44">
             {isDoctorOk ? `Dr(a). ${doctor.name.split(' ')[0]}` : 'CRM pendente'}
           </span>
           {isDoctorOk && (
@@ -80,7 +80,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
             size={15}
             className={hasPatient ? 'text-sky-600 dark:text-sky-400' : 'text-[var(--text-muted)]'}
           />
-          <span className="truncate max-w-[110px] sm:max-w-[180px]">
+          <span className="truncate max-w-28 sm:max-w-44">
             {hasPatient ? patient.name : 'Sem paciente'}
           </span>
           {weightKg > 0 && (

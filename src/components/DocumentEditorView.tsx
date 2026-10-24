@@ -321,7 +321,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     content: '',
     editorProps: {
       attributes: {
-        class: 'min-h-[200px] leading-relaxed text-inherit selection:bg-sky-200 dark:selection:bg-sky-800',
+        class: 'min-h-48 leading-relaxed text-inherit selection:bg-sky-200 dark:selection:bg-sky-800',
       },
     },
     onCreate: ({ editor: ed }) => {
@@ -539,7 +539,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   return (
-    <div className={`flex flex-col gap-2.5 mx-auto w-full pb-16 transition ${pageOrientation === 'landscape' ? 'max-w-[1240px]' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
+    <div className={`flex flex-col gap-2.5 mx-auto w-full pb-16 transition ${pageOrientation === 'landscape' ? 'max-w-7xl' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
       {/* Toast Feedback */}
       {toastMessage && (
         <div

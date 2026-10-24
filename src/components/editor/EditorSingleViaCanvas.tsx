@@ -203,7 +203,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                 onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
                 placeholder="Data de emissão"
                 style={{ fontFamily: 'inherit' }}
-                className="text-xs text-slate-500 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition flex-1 min-w-[110px] min-h-6"
+                className="text-xs text-slate-500 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition flex-1 min-w-28 min-h-6"
                 title="Clique para editar a data de emissão"
               />
             </div>

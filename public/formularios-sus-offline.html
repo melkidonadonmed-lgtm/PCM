@@ -39,7 +39,7 @@
             --shadow-sculpted: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 0 var(--rim-light);
 
             /* Regra dos 2% de Cor Pontual (Verde Esmeralda Clínico) */
-            --punctual-accent: #059669;
+            --punctual-accent: #047857;
             --punctual-text: #065F46;
             --punctual-soft: rgba(5, 150, 105, 0.10);
             --punctual-border: rgba(5, 150, 105, 0.30);
@@ -51,7 +51,7 @@
             color: var(--ink-primary);
             font-family: var(--font-sans);
             font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-            -webkit-font-smoothing: antialiased;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;
             overflow-x: hidden;
         }
 
@@ -101,7 +101,7 @@
             padding: 0.45rem 0.85rem;
             border-radius: 10px;
             white-space: nowrap;
-            transition: all 0.16s ease;
+            transition: background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.45rem;
@@ -166,13 +166,13 @@
             font-weight: 700;
             line-height: 1;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
             background: transparent;
             border: none;
         }
         .field-clear-btn:hover {
             background-color: #FEE2E2;
-            color: #DC2626;
+            color: #991B1B;
         }
         .field-wrapper.is-empty .field-clear-btn {
             opacity: 0;
@@ -439,7 +439,7 @@
         .gap-5 { gap: 1.25rem; }
         .grid { display: grid; }
         .w-full { width: 100%; }
-        .max-w-\[1920px\] { max-width: 1920px; }
+        .max-w-screen-2xl { max-width: 1920px; }
         .mx-auto { margin-left: auto; margin-right: auto; }
         .p-3 { padding: 0.75rem; }
         .p-3\.5 { padding: 0.875rem; }
@@ -486,7 +486,7 @@
          CABEÇALHO SUPERIOR EDITORIAL MÉDICO (TEMA CLARO AD LUCEM)
          ============================================================================ -->
     <header class="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 no-print">
-        <div class="max-w-[1920px] mx-auto px-3 sm:px-6 py-3 flex flex-col gap-2.5">
+        <div class="max-w-screen-2xl mx-auto px-3 sm:px-6 py-3 flex flex-col gap-2.5">
             
             <!-- Linha 1: Identidade + Ações Rápidas -->
             <div class="flex flex-wrap items-center justify-between gap-3">
@@ -552,7 +552,7 @@
     <!-- ============================================================================
          WORKBENCH SPLIT-SCREEN (COL-5 FORMULÁRIO INTERATIVO | COL-7 FOLHA A4 OFICIAL)
          ============================================================================ -->
-    <main id="main-workbench-grid" class="flex-1 max-w-[1920px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 p-3 sm:p-6 items-start">
+    <main id="main-workbench-grid" class="flex-1 max-w-screen-2xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 p-3 sm:p-6 items-start">
         
         <!-- PAINEL ESQUERDO: CONTROLES, PACIENTE, MÉDICO E CAMPOS DO MODELO (NO-PRINT) -->
         <section id="left-workbench-panel" class="lg:col-span-5 flex flex-col gap-4 no-print">
@@ -2590,9 +2590,9 @@
 <title>${currentMeta.officialTitle} — SESAU-RO</title>
 <style>
     @page { size: A4 portrait; margin: 5mm; }
-    body { background: #F4F5F7; margin: 0; padding: 20px; font-family: Arial, Helvetica, sans-serif; }
-    .toolbar { max-width: 210mm; margin: 0 auto 14px auto; background: #111827; color: #fff; padding: 10px 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-    .toolbar button { background: #059669; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    body { background: #F4F5F7; margin: 0; padding: 24px; font-family: Arial, Helvetica, sans-serif; }
+    .toolbar { max-width: 210mm; margin: 0 auto 16px auto; background: #111827; color: #fff; padding: 12px 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .toolbar button { background: #047857; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .sus-a4-sheet { width: 210mm; min-height: 295mm; margin: 0 auto; background: #FFFFFF; color: #000000; padding: 5.5mm 6.5mm; box-sizing: border-box; font-size: 8.5pt; line-height: 1.18; border: 1px solid #000; }
     .sus-triple-header { display: grid; grid-template-columns: 38mm 1fr 34mm; border: 2px solid #000; margin-bottom: 1.5mm; }
     .sus-header-left { border-right: 1.5px solid #000; padding: 1.5mm 2mm; text-align: center; display: flex; flex-direction: column; justify-content: center; }

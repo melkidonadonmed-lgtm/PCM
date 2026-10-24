@@ -102,7 +102,7 @@ export const CloudAuthButton: React.FC = () => {
           />
         </div>
         <div className="hidden sm:flex lg:hidden 2xl:flex flex-col items-start leading-tight min-w-0">
-          <span className="font-semibold text-xs max-w-[75px] 2xl:max-w-[105px] truncate">
+          <span className="font-semibold text-xs max-w-[80px] 2xl:max-w-[96px] truncate">
             {user.displayName?.split(' ')[0] || 'Dr(a).'}
           </span>
           <div className="hidden 2xl:flex items-center gap-1 text-[10px]">
@@ -308,7 +308,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab(tab.id)}
                   aria-current={isActive ? 'page' : undefined}
                   title={`${tab.label} (${tab.shortcut})`}
-                  className={`px-1.5 xl:px-2 py-1 min-h-[34px] xl:min-h-[36px] rounded-xl text-[11px] xl:text-xs flex items-center gap-1 transition-all cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
+                  className={`px-1.5 xl:px-2 py-1 min-h-[32px] xl:min-h-[40px] rounded-xl text-[11px] xl:text-xs flex items-center gap-1 transition-all cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'nav-segmented-pill-active font-bold'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] font-semibold border border-transparent'
@@ -325,7 +325,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <span
                       className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full clinical-unit clinical-tabular-nums ${
                         isActive
-                          ? 'bg-sky-600 text-white shadow-xs'
+                          ? 'bg-sky-700 text-white shadow-xs'
                           : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
                       }`}
                     >

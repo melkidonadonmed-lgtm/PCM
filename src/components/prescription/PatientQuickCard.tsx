@@ -70,7 +70,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             title="Alternar exibição de CPF e Peso"
           >
             <Icon name={showExtraPatientFields ? 'expand_less' : 'expand_more'} size={15} />
-            <span className="truncate max-w-[180px] sm:max-w-none">
+            <span className="truncate max-w-44 sm:max-w-none">
               {showExtraPatientFields
                 ? 'Ocultar CPF / Peso'
                 : hasExtraData
