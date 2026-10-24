@@ -131,7 +131,7 @@ O **PresCMed (`PCM`)** expressa uma identidade visual de **precisão cirúrgica,
    - **Modo Diurno (`clinical-day`)**: Superfície Clean Slate (`#F8FAFC`) com cartões em branco puro (`#FFFFFF`) e contraste `>= 10:1` para doses, nomes de fármacos e alertas sanitários.
    - **Modo Plantão Noturno (`clinical-night`)**: Superfície Deep Slate acetinada (`#0F172A` / `#1E293B`), reduzindo o ofuscamento em plantões noturnos sem recorrer a pretos abissais `#000000` que apagam bordas e sombras.
 3. **Chrome Estrutural Esculpido & Navegação Não-Genérica**:
-   - **Header Command Bar**: Superfície clara no tema claro (`--surface-card`) e escura no escuro, integrando o **Segmented Workspace Track** (`Alt+1..6` com indicador ativo esculpido) e o **Command & Context Cluster** (Paciente + Peso + Busca `Ctrl+K` + CRM + Nuvem + Tema agrupados em trilho coeso).
+   - **Header Command Bar**: Superfície clara no tema claro (`--surface-card`) e escura no escuro, integrando o **Segmented Workspace Track** (`Alt+1..8` com indicador ativo esculpido) e o **Command & Context Cluster** (Paciente + Peso + Busca `Ctrl+K` + CRM + Nuvem + Tema agrupados em trilho coeso).
    - **Sidebar & MobileBottomNav em Deep Navy**: Ancoram o perímetro de navegação nos dois temas (`#0F172A` / `#0B1120`), com indicador luminoso vertical (`3px` em `#38BDF8`), atalhos visíveis em `tabular-nums` e seletor compacto de Macro-Módulos (`MOD-01` Ativo, `MOD-02` PEP, `MOD-03` Hospitalar).
 4. **Imutabilidade da Folha Física A4 (`printable-a4-sheet` & `.sus-grid`)**: A folha médica simula papel físico real (`794x1123px` retrato / `1123x794px` paisagem) e é **sempre branca (`#FFFFFF`) com tinta escura**, tanto na tela quanto em `@media print` e PDF.
 
@@ -182,7 +182,7 @@ A tipografia combina 3 motores especializados com **escala modular fluida (`clam
 A composição espacial utiliza primitivas intrínsecas em grade **Base-4 / Base-8 (`4px, 8px, 12px, 16px, 24px, 32px, 64px`)**:
 
 - **Split-View Assimétrico (`12 Colunas`)**: No `PrescriptionBuilder`, a coluna esquerda (`xl:col-span-7`) concentra o fluxo vertical (`Stack`) de identificação, composição e lista prescrita, enquanto a coluna direita (`xl:col-span-5`, `xl:sticky xl:top-20`) ancora a bancada A4 em tempo real e a gaveta pediátrica (`@container`).
-- **Header Command Bar (`64px` / `h-16`)**: Alinhamento simétrico contendo gatilho da Sidebar, botão Início unificado, **Segmented Workspace Track** (`Receitas`, `Documentos`, `Doses`, `Protocolos`, `Editor` com atalhos `Alt+1..5`) e **Command & Context Cluster** à direita.
+- **Header Command Bar (`64px` / `h-16`)**: Alinhamento simétrico contendo gatilho da Sidebar, botão Início unificado, **Segmented Workspace Track** (`Receitas`, `Documentos`, `Doses`, `Protocolos`, `Editor`, `Guias SUS`, `Hospitalar`, `Scores CDSS` com atalhos `Alt+1..8`) e **Command & Context Cluster** à direita.
 - **Sidebar Deep Navy (`256px` expandida / `68px` recolhida)**: Topo imediato com Posto de Atuação SUS (`ContextSwitcher`) e Perfil CRM, seguido por `Atendimento` e `Apoio clínico` com barra de acento vertical no item ativo, `Kits de plantão` retráteis e rodapé de Macro-Módulos + utilitários (`Novo Atendimento`, `Backup .pcm`, `Instalar App`).
 - **Breakpoint Mobile (`1024px` / `lg`) & `MobileBottomNav`**: Abaixo de `1024px`, a navegação migra para o `MobileBottomNav` (`h-16`, Deep Navy) com 5 destinos (`Receitas`, `Documentos`, `Doses`, `Editor`, `Mais`), alvos `>= 44x44px` e `whitespace-nowrap`.
 

@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@source not "../GEMINI.md";
+@source not "../AGENTS.md";
+@source not "../DESIGN.md";
+@source not "../docs";
 @import "./styles/globals.css";
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -174,7 +178,7 @@
     --text-main: #0F172A;
     --text-secondary: #334155;
     --text-placeholder: #5B6B80;
-    --text-subtle: #94A3B8;
+    --text-subtle: #64748B;
     --text-inverse: #FFFFFF;
 
     /* Acentos & Botões Primários */
@@ -465,7 +469,7 @@
   }
 
   .dark .chip-neutral[data-active="true"] {
-    background-color: rgba(14, 165, 233, 0.16);
+    background-color: #173753;
     color: #7DD3FC;
     border-color: rgba(56, 189, 248, 0.45);
   }
@@ -1464,7 +1468,7 @@
   }
 
   :is(.a4-editor-canvas, #printable-a4-sheet) ::placeholder {
-    color: #94a3b8 !important;
+    color: #64748b !important;
   }
 
   :is(.a4-editor-canvas, #printable-a4-sheet) :is(input, textarea) {

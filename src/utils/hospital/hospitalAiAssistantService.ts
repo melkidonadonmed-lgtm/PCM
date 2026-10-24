@@ -111,17 +111,19 @@ export function queryScienceLiteratureAgent(queryText: string, bedRecord: Hospit
 export function generateBedCopilotResponse(
   userPrompt: string,
   bedRecord: HospitalBedPatientRecord,
-  channel: 'bed_copilot' | 'science_protocol' | 'live_voice'
+  channel: 'bed_copilot' | 'science_protocol' | 'live_voice',
+  nowMs: number = Date.now()
 ): HospitalBedChatMessage {
+  const createdAtIso = new Date(nowMs).toISOString();
   if (channel === 'science_protocol') {
     const sci = queryScienceLiteratureAgent(userPrompt, bedRecord);
     return {
-      id: `msg-${Date.now()}`,
+      id: `msg-${nowMs}`,
       role: 'science',
       channel: 'science_protocol',
       content: sci.replyText,
       evidenceCitations: sci.citations,
-      createdAtIso: new Date().toISOString(),
+      createdAtIso,
     };
   }
 
@@ -168,11 +170,11 @@ export function generateBedCopilotResponse(
   ].join('\n\n');
 
   return {
-    id: `msg-${Date.now()}`,
+    id: `msg-${nowMs}`,
     role: 'assistant',
     channel,
     content,
     evidenceCitations: ['Dados extraídos exclusivamente do prontuário estruturado do leito (Diretriz Zero Alucinação).'],
-    createdAtIso: new Date().toISOString(),
+    createdAtIso,
   };
 }

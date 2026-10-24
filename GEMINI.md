@@ -2,7 +2,7 @@
 
 Este arquivo serve como **memória persistente, diretrizes de arquitetura e base de conhecimento** para o desenvolvimento do **PresCMed**. Todos os agentes e modelos que atuam neste repositório devem seguir estritamente as diretrizes aqui documentadas.
 
-> **Fonte detalhada:** o [`AGENTS.md`](./AGENTS.md) traz as regras completas (regimes de receita, emissão de documentos, documentos SUS, estrutura arquivo por arquivo). Em caso de divergência, vale o `AGENTS.md`. As seções 1 a 6 abaixo foram conferidas com o código em 11/10/2026; a seção 7 é histórico.
+> **Fonte detalhada:** o [`AGENTS.md`](./AGENTS.md) traz as regras completas (regimes de receita, emissão de documentos, documentos SUS, estrutura arquivo por arquivo). Em caso de divergência, vale o `AGENTS.md`. As seções 1 a 6 abaixo foram conferidas com o código em 24/10/2026; a seção 7 é histórico.
 
 ---
 
@@ -36,11 +36,11 @@ Este arquivo serve como **memória persistente, diretrizes de arquitetura e base
 | **Frontend** | React 19 + TypeScript | Modo funcional com hooks. Sem React Router (roteamento por aba `activeTab` em `App.tsx`). |
 | **Bundler** | Vite 6 | `@vitejs/plugin-react` e `@tailwindcss/vite`. |
 | **Estilos** | Tailwind CSS v4 | Configurado diretamente via CSS em `src/index.css` (`@import "tailwindcss"` e `@theme`). |
-| **UI & Ícones** | Google Material Symbols (`material-symbols`), `lucide-react` | Sistema canônico `<Icon />` com Google Material Design Icons offline + suporte legado Lucide. O pacote `motion` foi removido. |
+| **UI & Ícones** | Google Material Symbols (`material-symbols`) | Sistema canônico `<Icon />` com Google Material Design Icons 100% offline. Os pacotes `motion` e `lucide-react` foram removidos. |
 | **Editor** | Tiptap 3 | Editor A4 (`DocumentEditorView.tsx`), carregado sob demanda. |
 | **Documentos / PDF** | `html2canvas-pro`, `jspdf` | Folha A4 única (`components/documento/`): prévia, impressão e PDF saem do mesmo componente. |
-| **Testes** | Vitest 5 | Doses, kits, regimes de receita, consentimento de CID, folha dos documentos e documentos SUS. |
-| **Persistência** | `localStorage` + Dexie.js 4 (esquema v2) | Persistência local segura + backup e restauração portátil (`.pcm.json`). |
+| **Testes** | Vitest 5 | 26 suítes (`241/241` testes determinísticos Nível 4): doses, kits, regimes, CID, SUS, `MOD-03` e 114 escores CDSS. |
+| **Persistência** | `localStorage` + Dexie.js 4 (esquema v3) | Persistência local segura (`workContexts`, `savedDocuments`, `hospitalBeds`) + backup portátil v2 (`.pcm.json`). |
 | **Nuvem (opcional)** | Firebase 12 (Auth + Firestore) | Chunk `vendor-firebase`, carregado só após o clique em "Nuvem" e fora do cache offline. |
 | **PWA** | `vite-plugin-pwa` (Workbox) | Instalação como aplicativo e funcionamento offline. |
 
@@ -223,7 +223,7 @@ npm run preview     # Pré-visualização do bundle compilado
   - **Timbre da rede pública**: logo do órgão de um lado, SUS do outro e o nome do local no meio.
   - **Rotinas e painéis de exames**: pré-natal por trimestre, saúde da mulher, do homem e do idoso, HAS, diabetes, IST.
   - `README.md`, `AGENTS.md`, `.github/copilot-instructions.md` e este arquivo conferidos com o código.
-  - Pendências em aberto: ver `.context/CURRENT_STATE.md`.
+- **21/10/2026 a 24/10/2026**: Modularização dos 5 monólitos (`< 850` linhas), entrega do **Módulo Hospitalar (`MOD-03`, `Alt+7`)** e **Scoreboard CDSS (`Alt+8`, 114 escores + `EPARADA` + Rastreio INCA)**, auditoria REA P0–P3 (`backup v2`, `sanitizeHtml`, fila de exclusões Firestore, higienização de `firestore.rules` e remoção de `lucide-react`) e validação com `241/241` testes em 26 suítes Vitest. Pendências em aberto: ver `.context/CURRENT_STATE.md`.
 
 ---
 

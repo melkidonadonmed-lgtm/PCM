@@ -15,7 +15,8 @@ import {
 
 export function createEmptyHospitalBedRecord(
   wardAndBed = '110-15',
-  specialtyTemplate: HospitalSpecialtyTemplate = 'enfermaria_clinica'
+  specialtyTemplate: HospitalSpecialtyTemplate = 'enfermaria_clinica',
+  nowMs: number = Date.now()
 ): HospitalBedPatientRecord {
   return {
     id: `bed-${wardAndBed.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
@@ -60,7 +61,7 @@ export function createEmptyHospitalBedRecord(
     conductList: [],
     evolutionHistoryTimeline: [],
     chatMessages: [],
-    updatedAt: Date.now(),
+    updatedAt: nowMs,
   };
 }
 

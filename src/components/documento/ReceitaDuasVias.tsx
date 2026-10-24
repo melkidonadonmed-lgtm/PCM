@@ -207,7 +207,7 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
         ) : (
           <div style={{ ...quadro, marginTop: 8, fontSize: 8.5, color: TINTA_SUAVE }}>
             <p style={rotulo}>Orientações ao paciente (Portaria SVS/MS nº 344/98)</p>
-            <p style={{ margin: '3px 0 0' }}>• Medicamento sujeito a controle especial. Uso estritamente individual conforme prescrito.</p>
+            <p style={{ margin: '4px 0 0' }}>• Medicamento sujeito a controle especial. Uso estritamente individual conforme prescrito.</p>
             <p style={{ margin: 0 }}>• Não altere as doses nem interrompa o tratamento sem prévia avaliação médica.</p>
             <p style={{ margin: 0 }}>• Mantenha fora do alcance de crianças, em local seguro e protegido de luz e umidade.</p>
           </div>
@@ -244,7 +244,7 @@ export const ReceitaDuasVias: React.FC<ReceitaDuasViasProps> = (props) => (
       aria-hidden="true"
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderLeft: `1px dashed ${FILETE}`, width: 0 }}
     >
-      <span style={{ padding: '6px 0', backgroundColor: '#FFFFFF', fontSize: 11, color: TINTA_APAGADA, transform: 'translateX(-0.5px)' }}>{SIMBOLO_CORTE}</span>
+      <span style={{ backgroundColor: '#FFFFFF', fontSize: 11, color: TINTA_APAGADA, transform: 'translateX(-0.5px)', padding: '4px 0' }}>{SIMBOLO_CORTE}</span>
     </div>
     {props.regime === 'simples' ? <div aria-hidden="true" /> : <Via via={2} {...props} />}
   </div>

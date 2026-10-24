@@ -399,7 +399,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               return (
                 <div
                   key={item.id}
-                  className="flex flex-col justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-3.5 transition-all hover:border-blue-500/60 hover:shadow-xs"
+                  className="flex flex-col justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-3.5 transition hover:border-blue-500/60 hover:shadow-xs"
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2">

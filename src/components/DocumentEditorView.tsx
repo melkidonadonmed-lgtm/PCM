@@ -657,7 +657,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08)',
+            boxShadow: '0 24px 48px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08)',
             position: 'relative',
             fontFamily: selectedFont.family,
             fontSize: `${baseFontSize}pt`,

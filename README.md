@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Dexie v4](https://img.shields.io/badge/IndexedDB-Dexie%20v4-f59e0b?style=flat-square)](https://dexie.org/)
-[![Vitest](https://img.shields.io/badge/Testes-238%2F238%20Vitest-22c55e?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Testes-241%2F241%20Vitest-22c55e?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![PWA](https://img.shields.io/badge/PWA-Offline--First-8b5cf6?style=flat-square)](https://web.dev/progressive-web-apps/)
 
 Plataforma médica digital *offline-first* para o contexto clínico, ambulatorial, de emergência e hospitalar brasileiro (`pt-BR`): receituário inteligente no padrão PEC/SUS, calculadora pediátrica por peso, central de documentos (atestados CFM, encaminhamentos, exames e 9 formulários regulatórios do SUS), bancada de apoio à decisão clínica (**Scoreboard CDSS** com **114 escores**, painel **EPARADA** ACLS/PALS, **Bomba de Infusão Contínua** e **Rastreio Oncológico INCA/MS**) e **Módulo Hospitalar (`MOD-03`)** com gestão de leitos, evolução padronizada, ingestão multimodal sem alucinação e painel longitudinal *Conduta × Evolução*.
@@ -116,14 +116,14 @@ flowchart TD
 
 | Camada | Tecnologias |
 | :--- | :--- |
-| **Interface & Estilo** | React 19 (`19.0.1`), TypeScript `~5.8.2`, Tailwind CSS v4 (`@tailwindcss/vite`), Material Symbols (offline via `<Icon />`) e `lucide-react` |
-| **Build & Bundler** | Vite 6 (`6.2.3`) com code-splitting manual (`vendor-react`, `vendor-tiptap`, `vendor-pdf`, `vendor-firebase`, `editor-view`) |
+| **Interface & Estilo** | React 19 (`19.0.1`), TypeScript `~5.8.2`, Tailwind CSS v4 (`@tailwindcss/vite`) e Material Symbols (offline via `<Icon />`) |
+| **Build & Bundler** | Vite 6 (`6.2.3`) com code-splitting manual (`vendor-react`, `vendor-tiptap`, `vendor-dexie`, `vendor-firebase`, `scores-catalog`) |
 | **Editor Rich-Text A4** | Tiptap 3 (`@tiptap/react`, `starter-kit`, `extension-text-align`, `extension-placeholder`) |
 | **Persistência Local** | Dexie.js 4 (`4.4.6` — IndexedDB v3: `workContexts`, `savedDocuments`, `hospitalBeds`) + `localStorage` |
 | **Motor de PDF** | `html2canvas-pro` (`2.4.5`, suporte nativo a `oklch()`) + `jsPDF` (`4.2.1`) |
 | **PWA / Offline** | `vite-plugin-pwa` (`1.3.0` / Workbox `generateSW`) |
 | **Nuvem Opcional** | Firebase 12 (`12.19.0` — Google Auth + Cloud Firestore sob demanda) |
-| **Qualidade & Testes** | Vitest 5 (`5.0.2` — 26 suítes, 238 testes determinísticos Nível 4) + `@google/design.md` |
+| **Qualidade & Testes** | Vitest 5 (`5.0.2` — 26 suítes, 241 testes determinísticos Nível 4) + `@google/design.md` |
 | **Produção** | Google Cloud Run (`southamerica-east1`), container multi-stage (`node:24-alpine` + `nginx:alpine`) |
 
 ---
@@ -223,7 +223,7 @@ PCM/
     │                                # documentoClinico.ts, folhaA4.ts, renderSheetToPdf.ts, downloadPdf.ts,
     │                                # formularioOficial.ts, prescricaoRapida.ts, montarItensDoKit.ts, fuzzySearch.ts,
     │                                # parsePrescriptionHtml.ts, sanitizeHtml.ts, compartilhamentoTexto.ts, medicoConfigurado.ts
-    └── __tests__/                   # 26 suítes Vitest (238 testes determinísticos) + snapshots de kits clínicos
+    └── __tests__/                   # 26 suítes Vitest (241 testes determinísticos) + snapshots de kits clínicos
 ```
 
 ---
@@ -269,11 +269,11 @@ O login na nuvem é opcional; as variáveis `VITE_FIREBASE_*` estão documentada
 
 ---
 
-## 7. Testes e Portões de Qualidade (`26` suítes / `238` testes)
+## 7. Testes e Portões de Qualidade (`26` suítes / `241` testes)
 
 ```powershell
 npm run lint         # Type-check estrito: tsc --noEmit (0 any)
-npm run test         # Suíte completa Vitest (26 suítes, 238 testes)
+npm run test         # Suíte completa Vitest (26 suítes, 241 testes)
 npm run test:watch   # Modo interativo contínuo
 npm run design:lint  # Conformidade estrutural com o DESIGN.md
 npm run build        # Build de produção otimizado em dist/

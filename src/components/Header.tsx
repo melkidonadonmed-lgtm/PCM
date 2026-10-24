@@ -322,7 +322,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab(tab.id)}
                   aria-current={isActive ? 'page' : undefined}
                   title={`${tab.label} (${tab.shortcut})`}
-                  className={`px-1.5 xl:px-2 py-1 min-h-[32px] xl:min-h-[40px] rounded-xl text-[11px] xl:text-xs flex items-center gap-1 transition-all cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
+                  className={`px-1.5 xl:px-2 py-1 min-h-[32px] xl:min-h-[40px] rounded-xl text-[11px] xl:text-xs flex items-center gap-1 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'nav-segmented-pill-active font-bold'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] font-semibold border border-transparent'

@@ -88,7 +88,7 @@ export const ScoreParameterGroupInput: React.FC<ScoreParameterGroupInputProps> =
                 role="radio"
                 aria-checked={isSelected}
                 onClick={() => onChange(group.id, opt.id)}
-                className={`group flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-left text-xs transition-all cursor-pointer ${
+                className={`group flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-left text-xs transition cursor-pointer ${
                   isSelected
                     ? opt.isNormalBaseline
                       ? 'border-emerald-500/70 bg-emerald-50/90 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-100 shadow-xs'

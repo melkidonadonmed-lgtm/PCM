@@ -128,7 +128,7 @@ src/
     useDocumentLogoManager.ts  # Estado e persistência de logotipos esquerdo/direito e estilos do Editor A4
     useDocumentTemplatesAndStyles.ts # Gerenciamento de modelos personalizados, estilos visuais e sincronização com a receita
     useModalAccessibility.ts   # Focus trap, restauração de foco e fechamento por Escape em modais
-    useNavigationSync.ts       # Sincronização de abas com URL hash e atalhos de teclado Alt+1..6 / Ctrl+K
+    useNavigationSync.ts       # Sincronização de abas com URL hash e atalhos de teclado Alt+1..8 / Ctrl+K
     usePrescriptionModels.ts   # Persistência local de modelos reutilizáveis de prescrição
     usePrescriptionSession.ts  # Gerenciamento de sessão, rascunhos e ciclo de vida da receita
     usePwaInstall.ts           # Detecção de suporte e acionamento de instalação como Progressive Web App
@@ -170,7 +170,7 @@ src/
     parsePrescriptionHtml.ts   # Converte o HTML do Editor A4 de volta em itens tipados da receita
     sanitizeHtml.ts            # Sanitizador anti-XSS (DOMPurify + escapeHtml preservando operadores < e >)
     compartilhamentoTexto.ts   # Formatadores puros de texto para cópia e WhatsApp por regime sanitário
-  __tests__/                   # 26 suítes Vitest (238 testes Nível 4) cobrindo cálculo pediátrico, Portaria 344/98, RDC 471/2021, CFM CID-10, APAC/LME, Módulo Hospitalar (MOD-03), Scoreboard CDSS (114 escores) e UI/A11y
+  __tests__/                   # 26 suítes Vitest (241 testes Nível 4) cobrindo cálculo pediátrico, Portaria 344/98, RDC 471/2021, CFM CID-10, APAC/LME, Módulo Hospitalar (MOD-03), Scoreboard CDSS (114 escores) e UI/A11y
 ```
 
 ---

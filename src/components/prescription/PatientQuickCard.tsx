@@ -66,7 +66,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           <button
             type="button"
             onClick={onToggleExtraFields}
-            className="h-7 px-2.5 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/70 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 inline-flex items-center justify-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 whitespace-nowrap clinical-tabular-nums transition-all duration-150"
+            className="h-7 px-2.5 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/70 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 inline-flex items-center justify-center gap-1 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 whitespace-nowrap clinical-tabular-nums transition duration-150"
             title="Alternar exibição de CPF e Peso"
           >
             <Icon name={showExtraPatientFields ? 'expand_less' : 'expand_more'} size={15} />
@@ -83,7 +83,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onRequestClearPatient}
-              className="h-7 px-2.5 rounded-lg border border-rose-200/80 dark:border-rose-500/20 bg-rose-50/50 dark:bg-rose-500/10 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-100/80 dark:hover:bg-rose-500/20 font-medium inline-flex items-center justify-center gap-1 cursor-pointer active:scale-95 transition-all duration-150 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-rose-500"
+              className="h-7 px-2.5 rounded-lg border border-rose-200/80 dark:border-rose-500/20 bg-rose-50/50 dark:bg-rose-500/10 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-100/80 dark:hover:bg-rose-500/20 font-medium inline-flex items-center justify-center gap-1 cursor-pointer active:scale-95 transition duration-150 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-rose-500"
               title="Limpar paciente e reiniciar consulta"
             >
               <Icon name="delete" size={14} />
@@ -94,7 +94,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           <button
             type="button"
             onClick={onOpenPatientModal}
-            className="h-7 px-2.5 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/70 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 inline-flex items-center justify-center gap-1 cursor-pointer active:scale-95 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 transition-all duration-150"
+            className="h-7 px-2.5 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/70 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 inline-flex items-center justify-center gap-1 cursor-pointer active:scale-95 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 transition duration-150"
             title="Abrir cadastro clínico detalhado"
           >
             <Icon name="person_add" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />

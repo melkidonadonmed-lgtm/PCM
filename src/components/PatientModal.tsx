@@ -304,7 +304,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             <button
               type="button"
               onClick={handleClear}
-              className="h-11 min-h-[44px] px-3.5 rounded-xl border border-subtle dark:border-white/12 bg-slate-50 dark:bg-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300 hover:border-rose-200 dark:hover:border-rose-500/30 transition-all duration-150 inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="h-11 min-h-[44px] px-3.5 rounded-xl border border-subtle dark:border-white/12 bg-slate-50 dark:bg-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300 hover:border-rose-200 dark:hover:border-rose-500/30 transition duration-150 inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title="Limpar todos os campos para digitar novo paciente"
             >
               <Icon name="ink_eraser" className="text-[16px]" />
@@ -314,13 +314,13 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="btn-tactile-secondary h-11 min-h-[44px] px-4 rounded-xl text-xs font-semibold inline-flex items-center justify-center cursor-pointer active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="btn-tactile-secondary h-11 min-h-[44px] px-4 rounded-xl text-xs font-semibold inline-flex items-center justify-center cursor-pointer active:scale-95 transition duration-150 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="btn-tactile-primary h-11 min-h-[44px] px-5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition-all duration-150"
+                className="btn-tactile-primary h-11 min-h-[44px] px-5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition duration-150"
               >
                 <Icon name="check" className="text-[16px]" />
                 <span>Salvar Paciente</span>
