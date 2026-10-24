@@ -13,6 +13,7 @@ import {
   PrescriptionStyle,
 } from '../../types';
 import { resolverIdentidade, separarPorRegime } from '../../utils/documentoClinico';
+import { escapeHtml } from '../../utils/sanitizeHtml';
 import type { RegimeReceita } from '../../utils/isSpecialControlOrAntibiotic';
 
 export type PresetQuickTemplateType =
@@ -264,16 +265,16 @@ export function formatPrescriptionItemsList(items: PrescriptionItem[]): string {
         !presLower.includes('caixa') &&
         presLower !== 'uso oral' &&
         !qtdLower.includes(presLower);
-      const presLabel = showPres ? ` (${item.presentation})` : '';
-      const routeLabel = item.route ? ` (${item.route})` : '';
-      const qtyLabel = item.quantity ? ` &nbsp;—&nbsp; <strong>${item.quantity}</strong>` : '';
-      const instructions = item.instructions || 'Conforme orientação médica.';
+      const presLabel = showPres ? ` (${escapeHtml(item.presentation)})` : '';
+      const routeLabel = item.route ? ` (${escapeHtml(item.route)})` : '';
+      const qtyLabel = item.quantity ? ` &nbsp;—&nbsp; <strong>${escapeHtml(item.quantity)}</strong>` : '';
+      const instructions = escapeHtml(item.instructions || 'Conforme orientação médica.');
       const times =
         item.scheduleTimes && item.scheduleTimes.length > 0
-          ? `<br><span style="font-size: 0.9em; color: #475569;">Horários recomendados: ${item.scheduleTimes.join(' — ')}</span>`
+          ? `<br><span style="font-size: 0.9em; color: #475569;">Horários recomendados: ${escapeHtml(item.scheduleTimes.join(' — '))}</span>`
           : '';
       return `
-        <p><strong>${idx + 1}. ${item.name}${presLabel}</strong>${routeLabel}${qtyLabel}</p>
+        <p><strong>${idx + 1}. ${escapeHtml(item.name)}${presLabel}</strong>${routeLabel}${qtyLabel}</p>
         <p style="margin-left: 20px; color: #334155;">${instructions}${times}</p>
       `;
     })
@@ -287,55 +288,61 @@ export function interpolateMedicalTags(
   doctor: DoctorProfile,
   activeContext: WorkContext | null
 ): string {
-  const today = new Date().toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-  const pName = patient?.name?.trim() || '______________________________';
-  const pAge = patient?.ageText || (patient?.birthDate ? patient.birthDate : '____ anos');
-  const pDoc = patient?.documentNumber?.trim() || '____________________';
-  const pCns = patient?.cns?.trim() || '____________________';
+  const today = escapeHtml(
+    new Date().toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    })
+  );
+  const pName = escapeHtml(patient?.name?.trim() || '______________________________');
+  const pAge = escapeHtml(patient?.ageText || (patient?.birthDate ? patient.birthDate : '____ anos'));
+  const pDoc = escapeHtml(patient?.documentNumber?.trim() || '____________________');
+  const pCns = escapeHtml(patient?.cns?.trim() || '____________________');
   const pAddressParts = [
     patient?.address,
     patient?.neighborhood,
     patient?.city ? `${patient.city}${patient.state ? `/${patient.state}` : ''}` : '',
   ].filter(Boolean);
-  const pAddress = pAddressParts.join(', ') || '______________________________';
-  const pWeight = patient?.weightKg ? `${patient.weightKg} kg` : '';
+  const pAddress = escapeHtml(pAddressParts.join(', ') || '______________________________');
+  const pWeight = escapeHtml(patient?.weightKg ? `${patient.weightKg} kg` : '');
   const meds = formatPrescriptionItemsList(prescriptionItems);
 
-  const docName = doctor?.name
+  const rawDocName = doctor?.name
     ? doctor.name.startsWith('Dr')
       ? doctor.name
       : `Dr(a). ${doctor.name}`
     : 'Dr(a). ____________________';
-  const docCrm = doctor?.crm
-    ? `CRM ${doctor.crm}${doctor.crmState ? `/${doctor.crmState}` : ''}`
-    : 'CRM: ____________';
-  const docSpec =
-    doctor?.specialty?.trim() || activeContext?.doctorCredentials?.specialty || 'Medicina Geral';
-  const clinicName = activeContext?.clinicName || doctor?.clinicName || 'Clínica Médica';
-  const clinicAddress = activeContext?.clinicAddress || doctor?.address || '';
-  const clinicPhone = doctor?.phone || '';
-  const clinicCnes = activeContext?.cnes || doctor?.cnes || '';
+  const docName = escapeHtml(rawDocName);
+  const docCrm = escapeHtml(
+    doctor?.crm
+      ? `CRM ${doctor.crm}${doctor.crmState ? `/${doctor.crmState}` : ''}`
+      : 'CRM: ____________'
+  );
+  const docSpec = escapeHtml(
+    doctor?.specialty?.trim() || activeContext?.doctorCredentials?.specialty || 'Medicina Geral'
+  );
+  const clinicName = escapeHtml(activeContext?.clinicName || doctor?.clinicName || 'Clínica Médica');
+  const clinicAddress = escapeHtml(activeContext?.clinicAddress || doctor?.address || '');
+  const clinicPhone = escapeHtml(doctor?.phone || '');
+  const clinicCnes = escapeHtml(activeContext?.cnes || doctor?.cnes || '');
 
   return rawHtml
-    .replace(/\{\{paciente_nome\}\}/g, pName)
-    .replace(/\{\{paciente_idade\}\}/g, pAge)
-    .replace(/\{\{paciente_documento\}\}/g, pDoc)
-    .replace(/\{\{paciente_cns\}\}/g, pCns)
-    .replace(/\{\{paciente_endereco\}\}/g, pAddress)
-    .replace(/\{\{paciente_peso\}\}/g, pWeight)
-    .replace(/\{\{medicamentos_prescritos\}\}/g, meds)
-    .replace(/\{\{data_atendimento\}\}/g, today)
-    .replace(/\{\{medico_nome\}\}/g, docName)
-    .replace(/\{\{medico_crm\}\}/g, docCrm)
-    .replace(/\{\{medico_especialidade\}\}/g, docSpec)
-    .replace(/\{\{clinica_nome\}\}/g, clinicName)
-    .replace(/\{\{clinica_endereco\}\}/g, clinicAddress)
-    .replace(/\{\{clinica_telefone\}\}/g, clinicPhone)
-    .replace(/\{\{clinica_cnes\}\}/g, clinicCnes);
+    .replace(/\{\{paciente_nome\}\}/g, () => pName)
+    .replace(/\{\{paciente_idade\}\}/g, () => pAge)
+    .replace(/\{\{paciente_documento\}\}/g, () => pDoc)
+    .replace(/\{\{paciente_cns\}\}/g, () => pCns)
+    .replace(/\{\{paciente_endereco\}\}/g, () => pAddress)
+    .replace(/\{\{paciente_peso\}\}/g, () => pWeight)
+    .replace(/\{\{medicamentos_prescritos\}\}/g, () => meds)
+    .replace(/\{\{data_atendimento\}\}/g, () => today)
+    .replace(/\{\{medico_nome\}\}/g, () => docName)
+    .replace(/\{\{medico_crm\}\}/g, () => docCrm)
+    .replace(/\{\{medico_especialidade\}\}/g, () => docSpec)
+    .replace(/\{\{clinica_nome\}\}/g, () => clinicName)
+    .replace(/\{\{clinica_endereco\}\}/g, () => clinicAddress)
+    .replace(/\{\{clinica_telefone\}\}/g, () => clinicPhone)
+    .replace(/\{\{clinica_cnes\}\}/g, () => clinicCnes);
 }
 
 export function buildActivePrescriptionPayload(
@@ -358,12 +365,15 @@ export function buildActivePrescriptionPayload(
   const receita = RECEITA_NO_EDITOR[regime];
   const itemsToLoad = grupos[regime];
 
-  const pName = patient?.name?.trim() || '______________________________';
-  const pDoc = patient?.documentNumber ? ` • Doc: ${patient.documentNumber}` : '';
+  const pName = escapeHtml(patient?.name?.trim() || '______________________________');
+  const pDoc = patient?.documentNumber ? ` • Doc: ${escapeHtml(patient.documentNumber)}` : '';
   const pAge =
-    patient?.ageText ||
-    (patient?.birthDate ? ` • Idade: ${patient.ageText || patient.birthDate}` : '');
-  const pWeight = patient?.weightKg > 0 ? ` • Peso: ${patient.weightKg} kg` : '';
+    patient?.ageText
+      ? escapeHtml(patient.ageText)
+      : patient?.birthDate
+      ? ` • Idade: ${escapeHtml(patient.ageText || patient.birthDate)}`
+      : '';
+  const pWeight = patient?.weightKg > 0 ? ` • Peso: ${escapeHtml(patient.weightKg)} kg` : '';
   const today = new Date().toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'long',
@@ -378,7 +388,7 @@ export function buildActivePrescriptionPayload(
     itemsToLoad && itemsToLoad.length > 0
       ? itemsToLoad
           .map((item, idx) => {
-            const route = item.route ? `(${item.route})` : '';
+            const route = item.route ? `(${escapeHtml(item.route)})` : '';
             const presLower = (item.presentation || '').toLowerCase();
             const qtdLower = (item.quantity || '').toLowerCase();
             const showPres =
@@ -387,16 +397,16 @@ export function buildActivePrescriptionPayload(
               !presLower.includes('caixa') &&
               presLower !== 'uso oral' &&
               !qtdLower.includes(presLower);
-            const presentation = showPres ? ` (${item.presentation})` : '';
-            const quantity = item.quantity ? ` &nbsp;—&nbsp; <strong>${item.quantity}</strong>` : '';
-            const instructions = item.instructions || '';
+            const presentation = showPres ? ` (${escapeHtml(item.presentation)})` : '';
+            const quantity = item.quantity ? ` &nbsp;—&nbsp; <strong>${escapeHtml(item.quantity)}</strong>` : '';
+            const instructions = escapeHtml(item.instructions || '');
             const times =
               item.scheduleTimes && item.scheduleTimes.length > 0
-                ? `<br><span style="font-size: 0.9em; color: #475569;">Horários recomendados: ${item.scheduleTimes.join(' — ')}</span>`
+                ? `<br><span style="font-size: 0.9em; color: #475569;">Horários recomendados: ${escapeHtml(item.scheduleTimes.join(' — '))}</span>`
                 : '';
 
             return `
-            <p><strong>${idx + 1}. ${item.name}${presentation}</strong> ${route}${quantity}</p>
+            <p><strong>${idx + 1}. ${escapeHtml(item.name)}${presentation}</strong> ${route}${quantity}</p>
             <p style="margin-left: 20px; color: #334155;">${instructions}${times}</p>
             <p></p>
           `;
@@ -414,7 +424,7 @@ export function buildActivePrescriptionPayload(
 
   const tituloCorpoHtml = currentHeader.showHeader
     ? ''
-    : `<p style="text-align: center;"><strong>${receita.titulo}</strong></p>`;
+    : `<p style="text-align: center;"><strong>${escapeHtml(receita.titulo)}</strong></p>`;
 
   const newHtml = `
     ${tituloCorpoHtml}
@@ -450,21 +460,24 @@ export function buildActiveReferralPayload(
   referral: MedicalReferral | undefined,
   currentHeader: DocumentHeaderConfig
 ) {
-  const pName =
-    patient?.name?.trim() || referral?.patientName?.trim() || '______________________________';
-  const pDoc = patient?.documentNumber || referral?.documentNumber || '____________________';
-  const pAge = patient?.ageText || (patient?.birthDate ? patient.birthDate : '');
+  const pName = escapeHtml(
+    patient?.name?.trim() || referral?.patientName?.trim() || '______________________________'
+  );
+  const pDoc = escapeHtml(patient?.documentNumber || referral?.documentNumber || '____________________');
+  const pAge = escapeHtml(patient?.ageText || (patient?.birthDate ? patient.birthDate : ''));
   const today =
     referral?.date ||
     new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-  const priorityLabel = (referral?.priority || 'eletivo').toUpperCase();
-  const specialty = referral?.destinationSpecialty || 'Especialidade Médica';
-  const institution =
-    referral?.destinationInstitution || 'Serviço de Referência / Atenção Especializada';
-  const reason = referral?.reason || 'Avaliação e conduta especializada.';
-  const summary = referral?.clinicalSummary || 'Quadro clínico em investigação.';
-  const exams = referral?.relevantExams || 'Sem exames complementares anexados.';
-  const cid = referral?.hypothesisCID || 'A esclarecer.';
+  const priorityLabel = escapeHtml((referral?.priority || 'eletivo').toUpperCase());
+  const rawSpecialty = referral?.destinationSpecialty || 'Especialidade Médica';
+  const specialty = escapeHtml(rawSpecialty);
+  const institution = escapeHtml(
+    referral?.destinationInstitution || 'Serviço de Referência / Atenção Especializada'
+  );
+  const reason = escapeHtml(referral?.reason || 'Avaliação e conduta especializada.');
+  const summary = escapeHtml(referral?.clinicalSummary || 'Quadro clínico em investigação.');
+  const exams = escapeHtml(referral?.relevantExams || 'Sem exames complementares anexados.');
+  const cid = escapeHtml(referral?.hypothesisCID || 'A esclarecer.');
 
   const referralHtml = `
     <p style="text-align: center;"><strong>GUIA DE ENCAMINHAMENTO MÉDICO</strong></p>
@@ -496,12 +509,12 @@ export function buildActiveReferralPayload(
     showHeader: true,
     showFooter: true,
     showPatientBanner: false,
-    badgeText: `ENCAMINHAMENTO • ${specialty.toUpperCase()}`,
+    badgeText: `ENCAMINHAMENTO • ${rawSpecialty.toUpperCase()}`,
     dateText: today,
   };
 
   return {
-    specialty,
+    specialty: rawSpecialty,
     referralHtml,
     nextHeader,
   };
@@ -512,21 +525,22 @@ export function buildActiveCertificatePayload(
   certificate: MedicalCertificate | undefined,
   currentHeader: DocumentHeaderConfig
 ) {
-  const pName =
-    patient?.name?.trim() || certificate?.patientName?.trim() || '______________________________';
-  const pDoc = patient?.documentNumber || certificate?.documentNumber || '____________________';
+  const pName = escapeHtml(
+    patient?.name?.trim() || certificate?.patientName?.trim() || '______________________________'
+  );
+  const pDoc = escapeHtml(patient?.documentNumber || certificate?.documentNumber || '____________________');
   const days = certificate?.daysOff || 1;
-  const daysText = days === 1 ? '1 (um) dia' : `${days} dias`;
-  const period = certificate?.periodText || 'por motivo de doença e necessidade de repouso';
+  const daysText = escapeHtml(days === 1 ? '1 (um) dia' : `${days} dias`);
+  const period = escapeHtml(certificate?.periodText || 'por motivo de doença e necessidade de repouso');
   const today =
     certificate?.date ||
     new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   const cidText =
     certificate?.includeCID && certificate?.cid10Code
-      ? `<p><strong>Diagnóstico (CID-10):</strong> ${certificate.cid10Code}${certificate.cid10Description ? ` - ${certificate.cid10Description}` : ''} <em>(Expressamente autorizado pelo paciente)</em></p><p></p>`
+      ? `<p><strong>Diagnóstico (CID-10):</strong> ${escapeHtml(certificate.cid10Code)}${certificate.cid10Description ? ` - ${escapeHtml(certificate.cid10Description)}` : ''} <em>(Expressamente autorizado pelo paciente)</em></p><p></p>`
       : '';
   const obsText = certificate?.observations
-    ? `<p><strong>Observações:</strong> ${certificate.observations}</p><p></p>`
+    ? `<p><strong>Observações:</strong> ${escapeHtml(certificate.observations)}</p><p></p>`
     : '';
   const addr = currentHeader.clinicAddress;
 
@@ -539,7 +553,7 @@ export function buildActiveCertificatePayload(
     <p></p>
     ${cidText}
     ${obsText}
-    <p style="text-align: right; margin-top: 24px;">${addr ? `${addr.split('-')[0].trim()}, ` : ''}${today}.</p>
+    <p style="text-align: right; margin-top: 24px;">${addr ? `${escapeHtml(addr.split('-')[0].trim())}, ` : ''}${escapeHtml(today)}.</p>
   `;
 
   const nextHeader: DocumentHeaderConfig = {
@@ -568,13 +582,15 @@ export function buildPresetQuickTemplatePayload(
   pageOrientation?: DocumentOrientation;
   baseFontSize?: number;
 } {
-  const patientName = patient?.name || '__________________________';
-  const patientDoc = patient?.documentNumber || '________________';
-  const today = new Date().toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
+  const patientName = escapeHtml(patient?.name || '__________________________');
+  const patientDoc = escapeHtml(patient?.documentNumber || '________________');
+  const today = escapeHtml(
+    new Date().toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    })
+  );
   const medsList = formatPrescriptionItemsList(prescriptionItems);
 
   if (type === 'receita_especial') {

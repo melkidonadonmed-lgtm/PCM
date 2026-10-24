@@ -10,6 +10,13 @@ import {
 import { buildSusDocumentHtml, SUS_DOCUMENTS_CATALOG } from '../data/susDocumentsCatalog';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import { parseAndValidateBackup } from '../services/backupService';
+import {
+  formatPrescriptionItemsList,
+  interpolateMedicalTags,
+  buildActiveReferralPayload,
+  buildActiveCertificatePayload
+} from '../components/editor/editorConfigAndFormatters';
+import { DEFAULT_HOSPITAL_BEDS_SEED } from '../utils/hospital/hospitalMultimodalIngestor';
 import type { DoctorProfile, Patient, PrescriptionItem, SusFilledFormData } from '../types';
 
 const medicoPadrao: DoctorProfile = {
@@ -56,6 +63,101 @@ describe('Auditoria de Segurança XSS e Sanitização HTML (sanitizeHtml)', () =
     expect(clean).not.toContain('onclick');
     expect(clean).not.toContain('javascript:');
     expect(sanitizeHtml(malicious)).toBe(clean);
+  });
+
+  it('neutraliza tags aninhadas reconstruídas (<scr<input>ipt>), atributos separados por barra (<img/onerror=...>) e entidades HTML em javascript: (PCM-SEC-03)', () => {
+    const nested = '<scr<input>ipt>window.pwned=1</scr</input>ipt><img/src="x"/onerror="alert(1)"><a href="&#106;avascript:alert(2)">Click</a>';
+    const clean = DOMPurify.sanitize(nested);
+
+    expect(clean).not.toContain('<script');
+    expect(clean).not.toContain('onerror');
+    expect(clean).not.toContain('javascript');
+    expect(clean).not.toContain('&#106;avascript');
+  });
+
+  it('escapa operadores clínicos (< e >) e tags HTML nos formatadores do Editor A4 sem interpretar padrões $ (PCM-SEC-03)', () => {
+    const itemsHtml = formatPrescriptionItemsList([
+      {
+        id: 'rx-sec-1',
+        name: 'Espironolactona 25 mg <script>evil()</script>',
+        presentation: 'Comprimido',
+        route: 'Uso Oral',
+        quantity: '30 comp',
+        doseCalculatedText: '1 comp',
+        frequencyText: '1x/dia',
+        instructions: 'Suspender se K+ > 5,5 mEq/L ou eTFG < 30 mL/min',
+        scheduleInterval: '24/24h',
+        scheduleTimes: [],
+        isContinuous: true,
+      },
+    ]);
+    expect(itemsHtml).not.toContain('<script>');
+    expect(itemsHtml).toContain('&gt; 5,5 mEq/L');
+    expect(itemsHtml).toContain('&lt; 30 mL/min');
+
+    const interpolated = interpolateMedicalTags(
+      '<p>Paciente: {{paciente_nome}}</p>',
+      { ...pacientePadrao, name: 'João $& <img src=x onerror=alert(1)>' },
+      [],
+      medicoPadrao,
+      null
+    );
+    expect(interpolated).toContain('João $&amp; &lt;img src=x onerror=alert(1)&gt;');
+    expect(interpolated).not.toContain('<img');
+
+    const refPayload = buildActiveReferralPayload(
+      pacientePadrao,
+      {
+        patientName: pacientePadrao.name,
+        documentNumber: '123',
+        destinationSpecialty: 'Cardiologia',
+        reason: 'ICFER com FEVE < 35% e QRS > 150 ms',
+        clinicalSummary: 'Uso de IECA <script>bad()</script>',
+        relevantExams: 'Eco: FEVE < 35%',
+        hypothesisCID: 'I50.0',
+        priority: 'prioritario',
+      },
+      {
+        doctorName: medicoPadrao.name,
+        doctorCrm: 'CRM-SP 123456',
+        doctorSpecialty: 'Clínica Médica',
+        clinicName: 'UBS',
+        clinicAddress: 'Rua A',
+        badgeText: '',
+        dateText: '24/10/2026',
+        showHeader: true,
+        showFooter: true,
+        showPatientBanner: false,
+        patientCustomText: '',
+        footerDocName: medicoPadrao.name,
+        footerCrm: 'CRM-SP 123456',
+        footerSpecialty: 'Clínica Médica',
+        footerSubtext: '',
+      }
+    );
+    expect(refPayload.referralHtml).toContain('FEVE &lt; 35%');
+    expect(refPayload.referralHtml).toContain('QRS &gt; 150 ms');
+    expect(refPayload.referralHtml).not.toContain('<script>');
+
+    const certPayload = buildActiveCertificatePayload(
+      pacientePadrao,
+      {
+        patientName: pacientePadrao.name,
+        documentNumber: '123',
+        daysOff: 3,
+        startDate: '2026-10-24',
+        endDate: '2026-10-26',
+        periodText: 'por quadro febril > 38,5°C',
+        includeCID: true,
+        cid10Code: 'J18.9',
+        cid10Description: 'Pneumonia <bacteriana>',
+        observations: 'Reavaliar se SpO2 < 94%',
+      },
+      refPayload.nextHeader
+    );
+    expect(certPayload.certHtml).toContain('&gt; 38,5°C');
+    expect(certPayload.certHtml).toContain('SpO2 &lt; 94%');
+    expect(certPayload.certHtml).toContain('&lt;bacteriana&gt;');
   });
 
   it('escapa campos livres e sinais clínicos (< / >) em buildSusDocumentHtml', () => {
@@ -307,5 +409,35 @@ describe('Preservação de Metadados no Editor A4 e Validação Defensiva de Bac
     await expect(parseAndValidateBackup(mockFileInv)).rejects.toThrow(
       'O perfil médico no backup contém estrutura inválida.'
     );
+
+    const jsonComLeitosValidos = JSON.stringify({
+      system: 'PresCMed',
+      version: 2,
+      exportedAt: '2026-10-24T12:00:00.000Z',
+      data: {
+        doctorProfile: medicoPadrao,
+        workContexts: [],
+        savedDocuments: [],
+        hospitalBeds: DEFAULT_HOSPITAL_BEDS_SEED,
+        customStyles: []
+      }
+    });
+    const parsedV2 = await parseAndValidateBackup({ text: async () => jsonComLeitosValidos } as unknown as File);
+    expect(parsedV2.data.hospitalBeds).toHaveLength(DEFAULT_HOSPITAL_BEDS_SEED.length);
+    expect(parsedV2.data.hospitalBeds?.[0].wardAndBed).toBe('110-15');
+
+    const jsonComLeitoInvalido = JSON.stringify({
+      system: 'PresCMed',
+      version: 2,
+      exportedAt: '2026-10-24T12:00:00.000Z',
+      data: {
+        workContexts: [],
+        savedDocuments: [],
+        hospitalBeds: [{ id: 123 }]
+      }
+    });
+    await expect(
+      parseAndValidateBackup({ text: async () => jsonComLeitoInvalido } as unknown as File)
+    ).rejects.toThrow('O registro de leito hospitalar #1 contém campos obrigatórios ausentes.');
   });
 });

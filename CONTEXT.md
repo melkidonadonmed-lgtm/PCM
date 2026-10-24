@@ -11,10 +11,10 @@ O **PresCMed (`PCM`)** é a SPA clínica, ambulatorial e hospitalar 100% client-
   - `MOD-03` (`Alt+7` — Módulo Hospitalar): Gestão de leitos (`EF/LT`), modelo padronizado de evolução/admissão, ingestão multimodal sem alucinação, monitoramento longitudinal de exames e escores CDSS (`tabular-nums`), cruzamento *Conduta × Evolução* (6 eixos) e Copiloto do Leito / Agente Science.
   - `Scoreboard CDSS` (`Alt+8`): 114 calculadoras clínicas em 9 blocos de especialidade, painel `EPARADA` (PCR ACLS/PALS + 5H/5T), Rastreio Oncológico INCA/MS (Mama, Colo, Próstata), Bomba de Infusão Contínua (`BIC`), Radar Fisiológico e ponte bidirecional com os leitos hospitalares (`HospitalBedScoreEntry`).
 - **Fonte Única de Impressão (`FolhaA4.tsx` + `DocumentoClinico.tsx`)**: A prévia na tela, a impressão (`window.print`) e a exportação em PDF (`html2canvas-pro` + `jspdf`) renderizam exatamente o mesmo componente A4.
-- **Persistência Local e Cloud Opcional**: IndexedDB (`Dexie.js` v4, esquema v3: `workContexts`, `savedDocuments`, `hospitalBeds`) + 11 chaves em `localStorage`, com sincronização opcional via Firebase Auth/Firestore carregada sob demanda (`vendor-firebase`).
+- **Persistência Local, Backup v2 e Cloud Opcional**: IndexedDB (`Dexie.js` v4, esquema v3: `workContexts`, `savedDocuments`, `hospitalBeds`) + `localStorage`, backup portátil `.pcm.json` v2 (incluindo leitos hospitalares e estilos customizados) e sincronização opcional via Firebase Auth/Firestore com propagação de exclusões (`prescmed_cloud_pending_deletes`), fatiamento de lotes (`<= 450` ops) e compressão automática de logos Base64.
 
 ---
 
 ## 2. Estado Operacional e Deploy
 - **Produção Cloud Run**: Serviço `prescmed` em `southamerica-east1` (projeto `agent-md-506215`), servido via Nginx (`node:24-alpine` build) com healthcheck em `/health`.
-- **Qualidade e Governança**: `170` arquivos em `src/`, validado por `26` suítes no Vitest (`238/238` testes determinísticos Nível 4, `npm test`), typecheck (`npm run lint`) e design lint (`npm run design:lint`).
+- **Qualidade e Governança**: `170` arquivos em `src/`, validado por `26` suítes no Vitest (`241/241` testes determinísticos Nível 4, `npm test`), typecheck (`npm run lint`) e design lint (`npm run design:lint`).

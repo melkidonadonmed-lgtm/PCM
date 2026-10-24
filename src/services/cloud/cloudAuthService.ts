@@ -46,8 +46,10 @@ class CloudAuthService {
 
   /**
    * Encerra a sessão ativa no Firebase.
+   * Quando `options.clearLocalSession` for verdadeiro (ex.: encerramento de plantão em computador compartilhado),
+   * higieniza também os dados de paciente, receita e rascunhos clínicos no `localStorage`.
    */
-  async logout(): Promise<void> {
+  async logout(options?: { clearLocalSession?: boolean }): Promise<void> {
     try {
       const { auth } = await getFirebaseInstances();
       const { signOut } = await import('firebase/auth');
@@ -57,6 +59,18 @@ class CloudAuthService {
     } finally {
       this.currentUser = null;
       storageService.removeItem(CLOUD_AUTH_ACTIVE_KEY);
+      if (options?.clearLocalSession) {
+        [
+          'prescmed_patient',
+          'prescmed_prescription',
+          'prescmed_exams',
+          'prescmed_exam_indication',
+          'prescmed_certificate',
+          'prescmed_referral',
+          'prescmed_draft_referral',
+          'prescmed_draft_certificate',
+        ].forEach((key) => storageService.removeItem(key));
+      }
       this.notifyListeners();
     }
   }

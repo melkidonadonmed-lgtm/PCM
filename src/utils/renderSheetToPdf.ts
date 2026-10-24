@@ -124,6 +124,28 @@ function ajustarCorte(ctx: CanvasRenderingContext2D, corteIdeal: number, inicio:
   return corteIdeal;
 }
 
+function canvasPossuiDimensoesValidas(canvas: HTMLCanvasElement): boolean {
+  if (!canvas || canvas.width <= 0 || canvas.height <= 0) return false;
+  try {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return false;
+    const sample = ctx.getImageData(0, 0, 1, 1);
+    return sample.data.length === 4;
+  } catch {
+    return false;
+  }
+}
+
+function liberarMemoriaCanvas(canvas: HTMLCanvasElement | null | undefined): void {
+  if (!canvas) return;
+  try {
+    canvas.width = 0;
+    canvas.height = 0;
+  } catch {
+    // Ignora caso o elemento já tenha sido coletado
+  }
+}
+
 function adicionarCanvasAoPdf(pdf: jsPDF, canvas: HTMLCanvasElement, orientation: OrientacaoFolha, primeiraPagina: boolean): void {
   const pageWmm = orientation === 'landscape' ? A4_H_MM : A4_W_MM;
   const pageHmm = orientation === 'landscape' ? A4_W_MM : A4_H_MM;
@@ -134,6 +156,7 @@ function adicionarCanvasAoPdf(pdf: jsPDF, canvas: HTMLCanvasElement, orientation
 
   if (alturaNaturalMm <= pageHmm + 0.5) {
     pdf.addImage(canvas.toDataURL('image/jpeg', 0.94), 'JPEG', 0, 0, pageWmm, alturaNaturalMm, undefined, 'FAST');
+    liberarMemoriaCanvas(canvas);
     return;
   }
 
@@ -157,10 +180,12 @@ function adicionarCanvasAoPdf(pdf: jsPDF, canvas: HTMLCanvasElement, orientation
 
     if (indice > 0) pdf.addPage('a4', orientation);
     pdf.addImage(fatia.toDataURL('image/jpeg', 0.94), 'JPEG', 0, topoMm, pageWmm, fatia.height / pxPorMm, undefined, 'FAST');
+    liberarMemoriaCanvas(fatia);
 
     y = fim;
     indice += 1;
   }
+  liberarMemoriaCanvas(canvas);
 }
 
 /**
@@ -181,7 +206,8 @@ export async function sheetsToPdf(
   for (let i = 0; i < folhas.length; i += 1) {
     await aguardarRecursos(folhas[i]);
     let canvas = await capturarFolha(folhas[i], orientation, opts.scale ?? 3);
-    if (!canvas.width || !canvas.height || canvas.toDataURL('image/jpeg', 0.1).length < 64) {
+    if (!canvasPossuiDimensoesValidas(canvas)) {
+      liberarMemoriaCanvas(canvas);
       // Aparelhos com pouca memória recusam canvas grandes: refaz em escala menor.
       canvas = await capturarFolha(folhas[i], orientation, 2);
     }

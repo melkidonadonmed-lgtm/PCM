@@ -54,7 +54,8 @@ export const BackupModal: React.FC<BackupModalProps> = ({
   const [stats, setStats] = useState<BackupStats>({
     contextsCount: 0,
     documentsCount: 0,
-    templatesCount: 0
+    templatesCount: 0,
+    hospitalBedsCount: 0
   });
   const [isExporting, setIsExporting] = useState(false);
   const [exportFeedback, setExportFeedback] = useState<string | null>(null);
@@ -153,7 +154,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
       }
 
       setImportSuccess(
-        `Restauração concluída: ${result.importedContexts} locais e ${result.importedDocs} documentos/modelos importados com sucesso!`
+        `Restauração concluída: ${result.importedContexts} locais, ${result.importedDocs} documentos/modelos e ${result.importedBeds} leitos hospitalares importados com sucesso!`
       );
 
       // Notifica o aplicativo pai para atualizar contextos na tela
@@ -365,7 +366,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-3 gap-2 text-xs">
                   <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Locais de Atendimento</span>
                     <strong className="text-sm font-bold text-[var(--text-main)] clinical-tabular-nums">{parsedBackup.data.workContexts?.length || 0}</strong>
@@ -373,6 +374,10 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                   <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Modelos e Documentos</span>
                     <strong className="text-sm font-bold text-[var(--text-main)] clinical-tabular-nums">{parsedBackup.data.savedDocuments?.length || 0}</strong>
+                  </div>
+                  <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                    <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Leitos Hospitalares</span>
+                    <strong className="text-sm font-bold text-[var(--text-main)] clinical-tabular-nums">{parsedBackup.data.hospitalBeds?.length || 0}</strong>
                   </div>
                 </div>
 

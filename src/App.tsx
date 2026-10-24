@@ -185,6 +185,19 @@ export default function App() {
   const handleOpenBackupModal = React.useCallback(() => setIsBackupModalOpen(true), []);
   const handleCloseBackupModal = React.useCallback(() => setIsBackupModalOpen(false), []);
 
+  const handleBackupRestored = React.useCallback(async () => {
+    await loadContexts();
+    if (clinicalRepository.listHospitalBeds) {
+      const storedBeds = await clinicalRepository.listHospitalBeds();
+      if (storedBeds && storedBeds.length > 0) {
+        setHospitalBeds(storedBeds);
+        setActiveHospitalBedId((prev) =>
+          storedBeds.some((b) => b.id === prev) ? prev : storedBeds[0].id
+        );
+      }
+    }
+  }, [loadContexts]);
+
   // Manipuladores de ação
   const handleUpdatePatientWeight = (newWeight: number) => {
     setPatient(prev => ({ ...prev, weightKg: newWeight }));
@@ -805,7 +818,7 @@ export default function App() {
             darkMode={darkMode}
             doctor={doctor}
             onUpdateDoctor={setDoctor}
-            onBackupRestored={loadContexts}
+            onBackupRestored={handleBackupRestored}
             onClose={handleCloseBackupModal}
           />
         </Suspense>

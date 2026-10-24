@@ -1,7 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeForFirestore } from '../services/cloud/cloudSyncManager';
+import { sanitizeForFirestore, cloudSyncManager } from '../services/cloud/cloudSyncManager';
 
 describe('sanitizeForFirestore - Blindagem de Persistência na Nuvem', () => {
+  it('rastreia exclusões pendentes (anti-ressurreição / Zombie Records) por coleção (PCM-SYNC-02)', () => {
+    cloudSyncManager.recordPendingDelete('prescription_models', 'model-zombie-1');
+    cloudSyncManager.recordPendingDelete('work_contexts', 'ctx-zombie-1');
+
+    expect(cloudSyncManager.getPendingDeletedIds('prescription_models')).toContain('model-zombie-1');
+    expect(cloudSyncManager.getPendingDeletedIds('work_contexts')).toContain('ctx-zombie-1');
+  });
+
   it('deve remover recursivamente campos com valor undefined em objetos complexos', () => {
     const rawData = {
       id: 'ctx-ubs',

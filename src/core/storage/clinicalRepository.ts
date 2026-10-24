@@ -68,6 +68,19 @@ export const CLINICAL_STORAGE_KEYS = {
 class LocalDexieClinicalRepository implements IClinicalRepository {
   public readonly driverName = 'local-dexie-v2' as const;
   private memoryBedsFallback: HospitalBedPatientRecord[] = [];
+  private fallbackWriteTimer: ReturnType<typeof setTimeout> | null = null;
+  private hasDeletedBedExplicitly = false;
+
+  private scheduleFallbackPersistence(records: HospitalBedPatientRecord[]): void {
+    this.memoryBedsFallback = records;
+    if (this.fallbackWriteTimer) {
+      clearTimeout(this.fallbackWriteTimer);
+    }
+    this.fallbackWriteTimer = setTimeout(() => {
+      this.fallbackWriteTimer = null;
+      storageService.saveItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK, this.memoryBedsFallback);
+    }, 350);
+  }
 
   public listModules(): readonly ClinicalModuleDescriptor[] {
     return CLINICAL_MODULES_REGISTRY;
@@ -102,7 +115,7 @@ class LocalDexieClinicalRepository implements IClinicalRepository {
   }
 
   public async listWorkContexts(): Promise<WorkContext[]> {
-    return db.workContexts.orderBy('createdAt').toArray();
+    return db.workContexts.orderBy('updatedAt').toArray();
   }
 
   public async saveWorkContext(context: WorkContext): Promise<void> {
@@ -123,7 +136,8 @@ class LocalDexieClinicalRepository implements IClinicalRepository {
   public async listHospitalBeds(wardFilter?: string): Promise<HospitalBedPatientRecord[]> {
     try {
       const all = await db.hospitalBeds.orderBy('wardAndBed').toArray();
-      if (all.length > 0) {
+      if (all.length > 0 || this.hasDeletedBedExplicitly) {
+        this.memoryBedsFallback = all;
         return wardFilter
           ? all.filter((b) => b.wardName.toLowerCase().includes(wardFilter.toLowerCase()))
           : all;
@@ -131,37 +145,47 @@ class LocalDexieClinicalRepository implements IClinicalRepository {
     } catch {
       // Fallback para ambientes de teste sem IndexedDB
     }
-    const local = storageService.loadItem<HospitalBedPatientRecord[]>(
-      CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
-      this.memoryBedsFallback
-    );
+    const local =
+      this.memoryBedsFallback.length > 0
+        ? this.memoryBedsFallback
+        : storageService.loadItem<HospitalBedPatientRecord[]>(
+            CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
+            this.memoryBedsFallback
+          );
     return wardFilter
       ? local.filter((b) => b.wardName.toLowerCase().includes(wardFilter.toLowerCase()))
       : local;
   }
 
   public async saveHospitalBed(record: HospitalBedPatientRecord): Promise<void> {
-    const current = storageService.loadItem<HospitalBedPatientRecord[]>(
-      CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
-      this.memoryBedsFallback
-    );
+    const current =
+      this.memoryBedsFallback.length > 0
+        ? this.memoryBedsFallback
+        : storageService.loadItem<HospitalBedPatientRecord[]>(
+            CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
+            this.memoryBedsFallback
+          );
     const next = current.some((item) => item.id === record.id)
       ? current.map((item) => (item.id === record.id ? record : item))
       : [...current, record];
-    this.memoryBedsFallback = next;
-    storageService.saveItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK, next);
+    this.scheduleFallbackPersistence(next);
     try {
       await db.hospitalBeds.put(record);
     } catch {
       // Silencioso em SSR/Vitest sem IndexedDB
+      storageService.saveItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK, next);
     }
   }
 
   public async deleteHospitalBed(bedId: string): Promise<void> {
-    const current = storageService.loadItem<HospitalBedPatientRecord[]>(
-      CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
-      this.memoryBedsFallback
-    );
+    this.hasDeletedBedExplicitly = true;
+    const current =
+      this.memoryBedsFallback.length > 0
+        ? this.memoryBedsFallback
+        : storageService.loadItem<HospitalBedPatientRecord[]>(
+            CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
+            this.memoryBedsFallback
+          );
     const next = current.filter((item) => item.id !== bedId);
     this.memoryBedsFallback = next;
     storageService.saveItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK, next);

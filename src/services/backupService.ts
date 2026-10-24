@@ -1,13 +1,17 @@
 import { db, SavedDocument } from './db';
-import { WorkContext, DoctorProfile } from '../types';
+import { WorkContext, DoctorProfile, PrescriptionStyle } from '../types';
+import type { HospitalBedPatientRecord } from '../core/domain/clinicalEntities';
+import { CLINICAL_STORAGE_KEYS } from '../core/storage/clinicalRepository';
 
 export interface PresCMedBackup {
-  version: number;
+  version: number | string;
   exportedAt: string;
   system: 'PresCMed';
   data: {
     workContexts: WorkContext[];
     savedDocuments: SavedDocument[];
+    hospitalBeds?: HospitalBedPatientRecord[];
+    customStyles?: PrescriptionStyle[];
     activeContextId: string | null;
     doctorProfile?: DoctorProfile;
   };
@@ -17,6 +21,31 @@ export interface BackupStats {
   contextsCount: number;
   documentsCount: number;
   templatesCount: number;
+  hospitalBedsCount: number;
+}
+
+function loadLocalHospitalBedsFallback(): HospitalBedPatientRecord[] {
+  if (typeof window === 'undefined' || !window.localStorage) return [];
+  try {
+    const raw = window.localStorage.getItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as HospitalBedPatientRecord[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function loadLocalCustomStyles(): PrescriptionStyle[] {
+  if (typeof window === 'undefined' || !window.localStorage) return [];
+  try {
+    const raw = window.localStorage.getItem('prescmed_custom_styles');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as PrescriptionStyle[]) : [];
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -24,25 +53,37 @@ export interface BackupStats {
  */
 export async function getLocalDatabaseStats(): Promise<BackupStats> {
   await db.open();
-  const workContexts = await db.workContexts.toArray();
-  const savedDocuments = await db.savedDocuments.toArray();
+  const [workContexts, savedDocuments, idbBeds] = await Promise.all([
+    db.workContexts.toArray(),
+    db.savedDocuments.toArray(),
+    db.hospitalBeds ? db.hospitalBeds.toArray().catch(() => []) : Promise.resolve([]),
+  ]);
   const templatesCount = savedDocuments.filter(d => d.isTemplate).length;
+  const hospitalBeds = idbBeds.length > 0 ? idbBeds : loadLocalHospitalBedsFallback();
 
   return {
     contextsCount: workContexts.length,
     documentsCount: savedDocuments.length,
-    templatesCount
+    templatesCount,
+    hospitalBedsCount: hospitalBeds.length,
   };
 }
 
 /**
- * Exporta a base completa do PresCMed em arquivo JSON criptograficamente íntegro
+ * Exporta a base completa do PresCMed em arquivo JSON íntegro (v2 com leitos e estilos)
  */
 export async function exportCompleteBackup(doctorProfile?: DoctorProfile): Promise<{ filename: string; sizeBytes: number }> {
   await db.open();
-  const workContexts = await db.workContexts.toArray();
-  const savedDocuments = await db.savedDocuments.toArray();
-  const activeContextId = localStorage.getItem('pcm_active_context_id');
+  const [workContexts, savedDocuments, idbBeds] = await Promise.all([
+    db.workContexts.toArray(),
+    db.savedDocuments.toArray(),
+    db.hospitalBeds ? db.hospitalBeds.toArray().catch(() => []) : Promise.resolve([]),
+  ]);
+  const hospitalBeds = idbBeds.length > 0 ? idbBeds : loadLocalHospitalBedsFallback();
+  const customStyles = loadLocalCustomStyles();
+  const activeContextId =
+    localStorage.getItem('prescmed_active_context_id') ||
+    localStorage.getItem('pcm_active_context_id');
 
   const now = new Date();
   const pad = (n: number) => n.toString().padStart(2, '0');
@@ -50,16 +91,24 @@ export async function exportCompleteBackup(doctorProfile?: DoctorProfile): Promi
   const filename = `prescmed_backup_${dateStr}.pcm.json`;
 
   const backupData: PresCMedBackup = {
-    version: 1,
+    version: 2,
     exportedAt: now.toISOString(),
     system: 'PresCMed',
     data: {
       workContexts,
       savedDocuments,
+      hospitalBeds,
+      customStyles,
       activeContextId,
       doctorProfile
     }
   };
+
+  try {
+    localStorage.setItem('prescmed_last_export_timestamp', now.toISOString());
+  } catch {
+    // Ignora falha de quota em modo privado
+  }
 
   const jsonString = JSON.stringify(backupData, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
@@ -102,7 +151,7 @@ export async function parseAndValidateBackup(file: File): Promise<PresCMedBackup
   }
 
   const dataObj = json.data as Record<string, unknown>;
-  const { workContexts, savedDocuments } = dataObj;
+  const { workContexts, savedDocuments, hospitalBeds, customStyles } = dataObj;
 
   if (!Array.isArray(workContexts) || !Array.isArray(savedDocuments)) {
     throw new Error('As tabelas institucionais e de modelos não estão em formato de lista válido.');
@@ -122,6 +171,29 @@ export async function parseAndValidateBackup(file: File): Promise<PresCMedBackup
     if (!doc || typeof doc !== 'object' || typeof doc.id !== 'string' || typeof doc.title !== 'string') {
       throw new Error(`O documento #${i + 1} contém campos obrigatórios ausentes.`);
     }
+  }
+
+  // Validação defensiva dos leitos hospitalares quando presentes no backup (v2+)
+  if (hospitalBeds !== undefined && hospitalBeds !== null) {
+    if (!Array.isArray(hospitalBeds)) {
+      throw new Error('A lista de leitos hospitalares no backup contém formato inválido.');
+    }
+    for (let i = 0; i < hospitalBeds.length; i++) {
+      const bed = hospitalBeds[i] as Record<string, unknown> | null;
+      if (
+        !bed ||
+        typeof bed !== 'object' ||
+        typeof bed.id !== 'string' ||
+        typeof bed.wardAndBed !== 'string'
+      ) {
+        throw new Error(`O registro de leito hospitalar #${i + 1} contém campos obrigatórios ausentes.`);
+      }
+    }
+  }
+
+  // Validação defensiva de estilos customizados quando presentes
+  if (customStyles !== undefined && customStyles !== null && !Array.isArray(customStyles)) {
+    throw new Error('A lista de estilos customizados no backup contém formato inválido.');
   }
 
   // Validação defensiva do perfil médico quando presente no backup
@@ -149,15 +221,20 @@ export async function importBackupData(
 ): Promise<{ 
   importedContexts: number; 
   importedDocs: number; 
+  importedBeds: number;
   doctorProfile?: DoctorProfile; 
   activeContextId?: string | null 
 }> {
   await db.open();
-  const { workContexts, savedDocuments, activeContextId, doctorProfile } = backup.data;
+  const { workContexts, savedDocuments, hospitalBeds, customStyles, activeContextId, doctorProfile } = backup.data;
+  const bedsToImport = Array.isArray(hospitalBeds) ? hospitalBeds : [];
 
   if (strategy === 'replace') {
     await db.workContexts.clear();
     await db.savedDocuments.clear();
+    if (db.hospitalBeds && Array.isArray(hospitalBeds)) {
+      await db.hospitalBeds.clear();
+    }
   }
 
   if (workContexts.length > 0) {
@@ -168,8 +245,38 @@ export async function importBackupData(
     await db.savedDocuments.bulkPut(savedDocuments);
   }
 
+  if (db.hospitalBeds && bedsToImport.length > 0) {
+    await db.hospitalBeds.bulkPut(bedsToImport);
+  }
+
+  if (Array.isArray(hospitalBeds)) {
+    try {
+      const updatedBeds = db.hospitalBeds ? await db.hospitalBeds.toArray() : bedsToImport;
+      localStorage.setItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK, JSON.stringify(updatedBeds));
+    } catch (e) {
+      console.warn('[BackupService] Falha ao sincronizar cache de leitos no localStorage:', e);
+    }
+  }
+
+  if (Array.isArray(customStyles)) {
+    try {
+      if (strategy === 'replace') {
+        localStorage.setItem('prescmed_custom_styles', JSON.stringify(customStyles));
+      } else if (customStyles.length > 0) {
+        const existing = loadLocalCustomStyles();
+        const mergedMap = new Map<string, PrescriptionStyle>();
+        existing.forEach((s) => mergedMap.set(s.id, s));
+        customStyles.forEach((s) => mergedMap.set(s.id, s));
+        localStorage.setItem('prescmed_custom_styles', JSON.stringify(Array.from(mergedMap.values())));
+      }
+    } catch (e) {
+      console.warn('[BackupService] Falha ao persistir estilos customizados:', e);
+    }
+  }
+
   if (activeContextId) {
     try {
+      localStorage.setItem('prescmed_active_context_id', activeContextId);
       localStorage.setItem('pcm_active_context_id', activeContextId);
     } catch (e) {
       console.warn('[BackupService] Falha ao persistir contexto ativo no localStorage:', e);
@@ -179,6 +286,7 @@ export async function importBackupData(
   return {
     importedContexts: workContexts.length,
     importedDocs: savedDocuments.length,
+    importedBeds: bedsToImport.length,
     doctorProfile,
     activeContextId
   };

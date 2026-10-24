@@ -20,6 +20,12 @@ interface SyncableEntity {
   _deleted?: boolean;
 }
 
+type SyncCollectionKey = 'work_contexts' | 'prescription_models';
+
+const PENDING_DELETES_STORAGE_KEY = 'prescmed_cloud_pending_deletes';
+const MAX_FIRESTORE_BATCH_OPS = 450;
+const MAX_FIRESTORE_DOC_BYTES = 950_000;
+
 /**
  * Remove recursivamente campos `undefined` para prevenir exceções do Firestore SDK
  * (Unsupported field value: undefined).
@@ -52,10 +58,67 @@ class CloudSyncManager {
   private currentUser: DoctorUserProfile | null = null;
   private debounceTimer: number | null = null;
   private hooksRegistered = false;
+  private pendingDeletedIds: Record<SyncCollectionKey, Set<string>> = {
+    work_contexts: new Set<string>(),
+    prescription_models: new Set<string>(),
+  };
 
   constructor() {
+    this.loadPendingDeletesFromStorage();
     this.initListeners();
     this.registerDexieHooks();
+  }
+
+  private loadPendingDeletesFromStorage(): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    try {
+      const raw = window.localStorage.getItem(PENDING_DELETES_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as Partial<Record<SyncCollectionKey, string[]>>;
+      if (Array.isArray(parsed.work_contexts)) {
+        parsed.work_contexts.forEach((id) => this.pendingDeletedIds.work_contexts.add(String(id)));
+      }
+      if (Array.isArray(parsed.prescription_models)) {
+        parsed.prescription_models.forEach((id) =>
+          this.pendingDeletedIds.prescription_models.add(String(id))
+        );
+      }
+      this.recalculatePendingCount();
+    } catch {
+      // Ignora JSON corrompido
+    }
+  }
+
+  private persistPendingDeletesToStorage(): void {
+    this.recalculatePendingCount();
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    try {
+      window.localStorage.setItem(
+        PENDING_DELETES_STORAGE_KEY,
+        JSON.stringify({
+          work_contexts: Array.from(this.pendingDeletedIds.work_contexts),
+          prescription_models: Array.from(this.pendingDeletedIds.prescription_models),
+        })
+      );
+    } catch {
+      // Ignora erro de quota
+    }
+  }
+
+  private recalculatePendingCount(): void {
+    this.pendingChangesCount =
+      this.pendingDeletedIds.work_contexts.size +
+      this.pendingDeletedIds.prescription_models.size;
+  }
+
+  public recordPendingDelete(collectionKey: SyncCollectionKey, id: string): void {
+    if (!id) return;
+    this.pendingDeletedIds[collectionKey].add(String(id));
+    this.persistPendingDeletesToStorage();
+  }
+
+  public getPendingDeletedIds(collectionKey: SyncCollectionKey): string[] {
+    return Array.from(this.pendingDeletedIds[collectionKey]);
   }
 
   /**
@@ -102,6 +165,10 @@ class CloudSyncManager {
       db.workContexts.hook('creating', (_primKey, obj) => {
         if (this.isApplyingRemoteChanges) return;
         obj.updatedAt = Date.now();
+        if (obj?.id) {
+          this.pendingDeletedIds.work_contexts.delete(String(obj.id));
+          this.persistPendingDeletesToStorage();
+        }
         this.triggerSyncDebounced();
       });
 
@@ -111,8 +178,9 @@ class CloudSyncManager {
         this.triggerSyncDebounced();
       });
 
-      db.workContexts.hook('deleting', () => {
+      db.workContexts.hook('deleting', (primKey) => {
         if (this.isApplyingRemoteChanges) return;
+        this.recordPendingDelete('work_contexts', String(primKey));
         this.triggerSyncDebounced();
       });
 
@@ -121,6 +189,10 @@ class CloudSyncManager {
         if (this.isApplyingRemoteChanges) return;
         obj.updatedAt = Date.now();
         if (obj.isTemplate) {
+          if (obj.id) {
+            this.pendingDeletedIds.prescription_models.delete(String(obj.id));
+            this.persistPendingDeletesToStorage();
+          }
           this.triggerSyncDebounced();
         }
       });
@@ -133,9 +205,10 @@ class CloudSyncManager {
         }
       });
 
-      db.savedDocuments.hook('deleting', (_primKey, obj) => {
+      db.savedDocuments.hook('deleting', (primKey, obj) => {
         if (this.isApplyingRemoteChanges) return;
-        if (obj.isTemplate) {
+        if (obj?.isTemplate) {
+          this.recordPendingDelete('prescription_models', String(primKey));
           this.triggerSyncDebounced();
         }
       });
@@ -187,6 +260,7 @@ class CloudSyncManager {
       // 1. SINCRONIZAR WORK CONTEXTS (Postos de Trabalho / Timbrados)
       // =======================================================================
       await this.syncGenericCollection({
+        collectionKey: 'work_contexts',
         firestorePath: `users/${uid}/work_contexts`,
         localTable: db.workContexts,
         firestore,
@@ -201,6 +275,7 @@ class CloudSyncManager {
       // 2. SINCRONIZAR MODELOS DE PRESCRIÇÃO (Templates reutilizáveis - LGPD)
       // =======================================================================
       await this.syncGenericCollection({
+        collectionKey: 'prescription_models',
         firestorePath: `users/${uid}/prescription_models`,
         localTable: db.savedDocuments,
         firestore,
@@ -225,9 +300,11 @@ class CloudSyncManager {
   }
 
   /**
-   * Algoritmo de resolução determinística por timestamp (Last-Write-Wins).
+   * Algoritmo de resolução determinística por timestamp (Last-Write-Wins)
+   * com propagação de exclusões (anti-ressurreição) e fatiamento de lotes (<= 450 ops).
    */
   private async syncGenericCollection<T extends SyncableEntity>(params: {
+    collectionKey: SyncCollectionKey;
     firestorePath: string;
     localTable: Table<T, string>;
     firestore: Firestore;
@@ -238,6 +315,7 @@ class CloudSyncManager {
     getLocalItems: () => Promise<T[]>;
   }): Promise<void> {
     const {
+      collectionKey,
       firestorePath,
       localTable,
       firestore,
@@ -263,8 +341,37 @@ class CloudSyncManager {
       localItems.map((item) => [String(item.id), item])
     );
 
-    const batch = writeBatch(firestore);
-    let hasCloudWrites = false;
+    const pendingDeletesSet = this.pendingDeletedIds[collectionKey];
+    const idsDeletedInThisRun: string[] = [];
+
+    let currentBatch = writeBatch(firestore);
+    let currentBatchOps = 0;
+    const batchesToCommit: ReturnType<typeof writeBatch>[] = [];
+
+    const enqueueBatchOp = (applyOp: (b: ReturnType<typeof writeBatch>) => void) => {
+      if (currentBatchOps >= MAX_FIRESTORE_BATCH_OPS) {
+        batchesToCommit.push(currentBatch);
+        currentBatch = writeBatch(firestore);
+        currentBatchOps = 0;
+      }
+      applyOp(currentBatch);
+      currentBatchOps += 1;
+    };
+
+    // 2.1. Propagar exclusões locais pendentes para o Firestore (evita Zombie Records)
+    for (const deletedId of Array.from(pendingDeletesSet)) {
+      if (!localMap.has(deletedId)) {
+        if (cloudMap.has(deletedId)) {
+          const docRef = doc(firestore, firestorePath, deletedId);
+          enqueueBatchOp((b) => b.delete(docRef));
+          cloudMap.delete(deletedId);
+        }
+        idsDeletedInThisRun.push(deletedId);
+      } else {
+        // Foi recriado localmente antes do sync
+        idsDeletedInThisRun.push(deletedId);
+      }
+    }
 
     // 3. Processar Local -> Cloud (Upstream)
     for (const localItem of localItems) {
@@ -275,26 +382,43 @@ class CloudSyncManager {
       const cloudTime = cloudItem?.updatedAt || 0;
 
       if (!cloudItem || localTime > cloudTime) {
-        // Envia versão mais recente local para a nuvem
-        const docRef = doc(firestore, firestorePath, localId);
-        const payload = {
+        const payload = sanitizeForFirestore({
           ...localItem,
           updatedAt: localTime || Date.now()
-        };
-        batch.set(docRef, sanitizeForFirestore(payload), { merge: true });
-        hasCloudWrites = true;
+        });
+        const approxBytes = JSON.stringify(payload).length;
+        if (approxBytes > MAX_FIRESTORE_DOC_BYTES) {
+          console.warn(
+            `[CloudSync] Documento ${firestorePath}/${localId} excede limite seguro de 1 MiB (${approxBytes} bytes). Ignorado para preservar o lote.`
+          );
+          continue;
+        }
+        const docRef = doc(firestore, firestorePath, localId);
+        enqueueBatchOp((b) => b.set(docRef, payload, { merge: true }));
       }
     }
 
-    // Comita alterações na nuvem se houver dados novos locais
-    if (hasCloudWrites) {
-      await batch.commit();
+    if (currentBatchOps > 0) {
+      batchesToCommit.push(currentBatch);
+    }
+
+    // Comita alterações na nuvem em lotes seguros (<= 450 ops por batch)
+    for (const b of batchesToCommit) {
+      await b.commit();
+    }
+
+    if (idsDeletedInThisRun.length > 0) {
+      idsDeletedInThisRun.forEach((id) => pendingDeletesSet.delete(id));
+      this.persistPendingDeletesToStorage();
     }
 
     // 4. Processar Cloud -> Local (Downstream)
     this.isApplyingRemoteChanges = true;
     try {
       for (const [cloudId, cloudItem] of cloudMap.entries()) {
+        if (pendingDeletesSet.has(cloudId)) {
+          continue;
+        }
         const localItem = localMap.get(cloudId);
         const localTime = localItem?.updatedAt || 0;
         const cloudTime = cloudItem.updatedAt || 0;

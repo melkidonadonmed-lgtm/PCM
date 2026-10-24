@@ -67,6 +67,46 @@ export function useDocumentLogoManager({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const secondaryFileInputRef = useRef<HTMLInputElement>(null);
 
+  const MAX_RAW_LOGO_BYTES = 2 * 1024 * 1024; // 2 MiB bruto
+  const MAX_SAFE_DATAURL_CHARS = 350_000; // ~260 KB binário para não exceder 1 MiB no Firestore
+
+  const compressImageDataUrlIfNeeded = (rawDataUrl: string, mimeType: string): Promise<string> => {
+    if (
+      rawDataUrl.length <= MAX_SAFE_DATAURL_CHARS ||
+      mimeType === 'image/svg+xml' ||
+      typeof document === 'undefined'
+    ) {
+      return Promise.resolve(rawDataUrl);
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 480;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width = Math.max(1, Math.round(width * ratio));
+          height = Math.max(1, Math.round(height * ratio));
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(rawDataUrl);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL('image/webp', 0.86);
+        canvas.width = 0;
+        canvas.height = 0;
+        resolve(compressed.length < rawDataUrl.length ? compressed : rawDataUrl);
+      };
+      img.onerror = () => resolve(rawDataUrl);
+      img.src = rawDataUrl;
+    });
+  };
+
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -76,10 +116,16 @@ export function useDocumentLogoManager({
       return;
     }
 
+    if (file.size > MAX_RAW_LOGO_BYTES) {
+      showToast('A imagem selecionada excede 2 MB. Escolha um logotipo mais leve.');
+      return;
+    }
+
     setLogoUploading(true);
     const reader = new FileReader();
     reader.onload = async () => {
-      const dataUrl = reader.result as string;
+      const rawDataUrl = reader.result as string;
+      const dataUrl = await compressImageDataUrlIfNeeded(rawDataUrl, file.type);
       const updatedLogo: DocumentLogoConfig = {
         ...logoConfig,
         dataUrl,
@@ -181,10 +227,16 @@ export function useDocumentLogoManager({
       return;
     }
 
+    if (file.size > MAX_RAW_LOGO_BYTES) {
+      showToast('A imagem selecionada excede 2 MB. Escolha um logotipo mais leve.');
+      return;
+    }
+
     setSecondaryLogoUploading(true);
     const reader = new FileReader();
     reader.onload = async () => {
-      const dataUrl = reader.result as string;
+      const rawDataUrl = reader.result as string;
+      const dataUrl = await compressImageDataUrlIfNeeded(rawDataUrl, file.type);
       const updatedLogo: DocumentLogoConfig = {
         ...logoConfig,
         secondaryDataUrl: dataUrl,

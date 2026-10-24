@@ -82,17 +82,30 @@ service cloud.firestore {
     // =======================================================================
     // 4. PresCMed (PCM) — Isolamento estrito por médico autenticado (LGPD)
     // =======================================================================
+    function isValidWorkContextDoc(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() <= 300;
+    }
+
+    function isValidPrescriptionModelDoc(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.title is string && data.title.size() <= 300 &&
+             (data.isTemplate == true || data._deleted == true);
+    }
+
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null && request.auth.uid == userId && isValidId(userId);
 
       // Postos de trabalho e timbrados institucionais (sem dados de pacientes)
       match /work_contexts/{contextId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, delete: if request.auth != null && request.auth.uid == userId && isValidId(contextId);
+        allow create, update: if request.auth != null && request.auth.uid == userId && isValidId(contextId) && isValidWorkContextDoc(incoming());
       }
 
-      // Modelos de prescrição e templates rápidos reutilizáveis
+      // Modelos de prescrição e templates rápidos reutilizáveis (bloqueia prontuários de pacientes via isTemplate == true)
       match /prescription_models/{modelId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, delete: if request.auth != null && request.auth.uid == userId && isValidId(modelId);
+        allow create, update: if request.auth != null && request.auth.uid == userId && isValidId(modelId) && isValidPrescriptionModelDoc(incoming());
       }
     }
   }
