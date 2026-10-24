@@ -1,0 +1,2632 @@
+{
+  "blockId": "block_08",
+  "blockName": "Pediatria, Neonatologia e Obstetrícia",
+  "version": "1.0.0",
+  "categorySlug": "bloco-08-pediatria-obstetricia",
+  "description": "Dossiês monográficos completos dos 8 escores de neonatologia (Apgar, Silverman-Anderson), emergência pediátrica (PEWS, Taussig, PRISM III, Holliday-Segar) e obstetrícia/ginecologia crítica (Bishop, SOFA Obstétrico / fullPIERS).",
+  "calculators": [
+    {
+      "id": "calc_apgar",
+      "slug": "boletim-apgar",
+      "name": "Boletim de Apgar Neonatal (1º e 5º Minutos de Vida)",
+      "acronym": "Apgar",
+      "version": "1.0.0",
+      "category": "Pediatria e Neonatologia",
+      "subcategory": "Sala de Parto e Reanimação Neonatal",
+      "categorySlug": "bloco-08-pediatria-neonatologia",
+      "categoryName": "Pediatria e Neonatologia",
+      "moduleName": "Sala de Parto e Triagem Neonatal",
+      "blockId": "block_08",
+      "blockFile": "block_08.json",
+      "description": "Avaliação padronizada da vitalidade neonatal no 1º e 5º minutos de vida (e a cada 5 min até o 20º min se < 7) através de 5 sinais objetivos (Frequência Cardíaca, Esforço Respiratório, Tônus Muscular, Irritabilidade Reflexa e Coloração da Pele), documentando a transição cardiorrespiratória e a resposta às manobras de reanimação em sala de parto.",
+      "summary": "Avaliação da vitalidade do recém-nascido no 1º e 5º minutos (0 a 10 pontos) e resposta à reanimação neonatal (SBP/ILCOR).",
+      "clinicalObjective": "Quantificar a adaptação extrauterina imediata e a resposta às manobras de ventilação com pressão positiva (VPP) no Golden Minute, orientando elegibilidade à hipotermia terapêutica se Apgar <= 5 no 10º minuto.",
+      "targetPopulation": "Recém-nascidos pré-termo, a termo e pós-termo imediatamente após o nascimento em sala de parto.",
+      "calculationType": "additive_points",
+      "formulaExpression": "FC (0-2) + Respiração (0-2) + Tônus (0-2) + Irritabilidade Reflexa (0-2) + Cor (0-2)",
+      "evidenceSource": "Apgar V. A proposal for a new method of evaluation of the newborn infant. Curr Res Anesth Analg. 1953;32(4):260-267. / Programa de Reanimação Neonatal da Sociedade Brasileira de Pediatria (PRN-SBP 2022).",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 10,
+      "baseScore": 0,
+      "badge": "pediatria",
+      "clinicalWarning": "DIRETRIZ PRN-SBP (GOLDEN MINUTE): O Boletim de Apgar NÃO deve ser utilizado para decidir o início da reanimação! A decisão de iniciar Ventilação com Pressão Positiva (VPP) nos primeiros 60 segundos de vida (Golden Minute) baseia-se exclusivamente na avaliação conjunta da Respiração (apneia/gasping) e da Frequência Cardíaca (< 100 bpm) após os passos iniciais.",
+      "radarAxes": [
+        {
+          "id": "axis_apgar_hr",
+          "label": "Frequência Cardíaca",
+          "system": "Cardiovascular",
+          "unit": "bpm",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_apgar_resp",
+          "label": "Esforço Respiratório",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_apgar_neuro",
+          "label": "Tônus e Irritabilidade Reflexa",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_apgar_color",
+          "label": "Oxigenação / Coloração Cutânea",
+          "system": "Perfusão",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_apgar_hr",
+          "name": "1. Frequência Cardíaca (P — Pulse)",
+          "slug": "frequencia-cardiaca-apgar",
+          "inputType": "single_choice",
+          "unit": "bpm",
+          "radarAxisId": "axis_apgar_hr",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Avaliar por ausculta precordial com estetoscópio ou monitor cardíaco de 3 derivações (padrão-ouro SBP).",
+          "options": [
+            {
+              "id": "opt_apg_hr_2",
+              "label": ">= 100 bpm (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Frequência cardíaca neonatal normal."
+            },
+            {
+              "id": "opt_apg_hr_1",
+              "label": "< 100 bpm (Bradicardia neonatal: +1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.6,
+              "sortOrder": 2,
+              "description": "Hipoxemia significativa; indica VPP imediata em sala de parto."
+            },
+            {
+              "id": "opt_apg_hr_0",
+              "label": "Ausente / Assistolia (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Parada cardiorrespiratória neonatal; exige VPP efetiva via cânula traqueal e massagem cardíaca se FC < 60 bpm."
+            }
+          ]
+        },
+        {
+          "id": "grp_apgar_resp",
+          "name": "2. Esforço Respiratório (R — Respiration)",
+          "slug": "esforco-respiratorio-apgar",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_apgar_resp",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_apg_re_2",
+              "label": "Regular, forte / Choro vigoroso (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Drive respiratório efetivo."
+            },
+            {
+              "id": "opt_apg_re_1",
+              "label": "Lento, irregular, fraco ou gemência (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.55,
+              "sortOrder": 2,
+              "description": "Hipoventilação ou depressão respiratória perinatal."
+            },
+            {
+              "id": "opt_apg_re_0",
+              "label": "Ausente (Apneia ou Gasping) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Apneia secundária; exige ventilação com pressão positiva imediata."
+            }
+          ]
+        },
+        {
+          "id": "grp_apgar_tone",
+          "name": "3. Tônus Muscular (A — Activity)",
+          "slug": "tonus-muscular-apgar",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_apgar_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_apg_to_2",
+              "label": "Movimentos ativos / Boa flexão dos 4 membros (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Tônus flexor fisiológico preservado."
+            },
+            {
+              "id": "opt_apg_to_1",
+              "label": "Alguma flexão de extremidades / Hipotonia leve (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Tônus reduzido (considerar idade gestacional em prematuros)."
+            },
+            {
+              "id": "opt_apg_to_0",
+              "label": "Flacidez completa / Atonia generalizada (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Hipotonia grave por hipóxia/acidose perinatal."
+            }
+          ]
+        },
+        {
+          "id": "grp_apgar_reflex",
+          "name": "4. Irritabilidade Reflexa (G — Grimace)",
+          "slug": "irritabilidade-reflexa-apgar",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_apgar_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_apg_rf_2",
+              "label": "Choro ativo, tosse, espirro ou reação vigorosa (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Reatividade neurológica íntegra ao estímulo tátil."
+            },
+            {
+              "id": "opt_apg_rf_1",
+              "label": "Careta ou movimento discreto ao estímulo (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Resposta reflexa deprimida."
+            },
+            {
+              "id": "opt_apg_rf_0",
+              "label": "Sem resposta ao estímulo tátil (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Arreflexia perinatal."
+            }
+          ]
+        },
+        {
+          "id": "grp_apgar_color",
+          "name": "5. Coloração da Pele e Mucosas (A — Appearance)",
+          "slug": "coloracao-pele-apgar",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_apgar_color",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "options": [
+            {
+              "id": "opt_apg_co_2",
+              "label": "Completamente rosado (corpo e extremidades) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Perfusão e oxigenação completas."
+            },
+            {
+              "id": "opt_apg_co_1",
+              "label": "Acrocianose (Corpo rosado com extremidades cianóticas) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 2,
+              "description": "Achado comum e fisiológico nos primeiros minutos de transição."
+            },
+            {
+              "id": "opt_apg_co_0",
+              "label": "Cianose central generalizada ou Palidez cutânea intensa (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Hipoxemia central ou choque hipovolêmico/asfíxico."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_apgar_severe",
+          "label": "Depressão Neonatal Grave / Asfixia Perinatal (Apgar 0 a 3 pontos)",
+          "severityLevel": "critical",
+          "minScore": 0,
+          "maxScore": 3,
+          "statisticalOutcome": "Alto risco de mortalidade neonatal e Encefalopatia Hipóxico-Isquêmica (EHI) se persistente no 5º e 10º minutos.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_apg_sev_1",
+              "drugName": "Adrenalina Endovenosa (Diluída 1:10.000 = 0,1 mg/mL) + Expansor SF 0,9%",
+              "dosage": "Adrenalina IV (cateter venoso umbilical): 0,02 mg/kg (0,2 mL/kg da diluição 1:10.000) a cada 3-5 min se FC < 60 bpm após VPP com cânula + massagem cardíaca. SF 0,9% 10 mL/kg IV em 5-10 min se hipovolemia",
+              "route": "Cateter Venoso Umbilical (Via de escolha PRN-SBP)",
+              "frequency": "A cada 3 a 5 minutos se FC permanecer < 60 bpm",
+              "dilutionInstructions": "Diluição 1:10.000: aspirar 1 mL de Adrenalina 1:1.000 (1 mg/mL) + 9 mL de SF 0,9% = 0,1 mg/mL."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_apg_sev_1",
+              "recommendationTitle": "Reanimação Neonatal Avançada (PRN-SBP) e Avaliação para Hipotermia Terapêutica",
+              "dispositionTarget": "UTI Neonatal (UTIN)",
+              "monitoringPlan": "VPP imediata, intubação orotraqueal, massagem cardíaca coordenada 3:1 com FiO2 100% se FC < 60 bpm após 30s de VPP por cânula traqueal. Coletar gasometria de cordão umbilical. Em RN >= 35 semanas com evidência de asfixia perinatal e EHI moderada/grave, iniciar Hipotermia Terapêutica (33,5 °C por 72h) antes de 6 horas de vida."
+            }
+          ]
+        },
+        {
+          "id": "tier_apgar_mod",
+          "label": "Depressão Neonatal Moderada (Apgar 4 a 6 pontos)",
+          "severityLevel": "high",
+          "minScore": 4,
+          "maxScore": 6,
+          "statisticalOutcome": "Transição cardiorrespiratória incompleta; requer suporte ventilatório no Golden Minute e vigilância pós-reanimação.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_apg_mod_1",
+              "drugName": "Oxigênio Suplementar Titulado por Blender e Oximetria Pré-Ductal (MSD)",
+              "dosage": "Iniciar VPP em ar ambiente (FiO2 21% se >= 34 sem) ou FiO2 30% (se < 34 sem), titulando conforme SpO2 alvo por minuto de vida",
+              "route": "Inalatória / Ventilação com Pressão Positiva (VPP)",
+              "frequency": "Titulação contínua",
+              "dilutionInstructions": "Alvos de SpO2 pré-ductal (membro superior direito): até 5 min: 70-80%; 5-10 min: 80-90%; > 10 min: 85-95%."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_apg_mod_1",
+              "recommendationTitle": "VPP Efetiva no Golden Minute / CPAP Nasal em Sala de Parto",
+              "dispositionTarget": "Unidade de Cuidado Intermediário Neonatal ou UTIN",
+              "monitoringPlan": "Passos iniciais (aquecer sob fonte de calor radiante, posicionar cabeça, aspirar se necessário, secar) em 30s; se FC < 100 bpm ou apneia/gasping, iniciar VPP com máscara facial (40-60 movimentos/min). Se FC >= 100 bpm e respiração espontânea com desconforto, aplicar CPAP nasal (+5 cmH2O)."
+            }
+          ]
+        },
+        {
+          "id": "tier_apgar_normal",
+          "label": "Boa Vitalidade Neonatal (Apgar 7 a 10 pontos)",
+          "severityLevel": "low",
+          "minScore": 7,
+          "maxScore": 10,
+          "statisticalOutcome": "Adaptação cardiorrespiratória fisiológica com risco mínimo de complicações asfíxicas.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_apg_norm_1",
+              "drugName": "Vitamina K1 (Fitomenadiona) IM + Profilaxia da Oftalmia Neonatal",
+              "dosage": "Vitamina K1: 1 mg IM (se peso > 1.500 g) ou 0,5 mg IM (se <= 1.500 g) em dose única no vasto lateral da coxa",
+              "route": "Intramuscular (IM)",
+              "frequency": "Dose única na primeira hora de vida",
+              "dilutionInstructions": "Prevenção universal da doença hemorrágica do recém-nascido."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_apg_norm_1",
+              "recommendationTitle": "Clampeamento Oportuno do Cordão (1 a 3 min) e Contato Pele a Pele",
+              "dispositionTarget": "Alojamento Conjunto com a Mãe",
+              "monitoringPlan": "Clampeamento tardio/oportuno do cordão umbilical (>= 60 segundos), contato pele a pele imediato, estímulo ao aleitamento materno na primeira hora de vida (Golden Hour) e manutenção da normotermia (36,5 a 37,5 °C)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_silverman_andersen",
+      "slug": "silverman-andersen",
+      "name": "Boletim de Silverman-Andersen (BSA) — Desconforto Respiratório Neonatal",
+      "acronym": "BSA",
+      "version": "1.0.0",
+      "category": "Pediatria e Neonatologia",
+      "subcategory": "Insuficiência Respiratória Neonatal",
+      "categorySlug": "bloco-08-pediatria-neonatologia",
+      "categoryName": "Pediatria e Neonatologia",
+      "moduleName": "Sala de Parto e Triagem Neonatal",
+      "blockId": "block_08",
+      "blockFile": "block_08.json",
+      "description": "Escala clínica semiológica de 0 a 10 pontos para quantificar a gravidade do desconforto respiratório no recém-nascido (Doença da Membrana Hialina/SDR, Taquipneia Transitória do RN, Síndrome de Aspiração Meconial), avaliando Balanço Toracoabdominal, Tiragem Intercostal, Retração Xifoidiana, Batimento de Asa Nasal e Gemido Expiratório.",
+      "summary": "Quantificação do desconforto respiratório neonatal (0 = sem desconforto; 10 = desconforto máximo) para indicação de CPAP ou Surfactante/IOT.",
+      "clinicalObjective": "Guiar de forma seriada a instituição precoce de CPAP nasal, administração de Surfactante Exógeno (técnica LISA/INSURE) ou ventilação mecânica invasiva.",
+      "targetPopulation": "Recém-nascidos pré-termo e a termo com taquipneia (FR > 60 irpm) ou sinais de esforço respiratório.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Balanço Toracoabdominal (0-2) + Tiragem Intercostal (0-2) + Retração Xifoidiana (0-2) + Batimento de Asa Nasal (0-2) + Gemido Expiratório (0-2)",
+      "evidenceSource": "Silverman WA, Andersen DH. A controlled clinical trial of effects of water mist on obstructive respiratory signs, death rate and necropsy findings among premature infants. Pediatrics. 1956;17(1):1-10.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 10,
+      "baseScore": 0,
+      "badge": "pediatria",
+      "clinicalWarning": "ATENÇÃO À INVERSÃO COM O APGAR: Ao contrário do Boletim de Apgar, no Boletim de Silverman-Andersen a pontuação ZERO (0) representa o recém-nascido NORMAL (sem desconforto) e 10 pontos representa falência respiratória iminente!",
+      "radarAxes": [
+        {
+          "id": "axis_bsa_async",
+          "label": "Assincronia Toracoabdominal",
+          "system": "Mecânica Ventilatória",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_bsa_retrac",
+          "label": "Tiragem Intercostal e Xifoidiana",
+          "system": "Complacência Pulmonar",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_bsa_upper",
+          "label": "Batimento de Asa Nasal e Gemido",
+          "system": "Recrutamento Alveolar",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_bsa_sync",
+          "name": "1. Movimento / Balanço Toracoabdominal",
+          "slug": "balanco-toracoabdominal-bsa",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bsa_async",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "options": [
+            {
+              "id": "opt_bsa_sy_0",
+              "label": "Sincronizado (Tórax e abdome elevam-se juntos na inspiração) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Mecânica diafragmática e torácica acoplada."
+            },
+            {
+              "id": "opt_bsa_sy_1",
+              "label": "Tórax imóvel / Pouca elevação torácica com abdome em movimento (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Assincronia leve a moderada."
+            },
+            {
+              "id": "opt_bsa_sy_2",
+              "label": "gangorra / Respiração Paradoxal (Tórax deprime enquanto abdome expande) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Balanço toracoabdominal grave por baixa complacência pulmonar e caixa torácica cartilaginosa."
+            }
+          ]
+        },
+        {
+          "id": "grp_bsa_intercostal",
+          "name": "2. Tiragem Intercostal Inferior",
+          "slug": "tiragem-intercostal-bsa",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bsa_retrac",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_bsa_ic_0",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem retração dos espaços intercostais."
+            },
+            {
+              "id": "opt_bsa_ic_1",
+              "label": "Discreta / Levemente visível (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Retração intercostal moderada."
+            },
+            {
+              "id": "opt_bsa_ic_2",
+              "label": "Acentuada e constante (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Alta pressão negativa pleural inspiratória."
+            }
+          ]
+        },
+        {
+          "id": "grp_bsa_xiphoid",
+          "name": "3. Retração Xifoidiana (Subdiafragmática / Esternal)",
+          "slug": "retracao-xifoidiana-bsa",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bsa_retrac",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_bsa_xi_0",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Apêndice xifoide estável na inspiração."
+            },
+            {
+              "id": "opt_bsa_xi_1",
+              "label": "Discreta / Pouco visível (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Afundamento leve do apêndice xifoide."
+            },
+            {
+              "id": "opt_bsa_xi_2",
+              "label": "Intensa / Acentuada (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Retração esternal profunda a cada incursão."
+            }
+          ]
+        },
+        {
+          "id": "grp_bsa_nasal",
+          "name": "4. Batimento de Asa Nasal (Dilatação das Narinas)",
+          "slug": "batimento-asa-nasal-bsa",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bsa_upper",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_bsa_na_0",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem abertura reflexa das asas nasais."
+            },
+            {
+              "id": "opt_bsa_na_1",
+              "label": "Discreto / Mínimo (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Mecanismo reflexo para reduzir resistência das vias aéreas superiores."
+            },
+            {
+              "id": "opt_bsa_na_2",
+              "label": "Intenso / Marcante (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Dilatação nasal acentuada por dispneia grave."
+            }
+          ]
+        },
+        {
+          "id": "grp_bsa_grunt",
+          "name": "5. Gemido Expiratório (Auto-PEEP Glótico)",
+          "slug": "gemido-expiratorio-bsa",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bsa_upper",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "helpText": "O gemido decorre do fechamento parcial da glote na expiração para manter a Capacidade Residual Funcional (auto-PEEP contra atelectasia).",
+          "options": [
+            {
+              "id": "opt_bsa_gr_0",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Expiração silenciosa."
+            },
+            {
+              "id": "opt_bsa_gr_1",
+              "label": "Audível apenas com estetoscópio (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Colapso alveolar incipiente responsivo a PEEP/CPAP."
+            },
+            {
+              "id": "opt_bsa_gr_2",
+              "label": "Audível a distância (sem estetoscópio) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Atelectasia difusa / deficiência grave de surfactante."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_bsa_mild",
+          "label": "Sem Desconforto ou Desconforto Leve (BSA 0 a 3 pontos)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 3,
+          "statisticalOutcome": "Boa mecânica ventilatória (0 pts = normal; 1-3 pts = desconforto leve). Baixa necessidade de suporte invasivo.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_bsa_low_1",
+              "drugName": "Monitorização de SpO2 Pré-Ductal (Oxigenoterapia apenas se SpO2 < 90%)",
+              "dosage": "Ar ambiente; se prematuro < 32 sem com risco de SDR, iniciar CPAP nasal profilático precoce (+5 a 6 cmH2O)",
+              "route": "Inalatória / CPAP Nasal",
+              "frequency": "Reavaliação seriada a cada 30-60 min",
+              "dilutionInstructions": "Evitar hiperóxia em prematuros (manter SpO2 alvo entre 90% e 94% para prevenir Retinopatia da Prematuridade)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_bsa_low_1",
+              "recommendationTitle": "Observação Aquecida e Vigilância Seriada do BSA",
+              "dispositionTarget": "Unidade Neonatal / Cuidado Intermediário",
+              "monitoringPlan": "Manter zona termoneutra em incubadora, monitorização contínua de oximetria de pulso e reavaliação do Boletim de Silverman-Andersen."
+            }
+          ]
+        },
+        {
+          "id": "tier_bsa_mod",
+          "label": "Desconforto Respiratório Moderado (BSA 4 a 6 pontos) — Indicação de CPAP Nasal",
+          "severityLevel": "high",
+          "minScore": 4,
+          "maxScore": 6,
+          "statisticalOutcome": "Redução moderada da complacência pulmonar; alta resposta ao recrutamento alveolar com CPAP nasal precoce.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_bsa_mod_1",
+              "drugName": "Surfactante Exógeno Porcino (Poractante Alfa — Curosurf) se FiO2 > 30% em CPAP",
+              "dosage": "Dose inicial de 200 mg/kg (2,5 mL/kg) via cateter fino endotraqueal (técnica LISA/MIST) ou INSURE",
+              "route": "Instilação Endotraqueal (LISA / INSURE)",
+              "frequency": "Dose única inicial; repetir 100 mg/kg após 12h se persistência de FiO2 > 30-40%",
+              "dilutionInstructions": "Consenso Europeu de SDR: indicar Surfactante se RN em CPAP >= 6 cmH2O necessitar de FiO2 > 0,30 para manter SpO2 90-94%."
+            },
+            {
+              "id": "pha_bsa_mod_2",
+              "drugName": "Citrato de Cafeína (em Prematuros < 32 semanas)",
+              "dosage": "Ataque: 20 mg/kg IV/VO; Manutenção: 5 a 10 mg/kg/dia 1x/dia",
+              "route": "Intravenosa (IV) / Via Oral (VO)",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Estimula o centro respiratório bulbar, melhora a contratilidade diafragmática e reduz displasia broncopulmonar."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_bsa_mod_1",
+              "recommendationTitle": "Instituição Imediata de CPAP Nasal (PEEP 6 a 8 cmH2O) e Radiografia de Tórax",
+              "dispositionTarget": "UTI Neonatal (UTIN)",
+              "monitoringPlan": "Instalar CPAP nasal com pronga binasal curta (PEEP 6-8 cmH2O), passar sonda orogástrica aberta para descompressão gástrica, suspender dieta enteral temporariamente (iniciar hidratação venosa) e realizar RX de tórax e gasometria."
+            }
+          ]
+        },
+        {
+          "id": "tier_bsa_sev",
+          "label": "Desconforto Respiratório Grave (BSA 7 a 10 pontos) — Falência Respiratória Iminente",
+          "severityLevel": "critical",
+          "minScore": 7,
+          "maxScore": 10,
+          "statisticalOutcome": "Exaustão ventilatória iminente e hipoxemia/acidose respiratória graves. Alta necessidade de intubação e surfactante.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_bsa_sev_1",
+              "drugName": "Surfactante Exógeno (Poractante Alfa 200 mg/kg) + Ampicilina e Gentamicina (Rastreio de Sepse Neonatal Precoce)",
+              "dosage": "Poractante Alfa 200 mg/kg (2,5 mL/kg) endotraqueal; Ampicilina 50 mg/kg IV 12/12h + Gentamicina 4-5 mg/kg IV 24-48h",
+              "route": "Endotraqueal + Intravenosa (IV)",
+              "frequency": "Imediata após confirmação da posição da cânula",
+              "dilutionInstructions": "A pneumonia/sepse neonatal precoce (Streptococcus agalactiae — GBS) é clínica e radiologicamente indistinguível da SDR grave; coletar hemocultura e iniciar antibioticoterapia empírica."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_bsa_sev_1",
+              "recommendationTitle": "Intubação Orotraqueal, Ventilação Protetora com Volume Garantido e Descarte de Pneumotórax",
+              "dispositionTarget": "UTI Neonatal (UTIN)",
+              "monitoringPlan": "Intubação orotraqueal e ventilação mecânica sincronizada com volume garantido (VC 4-6 mL/kg), PEEP 5-7 cmH2O e tempo inspiratório 0,30-0,40s. Transiluminação torácica e RX imediato para descartar pneumotórax hipertensivo."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_ballard_capurro",
+      "slug": "novo-ballard-capurro",
+      "name": "Escore de Novo Ballard & Capurro Somático — Idade Gestacional Neonatal",
+      "acronym": "Ballard / Capurro",
+      "version": "1.0.0",
+      "category": "Pediatria e Neonatologia",
+      "subcategory": "Avaliação de Idade Gestacional e Prematuridade",
+      "categorySlug": "bloco-08-pediatria-neonatologia",
+      "categoryName": "Pediatria e Neonatologia",
+      "moduleName": "Sala de Parto e Triagem Neonatal",
+      "blockId": "block_08",
+      "blockFile": "block_08.json",
+      "description": "Avaliação clínica neonatal combinada da Idade Gestacional ao nascimento: o Novo Escore de Ballard (12 critérios: 6 neuromusculares e 6 físicos, pontuando de -10 a +50 para IG de 20 a 44 semanas, sendo o padrão-ouro em prematuros extremos) e o Método de Capurro Somático (5 parâmetros físicos + constante K=204 dias para RN >= 34 semanas).",
+      "summary": "Estimativa clínica da Idade Gestacional (20 a 44 semanas) por maturidade neuromuscular e física (Novo Ballard / Capurro).",
+      "clinicalObjective": "Estimar com precisão a idade gestacional pós-natal quando a DUM ou USG de 1º trimestre são desconhecidos, classificando o RN em prematuro extremo (< 28 sem), muito pré-termo (28-31 sem), pré-termo moderado/tardio (32-36 sem), termo (37-41 sem) ou pós-termo (>= 42 sem).",
+      "targetPopulation": "Recém-nascidos nas primeiras 12 a 96 horas de vida (em prematuros < 26 semanas, realizar o Novo Ballard idealmente nas primeiras 12 horas).",
+      "calculationType": "additive_points",
+      "formulaExpression": "Semanas_IG = [(2 * Soma_Ballard) + 120] / 5 (Escala direta em semanas de IG: 22 a 43 semanas)",
+      "evidenceSource": "Ballard JL, Khoury JC, Wedig K, Wang L, Eilers-Walsman BL, Lipp R. New Ballard Score, expanded to include extremely premature infants. J Pediatr. 1991;119(3):417-423. / Capurro H et al. J Pediatr. 1978;93(1):120-122.",
+      "minPossibleScore": 22,
+      "maxPossibleScore": 43,
+      "baseScore": 22,
+      "badge": "pediatria",
+      "clinicalWarning": "ESCOLHA DO MÉTODO: Em prematuros (< 34 semanas), utilizar obrigatoriamente o Novo Ballard (expande a escala para até 20 semanas com pontuações -1 e -2). Em recém-nascidos com asfixia perinatal, sedação ou instabilidade neurológica nos quais o tônus está alterado, o Capurro Somático (Textura da pele, Forma da orelha, Glândula mamária, Pregas plantares, Formação do mamilo) evita o viés do exame neuromuscular.",
+      "radarAxes": [
+        {
+          "id": "axis_bal_neuro",
+          "label": "Maturidade Neuromuscular (Tônus Flexor)",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_bal_skin",
+          "label": "Textura da Pele, Lanugo e Sulcos Plantares",
+          "system": "Tegumentar",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_bal_soma",
+          "label": "Pavilhão Auricular, Mama e Genitália",
+          "system": "Somático",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_bal_neuro_posture",
+          "name": "1. Maturidade Neuromuscular: Postura, Ângulo de Punho (Janela Quadrada) e Recuo do Braço",
+          "slug": "maturidade-neuromuscular-proximal-ballard",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bal_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "A maturação do tônus flexor progride no sentido caudocefálico entre 20 e 40 semanas.",
+          "options": [
+            {
+              "id": "opt_bal_np_0",
+              "label": "Extensão completa / Flacidez; Janela quadrada > 90°; Sem recuo braquial (+0 sem sobre base 22)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 1,
+              "description": "Imaturidade neuromuscular extrema (< 26 semanas)."
+            },
+            {
+              "id": "opt_bal_np_2",
+              "label": "Flexão inicial de coxas; Janela quadrada 60-90°; Recuo braquial lento 140-180° (+2 sem)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.7,
+              "sortOrder": 2,
+              "description": "Padrão neuromuscular de 26 a 30 semanas."
+            },
+            {
+              "id": "opt_bal_np_4",
+              "label": "Flexão de MMII e leve em MMSS; Janela quadrada 30-45°; Recuo 110-140° (+4 sem)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.4,
+              "sortOrder": 3,
+              "description": "Padrão neuromuscular de 32 a 35 semanas."
+            },
+            {
+              "id": "opt_bal_np_6",
+              "label": "Hipertonia flexora completa dos 4 membros; Janela quadrada 0°; Recuo vivo < 90° (+6 sem)",
+              "pointValue": 6,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 4,
+              "description": "Maturidade neuromuscular completa de termo (>= 38 semanas)."
+            }
+          ]
+        },
+        {
+          "id": "grp_bal_neuro_distal",
+          "name": "2. Maturidade Neuromuscular: Ângulo Poplíteo, Sinal do Xale (Cachecol) e Calcanhar-Orelha",
+          "slug": "maturidade-neuromuscular-distal-ballard",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bal_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_bal_nd_0",
+              "label": "Ângulo poplíteo 180°; Cotovelo ultrapassa linha axilar oposta; Calcanhar toca orelha sem resistência (+0 sem)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 1,
+              "description": "Ausência de resistência passiva (< 26 semanas)."
+            },
+            {
+              "id": "opt_bal_nd_2",
+              "label": "Ângulo poplíteo 140-160°; Cotovelo na linha mamilar oposta (+2 sem)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 2,
+              "description": "Resistência passiva incipiente (28-31 semanas)."
+            },
+            {
+              "id": "opt_bal_nd_4",
+              "label": "Ângulo poplíteo 100-120°; Cotovelo na linha média esternal (+4 sem)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.3,
+              "sortOrder": 3,
+              "description": "Resistência intermediária (33-36 semanas)."
+            },
+            {
+              "id": "opt_bal_nd_5",
+              "label": "Ângulo poplíteo <= 90°; Cotovelo não atinge a linha média (+5 sem)",
+              "pointValue": 5,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 4,
+              "description": "Resistência flexora madura de RN a termo."
+            }
+          ]
+        },
+        {
+          "id": "grp_bal_skin_plantar",
+          "name": "3. Maturidade Física (Ballard & Capurro): Textura da Pele, Lanugo e Pregas Plantares",
+          "slug": "pele-pregas-plantares-ballard-capurro",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bal_skin",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_bal_sk_0",
+              "label": "Pele viscosa, friável e transparente; Lanugo ausente/esparso; Planta lisa sem pregas (+0 sem)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 1,
+              "description": "Barreira epidérmica extremamente imatura; altíssima perda transepidérmica de água."
+            },
+            {
+              "id": "opt_bal_sk_2",
+              "label": "Pele gelatinosa e avermelhada; Lanugo abundante; Marcas vermelhas apenas no 1/3 anterior plantar (+2 sem)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.7,
+              "sortOrder": 2,
+              "description": "Muito pré-termo (28-31 semanas)."
+            },
+            {
+              "id": "opt_bal_sk_4",
+              "label": "Pele lisa/rosada com veias visíveis; Lanugo rarefeito; Sulcos nos 2/3 anteriores plantares (+4 sem)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 3,
+              "description": "Pré-termo moderado/tardio (33-36 semanas)."
+            },
+            {
+              "id": "opt_bal_sk_5",
+              "label": "Pele espessa com descamação superficial; Pregas profundas em toda a planta do pé (+5 sem)",
+              "pointValue": 5,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 4,
+              "description": "Padrão somático de termo (38-40 semanas)."
+            },
+            {
+              "id": "opt_bal_sk_6",
+              "label": "Pele apergaminhada, coriácea, com fissuras profundas e ausência total de lanugo (+6 sem)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 5,
+              "description": "Sinais clássicos de pós-maturidade (>= 42 semanas)."
+            }
+          ]
+        },
+        {
+          "id": "grp_bal_ear_breast_gen",
+          "name": "4. Maturidade Física (Ballard & Capurro): Olhos/Orelha, Glândula Mamária e Genitália",
+          "slug": "orelha-mama-genitalia-ballard-capurro",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_bal_soma",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_bal_so_0",
+              "label": "Pálpebras fundidas; Pavilhão chato sem cartilagem; Mama imperceptível; Escroto liso / Clitóris proeminente (+0 sem)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 1,
+              "description": "Prematuro extremo (< 26 semanas)."
+            },
+            {
+              "id": "opt_bal_so_1",
+              "label": "Pálpebras abertas, recolhimento lento da orelha; Aréola plana sem broto; Testículos no canal / Grandes lábios pequenos (+1 sem)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 2,
+              "description": "Muito pré-termo (28-31 semanas)."
+            },
+            {
+              "id": "opt_bal_so_3",
+              "label": "Orelha com curvatura superior e retorno rápido; Broto mamário 3-4 mm; Testículos descendo (+3 sem)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 3,
+              "description": "Pré-termo moderado/tardio (33-36 semanas)."
+            },
+            {
+              "id": "opt_bal_so_4",
+              "label": "Cartilagem auricular firme com retorno imediato; Nódulo mamário 5-10 mm; Testículos pêndulos com rugas / Grandes lábios cobrem clitóris (+4 sem)",
+              "pointValue": 4,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 4,
+              "description": "Maturidade somática completa de termo (>= 38 semanas)."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_bal_extreme",
+          "label": "Prematuro Extremo / Muito Pré-Termo (IG Estimada 22 a 31 semanas)",
+          "severityLevel": "critical",
+          "minScore": 22,
+          "maxScore": 31,
+          "statisticalOutcome": "Altíssimo risco de Síndrome do Desconforto Respiratório (SDR), Hemorragia Peri-Intraventricular (HPIV), Enterocolite Necrosante e Hipotermia.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_bal_ext_1",
+              "drugName": "Citrato de Cafeína + Surfactante Seletivo Precoce + Nutrição Parenteral Total (NPT) no D1",
+              "dosage": "Cafeína ataque 20 mg/kg IV (manutenção 5-10 mg/kg/dia); Aminoácidos 2-3 g/kg/dia + Glicose VIG 4-6 mg/kg/min já na 1ª hora",
+              "route": "Intravenosa (Cateter Venoso Umbilical / PICC)",
+              "frequency": "Contínua (NPT) / Diária (Cafeína)",
+              "dilutionInstructions": "Prevenção de apneia da prematuridade e catabolismo proteico."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_bal_ext_1",
+              "recommendationTitle": "Protocolo de Manuseio Mínimo, Incubadora Umidificada (70-85%) e CPAP Nasal Precoce",
+              "dispositionTarget": "UTI Neonatal (UTIN)",
+              "monitoringPlan": "Recepção em saco plástico de polietileno e touca dupla em sala de parto; incubadora de parede dupla umidificada para conter perda transepidérmica de água; protocolo de neuroproteção (cabeça na linha média, mínimo manuseio nas primeiras 72h) e ultrassonografia transfontanelar seriada."
+            }
+          ]
+        },
+        {
+          "id": "tier_bal_late_preterm",
+          "label": "Pré-Termo Moderado a Tardio (IG Estimada 32 a 36 semanas)",
+          "severityLevel": "intermediate",
+          "minScore": 32,
+          "maxScore": 36,
+          "statisticalOutcome": "Risco aumentado de hipoglicemia neonatal, hipotermia, hiperbilirrubinemia prolongada, dificuldade de sucção e taquipneia transitória.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_bal_mod_1",
+              "drugName": "Vigilância de Glicemia Capilar (Glicose 10% 2 mL/kg IV se Glicemia < 40 mg/dL sintomática)",
+              "dosage": "Se hipoglicemia sintomática ou < 25-40 mg/dL refratária à dieta: Bolus de SG 10% 2 mL/kg (200 mg/kg) IV + manutenção VIG 5-8 mg/kg/min",
+              "route": "Via Oral (Aleitamento) ou Intravenosa (IV)",
+              "frequency": "Rastreio de glicemia capilar com 1, 3, 6, 12 e 24h de vida",
+              "dilutionInstructions": "NUNCA usar glicose a 25% ou 50% em bolus no recém-nascido pelo risco de hiperinsulinismo rebote e hiperosmolaridade."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_bal_mod_1",
+              "recommendationTitle": "Controle Térmico Rigoroso, Apoio à Coordenação Sucção-Deglutição e Curva de Bhutani",
+              "dispositionTarget": "Unidade de Cuidado Intermediário Neonatal ou Alojamento Conjunto Monitorado (>= 35 sem)",
+              "monitoringPlan": "Avaliar coordenação sucção-deglutição-respiração (transição por sonda/copinho se < 34 semanas), método Canguru precoce e triagem de bilirrubina antes da alta (mínimo 48-72h de observação)."
+            }
+          ]
+        },
+        {
+          "id": "tier_bal_term",
+          "label": "Recém-Nascido a Termo ou Pós-Termo (IG Estimada 37 a 43 semanas)",
+          "severityLevel": "low",
+          "minScore": 37,
+          "maxScore": 43,
+          "statisticalOutcome": "Maturidade fisiológica completa (se >= 42 sem / pós-termo, vigiar policitemia, hipoglicemia e síndrome de aspiração meconial).",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_bal_term_1",
+              "drugName": "Profilaxias Universais do RN a Termo (Vitamina K1 IM + Vacina Hepatite B)",
+              "dosage": "Vitamina K1 1 mg IM dose única + Vacina Hepatite B 0,5 mL IM nas primeiras 12-24h de vida",
+              "route": "Intramuscular (IM)",
+              "frequency": "Dose única ao nascer",
+              "dilutionInstructions": "Classificar peso para a idade gestacional nas curvas INTERGROWTH-21st (AIG, PIG ou GIG)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_bal_term_1",
+              "recommendationTitle": "Alojamento Conjunto e Triagens Neonatais Obrigatórias (SBP / Ministério da Saúde)",
+              "dispositionTarget": "Alojamento Conjunto",
+              "monitoringPlan": "Aleitamento materno em livre demanda, Teste do Coraçãozinho (oximetria de pulso em MSD e MI entre 24 e 48h), Teste do Olhinho, Teste da Orelhinha, Teste da Linguinha e Teste do Pezinho (entre o 3º e 5º dia de vida)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_kramer",
+      "slug": "zonas-de-kramer",
+      "name": "Zonas Dérmicas de Kramer — Progressão Craniocaudal da Icterícia Neonatal",
+      "acronym": "Kramer",
+      "version": "1.0.0",
+      "category": "Pediatria e Neonatologia",
+      "subcategory": "Hiperbilirrubinemia e Icterícia Neonatal",
+      "categorySlug": "bloco-08-pediatria-neonatologia",
+      "categoryName": "Pediatria e Neonatologia",
+      "moduleName": "Sala de Parto e Triagem Neonatal",
+      "blockId": "block_08",
+      "blockFile": "block_08.json",
+      "description": "Escala clínica semiológica de progressão cefalocaudal da icterícia neonatal (Zonas 1 a 5 de Kramer, 1969) associada aos modificadores de risco de neurotoxicidade (icterícia precoce < 24h de vida e fatores hemolíticos/prematuridade), orientando a dosagem imediata de Bilirrubina Total e Frações (BTF) e a indicação de Fototerapia Intensiva ou Exsanguineotransfusão (SBP / AAP / Nomograma de Bhutani).",
+      "summary": "Avaliação craniocaudal da icterícia neonatal (Zonas 1 a 5) e estratificação de risco para fototerapia (SBP/Bhutani).",
+      "clinicalObjective": "Identificar recém-nascidos com icterícia abaixo da cicatriz umbilical (Zona >= 3) ou icterícia precoce (< 24h) que exigem mensuração imediata de Bilirrubina Transcutânea/Sérica e fototerapia para prevenção de Kernicterus (Encefalopatia Bilirrubínica).",
+      "targetPopulation": "Recém-nascidos a termo e pré-termo tardios avaliados sob luz natural mediante digitopressão esternal e periférica.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Zona Dérmica de Kramer (1 a 5) + Modificador de Tempo de Vida (< 24h) + Fatores de Risco de Hemólise/Prematuridade",
+      "evidenceSource": "Kramer LI. Advancement of dermal icterus in the jaundiced newborn. Am J Dis Child. 1969;118(3):454-458. / Sociedade Brasileira de Pediatria (SBP 2021) & AAP Hyperbilirubinemia Guideline 2022.",
+      "minPossibleScore": 1,
+      "maxPossibleScore": 9,
+      "baseScore": 0,
+      "badge": "pediatria",
+      "clinicalWarning": "EMERGÊNCIA NEONATAL: TODA icterícia iniciada nas primeiras 24 horas de vida é PATOLÓGICA (geralmente doença hemolítica por incompatibilidade ABO, Rh ou deficiência de G6PD) e exige coleta imediata de Bilirrubina Total e Frações, reticulócitos, Coombs Direto (TAD) e início de Fototerapia de Alta Intensidade!",
+      "radarAxes": [
+        {
+          "id": "axis_kra_zone",
+          "label": "Progressão Craniocaudal (Zonas 1-5)",
+          "system": "Tegumentar",
+          "unit": "zona",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_kra_time",
+          "label": "Idade Pós-Natal (< 24h Patológica)",
+          "system": "Cinética Biliar",
+          "unit": "horas",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_kra_risk",
+          "label": "Risco de Neurotoxicidade / Hemólise",
+          "system": "Hematológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_kra_zone",
+          "name": "1. Zona Dérmica de Progressão Cefalocaudal de Kramer (Digitopressão sob Luz Natural)",
+          "slug": "zona-dermica-kramer",
+          "inputType": "single_choice",
+          "unit": "Zona",
+          "radarAxisId": "axis_kra_zone",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Avaliar pressionando a pele contra uma proeminência óssea até empalidecer.",
+          "options": [
+            {
+              "id": "opt_kra_z1",
+              "label": "Zona 1 — Cabeça e Pescoço (BT estimada ~ 5 a 7 mg/dL) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Icterícia restrita à face e pescoço (acima da linha mamilar)."
+            },
+            {
+              "id": "opt_kra_z2",
+              "label": "Zona 2 — Tronco Superior até a Cicatriz Umbilical (BT estimada ~ 8 a 10 mg/dL) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.3,
+              "sortOrder": 2,
+              "description": "Progressão até o umbigo."
+            },
+            {
+              "id": "opt_kra_z3",
+              "label": "Zona 3 — Hipogástrio / Abdome Inferior e Coxas até os Joelhos (BT estimada ~ 11 a 13 mg/dL) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.6,
+              "sortOrder": 3,
+              "description": "Abaixo da cicatriz umbilical: indicação formal da SBP para dosagem laboratorial/transcutânea imediata."
+            },
+            {
+              "id": "opt_kra_z4",
+              "label": "Zona 4 — Pernas (abaixo dos joelhos) e Antebraços/Braços (BT estimada ~ 14 a 16 mg/dL) (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.85,
+              "sortOrder": 4,
+              "description": "Icterícia extensa de extremidades distais."
+            },
+            {
+              "id": "opt_kra_z5",
+              "label": "Zona 5 — Regiões Palmares e Plantares (BT estimada >= 16 a > 20 mg/dL) (+5 pts)",
+              "pointValue": 5,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Impregnação palmoplantar: hiperbilirrubinemia grave com risco crítico de encefalopatia bilirrubínica."
+            }
+          ]
+        },
+        {
+          "id": "grp_kra_onset",
+          "name": "2. Tempo de Vida no Aparecimento da Icterícia",
+          "slug": "tempo-vida-kramer",
+          "inputType": "single_choice",
+          "unit": "horas",
+          "radarAxisId": "axis_kra_time",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_kra_on_0",
+              "label": "> 48 a 72 horas de vida (Pico fisiológico habitual no 3º-5º dia) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Cronologia compatível com icterícia fisiológica se em Zonas 1-2."
+            },
+            {
+              "id": "opt_kra_on_1",
+              "label": "Entre 24 e 48 horas de vida (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Aparecimento intermediário; plotar obrigatoriamente na curva horária de Bhutani."
+            },
+            {
+              "id": "opt_kra_on_2",
+              "label": "Primeiras 24 horas de vida (< 24h — Icterícia Precoce Patológica) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Emergência hemolítica neonatal até prova em contrário (velocidade de ascensão > 0,2-0,5 mg/dL/h)."
+            }
+          ]
+        },
+        {
+          "id": "grp_kra_risk",
+          "name": "3. Fatores de Risco para Hiperbilirrubinemia Grave e Neurotoxicidade (SBP / AAP)",
+          "slug": "fatores-risco-kramer",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_kra_risk",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_kra_rk_0",
+              "label": "Nenhum fator de risco (RN >= 38 semanas, Coombs negativo, boa pega) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Menor limiar de neurotoxicidade no nomograma."
+            },
+            {
+              "id": "opt_kra_rk_1",
+              "label": "IG 35 a 37 sem, céfalo-hematoma/equimoses, perda ponderal > 7-10% ou irmão com fototerapia (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Risco intermediário na curva de indicação de fototerapia."
+            },
+            {
+              "id": "opt_kra_rk_2",
+              "label": "Incompatibilidade ABO/Rh (Coombs Direto +), Deficiência de G6PD, Sepse, Acidose ou Albumina < 3,0 g/dL (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Alto risco de neurotoxicidade; reduz em 2 a 4 mg/dL o nível de corte para fototerapia e exsanguineotransfusão."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_kra_low",
+          "label": "Baixo Risco — Zona 1 ou 2 após 48h sem Fatores de Risco (1 a 2 pontos)",
+          "severityLevel": "low",
+          "minScore": 1,
+          "maxScore": 2,
+          "statisticalOutcome": "Compatível com icterícia fisiológica leve (BT estimada < 10 mg/dL em > 48h de vida).",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_kra_low_1",
+              "drugName": "Otimização do Aleitamento Materno Exclusivo (8 a 12 mamadas/dia)",
+              "dosage": "Livre demanda frequente (evitar oferta de água ou soro glicosado)",
+              "route": "Via Oral (Enteral)",
+              "frequency": "A cada 2 a 3 horas",
+              "dilutionInstructions": "O aumento do trânsito intestinal reduz a circulação êntero-hepática da bilirrubina pela beta-glicuronidase."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_kra_low_1",
+              "recommendationTitle": "Bilirrubina Transcutânea (BTc) Pré-Alta e Reavaliação em 48-72h",
+              "dispositionTarget": "Alojamento Conjunto / Alta com Retorno Agendado",
+              "monitoringPlan": "Realizar bilirrubina transcutânea antes da alta hospitalar, plotar no Nomograma de Bhutani por horas de vida e garantir consulta pediátrica de revisão entre 48 e 72 horas pós-alta."
+            }
+          ]
+        },
+        {
+          "id": "tier_kra_mod",
+          "label": "Risco Moderado a Alto — Zona >= 3 ou Fatores de Risco (3 a 4 pontos)",
+          "severityLevel": "high",
+          "minScore": 3,
+          "maxScore": 4,
+          "statisticalOutcome": "A estimativa visual isolada é imprecisa em Zonas >= 3 (especialmente em peles pigmentadas); alta probabilidade de indicação de fototerapia.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_kra_mod_1",
+              "drugName": "Fototerapia com Luz Azul de LED (Comprimento de onda 460-490 nm)",
+              "dosage": "Irradiância padrão >= 15 mW/cm²/nm (ou Fototerapia de Alta Intensidade >= 30 mW/cm²/nm se próximo ao nível de EST)",
+              "route": "Cutânea (Exposição corporal máxima com proteção ocular radiopaca)",
+              "frequency": "Contínua, reavaliando Bilirrubina Sérica em 6 a 12 horas",
+              "dilutionInstructions": "A luz azul converte a bilirrubina indireta lipossolúvel em fotoisômeros hidrossolúveis (lumirrubina) excretados na bile e urina sem necessidade de conjugação pela UGT1A1."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_kra_mod_1",
+              "recommendationTitle": "Coleta Obrigatória de Bilirrubina Total e Frações (BTF) Sérica e Plotagem por Horas de Vida",
+              "dispositionTarget": "Alojamento Conjunto com Fototerapia ou Unidade Neonatal",
+              "monitoringPlan": "Sempre confirmar BTc >= 12-14 mg/dL com Bilirrubina Sérica (BTF), tipagem sanguínea mãe/RN, Coombs Direto e reticulócitos. Se colestase (Bilirrubina Direta > 1,0 mg/dL), investigar atresia de vias biliares!"
+            }
+          ]
+        },
+        {
+          "id": "tier_kra_crit",
+          "label": "Emergência Ictérica Neonatal — Zona 4-5 ou Icterícia < 24h (5 a 9 pontos)",
+          "severityLevel": "critical",
+          "minScore": 5,
+          "maxScore": 9,
+          "statisticalOutcome": "Hiperbilirrubinemia grave / extrema (frequentemente > 18-25 mg/dL) com risco iminente de Encefalopatia Bilirrubínica Aguda e Kernicterus.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_kra_crit_1",
+              "drugName": "Fototerapia Dupla/Intensiva (>= 30 mW/cm²/nm) + Hidratação IV + Imunoglobulina Humana IV (se Isoimune)",
+              "dosage": "Fototerapia 360° imediata (sem aguardar resultado se Zona 5 ou sinais neurológicos); Imunoglobulina IV (IGIV) 0,5 a 1,0 g/kg em 2h se doença hemolítica isoimune (ABO/Rh) em ascensão rápida próxima ao limiar de Exsanguineotransfusão",
+              "route": "Cutânea Contínua + Intravenosa (IV)",
+              "frequency": "Imediata; dosar BT sérica a cada 2 a 4 horas",
+              "dilutionInstructions": "Preparar sangue reconstituído (concentrado de hemácias O negativo lavado/irradiado + plasma AB) para Exsanguineotransfusão (EST) de duplo volume (160 mL/kg) se BT atingir a curva de EST ou se houver qualquer sinal de encefalopatia (letargia, hipotonia ou opistótono/choro agudo)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_kra_crit_1",
+              "recommendationTitle": "Admissão em UTIN, Fototerapia Intensiva Imediata e Preparo de Exsanguineotransfusão",
+              "dispositionTarget": "UTI Neonatal (UTIN)",
+              "monitoringPlan": "Suspender interrupções da fototerapia, manter proteção ocular, monitorar escore BIND (Bilirubin-Induced Neurologic Dysfunction) e programar Potencial Evocado Auditivo de Tronco Encefálico (BERA/PEATE) antes da alta."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_pews",
+      "slug": "pews-brighton",
+      "name": "PEWS — Pediatric Early Warning Score (Escore de Alerta Precoce Pediátrico)",
+      "acronym": "PEWS",
+      "version": "1.0.0",
+      "category": "Pediatria e Neonatologia",
+      "subcategory": "Emergência e Deterioração Clínica Pediátrica",
+      "categorySlug": "bloco-08-pediatria-neonatologia",
+      "categoryName": "Pediatria e Neonatologia",
+      "moduleName": "Emergência e Sepse Pediátrica",
+      "blockId": "block_08",
+      "blockFile": "block_08.json",
+      "description": "Sistema estruturado de alerta precoce pediátrico (Brighton PEWS / Monaghan, 2005) de 0 a 11 pontos baseado nos 3 lados do Triângulo de Avaliação Pediátrica (Comportamento/Neurológico, Cardiovascular/Perfusão e Respiratório, de 0 a 3 pts cada) somados a modificadores críticos (+2 pts para nebulização contínua ou vômitos pós-operatórios persistentes).",
+      "summary": "Detecção precoce de deterioração clínica, sepse e risco de PCR em enfermaria e emergência pediátrica (0 a 11 pontos).",
+      "clinicalObjective": "Identificar precocemente crianças em deterioração fisiológica horas antes da parada cardiorrespiratória (em crianças, a hipotensão é sinal tardio e pré-PCR), acionando o Time de Resposta Rápida Pediátrico.",
+      "targetPopulation": "Lactentes, pré-escolares, escolares e adolescentes hospitalizados ou em observação no pronto-socorro pediátrico.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Comportamento (0-3) + Cardiovascular (0-3) + Respiratório (0-3) + Nebulização/Vômitos Pós-Op (0 ou 2)",
+      "evidenceSource": "Monaghan A. Detecting and managing deterioration in children. Paediatr Nurs. 2005;17(1):32-35. / Parshuram CS et al. Lancet. 2018.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 11,
+      "baseScore": 0,
+      "badge": "pediatria",
+      "clinicalWarning": "FISIOLOGIA DO CHOQUE PEDIÁTRICO: A criança compensa o débito cardíaco por taquicardia intensa e vasoconstrição periférica (TEC prolongado > 3s, extremidades frias, pele moteada). A queda da pressão arterial ocorre apenas quando > 35-45% da volemia foi perdida. Portanto, PEWS >= 5 ou qualquer pontuação 3 em um único domínio exige avaliação médica presencial imediata!",
+      "radarAxes": [
+        {
+          "id": "axis_pews_neuro",
+          "label": "Comportamento / Estado Neurológico",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_pews_cv",
+          "label": "Cardiovascular / Perfusão Capilar",
+          "system": "Cardiovascular",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_pews_resp",
+          "label": "Esforço Respiratório / FiO2",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_pews_extra",
+          "label": "Nebulização Contínua / Vômitos Pós-Op",
+          "system": "Clínico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_pews_behav",
+          "name": "1. Avaliação Comportamental / Neurológica",
+          "slug": "comportamento-pews",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pews_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "options": [
+            {
+              "id": "opt_pew_be_0",
+              "label": "Ativo, brincando, apropriado para a idade ou dormindo tranquilo (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Estado neurológico basal preservado."
+            },
+            {
+              "id": "opt_pew_be_1",
+              "label": "Sonolento ou irritado, mas consolável pelos pais (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 2,
+              "description": "Alteração comportamental leve."
+            },
+            {
+              "id": "opt_pew_be_2",
+              "label": "Irritado e inconsolável / Agitado (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.7,
+              "sortOrder": 3,
+              "description": "Sinal de hipoxemia cerebral, dor intensa ou baixo débito."
+            },
+            {
+              "id": "opt_pew_be_3",
+              "label": "Letárgico, obnubilado, confuso ou resposta reduzida à dor (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Sinal de alarme crítico (pontuação máxima isolada no domínio)."
+            }
+          ]
+        },
+        {
+          "id": "grp_pews_cv",
+          "name": "2. Avaliação Cardiovascular e Tempo de Enchimento Capilar (TEC)",
+          "slug": "cardiovascular-pews",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pews_cv",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_pew_cv_0",
+              "label": "Corado/Rosado e Tempo de Enchimento Capilar (TEC) de 1 a 2 segundos (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Perfusão periférica normal."
+            },
+            {
+              "id": "opt_pew_cv_1",
+              "label": "Pálido ou TEC de 3 segundos (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 2,
+              "description": "Vasoconstrição periférica inicial."
+            },
+            {
+              "id": "opt_pew_cv_2",
+              "label": "Acinzentado/Cianótico, TEC de 4 segundos OU Taquicardia >= 20 bpm acima do limite para a idade (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.7,
+              "sortOrder": 3,
+              "description": "Choque compensado moderado."
+            },
+            {
+              "id": "opt_pew_cv_3",
+              "label": "Pele acinzentada e moteada (rendilhada), TEC >= 5 segundos, Taquicardia >= 30 bpm acima do limite OU Bradicardia (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Choque descompensado / colapso circulatório iminente."
+            }
+          ]
+        },
+        {
+          "id": "grp_pews_resp",
+          "name": "3. Avaliação Respiratória (FR, Retrações e Suporte de O2)",
+          "slug": "respiratorio-pews",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pews_resp",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_pew_re_0",
+              "label": "FR normal para a idade, sem retrações, em ar ambiente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Eupneico em ar ambiente."
+            },
+            {
+              "id": "opt_pew_re_1",
+              "label": "FR > 10 irpm acima do normal, uso de musculatura acessória leve OU FiO2 >= 30% (ou >= 4 L/min) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 2,
+              "description": "Desconforto respiratório leve."
+            },
+            {
+              "id": "opt_pew_re_2",
+              "label": "FR > 20 irpm acima do normal, retrações subcostais/intercostais OU FiO2 >= 40% (ou >= 6 L/min) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.7,
+              "sortOrder": 3,
+              "description": "Desconforto respiratório moderado a importante."
+            },
+            {
+              "id": "opt_pew_re_3",
+              "label": "FR >= 5 irpm abaixo do normal (Bradipneia/Exaustão) com retrações graves/gemência OU FiO2 >= 50% (>= 8 L/min) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Insuficiência respiratória grave / fadiga diafragmática."
+            }
+          ]
+        },
+        {
+          "id": "grp_pews_extra",
+          "name": "4. Critérios Adicionais de Alerta (Nebulização ou Vômitos Pós-Operatórios)",
+          "slug": "adicionais-pews",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pews_extra",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_pew_ex_0",
+              "label": "Ausentes (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem nebulização de resgate frequente ou vômitos incoercíveis."
+            },
+            {
+              "id": "opt_pew_ex_2",
+              "label": "Nebulização contínua / a cada 15 min OU Vômitos pós-operatórios persistentes (>= 3 episódios) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Fator agravante de broncoespasmo refratário ou distúrbio hidroeletrolítico/cirúrgico."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_pews_low",
+          "label": "Baixo Risco de Deterioração (PEWS 0 a 2 pontos)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 2,
+          "statisticalOutcome": "Estabilidade fisiológica; manter vigilância padrão de enfermaria.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_pew_low_1",
+              "drugName": "Prescrição Basal de Enfermaria (Antitérmico / Analgesia se febre ou dor)",
+              "dosage": "Dipirona 20 mg/kg/dose ou Paracetamol 10-15 mg/kg/dose se febre/dor (a febre eleva a FC em ~10 bpm por °C e a FR)",
+              "route": "Via Oral (VO) ou Intravenosa (IV)",
+              "frequency": "Até de 6/6h se necessário",
+              "dilutionInstructions": "Reavaliar PEWS após defervescência térmica."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_pew_low_1",
+              "recommendationTitle": "Aferição de Sinais Vitais e PEWS a cada 4 a 6 horas",
+              "dispositionTarget": "Enfermaria Pediátrica",
+              "monitoringPlan": "Manter aferição rotineira de sinais vitais a cada 4-6h (ou a cada 2-4h se PEWS = 2)."
+            }
+          ]
+        },
+        {
+          "id": "tier_pews_mod",
+          "label": "Risco Moderado — Alerta Amarelo (PEWS 3 a 4 pontos)",
+          "severityLevel": "intermediate",
+          "minScore": 3,
+          "maxScore": 4,
+          "statisticalOutcome": "Deterioração clínica incipiente; exige revisão médica em até 30-60 minutos e intensificação da monitorização.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_pew_mod_1",
+              "drugName": "Oxigenoterapia Suplementar (Alvo SpO2 94-98%) + Broncodilatador / Expansão se Indicado",
+              "dosage": "O2 por cateter nasal ou máscara; se sibilância: Salbutamol spray 4-10 jatos com espaçador a cada 20 min; se desidratação/hipovolemia: SF 0,9% ou Ringer Lactato 10-20 mL/kg",
+              "route": "Inalatória / Intravenosa (IV)",
+              "frequency": "Reavaliar resposta em 30-60 minutos",
+              "dilutionInstructions": "Investigar ativamente foco infeccioso (sepse pediátrica inicial)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_pew_mod_1",
+              "recommendationTitle": "Avaliação Presencial pelo Pediatra Plantonista e Sinais Vitais a cada 1 a 2 horas",
+              "dispositionTarget": "Leito Monitorizado de Enfermaria / Semi-Intensiva",
+              "monitoringPlan": "Notificar enfermeiro líder e médico assistente em < 30 min; instalar monitorização contínua de oximetria e recalcular PEWS em 1 hora."
+            }
+          ]
+        },
+        {
+          "id": "tier_pews_high",
+          "label": "Alto Risco / Deterioração Crítica — Código Amarelo/Vermelho (PEWS 5 a 11 pontos)",
+          "severityLevel": "critical",
+          "minScore": 5,
+          "maxScore": 11,
+          "statisticalOutcome": "Alto risco de transferência urgente para UTI Pediátrica, choque séptico ou parada cardiorrespiratória por hipóxia/choque.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_pew_high_1",
+              "drugName": "Pacote de 1ª Hora de Sepse/Choque Pediátrico (Cristaloide Balanceado + Ceftriaxona + Epinefrina/Nora)",
+              "dosage": "Ringer Lactato ou SF 0,9% em alíquotas de 10 a 20 mL/kg IV/IO em 5-20 min (reavaliando estertores e hepatomegalia a cada bolus, até 40-60 mL/kg na 1ª hora se UTI disponível); Ceftriaxona 100 mg/kg/dia IV em < 1h; Epinefrina (0,05-0,3 mcg/kg/min) ou Noradrenalina se refratário a fluido",
+              "route": "Intravenosa (IV) ou Intraóssea (IO)",
+              "frequency": "Imediata (Pacote de 1 hora Surviving Sepsis Pediatric / PALS)",
+              "dilutionInstructions": "Se acesso venoso periférico não for obtido em 90s-3 min no choque descompensado, realizar punção Intraóssea (IO) tibial proximal imediatamente."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_pew_high_1",
+              "recommendationTitle": "Acionamento Imediato do Time de Resposta Rápida e Transferência para UTI Pediátrica",
+              "dispositionTarget": "Sala de Emergência Pediátrica / UTI Pediátrica (UTIP)",
+              "monitoringPlan": "Avaliação médica à beira do leito imediata (< 10-15 min), monitorização multiparamétrica contínua, gasometria com lactato, glicemia capilar imediata (corrigir se < 60 mg/dL com SG 10% 2-5 mL/kg) e suporte ventilatório precoce (CNAF, VNI ou IOT)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_glasgow_pediatric",
+      "slug": "glasgow-pediatrico",
+      "name": "Escala de Coma de Glasgow Pediátrica (Lactentes e Crianças Pré-Verbais)",
+      "acronym": "ECG Pediátrica",
+      "version": "1.0.0",
+      "category": "Pediatria e Neonatologia",
+      "subcategory": "Neuroemergência e Trauma Pediátrico",
+      "categorySlug": "bloco-08-pediatria-neonatologia",
+      "categoryName": "Pediatria e Neonatologia",
+      "moduleName": "Emergência e Sepse Pediátrica",
+      "blockId": "block_08",
+      "blockFile": "block_08.json",
+      "description": "Adaptação validada da Escala de Coma de Glasgow (3 a 15 pontos) para lactentes e crianças pequenas (< 2 a 5 anos / fase pré-verbal), substituindo os comandos verbais e motores de adultos por descritores comportamentais próprios do desenvolvimento neuropsicomotor (sorriso social, arrulhos/balbucio, consolabilidade do choro e retirada ao toque/dor).",
+      "summary": "Avaliação padronizada do nível de consciência em lactentes e crianças pré-verbais (3 a 15 pontos) no TCE, meningite e choque.",
+      "clinicalObjective": "Quantificar objetivamente o grau de rebaixamento do nível de consciência no trauma cranioencefálico pediátrico (regra PECARN), estados epilépticos, meningoencefalites e cetoacidose diabética (edema cerebral), definindo indicação de IOT (<= 8).",
+      "targetPopulation": "Lactentes e crianças em fase pré-verbal (< 2 a 5 anos) com trauma craniano ou alteração aguda do estado neurológico.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Abertura Ocular (1-4) + Resposta Verbal Pediátrica/Choro (1-5) + Resposta Motora Pediátrica (1-6)",
+      "evidenceSource": "James HE. Neurologic evaluation and support in the child with an acute brain insult. Pediatr Ann. 1986;15(1):16-22. / Kuppermann N et al. (PECARN). Lancet. 2009;374(9696):1160-1170.",
+      "minPossibleScore": 3,
+      "maxPossibleScore": 15,
+      "baseScore": 0,
+      "badge": "pediatria",
+      "clinicalWarning": "REGRA PECARN & INTUBAÇÃO PEDIÁTRICA: Glasgow Pediátrico <= 14 isoladamente já exclui a criança do grupo de muito baixo risco do PECARN, exigindo observação rigorosa ou Tomografia de Crânio. Glasgow <= 8 define Coma Grave com perda de proteção de via aérea e indicação formal de Intubação em Sequência Rápida (ISR).",
+      "radarAxes": [
+        {
+          "id": "axis_gcsp_eye",
+          "label": "Abertura Ocular (O)",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_gcsp_verbal",
+          "label": "Interação / Choro / Vocalização (V)",
+          "system": "Cortical",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_gcsp_motor",
+          "label": "Resposta Motora Pediátrica (M)",
+          "system": "Motor / Tronco",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_gcsp_eye",
+          "name": "1. Abertura Ocular (O — 1 a 4 pontos)",
+          "slug": "abertura-ocular-glasgow-ped",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_gcsp_eye",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "options": [
+            {
+              "id": "opt_gcsp_e4",
+              "label": "4 — Espontânea (Olhos abertos acompanhando o ambiente) (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Vigília preservada (SRAA íntegro)."
+            },
+            {
+              "id": "opt_gcsp_e3",
+              "label": "3 — Ao estímulo sonoro / À fala ou chamado (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.33,
+              "sortOrder": 2,
+              "description": "Sonolência responsiva à voz."
+            },
+            {
+              "id": "opt_gcsp_e2",
+              "label": "2 — Apenas ao estímulo doloroso / pressão (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.67,
+              "sortOrder": 3,
+              "description": "Obnubilação / torpor importante."
+            },
+            {
+              "id": "opt_gcsp_e1",
+              "label": "1 — Ausente (Não abre os olhos mesmo à dor) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Coma arreativo ocular."
+            }
+          ]
+        },
+        {
+          "id": "grp_gcsp_verbal",
+          "name": "2. Resposta Verbal / Vocalização para Lactentes e Pré-Verbais (V — 1 a 5 pontos)",
+          "slug": "resposta-verbal-glasgow-ped",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_gcsp_verbal",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_gcsp_v5",
+              "label": "5 — Arrulha, balbucia, sorri socialmente e interage normalmente (+5 pts)",
+              "pointValue": 5,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Comportamento vocal e interativo normal para a idade."
+            },
+            {
+              "id": "opt_gcsp_v4",
+              "label": "4 — Choro irritado, mas consolável pelos pais / palavras inapropriadas (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Irritabilidade cortical leve."
+            },
+            {
+              "id": "opt_gcsp_v3",
+              "label": "3 — Choro persistente e inconsolável / gritos apenas à dor (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 3,
+              "description": "Disfunção encefálica moderada ou hipertensão intracraniana inicial."
+            },
+            {
+              "id": "opt_gcsp_v2",
+              "label": "2 — Gemência ao estímulo doloroso / Agitado e inquieto sem choro estruturado (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 4,
+              "description": "Depressão grave do SNC."
+            },
+            {
+              "id": "opt_gcsp_v1",
+              "label": "1 — Ausente (Nenhuma resposta vocal ou choro) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Silêncio neurológico completo."
+            }
+          ]
+        },
+        {
+          "id": "grp_gcsp_motor",
+          "name": "3. Melhor Resposta Motora Pediátrica (M — 1 a 6 pontos)",
+          "slug": "resposta-motora-glasgow-ped",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_gcsp_motor",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_gcsp_m6",
+              "label": "6 — Movimentos espontâneos normais e intencionais (ou obedece comandos) (+6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Motricidade voluntária íntegra."
+            },
+            {
+              "id": "opt_gcsp_m5",
+              "label": "5 — Localiza a dor ou retira o membro ao simples toque (+5 pts)",
+              "pointValue": 5,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.2,
+              "sortOrder": 2,
+              "description": "Preservação de integração sensitivo-motora cortical."
+            },
+            {
+              "id": "opt_gcsp_m4",
+              "label": "4 — Flexão normal / Retirada inespecífica ao estímulo doloroso (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.4,
+              "sortOrder": 3,
+              "description": "Retirada nociceptiva sem localização precisa."
+            },
+            {
+              "id": "opt_gcsp_m3",
+              "label": "3 — Flexão anormal espástica à dor (Postura de Decorticação) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 4,
+              "description": "Lesão hemisférica difusa ou diencefálica acima do núcleo rubro."
+            },
+            {
+              "id": "opt_gcsp_m2",
+              "label": "2 — Extensão anormal hipertônica à dor (Postura de Descerebração) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.85,
+              "sortOrder": 5,
+              "description": "Sofrimento grave de tronco encefálico (mesencéfalo/ponte)."
+            },
+            {
+              "id": "opt_gcsp_m1",
+              "label": "1 — Ausente (Flacidez completa / nenhuma resposta motora) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 6,
+              "description": "Lesão bulbar grave, choque medular ou efeito de bloqueador neuromuscular."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_gcsp_severe",
+          "label": "TCE / Encefalopatia Grave — Coma (Glasgow Pediátrico 3 a 8 pontos)",
+          "severityLevel": "critical",
+          "minScore": 3,
+          "maxScore": 8,
+          "statisticalOutcome": "Perda dos reflexos protetores de via aérea e alto risco de hipertensão intracraniana (HIC), herniação cerebral e óbito.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_gcsp_sev_1",
+              "drugName": "Intubação em Sequência Rápida (Etomidato ou Cetamina + Rocurônio) + Salina Hipertônica 3% (se HIC)",
+              "dosage": "ISR: Cetamina 1-2 mg/kg IV ou Etomidato 0,3 mg/kg IV + Rocurônio 1,0-1,2 mg/kg IV. Se sinais de HIC/herniação: NaCl 3% 2 a 5 mL/kg IV em 10-20 min (ou Manitol 20% 0,5-1 g/kg)",
+              "route": "Intravenosa (IV)",
+              "frequency": "Imediata na Sala Vermelha",
+              "dilutionInstructions": "Fórmula da Salina Hipertônica 3% (100 mL): 85 mL de Água Destilada (ou SF 0,9%) + 15 mL de NaCl 20%. Na criança hipotensa com TCE, preferir Salina 3% ao Manitol (não causa diurese osmótica hipovolêmica)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_gcsp_sev_1",
+              "recommendationTitle": "Proteção Definitiva de Via Aérea (IOT com Imobilização Cervical), Neuroproteção e TC de Crânio Imediata",
+              "dispositionTarget": "Sala Vermelha -> Tomografia -> Centro Cirúrgico / UTI Pediátrica",
+              "monitoringPlan": "Manter cabeceira elevada a 30° com cabeça centrada, normocapnia estrita (PaCO2 35-40 mmHg — hiperventilação leve apenas se herniação iminente), normoglicemia, normotermia e evitar hipotensão a todo custo."
+            }
+          ]
+        },
+        {
+          "id": "tier_gcsp_mod",
+          "label": "TCE / Disfunção Neurológica Moderada (Glasgow Pediátrico 9 a 12 pontos)",
+          "severityLevel": "high",
+          "minScore": 9,
+          "maxScore": 12,
+          "statisticalOutcome": "Risco elevado de lesão intracraniana cirúrgica ou deterioração secundária rápida.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_gcsp_mod_1",
+              "drugName": "Analgesia, Antiemético (Ondansetrona) e Manutenção Isotônica (Proibido Soro Hipotônico)",
+              "dosage": "Ondansetrona 0,15 mg/kg IV; Hidratação basal exclusivamente com solução isotônica (SF 0,9% + SG 5%)",
+              "route": "Intravenosa (IV)",
+              "frequency": "Contínua",
+              "dilutionInstructions": "Soluções hipotônicas (SG 5% puro ou NaCl 0,2%/0,45%) são formalmente PROIBIDAS no TCE pelo risco de hiponatremia aguda e agravamento do edema cerebral."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_gcsp_mod_1",
+              "recommendationTitle": "Tomografia de Crânio de Urgência, Avaliação Neurocirúrgica e Vigilância de 1/1h",
+              "dispositionTarget": "UTI Pediátrica / Unidade de Emergência",
+              "monitoringPlan": "Realizar TC de crânio sem contraste imediatamente e manter reavaliação neurológica e pupilar a cada 30-60 minutos."
+            }
+          ]
+        },
+        {
+          "id": "tier_gcsp_mild",
+          "label": "TCE Leve / Alerta ou Sonolência Leve (Glasgow Pediátrico 13 a 15 pontos)",
+          "severityLevel": "low",
+          "minScore": 13,
+          "maxScore": 15,
+          "statisticalOutcome": "Se GCS 15 sem preditores PECARN, risco de lesão intracraniana clinicamente importante < 0,02%. Se GCS 13-14, risco de ~4%.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_gcsp_mild_1",
+              "drugName": "Analgesia Simples (Dipirona ou Paracetamol)",
+              "dosage": "Paracetamol 10-15 mg/kg/dose VO ou Dipirona 15-20 mg/kg/dose",
+              "route": "Via Oral (VO)",
+              "frequency": "6/6h se cefaleia ou dor local",
+              "dilutionInstructions": "Evitar sedativos que mascarem o exame neurológico seriado."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_gcsp_mild_1",
+              "recommendationTitle": "Aplicação do Algoritmo PECARN (< 2 anos vs >= 2 anos)",
+              "dispositionTarget": "Observação no Pronto-Socorro (4-6h) ou Alta com Orientações de Alarme",
+              "monitoringPlan": "Se GCS = 14, alteração do estado mental ou sinais palpáveis de fratura de crânio (ou base de crânio): realizar TC de crânio. Se GCS = 15 com hematoma subgaleal não frontal (< 2 anos), perda de consciência >= 5s, mecanismo grave ou vômitos: observação clínica 4-6h vs TC compartilhada."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_pelod2",
+      "slug": "pelod-2",
+      "name": "Escore PELOD-2 (Pediatric Logistic Organ Dysfunction-2) em UTI Pediátrica",
+      "acronym": "PELOD-2",
+      "version": "1.0.0",
+      "category": "Pediatria e Neonatologia",
+      "subcategory": "Terapia Intensiva e Sepse Pediátrica",
+      "categorySlug": "bloco-08-pediatria-neonatologia",
+      "categoryName": "Pediatria e Neonatologia",
+      "moduleName": "Emergência e Sepse Pediátrica",
+      "blockId": "block_08",
+      "blockFile": "block_08.json",
+      "description": "Escore logístico validado para quantificar a Síndrome de Disfunção de Múltiplos Órgãos (SDMO) em Unidades de Terapia Intensiva Pediátrica (UTIP) através de 10 variáveis distribuídas em 5 sistemas orgânicos: Neurológico (Glasgow e Pupilas), Cardiovascular (Lactato e PAM por faixa etária), Renal (Creatinina por idade), Respiratório (PaO2/FiO2, PaCO2 e Ventilação Mecânica Invasiva) e Hematológico (Leucócitos e Plaquetas).",
+      "summary": "Quantificação de disfunção multiorgânica e mortalidade em UTI Pediátrica em 5 sistemas (0 a 33 pontos).",
+      "clinicalObjective": "Avaliar a gravidade diária da disfunção orgânica pediátrica e calcular a probabilidade logística de mortalidade na UTIP.",
+      "targetPopulation": "Crianças criticamente enfermas admitidas em Unidade de Terapia Intensiva Pediátrica.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Neurológico (0-9) + Cardiovascular (0-10) + Renal (0-3) + Respiratório (0-6) + Hematológico (0-4); Logit = -6,61 + 0,47*(PELOD-2)",
+      "evidenceSource": "Leteurtre S, Duhamel A, Salleron J, Grandbastien B, Lacroix J, Leclerc F. PELOD-2: an update of the PEdiatric logistic organ dysfunction score. Crit Care Med. 2013;41(7):1761-1773.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 32,
+      "baseScore": 0,
+      "badge": "pediatria",
+      "clinicalWarning": "DIRETRIZ DE SEPSE PEDIÁTRICA: A avaliação de disfunção orgânica em crianças com suspeita de infecção (PELOD-2 e Phoenix Sepsis Score 2024) exige atenção especial aos cortes de Pressão Arterial Média (PAM) e Creatinina ajustados estritamente pela faixa etária pediátrica.",
+      "radarAxes": [
+        {
+          "id": "axis_pel_neuro",
+          "label": "Neurológico (Glasgow e Pupilas)",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_pel_cv",
+          "label": "Cardiovascular (Lactato e PAM/Idade)",
+          "system": "Cardiovascular",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_pel_renal",
+          "label": "Renal (Creatinina por Idade)",
+          "system": "Renal",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_pel_resp",
+          "label": "Respiratório (PaO2/FiO2, PaCO2, VMI)",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_pel_heme",
+          "label": "Hematológico (Plaquetas e Leucócitos)",
+          "system": "Hematológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_pel_neuro",
+          "name": "1. Sistema Neurológico (Escala de Glasgow e Reatividade Pupilar)",
+          "slug": "neurologico-pelod2",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pel_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "options": [
+            {
+              "id": "opt_pel_ne_0",
+              "label": "Glasgow >= 11 E Pupilas isocóricas fotorreagentes (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem disfunção neurológica aguda."
+            },
+            {
+              "id": "opt_pel_ne_1",
+              "label": "Glasgow 5 a 10 (Pupilas fotorreagentes) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Encefalopatia moderada."
+            },
+            {
+              "id": "opt_pel_ne_4",
+              "label": "Glasgow 3 a 4 (Pupilas fotorreagentes) (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.55,
+              "sortOrder": 3,
+              "description": "Coma profundo."
+            },
+            {
+              "id": "opt_pel_ne_5",
+              "label": "Pupilas médio-fixas/arreativas bilaterais (com Glasgow >= 5) (+5 pts)",
+              "pointValue": 5,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 4,
+              "description": "Comprometimento pupilar grave."
+            },
+            {
+              "id": "opt_pel_ne_9",
+              "label": "Glasgow 3 a 4 E Pupilas fixas/arreativas bilaterais (+9 pts)",
+              "pointValue": 9,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Falência neurológica máxima."
+            }
+          ]
+        },
+        {
+          "id": "grp_pel_cv",
+          "name": "2. Sistema Cardiovascular (Lactato Arterial e PAM Ajustada para a Idade)",
+          "slug": "cardiovascular-pelod2",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pel_cv",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Cortes de hipotensão grave de PAM: <1m: <31 mmHg; 1-11m: <39; 12-23m: <44; 24-59m: <45; 60-143m: <49; >=144m: <52 mmHg.",
+          "options": [
+            {
+              "id": "opt_pel_cv_0",
+              "label": "Lactato < 5,0 mmol/L e PAM normal para a faixa etária (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Perfusão tecidual e pressão arterial preservadas."
+            },
+            {
+              "id": "opt_pel_cv_2",
+              "label": "PAM moderadamente reduzida para a idade OU Lactato 5,0 a 10,9 mmol/L (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.3,
+              "sortOrder": 2,
+              "description": "Hipoperfusão ou hipotensão inicial."
+            },
+            {
+              "id": "opt_pel_cv_4",
+              "label": "Lactato >= 11,0 mmol/L OU Hipotensão moderada associada a hiperlactatemia (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.6,
+              "sortOrder": 3,
+              "description": "Choque descompensado importante."
+            },
+            {
+              "id": "opt_pel_cv_6",
+              "label": "Hipotensão grave para a idade (PAM muito baixa) (+6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.8,
+              "sortOrder": 4,
+              "description": "Colapso pressórico severo."
+            },
+            {
+              "id": "opt_pel_cv_10",
+              "label": "Hipotensão grave para a idade E Lactato >= 11,0 mmol/L (+10 pts)",
+              "pointValue": 10,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Choque refratário extremo."
+            }
+          ]
+        },
+        {
+          "id": "grp_pel_renal",
+          "name": "3. Sistema Renal (Creatinina Sérica Acima do Limite Superior para a Idade)",
+          "slug": "renal-pelod2",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pel_renal",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Cortes PELOD-2: <1m: >= 0,8 mg/dL; 1-11m: >= 0,3; 12-23m: >= 0,4; 24-59m: >= 0,6; 60-143m: >= 0,7; >=144m: >= 1,0 mg/dL.",
+          "options": [
+            {
+              "id": "opt_pel_re_0",
+              "label": "Creatinina normal para a faixa etária (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Taxa de filtração glomerular preservada."
+            },
+            {
+              "id": "opt_pel_re_2",
+              "label": "Creatinina elevada acima do corte etário (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 2,
+              "description": "Injúria renal aguda pediátrica estabelecida."
+            },
+            {
+              "id": "opt_pel_re_3",
+              "label": "Falência renal grave / Anúria com necessidade de Terapia Renal Substitutiva (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Disfunção renal máxima."
+            }
+          ]
+        },
+        {
+          "id": "grp_pel_resp",
+          "name": "4. Sistema Respiratório (PaO2/FiO2, PaCO2 e Ventilação Mecânica Invasiva)",
+          "slug": "respiratorio-pelod2",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pel_resp",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_pel_rs_0",
+              "label": "PaO2/FiO2 >= 61 mmHg, PaCO2 <= 58 mmHg e Sem Ventilação Invasiva (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Troca gasosa preservada sem VMI."
+            },
+            {
+              "id": "opt_pel_rs_1",
+              "label": "PaCO2 59 a 94 mmHg (Hipercapnia moderada) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Hipoventilação alveolar moderada."
+            },
+            {
+              "id": "opt_pel_rs_3",
+              "label": "Em Ventilação Mecânica Invasiva (VMI) OU PaO2/FiO2 <= 60 mmHg OU PaCO2 >= 95 mmHg (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.6,
+              "sortOrder": 3,
+              "description": "Insuficiência respiratória aguda requerendo VMI ou hipoxemia/hipercapnia severa."
+            },
+            {
+              "id": "opt_pel_rs_6",
+              "label": "VMI associada a SDRA Pediátrica Grave (PaO2/FiO2 <= 60 e PaCO2 >= 95 mmHg) (+6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Falência respiratória hipoxêmica e hipercápnica máxima."
+            }
+          ]
+        },
+        {
+          "id": "grp_pel_heme",
+          "name": "5. Sistema Hematológico (Contagem de Leucócitos e Plaquetas)",
+          "slug": "hematologico-pelod2",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_pel_heme",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "options": [
+            {
+              "id": "opt_pel_hm_0",
+              "label": "Leucócitos > 2.000/mm³ e Plaquetas >= 142.000/mm³ (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Série branca e plaquetária normais."
+            },
+            {
+              "id": "opt_pel_hm_1",
+              "label": "Plaquetas entre 77.000 e 141.000/mm³ (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.3,
+              "sortOrder": 2,
+              "description": "Plaquetopenia leve a moderada."
+            },
+            {
+              "id": "opt_pel_hm_2",
+              "label": "Plaquetas <= 76.000/mm³ OU Leucopenia <= 2.000/mm³ (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 3,
+              "description": "Trombocitopenia importante ou neutropenia/leucopenia grave."
+            },
+            {
+              "id": "opt_pel_hm_4",
+              "label": "Plaquetas <= 76.000/mm³ E Leucócitos <= 2.000/mm³ (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Pancitopenia / CIVD séptica grave."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_pel_low",
+          "label": "Disfunção Orgânica Leve / Ausente (PELOD-2 0 a 4 pontos)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 4,
+          "statisticalOutcome": "Mortalidade estimada em UTIP < 1% a 1,5%.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_pel_low_1",
+              "drugName": "Suporte Clínico de UTIP e Hidratação Isotônica Balanceada",
+              "dosage": "Manutenção segundo Holliday-Segar com vigilância de balanço hídrico",
+              "route": "Intravenosa (IV) / Enteral",
+              "frequency": "Reavaliação diária",
+              "dilutionInstructions": "Priorizar nutrição enteral precoce nas primeiras 24-48h de UTIP."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_pel_low_1",
+              "recommendationTitle": "Monitorização Intensiva e Prevenção de Sobrecarga Hídrica",
+              "dispositionTarget": "UTI Pediátrica (UTIP)",
+              "monitoringPlan": "Cálculo diário do PELOD-2 e controle estrito do percentual de sobrecarga hídrica (%FO < 10%)."
+            }
+          ]
+        },
+        {
+          "id": "tier_pel_mod",
+          "label": "SDMO Pediátrica Moderada (PELOD-2 5 a 10 pontos)",
+          "severityLevel": "high",
+          "minScore": 5,
+          "maxScore": 10,
+          "statisticalOutcome": "Mortalidade estimada em UTIP: 3% a 15%. Indica disfunção de múltiplos órgãos ativa.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_pel_mod_1",
+              "drugName": "Epinefrina ou Noradrenalina em BIC + Antibioticoterapia de Amplo Espectro",
+              "dosage": "Epinefrina 0,05 a 0,3 mcg/kg/min IV (choque frio/hipodinâmico) ou Noradrenalina 0,05 a 0,5 mcg/kg/min IV (choque quente/vasoplégico)",
+              "route": "Acesso Venoso Central (ou Periférico/IO temporário diluído)",
+              "frequency": "Infusão contínua titulada por PAM e clearance de lactato",
+              "dilutionInstructions": "Titular drogas vasoativas guiadas por ecocardiografia funcional à beira do leito (POCUS cardíaco e de veia cava)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_pel_mod_1",
+              "recommendationTitle": "Suporte Hemodinâmico e Ventilação Mecânica Protetora (PALICC)",
+              "dispositionTarget": "UTI Pediátrica (UTIP)",
+              "monitoringPlan": "Em caso de SDRA pediátrica (PARDS), manter volume corrente 5-8 mL/kg de peso predito, pressão de platô <= 28 cmH2O e hipercapnia permissiva (pH >= 7,20, exceto se HIC ou hipertensão pulmonar)."
+            }
+          ]
+        },
+        {
+          "id": "tier_pel_crit",
+          "label": "Falência Multiorgânica Crítica (PELOD-2 >= 11 pontos)",
+          "severityLevel": "critical",
+          "minScore": 11,
+          "maxScore": 32,
+          "statisticalOutcome": "Mortalidade estimada > 30% (PELOD-2 >= 15 supera 70-85% de mortalidade).",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_pel_crit_1",
+              "drugName": "Vasopressores Combinados + Hidrocortisona (Choque Refratário a Catecolaminas)",
+              "dosage": "Hidrocortisona 50 a 100 mg/m²/dia IV dividida de 6/6h (ou 1-2 mg/kg 6/6h) se choque resistente a fluidos e catecolaminas",
+              "route": "Intravenosa (IV)",
+              "frequency": "6/6h",
+              "dilutionInstructions": "Corrigir prontamente hipocalcemia iônica (Gluconato de Cálcio 10% 50-100 mg/kg IV lento), essencial para o acoplamento excitação-contração miocárdico no lactente."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_pel_crit_1",
+              "recommendationTitle": "Suporte Avançado de Vida: TRS Contínua (CVVHD) e Avaliação para ECMO",
+              "dispositionTarget": "UTI Pediátrica Quaternária",
+              "monitoringPlan": "Indicar Terapia Renal Substitutiva contínua se sobrecarga hídrica > 10-15% refratária a diuréticos; avaliar suporte extracorpóreo (ECMO VA ou VV) em centros de referência para choque séptico/cardiogênico ou PARDS refratários."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_holliday_segar",
+      "slug": "holliday-segar",
+      "name": "Regra de Holliday-Segar (100/50/20 & 4-2-1) — Hidratação Venosa Isotônica Pediátrica",
+      "acronym": "Holliday-Segar",
+      "version": "1.0.0",
+      "category": "Pediatria e Neonatologia",
+      "subcategory": "Hidratação Venosa e Distúrbios Hidroeletrolíticos",
+      "categorySlug": "bloco-08-pediatria-neonatologia",
+      "categoryName": "Pediatria e Neonatologia",
+      "moduleName": "Emergência e Sepse Pediátrica",
+      "blockId": "block_08",
+      "blockFile": "block_08.json",
+      "description": "Cálculo clássico da necessidade hídrica e calórica basal diária (100 mL/kg para os primeiros 10 kg; +50 mL/kg de 10 a 20 kg; +20 mL/kg para cada kg acima de 20 kg) e da taxa de infusão horária pela Regra 4-2-1 (4 mL/kg/h nos primeiros 10 kg; +2 mL/kg/h de 10 a 20 kg; +1 mL/kg/h acima de 20 kg), atualizado com a diretriz obrigatória da AAP/SBP de prescrição de Solução Isotônica (NaCl 0,9% + SG 5%).",
+      "summary": "Cálculo da vazão em mL/h (Regra 4-2-1) e volume diário (100/50/20) com Solução Isotônica padrão AAP/SBP.",
+      "clinicalObjective": "Determinar a taxa exata de infusão em bomba (mL/h) e a composição eletrolítica isotônica de manutenção para prevenir hiponatremia iatrogênica hospitalar por secreção inapropriada de ADH (SIADH).",
+      "targetPopulation": "Crianças de 28 dias de vida a 18 anos em jejum necessitando de hidratação venosa de manutenção.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Vazão (mL/h) = [4 mL/kg/h (0-10 kg) + 2 mL/kg/h (10-20 kg) + 1 mL/kg/h (> 20 kg)] ajustada pelo Fator Clínico de ADH",
+      "evidenceSource": "Holliday MA, Segar WE. The maintenance need for water in parenteral fluid therapy. Pediatrics. 1957;19(5):823-832. / Feld LG et al. (AAP Clinical Practice Guideline: Maintenance Intravenous Fluids in Children). Pediatrics. 2018;142(6):e20183083.",
+      "minPossibleScore": 8,
+      "maxPossibleScore": 120,
+      "baseScore": 0,
+      "badge": "pediatria",
+      "clinicalWarning": "DIRETRIZ MANDATÓRIA AAP 2018 / SBP (FIM DO SORO HIPOTÔNICO): Embora a fórmula original de 1957 sugerisse soro hipotônico (NaCl 0,2%), as diretrizes atuais determinam o uso de SOLUÇÃO ISOTÔNICA (NaCl 0,9% em SG 5%, ~140-154 mEq/L de Na+) para manutenção venosa pediátrica, devido ao alto risco de encefalopatia hiponatrêmica fatal induzida por estímulos não osmóticos de ADH (dor, pós-operatório, pneumonia, meningite).",
+      "radarAxes": [
+        {
+          "id": "axis_hs_weight1",
+          "label": "Faixa 1 (Primeiros 10 kg: 100 mL/kg | 4 mL/kg/h)",
+          "system": "Metabolismo Basal",
+          "unit": "mL/h",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_hs_weight2",
+          "label": "Faixa 2 e 3 (> 10 kg: +50/+20 mL/kg | +2/+1 mL/kg/h)",
+          "system": "Superfície Corporal",
+          "unit": "mL/h",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_hs_adh",
+          "label": "Ajuste por Estímulo de ADH / Estado Hídrico",
+          "system": "Renal / Endócrino",
+          "unit": "mL/h",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_hs_first10",
+          "name": "1. Primeiros 10 kg de Peso Corporal (100 mL/kg/dia = 4 mL/kg/h)",
+          "slug": "primeiros-10kg-holliday-segar",
+          "inputType": "single_choice",
+          "unit": "mL/h",
+          "radarAxisId": "axis_hs_weight1",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Para crianças >= 10 kg, esta primeira faixa contribui sempre com 1.000 mL/dia (40 mL/h).",
+          "options": [
+            {
+              "id": "opt_hs_w1_3",
+              "label": "Lactente de ~3 kg (300 mL/dia = 12 mL/h) (+12 mL/h)",
+              "pointValue": 12,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.2,
+              "sortOrder": 1,
+              "description": "Volume diário basal: 300 mL/24h."
+            },
+            {
+              "id": "opt_hs_w1_5",
+              "label": "Lactente de ~5 kg (500 mL/dia = 20 mL/h) (+20 mL/h)",
+              "pointValue": 20,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.4,
+              "sortOrder": 2,
+              "description": "Volume diário basal: 500 mL/24h."
+            },
+            {
+              "id": "opt_hs_w1_8",
+              "label": "Lactente de ~8 kg (800 mL/dia = 32 mL/h) (+32 mL/h)",
+              "pointValue": 32,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.7,
+              "sortOrder": 3,
+              "description": "Volume diário basal: 800 mL/24h."
+            },
+            {
+              "id": "opt_hs_w1_10",
+              "label": "Criança >= 10 kg — Faixa 1 Completa (1.000 mL/dia = 40 mL/h) (+40 mL/h)",
+              "pointValue": 40,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 4,
+              "description": "10 kg x 100 mL/kg = 1.000 mL/dia (40 mL/h)."
+            }
+          ]
+        },
+        {
+          "id": "grp_hs_above10",
+          "name": "2. Peso Adicional Acima de 10 kg (+50 mL/kg de 10-20 kg [+2 mL/kg/h] e +20 mL/kg > 20 kg [+1 mL/kg/h])",
+          "slug": "peso-acima-10kg-holliday-segar",
+          "inputType": "single_choice",
+          "unit": "mL/h",
+          "radarAxisId": "axis_hs_weight2",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_hs_w2_0",
+              "label": "Peso <= 10 kg (Sem acréscimo de Faixa 2 ou 3) (+0 mL/h)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Apenas Faixa 1 aplicável."
+            },
+            {
+              "id": "opt_hs_w2_15",
+              "label": "Peso Total ~15 kg (+5 kg na Faixa 2: +250 mL/dia = +10 mL/h)",
+              "pointValue": 10,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.2,
+              "sortOrder": 2,
+              "description": "Total 15 kg: 1.250 mL/dia (50 mL/h)."
+            },
+            {
+              "id": "opt_hs_w2_20",
+              "label": "Peso Total ~20 kg (+10 kg na Faixa 2: +500 mL/dia = +20 mL/h)",
+              "pointValue": 20,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.4,
+              "sortOrder": 3,
+              "description": "Total 20 kg: 1.500 mL/dia (60 mL/h)."
+            },
+            {
+              "id": "opt_hs_w2_30",
+              "label": "Peso Total ~30 kg (+500 mL Faixa 2 + 200 mL Faixa 3 = +30 mL/h)",
+              "pointValue": 30,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.6,
+              "sortOrder": 4,
+              "description": "Total 30 kg: 1.700 mL/dia (~70 mL/h)."
+            },
+            {
+              "id": "opt_hs_w2_40",
+              "label": "Peso Total ~40 kg (+500 mL Faixa 2 + 400 mL Faixa 3 = +40 mL/h)",
+              "pointValue": 40,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.8,
+              "sortOrder": 5,
+              "description": "Total 40 kg: 1.900 mL/dia (~80 mL/h)."
+            },
+            {
+              "id": "opt_hs_w2_60",
+              "label": "Peso Total >= 60 kg (Teto máximo fisiológico de manutenção = +60 mL/h)",
+              "pointValue": 60,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 6,
+              "description": "Total >= 60 kg: limitar teto máximo em 2.400 mL/dia (100 mL/h)."
+            }
+          ]
+        },
+        {
+          "id": "grp_hs_adh_mod",
+          "name": "3. Modulador Clínico de Volemia / Secreção de ADH (Pós-Operatório, Meningite, Pneumonia, Febre)",
+          "slug": "modulador-adh-holliday-segar",
+          "inputType": "single_choice",
+          "unit": "mL/h",
+          "radarAxisId": "axis_hs_adh",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Em estados de SIADH (meningite, TCE, bronquiolite/pneumonia grave), restringir a manutenção para 65-80% do Holliday-Segar.",
+          "options": [
+            {
+              "id": "opt_hs_adh_restr",
+              "label": "Restrição Hídrica (65-75% do basal: Meningite, Edema Cerebral, ICC, Bronquiolite Grave) (-4 mL/h)",
+              "pointValue": -4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.6,
+              "sortOrder": 1,
+              "description": "Reduz o volume livre para prevenir sobrecarga hídrica e hiponatremia por SIADH."
+            },
+            {
+              "id": "opt_hs_adh_norm",
+              "label": "Manutenção Basal Padrão (100% do Holliday-Segar — Paciente Euvolemico em Jejum) (+0 mL/h)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 2,
+              "description": "100% da regra 4-2-1 com Solução Isotônica."
+            },
+            {
+              "id": "opt_hs_adh_incr",
+              "label": "Perdas Insensíveis Aumentadas (Febre persistente +12% por °C, Fototerapia, Taquipneia) (+20 mL/h)",
+              "pointValue": 20,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Compensação de perdas evaporativas e térmicas aumentadas."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_hs_infant",
+          "label": "Faixa Lactente (< 10 kg) — Vazão Estimada 8 a 40 mL/h (200 a 1.000 mL/dia)",
+          "severityLevel": "low",
+          "minScore": 8,
+          "maxScore": 40,
+          "statisticalOutcome": "Meta de manutenção para lactentes: 100 mL/kg/dia (4 mL/kg/h) com monitorização rigorosa de glicemia e sódio.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_hs_inf_1",
+              "drugName": "Solução Isotônica Pediátrica em Bag de 500 mL (NaCl 0,9% + SG 5% + KCl)",
+              "dosage": "Receita Prática (500 mL): SG 5% 480 mL + NaCl 20% 20 mL (= 136 mEq/L de Na+) + KCl 19,1% 4 a 5 mL (= 20 mEq/L de K+ após diurese presente)",
+              "route": "Intravenosa (IV) em Bomba de Infusão Contínua (BIC)",
+              "frequency": "Contínua em 24 horas na vazão calculada (mL/h)",
+              "dilutionInstructions": "Alternativa comercial pronta: 500 mL de SF 0,9% + 50 mL de Glicose 50% (= SG 4,5% em SF ~0,82%) + KCl 19,1% 4 mL. NUNCA adicionar KCl antes de confirmar diurese efetiva!"
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_hs_inf_1",
+              "recommendationTitle": "Infusão Exclusiva em BIC e Dosagem Diária de Eletrólitos",
+              "dispositionTarget": "Observação / Enfermaria Pediátrica",
+              "monitoringPlan": "Em lactentes < 10 kg, toda hidratação venosa deve correr obrigatoriamente em Bomba de Infusão Contínua para evitar sobrecarga volêmica acidental. Pesar diariamente e dosar Na+, K+ e glicemia a cada 12-24h."
+            }
+          ]
+        },
+        {
+          "id": "tier_hs_child",
+          "label": "Faixa Pré-Escolar / Escolar (10 a 25 kg) — Vazão Estimada 41 a 68 mL/h (1.000 a 1.600 mL/dia)",
+          "severityLevel": "intermediate",
+          "minScore": 41,
+          "maxScore": 68,
+          "statisticalOutcome": "Regra 4-2-1: 40 mL/h (pelos primeiros 10 kg) + 2 mL/kg/h para cada kg entre 10 e 20 kg + 1 mL/kg/h acima de 20 kg.",
+          "colorHex": "#0ea5e9",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_hs_chi_1",
+              "drugName": "Solução Isotônica de Manutenção (SG 5% + NaCl 0,9% + KCl 20 mEq/L)",
+              "dosage": "Para cada etapa de 500 mL: SG 5% 480 mL + NaCl 20% 20 mL + KCl 19,1% 4 mL (ouKCl 10% 10 mL)",
+              "route": "Intravenosa (IV)",
+              "frequency": "Infusão contínua conforme vazão calculada em mL/h",
+              "dilutionInstructions": "Atenção: a solução de manutenção NÃO deve ser usada para expansão rápida (bolus)! Se houver desidratação grave/choque, expandir separadamente com SF 0,9% ou Ringer Lactato Puro (20 mL/kg SEM glicose e SEM potássio)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_hs_chi_1",
+              "recommendationTitle": "Transição Precoce para Via Oral / Reidratação Enteral Assim que Tolerado",
+              "dispositionTarget": "Enfermaria Pediátrica",
+              "monitoringPlan": "Reavaliar necessidade de manutenção IV a cada 12 horas; suspender hidratação venosa assim que a aceitação oral atingir >= 60-75% da cota diária."
+            }
+          ]
+        },
+        {
+          "id": "tier_hs_adolescent",
+          "label": "Faixa Escolar / Adolescente (> 25 kg) — Vazão Estimada 69 a 120 mL/h (Teto Máximo 2.400 mL/dia)",
+          "severityLevel": "high",
+          "minScore": 69,
+          "maxScore": 120,
+          "statisticalOutcome": "Regra 4-2-1: 60 mL/h (pelos primeiros 20 kg) + 1 mL/kg/h para cada kg acima de 20 kg (limitado ao teto adulto de 100 mL/h = 2.400 mL/dia).",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_hs_ado_1",
+              "drugName": "Solução Isotônica Padrão (NaCl 0,9% em SG 5% + KCl 20 mEq/L)",
+              "dosage": "Prescrever 4 etapas de 500 mL ou 2 bolsas de 1.000 mL nas 24h (respeitando o teto máximo de 2.000-2.400 mL/dia em pacientes obesos ou > 60 kg)",
+              "route": "Intravenosa (IV)",
+              "frequency": "Contínua",
+              "dilutionInstructions": "Em adolescentes obesos, utilizar o Peso Ideal (Percentil 50 para a estatura) e nunca ultrapassar 2.400 mL/dia de manutenção basal."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_hs_ado_1",
+              "recommendationTitle": "Controle de Balanço Hídrico, Diurese Horária e Natremia",
+              "dispositionTarget": "Enfermaria Pediátrica / Pós-Operatório",
+              "monitoringPlan": "Se Sódio sérico cair para < 135 mEq/L ou houver sintomas neurológicos (cefaleia, náuseas, letargia), reduzir a vazão para 60-70% e se hiponatremia sintomática aguda, administrar NaCl 3% 2-4 mL/kg em 15-20 min."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -299,7 +299,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs font-semibold px-3.5 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+              className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                 isSelected
                   ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
                   : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'

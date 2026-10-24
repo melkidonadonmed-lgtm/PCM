@@ -5,6 +5,7 @@ import { CLINICAL_KITS, ClinicalKit } from '../../data/clinicalKits';
 import { SUS_DOCUMENTS_CATALOG } from '../../data/susDocumentsCatalog';
 import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../../data/medicationDatabase';
 import { searchUnifiedMedicationsFuzzy } from '../../utils/fuzzySearch';
+import { searchScoreboardCatalog } from '../../data/scores/scoreboardCatalog';
 import { Badge } from '../ui/Badge';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
@@ -12,6 +13,7 @@ export interface CommandPaletteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectTab: (tab: ActiveTab) => void;
+  onSelectScore?: (calculatorId: string) => void;
   onAplicarKit: (kit: ClinicalKit) => void;
   onUsarMedicamento: (med: UnifiedMedication) => void;
   onOpenPatientModal: () => void;
@@ -20,7 +22,7 @@ export interface CommandPaletteModalProps {
 
 interface CommandOption {
   id: string;
-  group: 'Navegação Rápida' | 'Formulários SUS' | 'Kits de Plantão' | 'Medicamentos (RENAME/SUS)';
+  group: 'Navegação Rápida' | 'Escores Clínicos (Scoreboard)' | 'Formulários SUS' | 'Kits de Plantão' | 'Medicamentos (RENAME/SUS)';
   title: string;
   subtitle: string;
   badge?: string;
@@ -33,6 +35,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   isOpen,
   onClose,
   onSelectTab,
+  onSelectScore,
   onAplicarKit,
   onUsarMedicamento,
   onOpenPatientModal,
@@ -115,6 +118,18 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         },
       },
       {
+        id: 'nav-scores',
+        group: 'Navegação Rápida',
+        title: 'Escores Clínicos & Scoreboard CDSS (114 Escores, BIC & EPARADA)',
+        subtitle: 'Catálogo monográfico de 114 escores, Radar SVG 60fps, Drogas Vasoativas em BIC, EPARADA e Rastreio INCA',
+        shortcut: 'Alt+8',
+        icon: 'monitor_heart',
+        action: () => {
+          onSelectTab('scores');
+          onClose();
+        },
+      },
+      {
         id: 'nav-editor',
         group: 'Navegação Rápida',
         title: 'Editor A4 & Timbrados',
@@ -123,6 +138,18 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         icon: 'editor',
         action: () => {
           onSelectTab('editor');
+          onClose();
+        },
+      },
+      {
+        id: 'nav-hospital',
+        group: 'Navegação Rápida',
+        title: 'Módulo Hospitalar e Gestão de Pacientes (Leitos EF/LT)',
+        subtitle: 'Admissão manual e multimodal via IA, evolução 24h, curva de exames, Conduta x Evolução e Agente Science',
+        shortcut: 'Alt+7',
+        icon: 'local_hospital',
+        action: () => {
+          onSelectTab('hospital');
           onClose();
         },
       },
@@ -191,8 +218,26 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         opt.group.toLowerCase().includes(q) ||
         (opt.badge && opt.badge.toLowerCase().includes(q))
     );
+    const matchedScores: CommandOption[] = searchScoreboardCatalog(query, 'ALL')
+      .slice(0, 8)
+      .map((scoreItem) => ({
+        id: `score-${scoreItem.id}`,
+        group: 'Escores Clínicos (Scoreboard)',
+        title: `${scoreItem.acronym} — ${scoreItem.name}`,
+        subtitle: scoreItem.summary,
+        badge: scoreItem.hasInfusionProtocol ? 'Escore + BIC' : 'Escore CDSS',
+        icon: 'monitor_heart',
+        action: () => {
+          if (onSelectScore) {
+            onSelectScore(scoreItem.id);
+          } else {
+            onSelectTab('scores');
+          }
+          onClose();
+        },
+      }));
     const matchedMeds: CommandOption[] = searchUnifiedMedicationsFuzzy(UNIFIED_MEDICATIONS, query, 'all')
-      .slice(0, 12)
+      .slice(0, 10)
       .map((med) => ({
         id: `med-${med.id}`,
         group: 'Medicamentos (RENAME/SUS)',
@@ -205,8 +250,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
           onClose();
         },
       }));
-    return [...matchedNonMeds, ...matchedMeds].slice(0, 18);
-  }, [allOptions, onClose, onUsarMedicamento, query]);
+    return [...matchedNonMeds, ...matchedScores, ...matchedMeds].slice(0, 20);
+  }, [allOptions, onClose, onSelectScore, onSelectTab, onUsarMedicamento, query]);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -299,7 +344,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                   aria-selected={isSelected}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   onClick={item.action}
-                  className={`w-full min-h-[48px] px-3.5 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition cursor-pointer border ${
+                  className={`w-full min-h-[48px] px-4 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition cursor-pointer border ${
                     isSelected
                       ? 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/15 text-[var(--text-main)] shadow-tactile-sm'
                       : 'bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] border-transparent text-[var(--text-secondary)]'

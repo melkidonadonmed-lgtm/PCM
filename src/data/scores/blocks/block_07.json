@@ -1,0 +1,2496 @@
+{
+  "blockId": "block_07",
+  "blockName": "Gastroenterologia e Hepatologia",
+  "version": "1.0.0",
+  "categorySlug": "bloco-07-gastro-hepatologia",
+  "description": "Dossiês monográficos completos dos 7 escores de hepatologia (Child-Pugh, MELD-Na / MELD 3.0, Lille, Maddrey, CLIF-C ACLF) e hemorragia digestiva alta (Glasgow-Blatchford, Rockall).",
+  "calculators": [
+    {
+      "id": "calc_child_pugh",
+      "slug": "child-pugh",
+      "name": "Escore de Child-Pugh (Child-Turcotte-Pugh) na Cirrose Hepática",
+      "acronym": "Child-Pugh",
+      "version": "1.0.0",
+      "category": "Hepatologia e Gastroenterologia",
+      "subcategory": "Cirrose e Insuficiência Hepática",
+      "categorySlug": "bloco-07-hepatologia-gastroenterologia",
+      "categoryName": "Hepatologia e Gastroenterologia",
+      "moduleName": "Cirrose e Insuficiência Hepática",
+      "blockId": "block_07",
+      "blockFile": "block_07.json",
+      "description": "Classificação funcional e prognóstica clássica da reserva hepatocelular na cirrose hepática compensada e descompensada (Classes A, B e C), orientando sobrevida em 1 e 2 anos, risco cirúrgico abdominal e ajuste posológico de fármacos.",
+      "summary": "Estratificação funcional da cirrose hepática em Classes A (5-6 pts), B (7-9 pts) e C (10-15 pts).",
+      "clinicalObjective": "Quantificar a reserva funcional hepática, estimar sobrevida em 1 e 2 anos e estratificar risco de mortalidade perioperatória em hepatopatas crônicos.",
+      "targetPopulation": "Pacientes adultos com cirrose hepática de qualquer etiologia (viral, alcoólica, MASLD/NASH, autoimune ou colestática).",
+      "calculationType": "additive_points",
+      "formulaExpression": "Bilirrubina (1-3) + Albumina (1-3) + INR (1-3) + Ascite (1-3) + Encefalopatia (1-3)",
+      "evidenceSource": "Pugh RN, Murray-Lyon IM, Dawson JL, Pietroni MC, Williams R. Transection of the oesophagus for bleeding oesophageal varices. Br J Surg. 1973;60(8):646-649.",
+      "minPossibleScore": 5,
+      "maxPossibleScore": 15,
+      "baseScore": 0,
+      "badge": "hepatologia",
+      "clinicalWarning": "DIRETRIZ DE CIRROSE DESCOMPENSADA: Pacientes Child-Pugh B (>= 7 pts) com sangramento varicoso ativo têm indicação formal de TIPS precoce (preemptivo em < 72h). Pacientes Child-Pugh B e C devem ser encaminhados para avaliação de transplante hepático conjuntamente ao cálculo do MELD-Na.",
+      "radarAxes": [
+        {
+          "id": "axis_cp_excretion",
+          "label": "Excreção Biliar (Bilirrubina)",
+          "system": "Hepático",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_cp_synthesis",
+          "label": "Síntese Proteica (Albumina/INR)",
+          "system": "Coagulação",
+          "unit": "INR/g/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_cp_portal",
+          "label": "Hipertensão Portal (Ascite)",
+          "system": "Vascular",
+          "unit": "grau",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_cp_neuro",
+          "label": "Encefalopatia (West-Haven)",
+          "system": "Neurológico",
+          "unit": "grau",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_cp_bili",
+          "name": "1. Bilirrubina Total Sérica (mg/dL)",
+          "slug": "bilirrubina-total-child-pugh",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_cp_excretion",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Em colangite biliar primária (CBP) ou CEP, os cortes de bilirrubina são < 4 mg/dL (1 pt), 4-10 mg/dL (2 pts) e > 10 mg/dL (3 pts).",
+          "options": [
+            {
+              "id": "opt_cp_bili_1",
+              "label": "< 2,0 mg/dL (< 34 mcmol/L) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Excreção hepatobiliar preservada ou colestase mínima."
+            },
+            {
+              "id": "opt_cp_bili_2",
+              "label": "2,0 a 3,0 mg/dL (34 a 50 mcmol/L) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Hiperbilirrubinemia moderada com icterícia clínica evidente."
+            },
+            {
+              "id": "opt_cp_bili_3",
+              "label": "> 3,0 mg/dL (> 50 mcmol/L) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Falência grave de conjugação/excreção canalicular biliar."
+            }
+          ]
+        },
+        {
+          "id": "grp_cp_alb",
+          "name": "2. Albumina Sérica (g/dL)",
+          "slug": "albumina-serica-child-pugh",
+          "inputType": "single_choice",
+          "unit": "g/dL",
+          "radarAxisId": "axis_cp_synthesis",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Reflete a capacidade sintética hepatocelular crônica (meia-vida da albumina ~20 dias).",
+          "options": [
+            {
+              "id": "opt_cp_alb_1",
+              "label": "> 3,5 g/dL (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Síntese proteica hepática normal."
+            },
+            {
+              "id": "opt_cp_alb_2",
+              "label": "2,8 a 3,5 g/dL (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Hipoalbuminemia moderada por redução da reserva hepatocelular."
+            },
+            {
+              "id": "opt_cp_alb_3",
+              "label": "< 2,8 g/dL (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Hipoalbuminemia grave com queda importante da pressão oncótica plasmática."
+            }
+          ]
+        },
+        {
+          "id": "grp_cp_inr",
+          "name": "3. INR (Relação Normatizada Internacional / Tempo de Protrombina)",
+          "slug": "inr-child-pugh",
+          "inputType": "single_choice",
+          "unit": "INR",
+          "radarAxisId": "axis_cp_synthesis",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Marcador de síntese aguda de fatores vitamina K-dependentes (Fator VII tem meia-vida de 4-6 horas).",
+          "options": [
+            {
+              "id": "opt_cp_inr_1",
+              "label": "INR < 1,7 (Atividade TP > 50%) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Síntese de fatores de coagulação preservada."
+            },
+            {
+              "id": "opt_cp_inr_2",
+              "label": "INR 1,7 a 2,3 (Atividade TP 30-50%) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Coagulopatia hepatocelular moderada."
+            },
+            {
+              "id": "opt_cp_inr_3",
+              "label": "INR > 2,3 (Atividade TP < 30%) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Coagulopatia sintética severa com insuficiência hepatocelular avançada."
+            }
+          ]
+        },
+        {
+          "id": "grp_cp_ascites",
+          "name": "4. Ascite Clínica ou Ultrassonográfica",
+          "slug": "ascite-child-pugh",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_cp_portal",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Avalia hipertensão portal clinicamente significativa (GPVH >= 10-12 mmHg) e retenção renal de sódio.",
+          "options": [
+            {
+              "id": "opt_cp_asc_1",
+              "label": "Ausente (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem líquido livre peritoneal detectável clinicamente ou ao ultrassom."
+            },
+            {
+              "id": "opt_cp_asc_2",
+              "label": "Leve a moderada / Facilmente controlada com diuréticos (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Ascite grau 1 ou 2 responsiva a restrição de sódio e espironolactona/furosemida."
+            },
+            {
+              "id": "opt_cp_asc_3",
+              "label": "Tensa, volumosa ou refratária ao manejo clínico (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Ascite grau 3 tensa exigindo paracentese terapêutica de grande volume com reposição de albumina."
+            }
+          ]
+        },
+        {
+          "id": "grp_cp_he",
+          "name": "5. Encefalopatia Hepática (Critérios de West-Haven)",
+          "slug": "encefalopatia-child-pugh",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_cp_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "helpText": "Avaliar flapping (asterixis), inversão do ciclo sono-vigília, desorientação e torpor/coma.",
+          "options": [
+            {
+              "id": "opt_cp_he_1",
+              "label": "Ausente (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem alterações neuropsiquiátricas ou asterixis."
+            },
+            {
+              "id": "opt_cp_he_2",
+              "label": "Grau I a II (Letargia, inversão do sono, flapping presente, controlada) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Encefalopatia leve a moderada responsiva a lactulose e rifaximina."
+            },
+            {
+              "id": "opt_cp_he_3",
+              "label": "Grau III a IV (Estupor, confusão grave ou coma hepático / refratária) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Encefalopatia grave com risco de aspiração brônquica e edema cerebral."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_cp_class_a",
+          "label": "Child-Pugh Classe A (5 a 6 pontos) — Cirrose Compensada",
+          "severityLevel": "low",
+          "minScore": 5,
+          "maxScore": 6,
+          "statisticalOutcome": "Sobrevida em 1 ano: ~100%; Sobrevida em 2 anos: ~85%. Mortalidade cirúrgica abdominal: ~10%.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_cp_a_1",
+              "drugName": "Carvedilol (ou Propranolol)",
+              "dosage": "6,25 mg VO 1x/dia, titulando para 6,25 mg 12/12h (dose alvo 12,5 mg/dia)",
+              "route": "Via Oral (VO)",
+              "frequency": "12/12h",
+              "dilutionInstructions": "Consenso Baveno VII: Indicado para hipertensão portal clinicamente significativa (elastografia >= 25 kPa ou varizes gastroesofágicas) para prevenir primeira descompensação.",
+              "contraindications": "PAS < 90 mmHg, bradicardia < 50 bpm, bloqueio AV avançado, asma grave."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_cp_a_1",
+              "recommendationTitle": "Seguimento Ambulatorial e Rastreio de CHC",
+              "dispositionTarget": "Acompanhamento Ambulatorial Especializado (Hepatologia)",
+              "monitoringPlan": "Ultrassonografia abdominal superior + Alfafetoproteína (AFP) rigorosamente a cada 6 meses para rastreio de Carcinoma Hepatocelular (CHC). Endoscopia digestiva alta conforme Baveno VII.",
+              "laboratoryPanel": "Hemograma, transaminases, bilirrubinas, albumina, INR, creatinina e eletrólitos semestrais."
+            }
+          ]
+        },
+        {
+          "id": "tier_cp_class_b",
+          "label": "Child-Pugh Classe B (7 a 9 pontos) — Comprometimento Funcional Significativo",
+          "severityLevel": "intermediate",
+          "minScore": 7,
+          "maxScore": 9,
+          "statisticalOutcome": "Sobrevida em 1 ano: ~80%; Sobrevida em 2 anos: ~60%. Mortalidade cirúrgica abdominal: ~30%.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_cp_b_1",
+              "drugName": "Espironolactona + Furosemida",
+              "dosage": "Espironolactona 100 mg + Furosemida 40 mg (proporção 100:40, até máx 400:160 mg/dia)",
+              "route": "Via Oral (VO) pela manhã",
+              "frequency": "1x ao dia",
+              "dilutionInstructions": "Titular a cada 3-5 dias visando perda ponderal de até 0,5 kg/dia (sem edema periférico) ou 1,0 kg/dia (com edema de MMII).",
+              "renalAdjustment": "Suspender diuréticos se Creatinina > 2,0 mg/dL, Sódio < 125 mEq/L, Potássio > 6,0 mEq/L ou Encefalopatia aguda."
+            },
+            {
+              "id": "pha_cp_b_2",
+              "drugName": "Lactulose Xarope (667 mg/mL)",
+              "dosage": "15 a 30 mL VO 2x a 3x/dia",
+              "route": "Via Oral (VO)",
+              "frequency": "Titulada para 2 a 3 evacuações pastosas ao dia",
+              "dilutionInstructions": "Associar Rifaximina 550 mg VO 12/12h em episódios recorrentes de encefalopatia hepática."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_cp_b_1",
+              "recommendationTitle": "Manejo da Descompensação e Encaminhamento para Transplante",
+              "dispositionTarget": "Enfermaria de Gastroenterologia / Ambulatório de Transplante Hepático",
+              "monitoringPlan": "Restrição moderada de sódio dietético (2 g de Na = 5 g de NaCl/dia). Paracentese diagnóstica obrigatória na admissão hospitalar para descartar Peritonite Bacteriana Espontânea (PBE: PMN >= 250/mm³).",
+              "laboratoryPanel": "Cálculo concomitante do MELD-Na, celularidade e cultura de líquido ascítico em frasco de hemocultura."
+            }
+          ]
+        },
+        {
+          "id": "tier_cp_class_c",
+          "label": "Child-Pugh Classe C (10 a 15 pontos) — Cirrose Avançada Descompensada",
+          "severityLevel": "critical",
+          "minScore": 10,
+          "maxScore": 15,
+          "statisticalOutcome": "Sobrevida em 1 ano: ~45%; Sobrevida em 2 anos: ~35%. Mortalidade cirúrgica abdominal: 70% a 82% (contraindica cirurgias eletivas).",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_cp_c_1",
+              "drugName": "Albumina Humana a 20% + Paracentese / Profilaxia de SHR",
+              "dosage": "6 a 8 g de Albumina IV por litro de ascite retirado (acima de 5 litros). Na PBE: 1,5 g/kg no D1 e 1,0 g/kg no D3",
+              "route": "Intravenosa (IV)",
+              "frequency": "Conforme volume de paracentese ou protocolo de PBE (Sort et al.)",
+              "dilutionInstructions": "Cada frasco de 50 mL de Albumina 20% contém 10 g de albumina humana.",
+              "contraindications": "Congestão pulmonar aguda / Edema agudo de pulmão."
+            },
+            {
+              "id": "pha_cp_c_2",
+              "drugName": "Ceftriaxona (na PBE ou HDA Varicosa) ou Norfloxacino / Sulfametoxazol-Trimetoprima",
+              "dosage": "Ceftriaxona 2 g IV 24/24h (5-7 dias na PBE/HDA); Profilaxia secundária: Norfloxacino 400 mg/dia",
+              "route": "Intravenosa (IV) / Via Oral (VO)",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Em pacientes com líquido ascítico com proteína total < 1,5 g/dL e Child-Pugh >= 9 com bilirrubina >= 3 mg/dL, considerar profilaxia primária de PBE."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_cp_c_1",
+              "recommendationTitle": "Suporte Intensivo Hepático e Priorização para Transplante",
+              "dispositionTarget": "Internação Hospitalar / UTI Clínica",
+              "monitoringPlan": "Rastreio ativo de fatores precipitantes de ACLF (Acute-on-Chronic Liver Failure): infecções ocultas, HDA, injúria renal aguda (Síndrome Hepatorrenal - LRA). Suspender betabloqueadores se PAS < 90 mmHg, PAM < 65 mmHg ou SHR-LRA.",
+              "interventionalProcedure": "Paracentese diagnóstica e terapêutica guiada por ultrassom; proteção de via aérea (IOT) se Encefalopatia Grau III-IV (Glasgow <= 8).",
+              "laboratoryPanel": "Painel completo de ACLF: lactato, gasometria, hemoculturas, urinocultura, paracentese diagnóstica, MELD-Na e creatinina seriada."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_meld_na",
+      "slug": "meld-na-meld-3",
+      "name": "Escore MELD-Na (Padrão Brasil/SUS) & Análise Comparativa MELD 3.0",
+      "acronym": "MELD-Na / MELD 3.0",
+      "version": "1.0.0",
+      "category": "Hepatologia e Gastroenterologia",
+      "subcategory": "Cirrose e Transplante Hepático",
+      "categorySlug": "bloco-07-hepatologia-gastroenterologia",
+      "categoryName": "Hepatologia e Gastroenterologia",
+      "moduleName": "Cirrose e Insuficiência Hepática",
+      "blockId": "block_07",
+      "blockFile": "block_07.json",
+      "description": "Modelo matemático logarítmico de gravidade da doença hepática terminal adotado pelo Sistema Nacional de Transplantes (SNT/SUS Brasil) para alocação na fila de transplante hepático (MELD-Na), integrando os modificadores de Sexo Feminino e Albumina Sérica para análise comparativa de equidade pelo MELD 3.0 (Kim et al., 2021).",
+      "summary": "Predição de mortalidade em 90 dias na cirrose e priorização na fila de transplante hepático (escala 6 a 40 pontos).",
+      "clinicalObjective": "Determinar a mortalidade estimada em 3 meses em pacientes cirróticos >= 12 anos, definir elegibilidade e prioridade de alocação no SNT/SUS (MELD-Na >= 15) e corrigir a subestimação de risco em mulheres e hipoalbuminêmicos severos (MELD 3.0).",
+      "targetPopulation": "Pacientes com doença hepática crônica avançada candidatos a transplante hepático ou submetidos a estratificação de risco pré-TIPS / cirúrgico.",
+      "calculationType": "additive_points",
+      "formulaExpression": "MELD(i) = 9,57*ln(Cr) + 3,78*ln(Bili) + 11,2*ln(INR) + 6,43; MELD-Na = MELD(i) + 1,32*(137-Na) - [0,033*MELD(i)*(137-Na)]; MELD 3.0 adiciona Sexo Feminino (+1,33) e Albumina (< 3,5 g/dL)",
+      "evidenceSource": "Kim WR, Biggins SW, Kremers WK, et al. Hyponatremia and mortality among patients on the liver-transplant waiting list. N Engl J Med. 2008;359(10):1018-1026. / Kim WR, Mannalithara A, Heimbach JK, et al. MELD 3.0: The Model for End-Stage Liver Disease Updated for the Modern Era. Gastroenterology. 2021;161(6):1887-1895.",
+      "minPossibleScore": 6,
+      "maxPossibleScore": 40,
+      "baseScore": 6,
+      "badge": "hepatologia",
+      "clinicalWarning": "DIRETRIZ BRASIL/SUS & MELD 3.0: Valores laboratoriais < 1,0 para Bilirrubina, INR ou Creatinina são fixados em 1,0; Creatinina é limitada ao teto de 4,0 mg/dL (MELD-Na) ou 3,0 mg/dL (MELD 3.0), sendo fixada no teto se o paciente realizou >= 2 sessões de hemodiálise na última semana ou 24h de CVVHD. O Sódio é truncado entre 125 e 137 mEq/L. O MELD 3.0 corrige o viés de disparidade de sexo (+1,33 pts para mulheres, cuja menor massa muscular reduz a creatinina sérica para uma mesma TFG).",
+      "radarAxes": [
+        {
+          "id": "axis_meld_renal",
+          "label": "Função Renal (Creatinina/TRS)",
+          "system": "Renal",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_meld_coag",
+          "label": "Coagulopatia Sintética (INR)",
+          "system": "Coagulação",
+          "unit": "INR",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_meld_bili",
+          "label": "Colestase / Bilirrubina",
+          "system": "Hepático",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_meld_na",
+          "label": "Hiponatremia Dilucional (Na+)",
+          "system": "Metabólico",
+          "unit": "mEq/L",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_meld_30",
+          "label": "Modificadores MELD 3.0 (Sexo/Albumina)",
+          "system": "Nutricional",
+          "unit": "g/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_meld_cr",
+          "name": "1. Creatinina Sérica ou Terapia Renal Substitutiva (TRS)",
+          "slug": "creatinina-meld-na",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_meld_renal",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Se >= 2 sessões de hemodiálise nos últimos 7 dias ou 24h de hemofiltração contínua, selecionar a faixa máxima (Creatinina 4,0 mg/dL).",
+          "options": [
+            {
+              "id": "opt_meld_cr_0",
+              "label": "Creatinina <= 1,0 mg/dL (Sem diálise) (+0 pts sobre base 6)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Função renal preservada (ln(1,0) = 0)."
+            },
+            {
+              "id": "opt_meld_cr_1",
+              "label": "Creatinina 1,1 a 1,4 mg/dL (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Disfunção renal inicial ou LRA estágio 1."
+            },
+            {
+              "id": "opt_meld_cr_2",
+              "label": "Creatinina 1,5 a 1,9 mg/dL (+6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 3,
+              "description": "Injúria renal moderada; investigar Síndrome Hepatorrenal (SHR-LRA)."
+            },
+            {
+              "id": "opt_meld_cr_3",
+              "label": "Creatinina 2,0 a 2,9 mg/dL (+9 pts)",
+              "pointValue": 9,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 4,
+              "description": "LRA grave ( teto de creatinina no MELD 3.0 = 3,0 mg/dL)."
+            },
+            {
+              "id": "opt_meld_cr_4",
+              "label": "Creatinina >= 3,0 a 4,0 mg/dL ou Diálise >= 2x/semana (+12 pts)",
+              "pointValue": 12,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Falência renal estabelecida ou SHR-LRA refratária (teto MELD-Na = 4,0 mg/dL)."
+            }
+          ]
+        },
+        {
+          "id": "grp_meld_inr",
+          "name": "2. INR (Relação Normatizada Internacional)",
+          "slug": "inr-meld-na",
+          "inputType": "single_choice",
+          "unit": "INR",
+          "radarAxisId": "axis_meld_coag",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Possui o maior peso multiplicador na equação logarítmica (11,2 * ln(INR)).",
+          "options": [
+            {
+              "id": "opt_meld_inr_0",
+              "label": "INR <= 1,1 (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Coagulação basal preservada."
+            },
+            {
+              "id": "opt_meld_inr_1",
+              "label": "INR 1,2 a 1,5 (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.3,
+              "sortOrder": 2,
+              "description": "Alargamento leve do tempo de protrombina."
+            },
+            {
+              "id": "opt_meld_inr_2",
+              "label": "INR 1,6 a 2,0 (+6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.6,
+              "sortOrder": 3,
+              "description": "Deficiência sintética moderada de fatores hepáticos."
+            },
+            {
+              "id": "opt_meld_inr_3",
+              "label": "INR 2,1 a 2,9 (+8 pts)",
+              "pointValue": 8,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.85,
+              "sortOrder": 4,
+              "description": "Coagulopatia grave da insuficiência hepática avançada."
+            },
+            {
+              "id": "opt_meld_inr_4",
+              "label": "INR >= 3,0 (+10 pts)",
+              "pointValue": 10,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Falência sintética crítica com altíssimo risco de mortalidade em 90 dias."
+            }
+          ]
+        },
+        {
+          "id": "grp_meld_bili",
+          "name": "3. Bilirrubina Total Sérica (mg/dL)",
+          "slug": "bilirrubina-meld-na",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_meld_bili",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Componente 3,78 * ln(Bilirrubina).",
+          "options": [
+            {
+              "id": "opt_meld_bili_0",
+              "label": "Bilirrubina <= 1,2 mg/dL (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Níveis fisiológicos de bilirrubina sérica."
+            },
+            {
+              "id": "opt_meld_bili_1",
+              "label": "Bilirrubina 1,3 a 2,9 mg/dL (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Hiperbilirrubinemia leve a moderada."
+            },
+            {
+              "id": "opt_meld_bili_2",
+              "label": "Bilirrubina 3,0 a 5,9 mg/dL (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.55,
+              "sortOrder": 3,
+              "description": "Icterícia importante por disfunção hepatocelular."
+            },
+            {
+              "id": "opt_meld_bili_3",
+              "label": "Bilirrubina 6,0 a 11,9 mg/dL (+6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.8,
+              "sortOrder": 4,
+              "description": "Colestase / falência excretora severa."
+            },
+            {
+              "id": "opt_meld_bili_4",
+              "label": "Bilirrubina >= 12,0 mg/dL (+7 pts)",
+              "pointValue": 7,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Hiperbilirrubinemia extrema típica de ACLF ou hepatite fulminante."
+            }
+          ]
+        },
+        {
+          "id": "grp_meld_na",
+          "name": "4. Sódio Sérico (mEq/L — Ajuste MELD-Na entre 125 e 137 mEq/L)",
+          "slug": "sodio-meld-na",
+          "inputType": "single_choice",
+          "unit": "mEq/L",
+          "radarAxisId": "axis_meld_na",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "A hiponatremia dilucional reflete vasodilatação esplâncnica grave e hiperativação de ADH/SRAA.",
+          "options": [
+            {
+              "id": "opt_meld_na_0",
+              "label": "Sódio >= 137 mEq/L (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Natremia normal; sem incremento sobre o MELD inicial."
+            },
+            {
+              "id": "opt_meld_na_1",
+              "label": "Sódio 133 a 136 mEq/L (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.3,
+              "sortOrder": 2,
+              "description": "Hiponatremia leve."
+            },
+            {
+              "id": "opt_meld_na_2",
+              "label": "Sódio 129 a 132 mEq/L (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 3,
+              "description": "Hiponatremia moderada associada a ascite refratária."
+            },
+            {
+              "id": "opt_meld_na_3",
+              "label": "Sódio <= 128 mEq/L (truncado em 125 mEq/L) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Hiponatremia dilucional grave; alto risco de síndrome hepatorrenal e edema cerebral."
+            }
+          ]
+        },
+        {
+          "id": "grp_meld_sex",
+          "name": "5. Sexo Biológico (Fator de Equidade Comparativo MELD 3.0)",
+          "slug": "sexo-meld-3",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_meld_30",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "helpText": "No MELD 3.0, o sexo feminino adiciona +1,33 ponto para compensar a menor geração basal de creatinina.",
+          "options": [
+            {
+              "id": "opt_meld_sex_m",
+              "label": "Sexo Masculino / Padrão MELD-Na Clássico (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem ajuste adicional de sexo."
+            },
+            {
+              "id": "opt_meld_sex_f",
+              "label": "Sexo Feminino — Ajuste Comparativo MELD 3.0 (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Incremento de +1,33 pt no MELD 3.0 para corrigir subestimação da disfunção renal em mulheres."
+            }
+          ]
+        },
+        {
+          "id": "grp_meld_alb",
+          "name": "6. Albumina Sérica (g/dL — Variável Comparativa MELD 3.0)",
+          "slug": "albumina-meld-3",
+          "inputType": "single_choice",
+          "unit": "g/dL",
+          "radarAxisId": "axis_meld_30",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 6,
+          "helpText": "Truncada entre 1,5 e 3,5 g/dL na equação MELD 3.0.",
+          "options": [
+            {
+              "id": "opt_meld_alb_0",
+              "label": "Albumina >= 3,5 g/dL (ou cálculo MELD-Na estrito) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Albumina normal (>= 3,5 g/dL)."
+            },
+            {
+              "id": "opt_meld_alb_1",
+              "label": "Albumina < 2,8 g/dL — Ajuste Comparativo MELD 3.0 (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Hipoalbuminemia grave que eleva independentemente a mortalidade na fila de espera."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_meld_low",
+          "label": "MELD-Na 6 a 14 pontos — Baixo Risco (Sem Benefício de Transplante Imediato)",
+          "severityLevel": "low",
+          "minScore": 6,
+          "maxScore": 14,
+          "statisticalOutcome": "Mortalidade em 90 dias: 1,9% (MELD < 9) a 6,0% (MELD 10-14). Sobrevida com fígado nativo supera o risco pós-transplante imediato (salvo situações especiais/CHC).",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_meld_low_1",
+              "drugName": "Terapia Etiológica + Betabloqueador Não Seletivo (Carvedilol)",
+              "dosage": "Carvedilol 6,25 mg VO 12/12h + Antiviral de ação direta (HCV) ou Entecavir/Tenofovir (HBV)",
+              "route": "Via Oral (VO)",
+              "frequency": "Uso contínuo",
+              "dilutionInstructions": "Manter abstinência alcoólica estrita e controle metabólico."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_meld_low_1",
+              "recommendationTitle": "Manejo Conservador e Rastreio de Exceções Prioritárias",
+              "dispositionTarget": "Ambulatório de Hepatologia",
+              "monitoringPlan": "Recalcular MELD-Na a cada 3 a 6 meses. Verificar se há critérios de situação especial no SNT/SUS (ex.: Carcinoma Hepatocelular dentro dos Critérios de Milão, Síndrome Hepatopulmonar com PaO2 < 60 mmHg, Ascite refratária)."
+            }
+          ]
+        },
+        {
+          "id": "tier_meld_mod",
+          "label": "MELD-Na 15 a 24 pontos — Risco Moderado a Alto (Indicação de Listagem em Transplante)",
+          "severityLevel": "intermediate",
+          "minScore": 15,
+          "maxScore": 24,
+          "statisticalOutcome": "Mortalidade em 90 dias: ~19,6% (MELD 20-29). Ponto de inflexão (MELD >= 15) em que o benefício de sobrevida do transplante hepático supera a permanência sem transplante.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_meld_mod_1",
+              "drugName": "Espironolactona + Furosemida + Lactulose / Rifaximina",
+              "dosage": "Espironolactona 100-200 mg/dia + Furosemida 40-80 mg/dia; Rifaximina 550 mg 12/12h",
+              "route": "Via Oral (VO)",
+              "frequency": "Diário",
+              "dilutionInstructions": "Monitorar eletrólitos e função renal rigorosamente a cada ajuste diurético."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_meld_mod_1",
+              "recommendationTitle": "Inclusão Formal na Fila de Transplante Hepático (SNT/SUS)",
+              "dispositionTarget": "Centro Transplantador de Fígado Credenciado",
+              "monitoringPlan": "No Brasil (Portaria MS/SNT), MELD 11-18 exige renovação de exames a cada 90 dias (validade de 3 meses); MELD 19-24 exige renovação a cada 30 dias.",
+              "interventionalProcedure": "Atenção: se indicado TIPS eletivo, MELD > 18-20 associa-se a risco elevado de falência hepática pós-TIPS e encefalopatia refratária."
+            }
+          ]
+        },
+        {
+          "id": "tier_meld_high",
+          "label": "MELD-Na 25 a 31 pontos — Alto Risco (Prioridade Elevada na Fila de Transplante)",
+          "severityLevel": "high",
+          "minScore": 25,
+          "maxScore": 31,
+          "statisticalOutcome": "Mortalidade em 90 dias: 25% a 52%. Alta probabilidade de descompensação aguda sobre crônica (ACLF).",
+          "colorHex": "#f97316",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_meld_high_1",
+              "drugName": "Terlipressina + Albumina Humana 20% (Se Síndrome Hepatorrenal — SHR-LRA)",
+              "dosage": "Terlipressina 1 mg IV 4/4h ou 6/6h (ou infusão contínua 2 mg/24h até máx 12 mg/24h) + Albumina 20-40 g/dia IV",
+              "route": "Intravenosa (IV)",
+              "frequency": "Infusão contínua ou bolus 4/4h-6/6h",
+              "dilutionInstructions": "A infusão contínua de Terlipressina reduz efeitos adversos isquêmicos com eficácia equivalente ao bolus.",
+              "contraindications": "Doença coronariana aguda, isquemia mesentérica ou periférica grave, hipoxemia SpO2 < 90% (risco de insuficiência respiratória na ACLF grau 3)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_meld_high_1",
+              "recommendationTitle": "Renovação Semanal no SNT e Vigilância de ACLF",
+              "dispositionTarget": "Internação Hospitalar / Unidade Semi-Intensiva",
+              "monitoringPlan": "No SNT/SUS, MELD >= 25 tem validade máxima de 7 dias e exige atualização laboratorial semanal obrigatória.",
+              "laboratoryPanel": "Renovação semanal de Bilirrubina, INR, Creatinina e Sódio sérico."
+            }
+          ]
+        },
+        {
+          "id": "tier_meld_crit",
+          "label": "MELD-Na 32 a 40 pontos — Risco Crítico Extremo (Urgência Máxima de Transplante)",
+          "severityLevel": "critical",
+          "minScore": 32,
+          "maxScore": 40,
+          "statisticalOutcome": "Mortalidade em 90 dias: 52,6% (MELD 30-39) a 71,3% (MELD 40) sem transplante hepático de urgência.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_meld_crit_1",
+              "drugName": "Noradrenalina em BIC + Albumina Humana 20% (Choque / SHR-LRA em UTI)",
+              "dosage": "Noradrenalina 0,05 a 0,5 mcg/kg/min IV contínua visando elevação da PAM em >= 10-15 mmHg + Albumina 20% 20-40 g/dia",
+              "route": "Acesso Venoso Central",
+              "frequency": "Infusão contínua em BIC",
+              "dilutionInstructions": "4 ampolas (16 mg) em 234 mL de SG 5% (64 mcg/mL). Alternativa padrão à Terlipressina em ambiente de UTI com eficácia comprovada na reversão da SHR-LRA.",
+              "infusionProtocol": {
+                "drugId": "drug_noradrenalina",
+                "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+                "standardSolution": {
+                  "ampoules": "4 ampolas (16 mg = 16 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 64,
+                  "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+                  "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+                },
+                "concentratedSolution": {
+                  "ampoules": "8 ampolas (32 mg = 32 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 128,
+                  "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+                  "indication": "Restrição volêmica estrita / Choque refratário"
+                },
+                "doseUnit": "mcg/kg/min",
+                "initialDose": 0.05,
+                "maintenanceDoseMin": 0.1,
+                "maintenanceDoseMax": 0.5,
+                "maxDose": 2.0,
+                "defaultDose": 0.1,
+                "isFixedDose": false,
+                "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+                "containerCompatibility": "qualquer",
+                "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+                "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+                "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+              }
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_meld_crit_1",
+              "recommendationTitle": "Suporte Multiorgânico em UTI como Ponte para Transplante",
+              "dispositionTarget": "UTI Geral ou UTI de Transplante Hepático",
+              "monitoringPlan": "Monitorização hemodinâmica invasiva, terapia renal substitutiva contínua (CVVHD) se hipervolemia/acidose/uremia refratárias, rastreio infeccioso diário e prioridade máxima regional no SNT.",
+              "ventilatorySupport": "Intubação orotraqueal protetora se Encefalopatia Grau III-IV.",
+              "vascularAccess": "Cateter venoso central + PAI + cateter de hemodiálise se necessário."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_maddrey",
+      "slug": "maddrey-mdf",
+      "name": "Função Discriminante de Maddrey (mDF) na Hepatite Alcoólica Aguda",
+      "acronym": "Maddrey (mDF)",
+      "version": "1.0.0",
+      "category": "Hepatologia e Gastroenterologia",
+      "subcategory": "Hepatite Alcoólica Aguda",
+      "categorySlug": "bloco-07-hepatologia-gastroenterologia",
+      "categoryName": "Hepatologia e Gastroenterologia",
+      "moduleName": "Cirrose e Insuficiência Hepática",
+      "blockId": "block_07",
+      "blockFile": "block_07.json",
+      "description": "Índice prognóstico clássico da Hepatite Alcoólica Aguda baseado no alargamento do Tempo de Protrombina (TP paciente - TP controle em segundos) e na Bilirrubina Total sérica, identificando hepatite alcoólica grave (mDF >= 32) elegível à corticoterapia com Prednisolona.",
+      "summary": "Identificação de Hepatite Alcoólica Aguda Grave (mDF >= 32) para início de Prednisolona 40 mg/dia por 28 dias.",
+      "clinicalObjective": "Estratificar o risco de mortalidade em 28 a 30 dias na hepatite alcoólica aguda e selecionar candidatos com benefício de sobrevida ao tratamento com corticosteroide.",
+      "targetPopulation": "Pacientes com história de etilismo pesado, icterícia de início recente (< 8 semanas), relação AST/ALT > 1,5-2,0 (ambas < 400 UI/L) e Bilirrubina > 3,0 mg/dL.",
+      "calculationType": "additive_points",
+      "formulaExpression": "mDF = 4,6 * (TP_paciente - TP_controle [s]) + Bilirrubina Total (mg/dL)",
+      "evidenceSource": "Maddrey WC, Boitnott JK, Bedine MS, Weber FL Jr, Mezey E, White RI Jr. Corticosteroid therapy of alcoholic hepatitis. Gastroenterology. 1978;75(2):193-199. / Thursz MR et al. (STOPAH Trial). N Engl J Med. 2015;372(17):1619-1628.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 70,
+      "baseScore": 0,
+      "badge": "hepatologia",
+      "clinicalWarning": "RASTREIO OBRIGATÓRIO PRÉ-CORTICOIDE: Antes de iniciar Prednisolona 40 mg/dia em pacientes com mDF >= 32, é MANDATÓRIO realizar rastreio infeccioso completo (paracentese diagnóstica, urocultura, hemoculturas, RX de tórax), descartar hemorragia digestiva alta ativa, hepatite B aguda/crônica (HBsAg) e injúria renal aguda grave (Creatinina > 2,5 mg/dL). Avaliar resposta terapêutica obrigatoriamente no 7º dia pelo Modelo de Lille.",
+      "radarAxes": [
+        {
+          "id": "axis_mdf_pt",
+          "label": "Alargamento do TP (4,6x Delta TP)",
+          "system": "Coagulação",
+          "unit": "s",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_mdf_bili",
+          "label": "Bilirrubina Total Sérica",
+          "system": "Hepático",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_mdf_neuro",
+          "label": "Encefalopatia / Gravidade Clínica",
+          "system": "Neurológico",
+          "unit": "grau",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_mdf_pt",
+          "name": "1. Prolongamento do Tempo de Protrombina: (TP Paciente - TP Controle) x 4,6",
+          "slug": "prolongamento-tp-maddrey",
+          "inputType": "single_choice",
+          "unit": "segundos",
+          "radarAxisId": "axis_mdf_pt",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Multiplica-se a diferença em segundos entre o TP do paciente e o TP controle do laboratório pelo fator 4,6.",
+          "options": [
+            {
+              "id": "opt_mdf_pt_0",
+              "label": "Delta TP <= 1 s (TP normal ou limítrofe: +0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem prolongamento significativo do Tempo de Protrombina."
+            },
+            {
+              "id": "opt_mdf_pt_1",
+              "label": "Delta TP de 2 a 3 s (~11 pts na fórmula: +11 pts)",
+              "pointValue": 11,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Coagulopatia leve (4,6 x 2,5 s = 11,5 pts)."
+            },
+            {
+              "id": "opt_mdf_pt_2",
+              "label": "Delta TP de 4 a 5 s (~21 pts na fórmula: +21 pts)",
+              "pointValue": 21,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.55,
+              "sortOrder": 3,
+              "description": "Coagulopatia moderada (4,6 x 4,5 s = 20,7 pts)."
+            },
+            {
+              "id": "opt_mdf_pt_3",
+              "label": "Delta TP de 6 a 8 s (~32 pts na fórmula: +32 pts)",
+              "pointValue": 32,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.8,
+              "sortOrder": 4,
+              "description": "Coagulopatia grave; atinge isoladamente o limiar de Maddrey >= 32."
+            },
+            {
+              "id": "opt_mdf_pt_4",
+              "label": "Delta TP >= 9 s (>= 42 pts na fórmula: +42 pts)",
+              "pointValue": 42,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Falência sintética aguda extrema de fatores pró-coagulantes."
+            }
+          ]
+        },
+        {
+          "id": "grp_mdf_bili",
+          "name": "2. Bilirrubina Total Sérica (mg/dL)",
+          "slug": "bilirrubina-maddrey",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_mdf_bili",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Valor absoluto em mg/dL somado diretamente ao componente do TP.",
+          "options": [
+            {
+              "id": "opt_mdf_bili_0",
+              "label": "Bilirrubina < 3,0 mg/dL (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem hiperbilirrubinemia típica de hepatite alcoólica aguda."
+            },
+            {
+              "id": "opt_mdf_bili_1",
+              "label": "Bilirrubina 3,0 a 6,9 mg/dL (+5 pts)",
+              "pointValue": 5,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Icterícia moderada."
+            },
+            {
+              "id": "opt_mdf_bili_2",
+              "label": "Bilirrubina 7,0 a 12,9 mg/dL (+10 pts)",
+              "pointValue": 10,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.55,
+              "sortOrder": 3,
+              "description": "Colestase intra-hepática acentuada por lesão canalicular alcoólica."
+            },
+            {
+              "id": "opt_mdf_bili_3",
+              "label": "Bilirrubina 13,0 a 19,9 mg/dL (+16 pts)",
+              "pointValue": 16,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.8,
+              "sortOrder": 4,
+              "description": "Hiperbilirrubinemia grave."
+            },
+            {
+              "id": "opt_mdf_bili_4",
+              "label": "Bilirrubina >= 20,0 mg/dL (+22 pts)",
+              "pointValue": 22,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Hiperbilirrubinemia crítica com alto risco de nefropatia colêmica e mortalidade."
+            }
+          ]
+        },
+        {
+          "id": "grp_mdf_he",
+          "name": "3. Encefalopatia Hepática Espontânea Associada",
+          "slug": "encefalopatia-maddrey",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_mdf_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "A presença de encefalopatia hepática espontânea na hepatite alcoólica define gravidade clínica independentemente do valor numérico isolado.",
+          "options": [
+            {
+              "id": "opt_mdf_he_no",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Paciente alerta e orientado sem flapping."
+            },
+            {
+              "id": "opt_mdf_he_yes",
+              "label": "Presente (Encefalopatia Hepática espontânea: +6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Preditor independente de mortalidade precoce na hepatite alcoólica."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_mdf_non_severe",
+          "label": "Hepatite Alcoólica Não Grave (mDF < 32 pontos)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 31,
+          "statisticalOutcome": "Mortalidade em 28-30 dias < 10%. Não há benefício de corticoterapia (risco infeccioso supera benefício).",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_mdf_low_1",
+              "drugName": "Tiamina (Vitamina B1) + Complexo B + Reposição Eletrolítica",
+              "dosage": "Tiamina 300 mg IV/IM 1x/dia por 3-5 dias ANTES de qualquer aporte de glicose hipertônica; seguido de 100 mg VO/dia",
+              "route": "Intravenosa (IV) / Via Oral (VO)",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Prevenção mandatória da Encefalopatia de Wernicke-Korsakoff. Corrigir hipocalemia, hipomagnesemia e hipofosfatemia."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_mdf_low_1",
+              "recommendationTitle": "Abstinência Alcoólica e Suporte Nutricional Hiperproteico",
+              "dispositionTarget": "Enfermaria Clínica / Seguimento Ambulatorial Precoce",
+              "monitoringPlan": "Aporte calórico de 35-40 kcal/kg/dia e proteico de 1,2 a 1,5 g/kg/dia (NÃO restringir proteínas mesmo se houver encefalopatia). Monitorar síndrome de abstinência alcoólica (escala CIWA-Ar; se necessário benzodiazepínico, preferir Lorazepam por ausência de metabolização hepática fase I)."
+            }
+          ]
+        },
+        {
+          "id": "tier_mdf_severe",
+          "label": "Hepatite Alcoólica Aguda Grave (mDF >= 32 pontos)",
+          "severityLevel": "critical",
+          "minScore": 32,
+          "maxScore": 70,
+          "statisticalOutcome": "Mortalidade em 28-90 dias de 30% a 50% sem tratamento específico. Prednisolona reduz significativamente a mortalidade em 28 dias (STOPAH / diretrizes AASLD e EASL).",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_mdf_sev_1",
+              "drugName": "Prednisolona (Fármaco de Escolha — independe de conversão hepática de 1ª passagem)",
+              "dosage": "40 mg VO 1x/dia pela manhã por 28 dias (ou Metilprednisolona 32 mg IV/dia se impossibilidade de via oral)",
+              "route": "Via Oral (VO) ou Sonda Nasoenteral",
+              "frequency": "1x ao dia (Manhã) — Reavaliar no 7º dia pelo Modelo de Lille",
+              "dilutionInstructions": "Preferir Prednisolona à Prednisona, pois a cirrose prejudica a conversão hepática da prednisona em prednisolona pela 11-beta-HSD1.",
+              "contraindications": "Infecção bacteriana ou fúngica não controlada (tratar por >= 48h antes de iniciar), HDA ativa, pancreatite aguda, psicose grave, hepatite B ativa."
+            },
+            {
+              "id": "pha_mdf_sev_2",
+              "drugName": "N-Acetilcisteína (NAC) IV Adjuvante (Ensaio Nguyen-Khac et al.)",
+              "dosage": "D1: 150 mg/kg em 250 mL SG 5% em 30 min, 50 mg/kg em 500 mL em 4h, 100 mg/kg em 1000 mL em 16h; D2 a D5: 100 mg/kg/dia IV contínuo",
+              "route": "Intravenosa (IV)",
+              "frequency": "Durante os primeiros 5 dias associada à Prednisolona",
+              "dilutionInstructions": "A associação Prednisolona + NAC IV por 5 dias reduz mortalidade em 1 mês e incidência de síndrome hepatorrenal e infecções."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_mdf_sev_1",
+              "recommendationTitle": "Protocolo de Rastreio Infeccioso + Cálculo do Modelo de Lille no D7",
+              "dispositionTarget": "Internação Hospitalar (Enfermaria de Hepatologia ou UTI)",
+              "monitoringPlan": "Coletar culturas completas e paracentese antes da 1ª dose de Prednisolona. Nutrição enteral hiperproteica (1,5 g/kg/dia). No 7º dia de corticoide, calcular obrigatoriamente o Modelo de Lille: se Lille >= 0,45 (não respondedor), suspender imediatamente o corticoide.",
+              "laboratoryPanel": "Bilirrubina total no D0 e D7, albumina, INR, creatinina, hemoculturas, urocultura, celularidade ascítica e HBsAg/Anti-HCV."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_lille",
+      "slug": "lille-model",
+      "name": "Modelo de Lille (7º Dia) — Resposta ao Corticoide na Hepatite Alcoólica",
+      "acronym": "Lille (D7)",
+      "version": "1.0.0",
+      "category": "Hepatologia e Gastroenterologia",
+      "subcategory": "Hepatite Alcoólica Aguda",
+      "categorySlug": "bloco-07-hepatologia-gastroenterologia",
+      "categoryName": "Hepatologia e Gastroenterologia",
+      "moduleName": "Cirrose e Insuficiência Hepática",
+      "blockId": "block_07",
+      "blockFile": "block_07.json",
+      "description": "Modelo prognóstico dinâmico avaliado no 7º dia de corticoterapia (Prednisolona 40 mg/dia) na Hepatite Alcoólica Aguda Grave, combinando parâmetros basais (D0) e a cinética de queda da bilirrubina entre o D0 e o D7 para distinguir respondedores (Lille < 0,45) de não respondedores (Lille >= 0,45).",
+      "summary": "Avaliação no 7º dia de Prednisolona: corte < 0,45 (manter 28 dias) vs >= 0,45 (suspender corticoide por futilidade e risco séptico).",
+      "clinicalObjective": "Identificar precocemente no 7º dia os pacientes refratários à corticoterapia para interromper a imunossupressão fútil e avaliar elegibilidade a transplante hepático precoce.",
+      "targetPopulation": "Pacientes com hepatite alcoólica aguda grave (mDF >= 32 ou MELD > 20) completando 7 dias de Prednisolona 40 mg/dia.",
+      "calculationType": "additive_points",
+      "formulaExpression": "R = 3,19 - 0,101*(Idade) + 0,147*(Albumina D0) + 0,0165*(Bili D0 - Bili D7) - 0,206*(Cr>1,3) - 0,0065*(Bili D0) - 0,0096*(TP); Lille = exp(-R) / [1 + exp(-R)]",
+      "evidenceSource": "Louvet A, Naveau S, Abdelnour M, et al. The Lille model: a new tool for therapeutic strategy in patients with severe alcoholic hepatitis treated with steroids. Hepatology. 2007;45(6):1348-1354.",
+      "minPossibleScore": 0.0,
+      "maxPossibleScore": 1.0,
+      "baseScore": 0.0,
+      "badge": "hepatologia",
+      "clinicalWarning": "DECISÃO MANDATÓRIA NO 7º DIA: Se Escore de Lille >= 0,45 (especialmente >= 0,56 — não respondedor nulo), SUSPENDER IMEDIATAMENTE a Prednisolona! A manutenção de corticoide em não respondedores não traz qualquer ganho de sobrevida e multiplica a mortalidade por sepse e infecções fúngicas invasivas (aspergilose/candidemia).",
+      "radarAxes": [
+        {
+          "id": "axis_lille_delta_bili",
+          "label": "Cinética da Bilirrubina (D0 vs D7)",
+          "system": "Hepático",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_lille_renal",
+          "label": "Insuficiência Renal Basal (Cr > 1,3)",
+          "system": "Renal",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_lille_synth",
+          "label": "Reserva Basal (Albumina / TP D0)",
+          "system": "Coagulação",
+          "unit": "g/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_lille_age",
+          "label": "Idade e Bilirrubina Basal",
+          "system": "Clínico",
+          "unit": "anos",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_lille_delta_bili",
+          "name": "1. Evolução da Bilirrubina Total no 7º Dia (Bilirrubina D0 vs D7)",
+          "slug": "evolucao-bilirrubina-d7-lille",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_lille_delta_bili",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Principal determinante dinâmico do Modelo de Lille: a queda da bilirrubina no D7 reflete resposta anti-inflamatória hepatocelular.",
+          "options": [
+            {
+              "id": "opt_lille_db_0",
+              "label": "Queda acentuada da Bilirrubina no D7 (>= 25% ou queda >= 5 mg/dL) (+0,00)",
+              "pointValue": 0.0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Forte resposta bioquímica ao corticosteroide."
+            },
+            {
+              "id": "opt_lille_db_1",
+              "label": "Queda discreta da Bilirrubina no D7 (queda de 1 a 4 mg/dL) (+0,20)",
+              "pointValue": 0.2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 2,
+              "description": "Resposta parcial inicial."
+            },
+            {
+              "id": "opt_lille_db_2",
+              "label": "Bilirrubina estagnada / inalterada no D7 (Delta ~ 0 mg/dL) (+0,40)",
+              "pointValue": 0.4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 3,
+              "description": "Ausência de clareamento biliar após 1 semana de Prednisolona."
+            },
+            {
+              "id": "opt_lille_db_3",
+              "label": "Elevação / Piora da Bilirrubina no D7 (D7 > D0) (+0,50)",
+              "pointValue": 0.5,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Progressão da colestase sob corticoide; altíssima probabilidade de falha terapêutica."
+            }
+          ]
+        },
+        {
+          "id": "grp_lille_renal",
+          "name": "2. Função Renal Basal no D0 (Creatinina Sérica)",
+          "slug": "creatinina-basal-lille",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_lille_renal",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Variável dicotômica na equação original de Louvet: Creatinina > 1,3 mg/dL (115 mcmol/L) ou clearance < 40 mL/min.",
+          "options": [
+            {
+              "id": "opt_lille_cr_no",
+              "label": "Ausência de insuficiência renal (Creatinina <= 1,3 mg/dL) (+0,00)",
+              "pointValue": 0.0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Função renal preservada no início do tratamento."
+            },
+            {
+              "id": "opt_lille_cr_yes",
+              "label": "Insuficiência renal presente (Creatinina > 1,3 mg/dL) (+0,20)",
+              "pointValue": 0.2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Penaliza fortemente a probabilidade de resposta ao corticoide."
+            }
+          ]
+        },
+        {
+          "id": "grp_lille_synth",
+          "name": "3. Reserva Sintética Basal no D0 (Albumina e Tempo de Protrombina)",
+          "slug": "reserva-sintetica-lille",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_lille_synth",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Avalia Albumina sérica basal (g/L) e alargamento do Tempo de Protrombina no D0.",
+          "options": [
+            {
+              "id": "opt_lille_syn_0",
+              "label": "Albumina >= 3,0 g/dL e INR < 1,8 (+0,00)",
+              "pointValue": 0.0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Reserva sintética moderadamente preservada."
+            },
+            {
+              "id": "opt_lille_syn_1",
+              "label": "Albumina 2,5 a 2,9 g/dL ou INR 1,8 a 2,3 (+0,10)",
+              "pointValue": 0.1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Déficit sintético moderado."
+            },
+            {
+              "id": "opt_lille_syn_2",
+              "label": "Albumina < 2,5 g/dL e/ou INR > 2,3 (+0,15)",
+              "pointValue": 0.15,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Depleção sintética grave no D0."
+            }
+          ]
+        },
+        {
+          "id": "grp_lille_age_bili",
+          "name": "4. Idade e Nível Basal de Bilirrubina no D0",
+          "slug": "idade-bilirrubina-basal-lille",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_lille_age",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Idade avançada (> 50 anos) e bilirrubina basal muito elevada (> 15 mg/dL) reduzem o índice R.",
+          "options": [
+            {
+              "id": "opt_lille_ab_0",
+              "label": "Idade < 50 anos e Bilirrubina D0 < 12 mg/dL (+0,00)",
+              "pointValue": 0.0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Perfil basal favorável."
+            },
+            {
+              "id": "opt_lille_ab_1",
+              "label": "Idade >= 50 anos OU Bilirrubina D0 >= 12 mg/dL (+0,08)",
+              "pointValue": 0.08,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Risco intermediário basal."
+            },
+            {
+              "id": "opt_lille_ab_2",
+              "label": "Idade >= 50 anos E Bilirrubina D0 >= 18 mg/dL (+0,15)",
+              "pointValue": 0.15,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Combinação basal de alto risco de refratariedade."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_lille_responder",
+          "label": "Respondedor ao Corticoide (Lille < 0,45)",
+          "severityLevel": "low",
+          "minScore": 0.0,
+          "maxScore": 0.44,
+          "statisticalOutcome": "Sobrevida em 6 meses: ~85% (Lille <= 0,16 respondedor completo: > 90% de sobrevida). Excelente benefício da corticoterapia.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_lille_resp_1",
+              "drugName": "Manter Prednisolona 40 mg/dia até completar 28 dias",
+              "dosage": "40 mg VO 1x/dia pela manhã até o D28",
+              "route": "Via Oral (VO)",
+              "frequency": "1x ao dia (Manhã)",
+              "dilutionInstructions": "Completar o ciclo integral de 28 dias de corticoterapia, seguido de suspensão ou desmame rápido conforme protocolo institucional."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_lille_resp_1",
+              "recommendationTitle": "Manutenção do Protocolo Terapêutico e Suporte Nutricional",
+              "dispositionTarget": "Enfermaria / Alta Hospitalar Programada com Seguimento Precoce",
+              "monitoringPlan": "Manter suporte nutricional hiperproteico (1,5 g/kg/dia), vigilância clínica de infecções e programa multidisciplinar de abstinência alcoólica (considerar Baclofeno após estabilização)."
+            }
+          ]
+        },
+        {
+          "id": "tier_lille_non_responder",
+          "label": "Não Respondedor ao Corticoide (Lille >= 0,45) — Suspender Prednisolona",
+          "severityLevel": "critical",
+          "minScore": 0.45,
+          "maxScore": 1.0,
+          "statisticalOutcome": "Sobrevida em 6 meses: ~25% (menos de 15% se Lille >= 0,56 — não respondedor nulo). Corticoide ineficaz e deletério.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_lille_non_1",
+              "drugName": "SUSPENSÃO IMEDIATA da Prednisolona no 7º Dia",
+              "dosage": "Interromper corticosteroide imediatamente no D7",
+              "route": "Suspensão de prescrição",
+              "frequency": "Imediata",
+              "dilutionInstructions": "Após apenas 7 dias de uso, a Prednisolona pode ser suspensa abruptamente sem risco de insuficiência adrenal secundária clinicamente relevante, evitando sepse fatal."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_lille_non_1",
+              "recommendationTitle": "Suspensão do Corticoide, Vigilância Séptica e Avaliação de Transplante Precoce",
+              "dispositionTarget": "Unidade Semi-Intensiva / UTI / Centro de Transplante Hepático",
+              "monitoringPlan": "Rastreio rigoroso de infecções oportunistas e bacterianas, prevenção de síndrome hepatorrenal (evitar nefrotóxicos, expandir com albumina se indicado) e discussão em centros selecionados para Transplante Hepático Precoce (protocolo Mathurin et al. no 1º episódio de descompensação)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_glasgow_blatchford",
+      "slug": "glasgow-blatchford-gbs",
+      "name": "Escore de Glasgow-Blatchford (GBS) na Hemorragia Digestiva Alta",
+      "acronym": "GBS",
+      "version": "1.0.0",
+      "category": "Hepatologia e Gastroenterologia",
+      "subcategory": "Hemorragia Digestiva Alta (HDA)",
+      "categorySlug": "bloco-07-hepatologia-gastroenterologia",
+      "categoryName": "Hepatologia e Gastroenterologia",
+      "moduleName": "Hemorragia Digestiva Alta (HDA)",
+      "blockId": "block_07",
+      "blockFile": "block_07.json",
+      "description": "Escore pré-endoscópico padrão-ouro (diretrizes ESGE, ACG e Baveno VII) na Hemorragia Digestiva Alta (HDA) para predizer a necessidade de intervenção clínica/endoscópica (transfusão hemoterápica, hemostasia endoscópica ou cirurgia) e identificar pacientes de muito baixo risco (GBS 0-1) candidatos à alta precoce segura da emergência.",
+      "summary": "Triagem pré-endoscópica na HDA (0 a 23 pontos): GBS 0-1 permite manejo ambulatorial seguro; GBS >= 6 exige intervenção precoce.",
+      "clinicalObjective": "Identificar com sensibilidade > 99% os pacientes com HDA que não necessitarão de transfusão ou hemostasia endoscópica (GBS 0-1) versus aqueles de alto risco para ressuscitação hemodinâmica, IBP/vasoativos e EDA precoce.",
+      "targetPopulation": "Pacientes adultos admitidos no pronto-socorro com hematêmese, vômitos em borra de café ou melena.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Ureia (0-6) + Hemoglobina (0-6) + PAS (0-3) + FC>=100 (1) + Melena (1) + Síncope (2) + Hepatopatia (2) + ICC (2)",
+      "evidenceSource": "Blatchford O, Murray WR, Blatchford M. A risk score to predict need for treatment for upper-gastrointestinal haemorrhage. Lancet. 2000;356(9238):1318-1321. / ESGE Guideline 2021.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 23,
+      "baseScore": 0,
+      "badge": "emergencia",
+      "clinicalWarning": "TRANSFUSÃO RESTRITIVA & PROFILAXIA NA HDA VARICOSA: Manter estratégia transfusional restritiva com alvo de Hemoglobina entre 7,0 e 9,0 g/dL (gatilho < 7,0 g/dL; ou < 8,0 g/dL em coronariopatas agudos), pois a hipertransfusão eleva a pressão portal e a taxa de ressangramento (Villanueva et al., NEJM). Na suspeita de HDA varicosa, iniciar Terlipressina/Octreotide + Ceftriaxona 1g IV IMEDIATAMENTE antes mesmo da EDA.",
+      "radarAxes": [
+        {
+          "id": "axis_gbs_anemia",
+          "label": "Queda de Hemoglobina",
+          "system": "Hematológico",
+          "unit": "g/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_gbs_urea",
+          "label": "Ureia / Absorção Entérica de Sangue",
+          "system": "Renal",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_gbs_hemo",
+          "label": "Instabilidade (PAS / FC / Síncope)",
+          "system": "Cardiovascular",
+          "unit": "mmHg",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_gbs_comorb",
+          "label": "Hepatopatia / ICC / Melena",
+          "system": "Clínico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_gbs_urea",
+          "name": "1. Ureia Sérica (mg/dL) [ou BUN em mg/dL]",
+          "slug": "ureia-glasgow-blatchford",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_gbs_urea",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Conversão: Ureia (mg/dL) = BUN (mg/dL) x 2,14. A digestão proteica da hemoglobina no lúmen intestinal eleva acentuadamente a ureia.",
+          "options": [
+            {
+              "id": "opt_gbs_ur_0",
+              "label": "Ureia < 39 mg/dL (BUN < 18,2 mg/dL / < 6,5 mmol/L) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Ureia sérica fisiológica."
+            },
+            {
+              "id": "opt_gbs_ur_2",
+              "label": "Ureia 39 a 47,9 mg/dL (BUN 18,2 a 22,3 mg/dL / 6,5-7,9 mmol/L) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.3,
+              "sortOrder": 2,
+              "description": "Elevação leve de escórias nitrogenadas."
+            },
+            {
+              "id": "opt_gbs_ur_3",
+              "label": "Ureia 48 a 59,9 mg/dL (BUN 22,4 a 27,9 mg/dL / 8,0-9,9 mmol/L) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 3,
+              "description": "Elevação moderada sugestiva de sangue digerido no TGI superior."
+            },
+            {
+              "id": "opt_gbs_ur_4",
+              "label": "Ureia 60 a 149 mg/dL (BUN 28,0 a 69,9 mg/dL / 10,0-24,9 mmol/L) (+4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 4,
+              "description": "Azotemia importante por sangramento digestivo alto e/ou hipovolemia."
+            },
+            {
+              "id": "opt_gbs_ur_6",
+              "label": "Ureia >= 150 mg/dL (BUN >= 70 mg/dL / >= 25,0 mmol/L) (+6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Azotemia maciça associada a sangramento grave ou LRA pré-renal."
+            }
+          ]
+        },
+        {
+          "id": "grp_gbs_hb",
+          "name": "2. Hemoglobina Admissional (g/dL — Estratificada por Sexo)",
+          "slug": "hemoglobina-glasgow-blatchford",
+          "inputType": "single_choice",
+          "unit": "g/dL",
+          "radarAxisId": "axis_gbs_anemia",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Avaliar o corte correspondente ao sexo biológico do paciente.",
+          "options": [
+            {
+              "id": "opt_gbs_hb_0",
+              "label": "Homem >= 13,0 g/dL OU Mulher >= 12,0 g/dL (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Nível de hemoglobina preservado."
+            },
+            {
+              "id": "opt_gbs_hb_1",
+              "label": "Homem 12,0 a 12,9 g/dL OU Mulher 10,0 a 11,9 g/dL (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Queda discreta da hemoglobina."
+            },
+            {
+              "id": "opt_gbs_hb_3",
+              "label": "Homem 10,0 a 11,9 g/dL (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.6,
+              "sortOrder": 3,
+              "description": "Anemia moderada no sexo masculino."
+            },
+            {
+              "id": "opt_gbs_hb_6",
+              "label": "Homem < 10,0 g/dL OU Mulher < 10,0 g/dL (+6 pts)",
+              "pointValue": 6,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Anemia aguda importante com alta probabilidade de transfusão e hemostasia endoscópica."
+            }
+          ]
+        },
+        {
+          "id": "grp_gbs_sbp",
+          "name": "3. Pressão Arterial Sistólica (PAS em mmHg)",
+          "slug": "pas-glasgow-blatchford",
+          "inputType": "single_choice",
+          "unit": "mmHg",
+          "radarAxisId": "axis_gbs_hemo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_gbs_sbp_0",
+              "label": "PAS >= 110 mmHg (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Normotensão arterial."
+            },
+            {
+              "id": "opt_gbs_sbp_1",
+              "label": "PAS 100 a 109 mmHg (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 2,
+              "description": "Pressão sistólica limítrofe."
+            },
+            {
+              "id": "opt_gbs_sbp_2",
+              "label": "PAS 90 a 99 mmHg (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.7,
+              "sortOrder": 3,
+              "description": "Hipotensão incipiente."
+            },
+            {
+              "id": "opt_gbs_sbp_3",
+              "label": "PAS < 90 mmHg (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Choque hipovolêmico/hemorrágico instalado."
+            }
+          ]
+        },
+        {
+          "id": "grp_gbs_hr",
+          "name": "4. Frequência Cardíaca (Pulso >= 100 bpm)",
+          "slug": "fc-glasgow-blatchford",
+          "inputType": "single_choice",
+          "unit": "bpm",
+          "radarAxisId": "axis_gbs_hemo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_gbs_hr_0",
+              "label": "FC < 100 bpm (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem taquicardia reflexa."
+            },
+            {
+              "id": "opt_gbs_hr_1",
+              "label": "FC >= 100 bpm (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Taquicardia sinusal compensatória à hipovolemia."
+            }
+          ]
+        },
+        {
+          "id": "grp_gbs_melena",
+          "name": "5. Apresentação Clínica com Melena",
+          "slug": "melena-glasgow-blatchford",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_gbs_comorb",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "options": [
+            {
+              "id": "opt_gbs_mel_0",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem fezes em borra de piche."
+            },
+            {
+              "id": "opt_gbs_mel_1",
+              "label": "Presente (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Melena confirmada na história ou ao toque retal (> 50-100 mL de sangue no TGI alto)."
+            }
+          ]
+        },
+        {
+          "id": "grp_gbs_syncope",
+          "name": "6. Apresentação com Síncope ou Lipotímia",
+          "slug": "sincope-glasgow-blatchford",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_gbs_hemo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 6,
+          "options": [
+            {
+              "id": "opt_gbs_syn_0",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem perda transitória de consciência."
+            },
+            {
+              "id": "opt_gbs_syn_2",
+              "label": "Presente (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.8,
+              "sortOrder": 2,
+              "description": "Hipoperfusão cerebral postural aguda secundária à perda volêmica rápida."
+            }
+          ]
+        },
+        {
+          "id": "grp_gbs_liver",
+          "name": "7. Doença Hepática Crônica Conhecida ou Estigmas de Cirrose",
+          "slug": "hepatopatia-glasgow-blatchford",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_gbs_comorb",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 7,
+          "options": [
+            {
+              "id": "opt_gbs_liv_0",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem história ou estigmas periféricos de hepatopatia."
+            },
+            {
+              "id": "opt_gbs_liv_2",
+              "label": "Presente (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Alto risco de HDA varicosa por hipertensão portal e coagulopatia."
+            }
+          ]
+        },
+        {
+          "id": "grp_gbs_hf",
+          "name": "8. Insuficiência Cardíaca Conhecida ou Sinais Clínicos de ICC",
+          "slug": "icc-glasgow-blatchford",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_gbs_comorb",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 8,
+          "options": [
+            {
+              "id": "opt_gbs_hf_0",
+              "label": "Ausente (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem insuficiência cardíaca."
+            },
+            {
+              "id": "opt_gbs_hf_2",
+              "label": "Presente (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.85,
+              "sortOrder": 2,
+              "description": "Baixa reserva cardiovascular para tolerar anemia aguda."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_gbs_very_low",
+          "label": "Muito Baixo Risco (GBS 0 a 1 ponto) — Alta Segura da Emergência",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 1,
+          "statisticalOutcome": "Risco de necessidade de intervenção endoscópica, transfusão ou óbito < 1% (Sensibilidade > 99%).",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_gbs_low_1",
+              "drugName": "Omeprazol ou Pantoprazol Via Oral",
+              "dosage": "Omeprazol 40 mg VO 1x a 2x/dia",
+              "route": "Via Oral (VO)",
+              "frequency": "12/12h ou 24/24h",
+              "dilutionInstructions": "Suspender imediatamente AINEs e aspirina em uso não essencial."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_gbs_low_1",
+              "recommendationTitle": "Desospitalização Segura e Endoscopia Ambulatorial Eletiva",
+              "dispositionTarget": "Alta Orientada do Pronto-Socorro (Diretriz ESGE / ACG)",
+              "monitoringPlan": "Não requer internação hospitalar nem endoscopia de urgência. Agendar Endoscopia Digestiva Alta (EDA) ambulatorial eletiva e orientar sinais de alarme (nova hematêmese, tontura postural, melena volumosa)."
+            }
+          ]
+        },
+        {
+          "id": "tier_gbs_mod",
+          "label": "Risco Moderado (GBS 2 a 5 pontos) — Internação e EDA em < 24h",
+          "severityLevel": "intermediate",
+          "minScore": 2,
+          "maxScore": 5,
+          "statisticalOutcome": "Risco intermediário (~15% a 30%) de necessidade de hemostasia endoscópica ou hemotransfusão.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_gbs_mod_1",
+              "drugName": "Omeprazol ou Pantoprazol Intravenoso",
+              "dosage": "80 mg IV em bolus inicial, seguido de 40 mg IV de 12/12h",
+              "route": "Intravenosa (IV)",
+              "frequency": "12/12h",
+              "dilutionInstructions": "Estabiliza o coágulo plaquetário ao manter o pH intragástrico > 6,0 (inibe a pepsina gástrica)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_gbs_mod_1",
+              "recommendationTitle": "Internação Hospitalar, Jejum e EDA Precoce (< 24 horas)",
+              "dispositionTarget": "Sala de Observação / Enfermaria Clínica",
+              "monitoringPlan": "Dois acessos venosos periféricos calibrosos, reposição cristaloide guiada por metas, tipagem sanguínea e realização de EDA nas primeiras 24 horas da admissão."
+            }
+          ]
+        },
+        {
+          "id": "tier_gbs_high",
+          "label": "Alto Risco (GBS >= 6 pontos) — Ressuscitação Imediata, IBP/Vasoativo e EDA de Urgência",
+          "severityLevel": "critical",
+          "minScore": 6,
+          "maxScore": 23,
+          "statisticalOutcome": "Probabilidade > 50% a 80% de necessidade de intervenção hemostática endoscópica, transfusão ou cirurgia/embolização.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_gbs_high_1",
+              "drugName": "Omeprazol / Pantoprazol IV (HDA Não Varicosa) + Eritromicina Pró-Cinética",
+              "dosage": "Omeprazol 80 mg IV em bolus + 8 mg/h em BIC (ou 40 mg IV 12/12h). Eritromicina 250 mg IV 30-120 min antes da EDA",
+              "route": "Intravenosa (IV)",
+              "frequency": "Bolus + Manutenção",
+              "dilutionInstructions": "A Eritromicina pré-EDA esvazia coágulos gástricos e melhora drasticamente a visualização endoscópica."
+            },
+            {
+              "id": "pha_gbs_high_2",
+              "drugName": "Terlipressina (ou Octreotide) + Ceftriaxona IV (Se Suspeita de HDA Varicosa / Hepatopata)",
+              "dosage": "Terlipressina 2 mg IV de 4/4h nas primeiras 24-48h, depois 1 mg IV 4/4h por 3-5 dias (ou Octreotide 50 mcg bolus + 50 mcg/h em BIC) + Ceftriaxona 1 g IV 24/24h por 7 dias",
+              "route": "Intravenosa (IV)",
+              "frequency": "4/4h (Terlipressina) / Contínuo (Octreotide) + 24/24h (Ceftriaxona)",
+              "dilutionInstructions": "A profilaxia antibiótica com Ceftriaxona 1 g/dia IV reduz infecções bacterianas (PBE/bacteremia), ressangramento precoce e mortalidade na HDA varicosa (Baveno VII)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_gbs_high_1",
+              "recommendationTitle": "Estabilização Hemodinâmica, Transfusão Restritiva (Hb 7-9) e EDA (< 12h se Varicosa / < 24h Não Varicosa)",
+              "dispositionTarget": "Sala Vermelha / UTI",
+              "monitoringPlan": "Ressuscitação volêmica cautelosa com Ringer Lactato, transfusão de concentrado de hemácias com gatilho Hb < 7,0 g/dL (alvo 7-9 g/dL). Realizar EDA em < 12 horas se suspeita de HDA varicosa (ligadura elástica) ou < 24h na HDA ulcerosa após estabilização hemodinâmica.",
+              "interventionalProcedure": "Proteção de via aérea (IOT) antes da EDA se hematêmese maciça persistente ou Encefalopatia Grau III-IV."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_rockall",
+      "slug": "rockall-score",
+      "name": "Escore de Rockall Completo (Clínico + Endoscópico) na HDA",
+      "acronym": "Rockall",
+      "version": "1.0.0",
+      "category": "Hepatologia e Gastroenterologia",
+      "subcategory": "Hemorragia Digestiva Alta (HDA)",
+      "categorySlug": "bloco-07-hepatologia-gastroenterologia",
+      "categoryName": "Hepatologia e Gastroenterologia",
+      "moduleName": "Hemorragia Digestiva Alta (HDA)",
+      "blockId": "block_07",
+      "blockFile": "block_07.json",
+      "description": "Escore prognóstico clássico que integra 3 variáveis clínicas pré-endoscópicas (Idade, Choque, Comorbidades: 0 a 7 pts) e 2 variáveis da Endoscopia Digestiva Alta (Diagnóstico etiológico e Estigmas de Forrest: 0 a 4 pts) para predizer a taxa de ressangramento e a mortalidade na HDA.",
+      "summary": "Predição de ressangramento e mortalidade na HDA após Endoscopia Digestiva Alta (0 a 11 pontos).",
+      "clinicalObjective": "Estratificar o risco de ressangramento e óbito pós-EDA, definindo segurança para alta precoce (Rockall <= 2) versus vigilância intensiva e segunda revisão/embolização (Rockall >= 6).",
+      "targetPopulation": "Pacientes adultos com Hemorragia Digestiva Alta submetidos à avaliação clínica e Endoscopia Digestiva Alta.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Idade (0-2) + Choque (0-2) + Comorbidades (0-3) + Diagnóstico EDA (0-2) + Estigmas de Forrest (0-2)",
+      "evidenceSource": "Rockall TA, Logan RF, Devlin HB, Northfield TC. Risk assessment after acute upper gastrointestinal haemorrhage. Gut. 1996;38(3):316-321.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 11,
+      "baseScore": 0,
+      "badge": "emergencia",
+      "clinicalWarning": "CORRELAÇÃO COM CLASSIFICAÇÃO DE FORREST: Úlceras Forrest Ia (sangramento em jato), Ib (babação) e IIa (vaso visível não sangrante) exigem terapia endoscópica combinada dupla (epinefrina + método térmico ou hemoclipe) seguida de IBP em alta dose por 72h.",
+      "radarAxes": [
+        {
+          "id": "axis_rock_shock",
+          "label": "Estado de Choque (PAS/FC)",
+          "system": "Cardiovascular",
+          "unit": "mmHg",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_rock_comorb",
+          "label": "Idade e Comorbidades Sistêmicas",
+          "system": "Clínico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_rock_endo",
+          "label": "Achados Endoscópicos e Forrest",
+          "system": "Gastrointestinal",
+          "unit": "Forrest",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_rock_age",
+          "name": "1. Idade do Paciente",
+          "slug": "idade-rockall",
+          "inputType": "single_choice",
+          "unit": "anos",
+          "radarAxisId": "axis_rock_comorb",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "options": [
+            {
+              "id": "opt_rock_age_0",
+              "label": "< 60 anos (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Faixa etária de menor mortalidade basal."
+            },
+            {
+              "id": "opt_rock_age_1",
+              "label": "60 a 79 anos (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Risco intermediário associado à idade."
+            },
+            {
+              "id": "opt_rock_age_2",
+              "label": ">= 80 anos (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Idoso longevo com reserva fisiológica reduzida."
+            }
+          ]
+        },
+        {
+          "id": "grp_rock_shock",
+          "name": "2. Estado Hemodinâmico / Choque na Apresentação",
+          "slug": "choque-rockall",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_rock_shock",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_rock_sh_0",
+              "label": "Sem choque (PAS >= 100 mmHg e FC < 100 bpm) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Estabilidade hemodinâmica preservada."
+            },
+            {
+              "id": "opt_rock_sh_1",
+              "label": "Taquicardia isolada (PAS >= 100 mmHg e FC >= 100 bpm) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Choque compensado (Classe II ATLS)."
+            },
+            {
+              "id": "opt_rock_sh_2",
+              "label": "Hipotensão / Choque descompensado (PAS < 100 mmHg) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Choque hemorrágico franco (perda volêmica estimada >= 30%)."
+            }
+          ]
+        },
+        {
+          "id": "grp_rock_comorb",
+          "name": "3. Comorbidades Graves Associadas",
+          "slug": "comorbidades-rockall",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_rock_comorb",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_rock_cm_0",
+              "label": "Nenhuma comorbidade grave (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem falências orgânicas crônicas."
+            },
+            {
+              "id": "opt_rock_cm_2",
+              "label": "Insuficiência cardíaca, Cardiopatia isquêmica ou outra comorbidade maior (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 2,
+              "description": "Comorbidade cardiovascular ou sistêmica significativa."
+            },
+            {
+              "id": "opt_rock_cm_3",
+              "label": "Insuficiência renal, Insuficiência hepática ou Neoplasia disseminada (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Altíssimo risco de óbito por descompensação orgânica subjacente."
+            }
+          ]
+        },
+        {
+          "id": "grp_rock_diag",
+          "name": "4. Diagnóstico Endoscópico (EDA)",
+          "slug": "diagnostico-endoscopico-rockall",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_rock_endo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_rock_dg_0",
+              "label": "Laceração de Mallory-Weiss ou Nenhuma lesão identificada (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Lesões de excelente prognóstico espontâneo."
+            },
+            {
+              "id": "opt_rock_dg_1",
+              "label": "Úlcera péptica, doença erosiva, esofagite ou varizes (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Todos os outros diagnósticos benignos do TGI superior."
+            },
+            {
+              "id": "opt_rock_dg_2",
+              "label": "Neoplasia maligna do trato gastrointestinal superior (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Sangramento tumoral difuso com alta taxa de falha hemostática."
+            }
+          ]
+        },
+        {
+          "id": "grp_rock_stigmata",
+          "name": "5. Estigmas Endoscópicos de Sangramento Recente (Forrest)",
+          "slug": "estigmas-forrest-rockall",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_rock_endo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "options": [
+            {
+              "id": "opt_rock_st_0",
+              "label": "Sem estigmas ou apenas mancha hematina plana (Forrest IIc ou III) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Baixo risco de ressangramento (< 5-10%); dispensa hemostasia endoscópica."
+            },
+            {
+              "id": "opt_rock_st_2",
+              "label": "Sangue no TGI alto, sangramento ativo (Ia/Ib), vaso visível (IIa) ou coágulo aderido (IIb) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Estigma de alto risco de ressangramento; exige hemostasia endoscópica imediata."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_rock_low",
+          "label": "Baixo Risco Pós-EDA (Rockall 0 a 2 pontos)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 2,
+          "statisticalOutcome": "Risco de ressangramento < 5%; Mortalidade < 0,2%. Elegível à realimentação e alta hospitalar precoce.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_rock_low_1",
+              "drugName": "Omeprazol ou Pantoprazol Via Oral + Erradicação de H. pylori",
+              "dosage": "Omeprazol 20-40 mg VO 1x/dia por 4-8 semanas; testar e tratar H. pylori se positivo",
+              "route": "Via Oral (VO)",
+              "frequency": "1x ao dia",
+              "dilutionInstructions": "Úlceras Forrest IIc e III podem receber dieta oral imediata e IBP oral."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_rock_low_1",
+              "recommendationTitle": "Liberar Dieta Oral e Alta Hospitalar Precoce",
+              "dispositionTarget": "Alta Hospitalar com Seguimento Ambulatorial",
+              "monitoringPlan": "Suspensão definitiva de AINEs. Se úlcera gástrica, repetir EDA em 6-8 semanas para confirmar cicatrização e excluir neoplasia."
+            }
+          ]
+        },
+        {
+          "id": "tier_rock_mod",
+          "label": "Risco Intermediário (Rockall 3 a 5 pontos)",
+          "severityLevel": "intermediate",
+          "minScore": 3,
+          "maxScore": 5,
+          "statisticalOutcome": "Risco de ressangramento: 11% a 24%; Mortalidade: 3% a 11%.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_rock_mod_1",
+              "drugName": "Pantoprazol ou Omeprazol Intravenoso por 72 horas",
+              "dosage": "80 mg IV em bolus + 40 mg IV de 12/12h (ou 8 mg/h em BIC) por 72h após hemostasia endoscópica",
+              "route": "Intravenosa (IV)",
+              "frequency": "12/12h ou BIC contínua por 72h",
+              "dilutionInstructions": "Manter por 72h nos pacientes submetidos a hemostasia endoscópica (período crítico para estabilização do trombo)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_rock_mod_1",
+              "recommendationTitle": "Observação Hospitalar por 72h Pós-Hemostasia Endoscópica",
+              "dispositionTarget": "Enfermaria de Gastroenterologia / Semi-Intensiva",
+              "monitoringPlan": "Curva de hemoglobina a cada 12-24h, monitorização de sinais vitais e pesquisa de H. pylori."
+            }
+          ]
+        },
+        {
+          "id": "tier_rock_high",
+          "label": "Alto Risco de Ressangramento e Óbito (Rockall 6 a 11 pontos)",
+          "severityLevel": "critical",
+          "minScore": 6,
+          "maxScore": 11,
+          "statisticalOutcome": "Risco de ressangramento: 33% a 53%; Mortalidade: 17% a > 40%.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_rock_high_1",
+              "drugName": "IBP em Alta Dose IV Contínua (Não Varicosa) ou Terlipressina/Octreotide (Varicosa)",
+              "dosage": "Omeprazol 80 mg IV bolus + 8 mg/h em BIC por 72h; ou Terlipressina 1-2 mg IV 4/4h + Ceftriaxona 1 g IV/dia",
+              "route": "Intravenosa (IV)",
+              "frequency": "Infusão contínua / 4/4h",
+              "dilutionInstructions": "Manter reversão de coagulopatia se uso prévio de anticoagulantes (Complexo Protrombínico 4 fatores + Vitamina K se Varfarina)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_rock_high_1",
+              "recommendationTitle": "Vigilância em UTI e Retratamento Endoscópico / Embolização Transcateter se Ressangramento",
+              "dispositionTarget": "Unidade de Terapia Intensiva (UTI)",
+              "monitoringPlan": "Em caso de ressangramento após 1ª hemostasia endoscópica, realizar 2ª EDA terapêutica; se refratária na HDA não varicosa, indicar Angioembolização Transcateter (radiologia intervencionista) ou cirurgia. Na HDA varicosa refratária, considerar balão de Sengstaken-Blakemore / stent esofágico como ponte para TIPS de resgate."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_aims65",
+      "slug": "aims65-hda",
+      "name": "Escore AIMS65 para Mortalidade Intra-Hospitalar na HDA",
+      "acronym": "AIMS65",
+      "version": "1.0.0",
+      "category": "Hepatologia e Gastroenterologia",
+      "subcategory": "Hemorragia Digestiva Alta (HDA)",
+      "categorySlug": "bloco-07-hepatologia-gastroenterologia",
+      "categoryName": "Hepatologia e Gastroenterologia",
+      "moduleName": "Hemorragia Digestiva Alta (HDA)",
+      "blockId": "block_07",
+      "blockFile": "block_07.json",
+      "description": "Escore clínico simples e rápido de 5 variáveis não ponderadas (Albumina < 3,0 g/dL, INR > 1,5, Alteração mental GCS < 14, PAS <= 90 mmHg, Idade >= 65 anos) validado para predizer com alta acurácia a mortalidade intra-hospitalar, o tempo de internação e a necessidade de UTI na Hemorragia Digestiva Alta.",
+      "summary": "Predição rápida pré-endoscópica de mortalidade intra-hospitalar e necessidade de UTI na HDA (0 a 5 pontos).",
+      "clinicalObjective": "Estimar o risco de óbito intra-hospitalar na HDA à beira do leito sem depender de dados endoscópicos ou antecedentes subjetivos.",
+      "targetPopulation": "Pacientes adultos admitidos na emergência com Hemorragia Digestiva Alta aguda (varicosa ou não varicosa).",
+      "calculationType": "additive_points",
+      "formulaExpression": "Albumina<3,0 (1) + INR>1,5 (1) + Glasgow<14 (1) + PAS<=90 (1) + Idade>=65 (1)",
+      "evidenceSource": "Saltzman JR, Tabak YP, Hyett BH, Sun X, Travis AC, Johannes RS. A simple risk score accurately predicts in-hospital mortality, length of stay, and cost in acute upper GI bleeding. Gastrointest Endosc. 2011;74(6):1215-1224.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 5,
+      "baseScore": 0,
+      "badge": "emergencia",
+      "clinicalWarning": "COMPLEMENTARIDADE COM O GLASGOW-BLATCHFORD: Enquanto o GBS é superior para identificar pacientes de muito baixo risco que não precisam de intervenção/internação, o AIMS65 possui excelente acurácia (AUROC ~0,80) para predizer mortalidade intra-hospitalar e necessidade de leito de UTI (AIMS65 >= 2).",
+      "radarAxes": [
+        {
+          "id": "axis_aims_liver",
+          "label": "Síntese e Nutrição (Albumina/INR)",
+          "system": "Hepático",
+          "unit": "g/dL / INR",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_aims_neuro",
+          "label": "Estado Mental (Glasgow < 14)",
+          "system": "Neurológico",
+          "unit": "GCS",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_aims_hemo",
+          "label": "Choque Sistólico (PAS <= 90)",
+          "system": "Cardiovascular",
+          "unit": "mmHg",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_aims_age",
+          "label": "Fragilidade Etária (>= 65 anos)",
+          "system": "Clínico",
+          "unit": "anos",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_aims_alb",
+          "name": "1. A — Albumina Sérica < 3,0 g/dL (< 30 g/L)",
+          "slug": "albumina-aims65",
+          "inputType": "single_choice",
+          "unit": "g/dL",
+          "radarAxisId": "axis_aims_liver",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "options": [
+            {
+              "id": "opt_aims_alb_0",
+              "label": "Não (Albumina >= 3,0 g/dL) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Albumina sérica preservada."
+            },
+            {
+              "id": "opt_aims_alb_1",
+              "label": "Sim (Albumina < 3,0 g/dL) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Hipoalbuminemia associada a hepatopatia crônica, desnutrição ou inflamação sistêmica."
+            }
+          ]
+        },
+        {
+          "id": "grp_aims_inr",
+          "name": "2. I — INR > 1,5 (Relação Normatizada Internacional)",
+          "slug": "inr-aims65",
+          "inputType": "single_choice",
+          "unit": "INR",
+          "radarAxisId": "axis_aims_liver",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_aims_inr_0",
+              "label": "Não (INR <= 1,5) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem coagulopatia clínica relevante."
+            },
+            {
+              "id": "opt_aims_inr_1",
+              "label": "Sim (INR > 1,5) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Coagulopatia por insuficiência hepática, consumo ou uso de antagonista da vitamina K."
+            }
+          ]
+        },
+        {
+          "id": "grp_aims_mental",
+          "name": "3. M — Alteração do Estado Mental (Escala de Coma de Glasgow < 14)",
+          "slug": "estado-mental-aims65",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_aims_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Inclui desorientação, letargia, estupor, coma ou encefalopatia hepática aguda.",
+          "options": [
+            {
+              "id": "opt_aims_men_0",
+              "label": "Não (Glasgow 14 ou 15 — Alerta/Orientado) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Nível de consciência preservado."
+            },
+            {
+              "id": "opt_aims_men_1",
+              "label": "Sim (Glasgow < 14 — Confusão, letargia ou coma) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Hipoperfusão cerebral ou encefalopatia hepática desencadeada pela HDA."
+            }
+          ]
+        },
+        {
+          "id": "grp_aims_sbp",
+          "name": "4. S — Pressão Arterial Sistólica (PAS) <= 90 mmHg",
+          "slug": "pas-aims65",
+          "inputType": "single_choice",
+          "unit": "mmHg",
+          "radarAxisId": "axis_aims_hemo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_aims_sbp_0",
+              "label": "Não (PAS > 90 mmHg) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem hipotensão arterial sistólica."
+            },
+            {
+              "id": "opt_aims_sbp_1",
+              "label": "Sim (PAS <= 90 mmHg) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Instabilidade hemodinâmica e choque hemorrágico."
+            }
+          ]
+        },
+        {
+          "id": "grp_aims_age",
+          "name": "5. 65 — Idade >= 65 anos",
+          "slug": "idade-aims65",
+          "inputType": "single_choice",
+          "unit": "anos",
+          "radarAxisId": "axis_aims_age",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "options": [
+            {
+              "id": "opt_aims_age_0",
+              "label": "Não (Idade < 65 anos) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Adulto < 65 anos."
+            },
+            {
+              "id": "opt_aims_age_1",
+              "label": "Sim (Idade >= 65 anos) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Idoso com maior vulnerabilidade a eventos isquêmicos secundários."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_aims_low",
+          "label": "Baixo Risco de Mortalidade (AIMS65 0 a 1 ponto)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 1,
+          "statisticalOutcome": "Mortalidade intra-hospitalar: 0,3% (0 pts) a 1,2% (1 pt).",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_aims_low_1",
+              "drugName": "Omeprazol ou Pantoprazol IV",
+              "dosage": "40 mg IV de 12/12h até realização da Endoscopia Digestiva Alta",
+              "route": "Intravenosa (IV)",
+              "frequency": "12/12h",
+              "dilutionInstructions": "Associar ao escore de Glasgow-Blatchford para decidir necessidade de internação vs alta precoce."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_aims_low_1",
+              "recommendationTitle": "Manejo em Enfermaria ou Unidade de Observação",
+              "dispositionTarget": "Observação / Enfermaria Clínica",
+              "monitoringPlan": "Monitorização clínica e programação de EDA em < 24 horas (salvo se GBS 0-1 elegível à alta)."
+            }
+          ]
+        },
+        {
+          "id": "tier_aims_high",
+          "label": "Alto Risco de Mortalidade Intra-Hospitalar (AIMS65 2 a 5 pontos)",
+          "severityLevel": "critical",
+          "minScore": 2,
+          "maxScore": 5,
+          "statisticalOutcome": "Mortalidade intra-hospitalar ascendente: 3,2% (2 pts), 10,3% (3 pts), 16,5% (4 pts) e 24,5% (5 pts).",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_aims_high_1",
+              "drugName": "Ressuscitação Hemostática + IBP Alta Dose + Terlipressina/Ceftriaxona (se Cirrose) + Reversão de INR",
+              "dosage": "Omeprazol 80 mg IV bolus + 8 mg/h; se cirrose: Terlipressina 2 mg IV 4/4h + Ceftriaxona 1 g IV/dia; se uso de Varfarina: Complexo Protrombínico 25-50 UI/kg + Vitamina K 10 mg IV lenta",
+              "route": "Intravenosa (IV)",
+              "frequency": "Imediata na Sala Vermelha",
+              "dilutionInstructions": "Atenção: No paciente cirrótico sem uso de anticoagulantes, o INR elevado reflete deficiência balanceada de pró e anticoagulantes — NÃO transfundir Plasma Fresco Congelado rotineiramente para corrigir INR na HDA varicosa (Baveno VII), pois causa sobrecarga volêmica e aumenta a pressão portal!"
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_aims_high_1",
+              "recommendationTitle": "Admissão em UTI, Proteção de Via Aérea (se GCS <= 8 ou Hematêmese Maciça) e EDA Precoce",
+              "dispositionTarget": "Sala Vermelha / UTI",
+              "monitoringPlan": "Intubação orotraqueal profilática antes da EDA em pacientes com alteração mental importante ou hematêmese incoercível para evitar broncoaspiração maciça. Transfusão restritiva de CH (alvo Hb 7-9 g/dL)."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

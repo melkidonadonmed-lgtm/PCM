@@ -1,0 +1,863 @@
+{
+  "blockId": "block_09",
+  "blockName": "Hematologia, Oncologia e Toxicologia",
+  "version": "1.0.0",
+  "categorySlug": "bloco-09-hemato-onco-toxico",
+  "description": "Dossiês monográficos completos dos 3 escores críticos de hematologia, oncologia e toxicologia (4Ts para Trombocitopenia Induzida por Heparina, MASCC para Neutropenia Febril e Nomograma de Rumack-Matthew / King's College para Intoxicação por Paracetamol).",
+  "calculators": [
+    {
+      "id": "calc_mentzer",
+      "slug": "indice-de-mentzer",
+      "name": "Índice de Mentzer (VCM / Eritrócitos) no Diagnóstico Diferencial de Anemias Microcíticas",
+      "acronym": "Mentzer",
+      "version": "1.0.0",
+      "category": "Hematologia, Hemostasia e Reumatologia",
+      "subcategory": "Anemias Microcíticas e Hemoglobinopatias",
+      "categorySlug": "bloco-09-hematologia-reumatologia",
+      "categoryName": "Hematologia, Hemostasia e Reumatologia",
+      "moduleName": "Anemias, Citopenias e Sangramento",
+      "blockId": "block_09",
+      "blockFile": "block_09.json",
+      "description": "Índice hematimétrico discriminante clássico calculado pela razão entre o Volume Corpuscular Médio (VCM em fL) e a contagem de Eritrócitos/Hemácias (RBC em milhões/mm³), diferenciando o Traço Beta-Talassêmico (Mentzer < 13: microcitose acentuada com eritrocitose compensatória e RDW normal) da Anemia Ferropriva (Mentzer > 13: queda proporcional de hemácias com anisocitose / RDW elevado).",
+      "summary": "Razão VCM / Hemácias nas anemias microcíticas: < 13 sugere Traço Talassêmico; > 13 sugere Anemia Ferropriva.",
+      "clinicalObjective": "Guiar a propedêutica diferencial de anemias microcíticas (VCM < 80 fL), evitando prescrição iatrogênica de sulfato ferroso em portadores de talassemia (risco de sobrecarga de ferro) e direcionando para Eletroforese de Hemoglobina/HPLC ou Cinética de Ferro.",
+      "targetPopulation": "Crianças, gestantes e adultos com anemia microcítica e hipocrômica no hemograma automatizado.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Índice de Mentzer = VCM (fL) / Contagem de Eritrócitos (milhões/mm³)",
+      "evidenceSource": "Mentzer WC Jr. Differentiation of iron deficiency from thalassaemia trait. Lancet. 1973;1(7808):882.",
+      "minPossibleScore": 8,
+      "maxPossibleScore": 24,
+      "baseScore": 0,
+      "badge": "hematologia",
+      "clinicalWarning": "PROIBIÇÃO DE FERROTERAPIA EMPÍRICA SEM CINÉTICA DE FERRO: Pacientes com Índice de Mentzer < 13 apresentam alta probabilidade de Traço Beta-Talassêmico (medula hiperplásica produzindo > 5,0 milhões de hemácias/mm³ pequenas, com VCM 55-68 fL e RDW normal < 14%). Nesses casos, NÃO prescrever ferro antes de dosar Ferritina e Saturação de Transferrina! Nota: A deficiência concomitante de ferro pode mascarar a elevação de HbA2 na eletroforese.",
+      "radarAxes": [
+        {
+          "id": "axis_men_ratio",
+          "label": "Razão VCM / Contagem de Hemácias",
+          "system": "Eritropoiese",
+          "unit": "fL / 10^6",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_men_rdw",
+          "label": "Anisocitose Eritrocitária (RDW)",
+          "system": "Morfologia",
+          "unit": "%",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_men_iron",
+          "label": "Perfil de Ferro (Ferritina / Sat. Transferrina)",
+          "system": "Metabolismo do Ferro",
+          "unit": "ng/mL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_men_ratio",
+          "name": "1. Relação VCM (fL) / Contagem de Eritrócitos (milhões/mm³)",
+          "slug": "relacao-vcm-eritrocitos-mentzer",
+          "inputType": "single_choice",
+          "unit": "Índice",
+          "radarAxisId": "axis_men_ratio",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Exemplo Talassemia: VCM 62 fL / 5,6 milhões RBC = 11,0 (< 13). Exemplo Ferropriva: VCM 68 fL / 3,8 milhões RBC = 17,9 (> 13).",
+          "options": [
+            {
+              "id": "opt_men_rt_10",
+              "label": "Razão VCM / RBC < 11,5 (ex.: VCM 58-65 fL com RBC >= 5,5 milhões/mm³) (+9 pts)",
+              "pointValue": 9,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.15,
+              "sortOrder": 1,
+              "description": "Microcitose acentuada com poliglobulia microcítica compensatória clássica de Traço Talassêmico."
+            },
+            {
+              "id": "opt_men_rt_12",
+              "label": "Razão VCM / RBC entre 11,5 e 12,9 (ex.: VCM 65-72 fL com RBC 5,1-5,5 milhões/mm³) (+11 pts)",
+              "pointValue": 11,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 2,
+              "description": "Índice de Mentzer < 13: sugere fortemente Traço Beta-Talassêmico (ou Alfa-Talassemia)."
+            },
+            {
+              "id": "opt_men_rt_13",
+              "label": "Razão VCM / RBC limítrofe = 13,0 (Zona Indeterminada / Sobreposição) (+13 pts)",
+              "pointValue": 13,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 3,
+              "description": "Pode ocorrer na coexistência de traço talassêmico + ferropenia."
+            },
+            {
+              "id": "opt_men_rt_16",
+              "label": "Razão VCM / RBC entre 13,1 e 17,0 (ex.: VCM 70-76 fL com RBC 4,0-4,8 milhões/mm³) (+16 pts)",
+              "pointValue": 16,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 4,
+              "description": "Índice de Mentzer > 13: sugere Anemia Ferropriva."
+            },
+            {
+              "id": "opt_men_rt_20",
+              "label": "Razão VCM / RBC > 17,0 (ex.: VCM 60-72 fL com Eritropenia RBC < 3,8 milhões/mm³) (+20 pts)",
+              "pointValue": 20,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Eritropenia hipoproliferativa típica de Anemia Ferropriva moderada a grave."
+            }
+          ]
+        },
+        {
+          "id": "grp_men_rdw",
+          "name": "2. Amplitude de Distribuição Eritrocitária (RDW-CV %)",
+          "slug": "rdw-mentzer",
+          "inputType": "single_choice",
+          "unit": "%",
+          "radarAxisId": "axis_men_rdw",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "No traço talassêmico a população microcítica é homogênea (RDW normal); na ferropriva há intensa anisocitose (RDW > 15%).",
+          "options": [
+            {
+              "id": "opt_men_rdw_low",
+              "label": "RDW Normal / Homogêneo (11,5% a 14,0%) (-1 pt — reforça Talassemia)",
+              "pointValue": -1,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Microcitose uniforme; presença frequente de pontilhado basófilo e hemácias em alvo."
+            },
+            {
+              "id": "opt_men_rdw_mid",
+              "label": "RDW Discretamente Elevado (14,1% a 15,5%) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Anisocitose leve."
+            },
+            {
+              "id": "opt_men_rdw_high",
+              "label": "RDW Francamente Elevado (> 15,5% — Anisocitose e Poiquilocitose em Lápis/Charuto) (+2 pts — reforça Ferropriva)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Forte marcador de carência progressiva de ferro."
+            }
+          ]
+        },
+        {
+          "id": "grp_men_ferritin",
+          "name": "3. Cinética de Ferro (Ferritina Sérica e Saturação de Transferrina)",
+          "slug": "cinetica-ferro-mentzer",
+          "inputType": "single_choice",
+          "unit": "ng/mL",
+          "radarAxisId": "axis_men_iron",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_men_fe_norm",
+              "label": "Ferritina normal ou elevada (>= 30-100 ng/mL) e Sat. Transferrina >= 20% (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Estoques de ferro preservados; exclui anemia ferropriva isolada."
+            },
+            {
+              "id": "opt_men_fe_low",
+              "label": "Ferritina < 30 ng/mL (ou < 100 ng/mL se inflamação/IRC) e Sat. Transferrina < 20% (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Confirmação bioquímica padrão-ouro de ferropenia absoluta."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_men_thal",
+          "label": "Índice de Mentzer < 13 (8 a 12 pontos) — Alta Probabilidade de Traço Talassêmico",
+          "severityLevel": "intermediate",
+          "minScore": 8,
+          "maxScore": 12,
+          "statisticalOutcome": "Sensibilidade e especificidade > 85-90% na triagem de Traço Beta-Talassêmico (VCM diminuído desproporcionalmente com contagem de hemácias > 5,0 milhões/mm³).",
+          "colorHex": "#0ea5e9",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_men_thal_1",
+              "drugName": "Ácido Fólico (Suplementação seletiva se eritropoiese acelerada ou gestação) — EVITAR Sulfato Ferroso",
+              "dosage": "Ácido Fólico 1 a 5 mg VO 1x/dia (se indicado); NÃO prescrever sais de ferro salvo se ferropenia concomitante documentada",
+              "route": "Via Oral (VO)",
+              "frequency": "1x ao dia",
+              "dilutionInstructions": "A administração indevida de ferro em talassêmicos agrava o risco de hemocromatose secundária."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_men_thal_1",
+              "recommendationTitle": "Solicitar Eletroforese de Hemoglobina por HPLC e Aconselhamento Genético",
+              "dispositionTarget": "Ambulatório de Clínica Médica / Hematologia",
+              "monitoringPlan": "Solicitar Cromatografia Líquida de Alta Eficiência (HPLC) / Eletroforese de Hemoglobina: aumento de HbA2 (> 3,5%, tipicamente 3,8% a 7,0%) confirma Traço Beta-Talassêmico. Se HbA2 normal com microcitose persistente e ferro normal, suspeitar de Alfa-Talassemia (confirmada por biologia molecular)."
+            }
+          ]
+        },
+        {
+          "id": "tier_men_border",
+          "label": "Índice de Mentzer Limítrofe = 13 (13 pontos) — Zona de Sobreposição (Possível Associação)",
+          "severityLevel": "intermediate",
+          "minScore": 13,
+          "maxScore": 13,
+          "statisticalOutcome": "Zona cinzenta diagnóstica; avaliar coexistência de Traço Talassêmico com Deficiência de Ferro ou Anemia de Doença Crônica.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_men_bor_1",
+              "drugName": "Corrigir Ferropenia Documentada Antes de Interpretar HbA2 na Eletroforese",
+              "dosage": "Se Ferritina < 30 ng/mL: Ferro Elementar 60-100 mg VO em dias alternados por 8-12 semanas, depois repetir Eletroforese de Hb",
+              "route": "Via Oral (VO)",
+              "frequency": "Em dias alternados",
+              "dilutionInstructions": "A ferropenia reduz falsamente os níveis de HbA2 na eletroforese, podendo mascarar o traço beta-talassêmico até que os estoques de ferro sejam normalizados."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_men_bor_1",
+              "recommendationTitle": "Propedêutica Combinada: Cinética Completa de Ferro + Eletroforese de Hemoglobina",
+              "dispositionTarget": "Seguimento Ambulatorial",
+              "monitoringPlan": "Solicitar Ferritina, Ferro sérico, TIBC, Saturação de Transferrina, PCR, Reticulócitos e HPLC de Hemoglobina."
+            }
+          ]
+        },
+        {
+          "id": "tier_men_ida",
+          "label": "Índice de Mentzer > 13 (14 a 24 pontos) — Alta Probabilidade de Anemia Ferropriva",
+          "severityLevel": "high",
+          "minScore": 14,
+          "maxScore": 24,
+          "statisticalOutcome": "Padrão hipoproliferativo ferroprivo (queda simultânea de VCM e da contagem de eritrócitos com RDW elevado).",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_men_ida_1",
+              "drugName": "Sulfato Ferroso / Polimaltosado VO (ou Carboximaltose Férrica / Sacarato de Hidróxido Férrico IV)",
+              "dosage": "Adultos: 60 a 120 mg de Ferro Elementar VO em DIAS ALTERNADOS em jejum (melhora absorção por menor pico de hepcidina); Crianças: 3 a 5 mg/kg/dia de ferro elementar. Repor por 3 a 6 meses após normalização da Hb para repletar ferritina (> 50 ng/mL)",
+              "route": "Via Oral (VO) ou Intravenosa (IV se intolerância, má absorção, DII, pós-bariátrica ou Hb < 7-8 g/dL)",
+              "frequency": "Dias alternados (adultos) ou diário (pediatria)",
+              "dilutionInstructions": "1 comprimido de Sulfato Ferroso 300 mg contém 60 mg de ferro elementar. Avaliar pico reticulocitário entre o 7º e 10º dia de tratamento."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_men_ida_1",
+              "recommendationTitle": "Investigação Obrigatória da Causa de Perda Sanguínea Crônica (EDA + Colonoscopia em Homens e Mulheres Pós-Menopausa)",
+              "dispositionTarget": "Ambulatório de Clínica Médica / Gastroenterologia / Ginecologia",
+              "monitoringPlan": "Anemia ferropriva não é diagnóstico final! Em homens adultos e mulheres pós-menopausa (ou pré-menopausa com sintomas digestivos/refratariedade), realizar OBRIGATORIAMENTE Endoscopia Digestiva Alta e Colonoscopia para descartar neoplasia de cólon direito/estômago, doença celíaca (anti-transglutaminase IgA) ou angiodisplasias."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_4ts_hit",
+      "slug": "escore-4ts-hit",
+      "name": "Escore 4Ts para Trombocitopenia Induzida por Heparina (HIT Tipo II)",
+      "acronym": "4Ts (HIT)",
+      "version": "1.0.0",
+      "category": "Hematologia, Hemostasia e Reumatologia",
+      "subcategory": "Hemostasia, Trombose e Coagulopatias",
+      "categorySlug": "bloco-09-hematologia-reumatologia",
+      "categoryName": "Hematologia, Hemostasia e Reumatologia",
+      "moduleName": "Anemias, Citopenias e Sangramento",
+      "blockId": "block_09",
+      "blockFile": "block_09.json",
+      "description": "Escore clínico pré-teste padrão-ouro da American Society of Hematology (ASH) de 0 a 8 pontos para estimar a probabilidade de Trombocitopenia Induzida por Heparina imunomediada (HIT Tipo II — anticorpos IgG anti-complexo PF4/heparina) através de 4 domínios: Trombocitopenia (magnitude da queda e nadir), Tempo do início da queda plaquetária, Trombose ou sequelas agudas e Outras causas de plaquetopenia.",
+      "summary": "Probabilidade pré-teste de HIT (0 a 8 pontos): <= 3 exclui HIT; >= 4 exige suspensão de toda heparina e início de anticoagulante não heparínico.",
+      "clinicalObjective": "Identificar imediatamente pacientes com moderada/alta probabilidade de HIT (4 a 8 pts) para suspender toda exposição à heparina e iniciar anticoagulação alternativa plena antes do resultado laboratorial anti-PF4, prevenindo trombose catastrófica.",
+      "targetPopulation": "Pacientes hospitalizados expostos a Heparina Não Fracionada (HNF) ou Heparina de Baixo Peso Molecular (Enoxaparina) que evoluem com queda plaquetária >= 30% ou trombose aguda.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Trombocitopenia (0-2) + Tempo de Queda (0-2) + Trombose/Sequelas (0-2) + Outras Causas (0-2)",
+      "evidenceSource": "Lo GK, Juhl D, Warkentin TE, Sigouin CS, Eichler P, Greinacher A. Evaluation of pretest clinical score (4 T's) for the diagnosis of heparin-induced thrombocytopenia in two clinical settings. J Thromb Haemost. 2006;4(4):759-765. / ASH HIT Guidelines 2018.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 8,
+      "baseScore": 0,
+      "badge": "hematologia",
+      "clinicalWarning": "CONTRAINDICAÇÕES FATAIS NA HIT AGUDA: Em pacientes com 4Ts >= 4 pontos: 1) SUSPENDER IMEDIATAMENTE todas as heparinas (HNF, Enoxaparina, flushes de cateter arterial/venoso e circuitos de diálise); 2) NÃO INICIAR VARFARINA na fase aguda (causa depleção rápida de Proteína C e gangrena venosa de extremidades — se já estiver em uso de Varfarina, reverter com Vitamina K 5-10 mg!); 3) NÃO TRANSFUNDIR PLAQUETAS profilaticamente (alimenta o estado pró-trombótico explosivo).",
+      "radarAxes": [
+        {
+          "id": "axis_4t_plt",
+          "label": "Magnitude da Trombocitopenia e Nadir",
+          "system": "Plaquetário",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_4t_time",
+          "label": "Janela Temporal (Dias 5 a 10)",
+          "system": "Imunológico",
+          "unit": "dias",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_4t_thromb",
+          "label": "Trombose Nova ou Necrose Cutânea",
+          "system": "Vascular",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_4t_other",
+          "label": "Exclusão de Outras Causas",
+          "system": "Diagnóstico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_4t_plt",
+          "name": "1. T1 — Trombocitopenia (Magnitude da Queda Plaquetária e Nadir)",
+          "slug": "trombocitopenia-4ts",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_4t_plt",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Na HIT clássica, a queda é tipicamente > 50%, mas o nadir raramente cai abaixo de 20.000/mm³.",
+          "options": [
+            {
+              "id": "opt_4t_pl_0",
+              "label": "Queda < 30% OU Nadir plaquetário < 10.000/mm³ (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Nadir < 10.000/mm³ fala fortemente contra HIT isolada (sugere PTI, CIVD ou sepse grave)."
+            },
+            {
+              "id": "opt_4t_pl_1",
+              "label": "Queda de 30% a 50% (com nadir >= 10.000) OU Queda > 50% com nadir entre 10.000 e 19.000/mm³ (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Comportamento plaquetário intermediário."
+            },
+            {
+              "id": "opt_4t_pl_2",
+              "label": "Queda plaquetária > 50% E Nadir plaquetário >= 20.000/mm³ (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Perfil clássico de consumo plaquetário imunomediado por anticorpos anti-PF4/heparina."
+            }
+          ]
+        },
+        {
+          "id": "grp_4t_time",
+          "name": "2. T2 — Tempo do Início da Queda Plaquetária após Exposição à Heparina",
+          "slug": "tempo-queda-4ts",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_4t_time",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "options": [
+            {
+              "id": "opt_4t_tm_0",
+              "label": "Queda em < 4 dias SEM exposição prévia recente à heparina nos últimos 100 dias (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Incompatível com o tempo de síntese de IgG (ou representa HIT Tipo I não imune benigna)."
+            },
+            {
+              "id": "opt_4t_tm_1",
+              "label": "Consistente com 5-10 dias mas incerto (faltam hemogramas), OU início > 10 dias, OU <= 1 dia se exposição há 30-100 dias (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Cronologia intermediária ou reexposição subaguda."
+            },
+            {
+              "id": "opt_4t_tm_2",
+              "label": "Início claro entre o 5º e o 10º dia, OU queda em <= 1 dia com exposição prévia à heparina nos últimos 30 dias (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Janela imunológica clássica de soroconversão IgG anti-PF4 (ou HIT de início rápido por anticorpos circulantes)."
+            }
+          ]
+        },
+        {
+          "id": "grp_4t_thromb",
+          "name": "3. T3 — Trombose ou Outras Sequelas Agudas",
+          "slug": "trombose-sequelas-4ts",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_4t_thromb",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "options": [
+            {
+              "id": "opt_4t_th_0",
+              "label": "Nenhuma trombose ou sequela cutânea/sistêmica (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Trombocitopenia isolada."
+            },
+            {
+              "id": "opt_4t_th_1",
+              "label": "Trombose progressiva ou recorrente, Lesões cutâneas eritematosas não necróticas, ou Trombose suspeita não confirmada (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Suspeita clínica ou extensão trombótica sob heparina."
+            },
+            {
+              "id": "opt_4t_th_2",
+              "label": "Nova trombose comprovada (TVP/TEP/Arterial), Necrose cutânea nos sítios de injeção, ou Reação sistêmica aguda pós-bolus IV (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Estado hipercoagulável franco da HIT (trombose venosa, arterial ou hemorragia adrenal bilateral)."
+            }
+          ]
+        },
+        {
+          "id": "grp_4t_other",
+          "name": "4. T4 — Outras Causas de Trombocitopenia Presentes",
+          "slug": "outras-causas-4ts",
+          "inputType": "single_choice",
+          "radarAxisId": "axis_4t_other",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "options": [
+            {
+              "id": "opt_4t_ot_0",
+              "label": "Outra causa definitiva está presente (Sepse grave, CIVD, Quimioterapia, CEC < 48h, Linezolida/Vancomicina) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Etiologia alternativa explica plenamente a plaquetopenia."
+            },
+            {
+              "id": "opt_4t_ot_1",
+              "label": "Outra causa possível está presente (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Causa concorrente duvidosa."
+            },
+            {
+              "id": "opt_4t_ot_2",
+              "label": "Nenhuma outra causa aparente de trombocitopenia (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Exclusão completa de causas alternativas."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_4t_low",
+          "label": "Baixa Probabilidade de HIT (4Ts 0 a 3 pontos) — Alto Valor Preditivo Negativo (> 99%)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 3,
+          "statisticalOutcome": "Probabilidade de HIT < 1% (VPN ~99,8%). Permite manter a heparina com segurança e dispensa teste anti-PF4 na maioria dos casos.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_4t_low_1",
+              "drugName": "Manter Heparina (HNF ou Enoxaparina) Conforme Indicação Clínica",
+              "dosage": "Não suspender heparina; não solicitar imunoensaio anti-PF4 rotineiramente (alto índice de falso-positivo)",
+              "route": "Subcutânea (SC) ou Intravenosa (IV)",
+              "frequency": "Manter prescrição atual",
+              "dilutionInstructions": "Diretriz ASH Choosing Wisely: não testar anticorpos anti-PF4 em pacientes com escore 4Ts <= 3."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_4t_low_1",
+              "recommendationTitle": "Investigar Causas Alternativas de Plaquetopenia Hospitalar",
+              "dispositionTarget": "Enfermaria / UTI",
+              "monitoringPlan": "Avaliar pseudotrombocitopenia por EDTA (esfregaço de sangue periférico / coleta em citrato), sepse, hemodiluição, CIVD ou farmacodermia/fármacos mielotóxicos."
+            }
+          ]
+        },
+        {
+          "id": "tier_4t_mod",
+          "label": "Probabilidade Intermediária de HIT (4Ts 4 a 5 pontos) — Suspender Heparina e Testar Anti-PF4",
+          "severityLevel": "high",
+          "minScore": 4,
+          "maxScore": 5,
+          "statisticalOutcome": "Probabilidade de HIT: ~14%. Exige interrupção imediata de toda heparina e início de anticoagulante alternativo enquanto aguarda ELISA anti-PF4.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_4t_mod_1",
+              "drugName": "Suspender Toda Heparina + Iniciar Fondaparinux SC ou DOAC (Rivaroxabana / Apixabana)",
+              "dosage": "Fondaparinux: < 50 kg: 5 mg SC/dia; 50-100 kg: 7,5 mg SC/dia; > 100 kg: 10 mg SC/dia (se ClCr > 30 mL/min). Alternativa em estáveis: Rivaroxabana 15 mg VO 12/12h",
+              "route": "Subcutânea (SC) ou Via Oral (VO)",
+              "frequency": "24/24h (Fondaparinux) ou 12/12h (Rivaroxabana)",
+              "dilutionInstructions": "Em pacientes críticos ou com insuficiência renal (ClCr < 30 mL/min), preferir Argatroban IV (ou Bivalirudina).",
+              "renalAdjustment": "Fondaparinux é contraindicado se ClCr < 30 mL/min."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_4t_mod_1",
+              "recommendationTitle": "Solicitar Imunoensaio Anti-PF4/Heparina (ELISA) e Ensaio Funcional (SRA)",
+              "dispositionTarget": "Internação Monitorizada / UTI",
+              "monitoringPlan": "Se o imunoensaio ELISA anti-PF4 resultar negativo, a HIT é excluída e a heparina pode ser retomada. Se positivo com DO intermediária (0,4-2,0), confirmar com ensaio funcional de liberação de serotonina (SRA)."
+            }
+          ]
+        },
+        {
+          "id": "tier_4t_high",
+          "label": "Alta Probabilidade de HIT (4Ts 6 a 8 pontos) — Emergência Pró-Trombótica",
+          "severityLevel": "critical",
+          "minScore": 6,
+          "maxScore": 8,
+          "statisticalOutcome": "Probabilidade de HIT confirmada: ~64%. Risco de nova trombose venosa ou arterial de 30% a 50% se não anticoagulado imediatamente.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_4t_high_1",
+              "drugName": "Anticoagulação Plena Imediata Não Heparínica: Argatroban IV, Bivalirudina IV, Fondaparinux SC ou DOAC",
+              "dosage": "Argatroban (escolha na LRA): 2 mcg/kg/min IV contínuo (0,5 mcg/kg/min se disfunção hepática/UTI), titulando TTPa para 1,5-3,0x o basal; OU Fondaparinux 7,5 mg SC 24/24h (se função renal normal); OU Rivaroxabana 15 mg 12/12h por 21 dias seguido de 20 mg/dia",
+              "route": "Intravenosa Contínua (IV) / Subcutânea (SC) / Via Oral (VO)",
+              "frequency": "Início imediato (não aguardar resultado laboratorial)",
+              "dilutionInstructions": "Se paciente estava em uso de Varfarina no momento do diagnóstico de HIT, suspender Varfarina e administrar Vitamina K 5 a 10 mg IV/VO imediatamente para restaurar Proteína C e prevenir gangrena venosa de membros.",
+              "contraindications": "Proibido HNF, HBPM (Enoxaparina/Dalteparina), Varfarina antes de Plaquetas > 150.000/mm³ e transfusão profilática de plaquetas."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_4t_high_1",
+              "recommendationTitle": "Banimento Total de Heparina, Doppler Venoso de 4 Membros e Alerta de Alergia em Prontuário",
+              "dispositionTarget": "Unidade de Terapia Intensiva / Hematologia",
+              "monitoringPlan": "Realizar Ultrassonografia com Doppler venoso bilateral de membros inferiores (e membros superiores se cateter venoso central presente) mesmo em assintomáticos (alta prevalência de TVP silenciosa que muda a duração da anticoagulação de 4 semanas para 3 meses). Registrar alerta permanente de HIT no prontuário."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_ist_dic",
+      "slug": "isth-civd-dic",
+      "name": "Escore Diagnóstico da ISTH para Coagulação Intravascular Disseminada (CIVD / DIC)",
+      "acronym": "ISTH CIVD",
+      "version": "1.0.0",
+      "category": "Hematologia, Hemostasia e Reumatologia",
+      "subcategory": "Hemostasia, Trombose e Coagulopatias",
+      "categorySlug": "bloco-09-hematologia-reumatologia",
+      "categoryName": "Hematologia, Hemostasia e Reumatologia",
+      "moduleName": "Anemias, Citopenias e Sangramento",
+      "blockId": "block_09",
+      "blockFile": "block_09.json",
+      "description": "Sistema de pontuação oficial da International Society on Thrombosis and Haemostasis (ISTH, Taylor et al., 2001) de 0 a 8 pontos para o diagnóstico objetivo de Coagulação Intravascular Disseminada manifesta (Overt DIC >= 5 pontos), avaliando Contagem de Plaquetas, Produtos de Degradação da Fibrina / D-Dímero, Prolongamento do Tempo de Protrombina (TP) e Nível de Fibrinogênio plasmático (Método de Clauss).",
+      "summary": "Diagnóstico de CIVD manifesta (ISTH >= 5 pontos, escala 0 a 8) e guia de reposição hemoterápica (Plaquetas, PFC, Crioprecipitado).",
+      "clinicalObjective": "Confirmar laboratorialmente a CIVD descompensada em pacientes com condição clínica de base associada (sepse grave, politrauma, descolamento prematuro de placenta/embolia amniótica, leucemia promielocítica aguda - LMA M3, acidente ofídico) e orientar os gatilhos exatos de transfusão.",
+      "targetPopulation": "Pacientes críticos portadores de doença de base reconhecidamente desencadeante de ativação sistêmica da coagulação e consumo microvascular.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Plaquetas (0-2) + D-Dímero/PDF (0-3) + Prolongamento do TP (0-2) + Fibrinogênio (0-1)",
+      "evidenceSource": "Taylor FB Jr, Toh CH, Hoots WK, Wada H, Levi M; Scientific Subcommittee on Disseminated Intravascular Coagulation (DIC) of the ISTH. Towards definition, clinical and laboratory criteria, and a scoring system for disseminated intravascular coagulation. Thromb Haemost. 2001;86(5):1327-1330.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 8,
+      "baseScore": 0,
+      "badge": "hematologia",
+      "clinicalWarning": "PRÉ-REQUISITO OBRIGATÓRIO DA ISTH: O escore de CIVD da ISTH somente deve ser aplicado na presença de uma condição clínica subjacente conhecida por causar CIVD (sepse, trauma, complicações obstétricas, neoplasia/LPA, reação hemolítica aguda). O pilar número 1 do tratamento é a resolução agressiva da causa de base; a transfusão de hemocomponentes é indicada apenas se houver sangramento ativo ou antes de procedimentos invasivos, nunca apenas para 'normalizar exames'.",
+      "radarAxes": [
+        {
+          "id": "axis_dic_plt",
+          "label": "Consumo Plaquetário",
+          "system": "Plaquetário",
+          "unit": "/mm³",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_dic_ddimer",
+          "label": "Fibrinólise Secundária (D-Dímero)",
+          "system": "Fibrinolítico",
+          "unit": "ng/mL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_dic_pt",
+          "label": "Consumo de Fatores (Prolongamento TP)",
+          "system": "Coagulação",
+          "unit": "s",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_dic_fib",
+          "label": "Hipofibrinogenemia (Clauss)",
+          "system": "Fibrinogênio",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_dic_plt",
+          "name": "1. Contagem de Plaquetas (/mm³)",
+          "slug": "plaquetas-isth-civd",
+          "inputType": "single_choice",
+          "unit": "/mm³",
+          "radarAxisId": "axis_dic_plt",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "options": [
+            {
+              "id": "opt_dic_pl_0",
+              "label": ">= 100.000/mm³ (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Contagem plaquetária acima de 100.000/mm³."
+            },
+            {
+              "id": "opt_dic_pl_1",
+              "label": "50.000 a 99.000/mm³ (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Plaquetopenia moderada de consumo."
+            },
+            {
+              "id": "opt_dic_pl_2",
+              "label": "< 50.000/mm³ (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Trombocitopenia grave por microtrombose difusa."
+            }
+          ]
+        },
+        {
+          "id": "grp_dic_ddimer",
+          "name": "2. Elevação de Marcadores Relacionados à Fibrina (D-Dímero ou PDF)",
+          "slug": "ddimero-isth-civd",
+          "inputType": "single_choice",
+          "unit": "ng/mL FEU",
+          "radarAxisId": "axis_dic_ddimer",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Aumento moderado equivale a ~2x a 5x o limite superior normal (500 a 2.000-3.000 ng/mL); aumento acentuado equivale a > 5x a 10x (> 3.000-4.000 ng/mL).",
+          "options": [
+            {
+              "id": "opt_dic_dd_0",
+              "label": "Sem aumento (D-Dímero normal < 500 ng/mL FEU) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Exclui degradação ativa de fibrina reticulada."
+            },
+            {
+              "id": "opt_dic_dd_2",
+              "label": "Aumento moderado (2x a 5x o LSN / ~1.000 a 3.000 ng/mL) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 2,
+              "description": "Ativação moderada da geração de trombina e plasmina."
+            },
+            {
+              "id": "opt_dic_dd_3",
+              "label": "Aumento acentuado / forte (> 5x a 10x o LSN / > 3.000-4.000 ng/mL) (+3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Fibrinólise secundária maciça; maior peso isolado no escore ISTH."
+            }
+          ]
+        },
+        {
+          "id": "grp_dic_pt",
+          "name": "3. Prolongamento do Tempo de Protrombina (TP Acima do Limite Superior Normal em Segundos)",
+          "slug": "prolongamento-tp-isth-civd",
+          "inputType": "single_choice",
+          "unit": "segundos",
+          "radarAxisId": "axis_dic_pt",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Avalia quantos segundos o TP do paciente excede o limite superior normal do laboratório (ou equivalente em INR).",
+          "options": [
+            {
+              "id": "opt_dic_pt_0",
+              "label": "Prolongamento < 3 segundos acima do controle (INR < 1,3) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Via extrínseca preservada."
+            },
+            {
+              "id": "opt_dic_pt_1",
+              "label": "Prolongamento de 3 a 6 segundos acima do controle (INR ~1,3 a 1,7) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Depleção moderada de Fator V, VII e X."
+            },
+            {
+              "id": "opt_dic_pt_2",
+              "label": "Prolongamento >= 6 segundos acima do controle (INR > 1,7-2,0) (+2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Coagulopatia de consumo severa."
+            }
+          ]
+        },
+        {
+          "id": "grp_dic_fib",
+          "name": "4. Nível Plasmático de Fibrinogênio (Método de Clauss)",
+          "slug": "fibrinogenio-isth-civd",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_dic_fib",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Como o fibrinogênio é uma proteína de fase aguda (eleva-se até 400-800 mg/dL na sepse), valores < 100 mg/dL indicam consumo extremo.",
+          "options": [
+            {
+              "id": "opt_dic_fb_0",
+              "label": ">= 100 mg/dL (>= 1,0 g/L) (+0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Atenção: na gestação / hemorragia pós-parto, fibrinogênio < 200 mg/dL já indica risco grave."
+            },
+            {
+              "id": "opt_dic_fb_1",
+              "label": "< 100 mg/dL (< 1,0 g/L) (+1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Hipofibrinogenemia crítica por consumo intravascular e fibrinólise."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_dic_non_overt",
+          "label": "Não Compatível com CIVD Manifesta (ISTH 0 a 4 pontos) — Possível CIVD Não Manifesta / Compensada",
+          "severityLevel": "intermediate",
+          "minScore": 0,
+          "maxScore": 4,
+          "statisticalOutcome": "Não preenche critérios para CIVD manifesta descompensada no momento; repetir escore diariamente (a cada 24h).",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_dic_low_1",
+              "drugName": "Tratamento da Doença de Base + Tromboprofilaxia Farmacológica (se sem sangramento e Plaq > 30-50 mil)",
+              "dosage": "Enoxaparina 40 mg SC 1x/dia ou HNF 5.000 UI SC 8/8h em pacientes de UTI sem sangramento ativo",
+              "route": "Subcutânea (SC)",
+              "frequency": "24/24h ou 8/8h",
+              "dilutionInstructions": "Em pacientes sépticos sem sangramento, manter tromboprofilaxia venosa para bloquear a geração microvascular de trombina."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_dic_low_1",
+              "recommendationTitle": "Reavaliação Laboratorial Seriada em 24 horas e Controle do Foco Infeccioso/Traumático",
+              "dispositionTarget": "Unidade de Terapia Intensiva / Semi-Intensiva",
+              "monitoringPlan": "Repetir contagem de plaquetas, TP/INR, TTPa, Fibrinogênio de Clauss e D-Dímero em 12 a 24 horas para monitorar a tendência cinética."
+            }
+          ]
+        },
+        {
+          "id": "tier_dic_overt",
+          "label": "Compatível com CIVD Manifesta / Descompensada (ISTH 5 a 8 pontos)",
+          "severityLevel": "critical",
+          "minScore": 5,
+          "maxScore": 8,
+          "statisticalOutcome": "Sensibilidade de 91% e especificidade de 97% para CIVD manifesta. Mortalidade intra-hospitalar elevada (40% a 78%) associada a disfunção multiorgânica e hemorragia grave.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "pha_dic_ov_1",
+              "drugName": "Reposição Hemoterápica Guiada por Gatilhos (Plaquetas + Crioprecipitado + Plasma Fresco Congelado)",
+              "dosage": "1) Concentrado de Plaquetas (1 pool ou 1 U/10 kg): se sangramento ativo/procedimento invasivo e Plaquetas < 50.000/mm³ (ou profilático se < 10.000-20.000/mm³ sem sangramento); 2) Crioprecipitado (1 U/10 kg ou Concentrado de Fibrinogênio 2-4 g): se Fibrinogênio < 150 mg/dL (< 200 mg/dL em obstetrícia) com sangramento; 3) Plasma Fresco Congelado (15 a 30 mL/kg): se sangramento ativo e TP/TTPa > 1,5x",
+              "route": "Intravenosa (IV)",
+              "frequency": "Guiado por metas laboratoriais de 6/6h a 8/8h e tromboelastograma (ROTEM/TEG)",
+              "dilutionInstructions": "PROIBIDO usar Ácido Tranexâmico na CIVD clássica trombótica/séptica (bloqueia a fibrinólise compensatória e precipita falência renal/orgânica por microtrombos), EXCETO na hiperfibrinólise primária maciça do trauma (< 3h), hemorragia pós-parto ou coagulopatia específica.",
+              "contraindications": "Complexo Protrombínico (CCP) deve ser evitado como primeira linha na CIVD por não conter Fator V nem Fibrinogênio e conter fatores ativados pró-trombóticos."
+            },
+            {
+              "id": "pha_dic_ov_2",
+              "drugName": "ATRA (Ácido Transretinoico — Tretinoína) Imediato se Suspeita de Leucemia Promielocítica Aguda (LPA / LMA-M3)",
+              "dosage": "ATRA 45 mg/m²/dia VO dividido de 12/12h ao menor sinal citomorfológico de LPA (antes mesmo da confirmação genética PML-RARA)",
+              "route": "Via Oral (VO) / Sonda",
+              "frequency": "12/12h",
+              "dilutionInstructions": "Na LPA, manter metas agressivas: Plaquetas > 30.000-50.000/mm³ e Fibrinogênio > 150 mg/dL para prevenir hemorragia intracraniana fulminante."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "npa_dic_ov_1",
+              "recommendationTitle": "Erradicação Imediata da Causa Desencadeante e Suporte Intensivo em UTI",
+              "dispositionTarget": "Unidade de Terapia Intensiva (UTI)",
+              "monitoringPlan": "Drenagem cirúrgica de foco séptico / antibioticoterapia imediata, esvaziamento uterino de urgência em emergências obstétricas (DPP/óbito fetal retido), soro antiofídico específico em acidentes por Bothrops/Lachesis, e monitorização de esfregaço periférico (pesquisa de esquizócitos).",
+              "laboratoryPanel": "Hemograma com contagem de plaquetas, esfregaço periférico, TP/INR, TTPa, Fibrinogênio de Clauss e D-Dímero a cada 6 a 8 horas na fase aguda."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

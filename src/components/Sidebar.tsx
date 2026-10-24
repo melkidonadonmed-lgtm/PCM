@@ -199,21 +199,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   // Grupo 2: Ferramentas Clínicas & Apoio Diagnóstico
   const clinicalToolsNavItems: SidebarNavItem[] = [
-    {
-      id: 'pediatric_calc',
-      label: 'Calculadora Pediátrica',
-      shortLabel: 'Doses',
-      iconName: 'calculate',
-      shortcut: 'Alt+3',
-      badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
-    },
-    {
-      id: 'protocols',
-      label: 'Protocolos Clínicos',
-      shortLabel: 'Protocolos',
-      iconName: 'coracao',
-      shortcut: 'Alt+4'
-    }
+    { id: 'pediatric_calc', label: 'Calculadora Pediátrica', shortLabel: 'Doses', iconName: 'calculate', shortcut: 'Alt+3', badge: patientWeight > 0 ? `${patientWeight}kg` : undefined },
+    { id: 'protocols', label: 'Protocolos Clínicos', shortLabel: 'Protocolos', iconName: 'coracao', shortcut: 'Alt+4' },
+    { id: 'scores', label: 'Escores Clínicos (Scoreboard)', fullLabel: 'Escores Clínicos, Radar 60fps, BIC, EPARADA & Rastreio INCA', shortLabel: 'Escores', iconName: 'monitor_heart', shortcut: 'Alt+8', badge: '114' },
+    { id: 'hospital', label: 'Módulo Hospitalar (Leitos)', fullLabel: 'Módulo Hospitalar e Gestão de Pacientes (EF/LT, Evolução, Exames e Science)', shortLabel: 'Hospitalar', iconName: 'local_hospital', shortcut: 'Alt+7' }
   ];
 
   const handleNavClick = (tabId: ActiveTab) => {
@@ -666,19 +655,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     Ecossistema Clínico
                   </span>
                   <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
-                    MOD-01 Ativo
+                    {activeTab === 'hospital' ? 'MOD-03 Ativo' : 'MOD-01 Ativo'}
                   </span>
                 </div>
                 <div className="grid grid-cols-3 gap-1 text-[9px] clinical-tabular-nums">
-                  <div className="px-1 py-0.5 rounded bg-sky-500/15 border border-sky-400/25 text-white font-semibold truncate text-center">
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('prescription')}
+                    className={`px-1 py-0.5 rounded border truncate text-center cursor-pointer transition ${
+                      activeTab !== 'hospital'
+                        ? 'bg-sky-500/15 border-sky-400/25 text-white font-semibold'
+                        : 'bg-white/[0.02] border-white/5 text-slate-300 hover:text-white font-medium'
+                    }`}
+                  >
                     01. Clínico
-                  </div>
+                  </button>
                   <div className="px-1 py-0.5 rounded bg-white/[0.02] border border-white/5 text-slate-400 font-medium opacity-70 truncate text-center select-none">
                     02. PEP
                   </div>
-                  <div className="px-1 py-0.5 rounded bg-white/[0.02] border border-white/5 text-slate-400 font-medium opacity-70 truncate text-center select-none">
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('hospital')}
+                    className={`px-1 py-0.5 rounded border truncate text-center cursor-pointer transition ${
+                      activeTab === 'hospital'
+                        ? 'bg-sky-500/15 border-sky-400/25 text-white font-semibold'
+                        : 'bg-white/[0.04] border-white/10 text-slate-200 hover:text-white font-medium'
+                    }`}
+                  >
                     03. Hosp.
-                  </div>
+                  </button>
                 </div>
               </div>
             )}

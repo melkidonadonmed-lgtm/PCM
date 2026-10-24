@@ -17,6 +17,7 @@ interface ClinicalProtocolsViewProps {
   onUpdatePatientWeight: (weight: number) => void;
   onAddPrescriptionItem: (item: PrescriptionItem) => void;
   onNavigateToPrescription: () => void;
+  onNavigateToScores?: () => void;
   onUsarMedicamento?: (med: UnifiedMedication) => void;
 }
 
@@ -34,6 +35,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
   patient,
   onAddPrescriptionItem,
   onNavigateToPrescription,
+  onNavigateToScores,
   onUsarMedicamento
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
@@ -209,6 +211,17 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
             </span>
           </div>
 
+          {onNavigateToScores ? (
+            <button
+              type="button"
+              onClick={onNavigateToScores}
+              className="px-3.5 py-2 min-h-[44px] rounded-xl border border-blue-500/40 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 flex items-center justify-center gap-2 text-xs font-bold cursor-pointer whitespace-nowrap hover:bg-blue-100"
+            >
+              <Icon name="monitor_heart" className="text-[16px]" />
+              <span>Escores Clínicos & BIC (114)</span>
+            </button>
+          ) : null}
+
           <button
             type="button"
             onClick={onNavigateToPrescription}
@@ -237,7 +250,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs font-semibold px-3.5 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+              className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                 isSelected
                   ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
                   : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
@@ -439,7 +452,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setSelectedMedCategory(catKey)}
-                className={`text-xs font-semibold px-3.5 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                   isSelected
                     ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
                     : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'

@@ -22,7 +22,8 @@ npm run build       # Build de produção em dist/
 ## 2. Mapa de Diretórios e Divulgação Progressiva
 
 - `src/App.tsx` e `src/types.ts` — Estado centralizado por abas (`activeTab`, sem `react-router` nem Redux/Zustand).
-- `src/core/` — Fundação multi-módulo (`domain/clinicalEntities.ts` e `storage/clinicalRepository.ts`) preparando a expansão do Módulo de Prescrição (`MOD-01`) para Evolução/PEP (`MOD-02`) e Hospitalar (`MOD-03`).
+- `src/core/` — Fundação multi-módulo (`domain/clinicalEntities.ts` e `storage/clinicalRepository.ts`) orquestrando o Módulo de Prescrição (`MOD-01`), Evolução/PEP (`MOD-02`) e o Módulo Hospitalar e Gestão de Pacientes (`MOD-03`, `Dexie v3`).
+- `src/components/hospital/` e `src/utils/hospital/` — Módulo Hospitalar (`MOD-03`, atalho `Alt+7`): gestão de leitos (`EF/LT`), admissão manual e multimodal via IA sob Diretriz de Rigor Terapêutico (zero alucinação), formulário de evolução padronizado (categorias fixas + livres), monitoramento longitudinal de exames (`tabular-nums`), cruzamento Conduta × Evolução, Chat Live API e Agente Science.
 - `src/components/documento/` — Motor de folha única A4 (`FolhaA4.tsx`, `DocumentoClinico.tsx`, `ReceitaDuasVias.tsx`, `FormularioOficialSus.tsx`).
 - `src/components/sus/` — Guias regulatórias do SUS e grade vetorial interativa 12 colunas (`SusInteractiveVectorSheet.tsx`, `SusCommonIdentityFields.tsx`, `SusRegulatorySpecificFields.tsx`).
 - `src/utils/` — Motores clínicos determinísticos (`doseCalculator.ts`, `isSpecialControlOrAntibiotic.ts`, `notificacaoDeReceita.ts`, `formularioOficial.ts`, `folhaA4.ts`).

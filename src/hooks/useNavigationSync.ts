@@ -66,6 +66,8 @@ export function useNavigationSync({
         '4': 'protocols',
         '5': 'editor',
         '6': 'sus',
+        '7': 'hospital',
+        '8': 'scores',
       };
       const targetTab = shortcutMap[e.key];
       if (targetTab) {

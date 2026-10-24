@@ -228,11 +228,25 @@ export const Header: React.FC<HeaderProps> = ({
       shortKey: '4'
     },
     {
+      id: 'scores',
+      label: 'Escores',
+      icon: 'monitor_heart',
+      shortcut: 'Alt+8',
+      shortKey: '8'
+    },
+    {
       id: 'editor',
       label: 'Editor',
       icon: 'editor',
       shortcut: 'Alt+5',
       shortKey: '5'
+    },
+    {
+      id: 'hospital',
+      label: 'Hospitalar',
+      icon: 'local_hospital',
+      shortcut: 'Alt+7',
+      shortKey: '7'
     }
   ];
 

@@ -187,9 +187,11 @@ export type ActiveTab =
   | 'referral' 
   | 'sus'
   | 'protocols'
+  | 'scores'
   | 'editor'
   | 'print_preview' 
-  | 'patients';
+  | 'patients'
+  | 'hospital';
 
 // Tipagem para os Contextos de Atendimento (Multi-Instituição)
 export type InstitutionalSphere = 'municipal' | 'state' | 'private' | 'federal';

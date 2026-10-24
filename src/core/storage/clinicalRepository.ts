@@ -14,6 +14,7 @@ import {
   type ClinicalModuleId,
   type EvolutionSoapEntity,
   type HospitalAdmissionEntity,
+  type HospitalBedPatientRecord,
 } from '../domain/clinicalEntities';
 
 /**
@@ -46,18 +47,22 @@ export interface IClinicalRepository {
   listSavedDocuments(contextId?: string): Promise<SavedDocument[]>;
   saveDocument(doc: SavedDocument): Promise<void>;
 
-  /** Hooks preparados para os futuros módulos de Evolução (PEP) e Hospitalar */
+  /** Hooks preparados para os módulos de Evolução (PEP) e Hospitalar (MOD-03) */
   saveEncounterSnapshot?(encounter: ClinicalEncounterEntity): Promise<void>;
   listPatientEvolutions?(patientId: string): Promise<EvolutionSoapEntity[]>;
   savePatientEvolution?(entry: EvolutionSoapEntity): Promise<void>;
   listHospitalAdmissions?(wardFilter?: string): Promise<HospitalAdmissionEntity[]>;
   saveHospitalAdmission?(admission: HospitalAdmissionEntity): Promise<void>;
+  listHospitalBeds?(wardFilter?: string): Promise<HospitalBedPatientRecord[]>;
+  saveHospitalBed?(record: HospitalBedPatientRecord): Promise<void>;
+  deleteHospitalBed?(bedId: string): Promise<void>;
 }
 
 export const CLINICAL_STORAGE_KEYS = {
   DOCTOR: 'prescmed_doctor',
   PATIENT: 'prescmed_patient',
   PRESCRIPTION: 'prescmed_prescription',
+  HOSPITAL_BEDS_FALLBACK: 'prescmed_hospital_beds_v3',
 } as const;
 
 class LocalDexieClinicalRepository implements IClinicalRepository {
@@ -112,6 +117,58 @@ class LocalDexieClinicalRepository implements IClinicalRepository {
 
   public async saveDocument(doc: SavedDocument): Promise<void> {
     await db.savedDocuments.put(doc);
+  }
+
+  public async listHospitalBeds(wardFilter?: string): Promise<HospitalBedPatientRecord[]> {
+    try {
+      const all = await db.hospitalBeds.orderBy('wardAndBed').toArray();
+      if (all.length > 0) {
+        return wardFilter
+          ? all.filter((b) => b.wardName.toLowerCase().includes(wardFilter.toLowerCase()))
+          : all;
+      }
+    } catch {
+      // Fallback para ambientes de teste sem IndexedDB
+    }
+    const local = storageService.loadItem<HospitalBedPatientRecord[]>(
+      CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
+      []
+    );
+    return wardFilter
+      ? local.filter((b) => b.wardName.toLowerCase().includes(wardFilter.toLowerCase()))
+      : local;
+  }
+
+  public async saveHospitalBed(record: HospitalBedPatientRecord): Promise<void> {
+    const current = storageService.loadItem<HospitalBedPatientRecord[]>(
+      CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
+      []
+    );
+    const next = current.some((item) => item.id === record.id)
+      ? current.map((item) => (item.id === record.id ? record : item))
+      : [...current, record];
+    storageService.saveItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK, next);
+    try {
+      await db.hospitalBeds.put(record);
+    } catch {
+      // Silencioso em SSR/Vitest sem IndexedDB
+    }
+  }
+
+  public async deleteHospitalBed(bedId: string): Promise<void> {
+    const current = storageService.loadItem<HospitalBedPatientRecord[]>(
+      CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
+      []
+    );
+    storageService.saveItem(
+      CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
+      current.filter((item) => item.id !== bedId)
+    );
+    try {
+      await db.hospitalBeds.delete(bedId);
+    } catch {
+      // Silencioso em SSR/Vitest sem IndexedDB
+    }
   }
 }
 

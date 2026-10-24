@@ -234,26 +234,26 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveModalTab('presets')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               activeModalTab === 'presets'
                 ? 'bg-sky-600 text-white shadow-tactile-sm'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
             }`}
           >
-            <Shield className="w-3.5 h-3.5" />
+            <Shield className="w-4 h-4" />
             <span>Logos Oficiais Salvos (SEMUSA / SESAU / SUS)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveModalTab('generator')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               activeModalTab === 'generator'
                 ? 'bg-sky-600 text-white shadow-tactile-sm'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-4 h-4" />
             <span>Criador Procedural SVG</span>
           </button>
         </div>

@@ -53,15 +53,168 @@ export const CLINICAL_MODULES_REGISTRY: readonly ClinicalModuleDescriptor[] = [
   {
     id: 'hospital',
     code: 'MOD-03',
-    title: 'Módulo Hospitalar & Internação',
+    title: 'Módulo Hospitalar & Gestão de Pacientes',
     shortTitle: 'Hospitalar',
     description:
-      'Gestão de leitos, prescrição hospitalar sistematizada (Dieta, Hidratação Venosa, Medicamentos aprazados, SOS, Cuidados e Profilaxias), Evolução Diária (D1..Dn) e Sumário de Alta.',
+      'Gestão de leitos (EF/LT), admissão manual e multimodal via IA sem alucinação, evolução clínica inteligente (categorias fixas + livres), monitoramento longitudinal de exames, agente Conduta x Evolução, Chat Live e Agente Science.',
     iconName: 'local_hospital',
-    status: 'planned',
-    requiresSecureBackend: true,
+    status: 'active',
+    requiresSecureBackend: false,
   },
 ] as const;
+
+/**
+ * Especialidade / Setor de adaptação do Modelo Padronizado de Evolução / Admissão.
+ */
+export type HospitalSpecialtyTemplate =
+  | 'enfermaria_clinica'
+  | 'ortopedia'
+  | 'pediatria'
+  | 'uti'
+  | 'gineco_obstetricia'
+  | 'cirurgia_geral';
+
+/**
+ * Hipótese Diagnóstica estruturada em árvore (1 - Doença + data / 1.1 - Subitem + data).
+ */
+export interface DiagnosticHypothesisItem {
+  id: string;
+  codeNumber: string; // ex: "1", "2"
+  diseaseAndDate: string; // ex: "Pneumonia Comunitária Grave (20/10/2026)"
+  cid10?: string;
+  subItems: Array<{
+    id: string;
+    codeNumber: string; // ex: "1.1", "1.2"
+    diseaseAndDate: string; // ex: "Insuficiência Respiratória Hipoxêmica (21/10/2026)"
+  }>;
+}
+
+/**
+ * Registro de Medicações e Dispositivos ("FEZ USO" e "EM USO" com tempo e data).
+ */
+export interface MedicationOrDeviceEntry {
+  id: string;
+  nameAndDetails: string; // ex: "Ceftriaxona 1g EV 12/12h" ou "Acesso Venoso Central (JID)"
+  kind: 'medication' | 'device';
+  durationAndDates: string; // ex: "D5 (20/10/2026 - atual)" ou "7 dias (10/10/2026 a 17/10/2026)"
+  status: 'fez_uso' | 'em_uso';
+}
+
+/**
+ * Linha cronológica de exames laboratoriais (ex: "xx/xx/xxxx: HB | HT | LEU | SEG | ... K+ | CL...").
+ */
+export interface HospitalLabPanelEntry {
+  id: string;
+  dateBr: string; // DD/MM/AAAA
+  dateIso: string; // YYYY-MM-DD para ordenação estritamente cronológica
+  markers: Record<string, number | string>; // ex: { HB: 11.4, HT: 34, LEU: 12800, SEG: 78, PLQ: 210000, CR: 1.4, UR: 58, NA: 138, K: 4.9, CL: 102, PCR: 64 }
+  rawSummaryLine?: string;
+  sourceQuote?: string; // Trecho literal da fonte quando importado via IA
+}
+
+/**
+ * Registro cronológico de Exames de Imagem (data + modalidade + achados/laudo objetivo).
+ */
+export interface HospitalImagingExamEntry {
+  id: string;
+  dateBr: string; // DD/MM/AAAA
+  dateIso: string; // YYYY-MM-DD
+  examModalityAndRegion: string; // ex: "TC de Tórax sem contraste"
+  findingsSummary: string; // ex: "Consolidação em lobo inferior direito com broncogramas aéreos; pequeno derrame pleural laminar ipsilateral."
+}
+
+/**
+ * Categoria livre de evolução/exame físico específica por especialidade (Ortopedia, UTI, Pediatria, etc.).
+ */
+export interface CustomClinicalSection {
+  id: string;
+  title: string; // ex: "EXAME ORTOPÉDICO / NEUROVASCULAR" ou "PARÂMETROS VENTILATÓRIOS (VM)"
+  content: string;
+}
+
+/**
+ * Exame Físico sistematizado com categorias fixas + categorias livres por especialidade.
+ */
+export interface HospitalPhysicalExamSection {
+  geral: string;
+  ssvv: string;
+  ar: string;
+  ac: string;
+  abd?: string;
+  membrosEAnexos: string;
+  customSections: CustomClinicalSection[];
+}
+
+/**
+ * Snapshot diário auditável salvo na Linha do Tempo de Evolução do Leito.
+ */
+export interface HospitalEvolutionSnapshot {
+  id: string;
+  recordedAtIso: string;
+  dateBr: string;
+  dayNumber: number; // D1, D2...
+  authorDoctorName: string;
+  authorCrm: string;
+  formattedText: string;
+  evolution24hSummary: string;
+  conductSummary: string[];
+  vitalSigns?: VitalSignsRecord;
+}
+
+/**
+ * Mensagem do Assistente Virtual do Leito / Agente Science / Live API.
+ */
+export interface HospitalBedChatMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'science';
+  channel: 'bed_copilot' | 'science_protocol' | 'live_voice';
+  content: string;
+  createdAtIso: string;
+  attachedFileName?: string;
+  evidenceCitations?: string[];
+}
+
+/**
+ * Entidade Completa do Leito e Evolução/Admissão Padronizada (MOD-03).
+ */
+export interface HospitalBedPatientRecord {
+  id: string;
+  wardAndBed: string; // EF/LT: ex. "110-15"
+  wardName: string; // ex. "Enfermaria Clínica 110"
+  specialtyTemplate: HospitalSpecialtyTemplate;
+  patientNameOrInitials: string; // ID: Nome completo, iniciais ou prontuário
+  medicalRecordNumber?: string;
+  birthDateBr: string; // DN: DD/MM/AAAA
+  ageYearsText: string; // Idade calculada em anos (ex: "64 A")
+  cns: string; // CNS
+  dihDateBr: string; // DIH: DD/MM/AAAA
+  chiefComplaintQp: string; // QP: queixa principal sucinta e direta nas palavras do paciente
+  diagnosticHypotheses: DiagnosticHypothesisItem[]; // HD: 1 e 1.1 (doença + data)
+  historyPresentIllnessHda: string; // HDA: descrição estritamente cronológica até o presente momento
+  allergiesText: string; // ALERGIAS
+  serologiesText: string; // SOROLOGIAS
+  pastMedicalHistoryHpp: string; // HPP
+  familyAndSocialHistory: string[]; // HF/SOCIAL em tópicos (-)
+  obstetricHistoryApplicable: boolean;
+  obstetricHistoryText: string; // HISTÓRIA OBSTÉTRICA (se aplicável)
+  previousMedicationsAndDevices: MedicationOrDeviceEntry[]; // FEZ USO: medicações e dispositivos, tempo e data
+  currentMedicationsAndDevices: MedicationOrDeviceEntry[]; // EM USO: medicações e dispositivos, tempo e data
+  labPanels: HospitalLabPanelEntry[]; // EXAMES LAB (cronológico)
+  imagingExams: HospitalImagingExamEntry[]; // EXAMES DE IMAGEM (cronológico)
+  physicalExam: HospitalPhysicalExamSection; // EXAME FÍSICO (GERAL, SSVV, AR, AC, MEMBROS E ANEXOS + Categorias Livres)
+  evolution24h: string; // EVOLUÇÃO 24H: SSVV 24h, comportamento, aspecto geral + visita + enfermaria + informações
+  vitalSignsLatest?: VitalSignsRecord;
+  dietApplicable: boolean;
+  dietDescription: string; // DIETA (se aplicável)
+  hydrationApplicable: boolean;
+  hydrationDescription: string; // HIDRATAÇÃO (se aplicável: qual e por quanto tempo)
+  consultationsList: string[]; // Pareceres (-)
+  pendingItemsList: string[]; // PENDÊNCIAS (-)
+  conductList: string[]; // CD (-)
+  evolutionHistoryTimeline: HospitalEvolutionSnapshot[];
+  chatMessages: HospitalBedChatMessage[];
+  updatedAt: number;
+}
 
 /**
  * Sinais vitais padronizados (compartilhados entre Evolução Ambulatorial e Evolução Hospitalar).

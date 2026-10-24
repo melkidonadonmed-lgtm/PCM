@@ -375,7 +375,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span 
-                      className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center shrink-0 transition ${
+                      className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition ${
                         selected ? 'bg-navy-900 dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/40 text-white' : 'border-slate-300 dark:border-white/20'
                       }`}
                     >

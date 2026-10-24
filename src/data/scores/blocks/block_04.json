@@ -1,0 +1,3107 @@
+{
+  "blockId": "block_04",
+  "blockName": "Pneumologia e Vias Aéreas",
+  "version": "1.0.0",
+  "categorySlug": "bloco-04-pneumologia-vias-aereas",
+  "description": "Dossiês monográficos completos dos 8 escores de pneumologia, pneumonia adquirida na comunidade (CURB-65, PSI/PORT, SMART-COP), DPOC GOLD ABE (BODE, mMRC, CAT) e avaliação de via aérea difícil.",
+  "calculators": [
+    {
+      "id": "calc_curb65",
+      "slug": "curb-65",
+      "name": "CURB-65 para Gravidade da Pneumonia Adquirida na Comunidade (PAC)",
+      "acronym": "CURB-65",
+      "version": "1.0.0",
+      "blockId": "block_04",
+      "blockFile": "block_04.json",
+      "category": "Pneumologia e Vias Aéreas",
+      "subcategory": "Infecções Respiratórias Agudas e PAC",
+      "categorySlug": "bloco-04-pneumologia",
+      "categoryName": "Pneumologia e Vias Aéreas",
+      "moduleName": "Pneumonia Adquirida na Comunidade (PAC)",
+      "description": "Escore britânico clássico (British Thoracic Society — Lim et al., 2003) de 0 a 5 pontos para estratificação da mortalidade em 30 dias e decisão do local de tratamento (ambulatorial, enfermaria ou UTI) na Pneumonia Adquirida na Comunidade.",
+      "summary": "Estratificação de mortalidade em 30 dias e decisão de internação na PAC (0 a 5 pontos).",
+      "clinicalObjective": "Guiar de forma objetiva a alocação do paciente com PAC entre tratamento ambulatorial (0-1 pt), internação hospitalar em enfermaria (2 pts) ou cuidados intensivos em UTI (3-5 pts).",
+      "targetPopulation": "Pacientes adultos atendidos no pronto-socorro com diagnóstico clínico-radiológico de Pneumonia Adquirida na Comunidade.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Confusao + Ureia_50 + FR_30 + PA_Baixa + Idade_65",
+      "evidenceSource": "Lim WS, van der Eerden MM, Laing R, et al. Defining community acquired pneumonia severity on presentation to hospital: an international derivation and validation study. Thorax. 2003;58(5):377-382. Diretrizes SBPT / ATS-IDSA.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 5,
+      "baseScore": 0,
+      "badge": "pneumologia",
+      "clinicalWarning": "ATENÇÃO À OXIGENAÇÃO E FATORES SOCIAIS: Mesmo em pacientes com CURB-65 de 0 ou 1 ponto, a presença de hipoxemia (SpO2 < 90-92% em ar ambiente), derrame pleural complicado/empiema, intolerância à via oral ou vulnerabilidade social indica internação hospitalar.",
+      "radarAxes": [
+        {
+          "id": "axis_curb_resp",
+          "label": "Taquipneia / Esforço Ventilatório (FR)",
+          "system": "Respiratório",
+          "unit": "irpm",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_curb_hemo",
+          "label": "Instabilidade Pressórica (PAS/PAD)",
+          "system": "Cardiovascular",
+          "unit": "mmHg",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_curb_neuro",
+          "label": "Encefalopatia Aguda (Confusão)",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_curb_renal",
+          "label": "Escórias Nitrogenadas (Ureia) e Idade",
+          "system": "Renal",
+          "unit": "mg/dL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_curb_c",
+          "name": "1. C — Confusion (Confusão Mental Aguda)",
+          "slug": "curb65-confusao",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_curb_neuro",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Desorientação aguda em tempo, espaço ou pessoa de início recente (ou escore AMTS <= 8).",
+          "options": [
+            {
+              "id": "opt_curb_c_0",
+              "label": "Ausente — Lúcido e orientado (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Cognição basal preservada."
+            },
+            {
+              "id": "opt_curb_c_1",
+              "label": "Presente — Confusão mental ou desorientação aguda (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Encefalopatia séptica ou hipóxico-hipercápnica associada à PAC."
+            }
+          ]
+        },
+        {
+          "id": "grp_curb_u",
+          "name": "2. U — Urea (Ureia Sérica > 50 mg/dL ou BUN > 19-20 mg/dL / > 7 mmol/L)",
+          "slug": "curb65-ureia",
+          "inputType": "single_choice",
+          "unit": "mg/dL",
+          "radarAxisId": "axis_curb_renal",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "No Brasil, utiliza-se o ponto de corte de Ureia plasmática > 50 mg/dL (equivalente a BUN > 19-20 mg/dL).",
+          "options": [
+            {
+              "id": "opt_curb_u_0",
+              "label": "Ureia <= 50 mg/dL (BUN <= 19 mg/dL) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Escórias nitrogenadas dentro da faixa aceitável."
+            },
+            {
+              "id": "opt_curb_u_1",
+              "label": "Ureia > 50 mg/dL (BUN > 19 mg/dL ou > 7 mmol/L) (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Azotemia pré-renal por desidratação/hipoperfusão e hipercatabolismo proteico."
+            }
+          ]
+        },
+        {
+          "id": "grp_curb_r",
+          "name": "3. R — Respiratory Rate (Frequência Respiratória >= 30 irpm)",
+          "slug": "curb65-fr",
+          "inputType": "single_choice",
+          "unit": "irpm",
+          "radarAxisId": "axis_curb_resp",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Contagem de incursões respiratórias por minuto em um minuto completo.",
+          "options": [
+            {
+              "id": "opt_curb_r_0",
+              "label": "FR < 30 irpm (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Frequência respiratória abaixo do limiar crítico de exaustão."
+            },
+            {
+              "id": "opt_curb_r_1",
+              "label": "FR >= 30 irpm (Taquipneia acentuada) (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Sobrecarga mecânica ventilatória e perda de complacência pulmonar."
+            }
+          ]
+        },
+        {
+          "id": "grp_curb_b",
+          "name": "4. B — Blood Pressure (PAS < 90 mmHg OU PAD <= 60 mmHg)",
+          "slug": "curb65-pa",
+          "inputType": "single_choice",
+          "unit": "mmHg",
+          "radarAxisId": "axis_curb_hemo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Basta um dos critérios pressóricos (sistólico < 90 ou diastólico <= 60 mmHg) para pontuar.",
+          "options": [
+            {
+              "id": "opt_curb_b_0",
+              "label": "PAS >= 90 mmHg E PAD > 60 mmHg (Normotenso) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Pressão de perfusão tecidual preservada."
+            },
+            {
+              "id": "opt_curb_b_1",
+              "label": "PAS < 90 mmHg OU PAD <= 60 mmHg (Hipotensão) (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Vasoplegia inflamatória sistêmica ou choque séptico incipiente."
+            }
+          ]
+        },
+        {
+          "id": "grp_curb_65",
+          "name": "5. 65 — Idade >= 65 anos",
+          "slug": "curb65-idade",
+          "inputType": "single_choice",
+          "unit": "anos",
+          "radarAxisId": "axis_curb_renal",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "helpText": "Idade cronológica na admissão.",
+          "options": [
+            {
+              "id": "opt_curb_65_0",
+              "label": "Idade < 65 anos (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Adulto com menos de 65 anos."
+            },
+            {
+              "id": "opt_curb_65_1",
+              "label": "Idade >= 65 anos (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Imunossenescência e menor reserva fisiológica cardiopulmonar."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_curb_low",
+          "label": "Baixo Risco (0 a 1 ponto) — Tratamento Ambulatorial",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 1,
+          "statisticalOutcome": "Mortalidade em 30 dias de 0,6% (0 pts) a 2,7% (1 pt). Candidato a tratamento antimicrobiano ambulatorial se SpO2 >= 92% e sem complicações pleurais ou sociais.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_curb_low_atb",
+              "drugName": "Amoxicilina (+/- Clavulanato) + Azitromicina (ou Claritromicina)",
+              "dosage": "Amoxicilina 1g VO 8/8h (ou Amoxicilina+Clavulanato 875/125mg 12/12h se comorbidades) + Azitromicina 500mg VO 1x/dia por 5 a 7 dias",
+              "route": "Via Oral",
+              "frequency": "8/8h ou 12/12h + 24/24h",
+              "dilutionInstructions": "Alternativa em alérgicos a betalactâmicos: Levofloxacino 750mg VO 1x/dia ou Moxifloxacino 400mg VO 1x/dia por 5 dias.",
+              "renalAdjustment": "Ajustar Amoxicilina e Levofloxacino se ClCr < 30 mL/min.",
+              "contraindications": "Alergia a penicilinas ou intervalo QTc prolongado (macrolídeos/quinolonas)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_curb_low_1",
+              "recommendationTitle": "Alta com Tratamento Domiciliar e Reavaliação em 48-72h",
+              "dispositionTarget": "Alta Orientada / Ambulatório",
+              "monitoringPlan": "Hidratação oral vigorosa, antitérmicos e retorno imediato se surgir dispneia, queda de saturação, sonolência ou persistência de febre após 72h de antibiótico.",
+              "laboratoryPanel": "Radiografia de tórax PA e perfil; oximetria de pulso."
+            }
+          ]
+        },
+        {
+          "id": "tier_curb_mod",
+          "label": "Risco Intermediário (2 pontos) — Internação em Enfermaria",
+          "severityLevel": "intermediate",
+          "minScore": 2,
+          "maxScore": 2,
+          "statisticalOutcome": "Mortalidade em 30 dias de 6,8% a 9,2%. Indicação de internação hospitalar em enfermaria clínica (ou hospital-dia sob observação estreita).",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_curb_mod_atb",
+              "drugName": "Ceftriaxona IV + Azitromicina IV/VO (ou Claritromicina)",
+              "dosage": "Ceftriaxona 1g a 2g IV 24/24h + Azitromicina 500mg IV/VO 24/24h (ou Levofloxacino 750mg IV/VO 24/24h em monoterapia)",
+              "route": "Intravenosa / VO",
+              "frequency": "24/24 horas",
+              "dilutionInstructions": "Ceftriaxona: reconstituir e diluir em 50-100 mL SF 0,9% ou SG 5%. Transicionar para terapia oral assim que afebril por 24-48h e estável.",
+              "renalAdjustment": "Ceftriaxona não exige ajuste renal isolado; Levofloxacino exige ajuste se ClCr < 50 mL/min.",
+              "contraindications": "Não diluir Ceftriaxona em soluções contendo cálcio (Ringer Lactato)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_curb_mod_1",
+              "recommendationTitle": "Internação em Enfermaria e Profilaxia de TEV",
+              "dispositionTarget": "Enfermaria Clínica",
+              "monitoringPlan": "Monitorar sinais vitais e SpO2 de 6/6h; profilaxia farmacológica de TEV com Enoxaparina 40mg SC 1x/dia.",
+              "ventilatorySupport": "Oxigenoterapia suplementar por cateter nasal para manter SpO2 entre 92% e 96%.",
+              "laboratoryPanel": "Hemograma, PCR, ureia, creatinina, Na, K, glicemia, RX de tórax (ultrassom torácico se derrame pleural para toracocentese diagnóstica)."
+            }
+          ]
+        },
+        {
+          "id": "tier_curb_high",
+          "label": "Alto Risco / PAC Grave (3 a 5 pontos) — Avaliação de UTI",
+          "severityLevel": "critical",
+          "minScore": 3,
+          "maxScore": 5,
+          "statisticalOutcome": "Mortalidade em 30 dias de 14,5% (3 pts), 27% a 40% (4 pts) e até 57% (5 pts). Indicação de internação imediata e avaliação de UTI (aplicar SMART-COP / Critérios ATS-IDSA). Em choque séptico ou VM, associar Hidrocortisona (estudo CAPE COD).",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_curb_high_atb",
+              "drugName": "Ceftriaxona 2g IV + Azitromicina 500mg IV (ou Cefepime/Piperacilina-Tazobactam se risco de Pseudomonas)",
+              "dosage": "Ceftriaxona 2g IV 24/24h + Azitromicina 500mg IV 24/24h (iniciar na 1ª hora se sepse/choque)",
+              "route": "Intravenosa",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Se fatores de risco para MRSA (pneumonia necrosante pós-influenza, colonização prévia), associar Vancomicina (15-20 mg/kg 12/12h) ou Linezolida (600mg 12/12h).",
+              "renalAdjustment": "Ajustar betalactâmicos antipseudomonas e glicopeptídeos conforme ClCr.",
+              "contraindications": "Alergia grave a betalactâmicos."
+            },
+            {
+              "id": "rx_curb_high_cort",
+              "drugName": "Hidrocortisona Endovenosa (na PAC Grave em UTI — Estudo CAPE COD 2023)",
+              "dosage": "200 mg/dia IV em infusão contínua (ou 50 mg IV de 6/6h) por 4 a 7 dias com desmame gradual",
+              "route": "Intravenosa",
+              "frequency": "Contínua ou 6/6h",
+              "dilutionInstructions": "Diluir em SF 0,9%.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Pneumonia viral por Influenza confirmada (onde corticoide aumenta mortalidade) ou infecção fúngica invasiva."
+            },
+            {
+              "id": "rx_curb_high_norepi",
+              "drugName": "Noradrenalina em BIC (se Choque Séptico Pulmonar PAM < 65 mmHg)",
+              "dosage": "0,05 a 2,0 mcg/kg/min IV contínua em BIC",
+              "route": "Intravenosa contínua em BIC",
+              "frequency": "Contínua",
+              "dilutionInstructions": "4 ampolas (16 mg) em 234 mL SG 5% (64 mcg/mL).",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Acesso central preferencial.",
+              "infusionProtocol": {
+                "drugId": "drug_noradrenalina",
+                "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+                "standardSolution": {
+                  "ampoules": "4 ampolas (16 mg = 16 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 64,
+                  "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+                  "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+                },
+                "concentratedSolution": {
+                  "ampoules": "8 ampolas (32 mg = 32 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 128,
+                  "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+                  "indication": "Restrição volêmica estrita / Choque refratário"
+                },
+                "doseUnit": "mcg/kg/min",
+                "initialDose": 0.05,
+                "maintenanceDoseMin": 0.1,
+                "maintenanceDoseMax": 0.5,
+                "maxDose": 2.0,
+                "defaultDose": 0.1,
+                "isFixedDose": false,
+                "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+                "containerCompatibility": "qualquer",
+                "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+                "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+                "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+              }
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_curb_high_1",
+              "recommendationTitle": "Cuidados Intensivos, Suporte Ventilatório e Pacote de 1 Hora da Sepse",
+              "dispositionTarget": "UTI / Sala Vermelha",
+              "monitoringPlan": "Monitorização multiparamétrica contínua, balanço hídrico e curva de lactato.",
+              "ventilatorySupport": "Cateter Nasal de Alto Fluxo (CNAF — reduz necessidade de IOT na hipoxemia aguda) ou Ventilação Mecânica Protetora (VC 6 mL/kg peso predito, Pplatô < 30, Driving Pressure < 15 cmH2O).",
+              "laboratoryPanel": "2 pares de hemoculturas, cultura de secreção traqueal/escarro, antígenos urinários para Pneumococo e Legionella, painel viral respiratório (Influenza/SARS-CoV-2), gasometria arterial e lactato."
+            }
+          ],
+          "infusionProtocol": {
+            "drugId": "drug_noradrenalina",
+            "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+            "standardSolution": {
+              "ampoules": "4 ampolas (16 mg = 16 mL)",
+              "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+              "totalVolumeMl": 250,
+              "concentrationMcgMl": 64,
+              "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+              "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+            },
+            "concentratedSolution": {
+              "ampoules": "8 ampolas (32 mg = 32 mL)",
+              "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+              "totalVolumeMl": 250,
+              "concentrationMcgMl": 128,
+              "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+              "indication": "Restrição volêmica estrita / Choque refratário"
+            },
+            "doseUnit": "mcg/kg/min",
+            "initialDose": 0.05,
+            "maintenanceDoseMin": 0.1,
+            "maintenanceDoseMax": 0.5,
+            "maxDose": 2.0,
+            "defaultDose": 0.1,
+            "isFixedDose": false,
+            "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+            "containerCompatibility": "qualquer",
+            "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+            "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+            "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+          }
+        }
+      ]
+    },
+    {
+      "id": "calc_crb65",
+      "slug": "crb-65",
+      "name": "CRB-65 para Triagem de PAC sem Laboratório (Atenção Primária e UPA)",
+      "acronym": "CRB-65",
+      "version": "1.0.0",
+      "blockId": "block_04",
+      "blockFile": "block_04.json",
+      "category": "Pneumologia e Vias Aéreas",
+      "subcategory": "Infecções Respiratórias Agudas e PAC",
+      "categorySlug": "bloco-04-pneumologia",
+      "categoryName": "Pneumologia e Vias Aéreas",
+      "moduleName": "Pneumonia Adquirida na Comunidade (PAC)",
+      "description": "Versão puramente clínica do CURB-65 (0 a 4 pontos) que dispensa a dosagem sérica de ureia, validada pela British Thoracic Society e OMS para decisão imediata de encaminhamento hospitalar no consultório, UBS ou pronto-atendimento sem laboratório imediato.",
+      "summary": "Estratificação clínica imediata de PAC sem necessidade de exames laboratoriais (0 a 4 pontos).",
+      "clinicalObjective": "Identificar imediatamente no consultório ou atenção primária pacientes com PAC de baixo risco (0 pts) que podem ser tratados no domicílio versus aqueles (>= 1 pt) que necessitam de avaliação hospitalar.",
+      "targetPopulation": "Pacientes adultos com suspeita clínica de Pneumonia Adquirida na Comunidade em ambiente ambulatorial, UBS ou triagem de emergência.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Confusao + FR_30 + PA_Baixa + Idade_65",
+      "evidenceSource": "Bauer TT, Ewig S, Marre R, Suttorp N, Welte T; CAPNETZ Study Group. CRB-65 predicts death from community-acquired pneumonia. J Intern Med. 2006;260(1):93-101.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 4,
+      "baseScore": 0,
+      "badge": "pneumologia",
+      "clinicalWarning": "Na Atenção Primária, qualquer paciente com CRB-65 >= 1 ponto OU oximetria de pulso < 92% em ar ambiente deve ser referenciado para avaliação hospitalar. Com 0 pontos e SpO2 >= 92%, o tratamento ambulatorial é altamente seguro (mortalidade < 1%).",
+      "radarAxes": [
+        {
+          "id": "axis_crb_resp",
+          "label": "Taquipneia (FR >= 30 irpm)",
+          "system": "Respiratório",
+          "unit": "irpm",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_crb_hemo",
+          "label": "Pressão Arterial (PAS < 90 ou PAD <= 60)",
+          "system": "Cardiovascular",
+          "unit": "mmHg",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_crb_neuro_age",
+          "label": "Confusão Mental e Idade >= 65a",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_crb_c",
+          "name": "1. C — Confusion (Confusão Mental de Início Agudo)",
+          "slug": "crb65-confusao",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_crb_neuro_age",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Desorientação aguda temporoespacial ou sonolência não habitual.",
+          "options": [
+            {
+              "id": "opt_crb_c_0",
+              "label": "Ausente — Alerta e orientado (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Estado mental basal preservado."
+            },
+            {
+              "id": "opt_crb_c_1",
+              "label": "Presente — Confusão mental aguda (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Sinal de hipoxemia cerebral ou encefalopatia séptica."
+            }
+          ]
+        },
+        {
+          "id": "grp_crb_r",
+          "name": "2. R — Respiratory Rate (Frequência Respiratória >= 30 irpm)",
+          "slug": "crb65-fr",
+          "inputType": "single_choice",
+          "unit": "irpm",
+          "radarAxisId": "axis_crb_resp",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Frequência respiratória aferida em repouso.",
+          "options": [
+            {
+              "id": "opt_crb_r_0",
+              "label": "FR < 30 irpm (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem taquipneia grave."
+            },
+            {
+              "id": "opt_crb_r_1",
+              "label": "FR >= 30 irpm (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Taquipneia grave indicando comprometimento parenquimatoso extenso."
+            }
+          ]
+        },
+        {
+          "id": "grp_crb_b",
+          "name": "3. B — Blood Pressure (PAS < 90 mmHg OU PAD <= 60 mmHg)",
+          "slug": "crb65-pa",
+          "inputType": "single_choice",
+          "unit": "mmHg",
+          "radarAxisId": "axis_crb_hemo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Pressão arterial aferida no braço.",
+          "options": [
+            {
+              "id": "opt_crb_b_0",
+              "label": "PAS >= 90 mmHg E PAD > 60 mmHg (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Estabilidade pressórica."
+            },
+            {
+              "id": "opt_crb_b_1",
+              "label": "PAS < 90 mmHg OU PAD <= 60 mmHg (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Hipotensão arterial aguda."
+            }
+          ]
+        },
+        {
+          "id": "grp_crb_65",
+          "name": "4. 65 — Idade >= 65 anos",
+          "slug": "crb65-idade",
+          "inputType": "single_choice",
+          "unit": "anos",
+          "radarAxisId": "axis_crb_neuro_age",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Idade do paciente.",
+          "options": [
+            {
+              "id": "opt_crb_65_0",
+              "label": "Idade < 65 anos (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Menos de 65 anos."
+            },
+            {
+              "id": "opt_crb_65_1",
+              "label": "Idade >= 65 anos (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Idoso (>= 65 anos)."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_crb_low",
+          "label": "Muito Baixo Risco (0 pontos) — Tratamento Domiciliar",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 0,
+          "statisticalOutcome": "Mortalidade em 30 dias < 0,9%. Tratamento ambulatorial seguro sem necessidade obrigatória de coleta laboratorial.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_crb_low_1",
+              "drugName": "Amoxicilina 1g 8/8h (ou Amoxicilina-Clavulanato + Macrolídeo se comorbidades)",
+              "dosage": "Amoxicilina 1g VO 8/8h por 5-7 dias (associar Azitromicina 500mg/dia se suspeita de germes atípicos)",
+              "route": "Via Oral",
+              "frequency": "8/8h",
+              "dilutionInstructions": "Tomar com água.",
+              "renalAdjustment": "Ajustar se DRC conhecida.",
+              "contraindications": "Alergia a penicilinas (usar Claritromicina 500mg 12/12h ou Levofloxacino 750mg/dia)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_crb_low_1",
+              "recommendationTitle": "Manejo Domiciliar com Revisão em 48 Horas",
+              "dispositionTarget": "Domicílio / UBS",
+              "monitoringPlan": "Aferir SpO2 antes da liberação (deve ser >= 92% em ar ambiente); orientar sinais de alarme.",
+              "laboratoryPanel": "Dispensável na ausência de comorbidades descompensadas."
+            }
+          ]
+        },
+        {
+          "id": "tier_crb_mod",
+          "label": "Risco Intermediário (1 a 2 pontos) — Avaliação e Internação Hospitalar",
+          "severityLevel": "intermediate",
+          "minScore": 1,
+          "maxScore": 2,
+          "statisticalOutcome": "Mortalidade em 30 dias de ~5,2% (1 pt) a ~12,0% (2 pts). Indicação de encaminhamento hospitalar para exames complementares, radiografia e antibioticoterapia parentera/assistida.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_crb_mod_1",
+              "drugName": "Ceftriaxona 1-2g IV + Azitromicina 500mg IV/VO (ou Levofloxacino 750mg)",
+              "dosage": "Ceftriaxona 1-2g IV 1x/dia + Azitromicina 500mg 1x/dia",
+              "route": "IV ou VO",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Iniciar primeira dose no pronto-atendimento antes da transferência.",
+              "renalAdjustment": "Ajustar quinolona pela função renal.",
+              "contraindications": "Alergia a cefalosporinas."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_crb_mod_1",
+              "recommendationTitle": "Avaliação Hospitalar e Cálculo do CURB-65 Completo",
+              "dispositionTarget": "Pronto-Socorro / Enfermaria",
+              "monitoringPlan": "Coletar ureia e eletrólitos para converter para CURB-65; manter SpO2 >= 92%.",
+              "laboratoryPanel": "Hemograma, ureia, creatinina, PCR, glicemia e RX de tórax."
+            }
+          ]
+        },
+        {
+          "id": "tier_crb_high",
+          "label": "Alto Risco (3 a 4 pontos) — Internação Hospitalar de Urgência / UTI",
+          "severityLevel": "critical",
+          "minScore": 3,
+          "maxScore": 4,
+          "statisticalOutcome": "Mortalidade em 30 dias > 31%. Emergência médica exigindo estabilização hemodinâmica e ventilatória imediata e transferência em ambulância avançada para UTI.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_crb_high_1",
+              "drugName": "Antibioticoterapia Endovenosa na 1ª Hora + Ressuscitação Volêmica / Vasopressor",
+              "dosage": "Ceftriaxona 2g IV + Azitromicina 500mg IV + Cristaloide 30 mL/kg se hipotensão",
+              "route": "Intravenosa",
+              "frequency": "Imediato",
+              "dilutionInstructions": "Se PAM < 65 mmHg refratária a volume, iniciar Noradrenalina em BIC.",
+              "renalAdjustment": "Sem ajuste na dose de ataque.",
+              "contraindications": "Choque cardiogênico concomitante.",
+              "infusionProtocol": {
+                "drugId": "drug_noradrenalina",
+                "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+                "standardSolution": {
+                  "ampoules": "4 ampolas (16 mg = 16 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 64,
+                  "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+                  "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+                },
+                "concentratedSolution": {
+                  "ampoules": "8 ampolas (32 mg = 32 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 128,
+                  "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+                  "indication": "Restrição volêmica estrita / Choque refratário"
+                },
+                "doseUnit": "mcg/kg/min",
+                "initialDose": 0.05,
+                "maintenanceDoseMin": 0.1,
+                "maintenanceDoseMax": 0.5,
+                "maxDose": 2.0,
+                "defaultDose": 0.1,
+                "isFixedDose": false,
+                "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+                "containerCompatibility": "qualquer",
+                "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+                "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+                "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+              }
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_crb_high_1",
+              "recommendationTitle": "Estabilização na Sala Vermelha e Vaga de UTI",
+              "dispositionTarget": "Sala Vermelha / UTI",
+              "monitoringPlan": "Monitorização contínua, oxigenoterapia suplementar / VNI / IOT conforme mecânica respiratória.",
+              "ventilatorySupport": "CNAF, VNI ou Intubação Orotraqueal se insuficiência respiratória franca.",
+              "laboratoryPanel": "Gasometria arterial, lactato, hemoculturas, ureia, creatinina, eletrólitos."
+            }
+          ],
+          "infusionProtocol": {
+            "drugId": "drug_noradrenalina",
+            "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+            "standardSolution": {
+              "ampoules": "4 ampolas (16 mg = 16 mL)",
+              "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+              "totalVolumeMl": 250,
+              "concentrationMcgMl": 64,
+              "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+              "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+            },
+            "concentratedSolution": {
+              "ampoules": "8 ampolas (32 mg = 32 mL)",
+              "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+              "totalVolumeMl": 250,
+              "concentrationMcgMl": 128,
+              "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+              "indication": "Restrição volêmica estrita / Choque refratário"
+            },
+            "doseUnit": "mcg/kg/min",
+            "initialDose": 0.05,
+            "maintenanceDoseMin": 0.1,
+            "maintenanceDoseMax": 0.5,
+            "maxDose": 2.0,
+            "defaultDose": 0.1,
+            "isFixedDose": false,
+            "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+            "containerCompatibility": "qualquer",
+            "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+            "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+            "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+          }
+        }
+      ]
+    },
+    {
+      "id": "calc_psi_port",
+      "slug": "psi-port",
+      "name": "PSI / PORT Score (Pneumonia Severity Index)",
+      "acronym": "PSI/PORT",
+      "version": "1.0.0",
+      "blockId": "block_04",
+      "blockFile": "block_04.json",
+      "category": "Pneumologia e Vias Aéreas",
+      "subcategory": "Infecções Respiratórias Agudas e PAC",
+      "categorySlug": "bloco-04-pneumologia",
+      "categoryName": "Pneumologia e Vias Aéreas",
+      "moduleName": "Pneumonia Adquirida na Comunidade (PAC)",
+      "description": "Escore prognóstico mais extensamente validado pelas diretrizes ATS/IDSA (Fine et al., 1997) para estratificação da Pneumonia Adquirida na Comunidade em 5 Classes de Risco (Classes I a V), combinando demografia, comorbidades, exame físico, gasometria, bioquímica e radiologia.",
+      "summary": "Estratificação detalhada ATS/IDSA da PAC nas Classes de Risco I a V para decisão segura de alta ou internação.",
+      "clinicalObjective": "Maximizar a identificação segura de pacientes de baixo risco (Classes I e II, <= 70 pontos) para tratamento ambulatorial, reduzindo internações desnecessárias com maior poder discriminatório que o CURB-65.",
+      "targetPopulation": "Pacientes adultos atendidos em serviços de emergência com diagnóstico de Pneumonia Adquirida na Comunidade.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Demografia + Comorbidades + ExameFisico + GasometriaOxigenacao + BioquimicaHematologia + DerramePleural",
+      "evidenceSource": "Fine MJ, Auble TE, Yealy DM, et al. A prediction rule to identify low-risk patients with community-acquired pneumonia. N Engl J Med. 1997;336(4):243-250. ATS/IDSA CAP Guidelines 2019.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 290,
+      "baseScore": 0,
+      "badge": "pneumologia",
+      "clinicalWarning": "A diretriz ATS/IDSA recomenda preferencialmente o PSI/PORT sobre o CURB-65 para identificar candidatos ao tratamento ambulatorial (Classes I e II), mas ressalta que o PSI pode superestimar a gravidade em idosos saudáveis pelo peso da idade e subestimar a necessidade de UTI em jovens hipoxêmicos (onde o SMART-COP é superior).",
+      "radarAxes": [
+        {
+          "id": "axis_psi_demo_comorb",
+          "label": "Demografia e Comorbidades Crônicas",
+          "system": "Cardiovascular",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_psi_vitals",
+          "label": "Instabilidade de Sinais Vitais e Sensório",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_psi_gaso",
+          "label": "Acidose (pH < 7,35) e Hipoxemia",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_psi_lab_rx",
+          "label": "Distúrbios Metabólicos e Derrame Pleural",
+          "system": "Renal",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_psi_1",
+          "name": "1. Demografia, Faixa Etária e Institucionalização",
+          "slug": "psi-demografia",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_psi_demo_comorb",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "No PSI original: Homens pontuam a idade em anos; Mulheres pontuam Idade - 10; Residentes em asilo/ILPI somam +10 pts.",
+          "options": [
+            {
+              "id": "opt_psi_1_0",
+              "label": "Adulto < 50 anos sem comorbidades e sinais vitais normais (Classe I) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Critério de triagem da Etapa 1 de Fine (Classe I direta se sem alterações)."
+            },
+            {
+              "id": "opt_psi_1_50",
+              "label": "Faixa de 50 a 64 anos (ou mulher de 60 a 74 anos) (50 pts)",
+              "pointValue": 50,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.45,
+              "sortOrder": 2,
+              "description": "Pontuação demográfica intermediária."
+            },
+            {
+              "id": "opt_psi_1_70",
+              "label": "Faixa de 65 a 79 anos (70 pts)",
+              "pointValue": 70,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 3,
+              "description": "Pontuação demográfica elevada."
+            },
+            {
+              "id": "opt_psi_1_90",
+              "label": "Idade >= 80 anos OU Idoso residente em Instituição de Longa Permanência (+10) (90 pts)",
+              "pointValue": 90,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Longevidade avançada e/ou fragilidade institucional."
+            }
+          ]
+        },
+        {
+          "id": "grp_psi_2",
+          "name": "2. Doenças Coexistentes (Comorbidades de Base)",
+          "slug": "psi-comorbidades",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_psi_demo_comorb",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Neoplasia ativa (+30), Doença Hepática (+20), Insuficiência Cardíaca (+10), Doença Cerebrovascular (+10), Doença Renal (+10).",
+          "options": [
+            {
+              "id": "opt_psi_2_0",
+              "label": "Nenhuma comorbidade maior presente (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem neoplasia, hepatopatia, ICC, AVC ou nefropatia."
+            },
+            {
+              "id": "opt_psi_2_10",
+              "label": "1 comorbidade moderada: ICC (+10), Doença Cerebrovascular (+10) ou Doença Renal (+10) (10 pts)",
+              "pointValue": 10,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Presença de uma comorbidade de 10 pontos."
+            },
+            {
+              "id": "opt_psi_2_20",
+              "label": "Doença Hepática / Cirrose (+20) OU 2 comorbidades de 10 pts (20 pts)",
+              "pointValue": 20,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 3,
+              "description": "Hepatopatia crônica ou associação de duas comorbidades cardiovasculares/renais."
+            },
+            {
+              "id": "opt_psi_2_30",
+              "label": "Neoplasia ativa (+30) (exceto pele basocelular/espinocelular) (30 pts)",
+              "pointValue": 30,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 4,
+              "description": "Câncer ativo ou diagnosticado no último ano."
+            },
+            {
+              "id": "opt_psi_2_50",
+              "label": "Múltiplas comorbidades graves (ex: Neoplasia + ICC/DRC ou Hepatopatia) (50 pts)",
+              "pointValue": 50,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Elevada carga multimórbida basal."
+            }
+          ]
+        },
+        {
+          "id": "grp_psi_3",
+          "name": "3. Achados do Exame Físico na Admissão",
+          "slug": "psi-exame-fisico",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_psi_vitals",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Confusão mental (+20), FR >= 30 irpm (+20), PAS < 90 mmHg (+20), Temp < 35°C ou >= 40°C (+15), FC >= 125 bpm (+10).",
+          "options": [
+            {
+              "id": "opt_psi_3_0",
+              "label": "Exame físico sem sinais críticos (Lúcido, FR < 30, PAS >= 90, FC < 125) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sinais vitais e estado mental preservados."
+            },
+            {
+              "id": "opt_psi_3_20",
+              "label": "1 achado crítico: Confusão (+20) OU FR >= 30 (+20) OU PAS < 90 (+20) OU Temp extrema/FC >= 125 (20 pts)",
+              "pointValue": 20,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.4,
+              "sortOrder": 2,
+              "description": "Um marcador clínico de instabilidade aguda."
+            },
+            {
+              "id": "opt_psi_3_40",
+              "label": "2 achados críticos (ex: Taquipneia FR >= 30 + Confusão ou Hipotensão) (40 pts)",
+              "pointValue": 40,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 3,
+              "description": "Dupla disfunção clínica aguda."
+            },
+            {
+              "id": "opt_psi_3_60",
+              "label": ">= 3 achados críticos concomitantes no exame físico (60 pts)",
+              "pointValue": 60,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Instabilidade clínica grave multissistêmica."
+            }
+          ]
+        },
+        {
+          "id": "grp_psi_4",
+          "name": "4. Gasometria Arterial e Oxigenação (pH e PaO2/SpO2)",
+          "slug": "psi-gasometria",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_psi_gaso",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Acidemia pH arterial < 7,35 (+30 pts) e Hipoxemia PaO2 < 60 mmHg ou SpO2 < 90% em ar ambiente (+10 pts).",
+          "options": [
+            {
+              "id": "opt_psi_4_0",
+              "label": "pH >= 7,35 E PaO2 >= 60 mmHg (SpO2 >= 90% em AA) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Equilíbrio ácido-básico e oxigenação preservados."
+            },
+            {
+              "id": "opt_psi_4_10",
+              "label": "Hipoxemia isolada: PaO2 < 60 mmHg ou SpO2 < 90% em AA com pH >= 7,35 (10 pts)",
+              "pointValue": 10,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.35,
+              "sortOrder": 2,
+              "description": "Insuficiência respiratória hipoxêmica sem acidemia."
+            },
+            {
+              "id": "opt_psi_4_30",
+              "label": "Acidemia grave: pH arterial < 7,35 isolada (30 pts)",
+              "pointValue": 30,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.8,
+              "sortOrder": 3,
+              "description": "Acidose metabólica lática ou respiratória hipercápnica."
+            },
+            {
+              "id": "opt_psi_4_40",
+              "label": "Ambos: pH arterial < 7,35 E Hipoxemia PaO2 < 60 / SpO2 < 90% (40 pts)",
+              "pointValue": 40,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Falência ventilatória e/ou choque séptico com acidemia hipoxêmica."
+            }
+          ]
+        },
+        {
+          "id": "grp_psi_5",
+          "name": "5. Painel Bioquímico e Hematológico",
+          "slug": "psi-bioquimica",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_psi_lab_rx",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "helpText": "BUN >= 30 mg/dL / Ureia >= 65 mg/dL (+20), Sódio < 130 mEq/L (+20), Glicemia >= 250 mg/dL (+10), Hematócrito < 30% (+10).",
+          "options": [
+            {
+              "id": "opt_psi_5_0",
+              "label": "Exames laboratoriais dentro dos limites (Ureia < 65, Na >= 130, Glic < 250, Ht >= 30%) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Homeostase metabólica e hematológica preservada."
+            },
+            {
+              "id": "opt_psi_5_10",
+              "label": "Glicemia >= 250 mg/dL (+10) OU Hematócrito < 30% (+10) (10 pts)",
+              "pointValue": 10,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.3,
+              "sortOrder": 2,
+              "description": "Hiperglicemia de estresse ou anemia moderada."
+            },
+            {
+              "id": "opt_psi_5_20",
+              "label": "Ureia >= 65 mg/dL (BUN >= 30) (+20) OU Hiponatremia Na < 130 mEq/L (+20) (20 pts)",
+              "pointValue": 20,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.65,
+              "sortOrder": 3,
+              "description": "Azotemia importante ou SIADH secundária à pneumonia."
+            },
+            {
+              "id": "opt_psi_5_40",
+              "label": "Combinação de >= 2 distúrbios laboratoriais maiores (ex: Ureia >= 65 + Na < 130) (40 pts)",
+              "pointValue": 40,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Desarranjo metabólico e renal grave."
+            }
+          ]
+        },
+        {
+          "id": "grp_psi_6",
+          "name": "6. Derrame Pleural na Radiografia ou Ultrassom de Tórax",
+          "slug": "psi-derrame-pleural",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_psi_lab_rx",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 6,
+          "helpText": "Presença de líquido livre ou loculado no espaço pleural.",
+          "options": [
+            {
+              "id": "opt_psi_6_0",
+              "label": "Ausente — Seios costofrênicos livres (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem derrame parapneumônico."
+            },
+            {
+              "id": "opt_psi_6_10",
+              "label": "Presente — Derrame pleural visível no RX ou US (+10 pts)",
+              "pointValue": 10,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Derrame parapneumônico (avaliar toracocentese se >= 1 cm no decúbito lateral ou > 2-3 cm no US)."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_psi_12",
+          "label": "PSI Classes I e II — Baixo Risco (0 a 70 pontos)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 70,
+          "statisticalOutcome": "Mortalidade em 30 dias de 0,1% (Classe I) a 0,6% (Classe II). Forte recomendação ATS/IDSA para tratamento antimicrobiano ambulatorial.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_psi_12_1",
+              "drugName": "Amoxicilina 1g 8/8h (ou Amoxicilina-Clavulanato + Macrolídeo)",
+              "dosage": "Amoxicilina 1g VO 8/8h (associar Azitromicina 500mg/dia ou Doxiciclina 100mg 12/12h se comorbidades)",
+              "route": "Via Oral",
+              "frequency": "8/8h a 24/24h",
+              "dilutionInstructions": "Curso total de 5 dias se estabilidade clínica alcançada.",
+              "renalAdjustment": "Ajustar se ClCr < 30 mL/min.",
+              "contraindications": "Alergia a betalactâmicos (usar quinolona respiratória)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_psi_12_1",
+              "recommendationTitle": "Tratamento Domiciliar com Retorno Programado",
+              "dispositionTarget": "Alta Orientada / Ambulatório",
+              "monitoringPlan": "Reavaliação clínica em 48-72h; não há necessidade de colher hemoculturas ou cultura de escarro no paciente ambulatorial.",
+              "laboratoryPanel": "RX de tórax e oximetria de pulso."
+            }
+          ]
+        },
+        {
+          "id": "tier_psi_3",
+          "label": "PSI Classe III — Risco Baixo-Intermediário (71 a 90 pontos)",
+          "severityLevel": "intermediate",
+          "minScore": 71,
+          "maxScore": 90,
+          "statisticalOutcome": "Mortalidade em 30 dias de 0,9% a 2,8%. Indica observação hospitalar curta (24h em unidade de decisão clínica) ou tratamento ambulatorial se suporte domiciliar excelente e SpO2 >= 92%.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_psi_3_1",
+              "drugName": "Ceftriaxona IV (1ª dose na observação) + Azitromicina VO ou Levofloxacino 750mg VO",
+              "dosage": "Ceftriaxona 1-2g IV + Azitromicina 500mg VO (transicionar para Amoxicilina-Clavulanato VO na alta)",
+              "route": "IV / VO",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Garantir primeira dose supervisionada e hidratação.",
+              "renalAdjustment": "Ajustar conforme função renal.",
+              "contraindications": "Alergias específicas."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_psi_3_1",
+              "recommendationTitle": "Observação Curta (12-24h) e Reavaliação de Estabilidade",
+              "dispositionTarget": "Unidade de Observação / Hospital-Dia",
+              "monitoringPlan": "Vigiar curva térmica, aceitação oral e oximetria antes da definição de alta vs. enfermaria.",
+              "laboratoryPanel": "Hemograma, ureia, creatinina, eletrólitos, PCR."
+            }
+          ]
+        },
+        {
+          "id": "tier_psi_4",
+          "label": "PSI Classe IV — Risco Moderado-Alto (91 a 130 pontos)",
+          "severityLevel": "high",
+          "minScore": 91,
+          "maxScore": 130,
+          "statisticalOutcome": "Mortalidade em 30 dias de 8,2% a 9,3%. Indicação formal de internação hospitalar em enfermaria clínica com antibioticoterapia endovenosa.",
+          "colorHex": "#f97316",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_psi_4_1",
+              "drugName": "Ceftriaxona 1-2g IV 24/24h + Azitromicina 500mg IV/VO 24/24h",
+              "dosage": "Terapia combinada Betalactâmico + Macrolídeo (ou Fluoroquinolona respiratória IV)",
+              "route": "Intravenosa",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Se houver derrame pleural significativo, realizar toracocentese diagnóstica (drenar imediatamente se pH líquido pleural < 7,20, pus franco ou glicose < 40 mg/dL).",
+              "renalAdjustment": "Ajustar conforme ClCr.",
+              "contraindications": "Intervalo QTc > 500 ms."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_psi_4_1",
+              "recommendationTitle": "Internação em Enfermaria Clínica e Toracocentese se Derrame",
+              "dispositionTarget": "Enfermaria Clínica",
+              "monitoringPlan": "Monitorização de sinais vitais 4/4h a 6/6h, oxigenoterapia suplementar e profilaxia de TEV com HBPM.",
+              "interventionalProcedure": "Toracocentese guiada por ultrassom se derrame parapneumônico >= 10 mm.",
+              "laboratoryPanel": "Hemoculturas (2 pares), cultura de escarro, bioquímica pleural (se derrame), PCR, painel metabólico."
+            }
+          ]
+        },
+        {
+          "id": "tier_psi_5",
+          "label": "PSI Classe V — Alto Risco / PAC Grave (131 a 290 pontos)",
+          "severityLevel": "critical",
+          "minScore": 131,
+          "maxScore": 290,
+          "statisticalOutcome": "Mortalidade em 30 dias de 27,0% a 31,1%. Indicação de admissão em UTI ou Unidade Semi-Intensiva, suporte ventilatório/hemodinâmico avançado e cobertura antimicrobiana de amplo espectro.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_psi_5_atb",
+              "drugName": "Ceftriaxona 2g IV + Azitromicina 500mg IV + Hidrocortisona 200mg/dia IV (se PAC grave em UTI)",
+              "dosage": "Antibiótico IV na 1ª hora; ampliar para Piperacilina-Tazobactam 4,5g 6/6h ou Cefepime 2g 8/8h se risco de Pseudomonas",
+              "route": "Intravenosa",
+              "frequency": "Horário estrito",
+              "dilutionInstructions": "Associar Hidrocortisona 200mg/dia IV se necessidade de VM ou CNAF com FiO2 >= 50% (estudo CAPE COD).",
+              "renalAdjustment": "Ajustar conforme função renal após dose de ataque.",
+              "contraindications": "Descartar Influenza antes de iniciar corticoide."
+            },
+            {
+              "id": "rx_psi_5_norepi",
+              "drugName": "Noradrenalina em BIC (se Choque Séptico Pulmonar)",
+              "dosage": "0,05 a 2,0 mcg/kg/min IV contínua em BIC",
+              "route": "Intravenosa contínua em BIC",
+              "frequency": "Contínua",
+              "dilutionInstructions": "4 ampolas (16 mg) em 234 mL SG 5% (64 mcg/mL).",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Garantir ressuscitação volêmica inicial.",
+              "infusionProtocol": {
+                "drugId": "drug_noradrenalina",
+                "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+                "standardSolution": {
+                  "ampoules": "4 ampolas (16 mg = 16 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 64,
+                  "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+                  "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+                },
+                "concentratedSolution": {
+                  "ampoules": "8 ampolas (32 mg = 32 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 128,
+                  "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+                  "indication": "Restrição volêmica estrita / Choque refratário"
+                },
+                "doseUnit": "mcg/kg/min",
+                "initialDose": 0.05,
+                "maintenanceDoseMin": 0.1,
+                "maintenanceDoseMax": 0.5,
+                "maxDose": 2.0,
+                "defaultDose": 0.1,
+                "isFixedDose": false,
+                "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+                "containerCompatibility": "qualquer",
+                "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+                "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+                "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+              }
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_psi_5_1",
+              "recommendationTitle": "Internação em UTI e Suporte Avançado de Vida",
+              "dispositionTarget": "UTI",
+              "monitoringPlan": "Monitorização invasiva, controle de lactato e diurese horária.",
+              "ventilatorySupport": "CNAF ou Ventilação Mecânica Protetora (VC 6 mL/kg peso predito).",
+              "laboratoryPanel": "Hemoculturas, cultura traqueal, antígenos urinários para Pneumococo e Legionella, gasometria arterial e lactato."
+            }
+          ],
+          "infusionProtocol": {
+            "drugId": "drug_noradrenalina",
+            "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+            "standardSolution": {
+              "ampoules": "4 ampolas (16 mg = 16 mL)",
+              "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+              "totalVolumeMl": 250,
+              "concentrationMcgMl": 64,
+              "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+              "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+            },
+            "concentratedSolution": {
+              "ampoules": "8 ampolas (32 mg = 32 mL)",
+              "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+              "totalVolumeMl": 250,
+              "concentrationMcgMl": 128,
+              "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+              "indication": "Restrição volêmica estrita / Choque refratário"
+            },
+            "doseUnit": "mcg/kg/min",
+            "initialDose": 0.05,
+            "maintenanceDoseMin": 0.1,
+            "maintenanceDoseMax": 0.5,
+            "maxDose": 2.0,
+            "defaultDose": 0.1,
+            "isFixedDose": false,
+            "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+            "containerCompatibility": "qualquer",
+            "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+            "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+            "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+          }
+        }
+      ]
+    },
+    {
+      "id": "calc_smart_cop",
+      "slug": "smart-cop",
+      "name": "SMART-COP Score para Suporte Ventilatório ou Vasopressor na PAC",
+      "acronym": "SMART-COP",
+      "version": "1.0.0",
+      "blockId": "block_04",
+      "blockFile": "block_04.json",
+      "category": "Pneumologia e Vias Aéreas",
+      "subcategory": "Infecções Respiratórias Agudas e PAC Grave",
+      "categorySlug": "bloco-04-pneumologia",
+      "categoryName": "Pneumologia e Vias Aéreas",
+      "moduleName": "Pneumonia Adquirida na Comunidade (PAC)",
+      "description": "Ferramenta clínica australiana (Charles et al., 2008) de 0 a 11 pontos desenhada especificamente para prever a necessidade de Suporte Respiratório Intensivo (Ventilação Mecânica Invasiva ou Não Invasiva) ou Suporte Vasopressor (IRVS) na Pneumonia Adquirida na Comunidade, superando o PSI e o CURB-65 em pacientes jovens graves.",
+      "summary": "Predição de necessidade de Ventilação Mecânica ou Vasopressores (UTI) na PAC (0 a 11 pontos).",
+      "clinicalObjective": "Identificar precocemente na emergência os pacientes com PAC que exigirão intubação, VNI/CNAF ou infusão de noradrenalina (escore >= 3 moderado; >= 5 alto risco de UTI).",
+      "targetPopulation": "Pacientes adultos admitidos no hospital com Pneumonia Adquirida na Comunidade.",
+      "calculationType": "additive_points",
+      "formulaExpression": "PAS_2 + Multilobar_1 + Albumina_1 + FR_1 + Taquicardia_1 + Confusao_1 + Oxigenacao_2 + pH_2",
+      "evidenceSource": "Charles PG, Wolfe R, Whitby M, et al. SMART-COP: a tool for predicting the need for intensive respiratory or vasopressor support in community-acquired pneumonia. Clin Infect Dis. 2008;47(3):375-384.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 11,
+      "baseScore": 0,
+      "badge": "emergencia",
+      "clinicalWarning": "VANTAGEM CRÍTICA SOBRE O CURB-65: O SMART-COP atribui peso duplo (2 pts) à Hipotensão (PAS < 90), Hipoxemia (ajustada por idade) e Acidose (pH < 7,35), evitando a falsa segurança do CURB-65 em pacientes jovens (< 65 anos) com pneumonia multilobar hipoxêmica.",
+      "radarAxes": [
+        {
+          "id": "axis_sc_oxy_ph",
+          "label": "Hipoxemia e Acidose Respiratória/Metabólica",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_sc_hemo",
+          "label": "Choque / Hipotensão (PAS) e Taquicardia",
+          "system": "Cardiovascular",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_sc_lung",
+          "label": "Extensão Multilobar e Taquipneia (FR)",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_sc_syst",
+          "label": "Hipoalbuminemia e Confusão Mental",
+          "system": "Neurológico",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_sc_s",
+          "name": "1. S — Systolic BP (Pressão Arterial Sistólica < 90 mmHg — Peso 2)",
+          "slug": "smartcop-pas",
+          "inputType": "single_choice",
+          "unit": "mmHg",
+          "radarAxisId": "axis_sc_hemo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "PAS inicial ou pré-ressuscitação na emergência.",
+          "options": [
+            {
+              "id": "opt_sc_s_0",
+              "label": "PAS >= 90 mmHg (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Pressão sistólica >= 90 mmHg."
+            },
+            {
+              "id": "opt_sc_s_2",
+              "label": "PAS < 90 mmHg (2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Hipotensão sistólica preditora direta de necessidade de suporte vasopressor."
+            }
+          ]
+        },
+        {
+          "id": "grp_sc_m",
+          "name": "2. M — Multilobar Involvement (Acometimento Multilobar no RX/TC)",
+          "slug": "smartcop-multilobar",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_sc_lung",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Consolidação alveolar acometendo >= 2 lobos pulmonares (uni ou bilateral).",
+          "options": [
+            {
+              "id": "opt_sc_m_0",
+              "label": "Unilobar — Restrito a 1 lobo pulmonar (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Infiltrado pneumônico focal."
+            },
+            {
+              "id": "opt_sc_m_1",
+              "label": "Multilobar — >= 2 lobos acometidos (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Extensa área de shunt intrapulmonar por preenchimento alveolar."
+            }
+          ]
+        },
+        {
+          "id": "grp_sc_a",
+          "name": "3. A — Albumin (Albumina Sérica < 3,5 g/dL)",
+          "slug": "smartcop-albumina",
+          "inputType": "single_choice",
+          "unit": "g/dL",
+          "radarAxisId": "axis_sc_syst",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Nível sérico de albumina na admissão.",
+          "options": [
+            {
+              "id": "opt_sc_a_0",
+              "label": "Albumina >= 3,5 g/dL (ou não aferida sem desnutrição) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Pressão coloidosmótica e estado nutricional preservados."
+            },
+            {
+              "id": "opt_sc_a_1",
+              "label": "Albumina < 3,5 g/dL (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Proteína negativa de fase aguda indicando inflamação sistêmica intensa e extravasamento capilar."
+            }
+          ]
+        },
+        {
+          "id": "grp_sc_r",
+          "name": "4. R — Respiratory Rate (Frequência Respiratória Ajustada por Idade)",
+          "slug": "smartcop-fr",
+          "inputType": "single_choice",
+          "unit": "irpm",
+          "radarAxisId": "axis_sc_lung",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Corte ajustado: se <= 50 anos: FR >= 25 irpm; se > 50 anos: FR >= 30 irpm.",
+          "options": [
+            {
+              "id": "opt_sc_r_0",
+              "label": "Normal para a idade (<= 50a: < 25 irpm; > 50a: < 30 irpm) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem taquipneia crítica para a faixa etária."
+            },
+            {
+              "id": "opt_sc_r_1",
+              "label": "Taquipneia (<= 50a: FR >= 25 irpm; > 50a: FR >= 30 irpm) (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Esforço ventilatório elevado ajustado à reserva etária."
+            }
+          ]
+        },
+        {
+          "id": "grp_sc_t",
+          "name": "5. T — Tachycardia (Frequência Cardíaca >= 125 bpm)",
+          "slug": "smartcop-fc",
+          "inputType": "single_choice",
+          "unit": "bpm",
+          "radarAxisId": "axis_sc_hemo",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "helpText": "Frequência cardíaca na apresentação.",
+          "options": [
+            {
+              "id": "opt_sc_t_0",
+              "label": "FC < 125 bpm (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Frequência cardíaca < 125 bpm."
+            },
+            {
+              "id": "opt_sc_t_1",
+              "label": "FC >= 125 bpm (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Taquicardia sinusal hiperdinâmica importante."
+            }
+          ]
+        },
+        {
+          "id": "grp_sc_c",
+          "name": "6. C — Confusion (Confusão Mental de Início Agudo)",
+          "slug": "smartcop-confusao",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_sc_syst",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 6,
+          "helpText": "Rebaixamento ou desorientação aguda.",
+          "options": [
+            {
+              "id": "opt_sc_c_0",
+              "label": "Ausente — Lúcido e orientado (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sensório normal."
+            },
+            {
+              "id": "opt_sc_c_1",
+              "label": "Presente — Confusão mental aguda (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Encefalopatia aguda."
+            }
+          ]
+        },
+        {
+          "id": "grp_sc_o",
+          "name": "7. O — Oxygen Low (Hipoxemia Ajustada por Idade — Peso 2)",
+          "slug": "smartcop-oxigenacao",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_sc_oxy_ph",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 7,
+          "helpText": "Se <= 50a: PaO2 < 70 mmHg, SpO2 <= 93% ou PaO2/FiO2 < 333. Se > 50a: PaO2 < 60 mmHg, SpO2 <= 90% ou PaO2/FiO2 < 250.",
+          "options": [
+            {
+              "id": "opt_sc_o_0",
+              "label": "Oxigenação preservada para a idade (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Troca gasosa preservada."
+            },
+            {
+              "id": "opt_sc_o_2",
+              "label": "Hipoxemia crítica (<=50a: SpO2 <=93% / PaO2 <70; >50a: SpO2 <=90% / PaO2 <60) (2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Falência de oxigenação indicando shunt grave e necessidade iminente de suporte ventilatório."
+            }
+          ]
+        },
+        {
+          "id": "grp_sc_p",
+          "name": "8. P — Arterial pH < 7,35 (Acidemia na Gasometria — Peso 2)",
+          "slug": "smartcop-ph",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_sc_oxy_ph",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 8,
+          "helpText": "pH arterial na gasometria admissional.",
+          "options": [
+            {
+              "id": "opt_sc_p_0",
+              "label": "pH arterial >= 7,35 (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem acidemia descompensada."
+            },
+            {
+              "id": "opt_sc_p_2",
+              "label": "pH arterial < 7,35 (2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Acidose respiratória por fadiga diafragmática e/ou acidose lática por hipoperfusão."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_sc_low",
+          "label": "Baixo Risco de Suporte Intensivo (0 a 2 pontos)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 2,
+          "statisticalOutcome": "Risco < 4% de necessidade de suporte ventilatório invasivo ou vasopressor. Seguro para manejo fora da UTI (enfermaria ou ambulatório conforme CURB-65/PSI).",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_sc_low_1",
+              "drugName": "Antibioticoterapia Padrão para PAC (Betalactâmico + Macrolídeo)",
+              "dosage": "Ceftriaxona 1-2g IV/dia + Azitromicina 500mg/dia (se internado) ou Amoxicilina-Clavulanato + Macrolídeo VO",
+              "route": "IV ou VO",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Administrar conforme alocação clínica.",
+              "renalAdjustment": "Ajuste renal se necessário.",
+              "contraindications": "Alergia a betalactâmicos."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_sc_low_1",
+              "recommendationTitle": "Cuidados em Enfermaria ou Ambulatório",
+              "dispositionTarget": "Enfermaria / Ambulatório",
+              "monitoringPlan": "Monitorização clínica de rotina e oximetria.",
+              "laboratoryPanel": "Hemograma, PCR, função renal e RX de tórax."
+            }
+          ]
+        },
+        {
+          "id": "tier_sc_mod",
+          "label": "Risco Moderado de Suporte Intensivo (3 a 4 pontos)",
+          "severityLevel": "intermediate",
+          "minScore": 3,
+          "maxScore": 4,
+          "statisticalOutcome": "Risco de 12,5% (1 em cada 8 pacientes) de evoluir com necessidade de ventilação mecânica ou aminas vasoativas. Internação hospitalar obrigatória com vigilância estreita.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_sc_mod_1",
+              "drugName": "Ceftriaxona 2g IV + Azitromicina 500mg IV + Cristaloide Criterioso",
+              "dosage": "Ceftriaxona 2g IV 24/24h + Azitromicina 500mg IV 24/24h",
+              "route": "Intravenosa",
+              "frequency": "24/24h",
+              "dilutionInstructions": "Iniciar imediatamente na emergência.",
+              "renalAdjustment": "Sem ajuste renal para Ceftriaxona.",
+              "contraindications": "Hipersensibilidade grave."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_sc_mod_1",
+              "recommendationTitle": "Internação Hospitalar com Vigilância Oximétrica e Gasométrica",
+              "dispositionTarget": "Enfermaria Monitorizada / Semi-Intensiva",
+              "monitoringPlan": "Reavaliar FR, SpO2, índice de ROX e pressão arterial a cada 2-4 horas nas primeiras 24h.",
+              "ventilatorySupport": "Oxigenoterapia titulada para SpO2 92-96%.",
+              "laboratoryPanel": "Gasometria arterial, lactato, albumina, ureia, creatinina, hemoculturas."
+            }
+          ]
+        },
+        {
+          "id": "tier_sc_high",
+          "label": "Alto / Altíssimo Risco de Suporte Intensivo (5 a 11 pontos)",
+          "severityLevel": "critical",
+          "minScore": 5,
+          "maxScore": 11,
+          "statisticalOutcome": "Risco de 33% (5-6 pts, 1 em 3) a >= 67% (>= 7 pts, 2 em 3) de exigir Ventilação Mecânica ou Suporte Vasopressor (sensibilidade de 92% para escore >= 3). Transferência IMEDIATA para UTI.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_sc_high_atb",
+              "drugName": "Terapia Antimicrobiana Dupla Endovenosa Imediata + Hidrocortisona 200mg/dia IV",
+              "dosage": "Ceftriaxona 2g IV (ou Cefepime/Piperacilina-Tazobactam) + Azitromicina 500mg IV + Hidrocortisona 200mg/dia IV",
+              "route": "Intravenosa",
+              "frequency": "Contínua / Horário",
+              "dilutionInstructions": "Na PAC grave em UTI sem Influenza, a Hidrocortisona 200mg/dia reduziu mortalidade em 28 dias de 11,9% para 6,2% (CAPE COD NEJM 2023).",
+              "renalAdjustment": "Ajustar betalactâmicos pela TFG.",
+              "contraindications": "Excluir pneumonia por Influenza."
+            },
+            {
+              "id": "rx_sc_high_norepi",
+              "drugName": "Noradrenalina em BIC (se PAS < 90 mmHg / PAM < 65 mmHg)",
+              "dosage": "0,05 a 2,0 mcg/kg/min IV contínua em BIC",
+              "route": "Intravenosa contínua em BIC",
+              "frequency": "Contínua",
+              "dilutionInstructions": "4 ampolas (16 mg) em 234 mL SG 5% (64 mcg/mL).",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Acesso central.",
+              "infusionProtocol": {
+                "drugId": "drug_noradrenalina",
+                "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+                "standardSolution": {
+                  "ampoules": "4 ampolas (16 mg = 16 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 64,
+                  "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+                  "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+                },
+                "concentratedSolution": {
+                  "ampoules": "8 ampolas (32 mg = 32 mL)",
+                  "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+                  "totalVolumeMl": 250,
+                  "concentrationMcgMl": 128,
+                  "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+                  "indication": "Restrição volêmica estrita / Choque refratário"
+                },
+                "doseUnit": "mcg/kg/min",
+                "initialDose": 0.05,
+                "maintenanceDoseMin": 0.1,
+                "maintenanceDoseMax": 0.5,
+                "maxDose": 2.0,
+                "defaultDose": 0.1,
+                "isFixedDose": false,
+                "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+                "containerCompatibility": "qualquer",
+                "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+                "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+                "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+              }
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_sc_high_1",
+              "recommendationTitle": "Admissão Imediata em UTI, CNAF / Ventilação Protetora e Suporte Hemodinâmico",
+              "dispositionTarget": "UTI",
+              "monitoringPlan": "Monitorar Índice de ROX ((SpO2/FiO2)/FR) em 2h, 6h e 12h se em CNAF (ROX < 3,85 indica alto risco de falha e necessidade de IOT imediata para não postergar intubação).",
+              "ventilatorySupport": "Cateter Nasal de Alto Fluxo (CNAF 40-60 L/min) ou Intubação Orotraqueal sob Ventilação Protetora (VC 6 mL/kg peso predito, PEEP titulada, Pplatô < 30 cmH2O).",
+              "vascularAccess": "Cateter Venoso Central e PAI se choque séptico.",
+              "laboratoryPanel": "Gasometria arterial seriada, lactato, hemoculturas, painel molecular respiratório e antígenos urinários."
+            }
+          ],
+          "infusionProtocol": {
+            "drugId": "drug_noradrenalina",
+            "drugName": "Noradrenalina (Hemitartarato de Norepinefrina)",
+            "standardSolution": {
+              "ampoules": "4 ampolas (16 mg = 16 mL)",
+              "diluent": "Soro Glicosado a 5% (SG 5%) 234 mL",
+              "totalVolumeMl": 250,
+              "concentrationMcgMl": 64,
+              "mandatoryVehicleNotice": "Veículo MANDATÓRIO: SG 5% (pH ácido 3,5–5,0 protege contra oxidação rápida). Proibida infusão contínua prolongada em SF 0,9%.",
+              "indication": "Choque Séptico, Choque Vasoplégico e Choque Cardiogênico com hipotensão grave (PAM < 65 mmHg)"
+            },
+            "concentratedSolution": {
+              "ampoules": "8 ampolas (32 mg = 32 mL)",
+              "diluent": "Soro Glicosado a 5% (SG 5%) 218 mL",
+              "totalVolumeMl": 250,
+              "concentrationMcgMl": 128,
+              "mandatoryVehicleNotice": "Solução Concentrada para restrição hídrica severa, SDRA ou LRA anúrica.",
+              "indication": "Restrição volêmica estrita / Choque refratário"
+            },
+            "doseUnit": "mcg/kg/min",
+            "initialDose": 0.05,
+            "maintenanceDoseMin": 0.1,
+            "maintenanceDoseMax": 0.5,
+            "maxDose": 2.0,
+            "defaultDose": 0.1,
+            "isFixedDose": false,
+            "administrationRoute": "Acesso Venoso Central exclusivo (em emergência extrema fora da UTI, veia antecubital calibrosa por no máx. 2 a 4h até punção central)",
+            "containerCompatibility": "qualquer",
+            "nursingPrecautions": "Monitorização de PAM invasiva (PAI) preferencial. Verificar refluxo de sangue no cateter a cada 2h para descartar extravasamento tecidual. Se dose > 0,25 mcg/kg/min, acionar alerta imediato para associação precoce de Vasopressina (0,01 a 0,04 UI/min).",
+            "titrationAdvice": "Titular a cada 5 a 10 minutos em passos de 0,02 a 0,05 mcg/kg/min visando PAM >= 65 mmHg (ou >= 80 mmHg em TCE com hipertensão intracraniana).",
+            "weaningCriteria": "Iniciar desmame somente após estabilização hemodinâmica persistente por >= 6-12h com lactato em queda e débito urinário > 0,5 mL/kg/h."
+          }
+        }
+      ]
+    },
+    {
+      "id": "calc_gold_abe",
+      "slug": "gold-abe-dpoc",
+      "name": "Classificação GOLD ABE (2024/2025) para Manejo da DPOC",
+      "acronym": "GOLD-ABE",
+      "version": "2025.1",
+      "blockId": "block_04",
+      "blockFile": "block_04.json",
+      "category": "Pneumologia e Vias Aéreas",
+      "subcategory": "Doença Pulmonar Obstrutiva Crônica (DPOC)",
+      "categorySlug": "bloco-04-pneumologia",
+      "categoryName": "Pneumologia e Vias Aéreas",
+      "moduleName": "DPOC e Doenças Obstrutivas Crônicas",
+      "description": "Sistema vigente da Global Initiative for Chronic Obstructive Lung Disease (GOLD 2024/2025) que unificou os antigos grupos C e D no novo Grupo E (Exacerbador), classificando o paciente com DPOC confirmada (VEF1/CVF < 0,70 pós-BD) nos Grupos A, B ou E conforme sintomas (mMRC/CAT), histórico de exacerbações e contagem sérica de eosinófilos.",
+      "summary": "Classificação moderna GOLD ABE (2024/2025) da DPOC para escolha de LABA, LAMA e Corticoide Inalatório.",
+      "clinicalObjective": "Definir a terapia inalatória farmacológica inicial e de seguimento na DPOC estável, reservando a terapia tripla (LABA + LAMA + CI) para pacientes do Grupo E com eosinófilos sanguíneos >= 300 células/µL.",
+      "targetPopulation": "Pacientes adultos com diagnóstico espirométrico confirmado de DPOC (relação VEF1/CVF pós-broncodilatador < 0,70).",
+      "calculationType": "branching_decision",
+      "formulaExpression": "Sintomas_mMRC_CAT(0_ou_2) + Exacerbacoes_GrupoE(0_ou_4) + Eosinofilos_GOLD(0_ou_1)",
+      "evidenceSource": "Global Initiative for Chronic Obstructive Lung Disease (GOLD). Global Strategy for the Diagnosis, Management, and Prevention of Chronic Obstructive Pulmonary Disease: 2024/2025 Report.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 7,
+      "baseScore": 0,
+      "badge": "pneumologia",
+      "clinicalWarning": "DIRETRIZ GOLD 2024/2025: A combinação LABA + CI isolada (sem LAMA) NÃO é mais recomendada na DPOC! Sempre que houver indicação de corticoide inalatório (Grupo E com eosinófilos >= 300 cél/µL ou história concomitante de asma), deve-se prescrever TERAPIA TRIPLA (LABA + LAMA + CI), preferencialmente em inalador único (estudos IMPACT e ETHOS demonstraram redução de mortalidade). Se eosinófilos < 100 cél/µL, evitar CI pelo risco elevado de pneumonia bacteriana.",
+      "radarAxes": [
+        {
+          "id": "axis_gold_symp",
+          "label": "Carga Sintomática (Dispneia mMRC / CAT)",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_gold_exac",
+          "label": "Frequência e Gravidade de Exacerbações (Grupo E)",
+          "system": "Respiratório",
+          "unit": "eventos/ano",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_gold_eos",
+          "label": "Inflamação Tipo 2 (Eosinófilos) e Obstrução",
+          "system": "Imunológico",
+          "unit": "cél/µL",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_gold_symp",
+          "name": "1. Eixo Horizontal: Carga de Sintomas (Escala mMRC e Questionário CAT)",
+          "slug": "gold-sintomas",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_gold_symp",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Basta um dos dois instrumentos atingir o limiar (mMRC >= 2 ou CAT >= 10) para classificar como muito sintomático.",
+          "options": [
+            {
+              "id": "opt_gold_symp_0",
+              "label": "Pouco Sintomático: mMRC 0 a 1 E CAT < 10 (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Dispneia apenas a grandes esforços e baixo impacto na qualidade de vida."
+            },
+            {
+              "id": "opt_gold_symp_2",
+              "label": "Muito Sintomático: mMRC >= 2 OU CAT >= 10 (2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Dispneia ao caminhar no plano no passo de pessoas da mesma idade ou escore CAT >= 10."
+            }
+          ]
+        },
+        {
+          "id": "grp_gold_exac",
+          "name": "2. Eixo Vertical: Histórico de Exacerbações nos Últimos 12 Meses",
+          "slug": "gold-exacerbacoes",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_gold_exac",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Exacerbação moderada = exigiu antibiótico e/ou corticoide sistêmico. Grave = exigiu internação hospitalar ou ida ao pronto-socorro.",
+          "options": [
+            {
+              "id": "opt_gold_exac_0",
+              "label": "Baixo Risco de Exacerbação: 0 ou 1 exacerbação moderada (SEM hospitalização) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Define alocação nos Grupos A ou B conforme sintomas."
+            },
+            {
+              "id": "opt_gold_exac_4",
+              "label": "Alto Risco (Grupo E): >= 2 exacerbações moderadas OU >= 1 hospitalização por DPOC (4 pts)",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Classifica automaticamente o paciente no Grupo E (Exacerbador) independentemente do mMRC/CAT."
+            }
+          ]
+        },
+        {
+          "id": "grp_gold_eos",
+          "name": "3. Biomarcador Sanguíneo (Eosinófilos Periféricos) e Grau Espirométrico (GOLD 1-4)",
+          "slug": "gold-eosinofilos",
+          "inputType": "single_choice",
+          "unit": "cél/µL",
+          "radarAxisId": "axis_gold_eos",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "A contagem de eosinófilos no hemograma guia a adição de Corticoide Inalatório (CI) no Grupo E.",
+          "options": [
+            {
+              "id": "opt_gold_eos_0",
+              "label": "Eosinófilos < 300 células/µL (GOLD 1: VEF1>=80%; GOLD 2: 50-79%; GOLD 3: 30-49%; GOLD 4: <30%) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem inflamação eosinofílica acentuada (se < 100 cél/µL, CI é ineficaz e aumenta risco de pneumonia)."
+            },
+            {
+              "id": "opt_gold_eos_1",
+              "label": "Eosinófilos >= 300 células/µL (ou >= 100 cél/µL com exacerbações refratárias a LABA+LAMA) (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Forte preditor de resposta clínica e redução de exacerbações com adição de Corticoide Inalatório (Terapia Tripla)."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_gold_a",
+          "label": "GOLD Grupo A — Poucos Sintomas e Baixo Risco de Exacerbações (0 a 1 ponto)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 1,
+          "statisticalOutcome": "mMRC 0-1, CAT < 10 e 0-1 exacerbação moderada sem internação. Conduta GOLD 2024/2025: Iniciar 1 Broncodilatador (preferencialmente de longa duração LAMA ou LABA).",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_gold_a_1",
+              "drugName": "Broncodilatador em Monoterapia (LAMA ou LABA de Longa Duração)",
+              "dosage": "Tiotrópio 5 mcg (2 jatos Respimat 1x/dia) ou Glicopirrônio 50 mcg 1x/dia ou Olodaterol / Indacaterol",
+              "route": "Inalatória",
+              "frequency": "1x/dia",
+              "dilutionInstructions": "Revisar técnica inalatória em todas as consultas.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Glaucoma de ângulo fechado ou retenção urinária grave prostática (cautela com LAMA)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_gold_a_1",
+              "recommendationTitle": "Cessação do Tabagismo, Vacinação e Atividade Física",
+              "dispositionTarget": "Ambulatório",
+              "monitoringPlan": "Cessação do tabagismo (vareniclina/bupropiona/TRN), vacinação anual contra Influenza, Pneumococo (VPC13/VPC15/VPC20 + VPP23), COVID-19, dTpa e Vírus Sincicial Respiratório (VSR se >= 60 anos).",
+              "laboratoryPanel": "Espirometria com prova broncodilatadora, hemograma (eosinófilos) e dosagem de Alfa-1 Antitripsina (uma vez na vida em todo paciente com DPOC)."
+            }
+          ]
+        },
+        {
+          "id": "tier_gold_b",
+          "label": "GOLD Grupo B — Muito Sintomático e Baixo Risco de Exacerbações (2 a 3 pontos)",
+          "severityLevel": "intermediate",
+          "minScore": 2,
+          "maxScore": 3,
+          "statisticalOutcome": "mMRC >= 2 ou CAT >= 10 com 0-1 exacerbação moderada sem hospitalização. Conduta GOLD 2024/2025: Iniciar diretamente Dupla Broncodilatação (LABA + LAMA) em dispositivo único.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_gold_b_1",
+              "drugName": "Dupla Broncodilatação: LABA + LAMA (Superior à monoterapia no alívio de dispneia)",
+              "dosage": "Tiotrópio + Olodaterol (2,5/2,5 mcg 2 jatos 1x/dia) OU Umeclidínio + Vilanterol (62,5/25 mcg 1 inalação/dia) OU Indacaterol + Glicopirrônio (110/50 mcg 1x/dia)",
+              "route": "Inalatória",
+              "frequency": "1x/dia",
+              "dilutionInstructions": "Preferir combinação em dispositivo único para maximizar adesão.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Não associar dois anticolinérgicos (ex: Tiotrópio + Ipratrópio)."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_gold_b_1",
+              "recommendationTitle": "Reabilitação Pulmonar Formal e Rastreio de Comorbidades",
+              "dispositionTarget": "Ambulatório de Pneumologia / Reabilitação",
+              "monitoringPlan": "Indicar programa de Reabilitação Pulmonar (obrigatório nos Grupos B e E); investigar insuficiência cardíaca, apneia do sono e câncer de pulmão (TC de baixa dose anual em tabagistas/ex-tabagistas 50-80a com >= 20 anos-maço).",
+              "laboratoryPanel": "Oximetria, espirometria, TC de tórax e ecocardiograma se dispneia desproporcional."
+            }
+          ]
+        },
+        {
+          "id": "tier_gold_e",
+          "label": "GOLD Grupo E — Alto Risco de Exacerbação (>= 2 moderadas ou >= 1 internação) (4 a 7 pontos)",
+          "severityLevel": "critical",
+          "minScore": 4,
+          "maxScore": 7,
+          "statisticalOutcome": "Fenótipo Exacerbador com alto risco de declínio acelerado do VEF1, reinternação e óbito. Conduta GOLD 2024/2025: LABA + LAMA (se Eos < 300) OU Terapia Tripla LABA + LAMA + CI de início se Eosinófilos >= 300 cél/µL (ou >= 100 cél/µL na falha de LABA+LAMA).",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_gold_e_triple",
+              "drugName": "Terapia Tripla em Inalador Único (LABA + LAMA + CI) se Eosinófilos >= 300 cél/µL (ou LABA + LAMA se Eos < 300)",
+              "dosage": "Fluticasona + Umeclidínio + Vilanterol (100/62,5/25 mcg 1x/dia) OU Beclometasona + Formoterol + Glicopirrônio (2 jatos 12/12h) OU Budesonida + Glicopirrônio + Formoterol",
+              "route": "Inalatória",
+              "frequency": "1x/dia ou 12/12h",
+              "dilutionInstructions": "Se paciente persistir exacerbando sob Terapia Tripla (ou sob LABA+LAMA com Eos < 100): adicionar Roflumilaste 500 mcg/dia (se VEF1 < 50% e bronquite crônica), Azitromicina 250mg/dia ou 500mg 3x/sem (em ex-tabagistas) ou Dupilumabe 300mg SC a cada 2 semanas (se Eos >= 300 e bronquite crônica — estudo BOREAS/NOTUS).",
+              "renalAdjustment": "Roflumilaste não exige ajuste renal.",
+              "contraindications": "Evitar CI se pneumonias de repetição, micobacteriose ou eosinófilos < 100 cél/µL."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_gold_e_1",
+              "recommendationTitle": "Reabilitação Pulmonar, Avaliação de Oxigenoterapia Domiciliar (ODP) e VNI Domiciliar",
+              "dispositionTarget": "Ambulatório de DPOC Avançada",
+              "monitoringPlan": "Avaliar indicação de ODP (>= 15h/dia se PaO2 <= 55 mmHg ou SpO2 <= 88% em repouso; ou PaO2 56-59 mmHg com cor pulmonale/policitemia Ht > 55%) e VNI domiciliar noturna se hipercapnia crônica persistente (PaCO2 >= 52-55 mmHg 2-4 semanas após exacerbação).",
+              "interventionalProcedure": "Avaliar redução volumétrica pulmonar (válvulas endobrônquicas Zephyr) se enfisema heterogêneo grave sem ventilação colateral.",
+              "laboratoryPanel": "Gasometria arterial em ar ambiente, hemograma com contagem absoluta de eosinófilos, TC de tórax de alta resolução e teste de caminhada de 6 minutos (calcular Índice BODE)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_bode",
+      "slug": "indice-bode",
+      "name": "Índice BODE para Sobrevida Multidimensional na DPOC",
+      "acronym": "BODE",
+      "version": "1.0.0",
+      "blockId": "block_04",
+      "blockFile": "block_04.json",
+      "category": "Pneumologia e Vias Aéreas",
+      "subcategory": "Doença Pulmonar Obstrutiva Crônica (DPOC)",
+      "categorySlug": "bloco-04-pneumologia",
+      "categoryName": "Pneumologia e Vias Aéreas",
+      "moduleName": "DPOC e Doenças Obstrutivas Crônicas",
+      "description": "Escore prognóstico multidimensional (Celli et al., NEJM 2004) de 0 a 10 pontos que integra 4 domínios fisiológicos na DPOC: Body Mass Index (B), Airflow Obstruction pelo VEF1 (O), Dyspnea pela escala mMRC (D) e Exercise Capacity pelo Teste de Caminhada de 6 Minutos (E), predizendo a sobrevida em 4 anos com acurácia superior ao VEF1 isolado.",
+      "summary": "Predição de sobrevida em 4 anos na DPOC integrando IMC, VEF1, mMRC e Teste de Caminhada de 6 Minutos (0 a 10 pontos).",
+      "clinicalObjective": "Quantificar o comprometimento sistêmico e pulmonar da DPOC para estimar mortalidade em 4 anos e selecionar candidatos a redução volumétrica pulmonar ou Transplante Pulmonar (BODE >= 7).",
+      "targetPopulation": "Pacientes adultos com DPOC estável submetidos a espirometria e teste de caminhada de 6 minutos.",
+      "calculationType": "additive_points",
+      "formulaExpression": "IMC_B + VEF1_O + mMRC_D + TC6M_E",
+      "evidenceSource": "Celli BR, Cote CG, Marin JM, et al. The body-mass index, airflow obstruction, dyspnea, and exercise capacity index in chronic obstructive pulmonary disease. N Engl J Med. 2004;350(10):1005-1012.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 10,
+      "baseScore": 0,
+      "badge": "pneumologia",
+      "clinicalWarning": "CRITÉRIO DE TRANSPLANTE PULMONAR (ISHLT): Um Índice BODE de 5 a 6 pontos indica encaminhamento para avaliação em centro de transplante pulmonar; um Índice BODE de 7 a 10 pontos (sobrevida em 4 anos de apenas 18%) é critério formal de listagem ativa para Transplante Pulmonar.",
+      "radarAxes": [
+        {
+          "id": "axis_bode_fev1",
+          "label": "Obstrução ao Fluxo Aéreo (VEF1 % predito)",
+          "system": "Respiratório",
+          "unit": "%",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_bode_dysp",
+          "label": "Percepção de Dispneia (Escala mMRC)",
+          "system": "Respiratório",
+          "unit": "grau",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_bode_6mwt",
+          "label": "Capacidade de Exercício (TC6M em metros)",
+          "system": "Cardiovascular",
+          "unit": "m",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_bode_bmi",
+          "label": "Depleção Nutricional / Sarcopenia (IMC)",
+          "system": "Metabólico",
+          "unit": "kg/m2",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_bode_b",
+          "name": "1. B — Body Mass Index (Índice de Massa Corporal — IMC)",
+          "slug": "bode-imc",
+          "inputType": "single_choice",
+          "unit": "kg/m2",
+          "radarAxisId": "axis_bode_bmi",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "O ponto de corte de desnutrição/caquexia pulmonar no BODE é IMC <= 21 kg/m².",
+          "options": [
+            {
+              "id": "opt_bode_b_0",
+              "label": "IMC > 21,0 kg/m² (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Massa corporal acima do limiar crítico de caquexia respiratória."
+            },
+            {
+              "id": "opt_bode_b_1",
+              "label": "IMC <= 21,0 kg/m² (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Depleção muscular diafragmática e periférica associada a maior mortalidade."
+            }
+          ]
+        },
+        {
+          "id": "grp_bode_o",
+          "name": "2. O — Airflow Obstruction (VEF1 Pós-Broncodilatador em % do Predito)",
+          "slug": "bode-vef1",
+          "inputType": "single_choice",
+          "unit": "%",
+          "radarAxisId": "axis_bode_fev1",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Volume Expiratório Forçado no 1º segundo pós-broncodilatador expresso em percentual do predito.",
+          "options": [
+            {
+              "id": "opt_bode_o_0",
+              "label": "VEF1 >= 65% do predito (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Obstrução leve a moderada inicial."
+            },
+            {
+              "id": "opt_bode_o_1",
+              "label": "VEF1 de 50% a 64% do predito (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.33,
+              "sortOrder": 2,
+              "description": "Obstrução moderada."
+            },
+            {
+              "id": "opt_bode_o_2",
+              "label": "VEF1 de 36% a 49% do predito (2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.66,
+              "sortOrder": 3,
+              "description": "Obstrução grave."
+            },
+            {
+              "id": "opt_bode_o_3",
+              "label": "VEF1 <= 35% do predito (3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Obstrução muito grave ao fluxo aéreo."
+            }
+          ]
+        },
+        {
+          "id": "grp_bode_d",
+          "name": "3. D — Dyspnea (Escala Modificada do Medical Research Council — mMRC)",
+          "slug": "bode-mmrc",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_bode_dysp",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Grau funcional de dispneia de 0 a 4.",
+          "options": [
+            {
+              "id": "opt_bode_d_0",
+              "label": "mMRC Grau 0 ou 1 (Dispneia apenas a grandes esforços ou aclive) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Limitação funcional mínima."
+            },
+            {
+              "id": "opt_bode_d_1",
+              "label": "mMRC Grau 2 (Anda mais devagar que pessoas da mesma idade no plano) (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.33,
+              "sortOrder": 2,
+              "description": "Limitação funcional moderada."
+            },
+            {
+              "id": "opt_bode_d_2",
+              "label": "mMRC Grau 3 (Para para respirar após caminhar ~100 metros ou poucos minutos) (2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.66,
+              "sortOrder": 3,
+              "description": "Limitação funcional importante."
+            },
+            {
+              "id": "opt_bode_d_3",
+              "label": "mMRC Grau 4 (Muito dispneico para sair de casa ou dispneia ao vestir-se) (3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Incapacidade respiratória grave nas atividades diárias."
+            }
+          ]
+        },
+        {
+          "id": "grp_bode_e",
+          "name": "4. E — Exercise Capacity (Distância no Teste de Caminhada de 6 Minutos — TC6M)",
+          "slug": "bode-tc6m",
+          "inputType": "single_choice",
+          "unit": "m",
+          "radarAxisId": "axis_bode_6mwt",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Distância total percorrida em metros no corredor plano de 30 metros em 6 minutos.",
+          "options": [
+            {
+              "id": "opt_bode_e_0",
+              "label": "Distância >= 350 metros (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Capacidade funcional de exercício preservada."
+            },
+            {
+              "id": "opt_bode_e_1",
+              "label": "Distância de 250 a 349 metros (1 pt)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.33,
+              "sortOrder": 2,
+              "description": "Redução discreta a moderada da tolerância ao exercício."
+            },
+            {
+              "id": "opt_bode_e_2",
+              "label": "Distância de 150 a 249 metros (2 pts)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.66,
+              "sortOrder": 3,
+              "description": "Comprometimento acentuado da capacidade aeróbica submáxima."
+            },
+            {
+              "id": "opt_bode_e_3",
+              "label": "Distância <= 149 metros (3 pts)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Intolerância extrema ao esforço com alto risco de óbito."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_bode_q1",
+          "label": "Quartil 1 (0 a 2 pontos) — Sobrevida em 4 Anos de 80%",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 2,
+          "statisticalOutcome": "Taxa de sobrevida estimada em 4 anos de 80% (mortalidade em 4 anos ~20%). Manter broncodilatação otimizada conforme GOLD ABE e atividade física regular.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_bode_q1_1",
+              "drugName": "Broncodilatação de Longa Duração (LAMA ou LABA+LAMA)",
+              "dosage": "Tiotrópio 5 mcg/dia ou Tiotrópio+Olodaterol conforme sintomatologia GOLD",
+              "route": "Inalatória",
+              "frequency": "1x/dia",
+              "dilutionInstructions": "Checar técnica inalatória.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Hipersensibilidade."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_bode_q1_1",
+              "recommendationTitle": "Cessação Tabágica, Vacinação e Treinamento Físico",
+              "dispositionTarget": "Ambulatório",
+              "monitoringPlan": "Incentivar caminhadas regulares e suporte nutricional se IMC próximo de 21 kg/m².",
+              "laboratoryPanel": "Espirometria anual e oximetria."
+            }
+          ]
+        },
+        {
+          "id": "tier_bode_q2",
+          "label": "Quartil 2 (3 a 4 pontos) — Sobrevida em 4 Anos de 67%",
+          "severityLevel": "intermediate",
+          "minScore": 3,
+          "maxScore": 4,
+          "statisticalOutcome": "Taxa de sobrevida estimada em 4 anos de 67% (mortalidade em 4 anos ~33%). Indicação formal de Reabilitação Pulmonar estruturada (que reduz o escore BODE em 1-2 pontos e melhora a sobrevida).",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_bode_q2_1",
+              "drugName": "Dupla Broncodilatação (LABA + LAMA) ou Terapia Tripla se Exacerbador Eosinofílico",
+              "dosage": "Umeclidínio+Vilanterol ou Tiotrópio+Olodaterol (adicionar CI se Grupo E com Eos >= 300)",
+              "route": "Inalatória",
+              "frequency": "1x/dia",
+              "dilutionInstructions": "Uso diário contínuo.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Glaucoma de ângulo estreito."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_bode_q2_1",
+              "recommendationTitle": "Programa de Reabilitação Pulmonar e Suporte Nutricional Hiperproteico",
+              "dispositionTarget": "Centro de Reabilitação Pulmonar",
+              "monitoringPlan": "Treinamento aeróbico e de força de membros inferiores/superiores por 8-12 semanas; suplementação proteico-calórica se IMC <= 21 kg/m².",
+              "laboratoryPanel": "TC6M com oximetria contínua (avaliar dessaturação esforço-induzida SpO2 < 88%)."
+            }
+          ]
+        },
+        {
+          "id": "tier_bode_q3",
+          "label": "Quartil 3 (5 a 6 pontos) — Sobrevida em 4 Anos de 57%",
+          "severityLevel": "high",
+          "minScore": 5,
+          "maxScore": 6,
+          "statisticalOutcome": "Taxa de sobrevida em 4 anos de 57% (mortalidade em 4 anos ~43%). Critério ISHLT para encaminhamento e avaliação inicial em Centro de Transplante Pulmonar e Cirurgia/Broncoscopia Redutora de Volume.",
+          "colorHex": "#f97316",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_bode_q3_1",
+              "drugName": "Terapia Inalatória Máxima + Avaliação de ODP e Mucolíticos/Macrolídeo",
+              "dosage": "LABA + LAMA + CI (se indicado) + N-Acetilcisteína 600mg 12/12h ou Roflumilaste",
+              "route": "Inalatória e VO",
+              "frequency": "Diário",
+              "dilutionInstructions": "Otimizar todas as terapias farmacológicas.",
+              "renalAdjustment": "Ajuste conforme função renal.",
+              "contraindications": "Contraindicações específicas."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_bode_q3_1",
+              "recommendationTitle": "Referenciamento para Centro de Transplante Pulmonar e Avaliação de ODP",
+              "dispositionTarget": "Ambulatório de Pneumologia Avançada",
+              "monitoringPlan": "Avaliar gasometria para Oxigenoterapia Domiciliar Prolongada (>= 15h/dia) e pletismografia para redução volumétrica pulmonar.",
+              "interventionalProcedure": "Avaliação broncoscópica para válvulas endobrônquicas se aprisionamento aéreo severo (VR > 175-200%).",
+              "laboratoryPanel": "Gasometria arterial, pletismografia de corpo inteiro, DLCO, TC de tórax quantitativa e ecocardiograma (rastreio de hipertensão pulmonar)."
+            }
+          ]
+        },
+        {
+          "id": "tier_bode_q4",
+          "label": "Quartil 4 (7 a 10 pontos) — Sobrevida em 4 Anos de 18% (Listagem para Transplante)",
+          "severityLevel": "critical",
+          "minScore": 7,
+          "maxScore": 10,
+          "statisticalOutcome": "Taxa de sobrevida em 4 anos de apenas 18% (mortalidade em 4 anos de 82%). Critério formal ISHLT para listagem ativa de Transplante Pulmonar, ODP, VNI domiciliar e cuidados paliativos respiratórios precoces.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_bode_q4_1",
+              "drugName": "Terapia Inalatória Plena + Morfina em Baixa Dose para Dispneia Refratária",
+              "dosage": "LABA+LAMA(+CI) + Sulfato de Morfina oral em baixa dose (2,5 a 5 mg VO de 6/6h ou 8/8h titulada para alívio de dispneia refratária)",
+              "route": "Inalatória e VO",
+              "frequency": "Contínuo",
+              "dilutionInstructions": "Associar laxativo profilático (Lactulose ou PEG 4000) sempre que prescrever opioide em baixa dose para dispneia crônica refratária.",
+              "renalAdjustment": "Evitar morfina se anúria/DRC grave (preferir Fentanil ou Metadona).",
+              "contraindications": "Acidose respiratória aguda descompensada sem suporte ventilatório."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_bode_q4_1",
+              "recommendationTitle": "Listagem para Transplante Pulmonar, ODP + VNI Domiciliar e Cuidados Paliativos",
+              "dispositionTarget": "Centro de Transplante Pulmonar / Assistência Domiciliar",
+              "monitoringPlan": "Oxigenoterapia contínua (>= 15h/dia), VNI noturna domiciliar se PaCO2 >= 52 mmHg e diretivas antecipadas de vontade.",
+              "interventionalProcedure": "Transplante Pulmonar uni ou bilateral ou Redução Volumétrica Pulmonar.",
+              "laboratoryPanel": "Gasometria arterial, cateterismo cardíaco direito pré-transplante, painel HLA e sorologias."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_mmrc",
+      "slug": "escala-mmrc",
+      "name": "Escala de Dispneia mMRC (Modified Medical Research Council)",
+      "acronym": "mMRC",
+      "version": "1.0.0",
+      "blockId": "block_04",
+      "blockFile": "block_04.json",
+      "category": "Pneumologia e Vias Aéreas",
+      "subcategory": "Avaliação Funcional Respiratória e DPOC",
+      "categorySlug": "bloco-04-pneumologia",
+      "categoryName": "Pneumologia e Vias Aéreas",
+      "moduleName": "DPOC e Doenças Intersticiais Pulmonares",
+      "description": "Escala padronizada internacionalmente (Graus 0 a 4) para graduar a limitação funcional imposta pela dispneia nas atividades de vida diária, sendo componente central da classificação GOLD ABE (corte >= 2) e do Índice BODE.",
+      "summary": "Graduação funcional da dispneia de Grau 0 a Grau 4 nas atividades diárias (corte sintomático GOLD >= 2).",
+      "clinicalObjective": "Quantificar de forma reprodutível a incapacidade funcional por dispneia em pacientes com DPOC, doença pulmonar intersticial, hipertensão pulmonar e insuficiência cardíaca.",
+      "targetPopulation": "Pacientes adultos com pneumopatias crônicas (DPOC, fibrose pulmonar, bronquiectasias) ou dispneia crônica em investigação.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Grau_mMRC_0_a_4",
+      "evidenceSource": "Fletcher CM, Elmes PC, Fairbairn AS, Wood CH. The significance of respiratory symptoms and the diagnosis of chronic bronchitis in a working population. Br Med J. 1959;2(5147):257-266. GOLD 2024/2025.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 4,
+      "baseScore": 0,
+      "badge": "pneumologia",
+      "clinicalWarning": "Na diretriz GOLD 2024/2025, um escore mMRC >= 2 pontos define o paciente como 'Muito Sintomático' (alocando-o no Grupo B ou E) e indica dupla broncodilatação (LABA + LAMA) e encaminhamento para Reabilitação Pulmonar.",
+      "radarAxes": [
+        {
+          "id": "axis_mmrc_grade",
+          "label": "Grau de Dispneia aos Esforços (mMRC 0-4)",
+          "system": "Respiratório",
+          "unit": "grau",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_mmrc_desat",
+          "label": "Comportamento Oximétrico ao Esforço",
+          "system": "Respiratório",
+          "unit": "%",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_mmrc_adl",
+          "label": "Comprometimento de Autonomia / AVDs",
+          "system": "Neurológico",
+          "unit": "grau",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_mmrc_1",
+          "name": "1. Grau de Dispneia na Escala mMRC (0 a 4 pontos)",
+          "slug": "mmrc-grau",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_mmrc_grade",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Selecione a afirmação que melhor descreve a limitação respiratória atual do paciente.",
+          "options": [
+            {
+              "id": "opt_mmrc_0",
+              "label": "Grau 0 (0 pts) — Tenho falta de ar apenas quando faço exercício físico intenso (correr, nadar, subir ladeira íngreme)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Tolerância fisiológica preservada aos esforços habituais."
+            },
+            {
+              "id": "opt_mmrc_1",
+              "label": "Grau 1 (1 pt) — Tenho falta de ar quando aperto o passo no plano ou quando subo uma ladeira leve / 1 lance de escada",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.25,
+              "sortOrder": 2,
+              "description": "Limitação leve: considerado 'pouco sintomático' pelo corte GOLD (< 2)."
+            },
+            {
+              "id": "opt_mmrc_2",
+              "label": "Grau 2 (2 pts) — Ando mais devagar que pessoas da mesma idade no plano por falta de ar, ou preciso parar quando ando no meu próprio passo",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 3,
+              "description": "Limiar GOLD de paciente 'Muito Sintomático' (mMRC >= 2): compromete a velocidade da marcha no plano."
+            },
+            {
+              "id": "opt_mmrc_3",
+              "label": "Grau 3 (3 pts) — Preciso parar para respirar após caminhar cerca de 100 metros (1 quadra) ou após poucos minutos no plano",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.75,
+              "sortOrder": 4,
+              "description": "Limitação funcional grave: autonomia restrita a curtas distâncias."
+            },
+            {
+              "id": "opt_mmrc_4",
+              "label": "Grau 4 (4 pts) — Sinto tanta falta de ar que não consigo sair de casa, ou sinto falta de ar ao vestir-me ou tomar banho",
+              "pointValue": 4,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 5,
+              "description": "Incapacidade respiratória extrema com dispneia aos mínimos esforços de autocuidado."
+            }
+          ]
+        },
+        {
+          "id": "grp_mmrc_2",
+          "name": "2. Comportamento da Oximetria de Pulso (Repouso e Caminhada)",
+          "slug": "mmrc-oximetria",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_mmrc_desat",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Avaliação complementar da troca gasosa associada à queixa de dispneia (modificador do radar fisiológico).",
+          "options": [
+            {
+              "id": "opt_mmrc_ox_0",
+              "label": "Normoxemia em repouso e esforço (SpO2 >= 92% sem queda >= 4% na caminhada) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Sem dessaturação induzida pelo exercício."
+            },
+            {
+              "id": "opt_mmrc_ox_1",
+              "label": "Dessaturação ao esforço (queda >= 4% ou SpO2 < 90% na caminhada, porém >= 89% em repouso) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Hipoxemia esforço-induzida sugerindo perda de leito capilar alveolar (DLCO reduzida)."
+            },
+            {
+              "id": "opt_mmrc_ox_2",
+              "label": "Hipoxemia crônica em repouso (SpO2 <= 88% em ar ambiente) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Insuficiência respiratória crônica hipoxêmica com indicação de investigar ODP."
+            }
+          ]
+        },
+        {
+          "id": "grp_mmrc_3",
+          "name": "3. Repercussão nas Atividades Básicas e Instrumentais de Vida Diária",
+          "slug": "mmrc-avds",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_mmrc_adl",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Impacto funcional da dispneia na independência domiciliar e laboral (modificador do radar).",
+          "options": [
+            {
+              "id": "opt_mmrc_adl_0",
+              "label": "Independente para atividades laborais, domésticas e sociais (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Autonomia global preservada."
+            },
+            {
+              "id": "opt_mmrc_adl_1",
+              "label": "Restrição em atividades instrumentais (compras, limpeza pesada, escadas) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Necessita pausas frequentes nas tarefas fora do domicílio."
+            },
+            {
+              "id": "opt_mmrc_adl_2",
+              "label": "Dependência parcial ou total em AVDs básicas (banho, troca de roupa, alimentação) (0 pts)",
+              "pointValue": 0,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Confinamento domiciliar secundário ao custo energético ventilatório."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_mmrc_low",
+          "label": "Dispneia Leve / Pouco Sintomático (mMRC Grau 0 a 1)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 1,
+          "statisticalOutcome": "Pontuação no Índice BODE = 0 pts para dispneia; classifica como 'Pouco Sintomático' no eixo horizontal do GOLD ABE. Baixa mortalidade atribuível à dispneia isolada.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_mmrc_low_1",
+              "drugName": "Monoterapia Broncodilatadora (LAMA ou LABA) se DPOC Grupo A",
+              "dosage": "Tiotrópio 5 mcg/dia (2 jatos Respimat) ou Glicopirrônio 50 mcg/dia",
+              "route": "Inalatória",
+              "frequency": "1x/dia",
+              "dilutionInstructions": "Manter atividade física regular.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Hipersensibilidade."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_mmrc_low_1",
+              "recommendationTitle": "Estímulo à Atividade Física Regular e Cessação do Tabagismo",
+              "dispositionTarget": "Ambulatório",
+              "monitoringPlan": "Manter condicionamento aeróbico e calendário vacinal em dia.",
+              "laboratoryPanel": "Espirometria com prova broncodilatadora."
+            }
+          ]
+        },
+        {
+          "id": "tier_mmrc_mod",
+          "label": "Dispneia Moderada a Importante / Muito Sintomático (mMRC Grau 2 a 3)",
+          "severityLevel": "intermediate",
+          "minScore": 2,
+          "maxScore": 3,
+          "statisticalOutcome": "mMRC >= 2 ultrapassa o limiar sintomático da diretriz GOLD (alocando em Grupo B ou E) e soma 1 pt (Grau 2) ou 2 pts (Grau 3) no Índice BODE.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_mmrc_mod_1",
+              "drugName": "Dupla Broncodilatação (LABA + LAMA) para Desinsuflação Farmacológica",
+              "dosage": "Tiotrópio + Olodaterol (2,5/2,5 mcg 2 jatos 1x/dia) ou Umeclidínio + Vilanterol (62,5/25 mcg 1x/dia)",
+              "route": "Inalatória",
+              "frequency": "1x/dia",
+              "dilutionInstructions": "A dupla broncodilatação reduz a hiperinsuflação dinâmica no exercício e melhora o mMRC.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Não associar dois LAMAs."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_mmrc_mod_1",
+              "recommendationTitle": "Encaminhamento Obrigatório para Reabilitação Pulmonar e TC6M",
+              "dispositionTarget": "Ambulatório / Centro de Reabilitação",
+              "monitoringPlan": "Solicitar Teste de Caminhada de 6 Minutos para calcular o Índice BODE completo e descartar causas cardíacas concomitantes.",
+              "laboratoryPanel": "Espirometria, TC6M, hemograma, BNP e ecocardiograma se necessário."
+            }
+          ]
+        },
+        {
+          "id": "tier_mmrc_high",
+          "label": "Dispneia Incapacitante / Extrema (mMRC Grau 4)",
+          "severityLevel": "critical",
+          "minScore": 4,
+          "maxScore": 4,
+          "statisticalOutcome": "Soma a pontuação máxima (3 pts) de dispneia no Índice BODE. Alta probabilidade de hiperinsuflação grave, hipoxemia crônica, cor pulmonale e mortalidade elevada em 4 anos.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_mmrc_high_1",
+              "drugName": "Terapia Inalatória Otimizada (LABA+LAMA ou Tripla) + Manejo de Dispneia Refratária",
+              "dosage": "LABA + LAMA (+ CI se Grupo E eosinofílico) + considerar Morfina oral em baixa dose (2,5mg VO 6/6h-8/8h) se dispneia refratária",
+              "route": "Inalatória e VO",
+              "frequency": "Diário",
+              "dilutionInstructions": "Avaliar troca de inalador de pó seco (DPI) por névoa suave (Respimat) ou spray com espaçador caso o fluxo inspiratório de pico do paciente seja < 30-40 L/min.",
+              "renalAdjustment": "Ajustar opioide pela função renal.",
+              "contraindications": "Retenção hipercápnica aguda não ventilada."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_mmrc_high_1",
+              "recommendationTitle": "Gasometria Arterial para Oxigenoterapia Domiciliar (ODP) e Conservação de Energia",
+              "dispositionTarget": "Ambulatório de Pneumologia Avançada / Domiciliar",
+              "monitoringPlan": "Prescrever Oxigenoterapia Domiciliar Prolongada (>= 15h/dia) se PaO2 <= 55 mmHg (ou SpO2 <= 88%); técnicas de conservação de energia no banho/vestuário e uso de ventilador portátil facial.",
+              "laboratoryPanel": "Gasometria arterial em ar ambiente, TC de tórax, ecocardiograma transtorácico e cálculo do Índice BODE."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calc_wood_downes",
+      "slug": "wood-downes-ferres",
+      "name": "Escala de Wood-Downes-Ferrés Modificada para Crise Asmática e Bronquiolite",
+      "acronym": "Wood-Downes",
+      "version": "1.0.0",
+      "blockId": "block_04",
+      "blockFile": "block_04.json",
+      "category": "Pneumologia e Vias Aéreas",
+      "subcategory": "Asma Aguda, Broncoespasmo e Bronquiolite",
+      "categorySlug": "bloco-04-pneumologia",
+      "categoryName": "Pneumologia e Vias Aéreas",
+      "moduleName": "Crise Asmática e Obstrução Aguda das Vias Aéreas",
+      "description": "Escala clínica à beira do leito (Wood-Downes-Ferrés Modificada, 0 a 14 pontos) que integra 6 parâmetros cardiorrespiratórios (Sibilos, Tiragem, Entrada de Ar, Cianose, Frequência Respiratória e Frequência Cardíaca) para quantificar a gravidade da crise de broncoespasmo agudo / bronquiolite e indicar suporte intensivo.",
+      "summary": "Estratificação clínica da gravidade de crise asmática e bronquiolite aguda (0 a 14 pontos).",
+      "clinicalObjective": "Monitorar de forma seriada a resposta ao tratamento broncodilatador na sala de emergência e detectar precocemente o 'tórax silencioso' e a fadiga muscular respiratória (escore >= 8 pontos).",
+      "targetPopulation": "Pacientes pediátricos e adultos jovens em crise aguda de asma, sibilância aguda ou bronquiolite viral aguda.",
+      "calculationType": "additive_points",
+      "formulaExpression": "Sibilos(0_3) + Tiragem(0_3) + EntradaAr(0_3) + Cianose(0_2) + FR(0_2) + FC(0_1)",
+      "evidenceSource": "Wood DW, Downes JJ, Lecks HI. A clinical scoring system for the diagnosis of respiratory failure. Preliminary report on childhood status asthmaticus. Am J Dis Child. 1972;123(3):227-228. Ferrés J et al., 1988.",
+      "minPossibleScore": 0,
+      "maxPossibleScore": 14,
+      "baseScore": 0,
+      "badge": "emergencia",
+      "clinicalWarning": "SINAL DE ALERTA MÁXIMO — TÓRAX SILENCIOSO: O desaparecimento dos sibilos acompanhado de entrada de ar muito reduzida ou abolida (3 pts em Sibilos e 3 pts em Entrada de Ar), cianose e bradicardia/sonolência indica obstrução brônquica quase total e parada respiratória iminente, exigindo Sulfato de Magnésio IV imediato, adrenalina/beta-2 contínuo e preparo para sequência rápida de intubação com Quetamina.",
+      "radarAxes": [
+        {
+          "id": "axis_wd_airflow",
+          "label": "Obstrução Brônquica (Sibilos e Entrada de Ar)",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_wd_work",
+          "label": "Trabalho Muscular (Tiragem e Taquipneia)",
+          "system": "Respiratório",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        },
+        {
+          "id": "axis_wd_oxy_hr",
+          "label": "Hipoxemia (Cianose) e Resposta Taquicárdica",
+          "system": "Cardiovascular",
+          "unit": "pts",
+          "baselineValue": 0,
+          "maxAxisValue": 1
+        }
+      ],
+      "parameterGroups": [
+        {
+          "id": "grp_wd_1",
+          "name": "1. Sibilos à Ausculta Pulmonar (0 a 3 pontos)",
+          "slug": "wd-sibilos",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_wd_airflow",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 1,
+          "helpText": "Avaliação acústica do broncoespasmo nas fases do ciclo respiratório.",
+          "options": [
+            {
+              "id": "opt_wd_1_0",
+              "label": "0 pts — Ausentes (Fluxo aéreo normal sem broncoespasmo)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Respiração tranquila sem ruídos adventícios."
+            },
+            {
+              "id": "opt_wd_1_1",
+              "label": "1 pt — Sibilos apenas no final da expiração (teleexpiratórios)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.33,
+              "sortOrder": 2,
+              "description": "Obstrução brônquica leve."
+            },
+            {
+              "id": "opt_wd_1_2",
+              "label": "2 pts — Sibilos audíveis durante toda a expiração",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.66,
+              "sortOrder": 3,
+              "description": "Broncoespasmo moderado com prolongamento do tempo expiratório."
+            },
+            {
+              "id": "opt_wd_1_3",
+              "label": "3 pts — Sibilos inspiratórios e expiratórios (bifásicos) OU Tórax Silencioso na crise grave",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Obstrução crítica de pequenas e médias vias aéreas."
+            }
+          ]
+        },
+        {
+          "id": "grp_wd_2",
+          "name": "2. Tiragem / Retrações da Musculatura Acessória (0 a 3 pontos)",
+          "slug": "wd-tiragem",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_wd_work",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 2,
+          "helpText": "Grau de recrutamento muscular acessório para vencer a resistência das vias aéreas.",
+          "options": [
+            {
+              "id": "opt_wd_2_0",
+              "label": "0 pts — Ausente (Sem retrações)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Mecânica ventilatória basal preservada."
+            },
+            {
+              "id": "opt_wd_2_1",
+              "label": "1 pt — Tiragem subcostal ou intercostal inferior leve (+1)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.33,
+              "sortOrder": 2,
+              "description": "Recrutamento inicial intercostal/subcostal."
+            },
+            {
+              "id": "opt_wd_2_2",
+              "label": "2 pts — Tiragem intercostal + supraclavicular + batimento de asa de nariz (+2)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.66,
+              "sortOrder": 3,
+              "description": "Recrutamento acentuado de escalenos, esternocleidomastóideo e aletas nasais."
+            },
+            {
+              "id": "opt_wd_2_3",
+              "label": "3 pts — Tiragem generalizada supraesternal, intercostal e balanço/dissociação toracoabdominal (+3)",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Fadiga diafragmática iminente com respiração paradoxal."
+            }
+          ]
+        },
+        {
+          "id": "grp_wd_3",
+          "name": "3. Entrada de Ar / Murmúrio Vesicular (0 a 3 pontos)",
+          "slug": "wd-entrada-ar",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_wd_airflow",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 3,
+          "helpText": "Intensidade e simetria do murmúrio vesicular nos campos pulmonares.",
+          "options": [
+            {
+              "id": "opt_wd_3_0",
+              "label": "0 pts — Boa, ampla e simétrica bilateralmente",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Ventilação alveolar preservada."
+            },
+            {
+              "id": "opt_wd_3_1",
+              "label": "1 pt — Regular / Levemente diminuída ou assimétrica em bases",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.33,
+              "sortOrder": 2,
+              "description": "Redução discreta da ventilação regional."
+            },
+            {
+              "id": "opt_wd_3_2",
+              "label": "2 pts — Muito diminuída difusamente",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.66,
+              "sortOrder": 3,
+              "description": "Hipoventilação alveolar importante por aprisionamento aéreo."
+            },
+            {
+              "id": "opt_wd_3_3",
+              "label": "3 pts — Abolida / Tórax Silencioso",
+              "pointValue": 3,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 4,
+              "description": "Ausência de fluxo aéreo eficaz — emergência absoluta."
+            }
+          ]
+        },
+        {
+          "id": "grp_wd_4",
+          "name": "4. Cianose / Hipoxemia (0 a 2 pontos)",
+          "slug": "wd-cianose",
+          "inputType": "single_choice",
+          "unit": "pts",
+          "radarAxisId": "axis_wd_oxy_hr",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 4,
+          "helpText": "Presença de cianose central/perioral ou queda crítica da SpO2.",
+          "options": [
+            {
+              "id": "opt_wd_4_0",
+              "label": "0 pts — Ausente em ar ambiente (SpO2 >= 94-95% em AA)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Oxigenação arterial preservada."
+            },
+            {
+              "id": "opt_wd_4_1",
+              "label": "1 pt — Cianose presente em ar ambiente (SpO2 < 92% em AA), revertida com O2 suplementar",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Hipoxemia por distúrbio V/Q responsivo à suplementação de O2."
+            },
+            {
+              "id": "opt_wd_4_2",
+              "label": "2 pts — Cianose persistente mesmo sob FiO2 >= 40% (SpO2 < 90% com O2)",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Hipoxemia refratária por shunt intrapulmonar / atelectasias / hipoventilação grave."
+            }
+          ]
+        },
+        {
+          "id": "grp_wd_5",
+          "name": "5. Frequência Respiratória (FR) (0 a 2 pontos)",
+          "slug": "wd-fr",
+          "inputType": "single_choice",
+          "unit": "irpm",
+          "radarAxisId": "axis_wd_work",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 5,
+          "helpText": "Frequência respiratória de acordo com a faixa etária.",
+          "options": [
+            {
+              "id": "opt_wd_5_0",
+              "label": "0 pts — FR < 30 irpm (Normal para a idade)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Eupneico ou taquipneia mínima."
+            },
+            {
+              "id": "opt_wd_5_1",
+              "label": "1 pt — FR de 31 a 45 irpm (Taquipneia moderada)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 0.5,
+              "sortOrder": 2,
+              "description": "Taquipneia compensatória moderada."
+            },
+            {
+              "id": "opt_wd_5_2",
+              "label": "2 pts — FR > 45 a 60 irpm OU Bradipneia pré-parada por exaustão",
+              "pointValue": 2,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 3,
+              "description": "Taquipneia extrema ou falência do drive respiratório."
+            }
+          ]
+        },
+        {
+          "id": "grp_wd_6",
+          "name": "6. Frequência Cardíaca (FC) (0 a 1 ponto)",
+          "slug": "wd-fc",
+          "inputType": "single_choice",
+          "unit": "bpm",
+          "radarAxisId": "axis_wd_oxy_hr",
+          "normalBaselineValue": 0,
+          "maxAxisValue": 1,
+          "sortOrder": 6,
+          "helpText": "Resposta cronotrópica ao esforço respiratório e à hipóxia.",
+          "options": [
+            {
+              "id": "opt_wd_6_0",
+              "label": "0 pts — FC < 120 bpm (Normal)",
+              "pointValue": 0,
+              "isNormalBaseline": true,
+              "radarNormalizedValue": 0.0,
+              "sortOrder": 1,
+              "description": "Frequência cardíaca abaixo de 120 bpm."
+            },
+            {
+              "id": "opt_wd_6_1",
+              "label": "1 pt — FC >= 120 bpm (Taquicardia importante) OU Bradicardia hipóxica (< 60 bpm)",
+              "pointValue": 1,
+              "isNormalBaseline": false,
+              "radarNormalizedValue": 1.0,
+              "sortOrder": 2,
+              "description": "Descarga adrenérgica intensa ou bradicardia hipóxico-acidótica."
+            }
+          ]
+        }
+      ],
+      "riskTiers": [
+        {
+          "id": "tier_wd_mild",
+          "label": "Crise Leve (0 a 3 pontos)",
+          "severityLevel": "low",
+          "minScore": 0,
+          "maxScore": 3,
+          "statisticalOutcome": "Crise obstrutiva leve com SpO2 >= 95% e boa entrada de ar. Excelente resposta ao broncodilatador de curta ação por aerossol dosimetrado com espaçador.",
+          "colorHex": "#10b981",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_wd_mild_saba",
+              "drugName": "Salbutamol Spray (100 mcg/jato) com Espaçador (ou Formoterol+Budesonida na asma GINA)",
+              "dosage": "4 a 8 jatos de Salbutamol com espaçador a cada 20 min na 1ª hora (se asma persistente, associar Prednisolona/Prednisona 1-2 mg/kg máx 40-50mg VO)",
+              "route": "Inalatória / VO",
+              "frequency": "A cada 20 min na 1ª hora",
+              "dilutionInstructions": "Em bronquiolite viral aguda (< 2 anos), diretrizes AAP não recomendam broncodilatador ou corticoide de rotina; priorizar aspiração nasal com SF 0,9% e suporte.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Taquiarritmia grave."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_wd_mild_1",
+              "recommendationTitle": "Reavaliação em 1 Hora e Revisão do Plano de Ação de Asma",
+              "dispositionTarget": "Observação Breve -> Alta Orientada",
+              "monitoringPlan": "Se Wood-Downes mantiver <= 3 pts e SpO2 >= 94% após 1h da última inalação, liberar com plano de ação escrito e corticoide inalatório de manutenção (nunca prescrever SABA isolado na asma — GINA 2024).",
+              "laboratoryPanel": "Oximetria de pulso (e Pico de Fluxo Expiratório / Peak Flow se >= 6 anos)."
+            }
+          ]
+        },
+        {
+          "id": "tier_wd_mod",
+          "label": "Crise Moderada (4 a 7 pontos)",
+          "severityLevel": "intermediate",
+          "minScore": 4,
+          "maxScore": 7,
+          "statisticalOutcome": "Crise moderada com esforço respiratório evidente e/ou hipoxemia leve (SpO2 91-94%). Requer terapia inalatória combinada (SABA + SAMA), corticoide sistêmico precoce na 1ª hora e oxigenoterapia.",
+          "colorHex": "#f59e0b",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_wd_mod_1",
+              "drugName": "Salbutamol + Brometo de Ipratrópio Inalatórios + Corticoide Sistêmico Precoce",
+              "dosage": "Salbutamol 4-10 jatos + Ipratrópio 4-8 jatos no espaçador a cada 20 min por 1h + Prednisona/Prednisolona 1-2 mg/kg VO (máx 40-60mg) ou Metilprednisolona 1-2 mg/kg IV",
+              "route": "Inalatória + VO/IV",
+              "frequency": "Ciclo de 1ª hora",
+              "dilutionInstructions": "A adição de Brometo de Ipratrópio na 1ª hora reduz significativamente a taxa de internação hospitalar em crises moderadas a graves.",
+              "renalAdjustment": "Sem ajuste renal.",
+              "contraindications": "Hipersensibilidade à atropina/ipratrópio."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_wd_mod_1",
+              "recommendationTitle": "Observação na Sala de Emergência e Oxigenoterapia Titulada",
+              "dispositionTarget": "Sala de Observação / Pronto-Socorro",
+              "monitoringPlan": "Recalcular o escore de Wood-Downes a cada 30-60 minutos; se sem melhora após 3-4h na emergência, internar em enfermaria.",
+              "ventilatorySupport": "Oxigenoterapia sob cateter nasal ou máscara para manter SpO2 93-95% (em adultos) ou 94-98% (em crianças).",
+              "laboratoryPanel": "Oximetria contínua; RX de tórax apenas se suspeita de pneumotórax, pneumonia associada ou corpo estranho."
+            }
+          ]
+        },
+        {
+          "id": "tier_wd_sev",
+          "label": "Crise Grave / Insuficiência Respiratória Iminente (8 a 14 pontos)",
+          "severityLevel": "critical",
+          "minScore": 8,
+          "maxScore": 14,
+          "statisticalOutcome": "Crise grave ameaçadora à vida (>= 8 pontos). Altíssimo risco de fadiga muscular respiratória, hipercapnia progressiva e parada cardiorrespiratória hipóxica. Indicação imediata de Sulfato de Magnésio IV, CNAF/VNI ou Intubação em UTI.",
+          "colorHex": "#ef4444",
+          "pharmacologicalActions": [
+            {
+              "id": "rx_wd_sev_mg",
+              "drugName": "Sulfato de Magnésio Endovenoso (Broncodilatador de Resgate na Crise Grave)",
+              "dosage": "Adultos: 2 g IV correr em 20 min; Crianças: 25 a 50 mg/kg IV (máx 2 g) correr em 20 a 30 min",
+              "route": "Intravenosa em infusão de 20-30 min",
+              "frequency": "Dose única (ou seguida de infusão em UTI)",
+              "dilutionInstructions": "Diluir 2g (4 mL de MgSO4 50% ou 20 mL de MgSO4 10%) em 100 mL de SF 0,9% ou SG 5%; infundir em 20-30 minutos monitorando PA e reflexos.",
+              "renalAdjustment": "Cautela extrema e redução de 50% se insuficiência renal grave.",
+              "contraindications": "Bloqueio atrioventricular ou hipotensão grave."
+            },
+            {
+              "id": "rx_wd_sev_cort_saba",
+              "drugName": "Beta-2 Agonista + Ipratrópio Contínuos + Metilprednisolona IV + Quetamina (se IOT)",
+              "dosage": "Metilprednisolona 1-2 mg/kg IV (máx 60-125mg) 6/6h + Salbutamol contínuo; se Intubação Orotraqueal: usar Quetamina 1,5-2 mg/kg IV como indutor (efeito broncodilatador direto)",
+              "route": "Intravenosa / Inalatória",
+              "frequency": "Contínuo / 6/6h",
+              "dilutionInstructions": "Evitar morfina ou bloqueadores neuromusculares liberadores de histamina (como atracúrio) na crise asmática.",
+              "renalAdjustment": "Ajuste se DRC.",
+              "contraindications": "Hipertensão intracraniana não controlada."
+            }
+          ],
+          "nonPharmacologicalActions": [
+            {
+              "id": "nonrx_wd_sev_1",
+              "recommendationTitle": "Transferência para UTI, CNAF/VNI e Estratégia de Ventilação Mecânica Obstrutiva",
+              "dispositionTarget": "UTI / Sala Vermelha",
+              "monitoringPlan": "Monitorização contínua de ECG, capnografia (EtCO2) e linha arterial (avaliar pulso paradoxal > 15-20 mmHg).",
+              "interventionalProcedure": "Se submetido à Ventilação Mecânica Invasiva: usar tubo de maior calibre possível, FR baixa (10-14 irpm), relação I:E prolongada (1:4 a 1:5), fluxo inspiratório alto (60-80 L/min), VC 6-8 mL/kg e hipercapnia permissiva para evitar Auto-PEEP (aprisionamento dinâmico) e barotrauma/pneumotórax hipertensivo.",
+              "ventilatorySupport": "CNAF / VNI em tentativa curta sob vigilância médica direta; Intubação Orotraqueal imediata se sonolência, tórax silencioso, bradicardia ou acidose respiratória progressiva.",
+              "laboratoryPanel": "Gasometria arterial, lactato, potássio sérico (beta-2 em altas doses causa hipocalemia intracelular), magnésio e RX de tórax no leito."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

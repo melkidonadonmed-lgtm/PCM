@@ -7,6 +7,8 @@ import { PediatricCalculator } from './components/PediatricCalculator';
 import { PrescriptionBuilder } from './components/PrescriptionBuilder';
 import { ClinicalDocumentsHub, DocumentsSubTab } from './components/ClinicalDocumentsHub';
 import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
+import { HospitalWardModuleView } from './components/hospital/HospitalWardModuleView';
+import { ScoreboardModuleView } from './components/scores/ScoreboardModuleView';
 import { PuxarParaAtualizar } from './components/PuxarParaAtualizar';
 import { ActiveTab, PrescriptionItem, Patient } from './types';
 import { ClinicalKit } from './data/clinicalKits';
@@ -203,6 +205,35 @@ export default function App() {
 
   const [editorInitialSyncTrigger, setEditorInitialSyncTrigger] = useState(0);
   const [editorCustomDoc, setEditorCustomDoc] = useState<{ html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null>(null);
+  const [selectedScoreboardId, setSelectedScoreboardId] = useState<string | null>(null);
+
+  const handleSelectScoreFromPalette = React.useCallback((calculatorId: string) => {
+    setSelectedScoreboardId(calculatorId);
+    setActiveTab('scores');
+  }, [setActiveTab]);
+
+  const handleAddExamFromScoreboard = React.useCallback((examId: string) => {
+    setSelectedExams(prev => {
+      if (prev.some(ex => ex.id === examId)) return prev;
+      return [
+        ...prev,
+        {
+          id: examId,
+          category: 'Rastreamento Oncológico (INCA/SUS)',
+          name: examId === 'mamografia'
+            ? 'Mamografia Bilateral para Rastreamento (SIGTAP 02.04.03.018-8)'
+            : examId === 'usg-mamas'
+              ? 'Ultrassonografia de Mamas Bilateral (SIGTAP 02.05.02.009-7)'
+              : examId === 'papanicolaou'
+                ? 'Exame Citopatológico Cervicovaginal / Papanicolaou (SIGTAP 02.03.01.008-6)'
+                : 'Dosagem de PSA Total e Livre (SIGTAP 02.02.03.010-5)',
+          selected: true,
+          urgency: 'routine',
+        },
+      ];
+    });
+    setKitToast('Exame de rastreio adicionado à Solicitação de Exames.');
+  }, [setSelectedExams]);
 
   const handleSelectTab = React.useCallback((tab: ActiveTab) => {
     if (tab === 'patients') {
@@ -474,7 +505,33 @@ export default function App() {
                 onUpdatePatientWeight={handleUpdatePatientWeight}
                 onAddPrescriptionItem={handleAddPrescriptionItem}
                 onNavigateToPrescription={() => setActiveTab('prescription')}
+                onNavigateToScores={() => handleSelectTab('scores')}
                 onUsarMedicamento={handleUsarMedicamento}
+              />
+            )}
+
+            {activeTab === 'scores' && (
+              <ScoreboardModuleView
+                patient={patient}
+                initialCalculatorId={selectedScoreboardId}
+                onUpdatePatientWeight={handleUpdatePatientWeight}
+                onAddPrescriptionItem={(item) => {
+                  handleAddPrescriptionItem(item);
+                  setKitToast(`Item "${item.name}" adicionado à receita.`);
+                }}
+                onAddExamById={handleAddExamFromScoreboard}
+                onSendToA4Editor={(html, title) =>
+                  handleNavigateToEditorWithHtml(html, title || 'Escore Clínico', 'custom')
+                }
+              />
+            )}
+
+            {activeTab === 'hospital' && (
+              <HospitalWardModuleView
+                darkMode={darkMode}
+                doctor={doctor}
+                patient={patient}
+                onSendToA4Editor={(html, title) => handleNavigateToEditorWithHtml(html, title, 'custom')}
               />
             )}
 
@@ -566,6 +623,7 @@ export default function App() {
         isOpen={isCommandPaletteOpen}
         onClose={handleCloseCommandPalette}
         onSelectTab={handleSelectTab}
+        onSelectScore={handleSelectScoreFromPalette}
         onAplicarKit={handleAplicarKit}
         onUsarMedicamento={handleUsarMedicamento}
         onOpenPatientModal={handleOpenPatientModal}
