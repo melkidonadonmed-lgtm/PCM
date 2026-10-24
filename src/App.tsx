@@ -7,10 +7,18 @@ import { PediatricCalculator } from './components/PediatricCalculator';
 import { PrescriptionBuilder } from './components/PrescriptionBuilder';
 import { ClinicalDocumentsHub, DocumentsSubTab } from './components/ClinicalDocumentsHub';
 import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
-import { HospitalWardModuleView } from './components/hospital/HospitalWardModuleView';
+import { HospitalWardModuleView, type HospitalSubViewId } from './components/hospital/HospitalWardModuleView';
+import type { DashboardMetricSource } from './components/hospital/HospitalLabsAndAnalyticsPanel';
 import { ScoreboardModuleView } from './components/scores/ScoreboardModuleView';
 import { PuxarParaAtualizar } from './components/PuxarParaAtualizar';
 import { ActiveTab, PrescriptionItem, Patient } from './types';
+import type {
+  HospitalBedPatientRecord,
+  HospitalBedScoreEntry,
+} from './core/domain/clinicalEntities';
+import { clinicalRepository } from './core/storage/clinicalRepository';
+import { DEFAULT_HOSPITAL_BEDS_SEED } from './utils/hospital/hospitalMultimodalIngestor';
+import { sortScoreEntriesChronologically } from './utils/hospital/hospitalEvolutionFormatter';
 import { ClinicalKit } from './data/clinicalKits';
 import { montarItensDoKit } from './utils/montarItensDoKit';
 import { UnifiedMedication } from './data/medicationDatabase';
@@ -206,6 +214,124 @@ export default function App() {
   const [editorInitialSyncTrigger, setEditorInitialSyncTrigger] = useState(0);
   const [editorCustomDoc, setEditorCustomDoc] = useState<{ html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null>(null);
   const [selectedScoreboardId, setSelectedScoreboardId] = useState<string | null>(null);
+
+  // Estado compartilhado de Internação Hospitalar (MOD-03) <-> Scoreboard CDSS
+  const [hospitalBeds, setHospitalBeds] = useState<HospitalBedPatientRecord[]>(
+    DEFAULT_HOSPITAL_BEDS_SEED
+  );
+  const [activeHospitalBedId, setActiveHospitalBedId] = useState<string>(
+    DEFAULT_HOSPITAL_BEDS_SEED[0].id
+  );
+  const [hospitalSubView, setHospitalSubView] =
+    useState<HospitalSubViewId>('evolution_form');
+  const [hospitalDashboardMetricSource, setHospitalDashboardMetricSource] =
+    useState<DashboardMetricSource>('labs');
+  const [hospitalDashboardScoreAcronym, setHospitalDashboardScoreAcronym] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    if (clinicalRepository.listHospitalBeds) {
+      clinicalRepository.listHospitalBeds().then((stored) => {
+        if (!mounted) return;
+        if (stored && stored.length > 0) {
+          setHospitalBeds(stored);
+          setActiveHospitalBedId(stored[0].id);
+        } else if (clinicalRepository.saveHospitalBed) {
+          DEFAULT_HOSPITAL_BEDS_SEED.forEach((b) => {
+            clinicalRepository.saveHospitalBed?.(b);
+          });
+        }
+      });
+    }
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleUpdateHospitalBed = React.useCallback(
+    (updated: HospitalBedPatientRecord) => {
+      setHospitalBeds((prev) =>
+        prev.map((b) => (b.id === updated.id ? updated : b))
+      );
+      clinicalRepository.saveHospitalBed?.(updated);
+    },
+    []
+  );
+
+  const handleCreateHospitalBed = React.useCallback(
+    (created: HospitalBedPatientRecord) => {
+      setHospitalBeds((prev) => [...prev, created]);
+      setActiveHospitalBedId(created.id);
+      clinicalRepository.saveHospitalBed?.(created);
+    },
+    []
+  );
+
+  const handleRecordScoreToHospitalBed = React.useCallback(
+    (
+      bedId: string,
+      entry: HospitalBedScoreEntry,
+      options?: { appendConductToBed?: boolean }
+    ) => {
+      setHospitalBeds((prev) =>
+        prev.map((bed) => {
+          if (bed.id !== bedId) return bed;
+          const nextScoreEntries = sortScoreEntriesChronologically([
+            ...(bed.scoreEntries || []),
+            entry,
+          ]);
+          const nextConductList =
+            options?.appendConductToBed &&
+            entry.recommendedConducts &&
+            entry.recommendedConducts.length > 0
+              ? [
+                  ...bed.conductList,
+                  ...entry.recommendedConducts.filter(
+                    (c) => !bed.conductList.includes(c)
+                  ),
+                ]
+              : bed.conductList;
+
+          const updatedBed: HospitalBedPatientRecord = {
+            ...bed,
+            scoreEntries: nextScoreEntries,
+            conductList: nextConductList,
+            updatedAt: Date.now(),
+          };
+          clinicalRepository.saveHospitalBed?.(updatedBed);
+          return updatedBed;
+        })
+      );
+      const targetBed = hospitalBeds.find((b) => b.id === bedId);
+      setKitToast(
+        `Escore ${entry.acronym} (${entry.scoreFormatted} pts) registrado no Leito ${targetBed?.wardAndBed || bedId}.`
+      );
+    },
+    [hospitalBeds]
+  );
+
+  const handleNavigateToHospitalDashboardFromScore = React.useCallback(
+    (bedId: string, scoreAcronym: string) => {
+      setActiveHospitalBedId(bedId);
+      setHospitalSubView('analytics_dashboard');
+      setHospitalDashboardMetricSource('scores');
+      setHospitalDashboardScoreAcronym(scoreAcronym);
+      setActiveTab('hospital');
+    },
+    []
+  );
+
+  const handleOpenScoreboardForBed = React.useCallback(
+    (bed: HospitalBedPatientRecord, calculatorId?: string) => {
+      setActiveHospitalBedId(bed.id);
+      if (calculatorId) {
+        setSelectedScoreboardId(calculatorId);
+      }
+      setActiveTab('scores');
+    },
+    []
+  );
 
   const handleSelectScoreFromPalette = React.useCallback((calculatorId: string) => {
     setSelectedScoreboardId(calculatorId);
@@ -523,6 +649,13 @@ export default function App() {
                 onSendToA4Editor={(html, title) =>
                   handleNavigateToEditorWithHtml(html, title || 'Escore Clínico', 'custom')
                 }
+                hospitalBeds={hospitalBeds}
+                activeHospitalBedId={activeHospitalBedId}
+                onSelectHospitalBed={setActiveHospitalBedId}
+                onRecordScoreToBed={handleRecordScoreToHospitalBed}
+                onNavigateToHospitalDashboard={
+                  handleNavigateToHospitalDashboardFromScore
+                }
               />
             )}
 
@@ -532,6 +665,15 @@ export default function App() {
                 doctor={doctor}
                 patient={patient}
                 onSendToA4Editor={(html, title) => handleNavigateToEditorWithHtml(html, title, 'custom')}
+                beds={hospitalBeds}
+                activeBedId={activeHospitalBedId}
+                onSelectBedId={setActiveHospitalBedId}
+                onUpdateBed={handleUpdateHospitalBed}
+                onCreateBed={handleCreateHospitalBed}
+                initialSubView={hospitalSubView}
+                initialDashboardMetricSource={hospitalDashboardMetricSource}
+                initialDashboardScoreAcronym={hospitalDashboardScoreAcronym}
+                onOpenScoreboardForBed={handleOpenScoreboardForBed}
               />
             )}
 

@@ -162,6 +162,28 @@ export interface HospitalEvolutionSnapshot {
 }
 
 /**
+ * Registro longitudinal de Escore Clínico e Estratificação de Risco vinculado ao Leito (MOD-03 <-> Scoreboard CDSS).
+ */
+export interface HospitalBedScoreEntry {
+  id: string;
+  dateBr: string; // DD/MM/AAAA
+  dateIso: string; // YYYY-MM-DD para ordenação estritamente cronológica
+  recordedAtIso: string; // ISO timestamp para desempate intraday
+  calculatorId: string; // ex: "calc_qsofa", "calc_sofa", "calc_curb65"
+  acronym: string; // ex: "qSOFA", "SOFA", "CURB-65"
+  calculatorName: string; // ex: "Quick SOFA (Sepsis-3)"
+  scoreNumeric: number; // valor numérico p/ curva SVG e cálculo de Delta
+  scoreFormatted: string; // ex: "2" ou "3,5"
+  minPossibleScore: number;
+  maxPossibleScore: number;
+  severityLevel: 'low' | 'intermediate' | 'high' | 'critical';
+  riskLabel: string; // ex: "Alto Risco de Desfecho Desfavorável"
+  findingsSummary?: string;
+  recommendedConducts?: string[];
+  infusionSummary?: string;
+}
+
+/**
  * Mensagem do Assistente Virtual do Leito / Agente Science / Live API.
  */
 export interface HospitalBedChatMessage {
@@ -201,6 +223,7 @@ export interface HospitalBedPatientRecord {
   currentMedicationsAndDevices: MedicationOrDeviceEntry[]; // EM USO: medicações e dispositivos, tempo e data
   labPanels: HospitalLabPanelEntry[]; // EXAMES LAB (cronológico)
   imagingExams: HospitalImagingExamEntry[]; // EXAMES DE IMAGEM (cronológico)
+  scoreEntries?: HospitalBedScoreEntry[]; // ESCORES CLÍNICOS (cronológico)
   physicalExam: HospitalPhysicalExamSection; // EXAME FÍSICO (GERAL, SSVV, AR, AC, MEMBROS E ANEXOS + Categorias Livres)
   evolution24h: string; // EVOLUÇÃO 24H: SSVV 24h, comportamento, aspecto geral + visita + enfermaria + informações
   vitalSignsLatest?: VitalSignsRecord;

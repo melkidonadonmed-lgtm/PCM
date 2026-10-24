@@ -1,5 +1,6 @@
 import type {
   HospitalBedPatientRecord,
+  HospitalBedScoreEntry,
   HospitalImagingExamEntry,
   HospitalLabPanelEntry,
   HospitalSpecialtyTemplate,
@@ -85,6 +86,107 @@ export function sortImagingChronologically(exams: HospitalImagingExamEntry[]): H
     const isoB = b.dateIso || parseDateBrOrIsoToIso(b.dateBr) || '9999-99-99';
     return isoA.localeCompare(isoB);
   });
+}
+
+export function sortScoreEntriesChronologically(
+  entries: HospitalBedScoreEntry[] = []
+): HospitalBedScoreEntry[] {
+  return [...entries].sort((a, b) => {
+    const isoA = a.dateIso || parseDateBrOrIsoToIso(a.dateBr) || '9999-99-99';
+    const isoB = b.dateIso || parseDateBrOrIsoToIso(b.dateBr) || '9999-99-99';
+    const cmp = isoA.localeCompare(isoB);
+    if (cmp !== 0) return cmp;
+    return (a.recordedAtIso || '').localeCompare(b.recordedAtIso || '');
+  });
+}
+
+export function formatScoreEntryCompactLine(entry: HospitalBedScoreEntry): string {
+  const formattedScore = String(entry.scoreFormatted ?? entry.scoreNumeric).replace('.', ',');
+  const rangeText = `${entry.minPossibleScore}..${entry.maxPossibleScore}`;
+  return `${entry.dateBr || 's/data'}: ${entry.acronym} ${formattedScore} pts [Escala ${rangeText}] — ${entry.riskLabel}`;
+}
+
+export interface LongitudinalScoreDelta {
+  calculatorId: string;
+  acronym: string;
+  calculatorName: string;
+  minPossibleScore: number;
+  maxPossibleScore: number;
+  previousDateBr: string;
+  latestDateBr: string;
+  previousValue: number | null;
+  latestValue: number;
+  latestScoreFormatted: string;
+  deltaNumeric: number | null;
+  direction: 'up' | 'down' | 'stable';
+  latestSeverityLevel: 'low' | 'intermediate' | 'high' | 'critical';
+  latestRiskLabel: string;
+  clinicalTrendStatus: 'favorable' | 'attention' | 'neutral';
+  pointsCount: number;
+}
+
+export function computeLongitudinalScoreDeltas(
+  entries: HospitalBedScoreEntry[] = []
+): LongitudinalScoreDelta[] {
+  const sorted = sortScoreEntriesChronologically(entries);
+  if (sorted.length === 0) return [];
+
+  const grouped = new Map<string, HospitalBedScoreEntry[]>();
+  for (const item of sorted) {
+    const key = item.acronym.toUpperCase();
+    const list = grouped.get(key) || [];
+    list.push(item);
+    grouped.set(key, list);
+  }
+
+  const results: LongitudinalScoreDelta[] = [];
+  for (const [, list] of grouped.entries()) {
+    const latest = list[list.length - 1];
+    const prev = list.length >= 2 ? list[list.length - 2] : null;
+    const deltaNumeric = prev ? Number((latest.scoreNumeric - prev.scoreNumeric).toFixed(2)) : null;
+
+    let direction: 'up' | 'down' | 'stable' = 'stable';
+    if (deltaNumeric !== null && Math.abs(deltaNumeric) > 0) {
+      direction = deltaNumeric > 0 ? 'up' : 'down';
+    }
+
+    // Na maioria dos escores (SOFA, qSOFA, CURB-65, Pádua), queda é resposta favorável.
+    // Em escalas de coma (Glasgow / Glasgow-P), elevação é resposta favorável.
+    const isHigherBetter = /glasgow/i.test(latest.acronym) || /glasgow/i.test(latest.calculatorId);
+    let clinicalTrendStatus: 'favorable' | 'attention' | 'neutral' = 'neutral';
+    if (direction !== 'stable') {
+      if (isHigherBetter) {
+        clinicalTrendStatus = direction === 'up' ? 'favorable' : 'attention';
+      } else {
+        clinicalTrendStatus = direction === 'down' ? 'favorable' : 'attention';
+      }
+    } else if (latest.severityLevel === 'high' || latest.severityLevel === 'critical') {
+      clinicalTrendStatus = 'attention';
+    } else if (latest.severityLevel === 'low' && list.length >= 2) {
+      clinicalTrendStatus = 'favorable';
+    }
+
+    results.push({
+      calculatorId: latest.calculatorId,
+      acronym: latest.acronym,
+      calculatorName: latest.calculatorName,
+      minPossibleScore: latest.minPossibleScore,
+      maxPossibleScore: latest.maxPossibleScore,
+      previousDateBr: prev ? prev.dateBr : '-',
+      latestDateBr: latest.dateBr,
+      previousValue: prev ? prev.scoreNumeric : null,
+      latestValue: latest.scoreNumeric,
+      latestScoreFormatted: String(latest.scoreFormatted || latest.scoreNumeric).replace('.', ','),
+      deltaNumeric,
+      direction,
+      latestSeverityLevel: latest.severityLevel,
+      latestRiskLabel: latest.riskLabel,
+      clinicalTrendStatus,
+      pointsCount: list.length,
+    });
+  }
+
+  return results;
 }
 
 export function formatLabPanelCompactLine(panel: HospitalLabPanelEntry): string {
@@ -179,7 +281,7 @@ export function computeLongitudinalLabDeltas(panels: HospitalLabPanelEntry[]): L
 
 export interface ConductEvolutionCorrelationItem {
   id: string;
-  domain: 'infeccioso' | 'renal_hidrico' | 'hematologico' | 'eletrolitico' | 'geral';
+  domain: 'infeccioso' | 'renal_hidrico' | 'hematologico' | 'eletrolitico' | 'escores_clinicos' | 'geral';
   activeConductText: string;
   evolutionResponseText: string;
   efficacyStatus: 'favorable' | 'attention' | 'neutral';
@@ -187,6 +289,7 @@ export interface ConductEvolutionCorrelationItem {
 
 export function analyzeConductVsEvolution(record: HospitalBedPatientRecord): ConductEvolutionCorrelationItem[] {
   const deltas = computeLongitudinalLabDeltas(record.labPanels);
+  const scoreDeltas = computeLongitudinalScoreDeltas(record.scoreEntries || []);
   const insights: ConductEvolutionCorrelationItem[] = [];
   const activeMedsText = record.currentMedicationsAndDevices.map((m) => `${m.nameAndDetails} (${m.durationAndDates})`).join('; ');
   const conductsJoined = [...record.conductList, activeMedsText].join(' ').toLowerCase();
@@ -217,6 +320,23 @@ export function analyzeConductVsEvolution(record: HospitalBedPatientRecord): Con
         : conductsJoined.includes('furosemida') ? 'Terapia diurética / controle de balanço' : 'Monitorização renal e hidroeletrolítica',
       evolutionResponseText: `${crDelta ? `CR ${crDelta.previousValue ?? '-'} -> ${crDelta.latestValue} mg/dL` : ''} ${kDelta ? `| K+ ${kDelta.previousValue ?? '-'} -> ${kDelta.latestValue} mEq/L` : ''}`.trim(),
       efficacyStatus: worseningRenal ? 'attention' : (crDelta?.direction === 'down' ? 'favorable' : 'neutral'),
+    });
+  }
+
+  if (scoreDeltas.length > 0) {
+    const hasAttention = scoreDeltas.some((s) => s.clinicalTrendStatus === 'attention');
+    const hasFavorable = scoreDeltas.some((s) => s.clinicalTrendStatus === 'favorable');
+    const scoreSummaryParts = scoreDeltas.map((s) =>
+      s.previousValue !== null
+        ? `${s.acronym} ${String(s.previousValue).replace('.', ',')} -> ${s.latestScoreFormatted} pts (${s.latestRiskLabel})`
+        : `${s.acronym} ${s.latestScoreFormatted} pts (${s.latestRiskLabel})`
+    );
+    insights.push({
+      id: 'corr-scores',
+      domain: 'escores_clinicos',
+      activeConductText: record.conductList.join('; ') || activeMedsText || 'Conduta estratificada guiada por escores (Scoreboard CDSS)',
+      evolutionResponseText: scoreSummaryParts.join(' | '),
+      efficacyStatus: hasAttention ? 'attention' : hasFavorable ? 'favorable' : 'neutral',
     });
   }
 
@@ -260,6 +380,9 @@ export function formatStandardHospitalEvolutionText(record: HospitalBedPatientRe
   const imgLines = sortImagingChronologically(record.imagingExams).map(
     (img) => `${img.dateBr}: ${img.examModalityAndRegion} — ${img.findingsSummary}`
   );
+  const scoreLines = sortScoreEntriesChronologically(record.scoreEntries || []).map(
+    formatScoreEntryCompactLine
+  );
   const customExamLines = (record.physicalExam.customSections || [])
     .filter((s) => s.title.trim() || s.content.trim())
     .map((s) => `${s.title.toUpperCase()}: ${s.content}`);
@@ -288,6 +411,7 @@ export function formatStandardHospitalEvolutionText(record: HospitalBedPatientRe
     ...(labLines.length > 0 ? labLines : ['-']),
     `EXAMES DE IMAGEM:`,
     ...(imgLines.length > 0 ? imgLines : ['-']),
+    ...(scoreLines.length > 0 ? [`ESCORES CLÍNICOS:`, ...scoreLines] : []),
     `EXAME FÍSICO:`,
     `GERAL: ${record.physicalExam.geral}`,
     `SSVV: ${record.physicalExam.ssvv}`,
@@ -315,7 +439,7 @@ export function buildHospitalEvolutionHtmlForA4(record: HospitalBedPatientRecord
     .split('\n')
     .map((line) => {
       const escaped = escapeHtml(line);
-      if (/^(EF\/LT|ID|DN|CNS|DIH|QP|HD|HDA|ALERGIAS|SOROLOGIAS|HPP|HF\/SOCIAL|HISTÓRIA OBSTÉTRICA|FEZ USO|EM USO|EXAMES LAB|EXAMES DE IMAGEM|EXAME FÍSICO|EVOLUÇÃO 24H|DIETA|HIDRATAÇÃO|Pareceres|PENDÊNCIAS|CD)\b/.test(line)) {
+      if (/^(EF\/LT|ID|DN|CNS|DIH|QP|HD|HDA|ALERGIAS|SOROLOGIAS|HPP|HF\/SOCIAL|HISTÓRIA OBSTÉTRICA|FEZ USO|EM USO|EXAMES LAB|EXAMES DE IMAGEM|ESCORES CLÍNICOS|EXAME FÍSICO|EVOLUÇÃO 24H|DIETA|HIDRATAÇÃO|Pareceres|PENDÊNCIAS|CD)\b/.test(line)) {
         const idx = escaped.indexOf(':');
         if (idx !== -1) {
           return `<p><strong>${escaped.slice(0, idx + 1)}</strong>${escaped.slice(idx + 1)}</p>`;

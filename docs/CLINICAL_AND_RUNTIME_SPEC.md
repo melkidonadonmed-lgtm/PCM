@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Árvore Completa de Código (`src/` — 134 Arquivos)
+## 1. Árvore Completa de Código (`src/` — 170 Arquivos)
 
 ```text
 index.html                     # Entry HTML com script inline de tema e fontes
@@ -67,6 +67,19 @@ src/
       EditorSingleViaCanvas.tsx # Folha A4 retrato (1 via) com cabeçalho editável, corpo ProseMirror e rodapé de assinatura
       EditorTwoViasCanvas.tsx  # Folha A4 paisagem (2 vias: Controle Especial Portaria 344/98 e Antimicrobiano RDC 471/2021)
       EditorModelsAndStylesDrawer.tsx # Gaveta lateral de modelos salvos, modelos clínicos predefinidos e estilos visuais
+    hospital/
+      HospitalWardModuleView.tsx # Bancada principal do Módulo Hospitalar (MOD-03, Alt+7) e seletor de leitos (EF/LT)
+      HospitalEvolutionFormPanel.tsx # Formulário padronizado de evolução/admissão hospitalar e exportação A4
+      HospitalLabsAndAnalyticsPanel.tsx # Monitoramento longitudinal de exames, escores CDSS e Dashboard Conduta x Evolução
+      HospitalBedChatAndSciencePanel.tsx # Copiloto do leito (Live API) e Agente Science de protocolos e evidências
+      HospitalMultimodalImportModal.tsx # Modal de ingestão multimodal (PDF, DOC, imagem, voz e texto) sem alucinação
+    scores/
+      ScoreboardModuleView.tsx # Bancada principal do Scoreboard CDSS (Alt+8, 114 calculadoras em 9 blocos) e ponte com leitos
+      ScoreCalculatorDetailView.tsx # Calculadora interativa com interpretação, condutas, BIC, Radar e envio p/ Receita/Leito/A4
+      EparadaAndScreeningPanel.tsx # Painel EPARADA (PCR ACLS/PALS + 5H/5T) e Rastreio Oncológico Rápido INCA/MS
+      ScoreBicInfusionCard.tsx # Calculadora de Bomba de Infusão Contínua (mcg/kg/min <-> mL/h)
+      ScoreParameterGroupInput.tsx # Controles segmentados e numéricos dos parâmetros de escores
+      ScorePhysiologicalRadar.tsx # Radar fisiológico SVG multissistêmico
     PrintPreview.tsx           # Tela de emissão: folha A4 + ações (baixar PDF, imprimir, WhatsApp, copiar)
     documento/
       FolhaA4.tsx              # Papel A4 em tamanho real (794×1123 px), reduzido por zoom para caber; impressão fiel
@@ -101,6 +114,11 @@ src/
       antimicrobialsAndAntiparasitics.ts # Antibióticos, antifúngicos, antivirais e antiparasitários
       cardioAndMetabolicMeds.ts # Anti-hipertensivos, antidiabéticos, hipolipemiantes, tireoide e vitaminas
       respiratoryGastroAndCnsMeds.ts # Respiratórios, anti-histamínicos, gastrointestinais, psicotrópicos e tópicos
+    scores/
+      manifest.json            # Manifesto indexado das 114 calculadoras clínicas CDSS
+      scoreboardCatalog.ts     # Catálogo, busca fonética/sinônimos e metadados dos 9 blocos de especialidades
+      blocks/
+        block_01.json..block_09.json # 9 blocos monográficos (Emergência/UTI, Cardio, Neuro, Pneumo, Nefro, Gastro, Trauma, Infecto, Ped/GO/Tox)
     exemplos.ts                # Dados fictícios de exemplo (Melki Donadon / Seu Melki) para prévia e placeholders
     presetAssets.ts            # Logos e marcas d'água predefinidos (apontam para arquivos em public/; nunca embutir base64 aqui)
     presetClinicalTemplates.ts # Modelos estruturados de documentos e atestados clínicos
@@ -116,7 +134,7 @@ src/
     usePwaInstall.ts           # Detecção de suporte e acionamento de instalação como Progressive Web App
     useWorkContext.ts          # Controle de posto de trabalho ativo e alternância de contexto
   services/
-    db.ts                      # Banco IndexedDB local via Dexie.js (esquema v2: workContexts e savedDocuments)
+    db.ts                      # Banco IndexedDB local via Dexie.js (esquema v3: workContexts, savedDocuments e hospitalBeds)
     storageService.ts          # Camada de persistência segura com fallback tipado para localStorage
     backupService.ts           # Geração e importação de backups integrais em formato .pcm.json
     cloud/
@@ -124,6 +142,19 @@ src/
       cloudSyncManager.ts      # Orquestrador de sincronização Zero-Knowledge lazy
       firebaseClient.ts        # Inicialização dos serviços Firebase/Firestore
   utils/
+    hospital/
+      hospitalEvolutionFormatter.ts # Formatador do Modelo Padronizado de Evolução, deltas de escores e Conduta x Evolução
+      hospitalMultimodalIngestor.ts # Ingestor multimodal determinístico sob Diretriz de Rigor Terapêutico (zero alucinação)
+      hospitalAiAssistantService.ts # Motor contextual do Copiloto do Leito e Agente Science
+    scores/
+      calculationEngine.ts     # Motor principal de avaliação numérica e estratificação das 114 calculadoras
+      clinicalSpecialtyScores.ts # Fórmulas clínicas especializadas por domínio
+      neuroSpineEngine.ts      # Motor de neuro-intensivismo, Glasgow-P e escalas de coluna (TLICS, SLIC, ASIA, ODI)
+      eparadaAndScreeningEngine.ts # Motor de PCR (ACLS/PALS por peso) e Rastreio Oncológico INCA/MS (BI-RADS, Colo, PSA)
+      infusionEngine.ts        # Motor de diluição e vazão em Bomba de Infusão Contínua (BIC)
+      radarEngine.ts           # Normalizador de eixos fisiológicos para o Radar SVG
+      pepExportEngine.ts       # Exportador estruturado SOAP/SBAR para prontuário e Editor A4
+      scoreTypes.ts            # Contratos tipados das calculadoras, parâmetros e interpretações
     doseCalculator.ts          # Motor de cálculo pediátrico, volumes, gotas e horários de tomada
     fuzzySearch.ts             # Algoritmo de busca textual fonética/aproximada com priorização de monofármacos
     medicoConfigurado.ts       # Validador de obrigatoriedade de identificação médica (nome e CRM)
@@ -139,14 +170,14 @@ src/
     parsePrescriptionHtml.ts   # Converte o HTML do Editor A4 de volta em itens tipados da receita
     sanitizeHtml.ts            # Sanitizador anti-XSS (DOMPurify + escapeHtml preservando operadores < e >)
     compartilhamentoTexto.ts   # Formatadores puros de texto para cópia e WhatsApp por regime sanitário
-  __tests__/                   # 23 suítes Vitest (215+ testes Nível 4) cobrindo cálculo pediátrico, Portaria 344/98, RDC 471/2021, CFM CID-10, APAC/LME e UI/A11y
+  __tests__/                   # 26 suítes Vitest (238 testes Nível 4) cobrindo cálculo pediátrico, Portaria 344/98, RDC 471/2021, CFM CID-10, APAC/LME, Módulo Hospitalar (MOD-03), Scoreboard CDSS (114 escores) e UI/A11y
 ```
 
 ---
 
 ## 2. Estado em Tempo de Execução e Chaves `localStorage`
 
-- **SPA sem roteador (`activeTab: ActiveTab` em `App.tsx`):** Valores `'prescription'`, `'pediatric_calc'`, `'documents'`, `'exams'`, `'certificate'`, `'referral'`, `'protocols'`, `'editor'`, `'print_preview'`, `'patients'`.
+- **SPA sem roteador (`activeTab: ActiveTab` em `App.tsx`):** Valores `'prescription'`, `'pediatric_calc'`, `'documents'`, `'exams'`, `'certificate'`, `'referral'`, `'sus'`, `'protocols'`, `'scores'`, `'editor'`, `'print_preview'`, `'patients'`, `'hospital'`.
   - `'documents'`, `'certificate'`, `'referral'` e `'exams'` abrem a Central de Documentos (`ClinicalDocumentsHub.tsx`) na aba correspondente; documentos SUS são a 4ª aba.
   - `'patients'` apenas abre o `PatientModal`.
 - **11 Chaves Oficiais de `localStorage` (`storageService`):**

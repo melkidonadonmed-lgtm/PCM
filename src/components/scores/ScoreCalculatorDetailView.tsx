@@ -2,6 +2,10 @@ import React, { useMemo, useState } from 'react';
 import { Icon } from '../Icon';
 import type { PrescriptionItem } from '../../types';
 import type {
+  HospitalBedPatientRecord,
+  HospitalBedScoreEntry,
+} from '../../core/domain/clinicalEntities';
+import type {
   Calculator,
   RiskSeverityLevel,
   ScoreInputRecord,
@@ -13,6 +17,7 @@ import {
   convertPharmacologicalActionToPrescriptionItem,
   generatePepNote,
   generateSbarNote,
+  summarizePositiveFindings,
 } from '../../utils/scores/pepExportEngine';
 import { ScoreParameterGroupInput } from './ScoreParameterGroupInput';
 import { ScorePhysiologicalRadar } from './ScorePhysiologicalRadar';
@@ -29,6 +34,15 @@ interface ScoreCalculatorDetailViewProps {
   onAddPrescriptionItem?: (item: PrescriptionItem) => void;
   onSendToA4Editor?: (html: string, title?: string) => void;
   onOpenScoreBySlug?: (slugOrId: string) => void;
+  hospitalBeds?: HospitalBedPatientRecord[];
+  activeHospitalBedId?: string;
+  onSelectHospitalBed?: (bedId: string) => void;
+  onRecordScoreToBed?: (
+    bedId: string,
+    entry: HospitalBedScoreEntry,
+    options?: { appendConductToBed?: boolean }
+  ) => void;
+  onNavigateToHospitalDashboard?: (bedId: string, scoreAcronym: string) => void;
 }
 
 const SEVERITY_BADGE_CLASSES: Record<RiskSeverityLevel, string> = {
@@ -53,6 +67,11 @@ export const ScoreCalculatorDetailView: React.FC<
   onAddPrescriptionItem,
   onSendToA4Editor,
   onOpenScoreBySlug,
+  hospitalBeds = [],
+  activeHospitalBedId,
+  onSelectHospitalBed,
+  onRecordScoreToBed,
+  onNavigateToHospitalDashboard,
 }) => {
   const [inputs, setInputs] = useState<ScoreInputRecord>(() => {
     const initial: ScoreInputRecord = {};
@@ -69,11 +88,18 @@ export const ScoreCalculatorDetailView: React.FC<
   });
 
   const [openBicDrugId, setOpenBicDrugId] = useState<string | null>(null);
-  const [copyFeedback, setCopyFeedback] = useState<'PEP' | 'SBAR' | 'A4' | null>(
-    null
-  );
+  const [copyFeedback, setCopyFeedback] = useState<
+    'PEP' | 'SBAR' | 'A4' | 'BED_RECORDED' | null
+  >(null);
+  const [appendConductToBed, setAppendConductToBed] = useState<boolean>(true);
   const [prescribedIds, setPrescribedIds] = useState<Record<string, boolean>>(
     {}
+  );
+
+  const selectedHospitalBed = useMemo(
+    () =>
+      hospitalBeds.find((b) => b.id === activeHospitalBedId) ?? hospitalBeds[0],
+    [hospitalBeds, activeHospitalBedId]
   );
 
   const result = useMemo(
@@ -151,6 +177,56 @@ export const ScoreCalculatorDetailView: React.FC<
     onSendToA4Editor(html, `Escore ${calculator.acronym}`);
     setCopyFeedback('A4');
     setTimeout(() => setCopyFeedback(null), 2200);
+  };
+
+  const handleRecordScoreInHospitalBed = () => {
+    if (!onRecordScoreToBed || !selectedHospitalBed) return;
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const sec = String(now.getSeconds()).padStart(2, '0');
+
+    const dateIso = `${yyyy}-${mm}-${dd}`;
+    const dateBr = `${dd}/${mm}/${yyyy}`;
+    const recordedAtIso = `${dateIso}T${hh}:${min}:${sec}`;
+
+    const findings = summarizePositiveFindings(calculator, inputs);
+    const recommendedConducts: string[] = [
+      ...activeTier.nonPharmacologicalActions.map(
+        (a) => `[${calculator.acronym} -> ${a.dispositionTarget}] ${a.recommendationTitle}: ${a.monitoringPlan}`
+      ),
+      ...activeTier.pharmacologicalActions.map(
+        (rx) => `[${calculator.acronym}] ${rx.drugName} ${rx.dosage} (${rx.route}, ${rx.frequency})`
+      ),
+    ];
+
+    const scoreNumeric = Number(result.score ?? result.rawScore ?? 0);
+    const entry: HospitalBedScoreEntry = {
+      id: `score-${selectedHospitalBed.id}-${calculator.slug}-${Date.now()}`,
+      dateBr,
+      dateIso,
+      recordedAtIso,
+      calculatorId: calculator.id,
+      acronym: calculator.acronym,
+      calculatorName: calculator.name,
+      scoreNumeric: Number.isFinite(scoreNumeric) ? scoreNumeric : 0,
+      scoreFormatted: result.scoreFormatted,
+      minPossibleScore: calculator.minPossibleScore,
+      maxPossibleScore: calculator.maxPossibleScore,
+      severityLevel: activeTier.severityLevel,
+      riskLabel: activeTier.label,
+      findingsSummary: findings.slice(0, 4).join(' | '),
+      recommendedConducts,
+    };
+
+    onRecordScoreToBed(selectedHospitalBed.id, entry, {
+      appendConductToBed,
+    });
+    setCopyFeedback('BED_RECORDED');
+    setTimeout(() => setCopyFeedback(null), 2800);
   };
 
   const handlePrescribeDrug = (
@@ -613,6 +689,101 @@ export const ScoreCalculatorDetailView: React.FC<
                     ? 'Enviado para o Editor A4!'
                     : 'Enviar Relatório Estruturado para o Editor A4'}
                 </button>
+              ) : null}
+
+              {/* Ponte Direta: Registrar Escore no Módulo de Internação (MOD-03) e Dashboard */}
+              {onRecordScoreToBed && selectedHospitalBed ? (
+                <div className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-3 space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                      <Icon name="local_hospital" size={14} />
+                      Integração Internação & Dashboard (MOD-03)
+                    </span>
+                    <span className="rounded bg-sky-500/15 px-1.5 py-0.5 font-mono text-[10px] font-bold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                      EF/LT {selectedHospitalBed.wardAndBed}
+                    </span>
+                  </div>
+
+                  {hospitalBeds.length > 1 && onSelectHospitalBed ? (
+                    <div>
+                      <label
+                        htmlFor="score-hospital-bed-select"
+                        className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1"
+                      >
+                        Leito Hospitalar Alvo (MOD-03)
+                      </label>
+                      <select
+                        id="score-hospital-bed-select"
+                        value={selectedHospitalBed.id}
+                        onChange={(e) => {
+                          onSelectHospitalBed(e.target.value);
+                          const chosen = hospitalBeds.find(
+                            (b) => b.id === e.target.value
+                          );
+                          if (chosen) {
+                            onBedIdentifierChange(chosen.wardAndBed);
+                          }
+                        }}
+                        className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-900 dark:text-slate-100 clinical-tabular-nums"
+                      >
+                        {hospitalBeds.map((b) => (
+                          <option key={b.id} value={b.id}>
+                            EF/LT {b.wardAndBed} —{' '}
+                            {b.patientNameOrInitials || 'Leito sem ID'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : null}
+
+                  <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={appendConductToBed}
+                      onChange={(e) => setAppendConductToBed(e.target.checked)}
+                      className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                    />
+                    <span>
+                      Sincronizar conduta sugerida na lista <strong>CD</strong> do leito
+                    </span>
+                  </label>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <button
+                      type="button"
+                      onClick={handleRecordScoreInHospitalBed}
+                      className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-sky-700 cursor-pointer"
+                    >
+                      <Icon
+                        name={
+                          copyFeedback === 'BED_RECORDED' ? 'check' : 'add_chart'
+                        }
+                        size={15}
+                      />
+                      <span>
+                        {copyFeedback === 'BED_RECORDED'
+                          ? `Registrado no Leito ${selectedHospitalBed.wardAndBed}!`
+                          : `Registrar no Leito ${selectedHospitalBed.wardAndBed} (Dashboard)`}
+                      </span>
+                    </button>
+
+                    {onNavigateToHospitalDashboard ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onNavigateToHospitalDashboard(
+                            selectedHospitalBed.id,
+                            calculator.acronym
+                          )
+                        }
+                        className="flex items-center justify-center gap-1 rounded-lg border border-sky-500/40 bg-white dark:bg-slate-900 px-2.5 py-2 text-xs font-bold text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-slate-800 cursor-pointer"
+                      >
+                        <Icon name="monitor_heart" size={14} />
+                        <span>Ver no Dashboard</span>
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
               ) : null}
 
               <div className="border-t border-slate-200 dark:border-slate-700 pt-2 text-[10px] text-slate-500 dark:text-slate-400">

@@ -23,12 +23,13 @@ npm run build       # Build de produção em dist/
 
 - `src/App.tsx` e `src/types.ts` — Estado centralizado por abas (`activeTab`, sem `react-router` nem Redux/Zustand).
 - `src/core/` — Fundação multi-módulo (`domain/clinicalEntities.ts` e `storage/clinicalRepository.ts`) orquestrando o Módulo de Prescrição (`MOD-01`), Evolução/PEP (`MOD-02`) e o Módulo Hospitalar e Gestão de Pacientes (`MOD-03`, `Dexie v3`).
-- `src/components/hospital/` e `src/utils/hospital/` — Módulo Hospitalar (`MOD-03`, atalho `Alt+7`): gestão de leitos (`EF/LT`), admissão manual e multimodal via IA sob Diretriz de Rigor Terapêutico (zero alucinação), formulário de evolução padronizado (categorias fixas + livres), monitoramento longitudinal de exames (`tabular-nums`), cruzamento Conduta × Evolução, Chat Live API e Agente Science.
+- `src/components/hospital/` e `src/utils/hospital/` — Módulo Hospitalar (`MOD-03`, atalho `Alt+7`): gestão de leitos (`EF/LT`), admissão manual e multimodal via IA sob Diretriz de Rigor Terapêutico (zero alucinação), formulário de evolução padronizado (categorias fixas + livres), monitoramento longitudinal de exames e escores CDSS (`tabular-nums`), cruzamento Conduta × Evolução (6 eixos incluindo `escores_clinicos`), Chat Live API e Agente Science.
+- `src/components/scores/`, `src/utils/scores/` e `src/data/scores/` — Scoreboard CDSS & Ferramentas de Apoio Clínico (atalho `Alt+8`): 114 calculadoras clínicas em 9 blocos de especialidade, painel `EPARADA` (PCR ACLS/PALS + checklist 5H/5T), Rastreio Oncológico INCA/MS (Mama, Colo, Próstata), Bomba de Infusão Contínua (`BIC`), Radar Fisiológico, exportação SOAP/SBAR para A4 e ponte bidirecional com os leitos hospitalares (`HospitalBedScoreEntry`).
 - `src/components/documento/` — Motor de folha única A4 (`FolhaA4.tsx`, `DocumentoClinico.tsx`, `ReceitaDuasVias.tsx`, `FormularioOficialSus.tsx`).
 - `src/components/sus/` — Guias regulatórias do SUS e grade vetorial interativa 12 colunas (`SusInteractiveVectorSheet.tsx`, `SusCommonIdentityFields.tsx`, `SusRegulatorySpecificFields.tsx`).
 - `src/utils/` — Motores clínicos determinísticos (`doseCalculator.ts`, `isSpecialControlOrAntibiotic.ts`, `notificacaoDeReceita.ts`, `formularioOficial.ts`, `folhaA4.ts`).
-- `src/data/` — Catálogos clínicos (`pediatricMeds.ts`, `medicationDatabase.ts`, `clinicalKits.ts`, `formulariosOficiaisSus.ts`, `susDocumentsCatalog.ts`).
-- **Especificação Completa de Runtime, Árvore de 134 Arquivos, 11 Chaves `localStorage` e Regras SUS/CFM/Anvisa:** Leia [`docs/CLINICAL_AND_RUNTIME_SPEC.md`](docs/CLINICAL_AND_RUNTIME_SPEC.md).
+- `src/data/` — Catálogos clínicos (`pediatricMeds.ts`, `medicationDatabase.ts`, `clinicalKits.ts`, `formulariosOficiaisSus.ts`, `susDocumentsCatalog.ts`, `scores/scoreboardCatalog.ts`).
+- **Especificação Completa de Runtime, Árvore de 170 Arquivos, 11 Chaves `localStorage` e Regras SUS/CFM/Anvisa:** Leia [`docs/CLINICAL_AND_RUNTIME_SPEC.md`](docs/CLINICAL_AND_RUNTIME_SPEC.md).
 - **Skills e Agente Revisor Local:** Para UI/impressão/PDF, consulte `.github/skills/ui-pdf-validation`. Para regras clínicas/doses, consulte `.github/skills/clinical-change-safety` e o agente `.github/agents/prescmed-clinical-reviewer`.
 
 ---

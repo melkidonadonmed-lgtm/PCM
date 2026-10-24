@@ -12,7 +12,7 @@ import {
 } from '../../utils/hospital/hospitalMultimodalIngestor';
 import { calculateHospitalStayDays } from '../../utils/hospital/hospitalEvolutionFormatter';
 import { HospitalEvolutionFormPanel } from './HospitalEvolutionFormPanel';
-import { HospitalLabsAndAnalyticsPanel } from './HospitalLabsAndAnalyticsPanel';
+import { HospitalLabsAndAnalyticsPanel, type DashboardMetricSource } from './HospitalLabsAndAnalyticsPanel';
 import { HospitalBedChatAndSciencePanel } from './HospitalBedChatAndSciencePanel';
 import { HospitalMultimodalImportModal } from './HospitalMultimodalImportModal';
 
@@ -27,26 +27,54 @@ export interface HospitalWardModuleViewProps {
   doctor: DoctorProfile;
   patient: Patient;
   onSendToA4Editor: (html: string, title: string) => void;
+  beds?: HospitalBedPatientRecord[];
+  activeBedId?: string;
+  onSelectBedId?: (bedId: string) => void;
+  onUpdateBed?: (updated: HospitalBedPatientRecord) => void;
+  onCreateBed?: (created: HospitalBedPatientRecord) => void;
+  initialSubView?: HospitalSubViewId;
+  initialDashboardMetricSource?: DashboardMetricSource;
+  initialDashboardScoreAcronym?: string | null;
+  onOpenScoreboardForBed?: (bed: HospitalBedPatientRecord, calculatorId?: string) => void;
 }
 
 export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
   doctor,
   onSendToA4Editor,
+  beds: externalBeds,
+  activeBedId: externalActiveBedId,
+  onSelectBedId,
+  onUpdateBed,
+  onCreateBed,
+  initialSubView = 'evolution_form',
+  initialDashboardMetricSource = 'labs',
+  initialDashboardScoreAcronym = null,
+  onOpenScoreboardForBed,
 }) => {
-  const [beds, setBeds] = useState<HospitalBedPatientRecord[]>(DEFAULT_HOSPITAL_BEDS_SEED);
-  const [activeBedId, setActiveBedId] = useState<string>(DEFAULT_HOSPITAL_BEDS_SEED[0].id);
-  const [activeSubView, setActiveSubView] = useState<HospitalSubViewId>('evolution_form');
+  const [internalBeds, setInternalBeds] = useState<HospitalBedPatientRecord[]>(DEFAULT_HOSPITAL_BEDS_SEED);
+  const [internalActiveBedId, setInternalActiveBedId] = useState<string>(DEFAULT_HOSPITAL_BEDS_SEED[0].id);
+  const [activeSubView, setActiveSubView] = useState<HospitalSubViewId>(initialSubView);
   const [isMultimodalModalOpen, setIsMultimodalModalOpen] = useState(false);
   const [newBedCodeInput, setNewBedCodeInput] = useState('');
 
+  const beds = externalBeds && externalBeds.length > 0 ? externalBeds : internalBeds;
+  const activeBedId = externalActiveBedId || internalActiveBedId;
+
   useEffect(() => {
+    if (initialSubView) {
+      setActiveSubView(initialSubView);
+    }
+  }, [initialSubView]);
+
+  useEffect(() => {
+    if (externalBeds && externalBeds.length > 0) return;
     let mounted = true;
     if (clinicalRepository.listHospitalBeds) {
       clinicalRepository.listHospitalBeds().then((stored) => {
         if (!mounted) return;
         if (stored && stored.length > 0) {
-          setBeds(stored);
-          setActiveBedId(stored[0].id);
+          setInternalBeds(stored);
+          setInternalActiveBedId(stored[0].id);
         } else if (clinicalRepository.saveHospitalBed) {
           DEFAULT_HOSPITAL_BEDS_SEED.forEach((b) => {
             clinicalRepository.saveHospitalBed?.(b);
@@ -57,22 +85,38 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [externalBeds]);
 
   const activeBed = beds.find((b) => b.id === activeBedId) || beds[0];
 
+  const handleSelectBed = (id: string) => {
+    if (onSelectBedId) {
+      onSelectBedId(id);
+    } else {
+      setInternalActiveBedId(id);
+    }
+  };
+
   const handleUpdateBedRecord = (updated: HospitalBedPatientRecord) => {
-    setBeds((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
-    clinicalRepository.saveHospitalBed?.(updated);
+    if (onUpdateBed) {
+      onUpdateBed(updated);
+    } else {
+      setInternalBeds((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+      clinicalRepository.saveHospitalBed?.(updated);
+    }
   };
 
   const handleCreateNewBed = () => {
     const code = newBedCodeInput.trim() || `110-${beds.length + 16}`;
     const created = createEmptyHospitalBedRecord(code, 'enfermaria_clinica');
-    setBeds((prev) => [...prev, created]);
-    setActiveBedId(created.id);
+    if (onCreateBed) {
+      onCreateBed(created);
+    } else {
+      setInternalBeds((prev) => [...prev, created]);
+      setInternalActiveBedId(created.id);
+      clinicalRepository.saveHospitalBed?.(created);
+    }
     setNewBedCodeInput('');
-    clinicalRepository.saveHospitalBed?.(created);
   };
 
   const handleApplyMultimodalExtraction = (extraction: MultimodalExtractionResult) => {
@@ -132,6 +176,17 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
               </button>
             </div>
 
+            {onOpenScoreboardForBed && (
+              <button
+                type="button"
+                onClick={() => onOpenScoreboardForBed(activeBed)}
+                className="btn-tactile-secondary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              >
+                <Icon name="monitor_heart" size={15} className="text-blue-600 dark:text-blue-400" />
+                <span>Escores do Leito ({activeBed.scoreEntries?.length || 0})</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => setIsMultimodalModalOpen(true)}
@@ -158,7 +213,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                 type="button"
                 role="tab"
                 aria-selected={isSelected}
-                onClick={() => setActiveBedId(bed.id)}
+                onClick={() => handleSelectBed(bed.id)}
                 className={`px-4 py-2 rounded-xl border text-left transition cursor-pointer shrink-0 min-w-44 ${
                   isSelected
                     ? 'bg-sky-600/15 border-sky-500/50 text-[var(--text-main)] shadow-tactile-sm'
@@ -223,6 +278,13 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
           mode={activeSubView}
           bedRecord={activeBed}
           onUpdateBedRecord={handleUpdateBedRecord}
+          initialMetricSource={initialDashboardMetricSource}
+          initialScoreAcronym={initialDashboardScoreAcronym}
+          onOpenScoreboardForBed={
+            onOpenScoreboardForBed
+              ? (calcId) => onOpenScoreboardForBed(activeBed, calcId)
+              : undefined
+          }
         />
       )}
 
@@ -230,7 +292,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
         <HospitalBedChatAndSciencePanel
           allBeds={beds}
           activeBed={activeBed}
-          onSelectBed={(id) => setActiveBedId(id)}
+          onSelectBed={(id) => handleSelectBed(id)}
           onUpdateBed={handleUpdateBedRecord}
         />
       )}

@@ -67,6 +67,7 @@ export const CLINICAL_STORAGE_KEYS = {
 
 class LocalDexieClinicalRepository implements IClinicalRepository {
   public readonly driverName = 'local-dexie-v2' as const;
+  private memoryBedsFallback: HospitalBedPatientRecord[] = [];
 
   public listModules(): readonly ClinicalModuleDescriptor[] {
     return CLINICAL_MODULES_REGISTRY;
@@ -132,7 +133,7 @@ class LocalDexieClinicalRepository implements IClinicalRepository {
     }
     const local = storageService.loadItem<HospitalBedPatientRecord[]>(
       CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
-      []
+      this.memoryBedsFallback
     );
     return wardFilter
       ? local.filter((b) => b.wardName.toLowerCase().includes(wardFilter.toLowerCase()))
@@ -142,11 +143,12 @@ class LocalDexieClinicalRepository implements IClinicalRepository {
   public async saveHospitalBed(record: HospitalBedPatientRecord): Promise<void> {
     const current = storageService.loadItem<HospitalBedPatientRecord[]>(
       CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
-      []
+      this.memoryBedsFallback
     );
     const next = current.some((item) => item.id === record.id)
       ? current.map((item) => (item.id === record.id ? record : item))
       : [...current, record];
+    this.memoryBedsFallback = next;
     storageService.saveItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK, next);
     try {
       await db.hospitalBeds.put(record);
@@ -158,12 +160,11 @@ class LocalDexieClinicalRepository implements IClinicalRepository {
   public async deleteHospitalBed(bedId: string): Promise<void> {
     const current = storageService.loadItem<HospitalBedPatientRecord[]>(
       CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
-      []
+      this.memoryBedsFallback
     );
-    storageService.saveItem(
-      CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK,
-      current.filter((item) => item.id !== bedId)
-    );
+    const next = current.filter((item) => item.id !== bedId);
+    this.memoryBedsFallback = next;
+    storageService.saveItem(CLINICAL_STORAGE_KEYS.HOSPITAL_BEDS_FALLBACK, next);
     try {
       await db.hospitalBeds.delete(bedId);
     } catch {

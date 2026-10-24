@@ -6,6 +6,7 @@ import {
   analyzeConductVsEvolution,
   calculateHospitalStayDays,
   computeLongitudinalLabDeltas,
+  computeLongitudinalScoreDeltas,
 } from './hospitalEvolutionFormatter';
 
 export interface ScienceProtocolGuideline {
@@ -125,6 +126,7 @@ export function generateBedCopilotResponse(
   }
 
   const deltas = computeLongitudinalLabDeltas(bedRecord.labPanels);
+  const scoreDeltas = computeLongitudinalScoreDeltas(bedRecord.scoreEntries || []);
   const correlations = analyzeConductVsEvolution(bedRecord);
   const stayDays = calculateHospitalStayDays(bedRecord.dihDateBr);
 
@@ -142,6 +144,16 @@ export function generateBedCopilotResponse(
           .join(' | ')
       : 'Sem exames laboratoriais seriados cadastrados.';
 
+  const scoreDeltaSummary =
+    scoreDeltas.length > 0
+      ? scoreDeltas
+          .map((s) => {
+            const arrow = s.direction === 'up' ? '↑' : s.direction === 'down' ? '↓' : '=';
+            return `${s.acronym}: ${s.previousValue !== null ? `${s.previousValue} -> ` : ''}${s.latestScoreFormatted} pts (${arrow} • ${s.latestRiskLabel})`;
+          })
+          .join(' | ')
+      : 'Nenhum escore clínico seriado registrado no leito.';
+
   const conductVsEvoSummary = correlations
     .map((c) => `• [${c.domain.toUpperCase()}] Conduta: ${c.activeConductText} => Evolução: ${c.evolutionResponseText}`)
     .join('\n');
@@ -150,8 +162,9 @@ export function generateBedCopilotResponse(
     `Resumo Auditado do Leito ${bedRecord.wardAndBed} (${bedRecord.patientNameOrInitials || 'Paciente sem ID'}${stayDays > 0 ? ` • D${stayDays}` : ''}):`,
     `1. ${allergyAlert}`,
     `2. Tendência Longitudinal de Exames: ${deltaSummary}`,
-    `3. Cruzamento Conduta x Evolução:\n${conductVsEvoSummary}`,
-    `4. Pendências Ativas: ${bedRecord.pendingItemsList.length > 0 ? bedRecord.pendingItemsList.join('; ') : 'Nenhuma pendência aberta.'}`,
+    `3. Tendência Longitudinal de Escores Clínicos (Scoreboard CDSS): ${scoreDeltaSummary}`,
+    `4. Cruzamento Conduta x Evolução:\n${conductVsEvoSummary}`,
+    `5. Pendências Ativas: ${bedRecord.pendingItemsList.length > 0 ? bedRecord.pendingItemsList.join('; ') : 'Nenhuma pendência aberta.'}`,
   ].join('\n\n');
 
   return {

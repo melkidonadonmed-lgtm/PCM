@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../Icon';
 import { storageService } from '../../services/storageService';
 import type { Patient, PrescriptionItem } from '../../types';
+import type {
+  HospitalBedPatientRecord,
+  HospitalBedScoreEntry,
+} from '../../core/domain/clinicalEntities';
 import {
   ALL_SCOREBOARD_CALCULATORS,
   DEFAULT_QUICK_PIN_IDS,
@@ -35,6 +39,15 @@ interface ScoreboardModuleViewProps {
   onAddPrescriptionItem?: (item: PrescriptionItem) => void;
   onAddExamById?: (examId: string) => void;
   onSendToA4Editor?: (html: string, title?: string) => void;
+  hospitalBeds?: HospitalBedPatientRecord[];
+  activeHospitalBedId?: string;
+  onSelectHospitalBed?: (bedId: string) => void;
+  onRecordScoreToBed?: (
+    bedId: string,
+    entry: HospitalBedScoreEntry,
+    options?: { appendConductToBed?: boolean }
+  ) => void;
+  onNavigateToHospitalDashboard?: (bedId: string, scoreAcronym: string) => void;
 }
 
 export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
@@ -44,6 +57,11 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
   onAddPrescriptionItem,
   onAddExamById,
   onSendToA4Editor,
+  hospitalBeds = [],
+  activeHospitalBedId,
+  onSelectHospitalBed,
+  onRecordScoreToBed,
+  onNavigateToHospitalDashboard,
 }) => {
   const [tabMode, setTabMode] = useState<ScoreboardTabMode>('CALCULATOR');
   const [activeCalculatorId, setActiveCalculatorId] = useState<string>(
@@ -53,7 +71,20 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
   const [selectedBlockId, setSelectedBlockId] = useState<string>('ALL');
   const [onlyFavoritesFilter, setOnlyFavoritesFilter] =
     useState<boolean>(false);
-  const [bedIdentifier, setBedIdentifier] = useState<string>('UTI-01');
+  const activeHospitalBed = useMemo(
+    () =>
+      hospitalBeds.find((b) => b.id === activeHospitalBedId) ?? hospitalBeds[0],
+    [hospitalBeds, activeHospitalBedId]
+  );
+  const [bedIdentifier, setBedIdentifier] = useState<string>(
+    activeHospitalBed?.wardAndBed || 'UTI-01'
+  );
+
+  useEffect(() => {
+    if (activeHospitalBed?.wardAndBed) {
+      setBedIdentifier(activeHospitalBed.wardAndBed);
+    }
+  }, [activeHospitalBed?.id, activeHospitalBed?.wardAndBed]);
 
   const [localWeightKg, setLocalWeightKg] = useState<number>(
     Number.isFinite(patient.weightKg) && patient.weightKg > 0 ? patient.weightKg : 70
@@ -256,6 +287,27 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <Icon name="search" className="text-xs" />
             Buscar entre {ALL_SCOREBOARD_CALCULATORS.length} Escores
           </button>
+
+          {hospitalBeds.length > 0 && activeHospitalBed && onSelectHospitalBed ? (
+            <div className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1 text-xs font-bold text-sky-800 dark:text-sky-200">
+              <Icon name="local_hospital" size={14} className="text-sky-600 dark:text-sky-400" />
+              <label htmlFor="scoreboard-top-bed-select" className="sr-only">
+                Leito Hospitalar Vinculado (MOD-03)
+              </label>
+              <select
+                id="scoreboard-top-bed-select"
+                value={activeHospitalBed.id}
+                onChange={(e) => onSelectHospitalBed(e.target.value)}
+                className="bg-transparent font-mono text-xs font-bold focus:outline-none cursor-pointer clinical-tabular-nums"
+              >
+                {hospitalBeds.map((b) => (
+                  <option key={b.id} value={b.id} className="text-slate-900">
+                    Leito {b.wardAndBed} — {b.patientNameOrInitials || 'Sem ID'}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -273,6 +325,11 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
           onAddPrescriptionItem={onAddPrescriptionItem}
           onSendToA4Editor={onSendToA4Editor}
           onOpenScoreBySlug={handleSelectScore}
+          hospitalBeds={hospitalBeds}
+          activeHospitalBedId={activeHospitalBed?.id}
+          onSelectHospitalBed={onSelectHospitalBed}
+          onRecordScoreToBed={onRecordScoreToBed}
+          onNavigateToHospitalDashboard={onNavigateToHospitalDashboard}
         />
       ) : null}
 
