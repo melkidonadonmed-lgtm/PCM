@@ -181,12 +181,12 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
                     {isOfficialForm && (
                       <span
                         title="Emissão sobre o impresso oficial do Ministério da Saúde"
-                        className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 whitespace-nowrap"
+                        className="text-[11px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 whitespace-nowrap"
                       >
                         Impresso MS
                       </span>
                     )}
-                    <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#27354A] text-sky-700 dark:text-sky-300 border border-slate-200 dark:border-white/10 whitespace-nowrap">
+                    <span className="text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#27354A] text-sky-700 dark:text-sky-300 border border-slate-200 dark:border-white/10 whitespace-nowrap">
                       {doc.system.split(' ')[0].replace(',', '')}
                     </span>
                   </div>
@@ -197,7 +197,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
                 </p>
 
                 <div className="flex items-center justify-between gap-2 mt-1 text-[11px]">
-                  <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400 clinical-tabular-nums truncate">
+                  <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400 clinical-tabular-nums truncate">
                     SIGTAP {doc.defaultSigtap || 'Diversos'}
                   </span>
                   <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 group-hover:underline inline-flex items-center gap-0.5 shrink-0">

@@ -117,7 +117,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                       alt="Logotipo Principal / Esquerdo"
                       className={`${getLogoSizeClass(logoConfig.size)} object-contain`}
                     />
-                    <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 left-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
+                    <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 left-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[0.5rem] z-20 whitespace-nowrap">
                       <button
                         type="button"
                         onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
@@ -164,7 +164,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                     alt="Logotipo Secundário / Direito"
                     className={`${getLogoSizeClass(logoConfig.secondarySize || logoConfig.size)} object-contain`}
                   />
-                  <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 right-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[8px] z-20 whitespace-nowrap">
+                  <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 right-0 bg-slate-900/90 text-white rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[0.5rem] z-20 whitespace-nowrap">
                     <button
                       type="button"
                       onClick={() => handleChangeSecondaryLogoSize(logoConfig.secondarySize === 'sm' ? 'md' : logoConfig.secondarySize === 'md' ? 'lg' : 'sm')}

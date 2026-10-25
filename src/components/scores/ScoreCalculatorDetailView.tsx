@@ -299,10 +299,10 @@ export const ScoreCalculatorDetailView: React.FC<
             className={`flex min-w-56 flex-col items-end justify-between rounded-xl border px-4 py-3 ${SEVERITY_BADGE_CLASSES[activeTier.severityLevel]}`}
           >
             <div className="flex w-full items-center justify-between gap-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider opacity-85">
+              <span className="text-[11px] font-bold uppercase tracking-wider opacity-85">
                 Escore Calculado
               </span>
-              <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[10px] uppercase clinical-tabular-nums">
+              <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[11px] uppercase clinical-tabular-nums">
                 Faixa: {calculator.minPossibleScore} a{' '}
                 {calculator.maxPossibleScore}
               </span>
@@ -602,7 +602,7 @@ export const ScoreCalculatorDetailView: React.FC<
                 <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                   Exportação Prontuário (PEP / SBAR / Editor A4)
                 </h4>
-                <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
                   Zero-PII / LGPD
                 </span>
               </div>
@@ -611,7 +611,7 @@ export const ScoreCalculatorDetailView: React.FC<
                 <div>
                   <label
                     htmlFor="score-bed-id"
-                    className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400"
+                    className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400"
                   >
                     Identificador de Leito
                   </label>
@@ -627,7 +627,7 @@ export const ScoreCalculatorDetailView: React.FC<
                 <div>
                   <label
                     htmlFor="score-patient-weight"
-                    className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400"
+                    className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400"
                   >
                     Peso p/ BIC (<span className="clinical-unit">kg</span>)
                   </label>
@@ -699,7 +699,7 @@ export const ScoreCalculatorDetailView: React.FC<
                       <Icon name="local_hospital" size={14} />
                       Integração Internação & Dashboard (MOD-03)
                     </span>
-                    <span className="rounded bg-sky-500/15 px-1.5 py-0.5 font-mono text-[10px] font-bold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                    <span className="rounded bg-sky-500/15 px-1.5 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
                       EF/LT {selectedHospitalBed.wardAndBed}
                     </span>
                   </div>
@@ -708,7 +708,7 @@ export const ScoreCalculatorDetailView: React.FC<
                     <div>
                       <label
                         htmlFor="score-hospital-bed-select"
-                        className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1"
+                        className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1"
                       >
                         Leito Hospitalar Alvo (MOD-03)
                       </label>
@@ -786,7 +786,7 @@ export const ScoreCalculatorDetailView: React.FC<
                 </div>
               ) : null}
 
-              <div className="border-t border-slate-200 dark:border-slate-700 pt-2 text-[10px] text-slate-500 dark:text-slate-400">
+              <div className="border-t border-slate-200 dark:border-slate-700 pt-2 text-[11px] text-slate-500 dark:text-slate-400">
                 <strong>Fonte Científica:</strong> {calculator.evidenceSource}
               </div>
             </div>

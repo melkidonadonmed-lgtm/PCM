@@ -96,7 +96,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 style={{ color: isActive ? '#38BDF8' : 'var(--surface-panel-muted)' }}
               />
               {item.badge && (
-                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[8px] flex items-center justify-center bg-sky-500/30 text-sky-100 border border-sky-400/30 clinical-unit clinical-tabular-nums">
+                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[11px] flex items-center justify-center bg-sky-500/30 text-sky-100 border border-sky-400/30 clinical-unit clinical-tabular-nums">
                   {item.badge}
                 </span>
               )}

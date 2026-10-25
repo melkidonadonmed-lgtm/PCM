@@ -170,7 +170,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                   </button>
                 </div>
               ) : (
-                <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-[var(--text-muted)] dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded border border-subtle dark:border-strong hidden sm:block pointer-events-none">
+                <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-mono text-[var(--text-muted)] dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded border border-subtle dark:border-strong hidden sm:block pointer-events-none">
                   Ctrl+K
                 </kbd>
               )}

@@ -262,7 +262,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
           />
           {item.badge && (
-            <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-sky-700 text-white text-[10px] font-black flex items-center justify-center shadow-sm border border-white/20 clinical-unit clinical-tabular-nums">
+            <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-sky-700 text-white text-[11px] font-black flex items-center justify-center shadow-sm border border-white/20 clinical-unit clinical-tabular-nums">
               {item.badge}
             </span>
           )}
@@ -315,7 +315,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
         {item.badge ? (
           <span 
-            className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0 ml-1 clinical-unit clinical-tabular-nums ${
+            className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0 ml-1 clinical-unit clinical-tabular-nums ${
               isActive ? 'bg-sky-500/30 text-sky-100 border border-sky-400/30' : 'bg-white/10 text-slate-300'
             }`}
           >
@@ -359,8 +359,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full pointer-events-none'
         } lg:pointer-events-auto lg:sticky lg:top-[4.25rem] lg:h-[calc(100dvh-4.75rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl ${
           isOpen
-            ? 'lg:w-[260px] shadow-tactile-navy border'
-            : 'lg:w-[68px] overflow-visible border'
+            ? 'lg:w-64 shadow-tactile-navy border'
+            : 'lg:w-16 overflow-visible border'
         }`}
         style={{
           backgroundColor: darkMode ? '#0B1120' : '#0F172A',
@@ -438,14 +438,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               title="Clique para editar CRM e dados profissionais"
             >
               <div className="flex items-center gap-2 min-w-0 flex-1">
-                <div className="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-200 border border-sky-400/25 flex items-center justify-center font-bold text-[10px] shrink-0 shadow-tactile-sm transition-transform duration-200 group-hover:scale-105">
+                <div className="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-200 border border-sky-400/25 flex items-center justify-center font-bold text-[11px] shrink-0 shadow-tactile-sm transition-transform duration-200 group-hover:scale-105">
                   CRM
                 </div>
                 <div className="overflow-hidden min-w-0 flex-1 leading-tight">
                   <p className="text-[11px] font-bold truncate text-white">
                     {hasDoctor ? doctor?.name : 'Configurar médico'}
                   </p>
-                  <p className="text-[10px] text-slate-300 font-medium truncate clinical-tabular-nums">
+                  <p className="text-[11px] text-slate-300 font-medium truncate clinical-tabular-nums">
                     {hasDoctor 
                       ? `CRM ${doctor?.crm}/${doctor?.crmState || 'SP'}${doctor?.rqe ? ' • RQE ' + doctor.rqe : ''}` 
                       : 'Toque para informar CRM'}
@@ -502,7 +502,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <p className="text-[11px] font-bold truncate text-white">
                     {hasPatient ? patientName : 'Identificar paciente'}
                   </p>
-                  <p className="text-[10px] text-slate-300 font-medium truncate clinical-tabular-nums">
+                  <p className="text-[11px] text-slate-300 font-medium truncate clinical-tabular-nums">
                     {hasPatient
                       ? patientWeight > 0
                         ? `Peso: ${patientWeight.toLocaleString('pt-BR')} kg${patient?.documentNumber ? ' • ' + patient.documentNumber : ''}`
@@ -514,7 +514,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </div>
               {hasPatient && patientWeight > 0 ? (
-                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-sky-500/25 text-sky-200 border border-sky-400/30 shrink-0 clinical-unit clinical-tabular-nums">
+                <span className="text-[11px] font-extrabold px-1.5 py-0.5 rounded-md bg-sky-500/25 text-sky-200 border border-sky-400/30 shrink-0 clinical-unit clinical-tabular-nums">
                   {patientWeight.toLocaleString('pt-BR')} kg
                 </span>
               ) : (
@@ -535,7 +535,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <Icon name={hasPatient ? 'person' : 'person_add'} size={20} filled={hasPatient} />
               {hasPatient && patientWeight > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-sky-700 text-white text-[9px] font-black flex items-center justify-center shadow-sm border border-white/20 clinical-unit clinical-tabular-nums">
+                <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-sky-700 text-white text-[11px] font-black flex items-center justify-center shadow-sm border border-white/20 clinical-unit clinical-tabular-nums">
                   {patientWeight.toLocaleString('pt-BR')}kg
                 </span>
               )}
@@ -552,7 +552,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Grupo 1: Atendimento Clínico Principal */}
             <div>
               {isOpen && (
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 mb-0.5 leading-none">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 mb-0.5 leading-none">
                   Atendimento
                 </p>
               )}
@@ -564,7 +564,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Grupo 2: Ferramentas de Apoio */}
             <div>
               {isOpen && (
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 mb-0.5 leading-none">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 mb-0.5 leading-none">
                   Apoio clínico
                 </p>
               )}
@@ -613,7 +613,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           <span className="text-xs font-medium text-slate-200 group-hover:text-white truncate">
                             {kit.name}
                           </span>
-                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white/10 text-slate-300 shrink-0 clinical-tabular-nums">
+                          <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/10 text-slate-300 shrink-0 clinical-tabular-nums">
                             {kit.badge}
                           </span>
                         </div>
@@ -651,14 +651,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 title="01. Clínico & Prescrição ativo • 02. PEP/SOAP e 03. Hospitalar prontos na arquitetura multi-módulo"
               >
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 truncate">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 truncate">
                     Ecossistema Clínico
                   </span>
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
                     {activeTab === 'hospital' ? 'MOD-03 Ativo' : 'MOD-01 Ativo'}
                   </span>
                 </div>
-                <div className="grid grid-cols-3 gap-1 text-[9px] clinical-tabular-nums">
+                <div className="grid grid-cols-3 gap-1 text-[11px] clinical-tabular-nums">
                   <button
                     type="button"
                     onClick={() => handleNavClick('prescription')}

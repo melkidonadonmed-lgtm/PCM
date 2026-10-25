@@ -247,7 +247,7 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
       />
     );
 
-    expect(htmlCollapsed).toContain('lg:w-[68px]');
+    expect(htmlCollapsed).toContain('lg:w-16');
     expect(htmlCollapsed).toContain('overflow-visible');
     expect(htmlCollapsed).toContain('id="sidebar-patient-chip"');
     expect(htmlCollapsed).toContain('Identificar paciente');
@@ -948,9 +948,9 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
       />
     );
     expect(sidebarHtml).toContain('flex-1 min-w-0 h-8 px-1 rounded-xl');
-    expect(sidebarHtml).toContain('lg:w-[260px]');
+    expect(sidebarHtml).toContain('lg:w-64');
 
-    // PatientQuickCard com campos extras recolhidos e paciente sem peso: botão "+ CPF e Peso" usa fonte sans-serif (clinical-tabular-nums) e não monospace (clinical-unit), e input do paciente possui largura mínima garantida (min-w-[185px])
+    // PatientQuickCard com campos extras recolhidos e paciente sem peso: botão "+ CPF e Peso" usa fonte sans-serif (clinical-tabular-nums) e não monospace (clinical-unit), e input do paciente possui largura mínima garantida (min-w-48)
     const patientNoWeightHtml = renderToStaticMarkup(
       <PatientQuickCard
         patient={emptyPatient}
@@ -963,7 +963,7 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(patientNoWeightHtml).toContain('+ CPF e Peso');
     expect(patientNoWeightHtml).toContain('whitespace-nowrap clinical-tabular-nums');
     expect(patientNoWeightHtml).not.toContain('clinical-unit">+ CPF e Peso');
-    expect(patientNoWeightHtml).toContain('flex-1 min-w-[185px]');
+    expect(patientNoWeightHtml).toContain('flex-1 min-w-48');
 
     // MedicationComposerCard via PrescriptionBuilder: textarea #presc-posology-textarea e botão + Inserir na receita compartilham h-11 min-h-[44px] sem barra de rolagem interna (overflow-hidden)
     const builderHtml = renderToStaticMarkup(

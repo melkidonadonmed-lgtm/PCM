@@ -185,7 +185,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 >
                   <Icon name="auto_awesome" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
                   <span>Kits e painéis prontos</span>
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-sky-600/15 dark:bg-sky-400/20 text-sky-800 dark:text-sky-200 clinical-tabular-nums">
+                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-sky-600/15 dark:bg-sky-400/20 text-sky-800 dark:text-sky-200 clinical-tabular-nums">
                     {EXAM_PACKAGES.length}
                   </span>
                   <Icon
@@ -253,7 +253,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                                   <span className="text-xs font-bold text-[var(--text-main)] truncate">
                                     {pkg.name}
                                   </span>
-                                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                                  <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
                                     {pkg.badge}
                                   </span>
                                 </div>
@@ -391,11 +391,11 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   </div>
 
                   {exam.urgency === 'urgent' ? (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 shrink-0">
+                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 shrink-0">
                       Urgência
                     </span>
                   ) : (
-                    <span className="text-[10px] text-[var(--text-muted)] dark:text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/70 shrink-0">
+                    <span className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/70 shrink-0">
                       {exam.category.split(' ')[0]}
                     </span>
                   )}

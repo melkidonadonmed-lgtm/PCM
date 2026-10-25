@@ -188,7 +188,7 @@ export const EparadaAndScreeningPanel: React.FC<
 
               <div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3">
                 <div>
-                  <span className="block text-[10px] uppercase text-slate-500">
+                  <span className="block text-[11px] uppercase text-slate-500">
                     Tempo Total
                   </span>
                   <span className="font-mono text-2xl font-black text-slate-900 dark:text-white clinical-tabular-nums">
@@ -197,7 +197,7 @@ export const EparadaAndScreeningPanel: React.FC<
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="block text-[10px] uppercase text-slate-500">
+                  <span className="block text-[11px] uppercase text-slate-500">
                     Próx. Checagem Ritmo
                   </span>
                   <span className="font-mono text-xl font-bold text-amber-600 dark:text-amber-400 clinical-tabular-nums">
@@ -245,13 +245,13 @@ export const EparadaAndScreeningPanel: React.FC<
                   onClick={() => setShocksCount((c) => c + 1)}
                   className="flex flex-col items-center rounded-lg border border-amber-500/40 bg-amber-50/70 dark:bg-amber-950/30 p-2 text-center hover:bg-amber-100 cursor-pointer"
                 >
-                  <span className="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300">
+                  <span className="text-[11px] font-bold uppercase text-amber-800 dark:text-amber-300">
                     Choques
                   </span>
                   <span className="font-mono text-lg font-black text-amber-900 dark:text-white clinical-tabular-nums">
                     {shocksCount}
                   </span>
-                  <span className="text-[10px] text-amber-700 dark:text-amber-400">
+                  <span className="text-[11px] text-amber-700 dark:text-amber-400">
                     +1 Choque
                   </span>
                 </button>
@@ -260,13 +260,13 @@ export const EparadaAndScreeningPanel: React.FC<
                   onClick={() => setEpinephrineCount((c) => c + 1)}
                   className="flex flex-col items-center rounded-lg border border-red-500/40 bg-red-50/70 dark:bg-red-950/30 p-2 text-center hover:bg-red-100 cursor-pointer"
                 >
-                  <span className="text-[10px] font-bold uppercase text-red-800 dark:text-red-300">
+                  <span className="text-[11px] font-bold uppercase text-red-800 dark:text-red-300">
                     Adrenalina
                   </span>
                   <span className="font-mono text-lg font-black text-red-900 dark:text-white clinical-tabular-nums">
                     {epinephrineCount}
                   </span>
-                  <span className="text-[10px] text-red-700 dark:text-red-400">
+                  <span className="text-[11px] text-red-700 dark:text-red-400">
                     +1 Dose (3-5m)
                   </span>
                 </button>
@@ -275,13 +275,13 @@ export const EparadaAndScreeningPanel: React.FC<
                   onClick={() => setAmiodaroneCount((c) => c + 1)}
                   className="flex flex-col items-center rounded-lg border border-blue-500/40 bg-blue-50/70 dark:bg-blue-950/30 p-2 text-center hover:bg-blue-100 cursor-pointer"
                 >
-                  <span className="text-[10px] font-bold uppercase text-blue-800 dark:text-blue-300">
+                  <span className="text-[11px] font-bold uppercase text-blue-800 dark:text-blue-300">
                     Amiodarona
                   </span>
                   <span className="font-mono text-lg font-black text-blue-900 dark:text-white clinical-tabular-nums">
                     {amiodaroneCount}
                   </span>
-                  <span className="text-[10px] text-blue-700 dark:text-blue-400">
+                  <span className="text-[11px] text-blue-700 dark:text-blue-400">
                     +1 Bolus
                   </span>
                 </button>
@@ -408,7 +408,7 @@ export const EparadaAndScreeningPanel: React.FC<
                           {d.drugOrAction}
                         </span>
                         {d.ceilingApplied ? (
-                          <span className="rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                          <span className="rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-amber-700 dark:text-amber-300">
                             Teto Máx
                           </span>
                         ) : null}
@@ -489,7 +489,7 @@ export const EparadaAndScreeningPanel: React.FC<
                     }`}
                   >
                     <span
-                      className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border font-mono text-[10px] font-bold ${
+                      className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border font-mono text-[11px] font-bold ${
                         checked
                           ? 'border-emerald-600 bg-emerald-600 text-white'
                           : 'border-slate-400'
@@ -563,7 +563,7 @@ export const EparadaAndScreeningPanel: React.FC<
                   <span className="text-xs font-bold uppercase tracking-wider text-pink-700 dark:text-pink-400">
                     1. Mama (Mamografia / BI-RADS)
                   </span>
-                  <span className="rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 font-mono text-[10px] clinical-tabular-nums">
+                  <span className="rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 font-mono text-[11px] clinical-tabular-nums">
                     {breastRec.sigtapCode}
                   </span>
                 </div>
@@ -661,7 +661,7 @@ export const EparadaAndScreeningPanel: React.FC<
                   <span className="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">
                     2. Colo do Útero (25–64 anos)
                   </span>
-                  <span className="rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 font-mono text-[10px] clinical-tabular-nums">
+                  <span className="rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 font-mono text-[11px] clinical-tabular-nums">
                     {cervicalRec.sigtapCode}
                   </span>
                 </div>
@@ -765,7 +765,7 @@ export const EparadaAndScreeningPanel: React.FC<
                   <span className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
                     3. Próstata (PSA & Decisão Compartilhada)
                   </span>
-                  <span className="rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 font-mono text-[10px] clinical-tabular-nums">
+                  <span className="rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 font-mono text-[11px] clinical-tabular-nums">
                     {prostateRec.sigtapCode}
                   </span>
                 </div>

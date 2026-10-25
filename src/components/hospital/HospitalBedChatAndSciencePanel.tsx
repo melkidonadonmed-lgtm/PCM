@@ -216,7 +216,7 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-extrabold uppercase tracking-wider text-[10px] text-sky-700 dark:text-sky-300">
+                  <span className="font-extrabold uppercase tracking-wider text-[11px] text-sky-700 dark:text-sky-300">
                     {msg.role === 'user'
                       ? 'Médico Assistente'
                       : msg.role === 'science'

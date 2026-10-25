@@ -248,7 +248,7 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
             onChange={(e) => setDose(parseFloat(e.target.value))}
             className="mt-2 w-full accent-blue-600 cursor-pointer"
           />
-          <div className="mt-1 flex justify-between font-mono text-[10px] text-slate-500 clinical-tabular-nums">
+          <div className="mt-1 flex justify-between font-mono text-[11px] text-slate-500 clinical-tabular-nums">
             <span>Início: {protocol.initialDose}</span>
             <span>
               Alvo: {protocol.maintenanceDoseMin}–{protocol.maintenanceDoseMax}
@@ -258,7 +258,7 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
         </div>
 
         <div className="flex flex-col items-center justify-center rounded-lg border border-blue-500/40 bg-blue-50/70 dark:bg-blue-950/40 p-3 text-center">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
             Vazão na Bomba (BIC)
           </span>
           <div className="mt-0.5 flex items-baseline gap-1">
@@ -269,7 +269,7 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
               mL/h
             </span>
           </div>
-          <span className="text-[10px] text-slate-600 dark:text-slate-400 clinical-tabular-nums">
+          <span className="text-[11px] text-slate-600 dark:text-slate-400 clinical-tabular-nums">
             para {calculation.formattedDose}
           </span>
         </div>
@@ -307,7 +307,7 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
                     : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 hover:border-slate-400'
               }`}
             >
-              <span className="text-[10px] opacity-80">{step.dose}</span>
+              <span className="text-[11px] opacity-80">{step.dose}</span>
               <span className="text-xs font-bold">{step.rateMlPerHour} mL/h</span>
             </button>
           ))}

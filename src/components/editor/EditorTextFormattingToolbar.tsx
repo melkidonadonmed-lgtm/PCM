@@ -67,7 +67,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
               <Icon name="tune" size={14} className="shrink-0" />
               <span>Folha & Timbrado</span>
               <span
-                className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md clinical-tabular-nums ${
+                className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md clinical-tabular-nums ${
                   isSheetConfigOpen
                     ? 'bg-white/20 text-white'
                     : 'bg-sky-600/15 dark:bg-sky-400/20 text-sky-800 dark:text-sky-200'

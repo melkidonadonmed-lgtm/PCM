@@ -119,9 +119,9 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                 {viasDeControleEspecial ? (
                   <>
                     {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
-                    <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
+                    <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[0.5rem] text-slate-700 leading-tight">
                       <div className="border border-medium rounded p-1 bg-slate-50/50">
-                        <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
+                        <p className="font-bold text-[0.5rem] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                           Identificação do Comprador
                         </p>
                         <div className="space-y-0.5">
@@ -133,7 +133,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                       </div>
 
                       <div className="border border-medium rounded p-1 bg-slate-50/50">
-                        <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
+                        <p className="font-bold text-[0.5rem] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                           Identificação do Fornecedor
                         </p>
                         <div className="space-y-0.5">
@@ -146,12 +146,12 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                     </div>
 
                     {/* Subtexto Regulamentar / Validade */}
-                    <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                    <div className="mt-1 text-[0.46875rem] text-slate-500 italic text-center">
                       1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
                     </div>
                   </>
                 ) : (
-                  <div className="mt-1.5 text-[7.5px] text-slate-500 italic text-center">
+                  <div className="mt-1.5 text-[0.46875rem] text-slate-500 italic text-center">
                     1ª Via: Orientação ao Paciente • Válida por 10 (dez) dias a partir da emissão (RDC Anvisa nº 471/2021).
                   </div>
                 )}
@@ -240,9 +240,9 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                 {viasDeControleEspecial ? (
                   <>
                     {/* Blocos Regulamentares Portaria SVS/MS 344/98 */}
-                    <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[8px] text-slate-700 leading-tight">
+                    <div className="mt-2 pt-1 border-t-2 border-slate-900 grid grid-cols-2 gap-1.5 text-[0.5rem] text-slate-700 leading-tight">
                       <div className="border border-medium rounded p-1 bg-slate-50/50">
-                        <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
+                        <p className="font-bold text-[0.5rem] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                           Identificação do Comprador
                         </p>
                         <div className="space-y-0.5">
@@ -254,7 +254,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                       </div>
 
                       <div className="border border-medium rounded p-1 bg-slate-50/50">
-                        <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
+                        <p className="font-bold text-[0.5rem] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                           Identificação do Fornecedor
                         </p>
                         <div className="space-y-0.5">
@@ -267,18 +267,18 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                     </div>
 
                     {/* Subtexto Regulamentar / Validade */}
-                    <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                    <div className="mt-1 text-[0.46875rem] text-slate-500 italic text-center">
                       2ª Via: Orientação ao Paciente • Válido por 30 (trinta) dias em todo o território nacional (Portaria SVS/MS nº 344/98).
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="mt-2 pt-1.5 border-t border-medium text-[8px] text-slate-700 flex items-center justify-between gap-2">
+                    <div className="mt-2 pt-1.5 border-t border-medium text-[0.5rem] text-slate-700 flex items-center justify-between gap-2">
                       <span><strong>Dispensação (farmácia):</strong> Data: ___/___/_____</span>
                       <span>Qtd aviada: _______</span>
                       <span>Lote: _______</span>
                     </div>
-                    <div className="mt-1 text-[7.5px] text-slate-500 italic text-center">
+                    <div className="mt-1 text-[0.46875rem] text-slate-500 italic text-center">
                       2ª Via: Retenção da Farmácia / Drogaria • Válida por 10 (dez) dias (RDC Anvisa nº 471/2021).
                     </div>
                   </>
@@ -348,9 +348,9 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                 </div>
                 {viasDeControleEspecial ? (
                   <>
-                    <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
+                    <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[0.5rem] text-slate-700">
                       <div className="border border-medium rounded p-1 bg-slate-50/50">
-                        <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
+                        <p className="font-bold text-[0.5rem] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                           Identificação do Comprador
                         </p>
                         <p><strong>Nome:</strong> _________________________</p>
@@ -359,7 +359,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
                       </div>
                       <div className="border border-medium rounded p-1 bg-slate-50/50">
-                        <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
+                        <p className="font-bold text-[0.5rem] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                           Identificação do Fornecedor
                         </p>
                         <p><strong>Farmácia/Drogaria:</strong> _____________</p>
@@ -368,12 +368,12 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         <p><strong>Quantidade Dispensada:</strong> __________</p>
                       </div>
                     </div>
-                    <div className="mt-0.5 text-[7px] text-slate-500 italic text-center">
+                    <div className="mt-0.5 text-[0.4375rem] text-slate-500 italic text-center">
                       1ª Via: Retenção da Farmácia / Drogaria (Portaria SVS/MS nº 344/98).
                     </div>
                   </>
                 ) : (
-                  <div className="mt-1 text-[7px] text-slate-500 italic text-center">
+                  <div className="mt-1 text-[0.4375rem] text-slate-500 italic text-center">
                     1ª Via: Orientação ao Paciente • Válida por 10 (dez) dias a partir da emissão (RDC Anvisa nº 471/2021).
                   </div>
                 )}
@@ -443,9 +443,9 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                 </div>
                 {viasDeControleEspecial ? (
                   <>
-                    <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[8px] text-slate-700">
+                    <div className="mt-1 pt-1 border-t border-slate-900 grid grid-cols-2 gap-1 text-[0.5rem] text-slate-700">
                       <div className="border border-medium rounded p-1 bg-slate-50/50">
-                        <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
+                        <p className="font-bold text-[0.5rem] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                           Identificação do Comprador
                         </p>
                         <p><strong>Nome:</strong> _________________________</p>
@@ -454,7 +454,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         <p><strong>Cidade/UF:</strong> _____ <strong>Tel:</strong> _________</p>
                       </div>
                       <div className="border border-medium rounded p-1 bg-slate-50/50">
-                        <p className="font-bold text-[8px] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
+                        <p className="font-bold text-[0.5rem] uppercase border-b border-medium pb-0.5 mb-0.5 text-slate-900">
                           Identificação do Fornecedor
                         </p>
                         <p><strong>Farmácia/Drogaria:</strong> _____________</p>
@@ -463,18 +463,18 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         <p><strong>Quantidade Dispensada:</strong> __________</p>
                       </div>
                     </div>
-                    <div className="mt-0.5 text-[7px] text-slate-600 italic text-center">
+                    <div className="mt-0.5 text-[0.4375rem] text-slate-600 italic text-center">
                       2ª Via: Orientação ao Paciente • Válido por 30 dias a contar da emissão (Portaria SVS/MS nº 344/98).
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="mt-1 pt-1 border-t border-medium text-[7.5px] text-slate-700 flex items-center justify-between gap-2">
+                    <div className="mt-1 pt-1 border-t border-medium text-[0.46875rem] text-slate-700 flex items-center justify-between gap-2">
                       <span><strong>Dispensação (farmácia):</strong> Data: ___/___/_____</span>
                       <span>Qtd aviada: _______</span>
                       <span>Lote: _______</span>
                     </div>
-                    <div className="mt-0.5 text-[7px] text-slate-600 italic text-center">
+                    <div className="mt-0.5 text-[0.4375rem] text-slate-600 italic text-center">
                       2ª Via: Retenção da Farmácia / Drogaria • Válida por 10 (dez) dias (RDC Anvisa nº 471/2021).
                     </div>
                   </>

@@ -225,7 +225,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                     EF/LT {bed.wardAndBed}
                   </span>
                   {stayDays > 0 && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
+                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
                       D{stayDays}
                     </span>
                   )}

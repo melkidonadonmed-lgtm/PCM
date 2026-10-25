@@ -282,7 +282,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                           <text x={x} y={y - 10} textAnchor="middle" className="fill-current text-[11px] font-bold">
                             {String(pt.value).replace('.', ',')}
                           </text>
-                          <text x={x} y={138} textAnchor="middle" className="fill-current text-[10px] opacity-75">
+                          <text x={x} y={138} textAnchor="middle" className="fill-current text-[11px] opacity-75">
                             {pt.dateBr}
                           </text>
                         </g>
@@ -349,7 +349,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                               {sd.acronym}
                             </span>
                             <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full clinical-tabular-nums ${
+                              className={`text-[11px] font-bold px-2 py-0.5 rounded-full clinical-tabular-nums ${
                                 sd.clinicalTrendStatus === 'favorable'
                                   ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
                                   : sd.clinicalTrendStatus === 'attention'
@@ -383,7 +383,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                           <p className="text-[11px] font-semibold text-[var(--text-secondary)] truncate">
                             {sd.latestRiskLabel}
                           </p>
-                          <p className="text-[10px] text-[var(--text-muted)] clinical-tabular-nums">
+                          <p className="text-[11px] text-[var(--text-muted)] clinical-tabular-nums">
                             {sd.previousValue !== null
                               ? `Ant: ${String(sd.previousValue).replace('.', ',')} pts (${sd.previousDateBr}) -> Atual: ${sd.latestDateBr}`
                               : `Avaliado em ${sd.latestDateBr} (${sd.pointsCount} registro)`}
@@ -462,7 +462,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                                   x={x}
                                   y={138}
                                   textAnchor="middle"
-                                  className="fill-current text-[10px] opacity-75"
+                                  className="fill-current text-[11px] opacity-75"
                                 >
                                   {pt.dateBr}
                                 </text>
@@ -582,14 +582,14 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
               >
                 <div className="flex items-center justify-between gap-1">
                   <span className="text-xs font-extrabold text-[var(--text-main)]">{d.label}</span>
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
+                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
                     {arrowSymbol}
                   </span>
                 </div>
                 <p className="text-sm font-extrabold text-[var(--text-main)] clinical-unit clinical-tabular-nums">
-                  {String(d.latestValue).replace('.', ',')} <span className="text-[10px] font-normal text-[var(--text-muted)]">{d.unit}</span>
+                  {String(d.latestValue).replace('.', ',')} <span className="text-[11px] font-normal text-[var(--text-muted)]">{d.unit}</span>
                 </p>
-                <p className="text-[10px] text-[var(--text-muted)] clinical-tabular-nums">
+                <p className="text-[11px] text-[var(--text-muted)] clinical-tabular-nums">
                   {d.previousValue !== null
                     ? `Ant: ${String(d.previousValue).replace('.', ',')} (${d.previousDateBr})`
                     : `Coleta: ${d.latestDateBr}`}
@@ -633,7 +633,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
           <p className="text-xs font-bold text-[var(--text-main)]">Registrar Nova Coleta Laboratorial por Data</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
             <div>
-              <label className="block text-[10px] font-bold text-[var(--text-muted)] mb-0.5">Data (DD/MM/AAAA)</label>
+              <label className="block text-[11px] font-bold text-[var(--text-muted)] mb-0.5">Data (DD/MM/AAAA)</label>
               <input
                 type="text"
                 value={newLabDateBr}
@@ -644,7 +644,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
             </div>
             {CANONICAL_LAB_MARKERS.map((m) => (
               <div key={m.key}>
-                <label className="block text-[10px] font-bold text-[var(--text-muted)] mb-0.5">
+                <label className="block text-[11px] font-bold text-[var(--text-muted)] mb-0.5">
                   {m.label} ({m.unit})
                 </label>
                 <input

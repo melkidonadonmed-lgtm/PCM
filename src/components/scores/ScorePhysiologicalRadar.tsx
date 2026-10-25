@@ -88,7 +88,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
           Radar Fisiológico (60fps)
         </span>
-        <div className="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-500/40 ring-1 ring-emerald-500" />
             Basal
@@ -191,7 +191,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
                 y={lbl.y}
                 textAnchor={lbl.textAnchor}
                 dominantBaseline={lbl.dominantBaseline}
-                className="fill-slate-700 dark:fill-slate-200 text-[9.5px] font-semibold"
+                className="fill-slate-700 dark:fill-slate-200 text-[11px] font-semibold"
               >
                 {lbl.label.length > 20 ? `${lbl.label.slice(0, 18)}…` : lbl.label}
               </text>
@@ -200,7 +200,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
                 y={lbl.y + 11}
                 textAnchor={lbl.textAnchor}
                 dominantBaseline={lbl.dominantBaseline}
-                className="fill-slate-500 dark:fill-slate-400 font-mono text-[8.5px] clinical-tabular-nums"
+                className="fill-slate-500 dark:fill-slate-400 font-mono text-[11px] clinical-tabular-nums"
               >
                 {lbl.system} ({valPct}%)
               </text>

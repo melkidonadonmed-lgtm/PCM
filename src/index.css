@@ -115,7 +115,7 @@
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 
     /* Dimensões Estruturais (escala monotônica compatível com Tailwind v4) */
-    --sidebar-width: 280px;
+    --sidebar-width: 256px;
     --navbar-height: 72px;
     --radius-sm: 6px;
     --radius-md: 8px;

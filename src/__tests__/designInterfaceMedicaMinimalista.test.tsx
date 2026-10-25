@@ -79,7 +79,7 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
     expect(html).toContain('Local de Atuação (SUS)');
   });
 
-  it('exibe os 5 destinos no MobileBottomNav sem truncamento artificial max-w-[68px]', () => {
+  it('exibe os 5 destinos no MobileBottomNav sem truncamento artificial max-w-16', () => {
     const html = renderToStaticMarkup(
       <MobileBottomNav
         activeTab="prescription"
@@ -90,7 +90,7 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
         onOpenMenu={vi.fn()}
       />
     );
-    expect(html).not.toContain('max-w-[68px]');
+    expect(html).not.toContain('max-w-16');
     expect(html).toContain('whitespace-nowrap');
     expect(html).toContain('Documentos');
     expect(html).toContain('id="mobile-nav-hospital"');

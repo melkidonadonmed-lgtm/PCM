@@ -339,7 +339,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                       >
                         <div className="flex items-center justify-between gap-1">
                           <span className="font-bold text-sky-700 dark:text-sky-300">{item.field}</span>
-                          <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                          <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
                             Verificado na fonte
                           </span>
                         </div>

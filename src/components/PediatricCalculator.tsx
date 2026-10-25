@@ -195,7 +195,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             <div className="px-1.5 sm:px-3 text-center min-w-[80px] sm:min-w-[96px]">
               <label 
                 htmlFor="peso-paciente"
-                className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 block cursor-pointer whitespace-nowrap"
+                className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 block cursor-pointer whitespace-nowrap"
               >
                 Peso atual (kg)
               </label>

@@ -384,7 +384,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                   >
                     <Icon name={blk.icon} className="text-sm" />
                     <span>{blk.shortLabel}</span>
-                    <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[10px] clinical-tabular-nums">
+                    <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[11px] clinical-tabular-nums">
                       {blk.count}
                     </span>
                   </button>
@@ -408,7 +408,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                       </span>
                       <div className="flex items-center gap-1">
                         {item.hasInfusionProtocol ? (
-                          <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                          <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
                             +BIC
                           </span>
                         ) : null}
@@ -440,7 +440,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                   </div>
 
                   <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-700/70 pt-2.5">
-                    <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-44">
+                    <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-44">
                       {item.categoryName}
                     </span>
                     <button

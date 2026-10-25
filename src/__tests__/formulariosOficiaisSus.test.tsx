@@ -1,7 +1,7 @@
 import React from 'react';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { SUS_DOCUMENTS_CATALOG, buildSusDocumentHtml, buildSusDocumentMarkdown, timbreDoDocumentoSus } from '../data/susDocumentsCatalog';
 import { LOGO_DO_ESTADO, LOGO_DO_SUS } from '../data/presetAssets';
@@ -381,7 +381,7 @@ describe('Formulários de preenchimento SUS: preservação de espaços e campos 
         currentDocItem={docApac}
         formData={dadosComEspaco}
         hasOfficialForm={true}
-        onFieldChange={() => {}}
+        onFieldChange={vi.fn()}
       />
     );
 
@@ -404,8 +404,8 @@ describe('Formulários de preenchimento SUS: preservação de espaços e campos 
         currentDocItem={siscanCito}
         formData={soIdentificacao}
         linhasDaLme={[linhaVaziaDaLme()]}
-        onFieldChange={() => {}}
-        onAlterarLinhaDaLme={() => {}}
+        onFieldChange={vi.fn()}
+        onAlterarLinhaDaLme={vi.fn()}
       />
     );
     expect(htmlSiscan).toContain('id="sus-dum"');
@@ -417,8 +417,8 @@ describe('Formulários de preenchimento SUS: preservação de espaços e campos 
         currentDocItem={galTb}
         formData={soIdentificacao}
         linhasDaLme={[linhaVaziaDaLme()]}
-        onFieldChange={() => {}}
-        onAlterarLinhaDaLme={() => {}}
+        onFieldChange={vi.fn()}
+        onAlterarLinhaDaLme={vi.fn()}
       />
     );
     expect(htmlGalTb).toContain('id="sus-sinan"');
@@ -431,8 +431,8 @@ describe('Formulários de preenchimento SUS: preservação de espaços e campos 
         currentDocItem={apacComp}
         formData={soIdentificacao}
         linhasDaLme={[linhaVaziaDaLme()]}
-        onFieldChange={() => {}}
-        onAlterarLinhaDaLme={() => {}}
+        onFieldChange={vi.fn()}
+        onAlterarLinhaDaLme={vi.fn()}
       />
     );
     expect(htmlApacComp).toContain('id="sus-creatinina"');

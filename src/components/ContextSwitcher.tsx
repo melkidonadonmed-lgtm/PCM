@@ -30,11 +30,11 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
     >
       {!collapsed && (
         <div className="flex items-center justify-between gap-1 mb-1.5 min-w-0">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1 min-w-0">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1 min-w-0">
             <Icon name="verified_user" size={14} className="text-emerald-400 shrink-0" />
             <span className="truncate">Local de Atuação (SUS)</span>
           </span>
-          <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-white/10 text-sky-200 border border-white/15 shrink-0 whitespace-nowrap leading-none shadow-xs">
+          <span className="px-1.5 py-0.5 rounded-md text-[11px] font-bold bg-white/10 text-sky-200 border border-white/15 shrink-0 whitespace-nowrap leading-none shadow-xs">
             {activeContext.documentFormatting?.prescriptionViaCount || 1} {activeContext.documentFormatting?.prescriptionViaCount === 1 ? 'VIA' : 'VIAS'}
           </span>
         </div>
@@ -64,7 +64,7 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
       </div>
 
       {!collapsed && activeContext.clinicName && (
-        <div className="mt-0.5 text-[10px] leading-tight text-slate-400 truncate" title={activeContext.clinicName}>
+        <div className="mt-0.5 text-[11px] leading-tight text-slate-400 truncate" title={activeContext.clinicName}>
           {activeContext.clinicName}
         </div>
       )}

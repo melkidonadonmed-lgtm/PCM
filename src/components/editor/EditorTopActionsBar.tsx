@@ -229,7 +229,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
               aria-label="Opções de arquivo e sincronização com a consulta"
               className="absolute right-0 top-full mt-1.5 w-60 bg-[var(--surface-card)] border border-[var(--border-subtle)] dark:border-strong rounded-2xl shadow-tactile-lg p-1.5 z-50 animate-tab-fade"
             >
-              <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
                 Importar da consulta ativa
               </div>
               <button
@@ -270,7 +270,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
               </button>
 
               <div className="border-t border-[var(--border-subtle)] my-1" />
-              <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
                 Salvar e modelos
               </div>
 
@@ -328,7 +328,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
           <FolderOpen className="w-3.5 h-3.5 text-[var(--text-muted)]" />
           <span className="hidden md:inline">Modelos</span>
           {savedTemplates.length > 0 && (
-            <span className="px-1.5 py-0.5 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold leading-none clinical-tabular-nums">
+            <span className="px-1.5 py-0.5 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[11px] font-bold leading-none clinical-tabular-nums">
               {savedTemplates.length}
             </span>
           )}

@@ -183,7 +183,7 @@ A composição espacial utiliza primitivas intrínsecas em grade **Base-4 / Base
 
 - **Split-View Assimétrico (`12 Colunas`)**: No `PrescriptionBuilder`, a coluna esquerda (`xl:col-span-7`) concentra o fluxo vertical (`Stack`) de identificação, composição e lista prescrita, enquanto a coluna direita (`xl:col-span-5`, `xl:sticky xl:top-20`) ancora a bancada A4 em tempo real e a gaveta pediátrica (`@container`).
 - **Header Command Bar (`64px` / `h-16`)**: Alinhamento simétrico contendo gatilho da Sidebar, botão Início unificado, **Segmented Workspace Track** (`Receitas`, `Documentos`, `Doses`, `Protocolos`, `Editor`, `Guias SUS`, `Hospitalar`, `Scores CDSS` com atalhos `Alt+1..8`) e **Command & Context Cluster** à direita.
-- **Sidebar Deep Navy (`256px` expandida / `68px` recolhida)**: Topo imediato com Posto de Atuação SUS (`ContextSwitcher`) e Perfil CRM, seguido por `Atendimento` e `Apoio clínico` com barra de acento vertical no item ativo, `Kits de plantão` retráteis e rodapé de Macro-Módulos + utilitários (`Novo Atendimento`, `Backup .pcm`, `Instalar App`).
+- **Sidebar Deep Navy (`256px` / `w-64` expandida / `64px` / `w-16` recolhida)**: Topo imediato com Posto de Atuação SUS (`ContextSwitcher`) e Perfil CRM, seguido por `Atendimento` e `Apoio clínico` com barra de acento vertical no item ativo, `Kits de plantão` retráteis e rodapé de Macro-Módulos + utilitários (`Novo Atendimento`, `Backup .pcm`, `Instalar App`).
 - **Breakpoint Mobile (`1024px` / `lg`) & `MobileBottomNav`**: Abaixo de `1024px`, a navegação migra para o `MobileBottomNav` (`h-16`, Deep Navy) com 5 destinos (`Receitas`, `Documentos`, `Hospitalar`, `Editor`, `Mais`), alvos `>= 44x44px` e `whitespace-nowrap`.
 
 ---
