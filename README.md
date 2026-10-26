@@ -1,6 +1,6 @@
 # PresCMed (`PCM`) — Plataforma Clínica, Prescrição Ambulatorial, Escores CDSS e Gestão Hospitalar
 
-[![Produção Cloud Run](https://img.shields.io/badge/Produção-Cloud%20Run%20(SP)-0ea5e9?style=flat-square&logo=googlecloud)](https://prescmed-syqnqsm4iq-rj.a.run.app)
+[![Produção Cloud Run](https://img.shields.io/badge/Produção-precmed.web.app%20(SP)-0ea5e9?style=flat-square&logo=googlecloud)](https://precmed.web.app)
 [![React 19](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
@@ -11,7 +11,7 @@
 
 Plataforma médica digital *offline-first* para o contexto clínico, ambulatorial, de emergência e hospitalar brasileiro (`pt-BR`): receituário inteligente no padrão PEC/SUS, calculadora pediátrica por peso, central de documentos (atestados CFM, encaminhamentos, exames e 9 formulários regulatórios do SUS), bancada de apoio à decisão clínica (**Scoreboard CDSS** com **114 escores**, painel **EPARADA** ACLS/PALS, **Bomba de Infusão Contínua** e **Rastreio Oncológico INCA/MS**) e **Módulo Hospitalar (`MOD-03`)** com gestão de leitos, evolução padronizada, ingestão multimodal sem alucinação e painel longitudinal *Conduta × Evolução*.
 
-**Produção:** [https://prescmed-syqnqsm4iq-rj.a.run.app](https://prescmed-syqnqsm4iq-rj.a.run.app)
+**Produção:** [https://precmed.web.app](https://precmed.web.app) *(espelhado no Cloud Run em `southamerica-east1`)*
 
 > [!IMPORTANT]
 > Quem for alterar o código (pessoa ou agente) deve ler o [`AGENTS.md`](AGENTS.md) e a especificação detalhada [`docs/CLINICAL_AND_RUNTIME_SPEC.md`](docs/CLINICAL_AND_RUNTIME_SPEC.md): eles documentam as invariantes clínicas, sanitárias (Portaria SVS/MS nº 344/98, RDC Anvisa nº 471/2021, Resoluções CFM nº 1.658/2002 e 1.819/2007) e de emissão em folha A4 única.

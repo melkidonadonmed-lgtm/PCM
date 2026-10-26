@@ -49,8 +49,9 @@ npm run build       # Build de produção em dist/
 
 ---
 
-## 4. Deploy Cloud Run (`prescmed`, `southamerica-east1`)
+## 4. Deploy Cloud Run (`prescmed`, `southamerica-east1`) & Domínio (`precmed.web.app`)
 
+- **URL Canônica de Produção:** `https://precmed.web.app` (Firebase Hosting site `precmed` em `firebase.json` com rewrite dinâmico `**` para o serviço Cloud Run `prescmed` em `southamerica-east1`, autorizado no Firebase Auth).
 - Push em `main` aciona o gatilho Cloud Build `gcpmain` (`cloudbuild.yaml`), ou manual via `pwsh -File .\deploy-cloudrun.ps1`.
 - O `Dockerfile` executa `npm run lint && npm run test` antes de gerar a imagem Nginx (`node:24-alpine`). Healthcheck em `/health` (nunca `/healthz`).
 

@@ -224,6 +224,8 @@ npm run preview     # Pré-visualização do bundle compilado
   - **Rotinas e painéis de exames**: pré-natal por trimestre, saúde da mulher, do homem e do idoso, HAS, diabetes, IST.
   - `README.md`, `AGENTS.md`, `.github/copilot-instructions.md` e este arquivo conferidos com o código.
 - **21/10/2026 a 24/10/2026**: Modularização dos 5 monólitos (`< 850` linhas), entrega do **Módulo Hospitalar (`MOD-03`, `Alt+7`)** e **Scoreboard CDSS (`Alt+8`, 114 escores + `EPARADA` + Rastreio INCA)**, auditoria REA P0–P3 (`backup v2`, `sanitizeHtml`, fila de exclusões Firestore, higienização de `firestore.rules` e remoção de `lucide-react`) e validação com `241/241` testes em 26 suítes Vitest. Pendências em aberto: ver `.context/CURRENT_STATE.md`.
+- **26/10/2026**:
+  - **Domínio Curto Gratuito (`https://precmed.web.app`)**: Provisionado o site `precmed` no Firebase Hosting (`agent-md-506215`) com rewrite dinâmico integral (`**` em `firebase.json` e `.firebaserc`) apontando para o serviço Cloud Run `prescmed` (`southamerica-east1`). Adicionados `precmed.web.app` e `precmed.firebaseapp.com` aos `authorizedDomains` do Firebase Auth.
 
 ---
 

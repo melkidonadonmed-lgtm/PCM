@@ -1,5 +1,14 @@
 {
-  "firestore": {
-    "rules": "firestore.rules"
+  "hosting": {
+    "site": "precmed",
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "prescmed",
+          "region": "southamerica-east1"
+        }
+      }
+    ]
   }
 }

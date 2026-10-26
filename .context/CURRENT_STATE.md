@@ -29,7 +29,7 @@
   - Remoção da dependência residual `lucide-react` (100% dos ícones unificados em `Icon.tsx` via `material-symbols`) e injeção determinística de clock (`nowMs`) nos motores hospitalares.
 
 ## Implantação e Qualidade
-- **Produção:** Cloud Run `prescmed` (`southamerica-east1`) — https://prescmed-syqnqsm4iq-rj.a.run.app
+- **Produção:** https://precmed.web.app *(Firebase Hosting → Cloud Run `prescmed` em `southamerica-east1`, https://prescmed-syqnqsm4iq-rj.a.run.app)*
 - **Qualidade:** `241/241` testes em `26` suítes Vitest (`100.0/100` Nível 4 Determinístico) · `tsc --noEmit` limpo (`0 any`) · `npm run design:lint` limpo (`0 erros`) · `audit_tactile_ui.py` `100.0/100.0 [PASS]`.
 
 ## Pendências (Backlog Opcional / Revisão Humana)
