@@ -6,6 +6,7 @@
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Dexie v4](https://img.shields.io/badge/IndexedDB-Dexie%20v4-f59e0b?style=flat-square)](https://dexie.org/)
 [![Vitest](https://img.shields.io/badge/Testes-241%2F241%20Vitest-22c55e?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Arquitetura SGA](https://img.shields.io/badge/Arquitetura%20SGA-92.76%2F100-0284c7?style=flat-square)](#7-testes-e-portões-de-qualidade-26-suítes--241-testes)
 [![PWA](https://img.shields.io/badge/PWA-Offline--First-8b5cf6?style=flat-square)](https://web.dev/progressive-web-apps/)
 
 Plataforma médica digital *offline-first* para o contexto clínico, ambulatorial, de emergência e hospitalar brasileiro (`pt-BR`): receituário inteligente no padrão PEC/SUS, calculadora pediátrica por peso, central de documentos (atestados CFM, encaminhamentos, exames e 9 formulários regulatórios do SUS), bancada de apoio à decisão clínica (**Scoreboard CDSS** com **114 escores**, painel **EPARADA** ACLS/PALS, **Bomba de Infusão Contínua** e **Rastreio Oncológico INCA/MS**) e **Módulo Hospitalar (`MOD-03`)** com gestão de leitos, evolução padronizada, ingestão multimodal sem alucinação e painel longitudinal *Conduta × Evolução*.
@@ -74,13 +75,14 @@ flowchart TD
 * **Central de Documentos (`Alt+2`) e Guias SUS (`Alt+6`)**
   * **Atestado Médico:** o código CID-10 só é impresso mediante consentimento explícito do paciente (`authorizedByPatient === true`, Resoluções CFM nº 1.658/2002 e 1.819/2007).
   * **Encaminhamento:** especialidade de destino, prioridade (`eletivo`, `prioritario`, `urgente`), resumo clínico e hipótese diagnóstica.
-  * **Pedido de Exames:** catálogo laboratorial e de imagem com **14 rotinas clínicas prontas** (pré-natal por trimestre, saúde da mulher/homem/idoso, HAS, DM, IST, pré-operatório, etc.).
+  * **Pedido de Exames:** catálogo laboratorial e de imagem com **14 rotinas clínicas prontas** (pré-natal por trimestre, saúde da mulher/homem/idoso, HAS, DM, IST, pré-operatório, etc.), com ações diretas para **Visualizar Folha A4 e Emitir PDF**, **Abrir no Editor A4** (`buildExamRequestHtmlForA4`) e **Copiar Pedido** em texto estruturado.
   * **9 Documentos Regulatórios do SUS (`Alt+6`):**
     * **APAC Principal (55 campos)** e **LME (23 campos)** saem sobre a imagem do **impresso oficial do Ministério da Saúde** (`public/formularios-sus/`), posicionando cada dado exatamente no campo numerado (incluindo CNS, CPF e CNES do médico) ou permitindo edição na **grade vetorial interativa de 12 colunas (`SusInteractiveVectorSheet.tsx` / `.sus-grid`)**.
     * **7 Guias Complementares** (`APAC Complementar`, `SISREG`, `SISCAN Citopatológico`, `SISCAN Histopatológico`, `SISCAN Mamografia`, `GAL/LACEN Geral` e `GAL TRM-TB`) saem em grades técnicas HTML numeradas com timbre duplo (`TimbreSus`: logo institucional à esquerda + logo SUS à direita) e zero dados clínicos presumidos.
 * **Calculadora Pediátrica por Peso (`Alt+3` e Gaveta Lateral)**
   * Converte `mg/kg` em `mL` ou `gotas` com trava de segurança **"Sem peso, sem dose"** (faixa aceita: `0,5 kg` a `120 kg`) e tetos máximos por tomada (ex.: trava de `20 mL` para amoxicilina `250 mg/5 mL` e prednisolona `3 mg/mL`).
 * **Protocolos Clínicos (`Alt+4`) e Editor A4 Rico (`Alt+5`)**
+  * Busca rápida textual por patologia, conduta ou medicamento (`#protocol-search-input`) integrada à Command Palette (`Ctrl+K`) e filtros por especialidade.
   * Editor rico baseado em **Tiptap 3** com alternância entre 1 via (A4 retrato) e 2 vias (A4 paisagem: Simples, Antimicrobiano e Controle Especial), gerador de logotipos/monogramas vetoriais SVG (`LogoGeneratorModal.tsx`), marcas d'água e engenharia reversa do HTML de volta para itens estruturados da receita (`parsePrescriptionHtml.ts`).
 
 ### 2.2. Módulo Hospitalar & Gestão de Pacientes (`MOD-03` — `Alt+7`)
@@ -108,7 +110,7 @@ flowchart TD
 * **Painel `EPARADA` (PCR ACLS / PALS) & Rastreio Oncológico INCA/MS (`EparadaAndScreeningPanel.tsx`):**
   * Cronômetro de ciclo de RCP (`2:00`), doses de emergência guiadas por peso (com trava *"Sem peso, sem dose"*), energia de desfibrilação em Joules e checklist reversível **5H / 5T**.
   * Rastreio oncológico rápido para **Mama (BI-RADS)**, **Colo do Útero (Citopatológico)** e **Próstata (PSA)** com adição automática do exame SIGTAP/SUS ao pedido ativo.
-* **Ponte Bidirecional com Internação (`MOD-03`):** qualquer escore calculado no `Scoreboard CDSS` pode ser registrado diretamente no leito ativo (`HospitalBedScoreEntry`), alimentando a curva longitudinal e o cruzamento *Conduta × Evolução* no Dashboard Hospitalar.
+* **Ponte Bidirecional com Internação (`MOD-03`):** qualquer escore calculado no `Scoreboard CDSS` pode ser registrado diretamente no leito ativo (`HospitalBedScoreEntry`), alimentando a curva longitudinal e o cruzamento *Conduta × Evolução* no Dashboard Hospitalar, com botão de retorno em 1 clique (**`Voltar ao Leito`**) para a evolução do paciente internado.
 
 ---
 
@@ -232,7 +234,7 @@ PCM/
 
 | Atalho | Destino / Ação |
 | :--- | :--- |
-| `Ctrl+K` / `Cmd+K` | Abre a **Command Palette Global** (busca unificada de medicamentos, kits, protocolos, guias SUS e 114 calculadoras CDSS) |
+| `Ctrl+K` / `Cmd+K` | Abre a **Command Palette Global** (busca unificada de medicamentos, kits, protocolos patológicos e de urgência, leitos hospitalares `MOD-03`, guias SUS e 114 calculadoras CDSS) |
 | `Alt+1` | **Receitas** (`PrescriptionBuilder`) |
 | `Alt+2` | **Central de Documentos** (`ClinicalDocumentsHub`: Atestado, Encaminhamento, Exames, SUS) |
 | `Alt+3` | **Calculadora Pediátrica por Peso** (`PediatricCalculator`) |

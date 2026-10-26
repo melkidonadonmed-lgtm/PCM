@@ -51,7 +51,7 @@ const BackupModal = React.lazy(() => import('./components/BackupModal'));
 export default function App() {
   // Tema visual (Claro como padrão oficial do sistema)
   const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('prescmed_theme');
+    const saved = storageService.loadRawString('prescmed_theme');
     return saved !== null ? saved === 'dark' : false;
   });
 
@@ -498,6 +498,7 @@ export default function App() {
 
   // Medicamento pendente vindo de outras telas (ex: Protocolos)
   const [medicamentoPendente, setMedicamentoPendente] = useState<UnifiedMedication | null>(null);
+  const [protocolSearchQuery, setProtocolSearchQuery] = useState<string | null>(null);
 
   // Toast de notificação de kit aplicado
   const [kitToast, setKitToast] = useState<string | null>(null);
@@ -701,6 +702,7 @@ export default function App() {
               <ClinicalProtocolsView
                 darkMode={darkMode}
                 patient={patient}
+                initialSearchQuery={protocolSearchQuery}
                 onUpdatePatientWeight={handleUpdatePatientWeight}
                 onAddPrescriptionItem={handleAddPrescriptionItem}
                 onNavigateToPrescription={() => setActiveTab('prescription')}
@@ -729,6 +731,11 @@ export default function App() {
                 onNavigateToHospitalDashboard={
                   handleNavigateToHospitalDashboardFromScore
                 }
+                onReturnToHospitalBed={(bedId) => {
+                  setActiveHospitalBedId(bedId);
+                  setHospitalSubView('evolution_form');
+                  setActiveTab('hospital');
+                }}
               />
             )}
 
@@ -845,6 +852,16 @@ export default function App() {
         onUsarMedicamento={handleUsarMedicamento}
         onOpenPatientModal={handleOpenPatientModal}
         onOpenDoctorModal={handleOpenDoctorModal}
+        hospitalBeds={hospitalBeds}
+        onSelectHospitalBed={(bedId) => {
+          setActiveHospitalBedId(bedId);
+          setHospitalSubView('evolution_form');
+          setActiveTab('hospital');
+        }}
+        onSelectProtocol={(query) => {
+          setProtocolSearchQuery(query);
+          setActiveTab('protocols');
+        }}
       />
 
       {/* Modals */}

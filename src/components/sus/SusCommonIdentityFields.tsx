@@ -43,6 +43,8 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
 
       {/* CARD 1: DADOS DO MÉDICO / ESTABELECIMENTO (AUTOFILLED & RETRÁTIL QUANDO CONFIGURADO) */}
       <div
+        data-state="idle"
+        aria-busy={false}
         className="tactile-card p-4 rounded-2xl border"
         style={{
           backgroundColor: darkMode ? 'var(--surface-card)' : '#FFFFFF',

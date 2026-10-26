@@ -70,6 +70,22 @@ export const storageService = {
   },
 
   /**
+   * Carrega uma string literal diretamente do localStorage (ex.: tema 'light'/'dark' ou flags).
+   */
+  loadRawString(key: string, defaultValue: string | null = null): string | null {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return defaultValue;
+    }
+    try {
+      const value = localStorage.getItem(key);
+      return value !== null ? value : defaultValue;
+    } catch (error) {
+      console.warn(`[storageService] Erro ao ler string "${key}":`, error);
+      return defaultValue;
+    }
+  },
+
+  /**
    * Salva uma string literal diretamente no localStorage (ex.: tema 'light'/'dark' ou flags).
    */
   saveRawString(key: string, value: string): boolean {

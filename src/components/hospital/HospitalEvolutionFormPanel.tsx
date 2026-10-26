@@ -161,7 +161,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
     bedRecord.diagnosticHypotheses[0]?.diseaseAndDate || 'Sem HD principal registrada';
 
   return (
-    <div data-state="idle" className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+    <div data-state="idle" aria-busy={false} className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
       <div className="xl:col-span-7 space-y-4">
         {/* Seção 1 (Acordeão Inteligente): Dados de Admissão, Identificação, HDA e Antecedentes */}
         <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-4 space-y-3">

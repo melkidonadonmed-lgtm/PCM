@@ -144,9 +144,17 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
 
   const patientName = patient?.name?.trim() || 'Paciente não identificado';
   const hasPatient = Boolean(patient?.name?.trim());
+  const hubState: 'idle' | 'loading' | 'error' = !doctor?.crm?.trim() ? 'idle' : 'idle';
 
   return (
-    <SurfaceCard as="div" state="idle" id="clinical-documents-hub" className="max-w-7xl mx-auto space-y-4 sm:space-y-5 !p-0 !bg-transparent !border-none !shadow-none">
+    <SurfaceCard
+      as="div"
+      state={hubState}
+      data-state={hasPatient ? 'success' : 'empty'}
+      aria-busy={false}
+      id="clinical-documents-hub"
+      className="max-w-7xl mx-auto space-y-4 sm:space-y-5 !p-0 !bg-transparent !border-none !shadow-none"
+    >
       {/* Barra de Navegação Superior em Trilho Segmentado Esculpido */}
       <SoftCard variant="flat" className="card-surface p-2.5 sm:p-3.5 rounded-2xl border border-subtle dark:border-strong flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* Identificação do Contexto Clínico em 3 Níveis (Squint Test) */}
@@ -265,6 +273,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
             clinicalIndication={clinicalIndication}
             onUpdateClinicalIndication={onUpdateClinicalIndication}
             onNavigateToPrint={() => onNavigateToPrint('exams')}
+            onNavigateToEditorWithHtml={onNavigateToEditorWithHtml}
           />
         )}
 
@@ -278,7 +287,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
             initialDocId={initialSusDocId}
             catalogResetTrigger={susCatalogResetTrigger + localSusResetTrigger}
             onNavigateToEditorWithHtml={onNavigateToEditorWithHtml}
-            onNavigateToPrint={() => onNavigateToPrint('exams')}
+            onNavigateToPrint={() => onNavigateToPrint()}
           />
         )}
       </div>

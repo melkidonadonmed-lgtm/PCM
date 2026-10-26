@@ -131,7 +131,7 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
   };
 
   return (
-    <div data-state="idle" className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <div data-state="idle" aria-busy={false} className="grid grid-cols-1 lg:grid-cols-12 gap-4">
       {/* Coluna Principal: Assistente Virtual por Leito + Live API + Science */}
       <div className="lg:col-span-8 card-surface rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5 flex flex-col justify-between min-h-96 space-y-4">
         {/* Topo com Seletor Instantâneo de Leito e Modos do Agente */}

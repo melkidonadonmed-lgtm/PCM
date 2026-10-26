@@ -48,6 +48,7 @@ interface ScoreboardModuleViewProps {
     options?: { appendConductToBed?: boolean }
   ) => void;
   onNavigateToHospitalDashboard?: (bedId: string, scoreAcronym: string) => void;
+  onReturnToHospitalBed?: (bedId: string) => void;
 }
 
 export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
@@ -62,6 +63,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
   onSelectHospitalBed,
   onRecordScoreToBed,
   onNavigateToHospitalDashboard,
+  onReturnToHospitalBed,
 }) => {
   const [tabMode, setTabMode] = useState<ScoreboardTabMode>('CALCULATOR');
   const [activeCalculatorId, setActiveCalculatorId] = useState<string>(
@@ -178,6 +180,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
     <section
       className="space-y-4"
       aria-label="Módulo de Escores Clínicos e Ferramentas de Apoio"
+      aria-busy={false}
       data-state="idle"
     >
       {/* Cabeçalho da Bancada Scoreboard CDSS */}
@@ -188,13 +191,24 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               <Icon name="monitor_heart" className="text-xl" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-base font-bold text-slate-900 dark:text-white">
                   Scoreboard CDSS — Escores Clínicos, Infusão em BIC & Emergência
                 </h1>
                 <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 font-mono text-[11px] font-bold text-blue-700 dark:text-blue-300 clinical-tabular-nums">
                   {ALL_SCOREBOARD_CALCULATORS.length} Escores Monográficos
                 </span>
+                {activeHospitalBed && onReturnToHospitalBed && (
+                  <button
+                    type="button"
+                    onClick={() => onReturnToHospitalBed(activeHospitalBed.id)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1 text-xs font-bold text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition-colors cursor-pointer clinical-tabular-nums"
+                    title={`Retornar diretamente ao prontuário do Leito ${activeHospitalBed.wardAndBed}`}
+                  >
+                    <Icon name="arrow_back" className="text-sm" />
+                    <span>Voltar ao Leito {activeHospitalBed.wardAndBed}</span>
+                  </button>
+                )}
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Estratificação multissistêmica em tempo real, Radar Fisiológico SVG 60fps, Drogas Vasoativas em BIC, EPARADA (ACLS/PALS) e Rastreio INCA/MS integrados à prescrição e ao Editor A4.

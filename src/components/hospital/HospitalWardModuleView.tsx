@@ -174,7 +174,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
   const suggestedNextBedCode = `110-${beds.length + 15}`;
 
   return (
-    <div id="hospital-ward-module-root" data-state="idle" className="space-y-4">
+    <div id="hospital-ward-module-root" data-state="idle" aria-busy={false} className="space-y-4">
       {/* Cabeçalho Principal do Módulo Hospitalar */}
       <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5 space-y-3.5">
         <div className="flex flex-wrap items-center justify-between gap-3">

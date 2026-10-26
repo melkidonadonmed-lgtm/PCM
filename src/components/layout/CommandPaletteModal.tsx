@@ -1,7 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Icon, IconName } from '../Icon';
 import { ActiveTab, SusDocumentId } from '../../types';
+import type { HospitalBedPatientRecord } from '../../core/domain/clinicalEntities';
 import { CLINICAL_KITS, ClinicalKit } from '../../data/clinicalKits';
+import { PATHOLOGY_PROTOCOLS } from '../../data/clinicalProtocols';
+import { CLINICAL_PROTOCOLS } from '../../data/pediatricMeds';
 import { SUS_DOCUMENTS_CATALOG } from '../../data/susDocumentsCatalog';
 import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../../data/medicationDatabase';
 import { searchUnifiedMedicationsFuzzy } from '../../utils/fuzzySearch';
@@ -9,12 +12,20 @@ import { searchScoreboardCatalog } from '../../data/scores/scoreboardCatalog';
 import { Badge } from '../ui/Badge';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
+/**
+ * Paleta de Comandos Global (Ctrl+K / Cmd+K).
+ * Estados de UI cobertos: empty (nenhum módulo encontrado), loading (carregando índice),
+ * success (item selecionado/resolvido) e error (alerta de busca sem correspondência).
+ */
 export interface CommandPaletteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectTab: (tab: ActiveTab) => void;
   onSelectSusDoc?: (docId: SusDocumentId) => void;
   onSelectScore?: (calculatorId: string) => void;
+  onSelectProtocol?: (protocolSearchQuery: string) => void;
+  hospitalBeds?: HospitalBedPatientRecord[];
+  onSelectHospitalBed?: (bedId: string) => void;
   onAplicarKit: (kit: ClinicalKit) => void;
   onUsarMedicamento: (med: UnifiedMedication) => void;
   onOpenPatientModal: () => void;
@@ -23,7 +34,14 @@ export interface CommandPaletteModalProps {
 
 interface CommandOption {
   id: string;
-  group: 'Navegação Rápida' | 'Escores Clínicos (Scoreboard)' | 'Formulários SUS' | 'Kits de Plantão' | 'Medicamentos (RENAME/SUS)';
+  group:
+    | 'Navegação Rápida'
+    | 'Leitos Hospitalares (MOD-03)'
+    | 'Protocolos Clínicos & Urgência'
+    | 'Escores Clínicos (Scoreboard)'
+    | 'Formulários SUS'
+    | 'Kits de Plantão'
+    | 'Medicamentos (RENAME/SUS)';
   title: string;
   subtitle: string;
   badge?: string;
@@ -38,6 +56,9 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onSelectTab,
   onSelectSusDoc,
   onSelectScore,
+  onSelectProtocol,
+  hospitalBeds = [],
+  onSelectHospitalBed,
   onAplicarKit,
   onUsarMedicamento,
   onOpenPatientModal,
@@ -245,8 +266,76 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       },
     }));
 
-    return [...navOptions, ...susOptions, ...kitOptions];
-  }, [onAplicarKit, onClose, onOpenDoctorModal, onOpenPatientModal, onSelectSusDoc, onSelectTab]);
+    const bedOptions: CommandOption[] = hospitalBeds.map((bed) => ({
+      id: `bed-${bed.id}`,
+      group: 'Leitos Hospitalares (MOD-03)',
+      title: `Leito ${bed.wardAndBed} — ${bed.patientNameOrInitials || 'Paciente Internado'}`,
+      subtitle: `${bed.diagnosticHypotheses?.[0]?.diseaseAndDate || 'Enfermaria Clínica'} • DIH: ${bed.dihDateBr || '—'}`,
+      badge: 'MOD-03',
+      icon: 'local_hospital',
+      action: () => {
+        if (onSelectHospitalBed) {
+          onSelectHospitalBed(bed.id);
+        } else {
+          onSelectTab('hospital');
+        }
+        onClose();
+      },
+    }));
+
+    const pathologyProtocolOptions: CommandOption[] = PATHOLOGY_PROTOCOLS.map((prot) => ({
+      id: `prot-path-${prot.id}`,
+      group: 'Protocolos Clínicos & Urgência',
+      title: `Protocolo: ${prot.name}`,
+      subtitle: `${prot.category} • ${prot.firstLineSummary}`,
+      badge: prot.category,
+      icon: 'coracao',
+      action: () => {
+        if (onSelectProtocol) {
+          onSelectProtocol(prot.name);
+        } else {
+          onSelectTab('protocols');
+        }
+        onClose();
+      },
+    }));
+
+    const emergencyProtocolOptions: CommandOption[] = CLINICAL_PROTOCOLS.map((em) => ({
+      id: `prot-em-${em.id}`,
+      group: 'Protocolos Clínicos & Urgência',
+      title: `Urgência: ${em.title} (${em.condition})`,
+      subtitle: `${em.ruleFormula} • ${em.routeDilution}`,
+      badge: 'Urgência',
+      icon: 'emergency',
+      action: () => {
+        if (onSelectProtocol) {
+          onSelectProtocol(em.title);
+        } else {
+          onSelectTab('protocols');
+        }
+        onClose();
+      },
+    }));
+
+    return [
+      ...navOptions,
+      ...bedOptions,
+      ...pathologyProtocolOptions,
+      ...emergencyProtocolOptions,
+      ...susOptions,
+      ...kitOptions,
+    ];
+  }, [
+    hospitalBeds,
+    onAplicarKit,
+    onClose,
+    onOpenDoctorModal,
+    onOpenPatientModal,
+    onSelectHospitalBed,
+    onSelectProtocol,
+    onSelectSusDoc,
+    onSelectTab,
+  ]);
 
   const filteredOptions = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -442,7 +531,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             </span>
           </div>
           <span className="hidden sm:inline clinical-tabular-nums">
-            Atalhos: Alt+1..6 • Ctrl+K
+            Atalhos: Alt+1..8 • Ctrl+K
           </span>
         </div>
       </div>

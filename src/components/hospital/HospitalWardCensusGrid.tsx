@@ -66,6 +66,8 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
   return (
     <section
       id="hospital-ward-census-grid"
+      data-state="idle"
+      aria-busy={false}
       aria-label="Mapa de Leitos e Censo da Enfermaria"
       className="space-y-4"
     >

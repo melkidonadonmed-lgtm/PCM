@@ -11,7 +11,7 @@ interface UseNavigationSyncOptions {
 }
 
 /**
- * Sincroniza atalhos de teclado globais (Alt+1..6 e Ctrl+K / Cmd+K)
+ * Sincroniza atalhos de teclado globais (Alt+1..8 e Ctrl+K / Cmd+K)
  * e hash semântico leve (#prescription, #documents/sus, etc.) sem recarregar a página.
  */
 export function useNavigationSync({

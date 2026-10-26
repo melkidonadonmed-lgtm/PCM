@@ -8,7 +8,7 @@ import { PrescriptionBuilder, resolveMedicationKeyAction } from '../components/P
 import { ClinicalDocumentsHub } from '../components/ClinicalDocumentsHub';
 import { PediatricCalculator } from '../components/PediatricCalculator';
 import { ClinicalProtocolsView } from '../components/ClinicalProtocolsView';
-import { ExamRequester } from '../components/ExamRequester';
+import { ExamRequester, buildExamRequestHtmlForA4 } from '../components/ExamRequester';
 import { CommandPaletteModal } from '../components/layout/CommandPaletteModal';
 import { ConsultationReadinessBar } from '../components/bento/ConsultationReadinessBar';
 import { SurfaceCard } from '../components/ui/SurfaceCard';
@@ -373,6 +373,7 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
       />
     );
     expect(protocolsHtml).toContain('Protocolos clínicos por patologia');
+    expect(protocolsHtml).toContain('id="protocol-search-input"');
     expect(protocolsHtml).toContain('btn-tactile-secondary');
     expect(protocolsHtml).not.toContain('tactile-card-interactive');
 
@@ -382,9 +383,10 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
         patient={activePatient}
         selectedExams={sampleExams}
         onUpdateSelectedExams={vi.fn()}
-        clinicalIndication=""
+        clinicalIndication="Suspeita de dengue aguda"
         onUpdateClinicalIndication={vi.fn()}
         onNavigateToPrint={vi.fn()}
+        onNavigateToEditorWithHtml={vi.fn()}
       />
     );
     expect(examsHtml).toContain('Solicitação de exames complementares');
@@ -393,7 +395,19 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(examsHtml).toContain('aria-haspopup="dialog"');
     expect(examsHtml).toContain('Kits e painéis prontos');
     expect(examsHtml).toContain('Exames no pedido (2)');
+    expect(examsHtml).toContain('Visualizar Folha A4 e Emitir PDF');
+    expect(examsHtml).toContain('Abrir no Editor A4');
+    expect(examsHtml).toContain('Copiar Pedido');
     expect(examsHtml).not.toContain('Painéis e pacotes clínicos:');
+
+    const examEditorHtml = buildExamRequestHtmlForA4(
+      activePatient,
+      sampleExams,
+      'Suspeita de dengue aguda'
+    );
+    expect(examEditorHtml).toContain('SOLICITAÇÃO DE EXAMES COMPLEMENTARES');
+    expect(examEditorHtml).toContain('Carlos Eduardo Lima');
+    expect(examEditorHtml).toContain('Suspeita de dengue aguda');
 
     const mobileHtml = renderToStaticMarkup(
       <MobileBottomNav
@@ -1162,13 +1176,15 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(hubDirectSusHtml).toContain('Cardiologia');
     expect(hubDirectSusHtml).toContain('LME — Medicamentos Especializados (Alto Custo / CEAF)');
 
-    // 5. CommandPaletteModal inclui atalhos diretos para Atestado, Encaminhamento e Pedidos de Exames
+    // 5. CommandPaletteModal inclui atalhos diretos para Atestado, Encaminhamento, Pedidos de Exames e Protocolos Clínicos
     const paletteHtml = renderToStaticMarkup(
       <CommandPaletteModal
         isOpen={true}
         onClose={vi.fn()}
         onSelectTab={vi.fn()}
         onSelectSusDoc={vi.fn()}
+        onSelectProtocol={vi.fn()}
+        onSelectHospitalBed={vi.fn()}
         onAplicarKit={vi.fn()}
         onUsarMedicamento={vi.fn()}
         onOpenPatientModal={vi.fn()}
@@ -1178,5 +1194,6 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(paletteHtml).toContain('Atestado Médico (Res. CFM 1.658/2002)');
     expect(paletteHtml).toContain('Encaminhamento Médico Especializado');
     expect(paletteHtml).toContain('Pedidos de Exames (SADT / Laboratório e Imagem)');
+    expect(paletteHtml).toContain('Protocolos Clínicos');
   });
 });

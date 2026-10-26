@@ -66,7 +66,11 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
   return (
     <>
       {/* RIGHT COLUMN: Real-Time A4 Document Simulation (Sticky Tactile Sheet) */}
-      <div className={`xl:col-span-5 xl:sticky xl:top-20 space-y-3.5 ${mobileSection === 'composer' ? 'hidden md:block' : 'block'}`}>
+      <div
+        data-state="idle"
+        aria-busy={false}
+        className={`xl:col-span-5 xl:sticky xl:top-20 space-y-3.5 ${mobileSection === 'composer' ? 'hidden md:block' : 'block'}`}
+      >
         <div className="flex items-center justify-between gap-2 px-1">
           <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
             <Icon name="visibility" className="text-[15px] text-sky-600 dark:text-sky-400" />

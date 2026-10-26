@@ -184,6 +184,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
       aria-modal="true"
       aria-labelledby="hospital-quick-admission-title"
       data-state="idle"
+      aria-busy={false}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

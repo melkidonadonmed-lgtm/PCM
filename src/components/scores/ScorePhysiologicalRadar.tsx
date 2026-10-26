@@ -83,6 +83,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
     <div
       className="flex flex-col items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/50 p-3"
       data-state="idle"
+      aria-busy={false}
     >
       <div className="mb-1.5 flex w-full items-center justify-between px-1">
         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">

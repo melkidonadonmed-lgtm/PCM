@@ -14,6 +14,7 @@ import { Icon } from './Icon';
 interface ClinicalProtocolsViewProps {
   darkMode: boolean;
   patient: Patient;
+  initialSearchQuery?: string | null;
   onUpdatePatientWeight: (weight: number) => void;
   onAddPrescriptionItem: (item: PrescriptionItem) => void;
   onNavigateToPrescription: () => void;
@@ -33,14 +34,23 @@ const CATEGORY_BADGE_CLASSES: { [category: string]: string } = {
 export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
   darkMode,
   patient,
+  initialSearchQuery = null,
   onAddPrescriptionItem,
   onNavigateToPrescription,
   onNavigateToScores,
   onUsarMedicamento
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
+  const [protocolSearch, setProtocolSearch] = useState<string>(initialSearchQuery || '');
   const [selectedMedCategory, setSelectedMedCategory] = useState<string>('all');
   const [addedProtocolsMap, setAddedProtocolsMap] = useState<{ [id: string]: boolean }>({});
+
+  React.useEffect(() => {
+    if (initialSearchQuery !== null && initialSearchQuery !== undefined) {
+      setProtocolSearch(initialSearchQuery);
+      setSelectedCategory('Todas');
+    }
+  }, [initialSearchQuery]);
 
   const patientWeight = patient?.weightKg ?? 0;
 
@@ -50,10 +60,20 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
   }, []);
 
   const filteredProtocols = useMemo(() => {
-    return selectedCategory === 'Todas'
-      ? PATHOLOGY_PROTOCOLS
-      : PATHOLOGY_PROTOCOLS.filter(p => p.category === selectedCategory);
-  }, [selectedCategory]);
+    const byCat =
+      selectedCategory === 'Todas'
+        ? PATHOLOGY_PROTOCOLS
+        : PATHOLOGY_PROTOCOLS.filter((p) => p.category === selectedCategory);
+    const q = protocolSearch.trim().toLowerCase();
+    if (!q) return byCat;
+    return byCat.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        p.firstLineSummary.toLowerCase().includes(q) ||
+        p.medications.some((m) => m.name.toLowerCase().includes(q))
+    );
+  }, [selectedCategory, protocolSearch]);
 
   const filteredUnifiedMeds = useMemo(() => {
     if (selectedMedCategory === 'all') {
@@ -241,25 +261,54 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
         </span>
       </div>
 
-      {/* Category Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar fade-scroll-x">
-        {categories.map((cat) => {
-          const isSelected = selectedCategory === cat;
-          return (
+      {/* Busca Rápida de Protocolo + Category Pills */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
+        <div className="relative sm:w-72 shrink-0">
+          <Icon
+            name="search"
+            size={15}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
+          />
+          <input
+            id="protocol-search-input"
+            type="text"
+            value={protocolSearch}
+            onChange={(e) => setProtocolSearch(e.target.value)}
+            placeholder="Ex.: Pneumonia, ITU, Otite, Dengue..."
+            aria-label="Filtrar protocolos por patologia ou medicamento"
+            className="w-full pl-9 pr-8 py-2 min-h-[40px] rounded-xl text-xs font-medium tactile-input focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          />
+          {protocolSearch && (
             <button
-              key={cat}
               type="button"
-              onClick={() => setSelectedCategory(cat)}
-              className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
-                isSelected
-                  ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
-                  : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
-              }`}
+              onClick={() => setProtocolSearch('')}
+              aria-label="Limpar busca de protocolo"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
             >
-              {cat}
+              <Icon name="close" size={14} />
             </button>
-          );
-        })}
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar fade-scroll-x">
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                  isSelected
+                    ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
+                    : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Pathology Decks Grid */}

@@ -1,7 +1,33 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { ExamItem, Patient } from '../types';
 import { EXAM_CATALOG, EXAM_PACKAGES, ExamPackage } from '../data/examCatalog';
+import { escapeHtml } from '../utils/sanitizeHtml';
 import { Icon } from './Icon';
+
+export function buildExamRequestHtmlForA4(
+  patient: Patient,
+  selectedExams: ExamItem[],
+  clinicalIndication: string
+): string {
+  const safePatient = escapeHtml(patient?.name?.trim() || 'Paciente não identificado');
+  const safeIndication = escapeHtml(clinicalIndication.trim());
+  const listItems = selectedExams
+    .map(
+      (ex, idx) =>
+        `<li><strong>${idx + 1}. ${escapeHtml(ex.name)}</strong> <span>(${escapeHtml(ex.category)})</span></li>`
+    )
+    .join('');
+
+  return [
+    '<h2>SOLICITAÇÃO DE EXAMES COMPLEMENTARES (SADT)</h2>',
+    `<p><strong>Paciente:</strong> ${safePatient}</p>`,
+    safeIndication ? `<p><strong>Indicação Clínica:</strong> ${safeIndication}</p>` : '',
+    '<hr />',
+    `<ol>${listItems}</ol>`,
+  ]
+    .filter(Boolean)
+    .join('');
+}
 
 /**
  * Sub-ilha de Solicitação de Exames Laboratoriais e de Imagem.
@@ -17,6 +43,11 @@ interface ExamRequesterProps {
   clinicalIndication: string;
   onUpdateClinicalIndication: (text: string) => void;
   onNavigateToPrint: () => void;
+  onNavigateToEditorWithHtml?: (
+    html: string,
+    title: string,
+    type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom'
+  ) => void;
 }
 
 export const ExamRequester: React.FC<ExamRequesterProps> = ({
@@ -27,12 +58,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   onUpdateExams,
   clinicalIndication,
   onUpdateClinicalIndication,
-  onNavigateToPrint
+  onNavigateToPrint,
+  onNavigateToEditorWithHtml,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [customExamName, setCustomExamName] = useState('');
   const [isPackagesMenuOpen, setIsPackagesMenuOpen] = useState(false);
+  const [copiedExams, setCopiedExams] = useState(false);
   const packagesMenuRef = useRef<HTMLDivElement>(null);
 
   const updateExams = onUpdateSelectedExams || onUpdateExams || (() => {});
@@ -40,36 +73,33 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   // Fecha o menu de kits ao clicar fora ou pressionar Escape
   useEffect(() => {
     if (!isPackagesMenuOpen) return;
-    const handleClickOutside = (event: MouseEvent) => {
+    const onOutsideOrEsc = (event: MouseEvent | KeyboardEvent) => {
+      if ('key' in event) {
+        if (event.key === 'Escape') setIsPackagesMenuOpen(false);
+        return;
+      }
       if (packagesMenuRef.current && !packagesMenuRef.current.contains(event.target as Node)) {
         setIsPackagesMenuOpen(false);
       }
     };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsPackagesMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', onOutsideOrEsc);
+    document.addEventListener('keydown', onOutsideOrEsc);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', onOutsideOrEsc);
+      document.removeEventListener('keydown', onOutsideOrEsc);
     };
   }, [isPackagesMenuOpen]);
 
   const categories = useMemo(() => {
-    const list = Array.from(new Set(EXAM_CATALOG.map(e => e.category)));
+    const list = Array.from(new Set(EXAM_CATALOG.map((e) => e.category)));
     return ['Todos', ...list];
   }, []);
 
-  const isExamSelected = (id: string) => {
-    return selectedExams.some(e => e.id === id);
-  };
+  const isExamSelected = (id: string) => selectedExams.some((e) => e.id === id);
 
   const toggleExam = (exam: ExamItem) => {
     if (isExamSelected(exam.id)) {
-      updateExams(selectedExams.filter(e => e.id !== exam.id));
+      updateExams(selectedExams.filter((e) => e.id !== exam.id));
     } else {
       updateExams([...selectedExams, { ...exam, selected: true }]);
     }
@@ -77,9 +107,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
 
   const applyPackage = (pkg: ExamPackage) => {
     const newExams = [...selectedExams];
-    pkg.examIds.forEach(id => {
-      const found = EXAM_CATALOG.find(e => e.id === id);
-      if (found && !newExams.some(e => e.id === id)) {
+    pkg.examIds.forEach((id) => {
+      const found = EXAM_CATALOG.find((e) => e.id === id);
+      if (found && !newExams.some((e) => e.id === id)) {
         newExams.push({ ...found, selected: true });
       }
     });
@@ -96,7 +126,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       category: 'Personalizado',
       name: customExamName.trim(),
       selected: true,
-      urgency: 'routine'
+      urgency: 'routine',
     };
 
     updateExams([...selectedExams, newCustomExam]);
@@ -104,10 +134,11 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   };
 
   const filteredCatalog = useMemo(() => {
-    return EXAM_CATALOG.filter(exam => {
+    return EXAM_CATALOG.filter((exam) => {
       const matchCat = selectedCategory === 'Todos' || exam.category === selectedCategory;
-      const matchSearch = exam.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          exam.category.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchSearch =
+        exam.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        exam.category.toLowerCase().includes(searchTerm.toLowerCase());
       return matchCat && matchSearch;
     });
   }, [selectedCategory, searchTerm]);
@@ -115,22 +146,23 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   return (
     <div data-state="idle" aria-busy={false} id="exam-requester-section" className="space-y-3 sm:space-y-4">
       {/* Top Header Card Compacto */}
-      <div 
+      <div
         className="tactile-card p-3 sm:p-3.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
         style={{
           backgroundColor: 'var(--surface-card)',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
+          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
         }}
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          <div 
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-sky-600 border border-white/12 shadow-sm shrink-0"
-          >
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-sky-600 border border-white/12 shadow-sm shrink-0">
             <Icon name="science" size={16} className="text-slate-100" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-sm sm:text-base font-bold truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+              <h2
+                className="text-sm sm:text-base font-bold truncate"
+                style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}
+              >
                 Solicitação de exames complementares
               </h2>
               <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 dark:bg-[#27354A] dark:text-slate-200 border border-slate-300 dark:border-white/10 font-semibold clinical-tabular-nums">
@@ -163,7 +195,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             className="tactile-card p-3 rounded-2xl border space-y-2.5"
             style={{
               backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
+              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
             }}
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -202,14 +234,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     className="absolute right-0 left-auto z-40 top-full mt-1.5 w-80 sm:w-96 max-w-[calc(100vw-2rem)] rounded-2xl border shadow-tactile-lg overflow-hidden animate-tab-fade"
                     style={{
                       backgroundColor: 'var(--surface-card)',
-                      borderColor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)'
+                      borderColor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)',
                     }}
                   >
                     <div
                       className="px-3 py-2 border-b flex items-center justify-between gap-2"
                       style={{
                         backgroundColor: darkMode ? 'var(--surface-inset)' : '#F8FAFC',
-                        borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
+                        borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
                       }}
                     >
                       <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400">
@@ -290,7 +322,11 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             {/* Search and Custom Exam Row */}
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative flex-1">
-                <Icon name="search" size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400 pointer-events-none" />
+                <Icon
+                  name="search"
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400 pointer-events-none"
+                />
                 <input
                   type="text"
                   placeholder="Ex.: Hemograma, PCR, Dengue, Ureia, Raio-X, ECG..."
@@ -341,14 +377,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           </div>
 
           {/* Lista Compacta de Exames Individuais */}
-          <div 
+          <div
             tabIndex={0}
             role="region"
             aria-label="Lista de exames"
             className="tactile-card p-2.5 rounded-2xl max-h-96 sm:max-h-120 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             style={{
               backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
+              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
             }}
           >
             {filteredCatalog.map((exam) => {
@@ -368,15 +404,17 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                     }
                   }}
                   className={`flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none border ${
-                    selected 
-                      ? 'bg-sky-50/80 dark:bg-[#27354A] border-sky-500/40 dark:border-sky-400/30' 
+                    selected
+                      ? 'bg-sky-50/80 dark:bg-[#27354A] border-sky-500/40 dark:border-sky-400/30'
                       : 'border-[var(--border-subtle)] hover:bg-slate-100/70 dark:hover:bg-[#27354A]/60'
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span 
+                    <span
                       className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition ${
-                        selected ? 'bg-navy-900 dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/40 text-white' : 'border-slate-300 dark:border-white/20'
+                        selected
+                          ? 'bg-navy-900 dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/40 text-white'
+                          : 'border-slate-300 dark:border-white/20'
                       }`}
                     >
                       {selected && <Icon name="check" size={12} />}
@@ -408,14 +446,17 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         {/* Right Col: Indicação Clínica + Exames Selecionados no Pedido */}
         <div className="space-y-3">
           {/* Indicação Clínica */}
-          <div 
+          <div
             className="tactile-card p-3 rounded-2xl border"
             style={{
               backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
+              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
             }}
           >
-            <label htmlFor="exam-clinical-indication" className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400 mb-1.5">
+            <label
+              htmlFor="exam-clinical-indication"
+              className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400 mb-1.5"
+            >
               Indicação clínica / hipótese diagnóstica
             </label>
             <input
@@ -429,15 +470,21 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           </div>
 
           {/* Bandeja de Exames Selecionados */}
-          <div 
+          <div
             className="tactile-card p-3 sm:p-3.5 rounded-2xl flex flex-col h-fit space-y-2.5"
             style={{
               backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
+              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
             }}
           >
-            <div className="flex items-center justify-between border-b pb-2" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
-              <h3 className="font-semibold text-xs sm:text-sm flex items-center gap-2" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+            <div
+              className="flex items-center justify-between border-b pb-2"
+              style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}
+            >
+              <h3
+                className="font-semibold text-xs sm:text-sm flex items-center gap-2"
+                style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}
+              >
                 <Icon name="fact_check" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
                 Exames no pedido ({selectedExams.length})
               </h3>
@@ -454,24 +501,30 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
 
             {selectedExams.length === 0 ? (
               <div className="p-4 text-center text-[var(--text-muted)] dark:text-slate-400 text-xs">
-                Nenhum exame selecionado ainda. Marque exames avulsos na lista ou abra o menu <strong>Kits e painéis prontos</strong>.
+                Nenhum exame selecionado ainda. Marque exames avulsos na lista ou abra o menu{' '}
+                <strong>Kits e painéis prontos</strong>.
               </div>
             ) : (
               <div className="space-y-1 max-h-80 overflow-y-auto">
                 {selectedExams.map((exam, index) => (
-                  <div 
+                  <div
                     key={exam.id}
                     className="px-2.5 py-1.5 rounded-xl border flex items-center justify-between gap-2 tactile-flat"
                     style={{
                       backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
-                      borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
+                      borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
                     }}
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="text-xs font-semibold truncate" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                      <div
+                        className="text-xs font-semibold truncate"
+                        style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}
+                      >
                         {index + 1}. {exam.name}
                       </div>
-                      <span className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 font-medium">{exam.category}</span>
+                      <span className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 font-medium">
+                        {exam.category}
+                      </span>
                     </div>
                     <button
                       type="button"
@@ -488,15 +541,64 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             )}
 
             {selectedExams.length > 0 && (
-              <div className="pt-2 border-t" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+              <div
+                className="pt-2 border-t space-y-2"
+                style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}
+              >
                 <button
                   type="button"
                   onClick={onNavigateToPrint}
                   className="btn-tactile-primary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                 >
-                  <Icon name="download" className="text-[16px]" />
-                  <span>Gerar e baixar PDF</span>
+                  <Icon name="print" className="text-[16px]" />
+                  <span>Visualizar Folha A4 e Emitir PDF</span>
                 </button>
+
+                <div className="grid grid-cols-2 gap-1.5">
+                  {onNavigateToEditorWithHtml && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onNavigateToEditorWithHtml(
+                          buildExamRequestHtmlForA4(patient, selectedExams, clinicalIndication),
+                          'Solicitação de Exames',
+                          'custom'
+                        )
+                      }
+                      className="btn-tactile-secondary py-2 px-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                      title="Abrir pedido de exames no Editor Livre A4 para personalização"
+                    >
+                      <Icon name="edit_document" className="text-[15px] text-sky-600 dark:text-sky-400" />
+                      <span>Abrir no Editor A4</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const lines = [
+                        'SOLICITAÇÃO DE EXAMES COMPLEMENTARES',
+                        patient?.name?.trim() ? `Paciente: ${patient.name.trim()}` : '',
+                        clinicalIndication.trim() ? `Indicação clínica: ${clinicalIndication.trim()}` : '',
+                        '',
+                        ...selectedExams.map((ex, i) => `${i + 1}. ${ex.name}`),
+                      ].filter(Boolean);
+                      navigator.clipboard?.writeText(lines.join('\n')).catch(() => {});
+                      setCopiedExams(true);
+                      setTimeout(() => setCopiedExams(false), 2000);
+                    }}
+                    className={`btn-tactile-secondary py-2 px-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                      onNavigateToEditorWithHtml ? '' : 'col-span-2'
+                    }`}
+                    title="Copiar lista de exames selecionados para a área de transferência"
+                  >
+                    <Icon
+                      name={copiedExams ? 'check' : 'content_copy'}
+                      className={`text-[15px] ${copiedExams ? 'text-emerald-600 dark:text-emerald-400' : ''}`}
+                    />
+                    <span>{copiedExams ? 'Pedido Copiado!' : 'Copiar Pedido'}</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>

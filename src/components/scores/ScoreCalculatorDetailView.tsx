@@ -242,7 +242,7 @@ export const ScoreCalculatorDetailView: React.FC<
   };
 
   return (
-    <div className="space-y-4" data-state="idle">
+    <div className="space-y-4" data-state="idle" aria-busy={false}>
       {/* Banner de Cabeçalho e Pontuação em Tempo Real */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 shadow-xs">
         <div className="flex flex-wrap items-start justify-between gap-4">

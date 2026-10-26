@@ -45,7 +45,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
         hideRedundantDesktop ? 'lg:hidden' : ''
       }`}
     >
-      <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink">
+      <div data-state="idle" aria-busy={false} className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink">
         <button
           type="button"
           onClick={onOpenDoctorModal}

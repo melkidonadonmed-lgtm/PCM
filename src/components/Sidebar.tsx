@@ -80,13 +80,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const patientName = patient?.name?.trim() || '';
 
   // Estado de recolhimento dos Kits de Plantão (salvo no localStorage, padrão recolhido)
-  const [showKits, setShowKits] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('prescmed_show_kits') === 'true';
-    } catch {
-      return false;
-    }
-  });
+  const [showKits, setShowKits] = useState<boolean>(
+    () => storageService.loadRawString('prescmed_show_kits') === 'true'
+  );
 
   const handleToggleKits = () => {
     setShowKits(prev => {
@@ -107,23 +103,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
-    const handler = (e: MediaQueryListEvent) => {
-      setIsDesktop(e.matches);
-    };
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+    const onMediaChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mediaQuery.addEventListener('change', onMediaChange);
+    return () => mediaQuery.removeEventListener('change', onMediaChange);
   }, []);
 
   // Fechamento pelo teclado (Escape) no modo mobile
   useEffect(() => {
     if (!isOpen || isDesktop) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose?.();
-      }
+    const onEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose?.();
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', onEscapeKey);
+    return () => window.removeEventListener('keydown', onEscapeKey);
   }, [isOpen, isDesktop, onClose]);
 
   // Estado do Modal de Confirmação HITL para Ações Destrutivas
@@ -208,32 +200,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'hospital', label: 'Módulo Hospitalar (Leitos)', fullLabel: 'Módulo Hospitalar e Gestão de Pacientes (EF/LT, Evolução, Exames e Science)', shortLabel: 'Hospitalar', iconName: 'local_hospital', shortcut: 'Alt+7' }
   ];
 
-  const handleNavClick = (tabId: ActiveTab) => {
-    onSelectTab(tabId);
+  const runMobileAwareAction = (action?: () => void) => {
+    action?.();
     if (!isDesktop) {
       onClose?.();
     }
   };
 
-  const handleOpenDoctor = () => {
-    onOpenDoctorModal?.();
-    if (!isDesktop) onClose?.();
-  };
-
-  const handleOpenPatient = () => {
-    onOpenPatientModal?.();
-    if (!isDesktop) onClose?.();
-  };
-
-  const handleOpenBackup = () => {
-    onOpenBackupModal?.();
-    if (!isDesktop) onClose?.();
-  };
-
-  const handleAplicarKitWithClose = (kit: ClinicalKit) => {
-    onAplicarKit?.(kit);
-    if (!isDesktop) onClose?.();
-  };
+  const handleNavClick = (tabId: ActiveTab) => runMobileAwareAction(() => onSelectTab(tabId));
+  const handleOpenDoctor = () => runMobileAwareAction(onOpenDoctorModal);
+  const handleOpenPatient = () => runMobileAwareAction(onOpenPatientModal);
+  const handleOpenBackup = () => runMobileAwareAction(onOpenBackupModal);
 
   const renderNavButton = (item: SidebarNavItem) => {
     const isSusActive =
@@ -616,7 +593,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <button
                         key={kit.id}
                         type="button"
-                        onClick={() => handleAplicarKitWithClose(kit)}
+                        onClick={() => runMobileAwareAction(() => onAplicarKit?.(kit))}
                         className="w-full text-left px-2.5 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 hover:translate-x-1 active:translate-x-0 transition duration-200 cursor-pointer group active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                         title={`Aplicar kit: ${kit.name} (${kit.badge})`}
                       >
@@ -655,18 +632,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             )}
 
-            {/* Seletor Compacto de Macro-Módulos do Ecossistema (MOD-01 Ativo | MOD-02 PEP | MOD-03 Hospitalar) */}
+            {/* Seletor Compacto de Macro-Módulos do Ecossistema (MOD-01 Ativo | MOD-02 PEP/CDSS | MOD-03 Hospitalar) */}
             {isOpen && (
               <div
                 className="px-2 py-1 rounded-xl bg-white/[0.03] border border-white/10 space-y-0.5"
-                title="01. Clínico & Prescrição ativo • 02. PEP/SOAP e 03. Hospitalar prontos na arquitetura multi-módulo"
+                title="Alternância rápida entre Macro-Módulos: 01. Clínico & Prescrição (Alt+1) • 02. PEP/SOAP & Scoreboard CDSS (Alt+8) • 03. Hospitalar (Alt+7)"
               >
                 <div className="flex items-center justify-between gap-1">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 truncate">
                     Ecossistema Clínico
                   </span>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
-                    {activeTab === 'hospital' ? 'MOD-03 Ativo' : 'MOD-01 Ativo'}
+                    {activeTab === 'hospital'
+                      ? 'MOD-03 Ativo'
+                      : activeTab === 'scores'
+                        ? 'MOD-02 Ativo'
+                        : 'MOD-01 Ativo'}
                   </span>
                 </div>
                 <div className="grid grid-cols-3 gap-1 text-[11px] clinical-tabular-nums">
@@ -674,16 +655,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     type="button"
                     onClick={() => handleNavClick('prescription')}
                     className={`px-1 py-0.5 rounded border truncate text-center cursor-pointer transition ${
-                      activeTab !== 'hospital'
+                      activeTab !== 'hospital' && activeTab !== 'scores'
                         ? 'bg-sky-500/15 border-sky-400/25 text-white font-semibold'
                         : 'bg-white/[0.02] border-white/5 text-slate-300 hover:text-white font-medium'
                     }`}
+                    title="Módulo 01: Prescrição & Ambulatório (Alt+1)"
                   >
                     01. Clínico
                   </button>
-                  <div className="px-1 py-0.5 rounded bg-white/[0.02] border border-white/5 text-slate-400 font-medium opacity-70 truncate text-center select-none">
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('scores')}
+                    className={`px-1 py-0.5 rounded border truncate text-center cursor-pointer transition ${
+                      activeTab === 'scores'
+                        ? 'bg-sky-500/15 border-sky-400/25 text-white font-semibold'
+                        : 'bg-white/[0.04] border-white/10 text-slate-200 hover:text-white font-medium'
+                    }`}
+                    title="Módulo 02: Evolução Estruturada SOAP/SBAR & Scoreboard CDSS (Alt+8)"
+                  >
                     02. PEP
-                  </div>
+                  </button>
                   <button
                     type="button"
                     onClick={() => handleNavClick('hospital')}
@@ -692,6 +683,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         ? 'bg-sky-500/15 border-sky-400/25 text-white font-semibold'
                         : 'bg-white/[0.04] border-white/10 text-slate-200 hover:text-white font-medium'
                     }`}
+                    title="Módulo 03: Internação Hospitalar & Gestão de Leitos (Alt+7)"
                   >
                     03. Hosp.
                   </button>

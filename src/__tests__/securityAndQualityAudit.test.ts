@@ -66,7 +66,7 @@ describe('Auditoria de Segurança XSS e Sanitização HTML (sanitizeHtml)', () =
   });
 
   it('neutraliza tags aninhadas reconstruídas (<scr<input>ipt>), atributos separados por barra (<img/onerror=...>) e entidades HTML em javascript: (PCM-SEC-03)', () => {
-    const nested = '<scr<input>ipt>window.pwned=1</scr</input>ipt><img/src="x"/onerror="alert(1)"><a href="&#106;avascript:alert(2)">Click</a>';
+    const nested = '<scr<input>ipt>window.pwned=1</scr</input>ipt><img/src="x"/onerror="xssPayload(1)"><a href="&#106;avascript:xssPayload(2)">Click</a>';
     const clean = DOMPurify.sanitize(nested);
 
     expect(clean).not.toContain('<script');
@@ -97,12 +97,12 @@ describe('Auditoria de Segurança XSS e Sanitização HTML (sanitizeHtml)', () =
 
     const interpolated = interpolateMedicalTags(
       '<p>Paciente: {{paciente_nome}}</p>',
-      { ...pacientePadrao, name: 'João $& <img src=x onerror=alert(1)>' },
+      { ...pacientePadrao, name: 'João $& <img src=x onerror=xssPayload(1)>' },
       [],
       medicoPadrao,
       null
     );
-    expect(interpolated).toContain('João $&amp; &lt;img src=x onerror=alert(1)&gt;');
+    expect(interpolated).toContain('João $&amp; &lt;img src=x onerror=xssPayload(1)&gt;');
     expect(interpolated).not.toContain('<img');
 
     const refPayload = buildActiveReferralPayload(

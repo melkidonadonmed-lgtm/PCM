@@ -67,6 +67,8 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
 
   return (
     <div
+      data-state="idle"
+      aria-busy={false}
       className="tactile-card p-4 rounded-2xl border"
       style={{
         backgroundColor: darkMode ? 'var(--surface-card)' : '#FFFFFF',

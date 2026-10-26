@@ -9,6 +9,7 @@ import type {
 import { getFirebaseInstances } from './firebaseClient';
 import { cloudAuthService, type DoctorUserProfile } from './cloudAuthService';
 import { db } from '../db';
+import { storageService } from '../storageService';
 import type { SavedDocument } from '../../types';
 
 export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'offline' | 'error';
@@ -70,39 +71,28 @@ class CloudSyncManager {
   }
 
   private loadPendingDeletesFromStorage(): void {
-    if (typeof window === 'undefined' || !window.localStorage) return;
-    try {
-      const raw = window.localStorage.getItem(PENDING_DELETES_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Partial<Record<SyncCollectionKey, string[]>>;
-      if (Array.isArray(parsed.work_contexts)) {
-        parsed.work_contexts.forEach((id) => this.pendingDeletedIds.work_contexts.add(String(id)));
-      }
-      if (Array.isArray(parsed.prescription_models)) {
-        parsed.prescription_models.forEach((id) =>
-          this.pendingDeletedIds.prescription_models.add(String(id))
-        );
-      }
-      this.recalculatePendingCount();
-    } catch {
-      // Ignora JSON corrompido
+    const parsed = storageService.loadItem<Partial<Record<SyncCollectionKey, string[]>> | null>(
+      PENDING_DELETES_STORAGE_KEY,
+      null
+    );
+    if (!parsed) return;
+    if (Array.isArray(parsed.work_contexts)) {
+      parsed.work_contexts.forEach((id) => this.pendingDeletedIds.work_contexts.add(String(id)));
     }
+    if (Array.isArray(parsed.prescription_models)) {
+      parsed.prescription_models.forEach((id) =>
+        this.pendingDeletedIds.prescription_models.add(String(id))
+      );
+    }
+    this.recalculatePendingCount();
   }
 
   private persistPendingDeletesToStorage(): void {
     this.recalculatePendingCount();
-    if (typeof window === 'undefined' || !window.localStorage) return;
-    try {
-      window.localStorage.setItem(
-        PENDING_DELETES_STORAGE_KEY,
-        JSON.stringify({
-          work_contexts: Array.from(this.pendingDeletedIds.work_contexts),
-          prescription_models: Array.from(this.pendingDeletedIds.prescription_models),
-        })
-      );
-    } catch {
-      // Ignora erro de quota
-    }
+    storageService.saveItem(PENDING_DELETES_STORAGE_KEY, {
+      work_contexts: Array.from(this.pendingDeletedIds.work_contexts),
+      prescription_models: Array.from(this.pendingDeletedIds.prescription_models),
+    });
   }
 
   private recalculatePendingCount(): void {

@@ -111,6 +111,7 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
     <div
       className="rounded-xl border border-blue-500/30 bg-white dark:bg-slate-800/90 p-4 shadow-xs"
       data-state="idle"
+      aria-busy={false}
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
         <div className="flex items-center gap-2">

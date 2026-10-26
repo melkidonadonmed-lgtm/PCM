@@ -19,7 +19,11 @@ export const ScoreParameterGroupInput: React.FC<ScoreParameterGroupInputProps> =
     typeof selectedValue === 'string' ? selectedValue : baselineOption?.id;
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 p-3.5 transition-colors hover:border-slate-300 dark:hover:border-slate-600">
+    <div
+      data-state="idle"
+      aria-busy={false}
+      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 p-3.5 transition-colors hover:border-slate-300 dark:hover:border-slate-600"
+    >
       <div className="mb-2 flex items-start justify-between gap-2">
         <div>
           <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">

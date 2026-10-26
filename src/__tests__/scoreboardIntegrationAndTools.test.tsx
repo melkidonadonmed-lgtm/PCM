@@ -245,7 +245,7 @@ describe('Scoreboard CDSS & Ferramentas de Apoio Clínico Integradas ao PCM', ()
     const htmlA4 = buildScoreHtmlForA4({
       calculator: qsofa,
       result: res,
-      bedIdentifier: '<script>alert(1)</script>UTI-03',
+      bedIdentifier: '<script>xssPayload(1)</script>UTI-03',
     });
     expect(htmlA4).not.toContain('<script>');
     expect(htmlA4).toContain('&lt;script&gt;');
