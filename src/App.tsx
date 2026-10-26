@@ -11,7 +11,7 @@ import { HospitalWardModuleView, type HospitalSubViewId } from './components/hos
 import type { DashboardMetricSource } from './components/hospital/HospitalLabsAndAnalyticsPanel';
 import { ScoreboardModuleView } from './components/scores/ScoreboardModuleView';
 import { PuxarParaAtualizar } from './components/PuxarParaAtualizar';
-import { ActiveTab, PrescriptionItem, Patient } from './types';
+import { ActiveTab, PrescriptionItem, Patient, SusDocumentId } from './types';
 import type {
   HospitalBedPatientRecord,
   HospitalBedScoreEntry,
@@ -125,11 +125,18 @@ export default function App() {
   // Navegação entre abas
   const [activeTab, setActiveTab] = useState<ActiveTab>('prescription');
   const [documentsSubTab, setDocumentsSubTab] = useState<DocumentsSubTab>('certificate');
+  const [lastClinicalDocSubTab, setLastClinicalDocSubTab] = useState<'certificate' | 'referral' | 'exams'>('certificate');
+  const [initialSusDocId, setInitialSusDocId] = useState<SusDocumentId | null>(null);
+  const [susCatalogResetTrigger, setSusCatalogResetTrigger] = useState<number>(0);
+  const [returnNavigationTab, setReturnNavigationTab] = useState<ActiveTab>('prescription');
   const [printDocType, setPrintDocType] = useState<TipoDocumento>('prescription');
 
   const handleNavigateToPrint = (type?: TipoDocumento) => {
     if (type) {
       setPrintDocType(type);
+    }
+    if (activeTab !== 'print_preview') {
+      setReturnNavigationTab(activeTab);
     }
     setActiveTab('print_preview');
   };
@@ -386,6 +393,22 @@ export default function App() {
     setKitToast('Exame de rastreio adicionado à Solicitação de Exames.');
   }, [setSelectedExams]);
 
+  const handleDocumentsSubTabChange = React.useCallback((subTab: DocumentsSubTab) => {
+    setDocumentsSubTab(subTab);
+    if (subTab !== 'sus') {
+      setLastClinicalDocSubTab(subTab);
+      setInitialSusDocId(null);
+    }
+  }, []);
+
+  const handleSelectSusDocFromPalette = React.useCallback((docId: SusDocumentId) => {
+    runTabViewTransition(() => {
+      setInitialSusDocId(docId);
+      setDocumentsSubTab('sus');
+      setActiveTab('documents');
+    });
+  }, []);
+
   const handleSelectTab = React.useCallback((tab: ActiveTab) => {
     if (tab === 'patients') {
       handleOpenPatientModal();
@@ -395,17 +418,35 @@ export default function App() {
       if (tab === 'editor') {
         setEditorCustomDoc(null);
         setEditorInitialSyncTrigger(prev => prev + 1);
+        if (activeTab !== 'editor') {
+          setReturnNavigationTab(activeTab);
+        }
         setActiveTab('editor');
         return;
       }
-      if (tab === 'certificate' || tab === 'referral' || tab === 'exams' || tab === 'sus') {
+      if (tab === 'sus') {
+        setInitialSusDocId(null);
+        setSusCatalogResetTrigger(prev => prev + 1);
+        setDocumentsSubTab('sus');
+        setActiveTab('documents');
+        return;
+      }
+      if (tab === 'certificate' || tab === 'referral' || tab === 'exams') {
+        setInitialSusDocId(null);
+        setLastClinicalDocSubTab(tab);
         setDocumentsSubTab(tab);
+        setActiveTab('documents');
+        return;
+      }
+      if (tab === 'documents') {
+        setInitialSusDocId(null);
+        setDocumentsSubTab(prev => (prev === 'sus' ? lastClinicalDocSubTab : prev));
         setActiveTab('documents');
         return;
       }
       setActiveTab(tab);
     });
-  }, [handleOpenPatientModal]);
+  }, [activeTab, handleOpenPatientModal, lastClinicalDocSubTab]);
 
   const handleNavigateToEditor = React.useCallback(() => handleSelectTab('editor'), [handleSelectTab]);
   const handleNavigateToCertificate = React.useCallback(() => handleSelectTab('certificate'), [handleSelectTab]);
@@ -416,6 +457,9 @@ export default function App() {
   const handleCloseCommandPalette = React.useCallback(() => setIsCommandPaletteOpen(false), []);
 
   const handleNavigateToEditorWithHtml = (html: string, title: string, type: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' = 'custom') => {
+    if (activeTab !== 'editor') {
+      setReturnNavigationTab(activeTab);
+    }
     setEditorCustomDoc({ html, title, type });
     setActiveTab('editor');
   };
@@ -528,6 +572,7 @@ export default function App() {
         isSidebarOpen={sidebarOpen}
         onGoHome={handleGoHome}
         activeTab={activeTab}
+        documentsSubTab={documentsSubTab}
         onSelectTab={handleSelectTab}
         patient={patient}
         onOpenPatientModal={handleOpenPatientModal}
@@ -548,6 +593,7 @@ export default function App() {
           darkMode={darkMode}
           onToggleDarkMode={() => setDarkMode(!darkMode)}
           activeTab={activeTab}
+          documentsSubTab={documentsSubTab}
           onSelectTab={handleSelectTab}
           isOpen={sidebarOpen}
           onToggleOpen={() => setSidebarOpen(!sidebarOpen)}
@@ -644,7 +690,9 @@ export default function App() {
                   activeTab === 'exams' ? 'exams' :
                   activeTab === 'sus' ? 'sus' : documentsSubTab
                 }
-                onSubTabChange={setDocumentsSubTab}
+                initialSusDocId={initialSusDocId}
+                susCatalogResetTrigger={susCatalogResetTrigger}
+                onSubTabChange={handleDocumentsSubTabChange}
                 onNavigateToPrint={(type) => handleNavigateToPrint(type)}
               />
             )}
@@ -733,7 +781,7 @@ export default function App() {
                     onNavigateToPrint={() => handleNavigateToPrint('prescription')}
                     onOpenDoctorModal={handleOpenDoctorModal}
                     editorInitialSyncTrigger={editorInitialSyncTrigger}
-                    onNavigateBack={() => setActiveTab('prescription')}
+                    onNavigateBack={() => setActiveTab(returnNavigationTab)}
                   />
                 </Suspense>
               </AsyncErrorBoundary>
@@ -765,7 +813,7 @@ export default function App() {
                     referral={referral}
                     activeContext={activeContext}
                     initialDocType={printDocType}
-                    onBack={() => setActiveTab('prescription')}
+                    onBack={() => setActiveTab(returnNavigationTab)}
                     onAbrirPerfilMedico={handleOpenDoctorModal}
                   />
                 </Suspense>
@@ -791,6 +839,7 @@ export default function App() {
         isOpen={isCommandPaletteOpen}
         onClose={handleCloseCommandPalette}
         onSelectTab={handleSelectTab}
+        onSelectSusDoc={handleSelectSusDocFromPalette}
         onSelectScore={handleSelectScoreFromPalette}
         onAplicarKit={handleAplicarKit}
         onUsarMedicamento={handleUsarMedicamento}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ActiveTab, DoctorProfile, Patient, WorkContext } from '../types';
+import type { DocumentsSubTab } from './ClinicalDocumentsHub';
 import { CLINICAL_KITS, ClinicalKit } from '../data/clinicalKits';
 import { ConfirmationModal } from './ConfirmationModal';
 import { ContextSwitcher } from './ContextSwitcher';
@@ -15,6 +16,7 @@ interface SidebarProps {
   darkMode: boolean;
   onToggleDarkMode?: () => void;
   activeTab: ActiveTab;
+  documentsSubTab?: DocumentsSubTab;
   onSelectTab: (tab: ActiveTab) => void;
   isOpen: boolean;
   onToggleOpen: () => void;
@@ -50,6 +52,7 @@ interface SidebarNavItem {
 export const Sidebar: React.FC<SidebarProps> = ({
   darkMode,
   activeTab,
+  documentsSubTab,
   onSelectTab,
   isOpen,
   onToggleOpen,
@@ -233,9 +236,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const renderNavButton = (item: SidebarNavItem) => {
-    const isActive = item.id === 'documents'
-      ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
-      : activeTab === item.id;
+    const isSusActive =
+      activeTab === 'sus' || (activeTab === 'documents' && documentsSubTab === 'sus');
+    const isActive =
+      item.id === 'documents'
+        ? (activeTab === 'documents' && documentsSubTab !== 'sus') ||
+          activeTab === 'certificate' ||
+          activeTab === 'referral' ||
+          activeTab === 'exams'
+        : item.id === 'sus'
+          ? isSusActive
+          : activeTab === item.id;
 
     if (!isOpen) {
       return (

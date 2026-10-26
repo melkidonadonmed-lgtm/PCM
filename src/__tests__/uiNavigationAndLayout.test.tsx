@@ -1089,4 +1089,94 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(editorToolbarHtml).toContain('Folha &amp; Timbrado');
     expect(editorToolbarHtml).toContain('1 Via');
   });
+
+  it('sincroniza de forma mutuamente exclusiva a seleção entre Central de Documentos (Alt+2) e Guias SUS (Alt+6) no Header, Sidebar e ClinicalDocumentsHub', () => {
+    // 1. Quando activeTab="documents" e documentsSubTab="sus", apenas Guias SUS deve ficar ativo (aria-current="page")
+    const sidebarOnSusHtml = renderToStaticMarkup(
+      <Sidebar
+        darkMode={false}
+        activeTab="documents"
+        documentsSubTab="sus"
+        onSelectTab={vi.fn()}
+        isOpen={true}
+        onToggleOpen={vi.fn()}
+        doctor={configuredDoctor}
+        patient={activePatient}
+      />
+    );
+    expect(sidebarOnSusHtml).toMatch(/id="nav-btn-sus"[^>]*aria-current="page"/);
+    expect(sidebarOnSusHtml).not.toMatch(/id="nav-btn-documents"[^>]*aria-current="page"/);
+
+    // 2. Quando activeTab="documents" e documentsSubTab="certificate", apenas Central de Documentos fica ativo
+    const sidebarOnCertificateHtml = renderToStaticMarkup(
+      <Sidebar
+        darkMode={false}
+        activeTab="documents"
+        documentsSubTab="certificate"
+        onSelectTab={vi.fn()}
+        isOpen={true}
+        onToggleOpen={vi.fn()}
+        doctor={configuredDoctor}
+        patient={activePatient}
+      />
+    );
+    expect(sidebarOnCertificateHtml).toMatch(/id="nav-btn-documents"[^>]*aria-current="page"/);
+    expect(sidebarOnCertificateHtml).not.toMatch(/id="nav-btn-sus"[^>]*aria-current="page"/);
+
+    // 3. Header também destaca exclusivamente Guias SUS quando documentsSubTab="sus"
+    const headerOnSusHtml = renderToStaticMarkup(
+      <Header
+        darkMode={false}
+        onToggleDarkMode={vi.fn()}
+        onToggleSidebar={vi.fn()}
+        activeTab="documents"
+        documentsSubTab="sus"
+        onSelectTab={vi.fn()}
+        patient={activePatient}
+        doctor={configuredDoctor}
+      />
+    );
+    expect(headerOnSusHtml).toMatch(/aria-current="page"[^>]*title="Guias SUS \(Alt\+6\)"/);
+    expect(headerOnSusHtml).not.toMatch(/aria-current="page"[^>]*title="Documentos \(Alt\+2\)"/);
+
+    // 4. ClinicalDocumentsHub exibe badges contextuais nas 4 abas e abre formulário SUS direto quando initialSusDocId é informado
+    const hubDirectSusHtml = renderToStaticMarkup(
+      <ClinicalDocumentsHub
+        darkMode={false}
+        patient={activePatient}
+        doctor={configuredDoctor}
+        certificate={defaultCertificate}
+        onUpdateCertificate={vi.fn()}
+        referral={defaultReferral}
+        onUpdateReferral={vi.fn()}
+        selectedExams={sampleExams}
+        onUpdateSelectedExams={vi.fn()}
+        clinicalIndication=""
+        onUpdateClinicalIndication={vi.fn()}
+        initialSubTab="sus"
+        initialSusDocId="lme_medicamentos"
+        onNavigateToPrint={vi.fn()}
+      />
+    );
+    expect(hubDirectSusHtml).toContain('2d');
+    expect(hubDirectSusHtml).toContain('Cardiologia');
+    expect(hubDirectSusHtml).toContain('LME — Medicamentos Especializados (Alto Custo / CEAF)');
+
+    // 5. CommandPaletteModal inclui atalhos diretos para Atestado, Encaminhamento e Pedidos de Exames
+    const paletteHtml = renderToStaticMarkup(
+      <CommandPaletteModal
+        isOpen={true}
+        onClose={vi.fn()}
+        onSelectTab={vi.fn()}
+        onSelectSusDoc={vi.fn()}
+        onAplicarKit={vi.fn()}
+        onUsarMedicamento={vi.fn()}
+        onOpenPatientModal={vi.fn()}
+        onOpenDoctorModal={vi.fn()}
+      />
+    );
+    expect(paletteHtml).toContain('Atestado Médico (Res. CFM 1.658/2002)');
+    expect(paletteHtml).toContain('Encaminhamento Médico Especializado');
+    expect(paletteHtml).toContain('Pedidos de Exames (SADT / Laboratório e Imagem)');
+  });
 });

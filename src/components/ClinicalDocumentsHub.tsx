@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MedicalCertificate, MedicalReferral, ExamItem, Patient, DoctorProfile, WorkContext } from '../types';
+import { MedicalCertificate, MedicalReferral, ExamItem, Patient, DoctorProfile, WorkContext, SusDocumentId } from '../types';
 import { CertificateAndReferral } from './CertificateAndReferral';
 import { ExamRequester } from './ExamRequester';
 import { SusDocumentsFiller } from './SusDocumentsFiller';
@@ -29,6 +29,8 @@ interface ClinicalDocumentsHubProps {
   clinicalIndication: string;
   onUpdateClinicalIndication: (text: string) => void;
   initialSubTab?: DocumentsSubTab;
+  initialSusDocId?: SusDocumentId | null;
+  susCatalogResetTrigger?: number;
   onSubTabChange?: (subTab: DocumentsSubTab) => void;
   onNavigateToPrint: (docType?: 'certificate' | 'referral' | 'exams') => void;
   onNavigateToEditorWithHtml?: (html: string, title: string, type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom') => void;
@@ -49,16 +51,22 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
   clinicalIndication,
   onUpdateClinicalIndication,
   initialSubTab = 'certificate',
+  initialSusDocId = null,
+  susCatalogResetTrigger = 0,
   onSubTabChange,
   onNavigateToPrint,
   onNavigateToEditorWithHtml
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<DocumentsSubTab>(initialSubTab);
+  const [localSusResetTrigger, setLocalSusResetTrigger] = useState(0);
 
   const handleChangeSubTab = React.useCallback((nextTab: DocumentsSubTab) => {
+    if (nextTab === 'sus' && activeSubTab === 'sus') {
+      setLocalSusResetTrigger((prev) => prev + 1);
+    }
     setActiveSubTab(nextTab);
     onSubTabChange?.(nextTab);
-  }, [onSubTabChange]);
+  }, [activeSubTab, onSubTabChange]);
 
   // Sincroniza se o initialSubTab mudar externamente
   React.useEffect(() => {
@@ -67,18 +75,31 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
     }
   }, [initialSubTab]);
 
+  const certificateBadge =
+    certificate?.includeCID && certificate?.cid10Code?.trim()
+      ? certificate.cid10Code.trim()
+      : certificate?.daysOff && certificate.daysOff > 0
+        ? `${certificate.daysOff}d`
+        : undefined;
+
+  const referralBadge = referral?.destinationSpecialty?.trim()
+    ? referral.destinationSpecialty.trim().split(' ')[0]
+    : undefined;
+
   const tabsList: { id: DocumentsSubTab; label: string; regulatoryTag: string; icon: IconName; badge?: string }[] = [
     {
       id: 'certificate',
       label: 'Atestado médico',
       regulatoryTag: 'Res. CFM 1.658/2002',
-      icon: 'atestado'
+      icon: 'atestado',
+      badge: certificateBadge
     },
     {
       id: 'referral',
       label: 'Encaminhamento',
       regulatoryTag: 'Regulação Clínica',
-      icon: 'encaminhamento'
+      icon: 'encaminhamento',
+      badge: referralBadge
     },
     {
       id: 'exams',
@@ -90,8 +111,9 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
     {
       id: 'sus',
       label: 'Documentos SUS',
-      regulatoryTag: 'APAC • LME • SISREG',
-      icon: 'description'
+      regulatoryTag: 'APAC • LME • SISREG • GAL • SISCAN',
+      icon: 'description',
+      badge: '9'
     }
   ];
 
@@ -253,6 +275,8 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
             onUpdatePatient={onUpdatePatient}
             doctor={doctor}
             activeContext={activeContext}
+            initialDocId={initialSusDocId}
+            catalogResetTrigger={susCatalogResetTrigger + localSusResetTrigger}
             onNavigateToEditorWithHtml={onNavigateToEditorWithHtml}
             onNavigateToPrint={() => onNavigateToPrint('exams')}
           />

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Icon, IconName } from '../Icon';
-import { ActiveTab } from '../../types';
+import { ActiveTab, SusDocumentId } from '../../types';
 import { CLINICAL_KITS, ClinicalKit } from '../../data/clinicalKits';
 import { SUS_DOCUMENTS_CATALOG } from '../../data/susDocumentsCatalog';
 import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../../data/medicationDatabase';
@@ -13,6 +13,7 @@ export interface CommandPaletteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectTab: (tab: ActiveTab) => void;
+  onSelectSusDoc?: (docId: SusDocumentId) => void;
   onSelectScore?: (calculatorId: string) => void;
   onAplicarKit: (kit: ClinicalKit) => void;
   onUsarMedicamento: (med: UnifiedMedication) => void;
@@ -35,6 +36,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   isOpen,
   onClose,
   onSelectTab,
+  onSelectSusDoc,
   onSelectScore,
   onAplicarKit,
   onUsarMedicamento,
@@ -78,6 +80,42 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         icon: 'documentos',
         action: () => {
           onSelectTab('documents');
+          onClose();
+        },
+      },
+      {
+        id: 'nav-certificate',
+        group: 'Navegação Rápida',
+        title: 'Atestado Médico (Res. CFM 1.658/2002)',
+        subtitle: 'Abrir diretamente o formulário de Atestado Médico com sigilo de CID-10',
+        badge: 'CFM',
+        icon: 'atestado',
+        action: () => {
+          onSelectTab('certificate');
+          onClose();
+        },
+      },
+      {
+        id: 'nav-referral',
+        group: 'Navegação Rápida',
+        title: 'Encaminhamento Médico Especializado',
+        subtitle: 'Abrir diretamente a guia de Encaminhamento e Regulação Clínica',
+        badge: 'Regulação',
+        icon: 'encaminhamento',
+        action: () => {
+          onSelectTab('referral');
+          onClose();
+        },
+      },
+      {
+        id: 'nav-exams',
+        group: 'Navegação Rápida',
+        title: 'Pedidos de Exames (SADT / Laboratório e Imagem)',
+        subtitle: 'Abrir diretamente a solicitação de exames complementares e kits laboratoriais',
+        badge: 'SADT',
+        icon: 'exame',
+        action: () => {
+          onSelectTab('exams');
           onClose();
         },
       },
@@ -185,7 +223,11 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       badge: doc.badge,
       icon: 'description',
       action: () => {
-        onSelectTab('sus');
+        if (onSelectSusDoc) {
+          onSelectSusDoc(doc.id);
+        } else {
+          onSelectTab('sus');
+        }
         onClose();
       },
     }));
@@ -204,7 +246,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     }));
 
     return [...navOptions, ...susOptions, ...kitOptions];
-  }, [onAplicarKit, onClose, onOpenDoctorModal, onOpenPatientModal, onSelectTab]);
+  }, [onAplicarKit, onClose, onOpenDoctorModal, onOpenPatientModal, onSelectSusDoc, onSelectTab]);
 
   const filteredOptions = useMemo(() => {
     const q = query.trim().toLowerCase();

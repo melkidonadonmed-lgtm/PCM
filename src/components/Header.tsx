@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from './Icon';
 import { ActiveTab, DoctorProfile, Patient } from '../types';
+import type { DocumentsSubTab } from './ClinicalDocumentsHub';
 import { cloudAuthService, type DoctorUserProfile } from '../services/cloud/cloudAuthService';
 import { cloudSyncManager, type SyncStatus } from '../services/cloud/cloudSyncManager';
 
@@ -16,6 +17,7 @@ interface HeaderProps {
   onToggleSidebar: () => void;
   isSidebarOpen?: boolean;
   activeTab?: ActiveTab;
+  documentsSubTab?: DocumentsSubTab;
   onSelectTab?: (tab: ActiveTab) => void;
   doctor?: DoctorProfile;
   onOpenDoctorModal?: () => void;
@@ -170,6 +172,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   isSidebarOpen = false,
   activeTab = 'prescription',
+  documentsSubTab,
   onSelectTab,
   patient,
   onNavigateToEditor,
@@ -312,9 +315,17 @@ export const Header: React.FC<HeaderProps> = ({
             className="hidden lg:flex items-center gap-0.5 p-1 rounded-2xl nav-segmented-track min-w-0 max-w-full overflow-x-auto scrollbar-none"
           >
             {quickNavTabs.map((tab) => {
-              const isActive = tab.id === 'documents'
-                ? (activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams')
-                : activeTab === tab.id;
+              const isSusActive =
+                activeTab === 'sus' || (activeTab === 'documents' && documentsSubTab === 'sus');
+              const isActive =
+                tab.id === 'documents'
+                  ? (activeTab === 'documents' && documentsSubTab !== 'sus') ||
+                    activeTab === 'certificate' ||
+                    activeTab === 'referral' ||
+                    activeTab === 'exams'
+                  : tab.id === 'sus'
+                    ? isSusActive
+                    : activeTab === tab.id;
               return (
                 <button
                   key={tab.id}

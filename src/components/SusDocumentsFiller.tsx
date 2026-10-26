@@ -81,6 +81,8 @@ interface SusDocumentsFillerProps {
   onUpdatePatient?: (patient: Patient) => void;
   doctor: DoctorProfile;
   activeContext?: WorkContext | null;
+  initialDocId?: SusDocumentId | null;
+  catalogResetTrigger?: number;
   onNavigateToEditorWithHtml?: (
     html: string,
     title: string,
@@ -95,16 +97,42 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   onUpdatePatient,
   doctor,
   activeContext,
+  initialDocId = null,
+  catalogResetTrigger = 0,
   onNavigateToEditorWithHtml,
 }) => {
   // Estados de Navegação Interna: 'list' (catálogo) ou 'form' (preenchimento)
-  const [viewMode, setViewMode] = useState<'list' | 'form'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'form'>(() =>
+    initialDocId ? 'form' : 'list'
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
 
   // Seleção múltipla de documentos
-  const [selectedDocIds, setSelectedDocIds] = useState<SusDocumentId[]>([]);
-  const [activeFormDocId, setActiveFormDocId] = useState<SusDocumentId>('apac_principal');
+  const [selectedDocIds, setSelectedDocIds] = useState<SusDocumentId[]>(() =>
+    initialDocId ? [initialDocId] : []
+  );
+  const [activeFormDocId, setActiveFormDocId] = useState<SusDocumentId>(
+    () => initialDocId || 'apac_principal'
+  );
+
+  // Volta para a visão de catálogo ao clicar novamente na aba/atalho de Guias SUS
+  const lastResetTriggerRef = useRef(catalogResetTrigger);
+  useEffect(() => {
+    if (catalogResetTrigger !== lastResetTriggerRef.current) {
+      lastResetTriggerRef.current = catalogResetTrigger;
+      setViewMode('list');
+    }
+  }, [catalogResetTrigger]);
+
+  // Abre diretamente o documento quando acionado via Command Palette (Ctrl+K)
+  useEffect(() => {
+    if (initialDocId) {
+      setSelectedDocIds((prev) => (prev.includes(initialDocId) ? prev : [initialDocId]));
+      setActiveFormDocId(initialDocId);
+      setViewMode('form');
+    }
+  }, [initialDocId]);
 
   // Helper para dados padrão específicos de um documento
   const getDocDefaultFields = useCallback(camposIniciaisDoDocumento, []);
