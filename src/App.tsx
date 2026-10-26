@@ -236,7 +236,7 @@ export default function App() {
     DEFAULT_HOSPITAL_BEDS_SEED[0].id
   );
   const [hospitalSubView, setHospitalSubView] =
-    useState<HospitalSubViewId>('evolution_form');
+    useState<HospitalSubViewId>('ward_map');
   const [hospitalDashboardMetricSource, setHospitalDashboardMetricSource] =
     useState<DashboardMetricSource>('labs');
   const [hospitalDashboardScoreAcronym, setHospitalDashboardScoreAcronym] =
@@ -280,6 +280,18 @@ export default function App() {
     },
     []
   );
+
+  const handleDeleteHospitalBed = React.useCallback((bedId: string) => {
+    setHospitalBeds((prev) => {
+      const next = prev.filter((b) => b.id !== bedId);
+      const safeNext = next.length > 0 ? next : DEFAULT_HOSPITAL_BEDS_SEED;
+      setActiveHospitalBedId((currId) =>
+        currId === bedId ? safeNext[0].id : currId
+      );
+      return safeNext;
+    });
+    clinicalRepository.deleteHospitalBed?.(bedId);
+  }, []);
 
   const handleRecordScoreToHospitalBed = React.useCallback(
     (
@@ -683,6 +695,7 @@ export default function App() {
                 onSelectBedId={setActiveHospitalBedId}
                 onUpdateBed={handleUpdateHospitalBed}
                 onCreateBed={handleCreateHospitalBed}
+                onDeleteBed={handleDeleteHospitalBed}
                 initialSubView={hospitalSubView}
                 initialDashboardMetricSource={hospitalDashboardMetricSource}
                 initialDashboardScoreAcronym={hospitalDashboardScoreAcronym}

@@ -21,6 +21,7 @@ import {
   queryScienceLiteratureAgent,
 } from '../utils/hospital/hospitalAiAssistantService';
 import { HospitalWardModuleView } from '../components/hospital/HospitalWardModuleView';
+import { HospitalQuickAdmissionModal } from '../components/hospital/HospitalQuickAdmissionModal';
 import { HospitalEvolutionFormPanel } from '../components/hospital/HospitalEvolutionFormPanel';
 import { HospitalLabsAndAnalyticsPanel } from '../components/hospital/HospitalLabsAndAnalyticsPanel';
 import { HospitalBedChatAndSciencePanel } from '../components/hospital/HospitalBedChatAndSciencePanel';
@@ -157,8 +158,24 @@ describe('Módulo Hospitalar e Gestão de Pacientes (MOD-03) — Rigor Terapêut
     );
     expect(wardHtml).toContain('Módulo Hospitalar e Gestão de Pacientes');
     expect(wardHtml).toContain('MOD-03 Ativo');
+    expect(wardHtml).toContain('id="hospital-ward-census-grid"');
+    expect(wardHtml).toContain('+ Admitir Novo Paciente');
     expect(wardHtml).toContain('EF/LT 110-15');
     expect(wardHtml).toContain('EF/LT 204-02');
+    expect(wardHtml).toContain('Evoluir Leito');
+
+    const quickAdmModalHtml = renderToStaticMarkup(
+      <HospitalQuickAdmissionModal
+        isOpen={true}
+        initialMode="manual"
+        suggestedBedCode="110-18"
+        onClose={vi.fn()}
+        onConfirmNewBed={vi.fn()}
+      />
+    );
+    expect(quickAdmModalHtml).toContain('role="dialog"');
+    expect(quickAdmModalHtml).toContain('Nova Admissão de Paciente no Mapa de Leitos');
+    expect(quickAdmModalHtml).toContain('Confirmar Admissão e Abrir Prontuário');
 
     const formHtml = renderToStaticMarkup(
       <HospitalEvolutionFormPanel
@@ -170,6 +187,9 @@ describe('Módulo Hospitalar e Gestão de Pacientes (MOD-03) — Rigor Terapêut
       />
     );
     expect(formHtml).toContain('EXAME NEUROVASCULAR DISTAL (MID)');
+    expect(formHtml).toContain('Alergias Medicamentosas');
+    expect(formHtml).toContain('Em Uso Atual');
+    expect(formHtml).toContain('Suspender → Fez Uso');
     expect(formHtml).toContain('id="hospital-standard-evolution-preview"');
 
     const labsHtml = renderToStaticMarkup(

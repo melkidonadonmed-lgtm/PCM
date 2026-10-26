@@ -68,8 +68,10 @@ src/
       EditorTwoViasCanvas.tsx  # Folha A4 paisagem (2 vias: Controle Especial Portaria 344/98 e Antimicrobiano RDC 471/2021)
       EditorModelsAndStylesDrawer.tsx # Gaveta lateral de modelos salvos, modelos clínicos predefinidos e estilos visuais
     hospital/
-      HospitalWardModuleView.tsx # Bancada principal do Módulo Hospitalar (MOD-03, Alt+7) e seletor de leitos (EF/LT)
-      HospitalEvolutionFormPanel.tsx # Formulário padronizado de evolução/admissão hospitalar e exportação A4
+      HospitalWardModuleView.tsx # Bancada principal do Módulo Hospitalar (MOD-03, Alt+7), Mapa de Leitos e seletor rápido de round
+      HospitalWardCensusGrid.tsx # Mapa de Leitos e Censo da Enfermaria (cards clínicos, filtro por setor e ações rápidas)
+      HospitalQuickAdmissionModal.tsx # Modal de Nova Admissão Rápida (manual essencial ou prontuário colado em novo leito)
+      HospitalEvolutionFormPanel.tsx # Formulário padronizado de evolução/admissão hospitalar em acordeão e exportação A4
       HospitalLabsAndAnalyticsPanel.tsx # Monitoramento longitudinal de exames, escores CDSS e Dashboard Conduta x Evolução
       HospitalBedChatAndSciencePanel.tsx # Copiloto do leito (Live API) e Agente Science de protocolos e evidências
       HospitalMultimodalImportModal.tsx # Modal de ingestão multimodal (PDF, DOC, imagem, voz e texto) sem alucinação

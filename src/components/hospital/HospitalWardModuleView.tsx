@@ -6,17 +6,25 @@ import type { DoctorProfile, Patient } from '../../types';
 import { clinicalRepository } from '../../core/storage/clinicalRepository';
 import {
   DEFAULT_HOSPITAL_BEDS_SEED,
-  createEmptyHospitalBedRecord,
   mergeExtractedHospitalDataIntoBed,
   type MultimodalExtractionResult,
 } from '../../utils/hospital/hospitalMultimodalIngestor';
 import { calculateHospitalStayDays } from '../../utils/hospital/hospitalEvolutionFormatter';
+import { HospitalWardCensusGrid } from './HospitalWardCensusGrid';
+import {
+  HospitalQuickAdmissionModal,
+  type QuickAdmissionMode,
+} from './HospitalQuickAdmissionModal';
 import { HospitalEvolutionFormPanel } from './HospitalEvolutionFormPanel';
-import { HospitalLabsAndAnalyticsPanel, type DashboardMetricSource } from './HospitalLabsAndAnalyticsPanel';
+import {
+  HospitalLabsAndAnalyticsPanel,
+  type DashboardMetricSource,
+} from './HospitalLabsAndAnalyticsPanel';
 import { HospitalBedChatAndSciencePanel } from './HospitalBedChatAndSciencePanel';
 import { HospitalMultimodalImportModal } from './HospitalMultimodalImportModal';
 
 export type HospitalSubViewId =
+  | 'ward_map'
   | 'evolution_form'
   | 'longitudinal_labs'
   | 'analytics_dashboard'
@@ -32,6 +40,7 @@ export interface HospitalWardModuleViewProps {
   onSelectBedId?: (bedId: string) => void;
   onUpdateBed?: (updated: HospitalBedPatientRecord) => void;
   onCreateBed?: (created: HospitalBedPatientRecord) => void;
+  onDeleteBed?: (bedId: string) => void;
   initialSubView?: HospitalSubViewId;
   initialDashboardMetricSource?: DashboardMetricSource;
   initialDashboardScoreAcronym?: string | null;
@@ -46,16 +55,22 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
   onSelectBedId,
   onUpdateBed,
   onCreateBed,
-  initialSubView = 'evolution_form',
+  onDeleteBed,
+  initialSubView = 'ward_map',
   initialDashboardMetricSource = 'labs',
   initialDashboardScoreAcronym = null,
   onOpenScoreboardForBed,
 }) => {
-  const [internalBeds, setInternalBeds] = useState<HospitalBedPatientRecord[]>(DEFAULT_HOSPITAL_BEDS_SEED);
-  const [internalActiveBedId, setInternalActiveBedId] = useState<string>(DEFAULT_HOSPITAL_BEDS_SEED[0].id);
+  const [internalBeds, setInternalBeds] = useState<HospitalBedPatientRecord[]>(
+    DEFAULT_HOSPITAL_BEDS_SEED
+  );
+  const [internalActiveBedId, setInternalActiveBedId] = useState<string>(
+    DEFAULT_HOSPITAL_BEDS_SEED[0].id
+  );
   const [activeSubView, setActiveSubView] = useState<HospitalSubViewId>(initialSubView);
   const [isMultimodalModalOpen, setIsMultimodalModalOpen] = useState(false);
-  const [newBedCodeInput, setNewBedCodeInput] = useState('');
+  const [isQuickAdmissionOpen, setIsQuickAdmissionOpen] = useState(false);
+  const [quickAdmissionMode, setQuickAdmissionMode] = useState<QuickAdmissionMode>('manual');
 
   const beds = externalBeds && externalBeds.length > 0 ? externalBeds : internalBeds;
   const activeBedId = externalActiveBedId || internalActiveBedId;
@@ -97,6 +112,14 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
     }
   };
 
+  const handleOpenBedSubView = (
+    bedId: string,
+    targetView: 'evolution_form' | 'longitudinal_labs' | 'analytics_dashboard' | 'science_and_chat'
+  ) => {
+    handleSelectBed(bedId);
+    setActiveSubView(targetView);
+  };
+
   const handleUpdateBedRecord = (updated: HospitalBedPatientRecord) => {
     if (onUpdateBed) {
       onUpdateBed(updated);
@@ -106,9 +129,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
     }
   };
 
-  const handleCreateNewBed = () => {
-    const code = newBedCodeInput.trim() || `110-${beds.length + 16}`;
-    const created = createEmptyHospitalBedRecord(code, 'enfermaria_clinica');
+  const handleConfirmQuickAdmission = (created: HospitalBedPatientRecord) => {
     if (onCreateBed) {
       onCreateBed(created);
     } else {
@@ -116,7 +137,25 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
       setInternalActiveBedId(created.id);
       clinicalRepository.saveHospitalBed?.(created);
     }
-    setNewBedCodeInput('');
+    handleSelectBed(created.id);
+    setActiveSubView('evolution_form');
+  };
+
+  const handleDeleteBedRecord = (bedId: string) => {
+    if (onDeleteBed) {
+      onDeleteBed(bedId);
+    } else {
+      setInternalBeds((prev) => {
+        const next = prev.filter((b) => b.id !== bedId);
+        return next.length > 0 ? next : DEFAULT_HOSPITAL_BEDS_SEED;
+      });
+      clinicalRepository.deleteHospitalBed?.(bedId);
+    }
+  };
+
+  const handleOpenQuickAdmissionModal = (mode: QuickAdmissionMode = 'manual') => {
+    setQuickAdmissionMode(mode);
+    setIsQuickAdmissionOpen(true);
   };
 
   const handleApplyMultimodalExtraction = (extraction: MultimodalExtractionResult) => {
@@ -125,15 +164,18 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
   };
 
   const subNavItems: ReadonlyArray<{ id: HospitalSubViewId; label: string; icon: string }> = [
+    { id: 'ward_map', label: `Mapa de Leitos (${beds.length})`, icon: 'local_hospital' },
     { id: 'evolution_form', label: 'Evolução & Admissão (EF/LT)', icon: 'clinical_notes' },
     { id: 'longitudinal_labs', label: 'Monitoramento de Exames', icon: 'biotech' },
     { id: 'analytics_dashboard', label: 'Dashboard & Conduta × Evolução', icon: 'monitor_heart' },
     { id: 'science_and_chat', label: 'Assistente Live & Agente Science', icon: 'science' },
   ];
 
+  const suggestedNextBedCode = `110-${beds.length + 15}`;
+
   return (
     <div id="hospital-ward-module-root" data-state="idle" className="space-y-4">
-      {/* Cabeçalho do Módulo Hospitalar + Seletor Instantâneo de Leitos */}
+      {/* Cabeçalho Principal do Módulo Hospitalar */}
       <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5 space-y-3.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
@@ -141,104 +183,57 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
               <Icon name="local_hospital" size={20} />
             </span>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-base sm:text-lg font-extrabold text-[var(--text-main)]">
                   Módulo Hospitalar e Gestão de Pacientes
                 </h1>
                 <Badge tone="clinical" tabular>
                   MOD-03 Ativo
                 </Badge>
+                <span className="text-xs font-bold text-[var(--text-muted)] clinical-tabular-nums">
+                  • {beds.length} leito(s) no censo
+                </span>
               </div>
               <p className="text-xs text-[var(--text-muted)]">
-                Admissão manual e multimodal via IA sem alucinação, evolução padronizada, curva longitudinal de exames, Conduta × Evolução e Agente Science
+                Mapa de leitos da enfermaria, admissão rápida manual ou via IA sem alucinação, evolução padronizada e curva longitudinal
               </p>
             </div>
           </div>
 
-          {/* Ações Rápidas: Nova Admissão e Importação Multimodal */}
+          {/* Ações Globais de Admissão e Escores */}
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1.5">
-              <input
-                type="text"
-                value={newBedCodeInput}
-                onChange={(e) => setNewBedCodeInput(e.target.value)}
-                placeholder="Ex.: 110-18 ou UTI-02"
-                aria-label="Código da enfermaria e leito para nova admissão"
-                className="w-36 h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-semibold clinical-tabular-nums"
-              />
-              <button
-                type="button"
-                onClick={handleCreateNewBed}
-                className="btn-tactile-secondary h-9 px-3 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
-              >
-                <Icon name="add" size={15} />
-                <span>Admitir Leito</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => handleOpenQuickAdmissionModal('manual')}
+              className="btn-tactile-primary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            >
+              <Icon name="person_add" size={15} />
+              <span>+ Admitir Paciente</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsMultimodalModalOpen(true)}
+              className="btn-tactile-secondary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            >
+              <Icon name="auto_awesome" size={15} className="text-sky-600 dark:text-sky-400" />
+              <span>Importação Multimodal IA</span>
+            </button>
 
             {onOpenScoreboardForBed && (
               <button
                 type="button"
                 onClick={() => onOpenScoreboardForBed(activeBed)}
-                className="btn-tactile-secondary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                className="btn-tactile-secondary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer clinical-tabular-nums"
               >
                 <Icon name="monitor_heart" size={15} className="text-blue-600 dark:text-blue-400" />
                 <span>Escores do Leito ({activeBed.scoreEntries?.length || 0})</span>
               </button>
             )}
-
-            <button
-              type="button"
-              onClick={() => setIsMultimodalModalOpen(true)}
-              className="btn-tactile-primary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-            >
-              <Icon name="auto_awesome" size={15} />
-              <span>Importação Multimodal IA</span>
-            </button>
           </div>
         </div>
 
-        {/* Seletor Instantâneo de Leitos da Unidade */}
-        <div
-          role="tablist"
-          aria-label="Seletor instantâneo de leitos da unidade"
-          className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none"
-        >
-          {beds.map((bed) => {
-            const isSelected = bed.id === activeBed.id;
-            const stayDays = calculateHospitalStayDays(bed.dihDateBr);
-            return (
-              <button
-                key={bed.id}
-                type="button"
-                role="tab"
-                aria-selected={isSelected}
-                onClick={() => handleSelectBed(bed.id)}
-                className={`px-4 py-2 rounded-xl border text-left transition cursor-pointer shrink-0 min-w-44 ${
-                  isSelected
-                    ? 'bg-sky-600/15 border-sky-500/50 text-[var(--text-main)] shadow-tactile-sm'
-                    : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
-                    EF/LT {bed.wardAndBed}
-                  </span>
-                  {stayDays > 0 && (
-                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
-                      D{stayDays}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs font-semibold truncate mt-0.5">
-                  {bed.patientNameOrInitials || 'Leito sem identificação'}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Trilho Segmentado das 4 Sub-Bancadas Hospitalares */}
+        {/* Trilho Segmentado das 5 Visões Hospitalares (iniciando no Mapa de Leitos) */}
         <div className="grid grid-cols-2 lg:flex lg:items-center gap-1 p-1 rounded-2xl nav-segmented-track">
           {subNavItems.map((tab) => {
             const isActive = activeSubView === tab.id;
@@ -254,15 +249,93 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold'
                 }`}
               >
-                <Icon name={tab.icon} size={15} filled={isActive} className={isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'} />
+                <Icon
+                  name={tab.icon}
+                  size={15}
+                  filled={isActive}
+                  className={isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'}
+                />
                 <span className="truncate">{tab.label}</span>
               </button>
             );
           })}
         </div>
+
+        {/* Barra de Contexto do Paciente Ativo e Troca Rápida (exibida ao entrar em um leito) */}
+        {activeSubView !== 'ward_map' && (
+          <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveSubView('ward_map')}
+                className="btn-tactile-secondary h-8 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
+              >
+                <Icon name="arrow_back" size={14} />
+                <span>Mapa de Leitos</span>
+              </button>
+
+              <div className="min-w-0">
+                <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                  Leito Ativo: EF/LT {activeBed.wardAndBed}
+                </span>
+                <span className="text-xs font-semibold text-[var(--text-main)] ml-1.5">
+                  — {activeBed.patientNameOrInitials || 'Sem identificação'}
+                </span>
+              </div>
+            </div>
+
+            <div
+              role="tablist"
+              aria-label="Seletor instantâneo de leitos da unidade"
+              className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none"
+            >
+              {beds.map((bed) => {
+                const isSelected = bed.id === activeBed.id;
+                const stayDays = calculateHospitalStayDays(bed.dihDateBr);
+                return (
+                  <button
+                    key={bed.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isSelected}
+                    onClick={() => handleSelectBed(bed.id)}
+                    className={`px-3 py-1.5 rounded-xl border text-left transition cursor-pointer shrink-0 ${
+                      isSelected
+                        ? 'bg-sky-600/15 border-sky-500/50 text-[var(--text-main)] font-bold'
+                        : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] font-medium'
+                    }`}
+                  >
+                    <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                      EF/LT {bed.wardAndBed}
+                    </span>
+                    <span className="text-xs ml-1.5 truncate max-w-28 inline-block align-bottom">
+                      {bed.patientNameOrInitials || 'Sem ID'}
+                    </span>
+                    {stayDays > 0 && (
+                      <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
+                        D{stayDays}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* Área Ativa da Sub-Bancada */}
+      {/* Visão 1 (Padrão): Mapa de Leitos / Censo da Enfermaria */}
+      {activeSubView === 'ward_map' && (
+        <HospitalWardCensusGrid
+          beds={beds}
+          activeBedId={activeBed.id}
+          onOpenBedSubView={handleOpenBedSubView}
+          onOpenQuickAdmissionModal={handleOpenQuickAdmissionModal}
+          onDeleteBed={handleDeleteBedRecord}
+        />
+      )}
+
+      {/* Visão 2: Prontuário de Evolução e Admissão do Leito */}
       {activeSubView === 'evolution_form' && (
         <HospitalEvolutionFormPanel
           bedRecord={activeBed}
@@ -273,6 +346,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
         />
       )}
 
+      {/* Visão 3 e 4: Monitoramento Longitudinal de Exames e Dashboard Conduta x Evolução */}
       {(activeSubView === 'longitudinal_labs' || activeSubView === 'analytics_dashboard') && (
         <HospitalLabsAndAnalyticsPanel
           mode={activeSubView}
@@ -288,6 +362,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
         />
       )}
 
+      {/* Visão 5: Assistente Live e Agente Science */}
       {activeSubView === 'science_and_chat' && (
         <HospitalBedChatAndSciencePanel
           allBeds={beds}
@@ -297,7 +372,16 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
         />
       )}
 
-      {/* Modal de Importação Multimodal via IA (Rigor Terapêutico) */}
+      {/* Modal de Nova Admissão Rápida (Manual ou Prontuário Colado em Novo Leito) */}
+      <HospitalQuickAdmissionModal
+        isOpen={isQuickAdmissionOpen}
+        initialMode={quickAdmissionMode}
+        suggestedBedCode={suggestedNextBedCode}
+        onClose={() => setIsQuickAdmissionOpen(false)}
+        onConfirmNewBed={handleConfirmQuickAdmission}
+      />
+
+      {/* Modal de Importação Multimodal para Atualizar o Leito Ativo */}
       <HospitalMultimodalImportModal
         isOpen={isMultimodalModalOpen}
         activeBedCode={activeBed.wardAndBed}
