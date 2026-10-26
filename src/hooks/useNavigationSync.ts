@@ -86,32 +86,9 @@ export function useNavigationSync({
 }
 
 /**
- * Executa transição de aba com View Transitions API quando suportada e permitida pela preferência vestibular.
+ * Executa transição de aba sincronizada com a animação CSS `.animate-tab-fade` do container principal,
+ * sem congelar o drawer da Sidebar ou capturar snapshots assíncronos do root viewport.
  */
 export function runTabViewTransition(updateFn: () => void) {
-  if (typeof document === 'undefined' || typeof window === 'undefined') {
-    updateFn();
-    return;
-  }
-
-  const prefersReducedMotion =
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isPrinting = document.body?.classList?.contains('pcm-imprimindo');
-  const docWithVT = document as Document & {
-    startViewTransition?: (cb: () => void) => unknown;
-  };
-
-  if (!prefersReducedMotion && !isPrinting && typeof docWithVT.startViewTransition === 'function') {
-    try {
-      docWithVT.startViewTransition(() => {
-        updateFn();
-      });
-      return;
-    } catch {
-      // Fallback imediato
-    }
-  }
-
   updateFn();
 }

@@ -416,12 +416,12 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onInstallApp}
               className={`${
                 isSidebarOpen ? 'flex lg:hidden 2xl:flex' : 'flex'
-              } items-center justify-center gap-1.5 w-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:w-auto sm:px-2.5 lg:w-9 lg:px-0 2xl:w-auto 2xl:px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0`}
-              title="Instalar PresCMed como aplicativo offline"
+              } items-center justify-center gap-1.5 px-2.5 min-h-[44px] sm:min-h-0 lg:w-9 lg:px-0 2xl:w-auto 2xl:px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-sky-500/10 dark:bg-sky-500/15 border-sky-500/30 dark:border-sky-400/30 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0`}
+              title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
               aria-label="Instalar Aplicativo PresCMed"
             >
-              <Icon name="download" size={16} className="text-sky-600 dark:text-sky-400" />
-              <span className="hidden sm:inline lg:hidden 2xl:inline">Instalar</span>
+              <Icon name="download" size={16} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <span className="inline lg:hidden 2xl:inline">Baixar App</span>
             </button>
           )}
 

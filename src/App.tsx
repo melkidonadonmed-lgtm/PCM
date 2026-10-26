@@ -629,7 +629,10 @@ export default function App() {
             onOpenCommandPalette={handleOpenCommandPalette}
             compactOnDesktop={true}
           />
-          <div key={activeTab} className="animate-tab-fade">
+          <div
+            key={activeTab === 'documents' && documentsSubTab === 'sus' ? 'documents-sus' : activeTab}
+            className="animate-tab-fade"
+          >
             {activeTab === 'prescription' && (
               <PrescriptionBuilder
                 darkMode={darkMode}

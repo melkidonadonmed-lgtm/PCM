@@ -273,7 +273,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => handleNavClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`relative w-full h-9 flex items-center justify-between px-2.5 rounded-xl text-xs transition duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer group hover:translate-x-1 active:translate-x-0 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
+        className={`relative w-full h-9 flex items-center justify-between px-2.5 rounded-xl text-xs transition-colors duration-150 ease-out cursor-pointer group lg:hover:translate-x-0.5 active:translate-x-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
           isActive
             ? 'nav-item-active sidebar-active-surface text-white font-semibold'
             : 'text-slate-300 hover:bg-white/[0.07] hover:border-white/10 hover:text-white font-medium border border-transparent'
@@ -343,7 +343,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         aria-label="Menu Lateral de Navegação"
         aria-hidden={!isOpen && !isDesktop}
         inert={!isOpen && !isDesktop ? true : undefined}
-        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform transition-transform duration-300 ease-out ${
+        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform will-change-transform transition-[transform,width] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full pointer-events-none'
         } lg:pointer-events-auto lg:sticky lg:top-[4.25rem] lg:h-[calc(100dvh-4.75rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl ${
           isOpen
@@ -569,7 +569,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={handleToggleKits}
                   aria-expanded={showKits}
                   aria-controls="sidebar-kits-list"
-                  className="w-full h-9 px-2.5 rounded-xl text-xs font-medium text-slate-300 border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.07] hover:border-white/10 hover:translate-x-1 active:translate-x-0 active:scale-[0.98] transition duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                  className="w-full h-9 px-2.5 rounded-xl text-xs font-medium text-slate-300 border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.07] hover:border-white/10 lg:hover:translate-x-0.5 active:translate-x-0 active:scale-[0.99] transition-colors duration-150 ease-out cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.06] group-hover:bg-white/[0.10] group-hover:border-white/15 group-hover:scale-105 transition duration-200 flex items-center justify-center shrink-0">
@@ -594,7 +594,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         key={kit.id}
                         type="button"
                         onClick={() => runMobileAwareAction(() => onAplicarKit?.(kit))}
-                        className="w-full text-left px-2.5 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 hover:translate-x-1 active:translate-x-0 transition duration-200 cursor-pointer group active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 lg:hover:translate-x-0.5 active:translate-x-0 transition-colors duration-150 cursor-pointer group active:scale-[0.99] outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                         title={`Aplicar kit: ${kit.name} (${kit.badge})`}
                       >
                         <div className="flex items-center justify-between gap-1.5">
@@ -693,12 +693,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Pinned Footer: Ações da Consulta, Backup e Recolher Menu */}
+        {/* Pinned Footer: Ações da Consulta, Download do App, Backup e Recolher Menu */}
         <div className={`shrink-0 border-t border-white/10 bg-black/15 rounded-b-2xl overflow-hidden ${
-          isOpen ? 'p-2 space-y-1 pb-3 lg:pb-2' : 'py-2.5 px-1.5 space-y-2 flex flex-col items-center'
+          isOpen ? 'p-2 space-y-1.5 pb-[calc(0.875rem+env(safe-area-inset-bottom))] lg:pb-2' : 'py-2.5 px-1.5 space-y-2 flex flex-col items-center'
         }`}>
           {isOpen ? (
             <>
+              {/* Botão dedicado de Download / Instalação do App no Celular ou PC */}
+              {isInstallable && onInstallApp && (
+                <button
+                  id="btn-sidebar-install-pwa"
+                  type="button"
+                  onClick={() => {
+                    onInstallApp();
+                    if (!isDesktop) onClose?.();
+                  }}
+                  className="w-full h-9 min-h-[38px] px-2.5 rounded-xl border border-sky-400/35 bg-sky-500/20 text-sky-100 hover:bg-sky-500/30 hover:text-white hover:border-sky-400/50 active:scale-[0.98] transition duration-150 cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shadow-tactile-sm"
+                  title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
+                >
+                  <Icon name="download" size={15} className="text-sky-300 shrink-0" />
+                  <span className="truncate">Baixar / Instalar App</span>
+                </button>
+              )}
+
               {/* Novo Atendimento em linha única limpa */}
               <button
                 type="button"
@@ -710,7 +727,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="truncate">Novo Atendimento</span>
               </button>
 
-              {/* Utilitários secundários uniformes: Backup, Instalar e Recolher Menu (sem overflow horizontal) */}
+              {/* Utilitários secundários uniformes: Backup e Recolher Menu */}
               <div className="flex items-center gap-1.5 w-full min-w-0">
                 {onOpenBackupModal && (
                   <button
@@ -721,22 +738,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Icon name="cloud_download" size={13} className="text-slate-300 shrink-0" />
                     <span className="truncate">Backup (.pcm)</span>
-                  </button>
-                )}
-
-                {isInstallable && onInstallApp && (
-                  <button
-                    id="btn-sidebar-install-pwa"
-                    type="button"
-                    onClick={() => {
-                      onInstallApp();
-                      if (!isDesktop) onClose?.();
-                    }}
-                    className="flex-1 min-w-0 h-8 px-1 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:scale-[0.98] transition duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
-                    title="Instalar PresCMed como aplicativo offline"
-                  >
-                    <Icon name="download" size={13} className="text-sky-300 shrink-0" />
-                    <span className="truncate">Instalar App</span>
                   </button>
                 )}
 
