@@ -708,7 +708,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onInstallApp();
                     if (!isDesktop) onClose?.();
                   }}
-                  className="w-full h-9 min-h-[38px] px-2.5 rounded-xl border border-sky-400/35 bg-sky-500/20 text-sky-100 hover:bg-sky-500/30 hover:text-white hover:border-sky-400/50 active:scale-[0.98] transition duration-150 cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shadow-tactile-sm"
+                  className="w-full h-9 min-h-9 px-2.5 rounded-xl border border-sky-400/35 bg-sky-500/20 text-sky-100 hover:bg-sky-500/30 hover:text-white hover:border-sky-400/50 active:translate-y-[1px] transition duration-150 cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shadow-tactile-sm"
                   title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
                 >
                   <Icon name="download" size={15} className="text-sky-300 shrink-0" />

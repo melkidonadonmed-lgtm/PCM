@@ -54,6 +54,8 @@
     margin: 0;
     padding: 0;
     -webkit-text-size-adjust: 100%;
+    font-synthesis: none;
+    font-optical-sizing: auto;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -493,7 +495,7 @@
   }
 
   .chip-neutral:active:not(:disabled) {
-    transform: translate3d(0, 0, 0) scale(0.98);
+    transform: translate3d(0, 1px, 0);
   }
 
   .chip-neutral[data-active="true"] {
@@ -660,7 +662,7 @@
   }
 
   .tactile-card-interactive:active {
-    transform: translate3d(0, 1px, 0) scale(0.995);
+    transform: translate3d(0, 1px, 0);
     box-shadow: var(--elevation-z0);
   }
 
@@ -790,7 +792,7 @@
   .btn-tactile-primary:active:not(:disabled),
   .btn-primary-tactile:active:not(:disabled),
   .button-primary:active:not(:disabled) {
-    transform: translate3d(0, 1px, 0) scale(0.98);
+    transform: translate3d(0, 1px, 0);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
@@ -822,7 +824,7 @@
   .dark .btn-tactile-primary:active:not(:disabled),
   .dark .btn-primary-tactile:active:not(:disabled),
   .dark .button-primary:active:not(:disabled) {
-    transform: translate3d(0, 1px, 0) scale(0.98);
+    transform: translate3d(0, 1px, 0);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
   }
 
@@ -864,7 +866,7 @@
 
   .tactile-btn-success:active:not(:disabled),
   .btn-tactile-clinical:active:not(:disabled) {
-    transform: translate3d(0, 1px, 0) scale(0.98);
+    transform: translate3d(0, 1px, 0);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
@@ -916,7 +918,7 @@
 
   .tactile-btn-secondary:active:not(:disabled),
   .btn-tactile-secondary:active:not(:disabled) {
-    transform: translate3d(0, 1px, 0) scale(0.98);
+    transform: translate3d(0, 1px, 0);
     box-shadow: var(--shadow-pressed);
   }
 
@@ -950,7 +952,7 @@
   }
 
   .btn-tactile-icon:active:not(:disabled) {
-    transform: scale(0.95);
+    transform: translate3d(0, 1px, 0);
   }
 
   /* 5. Z-3 Floating Elements / Popovers / Sticky Bars (Sobreposição de Camadas) */
@@ -1579,7 +1581,25 @@
 
   .clinical-reading-measure {
     max-width: 65ch;
+    max-inline-size: 65ch;
     line-height: 1.65;
+  }
+
+  .flow-root {
+    display: flow-root;
+  }
+
+  @media (display-mode: standalone) {
+    body {
+      overscroll-behavior-y: none;
+    }
+
+    #prescmed-header,
+    #prescmed-sidebar,
+    #mobile-bottom-nav {
+      user-select: none;
+      -webkit-user-select: none;
+    }
   }
 
   .clinical-tabular-nums,
