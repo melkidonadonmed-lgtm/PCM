@@ -22,8 +22,8 @@ export function usePwaInstall() {
     }
 
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Previne a minibarra nativa do navegador para controlar a exibição na UI
-      e.preventDefault();
+      // Armazena a referência do evento para acionamento explícito no botão "Instalar App"
+      // sem chamar e.preventDefault() no carregamento (evitando o aviso "Banner not shown" no console).
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 

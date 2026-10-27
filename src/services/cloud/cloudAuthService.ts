@@ -13,35 +13,67 @@ type AuthCallback = (user: DoctorUserProfile | null) => void;
 
 const CLOUD_AUTH_ACTIVE_KEY = 'prescmed_cloud_auth_active';
 
+/**
+ * Identifica cancelamentos benignos de popup de login (quando o médico fecha a janela
+ * ou clica duas vezes seguidas), evitando falsos erros vermelhos no console.
+ */
+export function isBenignPopupAuthError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const code = (error as { code?: string }).code;
+  return (
+    code === 'auth/popup-closed-by-user' ||
+    code === 'auth/cancelled-popup-request'
+  );
+}
+
 class CloudAuthService {
   private currentUser: DoctorUserProfile | null = null;
   private listeners: Set<AuthCallback> = new Set();
   private isInitialized = false;
 
   /**
-   * Dispara o fluxo de autenticação com a conta Google via Popup.
+   * Dispara o fluxo de autenticação com a conta Google via Popup
+   * (com fallback para Redirect caso popups estejam bloqueados pelo navegador).
    */
-  async loginWithGoogle(): Promise<DoctorUserProfile> {
+  async loginWithGoogle(): Promise<DoctorUserProfile | null> {
     const { auth } = await getFirebaseInstances();
-    const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+    const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = await import('firebase/auth');
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-    this.currentUser = {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL
-    };
+      this.currentUser = {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL
+      };
 
-    storageService.saveRawString(CLOUD_AUTH_ACTIVE_KEY, 'true');
+      storageService.saveRawString(CLOUD_AUTH_ACTIVE_KEY, 'true');
 
-    this.notifyListeners();
-    return this.currentUser;
+      this.notifyListeners();
+      return this.currentUser;
+    } catch (error) {
+      if (isBenignPopupAuthError(error)) {
+        return null;
+      }
+
+      const code = (error as { code?: string })?.code;
+      if (
+        code === 'auth/popup-blocked' ||
+        code === 'auth/operation-not-supported-in-this-environment'
+      ) {
+        storageService.saveRawString(CLOUD_AUTH_ACTIVE_KEY, 'true');
+        await signInWithRedirect(auth, provider);
+        return null;
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -89,7 +121,9 @@ class CloudAuthService {
       this.isInitialized = true;
       try {
         const { auth } = await getFirebaseInstances();
-        const { onAuthStateChanged } = await import('firebase/auth');
+        const { onAuthStateChanged, getRedirectResult } = await import('firebase/auth');
+
+        getRedirectResult(auth).catch(() => {});
 
         onAuthStateChanged(auth, (user: User | null) => {
           if (user) {

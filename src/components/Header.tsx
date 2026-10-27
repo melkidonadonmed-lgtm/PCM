@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Icon } from './Icon';
 import { ActiveTab, DoctorProfile, Patient } from '../types';
 import type { DocumentsSubTab } from './ClinicalDocumentsHub';
-import { cloudAuthService, type DoctorUserProfile } from '../services/cloud/cloudAuthService';
+import { cloudAuthService, isBenignPopupAuthError, type DoctorUserProfile } from '../services/cloud/cloudAuthService';
 import { cloudSyncManager, type SyncStatus } from '../services/cloud/cloudSyncManager';
 
 /**
@@ -64,7 +64,9 @@ export const CloudAuthButton: React.FC = () => {
         await cloudAuthService.loginWithGoogle();
       }
     } catch (error) {
-      console.error('Falha na autenticação Google:', error);
+      if (!isBenignPopupAuthError(error)) {
+        console.error('Falha na autenticação Google:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -256,7 +258,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header 
       id="prescmed-header" 
-      className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)]/95 backdrop-blur-md border-[var(--border-subtle)]"
+      className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)]/80 backdrop-blur-md border-[var(--border-subtle)]"
       style={{
         boxShadow: darkMode 
           ? '0 4px 14px -4px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.06)'

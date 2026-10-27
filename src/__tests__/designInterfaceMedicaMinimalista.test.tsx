@@ -1,4 +1,6 @@
 import React from 'react';
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, it, expect, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Icon, resolveIconName } from '../components/Icon';
@@ -10,6 +12,8 @@ import { ConfirmationModal } from '../components/ConfirmationModal';
 import { PatientModal } from '../components/PatientModal';
 import { DoctorProfileModal } from '../components/DoctorProfileModal';
 import { Sidebar } from '../components/Sidebar';
+import { Header } from '../components/Header';
+import { isBenignPopupAuthError } from '../services/cloud/cloudAuthService';
 import { PRESCMED_TOKENS } from '../config/tokens';
 import type { DoctorProfile, Patient, WorkContext } from '../types';
 
@@ -187,5 +191,38 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
     );
     expect(doctorModalHtml).toContain('modal-content');
     expect(doctorModalHtml).not.toContain('#0E1420');
+  });
+
+  it('aplica otimização de Tema Claro e Escuro (hierarquia tipográfica, glassmorphism 80% no Header, arredondamento em .card-surface, filtro anti-glare fora do A4 e COOP/Auth popup)', () => {
+    expect(PRESCMED_TOKENS.cssVars.bgMain).toBe('var(--bg-main)');
+    expect(PRESCMED_TOKENS.cssVars.textTitle).toBe('var(--text-title)');
+    expect(PRESCMED_TOKENS.cssVars.textBody).toBe('var(--text-body)');
+
+    const headerHtml = renderToStaticMarkup(
+      <Header
+        darkMode={false}
+        onToggleDarkMode={vi.fn()}
+        onToggleSidebar={vi.fn()}
+        activeTab="prescription"
+      />
+    );
+    expect(headerHtml).toContain('bg-[var(--surface-card)]/80');
+    expect(headerHtml).toContain('backdrop-blur-md');
+
+    const indexCss = fs.readFileSync(path.resolve(__dirname, '../index.css'), 'utf8');
+    expect(indexCss).toContain('--bg-main: #f8fafc;');
+    expect(indexCss).toContain('--text-title: #0f172a;');
+    expect(indexCss).toContain('--text-body: #475569;');
+    expect(indexCss).toContain('--text-muted: #475569;');
+    expect(indexCss).toContain('line-height: 1.6;');
+    expect(indexCss).toContain('.dark img:not(:is(.a4-editor-canvas, #printable-a4-sheet, .folha-a4, #pcm-print-root) *)');
+
+    const nginxHeaders = fs.readFileSync(path.resolve(__dirname, '../../nginx-security-headers.conf'), 'utf8');
+    expect(nginxHeaders).toContain('Cross-Origin-Opener-Policy "same-origin-allow-popups"');
+
+    expect(isBenignPopupAuthError({ code: 'auth/popup-closed-by-user' })).toBe(true);
+    expect(isBenignPopupAuthError({ code: 'auth/cancelled-popup-request' })).toBe(true);
+    expect(isBenignPopupAuthError({ code: 'auth/invalid-credential' })).toBe(false);
+    expect(isBenignPopupAuthError(null)).toBe(false);
   });
 });

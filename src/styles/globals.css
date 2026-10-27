@@ -12,7 +12,7 @@
 
     --ink-primary: var(--text-main, #0F172A);
     --ink-secondary: var(--text-secondary, #334155);
-    --ink-muted: var(--text-muted, #5B6B80);
+    --ink-muted: var(--text-muted, #475569);
 
     --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 

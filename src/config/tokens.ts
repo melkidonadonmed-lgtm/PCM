@@ -22,6 +22,7 @@ export const PRESCMED_TOKENS = {
   },
   cssVars: {
     canvas: 'var(--bg-canvas)',
+    bgMain: 'var(--bg-main)',
     surface: 'var(--bg-surface)',
     surfaceCard: 'var(--surface-card)',
     surfaceInset: 'var(--surface-inset)',
@@ -29,7 +30,9 @@ export const PRESCMED_TOKENS = {
     surfaceHover: 'var(--surface-hover)',
     surfaceModal: 'var(--surface-modal)',
     inkPrimary: 'var(--ink-primary)',
+    textTitle: 'var(--text-title)',
     textMain: 'var(--text-main)',
+    textBody: 'var(--text-body)',
     textSecondary: 'var(--text-secondary)',
     textMuted: 'var(--text-muted)',
     borderSubtle: 'var(--border-subtle)',
