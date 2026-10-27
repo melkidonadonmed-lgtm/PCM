@@ -6,6 +6,11 @@ import { ContextSwitcher } from '../components/ContextSwitcher';
 import { MobileBottomNav } from '../components/MobileBottomNav';
 import { PediatricCalculator } from '../components/PediatricCalculator';
 import { ConsultationReadinessBar } from '../components/bento/ConsultationReadinessBar';
+import { ConfirmationModal } from '../components/ConfirmationModal';
+import { PatientModal } from '../components/PatientModal';
+import { DoctorProfileModal } from '../components/DoctorProfileModal';
+import { Sidebar } from '../components/Sidebar';
+import { PRESCMED_TOKENS } from '../config/tokens';
 import type { DoctorProfile, Patient, WorkContext } from '../types';
 
 const mockContext: WorkContext = {
@@ -126,5 +131,61 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
     );
     expect(html).toContain('hidden sm:inline-flex');
     expect(html).toContain('Ctrl+K');
+  });
+
+  it('aplica otimização de composição cromática no tema escuro (Regra 60-30-10, elevação modal-content e tokens OKLCH)', () => {
+    expect(PRESCMED_TOKENS.cssVars.surfaceHover).toBe('var(--surface-hover)');
+    expect(PRESCMED_TOKENS.cssVars.surfaceModal).toBe('var(--surface-modal)');
+    expect(PRESCMED_TOKENS.cssVars.textSecondary).toBe('var(--text-secondary)');
+    expect(PRESCMED_TOKENS.cssVars.oklchPrimary).toBe('var(--oklch-primary)');
+    expect(PRESCMED_TOKENS.cssVars.oklchPrimaryHover).toBe('var(--oklch-primary-hover)');
+
+    const sidebarDarkHtml = renderToStaticMarkup(
+      <Sidebar
+        darkMode={true}
+        activeTab="prescription"
+        onSelectTab={vi.fn()}
+        isOpen={true}
+        onToggleOpen={vi.fn()}
+        doctor={emptyDoctor}
+        patient={emptyPatient}
+      />
+    );
+    expect(sidebarDarkHtml).toContain('#1E293B');
+
+    const confirmHtml = renderToStaticMarkup(
+      <ConfirmationModal
+        isOpen={true}
+        title="Confirmar ação"
+        description="Descrição secundária legível"
+        darkMode={true}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />
+    );
+    expect(confirmHtml).toContain('modal-content');
+    expect(confirmHtml).toContain('text-[var(--text-main)]');
+    expect(confirmHtml).toContain('text-[var(--text-secondary)]');
+
+    const patientModalHtml = renderToStaticMarkup(
+      <PatientModal
+        darkMode={true}
+        patient={emptyPatient}
+        onSavePatient={vi.fn()}
+        onClose={vi.fn()}
+      />
+    );
+    expect(patientModalHtml).toContain('modal-content');
+
+    const doctorModalHtml = renderToStaticMarkup(
+      <DoctorProfileModal
+        darkMode={true}
+        doctor={emptyDoctor}
+        onSaveDoctor={vi.fn()}
+        onClose={vi.fn()}
+      />
+    );
+    expect(doctorModalHtml).toContain('modal-content');
+    expect(doctorModalHtml).not.toContain('#0E1420');
   });
 });

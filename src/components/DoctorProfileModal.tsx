@@ -172,30 +172,22 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-lg rounded-2xl border overflow-hidden shadow-tactile-lg modal-surface-spring"
-        style={{
-          backgroundColor: darkMode ? '#0E1420' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'var(--border-subtle)'
-        }}
+        className="w-full max-w-lg rounded-2xl tactile-modal modal-content overflow-hidden modal-surface-spring"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div 
-          className="p-4 border-b flex items-center justify-between" 
-          style={{ 
-            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
-            backgroundColor: darkMode ? '#1E293B' : '#F8FAFC'
-          }}
+          className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-card)] flex items-center justify-between"
         >
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-sky-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
               <UserCheck className="w-4 h-4" strokeWidth={2} />
             </div>
             <div>
-              <h3 id="doctor-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-white">
+              <h3 id="doctor-modal-title" className="font-bold text-sm sm:text-base text-[var(--text-main)]">
                 Perfil Profissional do Médico
               </h3>
-              <p className="text-xs text-[var(--text-muted)] dark:text-slate-400">
+              <p className="text-xs text-[var(--text-muted)]">
                 Nome, CRM e dados essenciais para o cabeçalho dos documentos
               </p>
             </div>

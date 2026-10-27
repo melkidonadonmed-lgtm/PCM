@@ -259,7 +259,7 @@ export const Header: React.FC<HeaderProps> = ({
       className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)]/95 backdrop-blur-md border-[var(--border-subtle)]"
       style={{
         boxShadow: darkMode 
-          ? '0 10px 24px -6px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.06)'
+          ? '0 4px 14px -4px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.06)'
           : '0 2px 12px -2px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255,255,255,0.95)'
       }}
     >
@@ -298,7 +298,7 @@ export const Header: React.FC<HeaderProps> = ({
               />
             </span>
             <div className="hidden sm:flex lg:hidden xl:flex flex-col items-start leading-none">
-              <span className="font-bold text-sm xl:text-[15px] tracking-tight text-slate-900 dark:text-white">
+              <span className="font-bold text-sm xl:text-[15px] tracking-tight text-[var(--text-main)]">
                 PresCMed
               </span>
               <span className="hidden 2xl:inline text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)] mt-0.5">

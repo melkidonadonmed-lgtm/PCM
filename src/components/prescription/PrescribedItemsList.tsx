@@ -67,7 +67,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <Icon name="prescriptions" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+          <h3 className="text-sm font-semibold text-[var(--text-main)]">
             Medicamentos prescritos
           </h3>
           <Badge tone="navy" tabular>
@@ -149,7 +149,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
       )}
 
       {items.length === 0 ? (
-        <div className="p-6 text-center rounded-xl bg-slate-50/70 dark:bg-slate-950/50 border border-dashed border-subtle dark:border-strong text-[var(--text-muted)] dark:text-slate-400 text-xs">
+        <div className="p-6 text-center rounded-xl bg-[var(--surface-inset)] border border-dashed border-subtle dark:border-strong text-[var(--text-muted)] text-xs">
           Nenhum medicamento adicionado ainda. Busque acima ou aplique um kit de plantão na barra lateral.
         </div>
       ) : (
@@ -165,7 +165,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                 className={`p-3 rounded-xl border flex items-start justify-between gap-3 shadow-tactile-sm transition ${
                   isEditing
                     ? 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/15 ring-1 ring-sky-500/40'
-                    : 'bg-slate-50/80 dark:bg-slate-950/60 border border-subtle dark:border-strong'
+                    : 'bg-[var(--surface-inset)] border border-subtle dark:border-strong'
                 }`}
               >
                 <div className="flex-1 min-w-0">
@@ -177,7 +177,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                     >
                       {idx + 1}
                     </span>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    <h4 className="text-xs font-bold text-[var(--text-main)] truncate">
                       {it.name}
                     </h4>
                     <Badge tone="neutral" tabular>
@@ -208,7 +208,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs text-slate-700 dark:text-slate-300 pl-7 leading-relaxed font-medium">
+                  <p className="text-xs text-[var(--text-secondary)] pl-7 leading-relaxed font-medium">
                     {it.instructions}
                   </p>
                 </div>

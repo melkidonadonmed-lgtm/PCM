@@ -96,12 +96,12 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-tactile-lg space-y-4 modal-surface-spring"
+            className="tactile-modal modal-content rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 modal-surface-spring"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-strong">
+            <div className="flex items-center justify-between pb-3 border-b border-subtle dark:border-strong">
               <div className="flex items-center gap-2">
                 <Icon name="bookmark_add" className="text-[20px] text-sky-600" />
-                <h3 className="font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                <h3 className="font-semibold text-sm sm:text-base text-[var(--text-main)]">
                   Salvar como modelo de receita
                 </h3>
               </div>
@@ -177,9 +177,9 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-tactile-lg modal-surface-spring"
+            className="tactile-modal modal-content rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col modal-surface-spring"
           >
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 dark:border-strong">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-subtle dark:border-strong">
               {isCreatingCustomModel ? (
                 <div className="flex items-center gap-2">
                   <button
@@ -191,14 +191,14 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   >
                     <Icon name="arrow_back" className="text-[18px]" />
                   </button>
-                  <h3 className="font-semibold text-base text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-base text-[var(--text-main)]">
                     Novo modelo de receita
                   </h3>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Icon name="folder_open" className="text-[20px] text-amber-500" />
-                  <h3 className="font-semibold text-base text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-base text-[var(--text-main)]">
                     Modelos de receitas salvos
                   </h3>
                 </div>
@@ -258,7 +258,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   </div>
 
                   {customModelSuggestions.length > 0 && (
-                    <div className="absolute left-0 right-0 top-full mt-1 z-20 bg-white dark:bg-slate-900 border border-subtle dark:border-strong rounded-xl shadow-tactile-lg max-h-48 overflow-y-auto p-1 space-y-1">
+                    <div className="absolute left-0 right-0 top-full mt-1 z-20 tactile-dropdown rounded-xl max-h-48 overflow-y-auto p-1 space-y-1">
                       {customModelSuggestions.map((sug) => (
                         <button
                           key={sug.id}

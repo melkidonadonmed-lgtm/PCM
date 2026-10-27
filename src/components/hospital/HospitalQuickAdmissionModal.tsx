@@ -192,7 +192,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
     >
       <div
         ref={modalRef}
-        className="w-full max-w-2xl max-h-[92vh] flex flex-col rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] shadow-2xl overflow-hidden modal-surface-spring"
+        className="w-full max-w-2xl max-h-[92vh] flex flex-col rounded-2xl tactile-modal modal-content text-[var(--text-main)] overflow-hidden modal-surface-spring"
       >
         {/* Cabeçalho do Modal */}
         <div className="px-5 py-3.5 border-b border-[var(--border-subtle)] flex items-center justify-between gap-3 bg-[var(--surface-inset)]">

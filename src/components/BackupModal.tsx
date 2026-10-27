@@ -204,11 +204,11 @@ export const BackupModal: React.FC<BackupModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-2xl bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl border border-[var(--border-subtle)] shadow-tactile-lg overflow-hidden flex flex-col max-h-[92vh] modal-surface-spring"
+        className="w-full max-w-2xl tactile-modal modal-content text-[var(--text-main)] rounded-2xl overflow-hidden flex flex-col max-h-[92vh] modal-surface-spring"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-app)]">
+        <div className="p-4 sm:p-5 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-card)]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-sky-600/15 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
               <Database className="w-5 h-5" />

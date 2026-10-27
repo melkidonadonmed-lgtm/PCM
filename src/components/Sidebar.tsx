@@ -351,12 +351,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             : 'lg:w-16 overflow-visible border'
         }`}
         style={{
-          backgroundColor: darkMode ? '#0B1120' : '#0F172A',
+          backgroundColor: darkMode ? '#1E293B' : '#0F172A',
           borderColor: (!isOpen && isDesktop) ? 'rgba(255, 255, 255, 0.08)' : (isOpen ? 'rgba(255, 255, 255, 0.12)' : 'transparent'),
           boxShadow: !isDesktop
-            ? (isOpen ? '0 20px 40px rgba(0,0,0,0.7), 4px 0 24px rgba(0,0,0,0.5)' : 'none')
+            ? (isOpen ? '0 12px 28px rgba(0,0,0,0.45), 4px 0 16px rgba(0,0,0,0.3)' : 'none')
             : darkMode
-            ? '0 12px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)'
+            ? '0 6px 18px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)'
             : '0 10px 25px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255,255,255,0.1)'
         }}
       >

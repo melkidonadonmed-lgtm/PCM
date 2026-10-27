@@ -66,7 +66,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       }}
     >
       <div 
-        className="w-full max-w-md rounded-2xl p-6 relative border border-subtle dark:border-strong bg-[var(--surface-card)] shadow-tactile-lg isolate transition modal-surface-spring"
+        className="w-full max-w-md rounded-2xl p-6 relative tactile-modal modal-content isolate transition modal-surface-spring"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-4">
@@ -83,13 +83,13 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <div className="flex-1 min-w-0">
             <h3 
               id="confirm-modal-title" 
-              className="text-base font-bold text-navy-900 dark:text-white"
+              className="text-base font-bold text-[var(--text-main)]"
             >
               {title}
             </h3>
             <p 
               id="confirm-modal-desc" 
-              className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-300"
+              className="mt-1.5 text-xs sm:text-sm leading-relaxed text-[var(--text-secondary)]"
             >
               {description}
             </p>

@@ -247,7 +247,7 @@
     --shadow-pressed: inset 0 2px 5px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
-  /* TEMA ESCURO: Deep Slate Acetinado (#0F172A / #1E293B) */
+  /* TEMA ESCURO: Deep Slate Acetinado (#0F172A / #1E293B) — Regra 60-30-10 & OKLCH */
   .dark, [data-theme="dark"] {
     /* Baseline color-scheme */
     color-scheme: dark;
@@ -256,18 +256,19 @@
     --border: #334155;
     --text-primary: #f8fafc;
     --text-muted: #94a3b8;
-    --primary: #0284c7;
-    --primary-hover: #0369a1;
+    --primary: oklch(0.6 0.15 250);
+    --primary-hover: oklch(0.7 0.15 250);
     --clinical: #10b981;
     --clinical-hover: #059669;
 
-    /* Hierarquia Tonal de 6 Níveis (DESIGN.md v4.5-soft) */
+    /* Hierarquia Tonal de 6 Níveis (60% #0F172A Canvas, 30% #1E293B Card/Nav, #334155 Modal/Hover) */
     --surface-sunken: #090E1A;
     --surface-canvas: #0F172A;
     --surface-inset: #131B2E;
     --surface-flat: #1E293B;
     --surface-raised: #27354A;
     --surface-contrast: #0B1120;
+    --surface-modal: #334155;
     --accent-point: #38BDF8;
 
     --bg-canvas: #0F172A;
@@ -279,35 +280,37 @@
     --surface-hover: #334155;
     --surface-active: #3B4961;
 
-    /* Cores de Navegação no Dark (Deep Slate) */
-    --nav-bg: #0B1120;
-    --surface-panel: #0B1120;
-    --surface-panel-2: #111827;
-    --surface-panel-hover: #1E293B;
-    --nav-border: rgba(255, 255, 255, 0.07);
-    --surface-panel-border: rgba(255, 255, 255, 0.07);
+    /* Cores de Navegação no Dark (30% Secondary Surface #1E293B) */
+    --nav-bg: #1E293B;
+    --surface-panel: #131B2E;
+    --surface-panel-2: #1E293B;
+    --surface-panel-hover: #334155;
+    --nav-border: #ffffff14;
+    --surface-panel-border: #ffffff14;
     --nav-text: #F8FAFC;
     --surface-panel-text: #F8FAFC;
     --nav-text-muted: #94A3B8;
     --surface-panel-muted: #94A3B8;
-    --nav-active-bg: #1E3A8A;
+    --nav-active-bg: oklch(0.6 0.15 250);
     --nav-active-text: #FFFFFF;
-    --nav-active-glow: 0 0 16px rgba(30, 58, 138, 0.5);
+    --nav-active-glow: 0 0 14px rgba(14, 165, 233, 0.35);
 
-    /* Texto */
+    /* Texto (Hierarquia Visual: #F8FAFC principal sem ofuscamento, #CBD5E1 corpo, #94A3B8 rótulos) */
     --text-main: #F8FAFC;
     --text-secondary: #CBD5E1;
     --text-placeholder: #94A3B8;
     --text-subtle: #64748B;
     --text-inverse: #0F172A;
 
-    /* Acentos & Botões Primários */
+    /* Acentos & Botões Primários (10% Sky Blue / OKLCH Uniformidade Perceptual) */
     --accent: #38BDF8;
     --accent-hover: #7DD3FC;
     --nav-accent: #38BDF8;
 
-    --accent-primary: #0369A1;
-    --accent-primary-hover: #0284C7;
+    --oklch-primary: oklch(0.6 0.15 250);
+    --oklch-primary-hover: oklch(0.7 0.15 250);
+    --accent-primary: oklch(0.6 0.15 250);
+    --accent-primary-hover: oklch(0.7 0.15 250);
     --accent-primary-subtle: rgba(56, 189, 248, 0.15);
     --accent-primary-border: rgba(56, 189, 248, 0.35);
 
@@ -328,43 +331,43 @@
     --accent-rose-subtle: rgba(251, 113, 133, 0.12);
     --accent-rose-border: rgba(251, 113, 133, 0.32);
 
-    /* Sombras e Efeitos Táteis (Deep Slate Acetinado com Luz Sutil) */
-    --tactile-bevel: inset 0 1px 1px rgba(255, 255, 255, 0.08), inset 0 -1px 1px rgba(0, 0, 0, 0.6);
-    --bevel-tactile-nav: inset 0 1px 1px rgba(255, 255, 255, 0.08), inset 0 -1px 1px rgba(0, 0, 0, 0.6);
-    --tactile-card-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 -1px 1px rgba(0, 0, 0, 0.4);
-    --bevel-tactile-card: inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 -1px 1px rgba(0, 0, 0, 0.4);
+    /* Sombras e Efeitos Táteis (Elevação por Luminosidade de Superfície sem Sombras Pesadas) */
+    --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 1px rgba(0, 0, 0, 0.35);
+    --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 1px rgba(0, 0, 0, 0.35);
+    --tactile-card-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 1px rgba(0, 0, 0, 0.25);
+    --bevel-tactile-card: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 1px rgba(0, 0, 0, 0.25);
 
-    /* Elevações táteis no tema escuro (valores exatos das variantes .dark) */
-    --elev-tactile: 0 10px 25px -4px rgba(0, 0, 0, 0.45), 0 4px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --elev-tactile-sm: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --elev-tactile-lg: 0 20px 40px -8px rgba(0, 0, 0, 0.6), 0 8px 16px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    --elev-tactile-navy: 0 12px 30px -5px rgba(10, 15, 29, 0.5), 0 4px 8px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    --elev-tactile-dark: 0 10px 25px -4px rgba(0, 0, 0, 0.45), 0 4px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --elev-tactile-btn: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
-    --elev-tactile-inset: inset 0 2px 5px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.3);
-    --elev-tactile-blue: 0 6px 16px -6px rgba(2, 132, 199, 0.35);
+    /* Elevações táteis suavizadas no tema escuro */
+    --elev-tactile: 0 4px 12px -2px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --elev-tactile-sm: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --elev-tactile-lg: 0 10px 24px -4px rgba(0, 0, 0, 0.35), 0 4px 8px -2px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --elev-tactile-navy: 0 8px 20px -4px rgba(10, 15, 29, 0.35), 0 2px 6px -1px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --elev-tactile-dark: 0 6px 16px -3px rgba(0, 0, 0, 0.28), 0 2px 4px -1px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --elev-tactile-btn: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --elev-tactile-inset: inset 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.25);
+    --elev-tactile-blue: 0 4px 12px -4px rgba(14, 165, 233, 0.3);
 
-    --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.35);
-    --shadow-projected: 0 10px 25px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --shadow-card-projected: 0 12px 30px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --shadow-card-hover: 0 18px 40px -6px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --shadow-nav: 0 12px 30px rgba(0, 0, 0, 0.6);
-    --shadow-sidebar-projected: 12px 0 30px rgba(0, 0, 0, 0.6);
-    --shadow-header-projected: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-bottomnav-projected: 0 -8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.2);
+    --shadow-projected: 0 4px 12px -2px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --shadow-card-projected: 0 6px 16px -3px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --shadow-card-hover: 0 10px 24px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --shadow-nav: 0 6px 18px rgba(0, 0, 0, 0.32);
+    --shadow-sidebar-projected: 6px 0 18px rgba(0, 0, 0, 0.3);
+    --shadow-header-projected: 0 4px 14px rgba(0, 0, 0, 0.28);
+    --shadow-bottomnav-projected: 0 -4px 14px rgba(0, 0, 0, 0.28);
 
-    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-subtle: #ffffff14;
     --border-medium: rgba(255, 255, 255, 0.14);
-    --border-strong: rgba(255, 255, 255, 0.24);
-    --rim-light-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    --border-strong: rgba(255, 255, 255, 0.22);
+    --rim-light-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
 
-    --elevation-z0: inset 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(0, 0, 0, 0.3);
-    --elevation-z1: 0 1px 3px rgba(0, 0, 0, 0.4), 0 4px 8px -1px rgba(0, 0, 0, 0.3);
-    --elevation-z2: 0 1px 4px rgba(0, 0, 0, 0.5), 0 6px 12px -2px rgba(0, 0, 0, 0.4);
-    --elevation-z3: 0 2px 6px rgba(0, 0, 0, 0.55), 0 12px 24px -4px rgba(0, 0, 0, 0.45);
-    --elevation-z4: 0 4px 10px rgba(0, 0, 0, 0.65), 0 20px 40px -8px rgba(0, 0, 0, 0.55);
+    --elevation-z0: inset 0 2px 4px rgba(0, 0, 0, 0.38), inset 0 1px 2px rgba(0, 0, 0, 0.22);
+    --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 6px -1px rgba(0, 0, 0, 0.18);
+    --elevation-z2: 0 1px 3px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.22);
+    --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 18px -3px rgba(0, 0, 0, 0.26);
+    --elevation-z4: 0 4px 8px rgba(0, 0, 0, 0.34), 0 12px 28px -6px rgba(0, 0, 0, 0.3);
 
-    --shadow-pressed: inset 0 2px 5px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 
   /* Placeholder e estados de campo base */
@@ -707,11 +710,12 @@
     box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.1), 0 6px 12px -3px rgba(15, 23, 42, 0.04);
   }
 
-  /* 4. Tactile Action Switches & CTA Buttons (135° Physical Engine & Inset Press) */
+  /* 4. Tactile Action Switches & CTA Buttons (135° Physical Engine & OKLCH Uniformity) */
   .tactile-btn-primary,
   .btn-tactile-primary,
-  .btn-primary-tactile {
-    background: #1E3A8A;
+  .btn-primary-tactile,
+  .button-primary {
+    background-color: #1E3A8A;
     color: #FFFFFF !important;
     border: 1px solid transparent;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12), 0 2px 6px -2px rgba(30, 58, 138, 0.3);
@@ -727,47 +731,56 @@
     will-change: transform, box-shadow;
     transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), 
                 box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1), 
-                background 0.2s ease,
+                background-color 0.2s ease,
                 color 0.2s ease;
   }
 
   @media (hover: hover) and (pointer: fine) {
     .tactile-btn-primary:hover:not(:disabled),
     .btn-tactile-primary:hover:not(:disabled),
-    .btn-primary-tactile:hover:not(:disabled) {
-      background: #172554;
+    .btn-primary-tactile:hover:not(:disabled),
+    .button-primary:hover:not(:disabled) {
+      background-color: #172554;
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.14), 0 4px 10px -2px rgba(30, 58, 138, 0.35);
     }
   }
 
   .tactile-btn-primary:active:not(:disabled),
   .btn-tactile-primary:active:not(:disabled),
-  .btn-primary-tactile:active:not(:disabled) {
+  .btn-primary-tactile:active:not(:disabled),
+  .button-primary:active:not(:disabled) {
     transform: translate3d(0, 1px, 0) scale(0.98);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
-  /* NO TEMA ESCURO: primário em azul mineral vivo, sem moldura clara em volta */
+  /* NO TEMA ESCURO: 10% Accent Sky Blue com Uniformidade Perceptual OKLCH */
   .dark .tactile-btn-primary,
   .dark .btn-tactile-primary,
-  .dark .btn-primary-tactile {
-    background: #075985;
+  .dark .btn-primary-tactile,
+  .dark .button-primary {
+    background-color: oklch(0.6 0.15 250);
     color: #FFFFFF !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 6px -2px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), 
+                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1), 
+                background-color 0.2s ease,
+                color 0.2s ease;
   }
 
   @media (hover: hover) and (pointer: fine) {
     .dark .tactile-btn-primary:hover:not(:disabled),
     .dark .btn-tactile-primary:hover:not(:disabled),
-    .dark .btn-primary-tactile:hover:not(:disabled) {
-      background: #0369A1;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 10px -2px rgba(0, 0, 0, 0.55);
+    .dark .btn-primary-tactile:hover:not(:disabled),
+    .dark .button-primary:hover:not(:disabled) {
+      background-color: oklch(0.7 0.15 250);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
     }
   }
 
   .dark .tactile-btn-primary:active:not(:disabled),
   .dark .btn-tactile-primary:active:not(:disabled),
-  .dark .btn-primary-tactile:active:not(:disabled) {
+  .dark .btn-primary-tactile:active:not(:disabled),
+  .dark .button-primary:active:not(:disabled) {
     transform: translate3d(0, 1px, 0) scale(0.98);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
   }
@@ -901,20 +914,33 @@
 
   /* 5. Z-3 Floating Elements / Popovers / Sticky Bars (Sobreposição de Camadas) */
   .tactile-floating {
-    border: 1px solid var(--border-medium);
+    border: 1px solid var(--border-subtle);
     box-shadow: var(--rim-light-top), var(--elevation-z3);
     background-color: var(--surface-card);
     border-radius: 16px;
     isolation: isolate;
   }
 
-  /* 6. Z-4 Critical Modals & Dialogs (Anti-Clipping & Maximum Depth) */
-  .tactile-modal {
-    border: 1px solid var(--border-medium);
-    box-shadow: var(--rim-light-top), var(--elevation-z4);
+  .dark .tactile-floating {
+    background-color: var(--surface-elevated);
+    border-color: var(--border-subtle);
+  }
+
+  /* 6. Z-4 Critical Modals & Dialogs (Elevação por Tom Mais Claro sem Sombras Pesadas no Dark) */
+  .tactile-modal,
+  .modal-content {
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--rim-light-top), var(--elevation-z3);
     background-color: var(--surface-card);
     border-radius: 20px;
     isolation: isolate;
+  }
+
+  .dark .tactile-modal,
+  .dark .modal-content {
+    background-color: var(--surface-hover);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--rim-light-top), var(--elevation-z3);
   }
 
   /* 7. Deep Navy Structural Panel (Menus / Sidebar / Header Chrome — Ambos os Temas) */
@@ -1007,9 +1033,9 @@
   }
 
   .dark .tactile-dropdown {
-    background-color: var(--bg-surface);
+    background-color: var(--surface-elevated);
     border: 1px solid var(--border-subtle);
-    box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.7), 0 4px 10px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow: var(--rim-light-top), var(--elevation-z2);
   }
 
   /* Folha A4 Flutuante / Papel Clínico Real */

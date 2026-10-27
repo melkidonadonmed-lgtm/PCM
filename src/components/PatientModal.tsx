@@ -100,16 +100,16 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-md rounded-2xl border border-subtle dark:border-strong bg-[var(--surface-card)] overflow-hidden shadow-tactile-lg isolate transition modal-surface-spring"
+        className="w-full max-w-md rounded-2xl tactile-modal modal-content overflow-hidden isolate transition modal-surface-spring"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 border-b border-subtle dark:border-strong bg-[var(--surface-elevated)] flex items-center justify-between">
+        <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-card)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-sky-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
               <Icon name="person" className="text-[18px]" />
             </div>
-            <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-navy-900 dark:text-white">
+            <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-[var(--text-main)]">
               Dados do Paciente
             </h3>
           </div>

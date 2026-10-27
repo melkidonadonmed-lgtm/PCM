@@ -613,7 +613,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
         >
           <div
             ref={saveModelModalRef}
-            className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative"
+            className="tactile-modal modal-content text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
@@ -702,7 +702,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
         >
           <div
             ref={saveStyleModalRef}
-            className="bg-[var(--surface-card)] text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 border border-[var(--border-subtle)] shadow-tactile-lg relative"
+            className="tactile-modal modal-content text-[var(--text-main)] rounded-2xl max-w-md w-full p-5 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">

@@ -51,7 +51,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           <Icon name="person" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
           <label
             htmlFor="quick-patient-name"
-            className="text-sm font-semibold text-slate-900 dark:text-white cursor-pointer whitespace-nowrap"
+            className="text-sm font-semibold text-[var(--text-main)] cursor-pointer whitespace-nowrap"
           >
             Identificação do paciente
           </label>
@@ -112,7 +112,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             value={patient.name || ''}
             onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
             placeholder="Ex.: Maria de Oliveira Santos"
-            className="w-full h-9 px-3 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm transition"
+            className="w-full h-9 px-3 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm transition"
           />
         </div>
 
@@ -168,7 +168,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
       {showExtraPatientFields && (
         <div className="grid grid-cols-12 gap-2 pt-2 border-t border-subtle dark:border-strong">
           <div className="col-span-7 sm:col-span-8">
-            <label htmlFor="quick-patient-doc" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+            <label htmlFor="quick-patient-doc" className="block text-xs font-medium text-[var(--text-muted)] mb-1">
               CPF / RG
             </label>
             <input
@@ -177,12 +177,12 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
               value={patient.documentNumber || ''}
               onChange={(e) => onUpdatePatient({ ...patient, documentNumber: e.target.value })}
               placeholder="Ex.: 000.000.000-00"
-              className="w-full h-9 px-2.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+              className="w-full h-9 px-2.5 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
             />
           </div>
 
           <div className="col-span-5 sm:col-span-4">
-            <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+            <label htmlFor="quick-patient-weight" className="block text-xs font-medium text-[var(--text-muted)] mb-1">
               Peso (kg)
             </label>
             <input
@@ -199,7 +199,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
               }}
               onBlur={() => setWeightDraft(null)}
               placeholder="Ex.: 14.5"
-              className="w-full h-9 px-2.5 bg-slate-50/80 dark:bg-slate-950 border border-subtle dark:border-strong rounded-xl text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+              className="w-full h-9 px-2.5 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
             />
           </div>
         </div>

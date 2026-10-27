@@ -36,6 +36,7 @@
     --bg-canvas: var(--bg-app, #0F172A);
     --bg-surface: var(--surface-card, #1E293B);
     --bg-elevated: #27354A;
+    --bg-modal: var(--surface-hover, #334155);
     --bg-subtle: var(--surface-inset, #131B2E);
 
     --ink-primary: var(--text-main, #F8FAFC);

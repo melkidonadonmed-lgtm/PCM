@@ -418,7 +418,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-2xl tactile-modal modal-surface-spring overflow-hidden border border-subtle dark:border-strong shadow-tactile-lg"
+        className="w-full max-w-2xl tactile-modal modal-content modal-surface-spring overflow-hidden border border-subtle dark:border-strong"
       >
         {/* Barra de Pesquisa */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-subtle dark:border-strong bg-[var(--surface-card)]">
