@@ -63,7 +63,7 @@ export const SurfaceCard: React.FC<SurfaceCardProps> = ({
       data-state={resolvedState}
       aria-busy={resolvedState === 'loading'}
       aria-label={title || rest['aria-label']}
-      className={`${variantClass} ${spanClass} ${className}`.trim()}
+      className={`cq-card ${variantClass} ${spanClass} ${className}`.trim()}
       {...rest}
     >
       {(title || eyebrow || headerRight) && (

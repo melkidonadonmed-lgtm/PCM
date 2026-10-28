@@ -43,7 +43,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
       data-state="idle"
       aria-busy={false}
       aria-label="Identificação rápida do paciente"
-      className="card-surface surface-card-minimal rounded-2xl p-4 sm:p-5 space-y-3 border border-subtle dark:border-strong"
+      className="cq-card card-surface surface-card-minimal rounded-2xl p-4 sm:p-5 space-y-3 border border-subtle dark:border-strong"
     >
       {/* Cabeçalho compacto com quebra responsiva limpa (evita colisão entre Sincronizado e ações no mobile) */}
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
@@ -121,7 +121,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToCertificate}
-              className="chip-neutral h-9 text-[11px] sm:text-xs px-3 rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
+              className="chip-neutral h-9 text-[11px] sm:text-xs px-3 rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
               title="Abrir formulário de Atestado Médico para este paciente"
             >
               <Icon name="atestado" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
@@ -132,7 +132,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToReferral}
-              className="chip-neutral h-9 text-[11px] sm:text-xs px-3 rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
+              className="chip-neutral h-9 text-[11px] sm:text-xs px-3 rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
               title="Abrir Encaminhamento Médico para este paciente"
             >
               <Icon name="encaminhamento" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
@@ -143,7 +143,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToExams}
-              className="chip-neutral h-9 text-[11px] sm:text-xs px-3 rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
+              className="chip-neutral h-9 text-[11px] sm:text-xs px-3 rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
               title="Abrir Solicitação de Exames para este paciente"
             >
               <Icon name="exame" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
@@ -154,7 +154,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             <button
               type="button"
               onClick={onNavigateToSus}
-              className="chip-neutral h-9 text-[11px] sm:text-xs px-3 rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
+              className="chip-neutral h-9 text-[11px] sm:text-xs px-3 rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 min-w-0 whitespace-nowrap"
               title="Abrir Formulários SUS (LME, APAC, SISREG) para este paciente"
             >
               <Icon name="sus" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />

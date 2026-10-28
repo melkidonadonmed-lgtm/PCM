@@ -343,21 +343,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         aria-label="Menu Lateral de Navegação"
         aria-hidden={!isOpen && !isDesktop}
         inert={!isOpen && !isDesktop ? true : undefined}
-        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform will-change-transform transition-[transform,width] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full pointer-events-none'
+        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform will-change-transform transition-[transform,width] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] border border-white/10 ${
+          isOpen ? 'translate-x-0 shadow-tactile-navy' : '-translate-x-full pointer-events-none shadow-none lg:shadow-tactile-navy'
         } lg:pointer-events-auto lg:sticky lg:top-[4.25rem] lg:h-[calc(100dvh-4.75rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl ${
           isOpen
-            ? 'lg:w-64 shadow-tactile-navy border'
-            : 'lg:w-16 overflow-visible border'
+            ? 'lg:w-64'
+            : 'lg:w-16 overflow-visible'
         }`}
         style={{
-          backgroundColor: darkMode ? '#1E293B' : '#0F172A',
-          borderColor: (!isOpen && isDesktop) ? 'rgba(255, 255, 255, 0.08)' : (isOpen ? 'rgba(255, 255, 255, 0.12)' : 'transparent'),
-          boxShadow: !isDesktop
-            ? (isOpen ? '0 12px 28px rgba(0,0,0,0.45), 4px 0 16px rgba(0,0,0,0.3)' : 'none')
-            : darkMode
-            ? '0 6px 18px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)'
-            : '0 10px 25px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255,255,255,0.1)'
+          backgroundColor: darkMode ? '#1E293B' : '#0F172A'
         }}
       >
         {/* Scrollable Main Area (overflow-visible when collapsed so floating tooltips are never clipped) */}

@@ -155,7 +155,7 @@ export const CloudAuthButton: React.FC = () => {
       disabled={loading}
       data-state={loading ? 'loading' : 'idle'}
       aria-busy={loading || undefined}
-      className="flex items-center justify-center gap-1.5 w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 2xl:w-auto 2xl:px-3 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
+      className="flex items-center justify-center gap-1.5 w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 2xl:w-auto 2xl:px-3 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
       title="Conectar Conta Google para sincronização em nuvem (opcional)"
       aria-label="Conectar Nuvem"
     >
@@ -258,12 +258,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header 
       id="prescmed-header" 
-      className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)]/80 backdrop-blur-md border-[var(--border-subtle)]"
-      style={{
-        boxShadow: darkMode 
-          ? '0 4px 14px -4px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.06)'
-          : '0 2px 12px -2px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255,255,255,0.95)'
-      }}
+      className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)]/80 backdrop-blur-md border-[var(--border-subtle)] panel-projected-bottom"
     >
       <div className="w-full max-w-screen-2xl container mx-auto h-16 px-2.5 sm:px-4 lg:px-4 xl:px-6 flex items-center justify-between gap-2">
         {/* Left side: Menu trigger & Unified Brand Home Button */}
@@ -273,7 +268,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
-            className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
           >
             <Icon name="menu" size={18} />
           </button>
@@ -283,7 +278,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             aria-label="Início"
             onClick={onGoHome}
-            className="flex items-center gap-2 px-1 h-9 xl:h-10 rounded-xl transition cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
+            className="flex items-center gap-2 px-1 h-9 xl:h-10 rounded-xl transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
             title="Voltar ao início (Receitas — Alt+1)"
           >
             <span

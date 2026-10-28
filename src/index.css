@@ -498,6 +498,13 @@
     transform: translate3d(0, 1px, 0);
   }
 
+  @media (pointer: coarse) {
+    .chip-neutral {
+      min-block-size: 44px;
+      padding-inline: 0.75rem;
+    }
+  }
+
   .chip-neutral[data-active="true"] {
     background-color: #EFF6FF;
     color: #1E3A8A;

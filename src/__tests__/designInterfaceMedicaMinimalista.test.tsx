@@ -225,4 +225,38 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
     expect(isBenignPopupAuthError({ code: 'auth/invalid-credential' })).toBe(false);
     expect(isBenignPopupAuthError(null)).toBe(false);
   });
+
+  it('valida o contrato arquitetural DESIGN.md v8.0.0 (9 Eixos SSOT, Tokens em 3 Camadas OKLCH, Elevação em 3 Níveis e Adendos A–I)', () => {
+    expect(PRESCMED_TOKENS.designMdVersion).toBe('8.0.0');
+    expect(PRESCMED_TOKENS.complexityTier).toBe('tier_2_spa_feature_driven');
+    expect(PRESCMED_TOKENS.spatialArchetypes).toContain('workbench_split_view');
+    expect(PRESCMED_TOKENS.spatialArchetypes).toContain('folha_vetorial_impressao_a4');
+    expect(PRESCMED_TOKENS.cssVars.elevationLow).toBe('var(--elevation-low)');
+    expect(PRESCMED_TOKENS.cssVars.elevationMedium).toBe('var(--elevation-medium)');
+    expect(PRESCMED_TOKENS.cssVars.elevationHigh).toBe('var(--elevation-high)');
+
+    const designMd = fs.readFileSync(path.resolve(__dirname, '../../DESIGN.md'), 'utf8');
+    expect(designMd).toContain('design-md v8.0.0');
+    expect(designMd).toContain('tier_2_spa_feature_driven');
+    expect(designMd).toContain('light-dark(');
+    expect(designMd).toContain('color-mix(in oklab');
+    expect(designMd).toContain('--elevation-low');
+    expect(designMd).toContain('--elevation-medium');
+    expect(designMd).toContain('--elevation-high');
+    expect(designMd).toContain('@container cardComponent');
+    expect(designMd).toContain('8.1. Adendo A');
+    expect(designMd).toContain('8.9. Adendo I');
+    expect(designMd).toContain('9. Matriz de Decisão Rápida de Arquitetura Visual');
+
+    const globalsCss = fs.readFileSync(path.resolve(__dirname, '../styles/globals.css'), 'utf8');
+    expect(globalsCss).toContain('--primitive-navy-700');
+    expect(globalsCss).toContain('--shadow-elevation-1');
+    expect(globalsCss).toContain('--shadow-elevation-2');
+    expect(globalsCss).toContain('--shadow-elevation-3');
+    expect(globalsCss).toContain('--elevation-low');
+    expect(globalsCss).toContain('.breadcrumbsList');
+    expect(globalsCss).toContain('.cq-card');
+    expect(globalsCss).toContain('container-type: inline-size;');
+    expect(globalsCss).toContain('.posology-cq-grid');
+  });
 });

@@ -1,9 +1,18 @@
 /**
  * Contrato Tipado de Tokens Semânticos por Propósito (PresCMed · medtech_clinico)
- * Sincronizado com DESIGN.md (Google Labs) e src/index.css.
+ * Sincronizado com DESIGN.md (design-md v8.0.0 + Google Labs @google/design.md),
+ * src/styles/globals.css e src/index.css.
  */
 export const PRESCMED_TOKENS = {
   purpose: 'medtech_clinico' as const,
+  designMdVersion: '8.0.0' as const,
+  complexityTier: 'tier_2_spa_feature_driven' as const,
+  spatialArchetypes: [
+    'workbench_split_view',
+    'bento_grid_asymmetric_12col',
+    'command_center_data_grid',
+    'folha_vetorial_impressao_a4',
+  ] as const,
   colors: {
     primary: '#1E3A8A',
     onPrimary: '#FFFFFF',
@@ -21,6 +30,8 @@ export const PRESCMED_TOKENS = {
     onRose: '#FFFFFF',
   },
   cssVars: {
+    brandPrimary: 'var(--brand-primary)',
+    brandAccent: 'var(--brand-accent)',
     canvas: 'var(--bg-canvas)',
     bgMain: 'var(--bg-main)',
     surface: 'var(--bg-surface)',
@@ -29,6 +40,8 @@ export const PRESCMED_TOKENS = {
     surfaceRaised: 'var(--surface-raised)',
     surfaceHover: 'var(--surface-hover)',
     surfaceModal: 'var(--surface-modal)',
+    surfaceSunken: 'var(--surface-sunken)',
+    surfaceGlass: 'var(--surface-glass)',
     inkPrimary: 'var(--ink-primary)',
     textTitle: 'var(--text-title)',
     textMain: 'var(--text-main)',
@@ -38,8 +51,13 @@ export const PRESCMED_TOKENS = {
     borderSubtle: 'var(--border-subtle)',
     oklchPrimary: 'var(--oklch-primary)',
     oklchPrimaryHover: 'var(--oklch-primary-hover)',
+    elevationLow: 'var(--elevation-low)',
+    elevationMedium: 'var(--elevation-medium)',
+    elevationHigh: 'var(--elevation-high)',
     shadowSculpted: 'var(--shadow-sculpted)',
     easeSpring: 'var(--ease-spring)',
+    easeOutNatural: 'var(--ease-out-natural)',
+    easeStateFast: 'var(--ease-state-fast)',
   },
   radii: {
     sm: '8px',

@@ -80,7 +80,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
   onSubmitMedication,
 }) => {
   return (
-    <section className="card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 space-y-2.5 border border-subtle dark:border-strong">
+    <section className="cq-card card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 space-y-2.5 border border-subtle dark:border-strong">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Icon name="medication" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
@@ -91,7 +91,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
         <button
           type="button"
           onClick={onOpenPediatricDrawer}
-          className="chip-neutral h-8 text-xs px-3 rounded-xl inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500"
+          className="chip-neutral min-h-[44px] sm:min-h-0 sm:h-8 text-xs px-3 rounded-xl inline-flex items-center gap-1.5 transition active:translate-y-px cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500"
           title="Abrir Calculadora Pediátrica em painel lateral sem sair da receita"
         >
           <Icon name="calculate" size={15} className="text-emerald-600 dark:text-emerald-400" />
@@ -252,7 +252,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
       </div>
 
       {/* Linha 2: Grade Compacta Lado a Lado de Dose, Apresentação, Frequência, Duração e Via */}
-      <div className="grid grid-cols-12 sm:grid-cols-[minmax(44px,0.5fr)_minmax(108px,1.35fr)_minmax(82px,0.95fr)_minmax(86px,0.95fr)_minmax(96px,1.1fr)] gap-1.5 sm:gap-2">
+      <div className="posology-cq-grid grid grid-cols-12 sm:grid-cols-[minmax(44px,0.5fr)_minmax(108px,1.35fr)_minmax(82px,0.95fr)_minmax(86px,0.95fr)_minmax(96px,1.1fr)] gap-1.5 sm:gap-2">
         {/* 1. Dose */}
         <div className="col-span-3 sm:col-span-1">
           <label htmlFor="presc-dose-input" className="block text-xs font-medium text-[var(--text-muted)] mb-1 truncate">
@@ -402,7 +402,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           <button
             type="button"
             onClick={onSubmitMedication}
-            className={`flex-1 h-11 min-h-[44px] px-3 rounded-xl font-semibold text-xs inline-flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 whitespace-nowrap ${
+            className={`flex-1 h-11 min-h-[44px] px-3 rounded-xl font-semibold text-xs inline-flex items-center justify-center gap-1.5 transition active:translate-y-px cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 whitespace-nowrap ${
               editingItemId
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                 : 'btn-tactile-primary button-primary'
