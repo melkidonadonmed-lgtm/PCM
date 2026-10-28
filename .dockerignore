@@ -17,8 +17,9 @@ coverage
 .DS_Store
 Thumbs.db
 
-# Documentação e artefatos que não entram na imagem
+# Documentação e artefatos que não entram na imagem (exceto DESIGN.md validado pela suíte Vitest)
 *.md
+!DESIGN.md
 docs
 .context
 *.png
