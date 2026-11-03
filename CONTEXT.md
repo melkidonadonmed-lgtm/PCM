@@ -17,4 +17,4 @@ O **PresCMed (`PCM`)** é a SPA clínica, ambulatorial e hospitalar 100% client-
 
 ## 2. Estado Operacional e Deploy
 - **Produção Cloud Run**: Serviço `prescmed` em `southamerica-east1` (projeto `agent-md-506215`), servido via Nginx (`node:24-alpine` build) com healthcheck em `/health`.
-- **Qualidade e Governança**: `170` arquivos em `src/`, validado por `26` suítes no Vitest (`241/241` testes determinísticos Nível 4, `npm test`), typecheck (`npm run lint`) e design lint (`npm run design:lint`).
+- **Qualidade e Governança**: `172` arquivos em `src/`, validado por `26` suítes no Vitest (`245/245` testes determinísticos Nível 4, `npm test`), typecheck (`npm run lint`) e design lint (`npm run design:lint`).

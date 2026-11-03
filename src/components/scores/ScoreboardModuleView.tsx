@@ -184,7 +184,43 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
       data-state="idle"
     >
       {/* Cabeçalho da Bancada Scoreboard CDSS */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 shadow-xs">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 shadow-xs space-y-2.5">
+        <nav aria-label="Caminho de navegação">
+          <ol role="list" className="breadcrumbsList">
+            <li>
+              <a
+                href="#scoreboard-catalog"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTabMode('CATALOG');
+                }}
+              >
+                Scoreboard CDSS (Alt+8)
+              </a>
+            </li>
+            <li>
+              <a
+                href="#scoreboard-block"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTabMode('CATALOG');
+                }}
+              >
+                {activeCalculator.categoryName || 'Escores Clínicos'}
+              </a>
+            </li>
+            <li>
+              <a
+                href={`#calc-${activeCalculator.id}`}
+                aria-current="page"
+                onClick={(e) => e.preventDefault()}
+              >
+                {activeCalculator.acronym}
+              </a>
+            </li>
+          </ol>
+        </nav>
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs">

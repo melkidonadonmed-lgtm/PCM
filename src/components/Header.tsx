@@ -31,7 +31,7 @@ interface HeaderProps {
   onOpenCommandPalette?: () => void;
 }
 
-export const CloudAuthButton: React.FC = () => {
+const CloudAuthButton: React.FC = () => {
   const [user, setUser] = useState<DoctorUserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
@@ -330,7 +330,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab(tab.id)}
                   aria-current={isActive ? 'page' : undefined}
                   title={`${tab.label} (${tab.shortcut})`}
-                  className={`px-1.5 xl:px-2 py-1 min-h-[32px] xl:min-h-[40px] rounded-xl text-[11px] xl:text-xs flex items-center gap-1 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
+                  className={`px-1.5 xl:px-2 py-1 min-h-[32px] xl:min-h-[40px] rounded-xl text-[11px] xl:text-xs flex items-center gap-1 transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'nav-segmented-pill-active font-bold'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] font-semibold border border-transparent'
@@ -380,7 +380,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenCommandPalette}
               aria-label="Busca rápida e navegação global (Ctrl+K)"
               title="Busca rápida de medicamentos, kits, protocolos e guias SUS (Ctrl+K)"
-              className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:w-auto sm:px-2.5 xl:h-10 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
+              className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:w-auto sm:px-2.5 xl:h-10 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
             >
               <Icon name="search" size={16} className="text-sky-600 dark:text-sky-400" />
               <span className="hidden sm:inline text-xs font-medium text-[var(--text-muted)]">
@@ -396,7 +396,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onNavigateToEditor}
-              className="hidden md:flex items-center gap-1.5 px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
+              className="hidden md:flex items-center gap-1.5 px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
               title="Abrir Editor Livre de Documentos A4"
             >
               <Icon name="editor" size={16} className="text-sky-600 dark:text-sky-400" />
@@ -413,7 +413,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onInstallApp}
               className={`${
                 isSidebarOpen ? 'flex lg:hidden 2xl:flex' : 'flex'
-              } items-center justify-center gap-1.5 px-2.5 min-h-[44px] sm:min-h-0 lg:w-9 lg:px-0 2xl:w-auto 2xl:px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:scale-95 bg-sky-500/10 dark:bg-sky-500/15 border-sky-500/30 dark:border-sky-400/30 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0`}
+              } items-center justify-center gap-1.5 px-2.5 min-h-[44px] sm:min-h-0 lg:w-9 lg:px-0 2xl:w-auto 2xl:px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-sky-500/10 dark:bg-sky-500/15 border-sky-500/30 dark:border-sky-400/30 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0`}
               title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
               aria-label="Instalar Aplicativo PresCMed"
             >
@@ -427,7 +427,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
+            className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
             title={darkMode ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
           >
             {darkMode ? (

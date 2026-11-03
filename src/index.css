@@ -282,8 +282,8 @@
     --text-title: #f8fafc;
     --text-body: #cbd5e1;
     --text-muted: #94a3b8;
-    --primary: oklch(0.6 0.15 250);
-    --primary-hover: oklch(0.7 0.15 250);
+    --primary: oklch(0.54 0.15 250);
+    --primary-hover: oklch(0.49 0.15 250);
     --clinical: #10b981;
     --clinical-hover: #059669;
 
@@ -317,7 +317,7 @@
     --surface-panel-text: #F8FAFC;
     --nav-text-muted: #94A3B8;
     --surface-panel-muted: #94A3B8;
-    --nav-active-bg: oklch(0.6 0.15 250);
+    --nav-active-bg: oklch(0.54 0.15 250);
     --nav-active-text: #FFFFFF;
     --nav-active-glow: 0 0 14px rgba(14, 165, 233, 0.35);
 
@@ -333,10 +333,10 @@
     --accent-hover: #7DD3FC;
     --nav-accent: #38BDF8;
 
-    --oklch-primary: oklch(0.6 0.15 250);
-    --oklch-primary-hover: oklch(0.7 0.15 250);
-    --accent-primary: oklch(0.6 0.15 250);
-    --accent-primary-hover: oklch(0.7 0.15 250);
+    --oklch-primary: oklch(0.54 0.15 250);
+    --oklch-primary-hover: oklch(0.49 0.15 250);
+    --accent-primary: oklch(0.54 0.15 250);
+    --accent-primary-hover: oklch(0.49 0.15 250);
     --accent-primary-subtle: rgba(56, 189, 248, 0.15);
     --accent-primary-border: rgba(56, 189, 248, 0.35);
 
@@ -808,7 +808,7 @@
   .dark .btn-tactile-primary,
   .dark .btn-primary-tactile,
   .dark .button-primary {
-    background-color: oklch(0.6 0.15 250);
+    background-color: oklch(0.54 0.15 250);
     color: #FFFFFF !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 6px -2px rgba(0, 0, 0, 0.35);
     transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), 
@@ -822,7 +822,7 @@
     .dark .btn-tactile-primary:hover:not(:disabled),
     .dark .btn-primary-tactile:hover:not(:disabled),
     .dark .button-primary:hover:not(:disabled) {
-      background-color: oklch(0.7 0.15 250);
+      background-color: oklch(0.49 0.15 250);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
     }
   }

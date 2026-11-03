@@ -1,4 +1,5 @@
 import React from 'react';
+import { PRESCMED_TOKENS } from '../../config/tokens';
 import type { UIState } from '../../types/index';
 
 export type { UIState };
@@ -59,6 +60,7 @@ export const SurfaceCard: React.FC<SurfaceCardProps> = ({
 
   return (
     <Component
+      data-purpose={PRESCMED_TOKENS.purpose}
       data-variant={variant}
       data-state={resolvedState}
       aria-busy={resolvedState === 'loading'}

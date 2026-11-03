@@ -263,62 +263,100 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
 
         {/* Barra de Contexto do Paciente Ativo e Troca Rápida (exibida ao entrar em um leito) */}
         {activeSubView !== 'ward_map' && (
-          <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveSubView('ward_map')}
-                className="btn-tactile-secondary h-8 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
-              >
-                <Icon name="arrow_back" size={14} />
-                <span>Mapa de Leitos</span>
-              </button>
-
-              <div className="min-w-0">
-                <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
-                  Leito Ativo: EF/LT {activeBed.wardAndBed}
-                </span>
-                <span className="text-xs font-semibold text-[var(--text-main)] ml-1.5">
-                  — {activeBed.patientNameOrInitials || 'Sem identificação'}
-                </span>
-              </div>
-            </div>
-
-            <div
-              role="tablist"
-              aria-label="Seletor instantâneo de leitos da unidade"
-              className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none"
-            >
-              {beds.map((bed) => {
-                const isSelected = bed.id === activeBed.id;
-                const stayDays = calculateHospitalStayDays(bed.dihDateBr);
-                return (
-                  <button
-                    key={bed.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={isSelected}
-                    onClick={() => handleSelectBed(bed.id)}
-                    className={`px-3 py-1.5 rounded-xl border text-left transition cursor-pointer shrink-0 ${
-                      isSelected
-                        ? 'bg-sky-600/15 border-sky-500/50 text-[var(--text-main)] font-bold'
-                        : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] font-medium'
-                    }`}
+          <div className="pt-2 border-t border-[var(--border-subtle)] space-y-2">
+            <nav aria-label="Caminho de navegação">
+              <ol role="list" className="breadcrumbsList">
+                <li>
+                  <a
+                    href="#hospital-ward-module-root"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveSubView('ward_map');
+                    }}
                   >
-                    <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
-                      EF/LT {bed.wardAndBed}
-                    </span>
-                    <span className="text-xs ml-1.5 truncate max-w-28 inline-block align-bottom">
-                      {bed.patientNameOrInitials || 'Sem ID'}
-                    </span>
-                    {stayDays > 0 && (
-                      <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
-                        D{stayDays}
+                    Hospitalar (MOD-03)
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#hospital-ward-module-root"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveSubView('ward_map');
+                    }}
+                  >
+                    Enfermaria Clínica
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={`#leito-${activeBed.id}`}
+                    aria-current="page"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    Leito {activeBed.wardAndBed} ({activeBed.patientNameOrInitials || 'Sem ID'})
+                  </a>
+                </li>
+              </ol>
+            </nav>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveSubView('ward_map')}
+                  className="btn-tactile-secondary h-8 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
+                >
+                  <Icon name="arrow_back" size={14} />
+                  <span>Mapa de Leitos</span>
+                </button>
+
+                <div className="min-w-0">
+                  <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                    Leito Ativo: EF/LT {activeBed.wardAndBed}
+                  </span>
+                  <span className="text-xs font-semibold text-[var(--text-main)] ml-1.5">
+                    — {activeBed.patientNameOrInitials || 'Sem identificação'}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                role="tablist"
+                aria-label="Seletor instantâneo de leitos da unidade"
+                className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none"
+              >
+                {beds.map((bed) => {
+                  const isSelected = bed.id === activeBed.id;
+                  const stayDays = calculateHospitalStayDays(bed.dihDateBr);
+                  return (
+                    <button
+                      key={bed.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isSelected}
+                      onClick={() => handleSelectBed(bed.id)}
+                      className={`px-3 py-1.5 rounded-xl border text-left transition cursor-pointer shrink-0 ${
+                        isSelected
+                          ? 'bg-sky-600/15 border-sky-500/50 text-[var(--text-main)] font-bold'
+                          : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] font-medium'
+                      }`}
+                    >
+                      <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                        EF/LT {bed.wardAndBed}
                       </span>
-                    )}
-                  </button>
-                );
-              })}
+                      <span className="text-xs ml-1.5 truncate max-w-28 inline-block align-bottom">
+                        {bed.patientNameOrInitials || 'Sem ID'}
+                      </span>
+                      {stayDays > 0 && (
+                        <span className="ml-1.5 text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
+                          D{stayDays}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

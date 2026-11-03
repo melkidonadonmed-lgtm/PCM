@@ -173,7 +173,7 @@ PCM/
 │   ├── styles/                   # TOKENS EM 3 CAMADAS E REGRAS DE BASE
 │   │   └── globals.css           # Camadas semânticas OKLCH, clamp(), @container e trilhos táteis
 │   ├── utils/                    # Motores matemáticos puros (doseCalculator, isSpecialControlOrAntibiotic)
-│   └── __tests__/                # 26 suítes determinísticas Vitest (241/241 testes Nível 4)
+│   └── __tests__/                # 26 suítes determinísticas Vitest (245/245 testes Nível 4)
 ├── DESIGN.md                     # Contrato canônico do Design System (validado por npm run design:lint)
 ├── AGENTS.md                     # Diretrizes operacionais e invariantes clínicos
 └── package.json
@@ -551,7 +551,7 @@ Todos os componentes interativos seguem **Engenharia Real-State (Máquina de Est
 
 ### 4. Diretrizes de Hooks de Tema (`useTheme`) e Interpolação `color-mix()`
 
-- **Sincronização de Tema sem FOUC**: O estado `darkMode` sincroniza a classe `.dark` e o atributo `data-theme="light|dark"` em `document.documentElement` e persiste em `localStorage` (`pcm_dark_mode`).
+- **Sincronização de Tema sem FOUC**: O estado `darkMode` sincroniza a classe `.dark` e o atributo `data-theme="light|dark"` em `document.documentElement` e persiste em `localStorage` (`prescmed_theme`).
 - **Badges Semânticos com `color-mix(in oklab)`**:
   ```css
   .badgeInfo {

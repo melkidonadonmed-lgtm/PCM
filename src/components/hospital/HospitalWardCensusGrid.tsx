@@ -221,7 +221,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
 
                 {/* Hipótese Diagnóstica Principal */}
                 <div className="p-2.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-1">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
                     Hipótese Diagnóstica Principal (HD 1)
                   </span>
                   <p className="text-xs font-semibold text-[var(--text-main)] line-clamp-2">

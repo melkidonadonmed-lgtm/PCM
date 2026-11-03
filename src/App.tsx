@@ -5,28 +5,18 @@ import { Sidebar } from './components/Sidebar';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { PediatricCalculator } from './components/PediatricCalculator';
 import { PrescriptionBuilder } from './components/PrescriptionBuilder';
-import { ClinicalDocumentsHub, DocumentsSubTab } from './components/ClinicalDocumentsHub';
-import { ClinicalProtocolsView } from './components/ClinicalProtocolsView';
-import { HospitalWardModuleView, type HospitalSubViewId } from './components/hospital/HospitalWardModuleView';
-import type { DashboardMetricSource } from './components/hospital/HospitalLabsAndAnalyticsPanel';
-import { ScoreboardModuleView } from './components/scores/ScoreboardModuleView';
+import type { DocumentsSubTab } from './components/ClinicalDocumentsHub';
 import { PuxarParaAtualizar } from './components/PuxarParaAtualizar';
-import { ActiveTab, PrescriptionItem, Patient, SusDocumentId } from './types';
-import type {
-  HospitalBedPatientRecord,
-  HospitalBedScoreEntry,
-} from './core/domain/clinicalEntities';
-import { clinicalRepository } from './core/storage/clinicalRepository';
-import { DEFAULT_HOSPITAL_BEDS_SEED } from './utils/hospital/hospitalMultimodalIngestor';
-import { sortScoreEntriesChronologically } from './utils/hospital/hospitalEvolutionFormatter';
+import { ActiveTab, PrescriptionItem, SusDocumentId } from './types';
 import { ClinicalKit } from './data/clinicalKits';
 import { montarItensDoKit } from './utils/montarItensDoKit';
 import { UnifiedMedication } from './data/medicationDatabase';
-import { usePrescriptionSession, DEFAULT_PATIENT } from './hooks/usePrescriptionSession';
+import { usePrescriptionSession } from './hooks/usePrescriptionSession';
 import { useWorkContext } from './hooks/useWorkContext';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { useNavigationSync, runTabViewTransition } from './hooks/useNavigationSync';
 import { useModalAccessibility } from './hooks/useModalAccessibility';
+import { useHospitalWardSession } from './hooks/useHospitalWardSession';
 import { CommandPaletteModal } from './components/layout/CommandPaletteModal';
 import { ConsultationReadinessBar } from './components/bento/ConsultationReadinessBar';
 import { AsyncErrorBoundary } from './components/AsyncErrorBoundary';
@@ -47,6 +37,18 @@ const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
 const PatientModal = React.lazy(() => import('./components/PatientModal'));
 const DoctorProfileModal = React.lazy(() => import('./components/DoctorProfileModal'));
 const BackupModal = React.lazy(() => import('./components/BackupModal'));
+const ClinicalDocumentsHub = React.lazy(() =>
+  import('./components/ClinicalDocumentsHub').then((m) => ({ default: m.ClinicalDocumentsHub }))
+);
+const ClinicalProtocolsView = React.lazy(() =>
+  import('./components/ClinicalProtocolsView').then((m) => ({ default: m.ClinicalProtocolsView }))
+);
+const ScoreboardModuleView = React.lazy(() =>
+  import('./components/scores/ScoreboardModuleView').then((m) => ({ default: m.ScoreboardModuleView }))
+);
+const HospitalWardModuleView = React.lazy(() =>
+  import('./components/hospital/HospitalWardModuleView').then((m) => ({ default: m.HospitalWardModuleView }))
+);
 
 export default function App() {
   // Tema visual (Claro como padrão oficial do sistema)
@@ -192,30 +194,50 @@ export default function App() {
   const handleOpenBackupModal = React.useCallback(() => setIsBackupModalOpen(true), []);
   const handleCloseBackupModal = React.useCallback(() => setIsBackupModalOpen(false), []);
 
+  const [editorInitialSyncTrigger, setEditorInitialSyncTrigger] = useState(0);
+  const [editorCustomDoc, setEditorCustomDoc] = useState<{ html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null>(null);
+  const [selectedScoreboardId, setSelectedScoreboardId] = useState<string | null>(null);
+
+  // Toast de notificação de kit aplicado
+  const [kitToast, setKitToast] = useState<string | null>(null);
+
+  const {
+    hospitalBeds,
+    activeHospitalBedId,
+    setActiveHospitalBedId,
+    hospitalSubView,
+    setHospitalSubView,
+    hospitalDashboardMetricSource,
+    hospitalDashboardScoreAcronym,
+    reloadHospitalBedsFromStorage,
+    handleUpdateHospitalBed,
+    handleCreateHospitalBed,
+    handleDeleteHospitalBed,
+    handleRecordScoreToHospitalBed,
+    handleNavigateToHospitalDashboardFromScore,
+    handleOpenScoreboardForBed,
+  } = useHospitalWardSession({
+    setActiveTab,
+    setSelectedScoreboardId,
+    onShowToast: setKitToast,
+  });
+
   const handleBackupRestored = React.useCallback(async () => {
     await loadContexts();
-    if (clinicalRepository.listHospitalBeds) {
-      const storedBeds = await clinicalRepository.listHospitalBeds();
-      if (storedBeds && storedBeds.length > 0) {
-        setHospitalBeds(storedBeds);
-        setActiveHospitalBedId((prev) =>
-          storedBeds.some((b) => b.id === prev) ? prev : storedBeds[0].id
-        );
-      }
-    }
-  }, [loadContexts]);
+    await reloadHospitalBedsFromStorage();
+  }, [loadContexts, reloadHospitalBedsFromStorage]);
 
   // Manipuladores de ação
   const handleUpdatePatientWeight = (newWeight: number) => {
-    setPatient(prev => ({ ...prev, weightKg: newWeight }));
+    setPatient((prev) => ({ ...prev, weightKg: newWeight }));
   };
 
   const handleToggleWeightCalc = (enabled: boolean) => {
-    setPatient(prev => ({ ...prev, weightCalcEnabled: enabled }));
+    setPatient((prev) => ({ ...prev, weightCalcEnabled: enabled }));
   };
 
   const handleAddPrescriptionItem = (newItem: PrescriptionItem) => {
-    setPrescriptionItems(prev => [...prev, newItem]);
+    setPrescriptionItems((prev) => [...prev, newItem]);
   };
 
   const handleClearPrescription = () => {
@@ -230,140 +252,6 @@ export default function App() {
     startNewConsultation();
     setActiveTab('prescription');
   };
-
-  const [editorInitialSyncTrigger, setEditorInitialSyncTrigger] = useState(0);
-  const [editorCustomDoc, setEditorCustomDoc] = useState<{ html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null>(null);
-  const [selectedScoreboardId, setSelectedScoreboardId] = useState<string | null>(null);
-
-  // Estado compartilhado de Internação Hospitalar (MOD-03) <-> Scoreboard CDSS
-  const [hospitalBeds, setHospitalBeds] = useState<HospitalBedPatientRecord[]>(
-    DEFAULT_HOSPITAL_BEDS_SEED
-  );
-  const [activeHospitalBedId, setActiveHospitalBedId] = useState<string>(
-    DEFAULT_HOSPITAL_BEDS_SEED[0].id
-  );
-  const [hospitalSubView, setHospitalSubView] =
-    useState<HospitalSubViewId>('ward_map');
-  const [hospitalDashboardMetricSource, setHospitalDashboardMetricSource] =
-    useState<DashboardMetricSource>('labs');
-  const [hospitalDashboardScoreAcronym, setHospitalDashboardScoreAcronym] =
-    useState<string | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    if (clinicalRepository.listHospitalBeds) {
-      clinicalRepository.listHospitalBeds().then((stored) => {
-        if (!mounted) return;
-        if (stored && stored.length > 0) {
-          setHospitalBeds(stored);
-          setActiveHospitalBedId(stored[0].id);
-        } else if (clinicalRepository.saveHospitalBed) {
-          DEFAULT_HOSPITAL_BEDS_SEED.forEach((b) => {
-            clinicalRepository.saveHospitalBed?.(b);
-          });
-        }
-      });
-    }
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const handleUpdateHospitalBed = React.useCallback(
-    (updated: HospitalBedPatientRecord) => {
-      setHospitalBeds((prev) =>
-        prev.map((b) => (b.id === updated.id ? updated : b))
-      );
-      clinicalRepository.saveHospitalBed?.(updated);
-    },
-    []
-  );
-
-  const handleCreateHospitalBed = React.useCallback(
-    (created: HospitalBedPatientRecord) => {
-      setHospitalBeds((prev) => [...prev, created]);
-      setActiveHospitalBedId(created.id);
-      clinicalRepository.saveHospitalBed?.(created);
-    },
-    []
-  );
-
-  const handleDeleteHospitalBed = React.useCallback((bedId: string) => {
-    setHospitalBeds((prev) => {
-      const next = prev.filter((b) => b.id !== bedId);
-      const safeNext = next.length > 0 ? next : DEFAULT_HOSPITAL_BEDS_SEED;
-      setActiveHospitalBedId((currId) =>
-        currId === bedId ? safeNext[0].id : currId
-      );
-      return safeNext;
-    });
-    clinicalRepository.deleteHospitalBed?.(bedId);
-  }, []);
-
-  const handleRecordScoreToHospitalBed = React.useCallback(
-    (
-      bedId: string,
-      entry: HospitalBedScoreEntry,
-      options?: { appendConductToBed?: boolean }
-    ) => {
-      setHospitalBeds((prev) =>
-        prev.map((bed) => {
-          if (bed.id !== bedId) return bed;
-          const nextScoreEntries = sortScoreEntriesChronologically([
-            ...(bed.scoreEntries || []),
-            entry,
-          ]);
-          const nextConductList =
-            options?.appendConductToBed &&
-            entry.recommendedConducts &&
-            entry.recommendedConducts.length > 0
-              ? [
-                  ...bed.conductList,
-                  ...entry.recommendedConducts.filter(
-                    (c) => !bed.conductList.includes(c)
-                  ),
-                ]
-              : bed.conductList;
-
-          const updatedBed: HospitalBedPatientRecord = {
-            ...bed,
-            scoreEntries: nextScoreEntries,
-            conductList: nextConductList,
-            updatedAt: Date.now(),
-          };
-          clinicalRepository.saveHospitalBed?.(updatedBed);
-          return updatedBed;
-        })
-      );
-      const targetBed = hospitalBeds.find((b) => b.id === bedId);
-      setKitToast(
-        `Escore ${entry.acronym} (${entry.scoreFormatted} pts) registrado no Leito ${targetBed?.wardAndBed || bedId}.`
-      );
-    },
-    [hospitalBeds]
-  );
-
-  const handleNavigateToHospitalDashboardFromScore = React.useCallback(
-    (bedId: string, scoreAcronym: string) => {
-      setActiveHospitalBedId(bedId);
-      setHospitalSubView('analytics_dashboard');
-      setHospitalDashboardMetricSource('scores');
-      setHospitalDashboardScoreAcronym(scoreAcronym);
-      setActiveTab('hospital');
-    },
-    []
-  );
-
-  const handleOpenScoreboardForBed = React.useCallback(
-    (bed: HospitalBedPatientRecord, calculatorId?: string) => {
-      setActiveHospitalBedId(bed.id);
-      if (calculatorId) {
-        setSelectedScoreboardId(calculatorId);
-      }
-      setActiveTab('scores');
-    },
-    []
-  );
 
   const handleSelectScoreFromPalette = React.useCallback((calculatorId: string) => {
     setSelectedScoreboardId(calculatorId);
@@ -499,9 +387,6 @@ export default function App() {
   // Medicamento pendente vindo de outras telas (ex: Protocolos)
   const [medicamentoPendente, setMedicamentoPendente] = useState<UnifiedMedication | null>(null);
   const [protocolSearchQuery, setProtocolSearchQuery] = useState<string | null>(null);
-
-  // Toast de notificação de kit aplicado
-  const [kitToast, setKitToast] = useState<string | null>(null);
 
   useEffect(() => {
     if (!kitToast) return;
@@ -663,102 +548,112 @@ export default function App() {
             )}
 
             {activeTab === 'pediatric_calc' && (
-              <PediatricCalculator
-                darkMode={darkMode}
-                patient={patient}
-                onUpdatePatientWeight={handleUpdatePatientWeight}
-                onAddPrescriptionItem={handleAddPrescriptionItem}
-                onNavigateToPrescription={() => setActiveTab('prescription')}
-              />
+              <Suspense fallback={null}>
+                <PediatricCalculator
+                  darkMode={darkMode}
+                  patient={patient}
+                  onUpdatePatientWeight={handleUpdatePatientWeight}
+                  onAddPrescriptionItem={handleAddPrescriptionItem}
+                  onNavigateToPrescription={() => setActiveTab('prescription')}
+                />
+              </Suspense>
             )}
 
             {(activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus') && (
-              <ClinicalDocumentsHub
-                darkMode={darkMode}
-                patient={patient}
-                onUpdatePatient={setPatient}
-                doctor={doctor}
-                activeContext={activeContext}
-                certificate={certificate}
-                onUpdateCertificate={setCertificate}
-                referral={referral}
-                onUpdateReferral={setReferral}
-                selectedExams={selectedExams}
-                onUpdateSelectedExams={setSelectedExams}
-                clinicalIndication={examIndication}
-                onUpdateClinicalIndication={setExamIndication}
-                onNavigateToEditorWithHtml={handleNavigateToEditorWithHtml}
-                initialSubTab={
-                  activeTab === 'certificate' ? 'certificate' :
-                  activeTab === 'referral' ? 'referral' :
-                  activeTab === 'exams' ? 'exams' :
-                  activeTab === 'sus' ? 'sus' : documentsSubTab
-                }
-                initialSusDocId={initialSusDocId}
-                susCatalogResetTrigger={susCatalogResetTrigger}
-                onSubTabChange={handleDocumentsSubTabChange}
-                onNavigateToPrint={(type) => handleNavigateToPrint(type)}
-              />
+              <Suspense fallback={null}>
+                <ClinicalDocumentsHub
+                  darkMode={darkMode}
+                  patient={patient}
+                  onUpdatePatient={setPatient}
+                  doctor={doctor}
+                  activeContext={activeContext}
+                  certificate={certificate}
+                  onUpdateCertificate={setCertificate}
+                  referral={referral}
+                  onUpdateReferral={setReferral}
+                  selectedExams={selectedExams}
+                  onUpdateSelectedExams={setSelectedExams}
+                  clinicalIndication={examIndication}
+                  onUpdateClinicalIndication={setExamIndication}
+                  onNavigateToEditorWithHtml={handleNavigateToEditorWithHtml}
+                  initialSubTab={
+                    activeTab === 'certificate' ? 'certificate' :
+                    activeTab === 'referral' ? 'referral' :
+                    activeTab === 'exams' ? 'exams' :
+                    activeTab === 'sus' ? 'sus' : documentsSubTab
+                  }
+                  initialSusDocId={initialSusDocId}
+                  susCatalogResetTrigger={susCatalogResetTrigger}
+                  onSubTabChange={handleDocumentsSubTabChange}
+                  onNavigateToPrint={(type) => handleNavigateToPrint(type)}
+                />
+              </Suspense>
             )}
 
             {activeTab === 'protocols' && (
-              <ClinicalProtocolsView
-                darkMode={darkMode}
-                patient={patient}
-                initialSearchQuery={protocolSearchQuery}
-                onUpdatePatientWeight={handleUpdatePatientWeight}
-                onAddPrescriptionItem={handleAddPrescriptionItem}
-                onNavigateToPrescription={() => setActiveTab('prescription')}
-                onNavigateToScores={() => handleSelectTab('scores')}
-                onUsarMedicamento={handleUsarMedicamento}
-              />
+              <Suspense fallback={null}>
+                <ClinicalProtocolsView
+                  darkMode={darkMode}
+                  patient={patient}
+                  initialSearchQuery={protocolSearchQuery}
+                  onUpdatePatientWeight={handleUpdatePatientWeight}
+                  onAddPrescriptionItem={handleAddPrescriptionItem}
+                  onNavigateToPrescription={() => setActiveTab('prescription')}
+                  onNavigateToScores={() => handleSelectTab('scores')}
+                  onUsarMedicamento={handleUsarMedicamento}
+                />
+              </Suspense>
             )}
 
             {activeTab === 'scores' && (
-              <ScoreboardModuleView
-                patient={patient}
-                initialCalculatorId={selectedScoreboardId}
-                onUpdatePatientWeight={handleUpdatePatientWeight}
-                onAddPrescriptionItem={(item) => {
-                  handleAddPrescriptionItem(item);
-                  setKitToast(`Item "${item.name}" adicionado à receita.`);
-                }}
-                onAddExamById={handleAddExamFromScoreboard}
-                onSendToA4Editor={(html, title) =>
-                  handleNavigateToEditorWithHtml(html, title || 'Escore Clínico', 'custom')
-                }
-                hospitalBeds={hospitalBeds}
-                activeHospitalBedId={activeHospitalBedId}
-                onSelectHospitalBed={setActiveHospitalBedId}
-                onRecordScoreToBed={handleRecordScoreToHospitalBed}
-                onNavigateToHospitalDashboard={
-                  handleNavigateToHospitalDashboardFromScore
-                }
-                onReturnToHospitalBed={(bedId) => {
-                  setActiveHospitalBedId(bedId);
-                  setHospitalSubView('evolution_form');
-                  setActiveTab('hospital');
-                }}
-              />
+              <Suspense fallback={null}>
+                <ScoreboardModuleView
+                  patient={patient}
+                  initialCalculatorId={selectedScoreboardId}
+                  onUpdatePatientWeight={handleUpdatePatientWeight}
+                  onAddPrescriptionItem={(item) => {
+                    handleAddPrescriptionItem(item);
+                    setKitToast(`Item "${item.name}" adicionado à receita.`);
+                  }}
+                  onAddExamById={handleAddExamFromScoreboard}
+                  onSendToA4Editor={(html, title) =>
+                    handleNavigateToEditorWithHtml(html, title || 'Escore Clínico', 'custom')
+                  }
+                  hospitalBeds={hospitalBeds}
+                  activeHospitalBedId={activeHospitalBedId}
+                  onSelectHospitalBed={setActiveHospitalBedId}
+                  onRecordScoreToBed={handleRecordScoreToHospitalBed}
+                  onNavigateToHospitalDashboard={
+                    handleNavigateToHospitalDashboardFromScore
+                  }
+                  onReturnToHospitalBed={(bedId) => {
+                    setActiveHospitalBedId(bedId);
+                    setHospitalSubView('evolution_form');
+                    setActiveTab('hospital');
+                  }}
+                />
+              </Suspense>
             )}
 
             {activeTab === 'hospital' && (
-              <HospitalWardModuleView
-                darkMode={darkMode}
-                doctor={doctor}
-                patient={patient}
-                onSendToA4Editor={(html, title) => handleNavigateToEditorWithHtml(html, title, 'custom')}
-                beds={hospitalBeds}
-                activeBedId={activeHospitalBedId}
-                onSelectBedId={setActiveHospitalBedId}
-                onUpdateBed={handleUpdateHospitalBed}
-                onCreateBed={handleCreateHospitalBed}
-                onDeleteBed={handleDeleteHospitalBed}
-                initialSubView={hospitalSubView}
-                initialDashboardMetricSource={hospitalDashboardMetricSource}
-                initialDashboardScoreAcronym={hospitalDashboardScoreAcronym}
-                onOpenScoreboardForBed={handleOpenScoreboardForBed}
-              />
+              <Suspense fallback={null}>
+                <HospitalWardModuleView
+                  darkMode={darkMode}
+                  doctor={doctor}
+                  patient={patient}
+                  onSendToA4Editor={(html, title) => handleNavigateToEditorWithHtml(html, title, 'custom')}
+                  beds={hospitalBeds}
+                  activeBedId={activeHospitalBedId}
+                  onSelectBedId={setActiveHospitalBedId}
+                  onUpdateBed={handleUpdateHospitalBed}
+                  onCreateBed={handleCreateHospitalBed}
+                  onDeleteBed={handleDeleteHospitalBed}
+                  initialSubView={hospitalSubView}
+                  initialDashboardMetricSource={hospitalDashboardMetricSource}
+                  initialDashboardScoreAcronym={hospitalDashboardScoreAcronym}
+                  onOpenScoreboardForBed={handleOpenScoreboardForBed}
+                />
+              </Suspense>
             )}
 
             {activeTab === 'editor' && (

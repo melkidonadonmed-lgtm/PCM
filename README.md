@@ -5,8 +5,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Dexie v4](https://img.shields.io/badge/IndexedDB-Dexie%20v4-f59e0b?style=flat-square)](https://dexie.org/)
-[![Vitest](https://img.shields.io/badge/Testes-241%2F241%20Vitest-22c55e?style=flat-square&logo=vitest)](https://vitest.dev/)
-[![Arquitetura SGA](https://img.shields.io/badge/Arquitetura%20SGA-92.76%2F100-0284c7?style=flat-square)](#7-testes-e-portões-de-qualidade-26-suítes--241-testes)
+[![Vitest](https://img.shields.io/badge/Testes-245%2F245%20Vitest-22c55e?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Arquitetura SGA](https://img.shields.io/badge/Arquitetura%20SGA-92.76%2F100-0284c7?style=flat-square)](#7-testes-e-portões-de-qualidade-26-suítes--245-testes)
 [![PWA](https://img.shields.io/badge/PWA-Offline--First-8b5cf6?style=flat-square)](https://web.dev/progressive-web-apps/)
 
 Plataforma médica digital *offline-first* para o contexto clínico, ambulatorial, de emergência e hospitalar brasileiro (`pt-BR`): receituário inteligente no padrão PEC/SUS, calculadora pediátrica por peso, central de documentos (atestados CFM, encaminhamentos, exames e 9 formulários regulatórios do SUS), bancada de apoio à decisão clínica (**Scoreboard CDSS** com **114 escores**, painel **EPARADA** ACLS/PALS, **Bomba de Infusão Contínua** e **Rastreio Oncológico INCA/MS**) e **Módulo Hospitalar (`MOD-03`)** com gestão de leitos, evolução padronizada, ingestão multimodal sem alucinação e painel longitudinal *Conduta × Evolução*.
@@ -125,12 +125,12 @@ flowchart TD
 | **Motor de PDF** | `html2canvas-pro` (`2.4.5`, suporte nativo a `oklch()`) + `jsPDF` (`4.2.1`) |
 | **PWA / Offline** | `vite-plugin-pwa` (`1.3.0` / Workbox `generateSW`) |
 | **Nuvem Opcional** | Firebase 12 (`12.19.0` — Google Auth + Cloud Firestore sob demanda) |
-| **Qualidade & Testes** | Vitest 5 (`5.0.2` — 26 suítes, 241 testes determinísticos Nível 4) + `@google/design.md` |
+| **Qualidade & Testes** | Vitest 5 (`5.0.2` — 26 suítes, 245 testes determinísticos Nível 4) + `@google/design.md` |
 | **Produção** | Google Cloud Run (`southamerica-east1`), container multi-stage (`node:24-alpine` + `nginx:alpine`) |
 
 ---
 
-## 4. Estrutura Completa do Repositório (`170` arquivos em `src/`)
+## 4. Estrutura Completa do Repositório (`172` arquivos em `src/`)
 
 ```plaintext
 PCM/
@@ -156,7 +156,7 @@ PCM/
 │   ├── formularios-sus-offline.html # Catálogo HTML standalone para consulta/impressão offline de guias SUS
 │   ├── logos/                       # Brasões e logos institucionais (sus.png, semusa.png, sesau-ro.png, rondonia-brasao.svg)
 │   └── watermarks/                  # Marcas d'água institucionais e PDFs base
-└── src/                             # 170 arquivos de código-fonte e testes
+└── src/                             # 172 arquivos de código-fonte e testes
     ├── main.tsx                     # Bootstrap React 19 (StrictMode)
     ├── App.tsx                      # Orquestrador de estado global, modais, leitos hospitalares e navegação por abas
     ├── types.ts                     # Contratos globais (DoctorProfile, Patient, PrescriptionItem, ActiveTab, SUS, etc.)
@@ -225,7 +225,7 @@ PCM/
     │                                # documentoClinico.ts, folhaA4.ts, renderSheetToPdf.ts, downloadPdf.ts,
     │                                # formularioOficial.ts, prescricaoRapida.ts, montarItensDoKit.ts, fuzzySearch.ts,
     │                                # parsePrescriptionHtml.ts, sanitizeHtml.ts, compartilhamentoTexto.ts, medicoConfigurado.ts
-    └── __tests__/                   # 26 suítes Vitest (241 testes determinísticos) + snapshots de kits clínicos
+    └── __tests__/                   # 26 suítes Vitest (245 testes determinísticos) + snapshots de kits clínicos
 ```
 
 ---
@@ -271,11 +271,11 @@ O login na nuvem é opcional; as variáveis `VITE_FIREBASE_*` estão documentada
 
 ---
 
-## 7. Testes e Portões de Qualidade (`26` suítes / `241` testes)
+## 7. Testes e Portões de Qualidade (`26` suítes / `245` testes)
 
 ```powershell
 npm run lint         # Type-check estrito: tsc --noEmit (0 any)
-npm run test         # Suíte completa Vitest (26 suítes, 241 testes)
+npm run test         # Suíte completa Vitest (26 suítes, 245 testes)
 npm run test:watch   # Modo interativo contínuo
 npm run design:lint  # Conformidade estrutural com o DESIGN.md
 npm run build        # Build de produção otimizado em dist/

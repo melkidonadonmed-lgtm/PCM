@@ -42,13 +42,6 @@ export function parseDateBrOrIsoToIso(raw: string): string {
   return '';
 }
 
-export function formatIsoToDateBr(raw: string): string {
-  const iso = parseDateBrOrIsoToIso(raw);
-  if (!iso) return raw.trim();
-  const [y, m, d] = iso.split('-');
-  return `${d}/${m}/${y}`;
-}
-
 export function calculatePatientAgeYearsFromDate(birthDateStr: string, refDateIso = '2026-10-24'): string {
   const birthIso = parseDateBrOrIsoToIso(birthDateStr);
   if (!birthIso) return '';

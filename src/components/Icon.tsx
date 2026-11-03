@@ -412,8 +412,6 @@ export const Icon: React.FC<IconProps> = ({
   );
 };
 
-export const MaterialSymbol = Icon;
-
 export interface MappedIconProps extends Omit<IconProps, 'name'> {
   strokeWidth?: number;
 }

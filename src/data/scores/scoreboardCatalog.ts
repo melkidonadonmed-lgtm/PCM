@@ -125,13 +125,6 @@ export function getCalculatorByIdOrSlug(idOrSlug: string): Calculator | undefine
   return CALCULATOR_BY_ID.get(normalized) ?? CALCULATOR_BY_SLUG.get(normalized);
 }
 
-export function getCalculatorsByBlockId(blockId: string): Calculator[] {
-  if (blockId === 'ALL') {
-    return ALL_SCOREBOARD_CALCULATORS;
-  }
-  return BLOCK_DATA_MAP[blockId]?.calculators ?? [];
-}
-
 function normalizeSearchToken(value: string): string {
   return value
     .normalize('NFD')

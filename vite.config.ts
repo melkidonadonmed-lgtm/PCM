@@ -123,12 +123,26 @@ export default defineConfig(() => {
             if (id.includes('node_modules/firebase') || id.includes('node_modules/@firebase')) {
               return 'vendor-firebase';
             }
+            if (id.includes('node_modules/jspdf') || id.includes('node_modules/html2canvas-pro')) {
+              return 'vendor-pdf-canvas';
+            }
             if (id.includes('data/scores/blocks/') || id.includes('data\\scores\\blocks\\') || id.includes('data/scores/manifest.json')) {
               return 'scores-catalog';
+            }
+            if (
+              id.includes('data/medications/') ||
+              id.includes('data\\medications\\') ||
+              id.includes('data/cidCatalog') ||
+              id.includes('data/pediatricMeds')
+            ) {
+              return 'clinical-catalogs';
             }
           },
         },
       },
+    },
+    test: {
+      fsModuleCache: true,
     },
   };
 });
