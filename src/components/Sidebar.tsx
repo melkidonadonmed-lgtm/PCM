@@ -31,6 +31,7 @@ interface SidebarProps {
   onOpenDoctorModal?: () => void;
   onOpenPatientModal?: () => void;
   onOpenBackupModal?: () => void;
+  onOpenLgpdModal?: () => void;
   isInstallable?: boolean;
   onInstallApp?: () => void;
   onClearPrescription?: () => void;
@@ -67,6 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenDoctorModal,
   onOpenPatientModal,
   onOpenBackupModal,
+  onOpenLgpdModal,
   isInstallable = false,
   onInstallApp,
   onClearPrescription,
@@ -94,14 +96,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   // Detecção de breakpoint desktop (>= 1024px) via matchMedia
   const [isDesktop, setIsDesktop] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
       return window.matchMedia('(min-width: 1024px)').matches;
     }
     return false;
   });
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
     const onMediaChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
     mediaQuery.addEventListener('change', onMediaChange);
@@ -211,6 +213,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleOpenDoctor = () => runMobileAwareAction(onOpenDoctorModal);
   const handleOpenPatient = () => runMobileAwareAction(onOpenPatientModal);
   const handleOpenBackup = () => runMobileAwareAction(onOpenBackupModal);
+  const handleOpenLgpd = () => runMobileAwareAction(onOpenLgpdModal);
 
   const renderNavButton = (item: SidebarNavItem) => {
     const isSusActive =
@@ -721,7 +724,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="truncate">Novo Atendimento</span>
               </button>
 
-              {/* Utilitários secundários uniformes: Backup e Recolher Menu */}
+              {/* Utilitários secundários uniformes: Backup, LGPD e Recolher Menu */}
               <div className="flex items-center gap-1.5 w-full min-w-0">
                 {onOpenBackupModal && (
                   <button
@@ -732,6 +735,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Icon name="cloud_download" size={13} className="text-slate-300 shrink-0" />
                     <span className="truncate">Backup (.pcm)</span>
+                  </button>
+                )}
+
+                {onOpenLgpdModal && (
+                  <button
+                    id="btn-sidebar-lgpd-security"
+                    type="button"
+                    onClick={handleOpenLgpd}
+                    className="h-8 px-2 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:scale-[0.98] transition duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shrink-0"
+                    title="Segurança, Seleção de Cookies e Conformidade LGPD"
+                    aria-label="Segurança, Seleção de Cookies e LGPD"
+                  >
+                    <Icon name="shield" size={13} className="text-emerald-400 shrink-0" />
+                    <span>LGPD</span>
                   </button>
                 )}
 
@@ -770,6 +787,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <Icon name="cloud_download" size={20} />
                   <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                     Backup (.pcm.json)
+                  </span>
+                </button>
+              )}
+
+              {onOpenLgpdModal && (
+                <button
+                  type="button"
+                  onClick={handleOpenLgpd}
+                  className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+                  aria-label="Segurança, Cookies e LGPD"
+                >
+                  <Icon name="shield" size={20} className="text-emerald-400" />
+                  <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+                    Segurança, Cookies &amp; LGPD
                   </span>
                 </button>
               )}

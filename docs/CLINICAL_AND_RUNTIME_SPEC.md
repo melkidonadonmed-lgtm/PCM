@@ -100,6 +100,10 @@ src/
     LogoGeneratorModal.tsx     # Utilitário para personalização de cabeçalho e monograma de receituário
     logo/
       LogoSvgCanvas.tsx        # Renderizador SVG vetorial parametrizado para logotipos e monogramas médicos
+    lgpd/
+      LgpdConsentBanner.tsx    # Banner inferior não-bloqueante de 1º acesso para seleção de cookies e aviso LGPD
+      LgpdLocalModeNotice.tsx  # Faixa contextual de Modo Local Sem Login e alerta de Computador Compartilhado (Art. 46 LGPD)
+      LgpdSecurityModal.tsx    # Central de Segurança, Seleção Granular de Cookies e Direitos do Titular (Art. 18 LGPD)
     PuxarParaAtualizar.tsx     # Gesto tátil de pull-to-refresh para atualização em dispositivos móveis
     WatermarkOverlay.tsx       # Camada visual de marca d'água no preview de documentos
     WatermarkSelector.tsx      # Seletor de marcas d'água predefinidas e personalizadas
@@ -138,6 +142,7 @@ src/
   services/
     db.ts                      # Banco IndexedDB local via Dexie.js (esquema v3: workContexts, savedDocuments e hospitalBeds)
     storageService.ts          # Camada de persistência segura com fallback tipado para localStorage
+    lgpdConsentService.ts      # Governança de consentimento LGPD, seleção de cookies e higienização de plantão
     backupService.ts           # Geração e importação de backups integrais em formato .pcm.json
     cloud/
       cloudAuthService.ts      # Autenticação Google e controle de estado do médico na nuvem
@@ -194,6 +199,7 @@ src/
   9. `prescmed_show_kits`: Preferência de exibição da gaveta de kits clínicos na sidebar.
   10. `prescmed_custom_styles`: Estilos e personalizações visuais de impressão.
   11. `prescmed_cloud_auth_active`: Flag de sessão ativa para sincronização na nuvem.
+  12. `prescmed_lgpd_consent`: Preferências de cookies, modo computador compartilhado e consentimento LGPD (`LgpdConsentPreferences`).
   - Prefixo de backups: `prescmed_backup_` (`.pcm.json`). A chave legada `prescmed_show_pedia_calc` foi removida.
 
 ---

@@ -393,5 +393,24 @@ export interface LmeMedicationRow {
   quantities: string[];
 }
 
+/**
+ * Preferências de Consentimento de Cookies, Armazenamento Local e Governança LGPD
+ * (Lei nº 13.709/2018 — Art. 7º, 11, 18 e 46 + Resoluções CFM 1.658/2002 e 1.821/2007).
+ */
+export interface LgpdConsentPreferences {
+  version: '1.0';
+  /** Timestamp (ms) de quando o médico registrou a escolha; null no 1º acesso */
+  consentedAt: number | null;
+  /** Armazenamento estritamente necessário (localStorage clínico + IndexedDB + PWA offline) */
+  essentialStorage: true;
+  /** Cookies/tokens de autenticação Google Firebase para sincronização opcional de timbrados e modelos */
+  cloudAuthCookies: boolean;
+  /** Modo Computador Compartilhado (UBS/UPA/Hospital): destaca alerta permanente de plantão e limpeza rápida */
+  sharedComputerMode: boolean;
+  /** Controla se o aviso compacto de operação sem login (Modo Local) foi recolhido pelo usuário */
+  dismissedNoLoginNotice?: boolean;
+}
+
 export type { UnifiedMedication } from './data/medicationDatabase';
+
 

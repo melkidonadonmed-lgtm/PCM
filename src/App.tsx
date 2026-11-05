@@ -20,7 +20,12 @@ import { useHospitalWardSession } from './hooks/useHospitalWardSession';
 import { CommandPaletteModal } from './components/layout/CommandPaletteModal';
 import { ConsultationReadinessBar } from './components/bento/ConsultationReadinessBar';
 import { AsyncErrorBoundary } from './components/AsyncErrorBoundary';
+import { LgpdConsentBanner } from './components/lgpd/LgpdConsentBanner';
+import { LgpdLocalModeNotice } from './components/lgpd/LgpdLocalModeNotice';
 import { storageService } from './services/storageService';
+import { lgpdConsentService } from './services/lgpdConsentService';
+import { cloudAuthService, type DoctorUserProfile } from './services/cloud/cloudAuthService';
+import type { LgpdConsentPreferences } from './types';
 import type { TipoDocumento } from './utils/documentoClinico';
 
 // Carregamento sob demanda com retry resiliente contra falhas de rede ou cache antigo
@@ -37,6 +42,7 @@ const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
 const PatientModal = React.lazy(() => import('./components/PatientModal'));
 const DoctorProfileModal = React.lazy(() => import('./components/DoctorProfileModal'));
 const BackupModal = React.lazy(() => import('./components/BackupModal'));
+const LgpdSecurityModal = React.lazy(() => import('./components/lgpd/LgpdSecurityModal'));
 const ClinicalDocumentsHub = React.lazy(() =>
   import('./components/ClinicalDocumentsHub').then((m) => ({ default: m.ClinicalDocumentsHub }))
 );
@@ -148,6 +154,32 @@ export default function App() {
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isLgpdModalOpen, setIsLgpdModalOpen] = useState(false);
+
+  // Governança LGPD, Seleção de Cookies e Estado de Login em Nuvem
+  const [lgpdConsent, setLgpdConsent] = useState<LgpdConsentPreferences>(() =>
+    lgpdConsentService.loadConsent()
+  );
+  const [cloudUser, setCloudUser] = useState<DoctorUserProfile | null>(() =>
+    cloudAuthService.getCurrentUser()
+  );
+
+  useEffect(() => {
+    const unsubscribeLgpd = lgpdConsentService.subscribe((nextPrefs) => {
+      setLgpdConsent(nextPrefs);
+    });
+    let unsubscribeAuth: (() => void) | undefined;
+    cloudAuthService.subscribe((userProfile) => {
+      setCloudUser(userProfile);
+    }).then((unsub) => {
+      unsubscribeAuth = unsub;
+    });
+
+    return () => {
+      unsubscribeLgpd();
+      if (unsubscribeAuth) unsubscribeAuth();
+    };
+  }, []);
 
   // Hook desacoplado de sessão clínica e persistência
   const {
@@ -193,6 +225,8 @@ export default function App() {
   const handleClosePatientModal = React.useCallback(() => setIsPatientModalOpen(false), []);
   const handleOpenBackupModal = React.useCallback(() => setIsBackupModalOpen(true), []);
   const handleCloseBackupModal = React.useCallback(() => setIsBackupModalOpen(false), []);
+  const handleOpenLgpdModal = React.useCallback(() => setIsLgpdModalOpen(true), []);
+  const handleCloseLgpdModal = React.useCallback(() => setIsLgpdModalOpen(false), []);
 
   const [editorInitialSyncTrigger, setEditorInitialSyncTrigger] = useState(0);
   const [editorCustomDoc, setEditorCustomDoc] = useState<{ html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null>(null);
@@ -252,6 +286,72 @@ export default function App() {
     startNewConsultation();
     setActiveTab('prescription');
   };
+
+  // Handlers de Segurança, Seleção de Cookies e Direitos LGPD
+  const handleAcceptEssentialCookies = React.useCallback(() => {
+    const updated = lgpdConsentService.acceptEssentialOnly();
+    setLgpdConsent(updated);
+    if (cloudUser) {
+      cloudAuthService.logout().catch(() => {});
+    }
+    setKitToast('Modo 100% Local ativado: apenas armazenamento essencial offline permitido.');
+  }, [cloudUser]);
+
+  const handleAcceptAllCookies = React.useCallback(() => {
+    const updated = lgpdConsentService.acceptAllCookies();
+    setLgpdConsent(updated);
+    setKitToast('Preferências LGPD salvas: armazenamento local e nuvem opcional habilitados.');
+  }, []);
+
+  const handleSaveLgpdPreferences = React.useCallback(
+    (prefs: {
+      cloudAuthCookies: boolean;
+      sharedComputerMode: boolean;
+      dismissedNoLoginNotice?: boolean;
+    }) => {
+      const updated = lgpdConsentService.saveConsent(prefs, { markConsentedNow: true });
+      setLgpdConsent(updated);
+      if (!prefs.cloudAuthCookies && cloudUser) {
+        cloudAuthService.logout().catch(() => {});
+      }
+      setKitToast('Configurações de segurança e cookies LGPD atualizadas.');
+    },
+    [cloudUser]
+  );
+
+  const handleSanitizeShiftData = React.useCallback(() => {
+    lgpdConsentService.sanitizeSharedShiftClinicalData();
+    startNewConsultation();
+    setKitToast('Plantão higienizado: dados do paciente e consulta ativa removidos do navegador.');
+  }, [startNewConsultation]);
+
+  const handleEraseAllLocalData = React.useCallback(async () => {
+    if (cloudUser) {
+      await cloudAuthService.logout({ clearLocalSession: true });
+    }
+    await lgpdConsentService.eraseAllLocalData();
+    startNewConsultation();
+    setDoctor({
+      name: '',
+      crm: '',
+      crmState: 'SP',
+      specialty: '',
+      clinicName: '',
+      address: '',
+      cityState: '',
+      phone: '',
+      email: '',
+      showSignature: true,
+    });
+    await loadContexts();
+    await reloadHospitalBedsFromStorage();
+    setKitToast('Base local eliminada com sucesso conforme Art. 18, VI da LGPD.');
+  }, [cloudUser, startNewConsultation, setDoctor, loadContexts, reloadHospitalBedsFromStorage]);
+
+  const handleDismissNoLoginNotice = React.useCallback(() => {
+    const updated = lgpdConsentService.setNoLoginNoticeDismissed(true);
+    setLgpdConsent(updated);
+  }, []);
 
   const handleSelectScoreFromPalette = React.useCallback((calculatorId: string) => {
     setSelectedScoreboardId(calculatorId);
@@ -370,6 +470,7 @@ export default function App() {
       isPatientModalOpen ||
       isDoctorModalOpen ||
       isBackupModalOpen ||
+      isLgpdModalOpen ||
       isCommandPaletteOpen ||
       showInstallHelp,
   });
@@ -445,6 +546,7 @@ export default function App() {
           isPatientModalOpen ||
           isDoctorModalOpen ||
           isBackupModalOpen ||
+          isLgpdModalOpen ||
           isCommandPaletteOpen ||
           showInstallHelp
         }
@@ -470,6 +572,7 @@ export default function App() {
         isInstallable={isInstallable}
         onInstallApp={installApp}
         onOpenCommandPalette={handleOpenCommandPalette}
+        onOpenLgpdModal={handleOpenLgpdModal}
       />
 
       {/* Main Responsive Body Layout */}
@@ -494,6 +597,7 @@ export default function App() {
           onOpenDoctorModal={handleOpenDoctorModal}
           onOpenPatientModal={handleOpenPatientModal}
           onOpenBackupModal={handleOpenBackupModal}
+          onOpenLgpdModal={handleOpenLgpdModal}
           isInstallable={isInstallable}
           onInstallApp={installApp}
           onClearPrescription={handleClearPrescription}
@@ -504,6 +608,20 @@ export default function App() {
 
         {/* Main Content Area */}
         <main className="flex-1 min-w-0 pb-20 lg:pb-6">
+          <LgpdLocalModeNotice
+            isCloudAuthenticated={Boolean(cloudUser)}
+            sharedComputerMode={lgpdConsent.sharedComputerMode}
+            isDismissed={Boolean(lgpdConsent.dismissedNoLoginNotice)}
+            hasActiveClinicalData={
+              Boolean(patient?.name?.trim()) ||
+              prescriptionItems.length > 0 ||
+              selectedExams.length > 0
+            }
+            onOpenLgpdModal={handleOpenLgpdModal}
+            onOpenBackupModal={handleOpenBackupModal}
+            onSanitizeShiftData={handleSanitizeShiftData}
+            onDismiss={handleDismissNoLoginNotice}
+          />
           <ConsultationReadinessBar
             doctor={doctor}
             patient={patient}
@@ -800,6 +918,33 @@ export default function App() {
           />
         </Suspense>
       )}
+
+      {isLgpdModalOpen && (
+        <Suspense fallback={null}>
+          <LgpdSecurityModal
+            isOpen={isLgpdModalOpen}
+            darkMode={darkMode}
+            consent={lgpdConsent}
+            isCloudAuthenticated={Boolean(cloudUser)}
+            cloudUserEmail={cloudUser?.email || cloudUser?.displayName}
+            onSavePreferences={handleSaveLgpdPreferences}
+            onAcceptEssentialOnly={handleAcceptEssentialCookies}
+            onAcceptAll={handleAcceptAllCookies}
+            onSanitizeShiftData={handleSanitizeShiftData}
+            onEraseAllLocalData={handleEraseAllLocalData}
+            onOpenBackupModal={handleOpenBackupModal}
+            onClose={handleCloseLgpdModal}
+          />
+        </Suspense>
+      )}
+
+      {/* Banner Inferior Não-Bloqueante de 1º Acesso — Seleção de Cookies e Aviso LGPD */}
+      <LgpdConsentBanner
+        isOpen={lgpdConsent.consentedAt === null}
+        onAcceptEssential={handleAcceptEssentialCookies}
+        onAcceptAll={handleAcceptAllCookies}
+        onOpenCustomizeModal={handleOpenLgpdModal}
+      />
 
       {/* Modal de Instruções de Instalação PWA (Mobile / Navegadores sem prompt automático) */}
       {showInstallHelp && (

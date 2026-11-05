@@ -29,6 +29,7 @@ interface HeaderProps {
   isInstallable?: boolean;
   onInstallApp?: () => void;
   onOpenCommandPalette?: () => void;
+  onOpenLgpdModal?: () => void;
 }
 
 const CloudAuthButton: React.FC = () => {
@@ -182,7 +183,8 @@ export const Header: React.FC<HeaderProps> = ({
   selectedExamsCount = 0,
   isInstallable = false,
   onInstallApp,
-  onOpenCommandPalette
+  onOpenCommandPalette,
+  onOpenLgpdModal
 }) => {
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : 0;
 
@@ -405,6 +407,19 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           <CloudAuthButton />
+
+          {onOpenLgpdModal && (
+            <button
+              id="btn-header-lgpd-security"
+              type="button"
+              onClick={onOpenLgpdModal}
+              aria-label="Segurança, Seleção de Cookies e LGPD"
+              title="Central de Privacidade, Seleção de Cookies e Conformidade LGPD (Lei nº 13.709/2018)"
+              className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
+            >
+              <Icon name="shield" size={16} className="text-emerald-600 dark:text-emerald-400" />
+            </button>
+          )}
 
           {isInstallable && onInstallApp && (
             <button

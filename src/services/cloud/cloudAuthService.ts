@@ -1,6 +1,7 @@
 import { getFirebaseInstances } from './firebaseClient';
 import type { User } from 'firebase/auth';
 import { storageService } from '../storageService';
+import { lgpdConsentService, CLINICAL_SESSION_STORAGE_KEYS } from '../lgpdConsentService';
 
 export interface DoctorUserProfile {
   uid: string;
@@ -36,6 +37,9 @@ class CloudAuthService {
    * (com fallback para Redirect caso popups estejam bloqueados pelo navegador).
    */
   async loginWithGoogle(): Promise<DoctorUserProfile | null> {
+    // O clique explícito do médico em "Conectar Nuvem" registra o opt-in para cookies de autenticação Firebase (LGPD Art. 7º, I)
+    lgpdConsentService.saveConsent({ cloudAuthCookies: true }, { markConsentedNow: true });
+
     const { auth } = await getFirebaseInstances();
     const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = await import('firebase/auth');
 
@@ -92,16 +96,7 @@ class CloudAuthService {
       this.currentUser = null;
       storageService.removeItem(CLOUD_AUTH_ACTIVE_KEY);
       if (options?.clearLocalSession) {
-        [
-          'prescmed_patient',
-          'prescmed_prescription',
-          'prescmed_exams',
-          'prescmed_exam_indication',
-          'prescmed_certificate',
-          'prescmed_referral',
-          'prescmed_draft_referral',
-          'prescmed_draft_certificate',
-        ].forEach((key) => storageService.removeItem(key));
+        CLINICAL_SESSION_STORAGE_KEYS.forEach((key) => storageService.removeItem(key));
       }
       this.notifyListeners();
     }
@@ -109,11 +104,21 @@ class CloudAuthService {
 
   /**
    * Inscreve a interface para escutar mudanças no estado do usuário.
-   * Se o usuário nunca tiver logado, não baixa o chunk do Firebase no boot.
+   * Se o usuário nunca tiver logado ou tiver desativado cookies de nuvem na LGPD,
+   * não baixa o chunk do Firebase no boot.
    */
   async subscribe(callback: AuthCallback): Promise<() => void> {
     this.listeners.add(callback);
     callback(this.currentUser);
+
+    const consent = lgpdConsentService.loadConsent();
+    const isCloudBlockedByLgpd = consent.consentedAt !== null && !consent.cloudAuthCookies;
+    if (isCloudBlockedByLgpd) {
+      storageService.removeItem(CLOUD_AUTH_ACTIVE_KEY);
+      return () => {
+        this.listeners.delete(callback);
+      };
+    }
 
     const hasPreviousSession = typeof window !== 'undefined' && localStorage.getItem(CLOUD_AUTH_ACTIVE_KEY) === 'true';
 
