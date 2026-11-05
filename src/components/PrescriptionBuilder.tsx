@@ -228,10 +228,14 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   const regimesComItens = REGIMES.filter((regime) => porRegime[regime].length > 0);
   const itensEmDuasVias = porRegime.antimicrobiano.length + porRegime.controle_especial.length;
 
-  // Folha mostrada na bancada: a escolhida pelo médico ou, por padrão, a primeira receita com itens
+  // Folha mostrada na bancada: a escolhida pelo médico ou, por padrão, a primeira receita com itens (ou o regime selecionado quando em branco)
   const [previewRegime, setPreviewRegime] = useState<RegimeReceita | null>(null);
   const regimeAtivo: RegimeReceita =
-    previewRegime && porRegime[previewRegime].length > 0 ? previewRegime : (regimesComItens[0] ?? 'simples');
+    regimesComItens.length === 0
+      ? (previewRegime ?? selectedRegime)
+      : previewRegime && porRegime[previewRegime].length > 0
+        ? previewRegime
+        : (regimesComItens[0] ?? 'simples');
   const itemsInPreview = porRegime[regimeAtivo];
 
   const handlePrintClick = () => onNavigateToPrint(DOCUMENTO_DO_REGIME[regimeAtivo]);

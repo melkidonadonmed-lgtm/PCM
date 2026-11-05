@@ -94,29 +94,46 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
       {!simples && (
         <div style={{ ...quadro, marginTop: 7 }}>
           <p style={rotulo}>Identificação do emitente</p>
-          <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700 }}>
-            {medico.nome} <span style={{ fontWeight: 600, color: TINTA_SUAVE }}>— {medico.registro}</span>
-          </p>
-          <p style={{ margin: 0, fontSize: 9, color: TINTA_SUAVE }}>
-            {[
-              medico.endereco,
-              medico.cidadeUf && !medico.endereco.includes(medico.cidadeUf) ? medico.cidadeUf : '',
-              medico.telefone ? `Tel. ${medico.telefone}` : ''
-            ].filter(Boolean).join(' • ') || '\u00A0'}
-          </p>
+          {medico.nome || medico.registro ? (
+            <>
+              <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700 }}>
+                {medico.nome || 'Médico(a)'}{' '}
+                {medico.registro && <span style={{ fontWeight: 600, color: TINTA_SUAVE }}>— {medico.registro}</span>}
+              </p>
+              <p style={{ margin: 0, fontSize: 9, color: TINTA_SUAVE }}>
+                {[
+                  medico.endereco,
+                  medico.cidadeUf && !medico.endereco.includes(medico.cidadeUf) ? medico.cidadeUf : '',
+                  medico.telefone ? `Tel. ${medico.telefone}` : ''
+                ].filter(Boolean).join(' • ') || '\u00A0'}
+              </p>
+            </>
+          ) : (
+            <>
+              <div>
+                <Campo nome="Médico(a)" largura="62%" />{' '}
+                <Campo nome="CRM/UF" largura="35%" />
+              </div>
+              <Campo nome="Endereço / Telefone" />
+            </>
+          )}
         </div>
       )}
 
       {/* Identificação do paciente; o endereço é exigido só na receita de controle especial */}
       <div style={{ ...quadro, marginTop: simples ? 8 : 5 }}>
         <p style={rotulo}>Paciente</p>
-        <p style={{ margin: '2px 0 0', fontSize: 11 }}>
-          <strong style={{ fontWeight: 700 }}>{nomePaciente}</strong>
-          {documento && <span style={{ color: TINTA_SUAVE }}> — Doc. {documento}</span>}
-          {idade && <span style={{ color: TINTA_SUAVE }}> — {idade}</span>}
-          {sexo && <span style={{ color: TINTA_SUAVE }}> — {sexo}</span>}
-          {peso && <span style={{ color: TINTA_SUAVE }}> — {peso}</span>}
-        </p>
+        {nomePaciente ? (
+          <p style={{ margin: '2px 0 0', fontSize: 11 }}>
+            <strong style={{ fontWeight: 700 }}>{nomePaciente}</strong>
+            {documento && <span style={{ color: TINTA_SUAVE }}> — Doc. {documento}</span>}
+            {idade && <span style={{ color: TINTA_SUAVE }}> — {idade}</span>}
+            {sexo && <span style={{ color: TINTA_SUAVE }}> — {sexo}</span>}
+            {peso && <span style={{ color: TINTA_SUAVE }}> — {peso}</span>}
+          </p>
+        ) : (
+          <Campo nome="Nome" />
+        )}
         {controleEspecial && (
           endereco ? (
             <p style={{ margin: 0, fontSize: 9, color: TINTA_SUAVE }}>Endereço: {endereco}</p>
@@ -126,17 +143,11 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
         )}
       </div>
 
-      {/* Prescrição: idêntica nas vias (medicamento, apresentação, quantidade e posologia) */}
+      {/* Prescrição: idêntica nas vias (medicamento, apresentação, quantidade e posologia); quando em branco, preserva espaço limpo para escrita à mão */}
       <div style={{ marginTop: 9, flex: 1 }}>
         <p style={{ ...rotulo, fontSize: 8, color: TINTA_SUAVE }}>Prescrição</p>
         {items.length === 0 ? (
-          <p style={{ margin: '24px 0', textAlign: 'center', fontFamily: SERIFA, fontStyle: 'italic', fontSize: 13, color: TINTA_APAGADA }}>
-            {controleEspecial
-              ? 'Nenhum medicamento de controle especial prescrito.'
-              : simples
-                ? 'Nenhum medicamento adicionado nesta prescrição.'
-                : 'Nenhum antimicrobiano prescrito.'}
-          </p>
+          <div style={{ minHeight: 200 }} aria-label="Espaço em branco para prescrição e anotações à mão" />
         ) : (
           agruparPorVia(items).map((grupo) => (
             <div key={grupo.via} style={{ marginTop: 4 }}>

@@ -9,7 +9,7 @@ export function buildExamRequestHtmlForA4(
   selectedExams: ExamItem[],
   clinicalIndication: string
 ): string {
-  const safePatient = escapeHtml(patient?.name?.trim() || 'Paciente não identificado');
+  const safePatient = escapeHtml(patient?.name?.trim() || '______________________________');
   const safeIndication = escapeHtml(clinicalIndication.trim());
   const listItems = selectedExams
     .map(
@@ -23,7 +23,7 @@ export function buildExamRequestHtmlForA4(
     `<p><strong>Paciente:</strong> ${safePatient}</p>`,
     safeIndication ? `<p><strong>Indicação Clínica:</strong> ${safeIndication}</p>` : '',
     '<hr />',
-    `<ol>${listItems}</ol>`,
+    selectedExams.length > 0 ? `<ol>${listItems}</ol>` : '<p></p>',
   ]
     .filter(Boolean)
     .join('');
@@ -178,8 +178,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         <button
           type="button"
           onClick={onNavigateToPrint}
-          disabled={selectedExams.length === 0}
-          className="btn-tactile-primary text-xs font-semibold px-3.5 py-2 min-h-[40px] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0 clinical-tabular-nums"
+          className="btn-tactile-primary text-xs font-semibold px-3.5 py-2 min-h-[40px] flex items-center justify-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
         >
           <Icon name="download" size={15} />
           <span>Visualizar e baixar PDF ({selectedExams.length})</span>

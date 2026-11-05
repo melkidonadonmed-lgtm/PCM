@@ -78,7 +78,7 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
           </h3>
           {!isDoctorConfigured && (
             <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-              Prévia de exemplo
+              Folha para carimbo / anotação manual
             </span>
           )}
         </div>
@@ -90,10 +90,10 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
           </div>
         )}
 
-        {/* Uma aba por receita quando a consulta gera mais de um documento */}
-        {regimesComItens.length > 1 && (
+        {/* Alternador de regime da folha: visível quando há mais de uma receita ou quando a receita está em branco (para imprimir 1 ou 2 vias em branco) */}
+        {(regimesComItens.length > 1 || itemsCount === 0) && (
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/80 dark:bg-navy-900 border border-medium dark:border-navy-700 w-full overflow-x-auto shadow-tactile-sm">
-            {regimesComItens.map((regime) => (
+            {(regimesComItens.length > 1 ? regimesComItens : (['simples', 'antimicrobiano', 'controle_especial'] as RegimeReceita[])).map((regime) => (
               <button
                 key={regime}
                 type="button"
@@ -105,14 +105,17 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <span>{regimeLabels[regime].rotulo} ({porRegime[regime].length})</span>
+                <span>
+                  {regimeLabels[regime].rotulo}
+                  {porRegime[regime].length > 0 ? ` (${porRegime[regime].length})` : ''}
+                </span>
               </button>
             ))}
           </div>
         )}
 
         {/* Folha A4 da bancada: o mesmo documento que será impresso / exportado em PDF (sempre paisagem no padrão PEC do SUS) */}
-        <FolhaA4 orientacao="landscape">
+        <FolhaA4 id="printable-a4-sheet" orientacao="landscape" imprimivel>
           <DocumentoClinico
             tipo={DOCUMENTO_DO_REGIME[regimeAtivo]}
             doctor={doctor}

@@ -220,12 +220,16 @@ export function buildDefaultHeaderConfig(
   activeContext: WorkContext | null
 ): DocumentHeaderConfig {
   const { cabecalho } = resolverIdentidade(doctor, activeContext);
-  const docCrm = activeContext?.doctorCredentials?.crm || doctor?.crm || '------';
-  const docCrmState = activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP';
-  const docRqe = activeContext?.doctorCredentials?.rqe || doctor?.rqe;
-  const docSpecialty =
-    activeContext?.doctorCredentials?.specialty || doctor?.specialty || 'Clínica Médica';
-  const docName = doctor?.name || 'Dr(a). Médico(a)';
+  const rawCrm = (activeContext?.doctorCredentials?.crm || doctor?.crm || '').trim();
+  const docCrmState = (activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP').trim();
+  const docRqe = (activeContext?.doctorCredentials?.rqe || doctor?.rqe || '').trim();
+  const docSpecialty = (
+    activeContext?.doctorCredentials?.specialty ||
+    doctor?.specialty ||
+    ''
+  ).trim();
+  const docName = doctor?.name?.trim() || '';
+  const crmFormatted = rawCrm ? `CRM-${docCrmState} ${rawCrm}${docRqe ? ` • RQE ${docRqe}` : ''}` : '';
   const today = new Date().toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'long',
@@ -234,7 +238,7 @@ export function buildDefaultHeaderConfig(
 
   return {
     doctorName: docName,
-    doctorCrm: `CRM-${docCrmState} ${docCrm}${docRqe ? ` • RQE ${docRqe}` : ''}`,
+    doctorCrm: crmFormatted,
     doctorSpecialty: docSpecialty,
     clinicName: cabecalho.titulo,
     clinicAddress: cabecalho.linhas.join(' • '),
@@ -245,7 +249,7 @@ export function buildDefaultHeaderConfig(
     showPatientBanner: true,
     patientCustomText: '',
     footerDocName: docName,
-    footerCrm: `Médico(a) — CRM-${docCrmState} ${docCrm}${docRqe ? ` • RQE ${docRqe}` : ''}`,
+    footerCrm: crmFormatted ? `Médico(a) — ${crmFormatted}` : 'Assinatura e carimbo do(a) médico(a) — CRM',
     footerSpecialty: docSpecialty,
     footerSubtext: '',
   };

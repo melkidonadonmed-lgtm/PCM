@@ -15,8 +15,7 @@ import {
   timbreDoDocumentoSus,
 } from '../data/susDocumentsCatalog';
 import { camposSemEspaco, formularioOficialDe } from '../data/formulariosOficiaisSus';
-import { medicoConfigurado } from '../utils/medicoConfigurado';
-import { exportarFolhaPdf } from '../utils/folhaA4';
+import { exportarFolhaPdf, prepararRaizDeImpressao } from '../utils/folhaA4';
 import { DOMPurify } from '../utils/sanitizeHtml';
 import { FolhaA4 } from './documento/FolhaA4';
 import { FormularioOficialSus } from './documento/FormularioOficialSus';
@@ -487,7 +486,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   const formularioOficial = formularioOficialDe(currentDocItem.id);
   const camposCortados = formularioOficial ? camposSemEspaco(formularioOficial, formData) : [];
   const classeDaFolha = (oficial: boolean) =>
-    `select-text ${oficial ? 'folha-a4--formulario' : ''} ${medicoConfigurado(doctor) ? '' : 'no-print'}`;
+    `select-text ${oficial ? 'folha-a4--formulario' : ''}`;
 
   const linhasDaLme = formData.lmeMedications?.length
     ? formData.lmeMedications
@@ -509,18 +508,11 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     `${prefixo}_${(formData.patientName || 'Paciente').trim().replace(/\s+/g, '_')}.pdf`;
 
   const handlePrintSheet = () => {
-    if (!medicoConfigurado(doctor)) {
-      showToast('Configure nome e CRM do médico para emitir documentos.');
-      return;
-    }
+    prepararRaizDeImpressao(folhaSusRef.current, 'portrait');
     window.print();
   };
 
   const handleDownloadPdf = async (downloadAll = false) => {
-    if (!medicoConfigurado(doctor)) {
-      showToast('Configure nome e CRM do médico para emitir documentos.');
-      return;
-    }
     const folhaAtual = folhaSusRef.current;
     if (!folhaAtual) return;
 

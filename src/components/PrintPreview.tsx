@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Icon } from './Icon';
 import { DoctorProfile, Patient, PrescriptionItem, ExamItem, MedicalCertificate, MedicalReferral, WorkContext, WatermarkType } from '../types';
-import { exportarFolhaPdf } from '../utils/folhaA4';
+import { exportarFolhaPdf, prepararRaizDeImpressao } from '../utils/folhaA4';
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import type { RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import {
@@ -39,7 +39,6 @@ interface PrintPreviewProps {
   onAbrirPerfilMedico?: () => void;
 }
 
-const AVISO_SEM_MEDICO = 'Configure nome e CRM do médico para emitir documentos';
 const REGIMES: RegimeReceita[] = ['simples', 'antimicrobiano', 'controle_especial'];
 const NOME_DO_REGIME: Record<RegimeReceita, string> = {
   simples: 'simples',
@@ -115,7 +114,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   const patientWeight = patient?.weightKg && patient.weightKg > 0 ? patient.weightKg : null;
 
   const handleExportPDF = async () => {
-    if (!isConfigured || !folhaRef.current) return;
+    if (!folhaRef.current) return;
 
     try {
       setIsExportingPdf(true);
@@ -173,25 +172,21 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   };
 
   const handlePrint = () => {
-    if (!isConfigured) return;
+    prepararRaizDeImpressao(folhaRef.current, orientacaoDoDocumento(docType));
     window.print();
   };
 
   const abas: Array<{ id: TipoDocumento; rotulo: string; icone: string }> = [
     { id: 'prescription', rotulo: `Receita Simples (${porRegime.simples.length})`, icone: 'description' },
-    // As receitas de 2 vias só aparecem quando há medicamento desse regime na consulta
-    ...(porRegime.antimicrobiano.length > 0
-      ? [{ id: 'antimicrobial_prescription' as const, rotulo: `Antimicrobiano • 2 Vias (${porRegime.antimicrobiano.length})`, icone: 'layers' }]
-      : []),
-    ...(porRegime.controle_especial.length > 0
-      ? [{ id: 'special_prescription' as const, rotulo: `Controle Especial • 2 Vias (${porRegime.controle_especial.length})`, icone: 'layers' }]
-      : []),
+    { id: 'antimicrobial_prescription', rotulo: `Antimicrobiano • 2 Vias (${porRegime.antimicrobiano.length})`, icone: 'layers' },
+    { id: 'special_prescription', rotulo: `Controle Especial • 2 Vias (${porRegime.controle_especial.length})`, icone: 'layers' },
     { id: 'exams', rotulo: `Exames (${exams.length})`, icone: 'science' },
     { id: 'certificate', rotulo: 'Atestado', icone: 'workspace_premium' },
     { id: 'referral', rotulo: 'Encaminhamento', icone: 'share' }
   ];
 
-  const tituloAcao = (texto: string) => (isConfigured ? texto : AVISO_SEM_MEDICO);
+  const temTextoCompartilhavel = Boolean(getFormattedDocumentText());
+  const tituloAcao = (texto: string) => texto;
   const classeBotaoSecundario =
     'btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 shrink-0 whitespace-nowrap transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none';
 
@@ -259,7 +254,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={handleCopyFormattedText}
-              disabled={!isConfigured}
+              disabled={!temTextoCompartilhavel}
               className={`${classeBotaoSecundario} flex`}
               title={tituloAcao('Copiar o texto do documento para o prontuário')}
             >
@@ -274,7 +269,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={handleSendWhatsApp}
-              disabled={!isConfigured}
+              disabled={!temTextoCompartilhavel}
               className={`${classeBotaoSecundario} flex`}
               title={tituloAcao('Enviar o texto do documento pelo WhatsApp')}
             >
@@ -285,7 +280,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={handleExportPDF}
-              disabled={isExportingPdf || !isConfigured}
+              disabled={isExportingPdf}
               className={`${classeBotaoSecundario} flex`}
               title={tituloAcao('Baixar o PDF desta folha')}
             >
@@ -310,9 +305,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
             <button
               type="button"
               onClick={handlePrint}
-              disabled={!isConfigured}
               aria-label="Imprimir a folha"
-              className="btn-tactile-primary h-10 sm:h-11 px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="btn-tactile-primary h-10 sm:h-11 px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               title={tituloAcao('Imprimir a folha direto na impressora (Ctrl+P)')}
             >
               <Icon name="print" className="text-[16px] shrink-0" />
@@ -377,7 +371,6 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           orientacao={orientacaoDoDocumento(docType)}
           ajustarALargura={ajustarATela}
           imprimivel
-          className={isConfigured ? '' : 'no-print'}
         >
           <DocumentoClinico
             tipo={docType}

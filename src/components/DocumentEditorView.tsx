@@ -25,7 +25,6 @@ import {
   DocumentViaLayout,
 } from '../types';
 import { db } from '../services/db';
-import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { separarPorRegime } from '../utils/documentoClinico';
 import { ConfirmationModal } from './ConfirmationModal';
 import LogoGeneratorModal from './LogoGeneratorModal';
@@ -87,7 +86,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   initialDocumentToLoad,
   activeContext,
   onSaveContext,
-  onOpenDoctorModal,
   editorInitialSyncTrigger = 0,
   onNavigateBack,
 }) => {
@@ -491,13 +489,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   const handlePrint = () => {
-    if (!medicoConfigurado(doctor)) {
-      if (onOpenDoctorModal) {
-        onOpenDoctorModal();
-      }
-      showToast('Configure o nome e CRM do médico emitente para imprimir ou gerar PDF.');
-      return;
-    }
     const orientacao = pageOrientation === 'landscape' ? 'landscape' : 'portrait';
     prepararRaizDeImpressao(sheetRef.current, orientacao);
     window.print();
@@ -505,14 +496,6 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
 
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const handleDownloadPdf = async () => {
-    if (!medicoConfigurado(doctor)) {
-      if (onOpenDoctorModal) {
-        onOpenDoctorModal();
-      }
-      showToast('Configure o nome e CRM do médico emitente para gerar PDF.');
-      return;
-    }
-
     if (!sheetRef.current) {
       handlePrint();
       return;

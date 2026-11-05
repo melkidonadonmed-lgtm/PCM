@@ -1,7 +1,6 @@
 import type { DoctorProfile, Patient, PrescriptionItem, WorkContext } from '../types';
 import { medicoConfigurado } from './medicoConfigurado';
 import { classificarReceita, type RegimeReceita } from './isSpecialControlOrAntibiotic';
-import { EXEMPLO_MEDICO, EXEMPLO_PACIENTE } from '../data/exemplos';
 import { LOGO_DO_SUS } from '../data/presetAssets';
 
 /**
@@ -71,13 +70,13 @@ export function resolverIdentidade(
 ): IdentidadeDocumento {
   const configurado = medicoConfigurado(doctor);
 
-  const nome = configurado ? doctor!.name.trim() : EXEMPLO_MEDICO.name;
-  const crm = configurado ? (activeContext?.doctorCredentials?.crm || doctor!.crm.trim()) : EXEMPLO_MEDICO.crm;
-  const uf = configurado ? (activeContext?.doctorCredentials?.uf || doctor!.crmState || 'SP') : EXEMPLO_MEDICO.crmState;
+  const nome = configurado ? doctor!.name.trim() : '';
+  const crm = configurado ? (activeContext?.doctorCredentials?.crm || doctor!.crm || '').trim() : '';
+  const uf = (activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP').trim();
   const rqe = configurado ? (activeContext?.doctorCredentials?.rqe || doctor!.rqe || '').trim() : '';
   const especialidade = configurado
     ? (activeContext?.doctorCredentials?.specialty || doctor!.specialty || '').trim()
-    : EXEMPLO_MEDICO.specialty;
+    : '';
 
   const local = activeContext?.clinicName?.trim() || doctor?.clinicName?.trim() || '';
   const endereco = activeContext?.clinicAddress?.trim() || doctor?.address?.trim() || '';
@@ -95,11 +94,13 @@ export function resolverIdentidade(
   const logoSecundario = activeContext?.secondaryLogoDataUrl
     || (localPublico && logo && logo !== LOGO_DO_SUS ? LOGO_DO_SUS : undefined);
 
+  const registro = crm ? `CRM-${uf} ${crm}${rqe ? ` • RQE ${rqe}` : ''}` : '';
+
   return {
     exemplo: !configurado,
     cabecalho: {
       titulo: local || nome,
-      tituloEhMedico: !local,
+      tituloEhMedico: !local && Boolean(nome),
       linhas: [endereco, contato].filter(Boolean),
       logo,
       logoSecundario,
@@ -107,7 +108,7 @@ export function resolverIdentidade(
     },
     medico: {
       nome,
-      registro: `CRM-${uf} ${crm}${rqe ? ` • RQE ${rqe}` : ''}`,
+      registro,
       especialidade,
       endereco,
       telefone,
@@ -132,15 +133,14 @@ export function tituloDoDocumento(tipo: TipoDocumento, activeContext?: WorkConte
   }
 }
 
-/** Nome exibido do paciente: o cadastrado, ou o placeholder de exemplo enquanto não há médico configurado. */
+/** Nome exibido do paciente: o cadastrado, ou vazio para preenchimento manual à mão na folha impressa. */
 export function nomeDoPaciente(
   patient: Patient | null | undefined,
-  exemplo: boolean,
+  _exemplo?: boolean,
   alternativas: Array<string | undefined> = [],
 ): string {
   const candidato = [patient?.name, ...alternativas].map((n) => n?.trim()).find(Boolean);
-  if (candidato) return candidato;
-  return exemplo ? EXEMPLO_PACIENTE.name : 'Não identificado';
+  return candidato || '';
 }
 
 /** Endereço completo do paciente em uma linha (exigido na receita de controle especial). */

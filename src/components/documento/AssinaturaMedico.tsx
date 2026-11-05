@@ -38,10 +38,22 @@ export const AssinaturaMedico: React.FC<AssinaturaMedicoProps> = ({ medico, emis
         borderTop: '1px solid #0F172A'
       }}
     >
-      <p style={{ margin: 0, fontSize: compacto ? 10.5 : 13.5, fontWeight: 700, color: '#0F172A' }}>{medico.nome}</p>
-      <p style={{ margin: 0, fontSize: compacto ? 9 : 11.5, fontWeight: 600, color: '#334155' }}>{medico.registro}</p>
-      {medico.especialidade && (
-        <p style={{ margin: 0, fontSize: compacto ? 8.5 : 10.5, color: '#64748B' }}>{medico.especialidade}</p>
+      {medico.nome || medico.registro ? (
+        <>
+          {medico.nome && (
+            <p style={{ margin: 0, fontSize: compacto ? 10.5 : 13.5, fontWeight: 700, color: '#0F172A' }}>{medico.nome}</p>
+          )}
+          {medico.registro && (
+            <p style={{ margin: 0, fontSize: compacto ? 9 : 11.5, fontWeight: 600, color: '#334155' }}>{medico.registro}</p>
+          )}
+          {medico.especialidade && (
+            <p style={{ margin: 0, fontSize: compacto ? 8.5 : 10.5, color: '#64748B' }}>{medico.especialidade}</p>
+          )}
+        </>
+      ) : (
+        <p style={{ margin: 0, fontSize: compacto ? 9 : 11, fontWeight: 600, color: '#475569' }}>
+          Assinatura e carimbo do(a) médico(a) — CRM
+        </p>
       )}
     </div>
   </footer>

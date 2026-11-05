@@ -1,0 +1,39 @@
+{
+  "entries": [
+    {
+      "path": "C:/Users/melki/dev/repos/franklin-quebragalho/skills",
+      "include_only": [
+        "design-interface-medica-minimalista",
+        "conversor-html-pdf",
+        "redator-tecnico-markdown",
+        "design-md",
+        "frontend-code-architect",
+        "frontend-testing-auditor",
+        "frontend-ui-ux-auditor",
+        "plan-uiux",
+        "complex-zero"
+      ]
+    },
+    {
+      "path": "C:/Users/melki/.agents/skills",
+      "include_only": [
+        "clinical-change-safety",
+        "ui-pdf-validation",
+        "vercel-react-best-practices",
+        "web-design-guidelines",
+        "ai-sdk",
+        "live-api-function-auditor"
+      ]
+    },
+    {
+      "path": "C:/Users/melki/.gemini/config/plugins/firebase/skills",
+      "include_only": [
+        "firebase_firestore",
+        "firebase_auth_basics",
+        "firebase_hosting_basics",
+        "firestore_rules_creation",
+        "firebase_security_rules_auditor"
+      ]
+    }
+  ]
+}

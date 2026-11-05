@@ -31,7 +31,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
   className = ''
 }) => {
   const isDisabledSemMedico = !isMedicoConfigurado;
-  const isActionDisabled = isDisabledSemMedico || itemsCount === 0;
+  const isTextShareDisabled = itemsCount === 0;
   const avisoId = 'aviso-medico-config-acoes';
 
   return (
@@ -61,17 +61,16 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 flex-wrap">
-          {/* Botão Primário: Imprimir / Gerar PDF (Comando Canônico de Emissão) */}
+          {/* Botão Primário: Imprimir / Gerar PDF (sempre ativo, inclusive para imprimir receita em branco para anotações à mão) */}
           <ActionButton
             variant="primary"
             iconName="print"
             onClick={onNavigateToPrint}
-            disabled={isActionDisabled}
             aria-describedby={isDisabledSemMedico ? avisoId : undefined}
             className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-btn"
             title={
-              isDisabledSemMedico
-                ? 'Configure nome e CRM do médico para emitir documentos.'
+              itemsCount === 0
+                ? 'Imprimir ou gerar PDF da receita em branco (para anotações à mão e carimbo)'
                 : 'Emitir receita oficial: imprimir folha A4 ou gerar PDF'
             }
           >
@@ -84,7 +83,6 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
               variant="secondary"
               iconName="description"
               onClick={onNavigateToEditor}
-              disabled={itemsCount === 0}
               className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm text-slate-700 dark:text-slate-300"
               title="Abrir no Editor visual A4 para ajustes de texto livre, layout ou timbrados"
             >
@@ -97,12 +95,12 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             variant="secondary"
             iconName="send"
             onClick={onSendWhatsApp}
-            disabled={isActionDisabled}
+            disabled={isTextShareDisabled}
             aria-describedby={isDisabledSemMedico ? avisoId : undefined}
             className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm"
             title={
-              isDisabledSemMedico
-                ? 'Configure nome e CRM do médico para emitir documentos.'
+              isTextShareDisabled
+                ? 'Adicione ao menos um medicamento para enviar o texto pelo WhatsApp'
                 : 'Enviar receita no WhatsApp'
             }
           >
@@ -114,12 +112,12 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
         <button
           type="button"
           onClick={onCopyText}
-          disabled={isActionDisabled}
+          disabled={isTextShareDisabled}
           aria-describedby={isDisabledSemMedico ? avisoId : undefined}
           className="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:underline flex items-center gap-1.5 py-2 px-1 cursor-pointer transition rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500"
           title={
-            isDisabledSemMedico
-              ? 'Configure nome e CRM do médico para emitir documentos.'
+            isTextShareDisabled
+              ? 'Adicione ao menos um medicamento para copiar o texto'
               : 'Copiar texto da receita'
           }
         >

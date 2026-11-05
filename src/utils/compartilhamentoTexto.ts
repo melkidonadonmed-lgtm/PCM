@@ -181,16 +181,19 @@ export function formatarDocumentoPreviewTexto(params: {
     examIndication
   } = params;
 
-  if (!isConfigured) return '';
-
   const dateStr = emissao.toLocaleDateString('pt-BR');
-  const docLine = `*${identidade.medico.nome}* — ${identidade.medico.registro}\n`;
+  const temMedico = Boolean(identidade.medico.nome || identidade.medico.registro);
+  const docLine = temMedico
+    ? `*${identidade.medico.nome || 'Médico(a)'}*${identidade.medico.registro ? ` — ${identidade.medico.registro}` : ''}\n`
+    : '';
   const patientLine =
-    patientName !== 'Não identificado'
+    patientName && patientName !== 'Não identificado'
       ? `*Paciente:* ${patientName}${patientWeight ? ` (${patientWeight} kg)` : ''}\n`
       : '';
   const header = `*DOCUMENTO MÉDICO DIGITAL*\n${docLine}${patientLine}*Data:* ${dateStr}\n------------------------------------\n`;
-  const assinaturaTexto = `_${identidade.medico.nome} — ${identidade.medico.registro}_`;
+  const assinaturaTexto = temMedico
+    ? `_${[identidade.medico.nome, identidade.medico.registro].filter(Boolean).join(' — ')}_`
+    : '_Assinatura e carimbo do(a) médico(a)_';
 
   if (ehReceita) {
     if (itensDaFolha.length === 0) return '';

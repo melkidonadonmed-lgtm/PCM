@@ -157,11 +157,18 @@ describe('Folha única do documento clínico (prévia = impressão = PDF)', () =
     expect(resolverIdentidade(medico, semCnes).cabecalho.linhas.join(' ')).not.toContain('CNES');
   });
 
-  it('médico não configurado gera apenas prévia marcada EXEMPLO, com os dados fictícios', () => {
-    const html = folha('prescription', { doctor: { ...medico, name: '', crm: '' } });
-    expect(html).toContain('EXEMPLO');
-    expect(html).toContain(EXEMPLO_MEDICO.name);
-    expect(folha('prescription')).not.toContain('EXEMPLO');
+  it('médico ou paciente não configurados e receita em branco geram folha limpa para preenchimento e carimbo manual (sem dados fictícios de exemplo)', () => {
+    const html = folha('prescription', {
+      doctor: { ...medico, name: '', crm: '' },
+      patient: { ...paciente, name: '', documentNumber: '', ageText: '', weightKg: 0 },
+      prescriptionItems: []
+    });
+    expect(html).not.toContain('EXEMPLO');
+    expect(html).not.toContain(EXEMPLO_MEDICO.name);
+    expect(html).not.toContain('Não identificado');
+    expect(html).not.toContain('Nenhum medicamento adicionado');
+    expect(html).toContain('Assinatura e carimbo do(a) médico(a) — CRM');
+    expect(html).toContain('Nome:');
   });
 
   it('receita não imprime horários nem duração que o médico não escreveu', () => {

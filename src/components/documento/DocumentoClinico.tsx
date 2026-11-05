@@ -62,12 +62,6 @@ const Secao: React.FC<{ titulo: string; children: React.ReactNode }> = ({ titulo
   </section>
 );
 
-const Vazio: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p style={{ margin: '64px 0', textAlign: 'center', fontFamily: SERIFA, fontStyle: 'italic', fontSize: 16, color: TINTA_APAGADA }}>
-    {children}
-  </p>
-);
-
 /**
  * Conteúdo do documento clínico, diagramado para a FolhaA4. É o ÚNICO desenho
  * de receita, pedido de exames, atestado e encaminhamento: a prévia na tela, a
@@ -94,39 +88,7 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
   const peso = patient?.weightKg && patient.weightKg > 0 ? `${String(patient.weightKg).replace('.', ',')} kg` : '';
   const marca = marcaDagua ?? activeContext?.watermarkType ?? 'none';
 
-  const fundo = (
-    <>
-      {identidade.exemplo && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-            userSelect: 'none'
-          }}
-        >
-          <span
-            style={{
-              transform: 'rotate(-38deg)',
-              fontSize: 118,
-              fontWeight: 900,
-              letterSpacing: '0.12em',
-              color: '#94A3B8',
-              opacity: 0.22
-            }}
-          >
-            EXEMPLO
-          </span>
-        </div>
-      )}
-      <WatermarkOverlay type={marca} opacity={activeContext?.watermarkOpacity} />
-    </>
-  );
+  const fundo = <WatermarkOverlay type={marca} opacity={activeContext?.watermarkOpacity} />;
 
   if (tipo === 'prescription' || tipo === 'special_prescription' || tipo === 'antimicrobial_prescription') {
     const regime =
@@ -190,9 +152,16 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
             borderBottom: `1px solid ${FILETE}`
           }}
         >
-          <p style={{ margin: 0, fontSize: 13.5, color: TINTA, minWidth: 0 }}>
-            <span style={{ ...rotulo, display: 'inline', marginRight: 6 }}>Paciente</span>
-            <strong style={{ fontWeight: 700 }}>{paciente}</strong>
+          <p style={{ margin: 0, fontSize: 13.5, color: TINTA, minWidth: 0, flex: 1, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={{ ...rotulo, display: 'inline' }}>Paciente</span>
+            {paciente ? (
+              <strong style={{ fontWeight: 700 }}>{paciente}</strong>
+            ) : (
+              <span
+                aria-label="Linha para nome do paciente à mão"
+                style={{ flex: 1, maxWidth: 380, borderBottom: `1px solid ${FILETE}`, height: 14, display: 'inline-block' }}
+              />
+            )}
           </p>
           <p style={{ margin: 0, display: 'flex', gap: 18, flexShrink: 0, fontSize: 12, color: TINTA_SUAVE }}>
             {dadosPaciente.map((dado) => (
@@ -210,7 +179,9 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
             <>
               {examIndication.trim() && <Secao titulo="Indicação clínica">{examIndication}</Secao>}
               {exams.length === 0 ? (
-                <Vazio>Nenhum exame selecionado neste pedido.</Vazio>
+                <section style={{ marginTop: 18, minHeight: 320 }} aria-label="Espaço em branco para solicitação de exames à mão">
+                  <p style={rotulo}>Exames solicitados</p>
+                </section>
               ) : (
                 <section style={{ marginTop: 18 }}>
                   <p style={rotulo}>Exames solicitados</p>
@@ -235,11 +206,12 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
           {tipo === 'certificate' && certificate && (() => {
             const dias = Math.max(1, certificate.daysOff || 1);
             const documento = certificate.documentNumber?.trim() || documentoPaciente;
+            const nomeAtestado = certificate.patientName?.trim() || paciente || '________________________________________';
             return (
               <div style={{ marginTop: 34, padding: '0 16px', fontFamily: SERIFA, color: TINTA }}>
                 <p style={{ margin: 0, fontSize: 18, lineHeight: 2, textAlign: 'justify', textIndent: 44 }}>
                   Atesto para os devidos fins de direito que o(a) paciente{' '}
-                  <strong style={{ fontWeight: 700, textTransform: 'uppercase' }}>{certificate.patientName?.trim() || paciente}</strong>,{' '}
+                  <strong style={{ fontWeight: 700, textTransform: 'uppercase' }}>{nomeAtestado}</strong>,{' '}
                   {documento ? `portador(a) do documento nº ${documento}, ` : ''}
                   esteve sob meus cuidados médicos profissionais no dia {dataCurta(certificate.startDate, emissao)},{' '}
                   necessitando de <strong style={{ fontWeight: 700 }}>{dias} ({numeroPorExtenso(dias)}) dia(s)</strong> de repouso e

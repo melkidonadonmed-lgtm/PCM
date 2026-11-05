@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ActiveTab, DoctorProfile, Patient, PrescriptionItem } from '../types';
 import { AcoesDaReceita } from '../components/AcoesDaReceita';
+import { PrintPreview } from '../components/PrintPreview';
 import { DocumentoClinico } from '../components/documento/DocumentoClinico';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import {
@@ -41,6 +42,69 @@ describe('Governança de Rotas e Navegação do Editor', () => {
     );
     expect(htmlBlocked).toContain('Configure nome e CRM do médico para emitir documentos.');
     expect(htmlBlocked).toContain('Configurar médico');
+
+    const htmlBlank = renderToStaticMarkup(
+      React.createElement(AcoesDaReceita, {
+        itemsCount: 0,
+        isMedicoConfigurado: false,
+        onNavigateToPrint: vi.fn(),
+        onNavigateToEditor: vi.fn(),
+        onSendWhatsApp: vi.fn(),
+        onCopyText: vi.fn(),
+        onAbrirPerfilMedico: vi.fn()
+      })
+    );
+    expect(htmlBlank).toContain('Imprimir / Gerar PDF');
+    expect(htmlBlank).not.toMatch(/disabled=""[^>]*>[\s\S]*?Imprimir \/ Gerar PDF/);
+
+    const previewHtml = renderToStaticMarkup(
+      React.createElement(PrintPreview, {
+        doctor: {
+          name: '',
+          crm: '',
+          crmState: 'RO',
+          specialty: '',
+          clinicName: '',
+          address: '',
+          cityState: '',
+          phone: '',
+          email: '',
+          showSignature: true
+        },
+        patient: { id: 'p-empty', name: '', weightKg: 0, gender: 'male', allergies: [] },
+        prescriptionItems: [],
+        exams: [],
+        examIndication: '',
+        certificate: {
+          patientName: '',
+          documentNumber: '',
+          daysOff: 1,
+          startDate: '2026-10-10',
+          endDate: '2026-10-10',
+          periodText: 'por motivo de saúde',
+          includeCID: false,
+          cid10Code: '',
+          cid10Description: '',
+          observations: ''
+        },
+        referral: {
+          patientName: '',
+          documentNumber: '',
+          destinationSpecialty: 'Clínica Médica',
+          reason: '',
+          clinicalSummary: '',
+          relevantExams: '',
+          hypothesisCID: '',
+          priority: 'eletivo'
+        },
+        onBack: vi.fn()
+      })
+    );
+    expect(previewHtml).toContain('Baixar PDF');
+    expect(previewHtml).toContain('Imprimir');
+    expect(previewHtml).toContain('Antimicrobiano • 2 Vias (0)');
+    expect(previewHtml).toContain('Controle Especial • 2 Vias (0)');
+    expect(previewHtml).not.toMatch(/id="printable-a4-sheet"[^>]*class="[^"]*no-print/);
   });
 
   it('deve priorizar a emissão direta com Imprimir/PDF na ação primária e Editor na ação secundária em AcoesDaReceita', () => {

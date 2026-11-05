@@ -263,21 +263,19 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
         </div>
       )}
 
-      {items.length > 0 && (
-        <div className="block xl:hidden pt-3 border-t border-subtle dark:border-strong space-y-3">
-          <AvisoNotificacaoReceita items={porRegime.controle_especial} />
-          <AcoesDaReceita
-            itemsCount={items.length}
-            isMedicoConfigurado={isDoctorConfigured}
-            onNavigateToPrint={onNavigateToPrint}
-            onNavigateToEditor={onNavigateToEditor}
-            onSendWhatsApp={onSendWhatsApp}
-            onCopyText={onCopyText}
-            copiedSuccess={copiedSuccess}
-            onAbrirPerfilMedico={onAbrirPerfilMedico}
-          />
-        </div>
-      )}
+      <div className="block xl:hidden pt-3 border-t border-subtle dark:border-strong space-y-3">
+        <AvisoNotificacaoReceita items={porRegime.controle_especial} />
+        <AcoesDaReceita
+          itemsCount={items.length}
+          isMedicoConfigurado={isDoctorConfigured}
+          onNavigateToPrint={onNavigateToPrint}
+          onNavigateToEditor={onNavigateToEditor}
+          onSendWhatsApp={onSendWhatsApp}
+          onCopyText={onCopyText}
+          copiedSuccess={copiedSuccess}
+          onAbrirPerfilMedico={onAbrirPerfilMedico}
+        />
+      </div>
     </section>
   );
 };
