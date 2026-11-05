@@ -208,12 +208,20 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     );
 
     expect(htmlExpanded).toContain('panel-navy');
+    expect(htmlExpanded).toContain('lg:will-change-auto');
+    expect(htmlExpanded).toContain('id="sidebar-top-fixed"');
+    expect(htmlExpanded).toContain('id="sidebar-doctor-chip"');
     expect(htmlExpanded).toContain('sidebar-active-surface');
     expect(htmlExpanded).toContain('sidebar-active-bar');
     expect(htmlExpanded).toContain('id="sidebar-patient-chip"');
     expect(htmlExpanded).toContain('Carlos Eduardo Lima');
     expect(htmlExpanded).toContain('18,5 kg');
     expect(htmlExpanded).toContain('Guias Oficiais SUS');
+    expect(htmlExpanded).toContain('Módulo de Apoio Clínico');
+    expect(htmlExpanded).toContain('Calculadora Ped.');
+    expect(htmlExpanded).toContain('Protocolos');
+    expect(htmlExpanded).toContain('Scores');
+    expect(htmlExpanded).toContain('Hospitalar');
     expect(htmlExpanded).toContain('MOD-01 Ativo');
     expect(htmlExpanded).toContain('Novo Atendimento');
     expect(htmlExpanded).toContain('Backup (.pcm)');
@@ -221,6 +229,26 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlExpanded).toContain('Instalar App');
     expect(htmlExpanded).toContain('Recolher Menu');
     expect(htmlExpanded).not.toContain('Paciente em Atendimento');
+    expect(htmlExpanded).not.toContain('Toque para informar CRM');
+    expect(htmlExpanded).not.toContain('Nome, peso (kg) e CPF/CNS');
+    expect(htmlExpanded).not.toContain('Toque para editar dados ou peso');
+    expect(htmlExpanded).not.toContain('active:scale-[0.98]');
+    expect(htmlExpanded).not.toContain('active:scale-[0.99]');
+
+    const htmlExpandedEmptyIdentity = renderToStaticMarkup(
+      <Sidebar
+        darkMode={false}
+        activeTab="prescription"
+        onSelectTab={vi.fn()}
+        isOpen={true}
+        onToggleOpen={vi.fn()}
+        patient={emptyPatient}
+      />
+    );
+    expect(htmlExpandedEmptyIdentity).toContain('Configurar médico');
+    expect(htmlExpandedEmptyIdentity).toContain('Identificar paciente');
+    expect(htmlExpandedEmptyIdentity).not.toContain('Toque para informar CRM');
+    expect(htmlExpandedEmptyIdentity).not.toContain('Nome, peso (kg) e CPF/CNS');
 
     const htmlCollapsed = renderToStaticMarkup(
       <Sidebar

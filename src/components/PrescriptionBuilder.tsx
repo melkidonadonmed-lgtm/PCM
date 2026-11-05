@@ -329,12 +329,13 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     const lower = med.name.toLowerCase();
     let unit: UnidadeDose = 'comprimido';
     if (lower.includes('cáps') || lower.includes('caps')) unit = 'cápsula';
-    else if (lower.includes('gotas') || lower.includes('gota')) unit = 'gota';
+    else if (lower.includes('gotas') || lower.includes('gota') || lower.includes('colírio') || lower.includes('colirio')) unit = 'gota';
     else if (lower.includes('xarope') || lower.includes('suspens') || lower.includes('/ml')) unit = 'mL';
     else if (lower.includes('sachê') || lower.includes('sache') || lower.includes('envelope')) unit = 'sachê';
     else if (lower.includes('ampola')) unit = 'ampola';
     else if (lower.includes('spray') || lower.includes('jato')) unit = 'jato';
-    else if (lower.includes('pomada') || lower.includes('creme') || lower.includes('gel')) unit = 'aplicação';
+    else if (lower.includes('pomada') || lower.includes('creme') || lower.includes('gel') || lower.includes('caneta')) unit = 'aplicação';
+    else if (lower.includes('drágea') || lower.includes('dragea')) unit = 'comprimido';
     setDoseUnit(unit);
 
     setShowSuggestions(false);
@@ -395,12 +396,13 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
     const lower = item.name.toLowerCase();
     let unit: UnidadeDose = 'comprimido';
     if (lower.includes('cáps') || lower.includes('caps')) unit = 'cápsula';
-    else if (lower.includes('gotas') || lower.includes('gota')) unit = 'gota';
+    else if (lower.includes('gotas') || lower.includes('gota') || lower.includes('colírio') || lower.includes('colirio')) unit = 'gota';
     else if (lower.includes('xarope') || lower.includes('suspens') || lower.includes('/ml')) unit = 'mL';
     else if (lower.includes('sachê') || lower.includes('sache') || lower.includes('envelope')) unit = 'sachê';
     else if (lower.includes('ampola')) unit = 'ampola';
     else if (lower.includes('spray') || lower.includes('jato')) unit = 'jato';
-    else if (lower.includes('pomada') || lower.includes('creme') || lower.includes('gel')) unit = 'aplicação';
+    else if (lower.includes('pomada') || lower.includes('creme') || lower.includes('gel') || lower.includes('caneta')) unit = 'aplicação';
+    else if (lower.includes('drágea') || lower.includes('dragea')) unit = 'comprimido';
     setDoseUnit(unit);
 
     if (searchInputRef.current) {

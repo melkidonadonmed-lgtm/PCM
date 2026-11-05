@@ -16,8 +16,9 @@ export type { RegimeReceita };
 const ANTIMICROBIANOS = [
   'amoxicilina', 'clavulanato', 'clavulin', 'amoxil', 'novocilin',
   'azitromicina', 'zitromax',
-  'cefalexina', 'keflex', 'cefaclor', 'cefadroxila', 'cefuroxima', 'ceftriaxona', 'rocefin', 'cefalotina',
-  'ciprofloxacino', 'levofloxacino', 'levaquin', 'moxifloxacino', 'norfloxacino',
+  'cefalexina', 'keflex', 'cefaclor', 'cefadroxila', 'cefuroxima', 'zinnat', 'ceftriaxona', 'rocefin', 'cefalotina',
+  'ciprofloxacino', 'ciloxan', 'cilodex', 'biamotil', 'levofloxacino', 'levaquin', 'tamiram', 'moxifloxacino', 'vigamox', 'vigadexa', 'norfloxacino',
+  'gatifloxacino', 'zymar', 'zypred', 'ofloxacino', 'floxestat',
   'claritromicina', 'klacid', 'eritromicina',
   'doxiciclina', 'vibramicina', 'minociclina',
   'clindamicina', 'dalacin',
@@ -26,7 +27,7 @@ const ANTIMICROBIANOS = [
   'nitrofurantoina', 'macrodantina',
   'fosfomicina', 'monuril',
   'penicilina', 'benzetacil', 'ampicilina', 'oxacilina',
-  'gentamicina', 'amicacina', 'tobramicina',
+  'gentamicina', 'amicacina', 'tobramicina', 'tobrex', 'tobradex',
   'rifampicina', 'isoniazida', 'pirazinamida', 'etambutol',
   'linezolida', 'vancomicina', 'meropenem', 'imipenem'
 ];
@@ -41,25 +42,29 @@ const CONTROLADOS = [
   'zolpidem', 'stilnox', 'zopiclona', 'eszopiclona', 'zaleplona', 'lemborexant',
 
   // Antidepressivos e estabilizadores (Lista C1)
-  'fluoxetina', 'prozac', 'daforin', 'sertralina', 'zoloft', 'assert',
-  'escitalopram', 'lexapro', 'reconter', 'citalopram', 'cipramil',
-  'paroxetina', 'aropax', 'venlafaxina', 'efexor', 'desvenlafaxina', 'pristiq',
-  'duloxetina', 'cymbalta', 'bupropiona', 'wellbutrin',
-  'mirtazapina', 'remeron', 'trazodona', 'donaren',
-  'amitriptilina', 'tryptanol', 'nortriptilina', 'pamelor', 'imipramina', 'clomipramina', 'anafranil',
+  'fluoxetina', 'prozac', 'daforin', 'sertralina', 'zoloft', 'assert', 'tolrest', 'serenata',
+  'escitalopram', 'lexapro', 'reconter', 'exodus', 'citalopram', 'cipramil', 'procimax',
+  'paroxetina', 'aropax', 'pondera', 'paxil', 'venlafaxina', 'efexor', 'venlift',
+  'desvenlafaxina', 'pristiq', 'deller', 'elifore',
+  'duloxetina', 'cymbalta', 'velija', 'bupropiona', 'wellbutrin', 'zetron',
+  'vilazodona', 'aymee', 'vortioxetina', 'brintellix',
+  'mirtazapina', 'remeron', 'menelat', 'razapina', 'trazodona', 'donaren',
+  'amitriptilina', 'tryptanol', 'amytril', 'nortriptilina', 'pamelor', 'imipramina', 'clomipramina', 'anafranil',
   'carbonato de litio', 'carbolitium',
 
   // Antipsicóticos (Lista C1)
   'haloperidol', 'haldol', 'risperidona', 'risperdal',
-  'olanzapina', 'zyprexa', 'quetiapina', 'seroquel',
-  'aripiprazol', 'abilify', 'clorpromazina', 'amplictil', 'levomepromazina',
+  'olanzapina', 'zyprexa', 'quetiapina', 'seroquel', 'quetros',
+  'aripiprazol', 'abilify', 'aristab', 'lurasidona', 'latuda',
+  'clorpromazina', 'amplictil', 'levomepromazina', 'neozine',
 
   // Anticonvulsivantes e moduladores (Lista C1)
   'carbamazepina', 'tegretol', 'oxcarbazepina', 'trileptal',
-  'valproato', 'depakene', 'depakote', 'divalproato',
+  'valproato', 'acido valproico', 'depakene', 'torval', 'depakote', 'divalproato',
   'lamotrigina', 'lamictal', 'topiramato', 'topamax',
+  'levetiracetam', 'keppra', 'fenitoina', 'hidantal',
   'fenobarbital', 'gardenal', 'primidona',
-  'gabapentina', 'pregabalina', 'lyrica',
+  'gabapentina', 'neurontin', 'progresse', 'pregabalina', 'lyrica', 'dorene',
 
   // Opioides e analgésicos narcóticos (Listas A1, A2, C1)
   'tramadol', 'tramal', 'sylador', 'codeina', 'tylex', 'paco',
@@ -74,11 +79,11 @@ const CONTROLADOS = [
 ];
 
 // Termos curtos só valem como palavra inteira, para não casar dentro de outras
-// palavras ("astro" dentro de "gastro", por exemplo).
+// palavras ("astro" dentro de "gastro", "amato" dentro de "anti-inflamatorio", etc.).
 const ANTIMICROBIANOS_PALAVRA_INTEIRA_REGEX = ['cipro', 'astro'].map(
   (termo) => new RegExp(`\\b${termo}\\b`)
 );
-const CONTROLADOS_PALAVRA_INTEIRA_REGEX = ['bup', 'litio', 'tylex', 'paco', 'frontal'].map(
+const CONTROLADOS_PALAVRA_INTEIRA_REGEX = ['bup', 'litio', 'tylex', 'paco', 'frontal', 'neural', 'amato', 'etira', 'insit'].map(
   (termo) => new RegExp(`\\b${termo}\\b`)
 );
 

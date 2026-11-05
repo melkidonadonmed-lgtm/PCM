@@ -58,6 +58,11 @@ export const PRESCMED_TOKENS = {
     easeSpring: 'var(--ease-spring)',
     easeOutNatural: 'var(--ease-out-natural)',
     easeStateFast: 'var(--ease-state-fast)',
+    sidebarTextPrimary: 'var(--sidebar-text-primary)',
+    sidebarTextSecondary: 'var(--sidebar-text-secondary)',
+    sidebarTextMuted: 'var(--sidebar-text-muted)',
+    sidebarItemSize: 'var(--sidebar-item-size)',
+    sidebarLabelSize: 'var(--sidebar-label-size)',
   },
   radii: {
     sm: '8px',

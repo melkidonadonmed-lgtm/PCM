@@ -180,7 +180,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'editor',
-      label: 'Editor A4 & Timbrados',
+      label: 'Editor A4',
       fullLabel: 'Editor de Prescrições e Laudos A4',
       shortLabel: 'Editor',
       iconName: 'editor',
@@ -188,18 +188,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'print_preview',
-      label: 'Exportar & Imprimir PDF',
+      label: 'Imprimir / PDF',
+      fullLabel: 'Exportar & Imprimir PDF',
       shortLabel: 'Exportar',
       iconName: 'imprimir'
     }
   ];
 
-  // Grupo 2: Ferramentas Clínicas & Apoio Diagnóstico
+  // Grupo 2: Módulo de Apoio Clínico (legendas sucintas)
   const clinicalToolsNavItems: SidebarNavItem[] = [
-    { id: 'pediatric_calc', label: 'Calculadora Pediátrica', shortLabel: 'Doses', iconName: 'calculate', shortcut: 'Alt+3', badge: patientWeight > 0 ? `${patientWeight}kg` : undefined },
-    { id: 'protocols', label: 'Protocolos Clínicos', shortLabel: 'Protocolos', iconName: 'coracao', shortcut: 'Alt+4' },
-    { id: 'scores', label: 'Escores Clínicos (Scoreboard)', fullLabel: 'Escores Clínicos, Radar 60fps, BIC, EPARADA & Rastreio INCA', shortLabel: 'Escores', iconName: 'monitor_heart', shortcut: 'Alt+8', badge: '114' },
-    { id: 'hospital', label: 'Módulo Hospitalar (Leitos)', fullLabel: 'Módulo Hospitalar e Gestão de Pacientes (EF/LT, Evolução, Exames e Science)', shortLabel: 'Hospitalar', iconName: 'local_hospital', shortcut: 'Alt+7' }
+    {
+      id: 'pediatric_calc',
+      label: 'Calculadora Ped.',
+      fullLabel: 'Calculadora Pediátrica por Peso (mg/kg)',
+      shortLabel: 'Doses',
+      iconName: 'calculate',
+      shortcut: 'Alt+3',
+      badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
+    },
+    {
+      id: 'protocols',
+      label: 'Protocolos',
+      fullLabel: 'Protocolos Clínicos e Condutas',
+      shortLabel: 'Protocolos',
+      iconName: 'coracao',
+      shortcut: 'Alt+4'
+    },
+    {
+      id: 'scores',
+      label: 'Scores',
+      fullLabel: 'Escores Clínicos, Radar 60fps, BIC, EPARADA & Rastreio INCA',
+      shortLabel: 'Scores',
+      iconName: 'monitor_heart',
+      shortcut: 'Alt+8',
+      badge: '114'
+    },
+    {
+      id: 'hospital',
+      label: 'Hospitalar',
+      fullLabel: 'Módulo Hospitalar e Gestão de Pacientes (EF/LT, Evolução, Exames e Science)',
+      shortLabel: 'Hospitalar',
+      iconName: 'local_hospital',
+      shortcut: 'Alt+7'
+    }
   ];
 
   const runMobileAwareAction = (action?: () => void) => {
@@ -276,20 +307,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => handleNavClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`relative w-full h-9 flex items-center justify-between px-2.5 rounded-xl text-xs transition-colors duration-150 ease-out cursor-pointer group lg:hover:translate-x-0.5 active:translate-x-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
+        aria-label={item.fullLabel || item.label}
+        className={`relative w-full h-9 flex items-center justify-between px-2.5 rounded-xl text-[13px] tracking-[-0.01em] transition-colors duration-150 ease-out cursor-pointer group active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
           isActive
-            ? 'nav-item-active sidebar-active-surface text-white font-semibold'
-            : 'text-slate-300 hover:bg-white/[0.07] hover:border-white/10 hover:text-white font-medium border border-transparent'
+            ? 'nav-item-active sidebar-active-surface text-[var(--sidebar-text-primary,#F8FAFC)] font-semibold'
+            : 'text-[var(--sidebar-text-secondary,#E2E8F0)] hover:bg-white/[0.07] hover:border-white/10 hover:text-white font-medium border border-transparent'
         }`}
-        title={item.shortcut ? `${item.label} (${item.shortcut})` : item.label}
+        title={item.shortcut ? `${item.fullLabel || item.label} (${item.shortcut})` : (item.fullLabel || item.label)}
       >
         {isActive && <span aria-hidden="true" className="sidebar-active-bar" />}
         <div className="flex items-center gap-2.5 min-w-0">
           <span
-            className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition duration-200 border ${
+            className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-150 border ${
               isActive
                 ? 'bg-sky-400/20 text-sky-300 border-sky-400/30 shadow-xs'
-                : 'bg-white/[0.04] text-slate-300 border-white/[0.06] group-hover:bg-white/[0.10] group-hover:border-white/15 group-hover:text-white group-hover:scale-105'
+                : 'bg-white/[0.04] text-slate-300 border-white/[0.06] group-hover:bg-white/[0.10] group-hover:border-white/15 group-hover:text-white'
             }`}
           >
             <Icon 
@@ -307,7 +339,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {item.badge ? (
           <span 
             className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0 ml-1 clinical-unit clinical-tabular-nums ${
-              isActive ? 'bg-sky-500/30 text-sky-100 border border-sky-400/30' : 'bg-white/10 text-slate-300'
+              isActive ? 'bg-sky-500/30 text-sky-100 border border-sky-400/30' : 'bg-white/10 text-slate-200'
             }`}
           >
             {item.badge}
@@ -318,7 +350,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className={`kbd-shortcut-chip flex-shrink-0 ml-1 transition-colors ${
               isActive
                 ? 'bg-sky-400/20 text-sky-200 font-bold'
-                : 'text-slate-400/80 group-hover:text-slate-200 bg-white/[0.04]'
+                : 'text-[var(--sidebar-text-muted,#94A3B8)] group-hover:text-slate-200 bg-white/[0.04]'
             }`}
           >
             {item.shortcut}
@@ -327,6 +359,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </button>
     );
   };
+
+  const activeMacroModuleLabel =
+    activeTab === 'hospital'
+      ? 'MOD-03 Ativo'
+      : activeTab === 'scores'
+        ? 'MOD-02 Ativo'
+        : 'MOD-01 Ativo';
 
   return (
     <>
@@ -346,7 +385,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         aria-label="Menu Lateral de Navegação"
         aria-hidden={!isOpen && !isDesktop}
         inert={!isOpen && !isDesktop ? true : undefined}
-        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform will-change-transform transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] border border-white/10 ${
+        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform will-change-transform lg:will-change-auto transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] border border-white/10 ${
           isOpen ? 'translate-x-0 shadow-tactile-navy' : '-translate-x-full pointer-events-none shadow-none lg:shadow-tactile-navy'
         } lg:pointer-events-auto lg:sticky lg:top-[4.25rem] lg:h-[calc(100dvh-4.75rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl ${
           isOpen
@@ -357,20 +396,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           backgroundColor: darkMode ? '#1E293B' : '#0F172A'
         }}
       >
-        {/* Scrollable Main Area (overflow-visible when collapsed so floating tooltips are never clipped) */}
-        <div className={`flex-1 ${
-          isOpen
-            ? 'overflow-y-auto overscroll-contain custom-scrollbar p-2 space-y-1.5'
-            : 'overflow-visible py-3 px-1.5 space-y-2.5 flex flex-col items-center'
-        }`}>
-          
+        {/* TOPO FIXO SEM SCROLL: Cabeçalho, Posto de Trabalho (SUS), Médico e Paciente */}
+        <div
+          id="sidebar-top-fixed"
+          className={`shrink-0 border-b border-white/10 ${
+            isOpen
+              ? 'p-2 pb-2 space-y-1.5'
+              : 'pt-2.5 pb-2 px-1.5 space-y-2 flex flex-col items-center overflow-visible'
+          }`}
+        >
           {/* Header da Navegação Clínica (Mobile & Desktop Expandido) */}
           {isOpen ? (
-            <div className="flex items-center justify-between px-1 pb-1.5 pt-0.5 border-b border-white/10">
+            <div className="flex items-center justify-between px-1 pb-1 pt-0.5">
               <div className="flex items-center gap-1.5 min-w-0">
                 <Icon name="layers" size={15} className="text-sky-400 shrink-0" />
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-200 truncate">
-                  Navegação Clínica
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--sidebar-text-secondary,#E2E8F0)] truncate">
+                  Navegação
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
+                  {activeMacroModuleLabel}
                 </span>
               </div>
               <button
@@ -378,7 +422,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={onClose || onToggleOpen}
                 aria-label="Fechar menu lateral"
                 title={isDesktop ? 'Recolher menu lateral' : 'Fechar menu lateral'}
-                className="w-7 h-7 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.12] hover:border-white/20 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition duration-150 shrink-0"
+                className="w-7 h-7 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.12] hover:border-white/20 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors duration-150 shrink-0"
               >
                 <Icon name={isDesktop ? 'chevron_left' : 'close'} size={15} />
               </button>
@@ -388,7 +432,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               type="button"
               onClick={onToggleOpen}
               aria-label="Abrir Janela de Navegação"
-              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-sky-300 items-center justify-center transition duration-200 cursor-pointer hover:-translate-y-0.5 active:translate-y-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-sky-300 items-center justify-center transition duration-200 cursor-pointer hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
             >
               <Icon name="menu_open" size={20} className="rotate-180" />
               <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
@@ -397,7 +441,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           )}
 
-          {/* Context Switcher (SUS Multi-Instituição) — Prioridade 1 no Topo */}
+          {/* Context Switcher (SUS Multi-Instituição) — Prioridade 1 no Topo Fixo */}
           {contexts && contexts.length > 0 && activeContext && onSwitchContext && (
             <ContextSwitcher
               contexts={contexts}
@@ -407,9 +451,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           )}
 
-          {/* Doctor Profile Badge Compacto — Prioridade 2 no Topo */}
+          {/* Doctor Profile Chip de Linha Única — Sem legenda secundária poluente */}
           {isOpen ? (
             <div
+              id="sidebar-doctor-chip"
               onClick={handleOpenDoctor}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -419,41 +464,45 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className="px-2.5 py-1.5 min-h-[44px] rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 hover:-translate-y-[1px] active:translate-y-0 transition duration-200 cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset"
-              title="Clique para editar CRM e dados profissionais"
+              className="h-9 px-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer group shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset"
+              title={
+                hasDoctor
+                  ? `${doctor?.name} — CRM ${doctor?.crm}/${doctor?.crmState || 'SP'}${doctor?.rqe ? ' • RQE ' + doctor.rqe : ''}`
+                  : 'Configurar médico e CRM'
+              }
             >
               <div className="flex items-center gap-2 min-w-0 flex-1">
-                <div className="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-200 border border-sky-400/25 flex items-center justify-center font-bold text-[11px] shrink-0 shadow-tactile-sm transition-transform duration-200 group-hover:scale-105">
+                <div className="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-200 border border-sky-400/25 flex items-center justify-center font-bold text-[10px] shrink-0 shadow-tactile-sm">
                   CRM
                 </div>
-                <div className="overflow-hidden min-w-0 flex-1 leading-tight">
-                  <p className="text-[11px] font-bold truncate text-white">
-                    {hasDoctor ? doctor?.name : 'Configurar médico'}
-                  </p>
-                  <p className="text-[11px] text-slate-300 font-medium truncate clinical-tabular-nums">
-                    {hasDoctor 
-                      ? `CRM ${doctor?.crm}/${doctor?.crmState || 'SP'}${doctor?.rqe ? ' • RQE ' + doctor.rqe : ''}` 
-                      : 'Toque para informar CRM'}
-                  </p>
-                </div>
+                <span className="text-[13px] font-semibold tracking-[-0.01em] truncate text-[var(--sidebar-text-primary,#F8FAFC)]">
+                  {hasDoctor ? doctor?.name : 'Configurar médico'}
+                </span>
               </div>
-              <Icon name="edit" size={14} className="text-slate-400 group-hover:text-sky-300 transition-colors shrink-0" />
+              {hasDoctor && doctor?.crm ? (
+                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-white/[0.08] text-sky-200 border border-white/10 shrink-0 clinical-unit clinical-tabular-nums">
+                  {doctor.crm}/{doctor.crmState || 'SP'}
+                </span>
+              ) : (
+                <Icon name="edit" size={14} className="text-slate-400 group-hover:text-sky-300 transition-colors shrink-0" />
+              )}
             </div>
           ) : (
             <button
+              id="sidebar-doctor-chip"
               type="button"
               onClick={handleOpenDoctor}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-sky-500/15 text-sky-200 border border-sky-400/25 hover:bg-sky-500/25 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-sky-500/15 text-sky-200 border border-sky-400/25 hover:bg-sky-500/25 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
               aria-label="Perfil do Médico"
             >
               <span>CRM</span>
               <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
-                {hasDoctor ? `Dr(a). ${doctor?.name}` : 'Configurar CRM'}
+                {hasDoctor ? `Dr(a). ${doctor?.name}` : 'Configurar médico'}
               </span>
             </button>
           )}
 
-          {/* Patient Identification Badge Compacto — Prioridade 3 no Topo */}
+          {/* Patient Identification Chip de Linha Única — Sem legenda secundária poluente */}
           {isOpen ? (
             <div
               id="sidebar-patient-chip"
@@ -466,16 +515,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className={`px-2.5 py-1.5 min-h-[44px] rounded-xl border transition duration-200 hover:-translate-y-[1px] active:translate-y-0 cursor-pointer group active:scale-[0.98] shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset ${
+              className={`h-9 px-2.5 rounded-xl border transition-colors duration-150 active:translate-y-px cursor-pointer group shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset ${
                 hasPatient
                   ? 'border-sky-400/30 bg-sky-500/[0.10] hover:bg-sky-500/[0.16] hover:border-sky-400/45'
                   : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20'
               }`}
-              title="Clique para identificar o paciente, peso e histórico clínico"
+              title={
+                hasPatient
+                  ? `${patientName}${patientWeight > 0 ? ` • ${patientWeight.toLocaleString('pt-BR')} kg` : ''}`
+                  : 'Identificar paciente'
+              }
             >
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <div
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-tactile-sm border transition-transform duration-200 group-hover:scale-105 ${
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 shadow-tactile-sm border ${
                     hasPatient
                       ? 'bg-sky-500/20 text-sky-200 border-sky-400/30'
                       : 'bg-white/10 text-slate-300 border-white/15'
@@ -483,20 +536,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <Icon name={hasPatient ? 'person' : 'person_add'} size={15} filled={hasPatient} />
                 </div>
-                <div className="overflow-hidden min-w-0 flex-1 leading-tight">
-                  <p className="text-[11px] font-bold truncate text-white">
-                    {hasPatient ? patientName : 'Identificar paciente'}
-                  </p>
-                  <p className="text-[11px] text-slate-300 font-medium truncate clinical-tabular-nums">
-                    {hasPatient
-                      ? patientWeight > 0
-                        ? `Peso: ${patientWeight.toLocaleString('pt-BR')} kg${patient?.documentNumber ? ' • ' + patient.documentNumber : ''}`
-                        : patient?.documentNumber
-                          ? `CPF/CNS: ${patient.documentNumber}`
-                          : 'Toque para editar dados ou peso'
-                      : 'Nome, peso (kg) e CPF/CNS'}
-                  </p>
-                </div>
+                <span className="text-[13px] font-semibold tracking-[-0.01em] truncate text-[var(--sidebar-text-primary,#F8FAFC)]">
+                  {hasPatient ? patientName : 'Identificar paciente'}
+                </span>
               </div>
               {hasPatient && patientWeight > 0 ? (
                 <span className="text-[11px] font-extrabold px-1.5 py-0.5 rounded-md bg-sky-500/25 text-sky-200 border border-sky-400/30 shrink-0 clinical-unit clinical-tabular-nums">
@@ -511,7 +553,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               id="sidebar-patient-chip"
               type="button"
               onClick={handleOpenPatient}
-              className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl border flex items-center justify-center shadow-tactile-sm transition duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group ${
+              className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl border flex items-center justify-center shadow-tactile-sm transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group ${
                 hasPatient
                   ? 'bg-sky-500/20 text-sky-200 border-sky-400/30 hover:bg-sky-500/30'
                   : 'bg-white/[0.06] text-slate-300 border-white/10 hover:bg-white/15 hover:text-white'
@@ -531,13 +573,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </span>
             </button>
           )}
+        </div>
 
-          {/* Navegação por Grupos */}
-          <div className={isOpen ? 'w-full space-y-1.5 relative' : 'w-full flex flex-col items-center space-y-2 relative'}>
+        {/* Área de Navegação por Grupos (overflow-visible quando recolhida para tooltips flutuantes) */}
+        <div
+          id="sidebar-nav-scroll"
+          className={`flex-1 ${
+            isOpen
+              ? 'overflow-y-auto overscroll-contain custom-scrollbar p-2 space-y-2'
+              : 'overflow-visible py-2.5 px-1.5 space-y-2 flex flex-col items-center'
+          }`}
+        >
+          <div className={isOpen ? 'w-full space-y-2 relative' : 'w-full flex flex-col items-center space-y-2 relative'}>
             {/* Grupo 1: Atendimento Clínico Principal */}
             <div>
               {isOpen && (
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 mb-0.5 leading-none">
+                <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted,#94A3B8)] px-2.5 mb-1 leading-none">
                   Atendimento
                 </p>
               )}
@@ -546,11 +597,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </nav>
             </div>
 
-            {/* Grupo 2: Ferramentas de Apoio */}
+            {/* Grupo 2: Módulo de Apoio Clínico */}
             <div>
               {isOpen && (
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 mb-0.5 leading-none">
-                  Apoio clínico
+                <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted,#94A3B8)] px-2.5 mb-1 leading-none">
+                  Módulo de Apoio Clínico
                 </p>
               )}
               <nav className={isOpen ? 'space-y-0.5' : 'space-y-1.5 w-full flex flex-col items-center'}>
@@ -566,10 +617,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={handleToggleKits}
                   aria-expanded={showKits}
                   aria-controls="sidebar-kits-list"
-                  className="w-full h-9 px-2.5 rounded-xl text-xs font-medium text-slate-300 border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.07] hover:border-white/10 lg:hover:translate-x-0.5 active:translate-x-0 active:scale-[0.99] transition-colors duration-150 ease-out cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                  className="w-full h-9 px-2.5 rounded-xl text-[13px] tracking-[-0.01em] font-medium text-[var(--sidebar-text-secondary,#E2E8F0)] border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.07] hover:border-white/10 active:translate-y-px transition-colors duration-150 ease-out cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.06] group-hover:bg-white/[0.10] group-hover:border-white/15 group-hover:scale-105 transition duration-200 flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.06] group-hover:bg-white/[0.10] group-hover:border-white/15 transition-colors duration-150 flex items-center justify-center shrink-0">
                       <Icon name="medication" size={15} opticalSize={20} className="text-slate-300 group-hover:text-white" />
                     </span>
                     <span className="truncate">Kits de plantão ({CLINICAL_KITS.length})</span>
@@ -591,7 +642,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         key={kit.id}
                         type="button"
                         onClick={() => runMobileAwareAction(() => onAplicarKit?.(kit))}
-                        className="w-full text-left px-2.5 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 lg:hover:translate-x-0.5 active:translate-x-0 transition-colors duration-150 cursor-pointer group active:scale-[0.99] outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 active:translate-y-px transition-colors duration-150 cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                         title={`Aplicar kit: ${kit.name} (${kit.badge})`}
                       >
                         <div className="flex items-center justify-between gap-1.5">
@@ -615,7 +666,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   setShowKits(true);
                   storageService.saveRawString('prescmed_show_kits', 'true');
                 }}
-                className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition duration-200 cursor-pointer group hover:-translate-y-0.5 active:translate-y-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative text-slate-300 bg-white/[0.02] hover:text-white hover:bg-white/10 border border-transparent hover:border-white/15"
+                className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition duration-200 cursor-pointer group hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative text-slate-300 bg-white/[0.02] hover:text-white hover:bg-white/10 border border-transparent hover:border-white/15"
                 aria-label="Kits de plantão"
               >
                 <Icon
@@ -627,65 +678,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   Kits de plantão
                 </span>
               </button>
-            )}
-
-            {/* Seletor Compacto de Macro-Módulos do Ecossistema (MOD-01 Ativo | MOD-02 PEP/CDSS | MOD-03 Hospitalar) */}
-            {isOpen && (
-              <div
-                className="px-2 py-1 rounded-xl bg-white/[0.03] border border-white/10 space-y-0.5"
-                title="Alternância rápida entre Macro-Módulos: 01. Clínico & Prescrição (Alt+1) • 02. PEP/SOAP & Scoreboard CDSS (Alt+8) • 03. Hospitalar (Alt+7)"
-              >
-                <div className="flex items-center justify-between gap-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 truncate">
-                    Ecossistema Clínico
-                  </span>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
-                    {activeTab === 'hospital'
-                      ? 'MOD-03 Ativo'
-                      : activeTab === 'scores'
-                        ? 'MOD-02 Ativo'
-                        : 'MOD-01 Ativo'}
-                  </span>
-                </div>
-                <div className="grid grid-cols-3 gap-1 text-[11px] clinical-tabular-nums">
-                  <button
-                    type="button"
-                    onClick={() => handleNavClick('prescription')}
-                    className={`px-1 py-0.5 rounded border truncate text-center cursor-pointer transition ${
-                      activeTab !== 'hospital' && activeTab !== 'scores'
-                        ? 'bg-sky-500/15 border-sky-400/25 text-white font-semibold'
-                        : 'bg-white/[0.02] border-white/5 text-slate-300 hover:text-white font-medium'
-                    }`}
-                    title="Módulo 01: Prescrição & Ambulatório (Alt+1)"
-                  >
-                    01. Clínico
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleNavClick('scores')}
-                    className={`px-1 py-0.5 rounded border truncate text-center cursor-pointer transition ${
-                      activeTab === 'scores'
-                        ? 'bg-sky-500/15 border-sky-400/25 text-white font-semibold'
-                        : 'bg-white/[0.04] border-white/10 text-slate-200 hover:text-white font-medium'
-                    }`}
-                    title="Módulo 02: Evolução Estruturada SOAP/SBAR & Scoreboard CDSS (Alt+8)"
-                  >
-                    02. PEP
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleNavClick('hospital')}
-                    className={`px-1 py-0.5 rounded border truncate text-center cursor-pointer transition ${
-                      activeTab === 'hospital'
-                        ? 'bg-sky-500/15 border-sky-400/25 text-white font-semibold'
-                        : 'bg-white/[0.04] border-white/10 text-slate-200 hover:text-white font-medium'
-                    }`}
-                    title="Módulo 03: Internação Hospitalar & Gestão de Leitos (Alt+7)"
-                  >
-                    03. Hosp.
-                  </button>
-                </div>
-              </div>
             )}
           </div>
         </div>
@@ -717,7 +709,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 type="button"
                 onClick={handleTriggerResetAll}
-                className="w-full h-9 flex items-center justify-center gap-1.5 px-2.5 rounded-xl text-xs font-semibold text-white bg-white/[0.08] hover:bg-white/[0.14] hover:border-white/20 hover:-translate-y-[1px] active:translate-y-0 border border-white/10 transition duration-150 cursor-pointer active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-sky-400 whitespace-nowrap group"
+                className="w-full h-9 flex items-center justify-center gap-1.5 px-2.5 rounded-xl text-xs font-semibold text-white bg-white/[0.08] hover:bg-white/[0.14] hover:border-white/20 active:translate-y-px border border-white/10 transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-sky-400 whitespace-nowrap group"
                 title="Iniciar uma nova consulta do zero"
               >
                 <Icon name="refresh" size={15} className="text-sky-300 group-hover:rotate-45 transition-transform duration-200 shrink-0" />
@@ -730,7 +722,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     type="button"
                     onClick={handleOpenBackup}
-                    className="flex-1 min-w-0 h-8 px-1 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:scale-[0.98] transition duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                    className="flex-1 min-w-0 h-8 px-1 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                     title="Exportar ou restaurar arquivo de backup (.pcm.json)"
                   >
                     <Icon name="cloud_download" size={13} className="text-slate-300 shrink-0" />
@@ -743,7 +735,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     id="btn-sidebar-lgpd-security"
                     type="button"
                     onClick={handleOpenLgpd}
-                    className="h-8 px-2 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:scale-[0.98] transition duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shrink-0"
+                    className="h-8 px-2 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shrink-0"
                     title="Segurança, Seleção de Cookies e Conformidade LGPD"
                     aria-label="Segurança, Seleção de Cookies e LGPD"
                   >

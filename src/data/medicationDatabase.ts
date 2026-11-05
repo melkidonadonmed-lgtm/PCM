@@ -36,6 +36,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   respiratorio: 'Respiratório & Alergia',
   gastro: 'Gastroenterologia',
   snc: 'SNC & Psiquiatria',
+  outros: 'Vitaminas & Oftalmologia',
 };
 
 export {

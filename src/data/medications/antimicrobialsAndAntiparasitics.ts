@@ -339,5 +339,122 @@ export const ANTIMICROBIALS_AND_ANTIPARASITICS: UnifiedMedication[] = [
     defaultQuantity: '10 cápsulas',
     defaultPosology: 'Tomar 1 cápsula via oral de 12 em 12 horas durante 5 dias consecutivos.'
   },
-];
+  {
+    id: 'cefuroxima-500mg',
+    name: 'Axetilcefuroxima 500mg comprimido (Zinnat 500mg)',
+    activeIngredient: 'Axetilcefuroxima',
+    route: 'Uso Oral',
+    category: 'antibioticos',
+    defaultQuantity: '14 comprimidos',
+    defaultPosology: 'Tomar 1 comprimido via oral de 12 em 12 horas após as refeições por 7 a 10 dias.'
+  },
+  {
+    id: 'cefuroxima-susp-250mg',
+    name: 'Axetilcefuroxima 250mg/5mL suspensão oral (Zinnat Suspensão)',
+    activeIngredient: 'Axetilcefuroxima',
+    route: 'Uso Oral',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (70 mL)',
+    defaultPosology: 'Dar dose pediátrica calculada (30 mg/kg/dia) de 12 em 12 horas após refeições por 10 dias.',
+    isPediatric: true,
+    pediatricDoseMgKg: 30,
+    pediatricConcentrationMgMl: 50,
+    pediatricUnitType: 'ml',
+    pediatricMaxDoseMg: 1000,
+    pediatricDefaultDays: 10
+  },
+  {
+    id: 'levofloxacino-750mg',
+    name: 'Levofloxacino 750mg comprimido (Levaquin 750, Tamiram 750)',
+    activeIngredient: 'Levofloxacino hemi-hidratado',
+    route: 'Uso Oral',
+    category: 'antibioticos',
+    defaultQuantity: '5 comprimidos',
+    defaultPosology: 'Tomar 1 comprimido via oral 1 vez ao dia durante 5 dias.'
+  },
 
+  // ==========================================
+  // 2B. COLÍRIOS ANTIBIÓTICOS E ASSOCIAÇÕES OFTÁLMICAS (RDC 471/2021 — 2 VIAS)
+  // ==========================================
+  {
+    id: 'tobramicina-colirio-0-3',
+    name: 'Tobramicina 0,3% (3mg/mL) colírio solução oftálmica (Tobrex)',
+    activeIngredient: 'Tobramicina',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (5 mL)',
+    defaultPosology: 'Pingar 1 a 2 gotas no(s) olho(s) afetado(s) de 4 em 4 horas (ou de 6/6h) durante 7 dias.'
+  },
+  {
+    id: 'tobramicina-dexametasona-colirio',
+    name: 'Tobramicina 0,3% + Dexametasona 0,1% colírio suspensão oftálmica (Tobradex)',
+    activeIngredient: 'Tobramicina + dexametasona',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (5 mL)',
+    defaultPosology: 'Pingar 1 a 2 gotas no(s) olho(s) afetado(s) de 4 em 4 horas ou de 6 em 6 horas por 7 dias.'
+  },
+  {
+    id: 'moxifloxacino-colirio-0-5',
+    name: 'Cloridrato de Moxifloxacino 0,5% (5mg/mL) colírio solução oftálmica (Vigamox)',
+    activeIngredient: 'Cloridrato de moxifloxacino',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (5 mL)',
+    defaultPosology: 'Pingar 1 gota no(s) olho(s) afetado(s) de 8 em 8 horas (3x ao dia) durante 7 dias.'
+  },
+  {
+    id: 'moxifloxacino-dexametasona-colirio',
+    name: 'Moxifloxacino 0,5% + Dexametasona 0,1% colírio solução oftálmica (Vigadexa)',
+    activeIngredient: 'Cloridrato de moxifloxacino + fosfato dissódico de dexametasona',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (5 mL)',
+    defaultPosology: 'Pingar 1 gota no(s) olho(s) afetado(s) de 6 em 6 horas (4x ao dia) por 7 dias.'
+  },
+  {
+    id: 'ciprofloxacino-colirio-0-3',
+    name: 'Cloridrato de Ciprofloxacino 0,3% (3mg/mL) colírio solução oftálmica (Ciloxan, Biamotil)',
+    activeIngredient: 'Cloridrato de ciprofloxacino',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (5 mL)',
+    defaultPosology: 'Pingar 1 a 2 gotas no(s) olho(s) afetado(s) de 4 em 4 horas (ou de 6/6h) durante 7 dias.'
+  },
+  {
+    id: 'ciprofloxacino-dexametasona-colirio',
+    name: 'Ciprofloxacino 0,3% + Dexametasona 0,1% colírio suspensão oftálmica (Cilodex, Biamotil-D)',
+    activeIngredient: 'Cloridrato de ciprofloxacino + dexametasona',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (5 mL)',
+    defaultPosology: 'Pingar 1 a 2 gotas no(s) olho(s) afetado(s) de 6 em 6 horas durante 7 dias.'
+  },
+  {
+    id: 'gatifloxacino-colirio-0-3',
+    name: 'Gatifloxacino 0,3% (3mg/mL) colírio solução oftálmica (Zymar)',
+    activeIngredient: 'Gatifloxacino',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (5 mL)',
+    defaultPosology: 'Pingar 1 gota no(s) olho(s) afetado(s) de 6 em 6 horas por 7 dias.'
+  },
+  {
+    id: 'gatifloxacino-prednisolona-colirio',
+    name: 'Gatifloxacino 0,3% + Acetato de Prednisolona 1% colírio suspensão oftálmica (Zypred)',
+    activeIngredient: 'Gatifloxacino + acetato de prednisolona',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (6 mL)',
+    defaultPosology: 'Pingar 1 gota no(s) olho(s) afetado(s) de 6 em 6 horas durante 7 dias.'
+  },
+  {
+    id: 'ofloxacino-colirio-0-3',
+    name: 'Ofloxacino 0,3% (3mg/mL) colírio solução oftálmica (Floxestat)',
+    activeIngredient: 'Ofloxacino',
+    route: 'Uso Oftálmico',
+    category: 'antibioticos',
+    defaultQuantity: '1 frasco (5 mL)',
+    defaultPosology: 'Pingar 1 a 2 gotas no(s) olho(s) afetado(s) de 4 em 4 horas ou de 6 em 6 horas por 7 dias.'
+  },
+];

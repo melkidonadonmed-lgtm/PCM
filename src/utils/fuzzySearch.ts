@@ -30,12 +30,17 @@ const SALT_AND_ESTER_PREFIXES: readonly string[] = [
   'hemifumarato de ',
   'dipropionato de ',
   'cloridrato de ',
+  'bromidrato de ',
   'bissulfato de ',
   'propionato de ',
+  'etexilato de ',
   'tartarato de ',
   'succinato de ',
+  'trometamol ',
   'besilato de ',
+  'benzoato de ',
   'fumarato de ',
+  'mesilato de ',
   'valerato de ',
   'maleato de ',
   'brometo de ',
@@ -46,6 +51,7 @@ const SALT_AND_ESTER_PREFIXES: readonly string[] = [
   'acetato de ',
   'citrato de ',
   'mucato de ',
+  'axetil',
 ];
 
 /**
@@ -209,7 +215,12 @@ export const THERAPEUTIC_CLASSES: TherapeuticCategoryMap[] = [
       'antiinflamatorio', 'anti-inflamatorio', 'aine', 'inflamacao', 'edema',
       'dor de garganta', 'garganta inflamada', 'artrite', 'artrose', 'tendinite',
       'entorse', 'trauma', 'dor articular', 'ibuprofeno', 'cetoprofeno', 'advil',
-      'alivium', 'profenid', 'nimesulida', 'diclofenaco', 'toragesic'
+      'alivium', 'profenid', 'nimesulida', 'diclofenaco', 'toragesic', 'cetorolaco',
+      'etoricoxibe', 'arcoxia', 'celecoxibe', 'celebra', 'naproxeno', 'flanax',
+      'aceclofenaco', 'proflam', 'dexketoprofeno', 'indometacina', 'lornoxicam',
+      'ciclobenzaprina', 'mioson', 'baclofeno', 'deflazacorte', 'triptano',
+      'triptanos', 'sumatriptana', 'sumax', 'naratriptana', 'naramig',
+      'zolmitriptana', 'zomig', 'rizatriptana', 'maxalt'
     ]
   },
   {
@@ -222,7 +233,10 @@ export const THERAPEUTIC_CLASSES: TherapeuticCategoryMap[] = [
       'cefalexina', 'keflex', 'cefuroxima', 'zinnat', 'ceftriaxona', 'rocefin',
       'ciprofloxacino', 'cipro', 'levofloxacino', 'bactrim', 'sulfametoxazol',
       'nitrofurantoina', 'macrodantina', 'sinusite', 'amigdalite', 'faringite',
-      'pneumonia', 'otite', 'itu', 'infeccao urinaria', 'cistite', 'erisipela'
+      'pneumonia', 'otite', 'itu', 'infeccao urinaria', 'cistite', 'erisipela',
+      'conjuntivite', 'colirio antibiotico', 'tobramicina', 'tobrex', 'tobradex',
+      'moxifloxacino', 'vigamox', 'vigadexa', 'ciloxan', 'cilodex', 'gatifloxacino',
+      'zymar', 'zypred', 'ofloxacino', 'floxestat'
     ]
   },
   {
@@ -235,11 +249,14 @@ export const THERAPEUTIC_CLASSES: TherapeuticCategoryMap[] = [
       'corticoide', 'corticoesteroide', 'esteroide', 'anti-inflamatorio esteroidal',
       'prednisolona', 'prelone', 'prednisona', 'meticorten', 'dexametasona', 'decadron',
       'budesonida', 'pulmicort', 'fluticasona', 'avamys', 'flixotide', 'beclometasona',
-      'clenil', 'laringite', 'croup', 'estridor', 'crise de asma', 'edema de glote',
+      'clenil', 'mometasona', 'nasonex', 'montelucaste', 'singulair',
+      'laringite', 'croup', 'estridor', 'crise de asma', 'edema de glote',
       'antialergico', 'anti-histaminico', 'antihistaminico', 'alergia', 'rinite',
       'urticaria', 'prurido', 'coceira', 'coriza', 'espirros', 'picada de inseto',
       'loratadina', 'claritin', 'desloratadina', 'desalex', 'cetirizina', 'zyrtec',
-      'hidroxizina', 'hixizine', 'dexclorfeniramina', 'polaramine'
+      'hidroxizina', 'hixizine', 'dexclorfeniramina', 'polaramine', 'bilastina',
+      'alektos', 'fexofenadina', 'allegra', 'levocetirizina', 'zyxem', 'ebastina',
+      'ebastel', 'rupatadina', 'rupafin', 'prometazina', 'fenergan'
     ]
   },
   {
@@ -247,10 +264,17 @@ export const THERAPEUTIC_CLASSES: TherapeuticCategoryMap[] = [
     displayName: 'Anti-hipertensivos & Cardiovasculares',
     keywords: [
       'antihipertensivo', 'anti-hipertensivo', 'pressao', 'pressao alta', 'hipertensao',
-      'cardiovascular', 'coracao', 'cardiologia', 'betabloqueador', 'ieca', 'bra',
+      'has', 'cardiovascular', 'coracao', 'cardiologia', 'betabloqueador', 'ieca', 'bra',
       'diuretico', 'losartana', 'atenolol', 'propranolol', 'metoprolol', 'selozok',
       'carvedilol', 'anlodipino', 'norvasc', 'enalapril', 'renitec', 'captopril',
       'hidroclorotiazida', 'furosemida', 'lasix', 'espironolactona', 'aldactone',
+      'olmesartana', 'benicar', 'valsartana', 'diovan', 'candesartana', 'atacand',
+      'telmisartana', 'micardis', 'irbesartana', 'aprovel', 'ramipril', 'triatec',
+      'perindopril', 'coversyl', 'lisinopril', 'levanlodipino', 'novanlo',
+      'lercanidipino', 'zanidip', 'nifedipino', 'adalat', 'indapamida', 'natrilix',
+      'clortalidona', 'higroton', 'nebivolol', 'nebilet', 'bisoprolol', 'concor',
+      'sacubitril', 'entresto', 'hidralazina', 'clonidina', 'atensina', 'doxazosina',
+      'apixabana', 'eliquis', 'dabigatrana', 'pradaxa', 'ezetimiba', 'zetia',
       'hipolipemiante', 'estatina', 'colesterol', 'triglicerideos', 'dislipidemia',
       'gordura no sangue', 'atorvastatina', 'lipitor', 'rosuvastatina', 'crestor',
       'sinvastatina'
@@ -258,11 +282,19 @@ export const THERAPEUTIC_CLASSES: TherapeuticCategoryMap[] = [
   },
   {
     canonicalCategory: 'diabetes',
-    displayName: 'Antidiabéticos & Metabólicos',
+    displayName: 'Antidiabéticos, Tireoide & Metabólicos',
     keywords: [
       'antidiabetico', 'diabetes', 'glicemia', 'acucar no sangue', 'insulina',
-      'hipoglicemiante', 'dm2', 'metformina', 'glifage', 'gliclazida', 'diamicron',
-      'insulina nph', 'insulina regular'
+      'hipoglicemiante', 'dm2', 'dm', 'metformina', 'glifage', 'gliclazida', 'diamicron',
+      'insulina nph', 'insulina regular', 'glargina', 'lantus', 'basaglar', 'toujeo',
+      'degludeca', 'tresiba', 'lispro', 'humalog', 'asparte', 'novorapid',
+      'sglt2', 'dpp4', 'glp1', 'dapagliflozina', 'forxiga', 'xigduo',
+      'empagliflozina', 'jardiance', 'glyxambi', 'sitagliptina', 'januvia', 'janumet',
+      'vildagliptina', 'galvus', 'linagliptina', 'trayenta', 'alogliptina', 'nesina',
+      'semaglutida', 'ozempic', 'rybelsus', 'wegovy', 'tirzepatida', 'mounjaro',
+      'liraglutida', 'victoza', 'saxenda', 'dulaglutida', 'trulicity',
+      'glimepirida', 'amaryl', 'pioglitazona', 'levotiroxina', 'tiroxina',
+      'hipotireoidismo', 'tireoide', 'puran', 'euthyrox', 'synthroid', 'levoid'
     ]
   },
   {
@@ -270,8 +302,10 @@ export const THERAPEUTIC_CLASSES: TherapeuticCategoryMap[] = [
     displayName: 'Gastrointestinais & Digestivos',
     keywords: [
       'gastro', 'gastrointestinal', 'gastroprotetor', 'protetor gastrico', 'estomago',
-      'gastrite', 'refluxo', 'azia', 'pirose', 'ibp', 'antiacido', 'ulcera',
-      'omeprazol', 'pantoprazol', 'esomeprazol', 'antiemetico', 'enjoo', 'vomito',
+      'gastrite', 'refluxo', 'azia', 'pirose', 'ibp', 'pcab', 'drge', 'esofagite',
+      'antiacido', 'ulcera', 'omeprazol', 'pantoprazol', 'esomeprazol', 'nexium',
+      'lansoprazol', 'ogastro', 'dexlansoprazol', 'dexilant', 'rabeprazol', 'pariet',
+      'vonoprazana', 'inzelm', 'antiemetico', 'enjoo', 'vomito',
       'nausea', 'ondansetrona', 'vonau', 'domperidona', 'motilium', 'metoclopramida',
       'plasil', 'simeticona', 'luftal', 'gases', 'colica intestinal',
       'laxativo', 'constipacao', 'prisao de ventre', 'intestino preso', 'evacuacao',
@@ -288,11 +322,43 @@ export const THERAPEUTIC_CLASSES: TherapeuticCategoryMap[] = [
     keywords: [
       'psicotropico', 'saude mental', 'ansiolitico', 'calmante', 'sedativo',
       'tarja preta', 'benzodiazepinico', 'sono', 'insonia', 'ansiedade', 'tag',
-      'antidepressivo', 'depressao', 'panico', 'isrs', 'humor', 'clonazepam',
-      'rivotril', 'diazepam', 'valium', 'alprazolam', 'frontan', 'zolpidem',
-      'stilnox', 'fluoxetina', 'prozac', 'sertralina', 'zoloft', 'escitalopram',
-      'lexapro', 'venlafaxina', 'duloxetina', 'pregabalina', 'lyrica', 'gabapentina',
-      'anticonvulsivante', 'epilepsia', 'carbamazepina', 'valproato', 'depakene'
+      'antidepressivo', 'depressao', 'panico', 'isrs', 'irsn', 'humor',
+      'estabilizador de humor', 'estabilizadores de humor', 'bipolar', 'tab',
+      'antipsicotico', 'antipsicoticos', 'esquizofrenia', 'neuralgia', 'fibromialgia',
+      'neuropatia', 'clonazepam', 'rivotril', 'diazepam', 'valium', 'alprazolam',
+      'frontan', 'zolpidem', 'stilnox', 'fluoxetina', 'prozac', 'sertralina',
+      'zoloft', 'escitalopram', 'lexapro', 'exodus', 'esc', 'citalopram',
+      'paroxetina', 'pondera', 'venlafaxina', 'efexor', 'desvenlafaxina', 'pristiq',
+      'deller', 'densvela', 'duloxetina', 'cymbalta', 'velija', 'vilazodona',
+      'aymee', 'vortioxetina', 'brintellix', 'bupropiona', 'wellbutrin', 'zetron',
+      'bup', 'trazodona', 'donaren', 'mirtazapina', 'remeron', 'amitriptilina',
+      'tryptanol', 'amytril', 'nortriptilina', 'pamelor', 'clomipramina', 'anafranil',
+      'pregabalina', 'lyrica', 'dorene', 'insit', 'gabapentina', 'neurontin',
+      'anticonvulsivante', 'epilepsia', 'carbamazepina', 'tegretol', 'valproato',
+      'acido valproico', 'depakene', 'divalproato', 'depakote', 'lamotrigina',
+      'lamictal', 'neural', 'litio', 'carbolitium', 'topiramato', 'topamax', 'amato',
+      'oxcarbazepina', 'trileptal', 'levetiracetam', 'keppra', 'etira', 'fenitoina',
+      'hidantal', 'fenobarbital', 'gardenal', 'risperidona', 'risperdal',
+      'olanzapina', 'zyprexa', 'quetiapina', 'seroquel', 'aripiprazol', 'aristab',
+      'abilify', 'lurasidona', 'latuda', 'clorpromazina', 'amplictil',
+      'levomepromazina', 'neozine', 'haloperidol', 'haldol'
+    ]
+  },
+  {
+    canonicalCategory: 'outros',
+    displayName: 'Vitaminas, Suplementos & Oftalmologia',
+    keywords: [
+      'vitamina', 'vitaminas', 'suplemento', 'vitamina b12', 'b12', 'cianocobalamina',
+      'mecobalamina', 'metilcobalamina', 'citoneurin', 'cronobe', 'rubranova',
+      'vitamina d', 'vitamina d3', 'colecalciferol', 'addera', 'depura', 'doss',
+      'calcio', 'carbonato de calcio', 'tiamina', 'vitamina b1', 'beneum',
+      'acido folico', 'complexo b', 'colirio', 'colirios', 'oftalmico', 'oftalmologia',
+      'lubrificante ocular', 'lagrima artificial', 'olho seco', 'carmelose', 'lacrifilm',
+      'optive', 'fresh tears', 'hialuronato', 'hyabak', 'lacribell', 'hipromelose',
+      'systane', 'olopatadina', 'patanol', 'cetotifeno', 'zaditen', 'acular',
+      'pred fort', 'maxidex', 'glaucoma', 'timolol', 'timoptol', 'latanoprosta',
+      'xalatan', 'travoprosta', 'travatan', 'bimatoprosta', 'lumigan', 'brimonidina',
+      'alphagan', 'dorzolamida', 'trusopt', 'cosopt'
     ]
   }
 ];
@@ -390,13 +456,14 @@ export const scoreUnifiedMedication = (
   }
 
   // 2. MATCH POR PREFIXO NA SUBSTÂNCIA ATIVA PRINCIPAL (ex: "dip" -> "dipirona", "metf" -> "metformina")
+  // Para prefixos curtos (<= 4 letras, ex: "par"), mantém pontuação uniforme entre monofármacos para preservar a prioridade canônica do catálogo (ex: Paracetamol antes de Paroxetina).
   if (primaryWord && primaryWord.startsWith(headToken)) {
-    const prefixRatio = Math.min(1, headToken.length / primaryWord.length);
+    const prefixRatio = headToken.length <= 4 ? 0.5 : Math.min(1, headToken.length / primaryWord.length);
     const primaryPrefixScore = 110 + prefixRatio * 8 - combinationPenalty;
     bestScore = Math.max(bestScore, primaryPrefixScore);
   } else if (coreName.startsWith(headToken) || coreActive.startsWith(headToken)) {
     const refLen = Math.max(headToken.length, primaryWord.length || coreName.length);
-    const prefixRatio = Math.min(1, headToken.length / refLen);
+    const prefixRatio = headToken.length <= 4 ? 0.5 : Math.min(1, headToken.length / refLen);
     const corePrefixScore = 108 + prefixRatio * 8 - combinationPenalty;
     bestScore = Math.max(bestScore, corePrefixScore);
   }

@@ -47,6 +47,18 @@
     --btn-primary-active: oklch(from var(--brand-primary) calc(l - 0.14) c h);
     --badge-bg: oklch(from var(--brand-primary) l c h / 0.12);
 
+    /* Tokens de Componente: Sidebar Deep Navy & Tipografia de Alta Nitidez */
+    --sidebar-surface-bg: oklch(0.16 0.022 260);
+    --sidebar-surface-elevated: oklch(0.21 0.026 260);
+    --sidebar-chip-bg: oklch(1 0 0 / 0.045);
+    --sidebar-chip-hover: oklch(1 0 0 / 0.085);
+    --sidebar-chip-border: oklch(1 0 0 / 0.10);
+    --sidebar-text-primary: oklch(0.985 0.004 255);
+    --sidebar-text-secondary: oklch(0.87 0.014 255);
+    --sidebar-text-muted: oklch(0.70 0.02 255);
+    --sidebar-item-size: 0.8125rem;
+    --sidebar-label-size: 0.6875rem;
+
     --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
     /* 4. Escala Tipográfica Modular e Fluida (clamp) */
