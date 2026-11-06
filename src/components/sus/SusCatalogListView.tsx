@@ -34,15 +34,15 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
       <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-[#0369A1] border border-white/12 shadow-tactile-sm shrink-0">
-              <Icon name="description" size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+              <Icon name="description" size={16} />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] truncate">
+                <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
                   Documentos & Requisições Oficiais do SUS
                 </h2>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-white/10 clinical-tabular-nums">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 clinical-tabular-nums">
                   9 modelos
                 </span>
               </div>
@@ -57,7 +57,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
               href="/formularios-sus-offline.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-semibold px-2.5 py-1.5 min-h-[40px] rounded-xl border border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-[#27354A] text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-[#334155] transition flex items-center gap-1.5 clinical-tabular-nums"
+              className="text-xs font-semibold px-2.5 h-8 min-h-[32px] rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition flex items-center gap-1.5 clinical-tabular-nums"
               title="Abrir Central Regulatória SUS A4 Vetorial (9 modelos editáveis diretos na folha)"
             >
               <Icon name="print" size={14} />
@@ -68,7 +68,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
               <button
                 type="button"
                 onClick={onStartFillingMultiple}
-                className="btn-tactile-primary text-xs font-semibold px-3 py-1.5 min-h-[40px] flex items-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
+                className="btn-tactile-primary text-xs font-semibold px-3 h-8 min-h-[32px] rounded-lg flex items-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
               >
                 <Icon name="layers" size={14} />
                 <span>Preencher ({selectedDocIds.length})</span>

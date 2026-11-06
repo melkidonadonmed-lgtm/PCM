@@ -146,17 +146,17 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   return (
     <div data-state="idle" aria-busy={false} id="exam-requester-section" className="flex flex-col gap-4 sm:gap-5">
       {/* Top Header Card Compacto */}
-      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-sky-600 border border-white/12 shadow-sm shrink-0">
-            <Icon name="science" size={16} className="text-slate-100" />
+          <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+            <Icon name="science" size={16} />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] truncate">
+              <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
                 Solicitação de exames complementares
               </h2>
-              <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 dark:bg-[#27354A] dark:text-slate-200 border border-slate-300 dark:border-white/10 font-semibold clinical-tabular-nums">
+              <span className="text-[11px] px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 font-semibold clinical-tabular-nums">
                 {selectedExams.length} selecionado(s)
               </span>
             </div>
@@ -169,9 +169,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         <button
           type="button"
           onClick={onNavigateToPrint}
-          className="btn-tactile-primary text-xs font-semibold px-3.5 py-2 min-h-[40px] flex items-center justify-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
+          className="btn-tactile-primary text-xs font-semibold px-3 h-8 min-h-[32px] rounded-lg flex items-center justify-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
         >
-          <Icon name="download" size={15} />
+          <Icon name="download" size={14} />
           <span>Visualizar e baixar PDF ({selectedExams.length})</span>
         </button>
       </div>

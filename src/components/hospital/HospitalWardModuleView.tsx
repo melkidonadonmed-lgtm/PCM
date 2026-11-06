@@ -176,47 +176,47 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
   return (
     <div id="hospital-ward-module-root" data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
       {/* Cabeçalho Principal do Módulo Hospitalar */}
-      <section className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-3.5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <span className="w-10 h-10 rounded-xl bg-sky-600/15 border border-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-              <Icon name="local_hospital" size={20} />
+      <section className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+              <Icon name="local_hospital" size={16} />
             </span>
-            <div>
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-base sm:text-lg font-extrabold text-[var(--text-main)]">
+                <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
                   Módulo Hospitalar e Gestão de Pacientes
                 </h1>
                 <Badge tone="clinical" tabular>
                   MOD-03 Ativo
                 </Badge>
-                <span className="text-xs font-bold text-[var(--text-muted)] clinical-tabular-nums">
+                <span className="text-xs font-semibold text-[var(--text-muted)] clinical-tabular-nums">
                   • {beds.length} leito(s) no censo
                 </span>
               </div>
-              <p className="text-xs text-[var(--text-muted)]">
-                Mapa de leitos da enfermaria, admissão rápida manual ou via IA sem alucinação, evolução padronizada e curva longitudinal
+              <p className="text-[11px] text-[var(--text-muted)] truncate">
+                Mapa de leitos, admissão estruturada, evolução padronizada e curva longitudinal.
               </p>
             </div>
           </div>
 
           {/* Ações Globais de Admissão e Escores */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => handleOpenQuickAdmissionModal('manual')}
-              className="btn-tactile-primary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              className="btn-tactile-primary h-8 min-h-[32px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
             >
-              <Icon name="person_add" size={15} />
+              <Icon name="person_add" size={14} />
               <span>+ Admitir Paciente</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsMultimodalModalOpen(true)}
-              className="btn-tactile-secondary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              className="btn-tactile-secondary h-8 min-h-[32px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
             >
-              <Icon name="auto_awesome" size={15} className="text-sky-600 dark:text-sky-400" />
+              <Icon name="auto_awesome" size={14} className="text-sky-600 dark:text-sky-400" />
               <span>Importação Multimodal IA</span>
             </button>
 
@@ -224,9 +224,9 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenScoreboardForBed(activeBed)}
-                className="btn-tactile-secondary h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer clinical-tabular-nums"
+                className="btn-tactile-secondary h-8 min-h-[32px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer clinical-tabular-nums"
               >
-                <Icon name="monitor_heart" size={15} className="text-blue-600 dark:text-blue-400" />
+                <Icon name="monitor_heart" size={14} className="text-sky-600 dark:text-sky-400" />
                 <span>Escores do Leito ({activeBed.scoreEntries?.length || 0})</span>
               </button>
             )}
@@ -234,7 +234,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
         </div>
 
         {/* Trilho Segmentado das 5 Visões Hospitalares (iniciando no Mapa de Leitos) */}
-        <div className="grid grid-cols-2 lg:flex lg:items-center gap-1 p-1 rounded-2xl nav-segmented-track">
+        <div className="grid grid-cols-2 lg:flex lg:items-center gap-1 p-1 rounded-xl nav-segmented-track">
           {subNavItems.map((tab) => {
             const isActive = activeSubView === tab.id;
             return (
@@ -243,7 +243,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                 type="button"
                 onClick={() => setActiveSubView(tab.id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex-1 min-h-10 px-3 py-1.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                className={`flex-1 h-8 min-h-[32px] px-2.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   isActive
                     ? 'nav-segmented-pill-active font-bold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold'
@@ -251,7 +251,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
               >
                 <Icon
                   name={tab.icon}
-                  size={15}
+                  size={14}
                   filled={isActive}
                   className={isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'}
                 />

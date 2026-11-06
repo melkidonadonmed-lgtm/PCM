@@ -184,180 +184,181 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
       data-state="idle"
     >
       {/* Cabeçalho da Bancada Scoreboard CDSS */}
-      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-3">
-        <nav aria-label="Caminho de navegação">
-          <ol role="list" className="breadcrumbsList">
-            <li>
-              <a
-                href="#scoreboard-catalog"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setTabMode('CATALOG');
-                }}
-              >
-                Scoreboard CDSS (Alt+8)
-              </a>
-            </li>
-            <li>
-              <a
-                href="#scoreboard-block"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setTabMode('CATALOG');
-                }}
-              >
-                {activeCalculator.categoryName || 'Escores Clínicos'}
-              </a>
-            </li>
-            <li>
-              <a
-                href={`#calc-${activeCalculator.id}`}
-                aria-current="page"
-                onClick={(e) => e.preventDefault()}
-              >
-                {activeCalculator.acronym}
-              </a>
-            </li>
-          </ol>
-        </nav>
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs">
-              <Icon name="monitor_heart" className="text-xl" />
+      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-2.5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 shrink-0">
+              <Icon name="monitor_heart" size={16} />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-base font-bold text-slate-900 dark:text-white">
-                  Scoreboard CDSS — Escores Clínicos, Infusão em BIC & Emergência
+                <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
+                  Scoreboard CDSS
                 </h1>
-                <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 font-mono text-[11px] font-bold text-blue-700 dark:text-blue-300 clinical-tabular-nums">
+                <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
                   {ALL_SCOREBOARD_CALCULATORS.length} Escores Monográficos
                 </span>
                 {activeHospitalBed && onReturnToHospitalBed && (
                   <button
                     type="button"
                     onClick={() => onReturnToHospitalBed(activeHospitalBed.id)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1 text-xs font-bold text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition-colors cursor-pointer clinical-tabular-nums"
+                    className="inline-flex items-center gap-1 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition-colors cursor-pointer clinical-tabular-nums"
                     title={`Retornar diretamente ao prontuário do Leito ${activeHospitalBed.wardAndBed}`}
                   >
-                    <Icon name="arrow_back" className="text-sm" />
+                    <Icon name="arrow_back" size={12} />
                     <span>Voltar ao Leito {activeHospitalBed.wardAndBed}</span>
                   </button>
                 )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Estratificação multissistêmica em tempo real, Radar Fisiológico SVG 60fps, Drogas Vasoativas em BIC, EPARADA (ACLS/PALS) e Rastreio INCA/MS integrados à prescrição e ao Editor A4.
-              </p>
+              <nav aria-label="Caminho de navegação" className="mt-0.5">
+                <ol role="list" className="breadcrumbsList">
+                  <li>
+                    <a
+                      href="#scoreboard-catalog"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setTabMode('CATALOG');
+                      }}
+                    >
+                      Escores Clínicos
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#scoreboard-block"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setTabMode('CATALOG');
+                      }}
+                    >
+                      {activeCalculator.categoryName || 'Escores Clínicos'}
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={`#calc-${activeCalculator.id}`}
+                      aria-current="page"
+                      onClick={(e) => e.preventDefault()}
+                    >
+                      {activeCalculator.acronym}
+                    </a>
+                  </li>
+                </ol>
+              </nav>
             </div>
           </div>
 
           {/* Navegação Segmentada da Bancada */}
-          <div className="flex flex-wrap items-center gap-1.5 rounded-2xl nav-segmented-track p-1">
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-1 rounded-xl nav-segmented-track p-1 shrink-0">
             <button
               type="button"
               onClick={() => setTabMode('CALCULATOR')}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-lg h-8 px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'CALCULATOR'
-                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300'
+                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              <Icon name="calculate" className="text-sm" />
-              Calculadora Ativa ({activeCalculator.acronym})
+              <Icon name="calculate" size={14} />
+              <span>Calculadora ({activeCalculator.acronym})</span>
             </button>
             <button
               type="button"
               onClick={() => setTabMode('CATALOG')}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-lg h-8 px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'CATALOG'
-                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300'
+                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              <Icon name="apps" className="text-sm" />
-              Catálogo A–Z ({ALL_SCOREBOARD_CALCULATORS.length})
+              <Icon name="apps" size={14} />
+              <span>Catálogo ({ALL_SCOREBOARD_CALCULATORS.length})</span>
             </button>
             <button
               type="button"
               onClick={() => setTabMode('BIC_DVA')}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-lg h-8 px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'BIC_DVA'
-                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300'
+                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              <Icon name="Vaccines" className="text-sm" />
-              Drogas Vasoativas (BIC)
+              <Icon name="Vaccines" size={14} />
+              <span>Drogas Vasoativas (BIC)</span>
             </button>
             <button
               type="button"
               onClick={() => setTabMode('EPARADA_ONCO')}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-lg h-8 px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'EPARADA_ONCO'
-                  ? 'bg-red-600 text-white shadow-xs'
+                  ? 'bg-red-600 text-white shadow-xs font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              <Icon name="emergency" className="text-sm" />
-              EPARADA & Rastreio INCA
+              <Icon name="emergency" size={14} />
+              <span>EPARADA & INCA</span>
             </button>
           </div>
         </div>
 
-        {/* Barra de Acesso Rápido (Quick-Pins Favoritos) */}
-        <div className="flex flex-wrap items-center gap-1.5 border-t border-subtle dark:border-strong pt-2.5">
-          <span className="mr-1 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            <Icon name="star" className="text-xs text-amber-500" />
-            Acesso Rápido:
-          </span>
-          {quickPinManifestItems.map((pin) => {
-            const isActive =
-              tabMode === 'CALCULATOR' && activeCalculator.id === pin.id;
-            return (
-              <button
-                key={pin.id}
-                type="button"
-                onClick={() => handleSelectScore(pin.id)}
-                className={`rounded-lg border px-2.5 py-1 font-mono text-xs font-semibold transition-colors cursor-pointer ${
-                  isActive
-                    ? 'border-blue-600 bg-blue-600 text-white'
-                    : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-blue-400'
-                }`}
-              >
-                {pin.acronym}
-              </button>
-            );
-          })}
-          <button
-            type="button"
-            onClick={() => setTabMode('CATALOG')}
-            className="ml-auto inline-flex items-center gap-1 rounded-lg border border-blue-500/30 bg-blue-50/70 dark:bg-blue-950/30 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-100 cursor-pointer"
-          >
-            <Icon name="search" className="text-xs" />
-            Buscar entre {ALL_SCOREBOARD_CALCULATORS.length} Escores
-          </button>
+        {/* Barra de Acesso Rápido (Quick-Pins Favoritos) em Linha Única */}
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 border-t border-subtle dark:border-strong pt-2">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0 flex-1 py-0.5">
+            <span className="mr-1 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] shrink-0">
+              <Icon name="star" size={12} className="text-amber-500" />
+              Rápido:
+            </span>
+            {quickPinManifestItems.map((pin) => {
+              const isActive =
+                tabMode === 'CALCULATOR' && activeCalculator.id === pin.id;
+              return (
+                <button
+                  key={pin.id}
+                  type="button"
+                  onClick={() => handleSelectScore(pin.id)}
+                  className={`rounded-lg border h-7 px-2 font-mono text-[11px] font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                    isActive
+                      ? 'border-navy-900 bg-navy-900 dark:border-sky-500/30 dark:bg-[#0369A1] text-white'
+                      : 'border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.08]'
+                  }`}
+                >
+                  {pin.acronym}
+                </button>
+              );
+            })}
+          </div>
 
-          {hospitalBeds.length > 0 && activeHospitalBed && onSelectHospitalBed ? (
-            <div className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1 text-xs font-bold text-sky-800 dark:text-sky-200">
-              <Icon name="local_hospital" size={14} className="text-sky-600 dark:text-sky-400" />
-              <label htmlFor="scoreboard-top-bed-select" className="sr-only">
-                Leito Hospitalar Vinculado (MOD-03)
-              </label>
-              <select
-                id="scoreboard-top-bed-select"
-                value={activeHospitalBed.id}
-                onChange={(e) => onSelectHospitalBed(e.target.value)}
-                className="bg-transparent font-mono text-xs font-bold focus:outline-none cursor-pointer clinical-tabular-nums"
-              >
-                {hospitalBeds.map((b) => (
-                  <option key={b.id} value={b.id} className="text-slate-900">
-                    Leito {b.wardAndBed} — {b.patientNameOrInitials || 'Sem ID'}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : null}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {hospitalBeds.length > 0 && activeHospitalBed && onSelectHospitalBed ? (
+              <div className="inline-flex items-center gap-1 rounded-lg border border-sky-500/25 bg-sky-500/10 h-7 px-2 text-[11px] font-semibold text-sky-800 dark:text-sky-200">
+                <Icon name="local_hospital" size={13} className="text-sky-600 dark:text-sky-400 shrink-0" />
+                <label htmlFor="scoreboard-top-bed-select" className="sr-only">
+                  Leito Hospitalar Vinculado (MOD-03)
+                </label>
+                <select
+                  id="scoreboard-top-bed-select"
+                  value={activeHospitalBed.id}
+                  onChange={(e) => onSelectHospitalBed(e.target.value)}
+                  className="bg-transparent font-mono text-[11px] font-semibold focus:outline-none cursor-pointer clinical-tabular-nums max-w-44 truncate"
+                >
+                  {hospitalBeds.map((b) => (
+                    <option key={b.id} value={b.id} className="text-slate-900">
+                      Leito {b.wardAndBed} — {b.patientNameOrInitials || 'Sem ID'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={() => setTabMode('CATALOG')}
+              className="inline-flex items-center gap-1 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] h-7 px-2.5 text-[11px] font-semibold text-[var(--text-main)] cursor-pointer whitespace-nowrap"
+            >
+              <Icon name="search" size={13} className="text-sky-600 dark:text-sky-400" />
+              <span>Buscar ({ALL_SCOREBOARD_CALCULATORS.length})</span>
+            </button>
+          </div>
         </div>
       </div>
 

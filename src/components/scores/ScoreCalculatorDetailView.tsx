@@ -244,78 +244,80 @@ export const ScoreCalculatorDetailView: React.FC<
   return (
     <div className="flex flex-col gap-4 sm:gap-5" data-state="idle" aria-busy={false}>
       {/* Banner de Cabeçalho e Pontuação em Tempo Real */}
-      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md bg-blue-600/10 dark:bg-blue-500/20 px-2.5 py-0.5 font-mono text-xs font-bold text-blue-700 dark:text-blue-300">
+      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300">
                 {calculator.acronym}
               </span>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              <span className="text-[11px] font-medium text-[var(--text-muted)] truncate max-w-md">
                 {calculator.categoryName ?? calculator.category} •{' '}
                 {calculator.moduleName ?? calculator.subcategory}
               </span>
-              <button
-                type="button"
-                onClick={() => onToggleFavorite(calculator.id)}
-                title={
-                  isFavorite
-                    ? 'Remover dos Favoritos Rápidos'
-                    : 'Fixar nos Favoritos Rápidos'
-                }
-                aria-label={
-                  isFavorite
-                    ? `Remover ${calculator.acronym} dos favoritos`
-                    : `Fixar ${calculator.acronym} nos favoritos`
-                }
-                className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold transition-colors cursor-pointer ${
-                  isFavorite
-                    ? 'border-amber-500/40 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
-                    : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Icon name="star" className="text-xs" />
-                {isFavorite ? 'Fixado' : 'Fixar'}
-              </button>
-              <button
-                type="button"
-                onClick={handleResetBaseline}
-                className="inline-flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-2 py-0.5 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
-              >
-                <Icon name="restart_alt" className="text-xs" />
-                Zerar Basal
-              </button>
+              <div className="inline-flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => onToggleFavorite(calculator.id)}
+                  title={
+                    isFavorite
+                      ? 'Remover dos Favoritos Rápidos'
+                      : 'Fixar nos Favoritos Rápidos'
+                  }
+                  aria-label={
+                    isFavorite
+                      ? `Remover ${calculator.acronym} dos favoritos`
+                      : `Fixar ${calculator.acronym} nos favoritos`
+                  }
+                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+                    isFavorite
+                      ? 'border-amber-500/40 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
+                      : 'border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  }`}
+                >
+                  <Icon name="star" size={12} />
+                  <span>{isFavorite ? 'Fixado' : 'Fixar'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetBaseline}
+                  className="inline-flex items-center gap-1 rounded-md border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
+                >
+                  <Icon name="restart_alt" size={12} />
+                  <span>Zerar Basal</span>
+                </button>
+              </div>
             </div>
 
-            <h2 className="mt-1.5 text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="mt-1 text-sm sm:text-base font-semibold tracking-tight text-[var(--text-main)]">
               {calculator.name}
             </h2>
-            <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+            <p className="mt-0.5 text-xs leading-snug text-[var(--text-muted)] line-clamp-2">
               {calculator.summary}
             </p>
           </div>
 
           <div
-            className={`flex min-w-56 flex-col items-end justify-between rounded-xl border px-4 py-3 ${SEVERITY_BADGE_CLASSES[activeTier.severityLevel]}`}
+            className={`flex min-w-44 sm:min-w-48 flex-col items-end justify-between rounded-xl border px-3.5 py-2.5 shrink-0 ${SEVERITY_BADGE_CLASSES[activeTier.severityLevel]}`}
           >
-            <div className="flex w-full items-center justify-between gap-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider opacity-85">
+            <div className="flex w-full items-center justify-between gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider opacity-85">
                 Escore Calculado
               </span>
-              <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[11px] uppercase clinical-tabular-nums">
+              <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[10px] uppercase clinical-tabular-nums">
                 Faixa: {calculator.minPossibleScore} a{' '}
                 {calculator.maxPossibleScore}
               </span>
             </div>
-            <div className="my-1 flex items-baseline gap-1.5">
-              <span className="font-mono text-3xl font-black tracking-tight clinical-tabular-nums">
+            <div className="my-0.5 flex items-baseline gap-1">
+              <span className="font-mono text-2xl font-extrabold tracking-tight clinical-tabular-nums">
                 {result.scoreFormatted}
               </span>
-              <span className="font-mono text-xs opacity-80 clinical-unit">
+              <span className="font-mono text-[11px] opacity-80 clinical-unit">
                 pts
               </span>
             </div>
-            <div className="text-right text-xs font-bold leading-tight">
+            <div className="text-right text-[11px] font-semibold leading-tight">
               {activeTier.label}
             </div>
           </div>

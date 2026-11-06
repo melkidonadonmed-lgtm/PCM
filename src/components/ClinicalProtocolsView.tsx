@@ -190,37 +190,25 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
   return (
     <div data-state="idle" aria-busy={false} id="clinical-protocols-section" className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
       {/* Top Banner */}
-      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white"
-            style={{
-              backgroundColor: darkMode ? '#155E75' : '#0E7490',
-              border: '1px solid rgba(255, 255, 255, 0.12)'
-            }}
-          >
-            <Icon name="stethoscope" className="text-[20px] text-slate-100" />
+      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+            <Icon name="stethoscope" size={16} />
           </div>
-          <div>
-            <h2 className="text-base sm:text-lg font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
               Protocolos clínicos por patologia
             </h2>
-            <p className="text-xs font-medium text-[var(--text-muted)]">
-              Condutas de 1ª linha acionáveis • dose pediátrica calculada para <span className="text-emerald-700 dark:text-emerald-400 font-semibold clinical-tabular-nums">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
+            <p className="text-[11px] font-medium text-[var(--text-muted)] truncate">
+              Condutas de 1ª linha • Peso: <span className="text-emerald-700 dark:text-emerald-400 font-semibold clinical-tabular-nums">{patientWeight > 0 ? `${patientWeight} kg` : 'não informado'}</span>
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <div 
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border tactile-flat"
-            style={{
-              backgroundColor: 'var(--surface-inset)',
-              borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-            }}
-          >
-            <Icon name="calculate" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
-            <span className="text-xs font-semibold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 self-start sm:self-auto shrink-0">
+          <div className="h-8 px-2.5 rounded-lg border border-subtle/80 dark:border-white/10 bg-[var(--surface-inset)] flex items-center gap-1.5">
+            <Icon name="calculate" size={14} className="text-emerald-700 dark:text-emerald-400" />
+            <span className="text-xs font-medium text-[var(--text-main)]">
               Peso: <span className="text-emerald-700 dark:text-emerald-400 font-bold clinical-tabular-nums">{patientWeight > 0 ? `${patientWeight} kg` : '—'}</span>
             </span>
           </div>
@@ -229,20 +217,20 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
             <button
               type="button"
               onClick={onNavigateToScores}
-              className="px-3.5 py-2 min-h-[44px] rounded-xl border border-blue-500/40 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 flex items-center justify-center gap-2 text-xs font-bold cursor-pointer whitespace-nowrap hover:bg-blue-100"
+              className="btn-tactile-secondary h-8 min-h-[32px] px-3 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap"
             >
-              <Icon name="monitor_heart" className="text-[16px]" />
-              <span>Escores Clínicos & BIC (114)</span>
+              <Icon name="monitor_heart" size={14} className="text-sky-600 dark:text-sky-400" />
+              <span>Escores & BIC (114)</span>
             </button>
           ) : null}
 
           <button
             type="button"
             onClick={onNavigateToPrescription}
-            className="tactile-btn-primary px-4 py-2 min-h-[44px] flex items-center justify-center gap-2 text-xs font-bold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+            className="btn-tactile-primary h-8 min-h-[32px] px-3.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
           >
             <span>Ir para receita</span>
-            <Icon name="arrow_forward" className="text-[16px]" />
+            <Icon name="arrow_forward" size={14} />
           </button>
         </div>
       </div>

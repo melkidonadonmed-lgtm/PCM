@@ -143,34 +143,30 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       className={`@container w-full flex flex-col gap-4 sm:gap-5 ${isDrawer ? 'max-w-full' : 'max-w-7xl mx-auto'}`}
     >
       {/* Top Controller: Weight Hero Tactile Card */}
-      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong relative overflow-hidden w-full">
-        <div className="flex flex-col @4xl:flex-row @4xl:items-center justify-between gap-3 sm:gap-6">
+      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong relative overflow-hidden w-full">
+        <div className="flex flex-col @3xl:flex-row @3xl:items-center justify-between gap-3">
           {/* Left: Info */}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span 
-                className="p-1.5 sm:p-2 rounded-xl text-white flex-shrink-0 bg-emerald-700 dark:bg-emerald-800 border border-white/12 flex items-center justify-center"
-              >
-                <Icon name="calculate" className="text-[18px] sm:text-[20px] text-slate-100" />
-              </span>
-              <h2 className="text-sm sm:text-lg font-semibold tracking-tight text-[var(--text-main)]">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <span className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <Icon name="calculate" size={16} />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
                 Calculadora de doses pediátricas
               </h2>
+              <p className="text-[11px] font-medium leading-snug text-[var(--text-muted)] truncate">
+                Paciente: <span className="text-sky-600 dark:text-sky-400 font-semibold">{patientName}</span>
+              </p>
             </div>
-            <p className="text-xs font-medium leading-snug text-[var(--text-muted)]">
-              Paciente: <span className="text-sky-600 dark:text-sky-400 font-semibold">{patientName}</span> • cálculo automático em mg, mL e gotas.
-            </p>
           </div>
 
-          {/* Right: Interactive Weight Stepper & Display (Ergonomic & Touch-friendly) */}
-          <div 
-            className="flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-2xl border w-full @4xl:w-auto flex-shrink-0 tactile-flat bg-[var(--surface-inset)] border-[var(--border-subtle)] clinical-tabular-nums"
-          >
+          {/* Right: Interactive Weight Stepper & Display (Compact & Ergonomic) */}
+          <div className="flex items-center justify-between sm:justify-center gap-1.5 px-2 py-1.5 rounded-xl border w-full @3xl:w-auto shrink-0 tactile-flat bg-[var(--surface-inset)] border-[var(--border-subtle)] clinical-tabular-nums">
             <button
               type="button"
               onClick={() => handleWeightDirectChange(Math.max(0, +(patientWeight - 1).toFixed(1)))}
               aria-label="Diminuir 1 kg"
-              className="w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl font-extrabold text-xs sm:text-sm flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
+              className="h-8 min-w-[36px] px-2 rounded-lg font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
               title="Diminuir 1 kg"
             >
               -1
@@ -179,21 +175,21 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               type="button"
               onClick={() => handleWeightDirectChange(Math.max(0, +(patientWeight - 0.5).toFixed(1)))}
               aria-label="Diminuir 0,5 kg"
-              className="w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
+              className="h-8 min-w-[36px] px-2 rounded-lg font-semibold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
               title="Diminuir 0.5 kg"
             >
               -0.5
             </button>
 
             {/* Bloco do Peso com Rótulo Associado */}
-            <div className="px-1.5 sm:px-3 text-center min-w-[80px] sm:min-w-[96px]">
-              <label 
+            <div className="px-2 text-center min-w-[88px]">
+              <label
                 htmlFor="peso-paciente"
-                className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 block cursor-pointer whitespace-nowrap"
+                className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block cursor-pointer whitespace-nowrap"
               >
                 Peso atual (kg)
               </label>
-              <div className="flex items-baseline justify-center gap-0.5 sm:gap-1 clinical-tabular-nums">
+              <div className="flex items-baseline justify-center gap-1 clinical-tabular-nums">
                 <input
                   id="peso-paciente"
                   ref={weightInputRef}
@@ -210,9 +206,9 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                     onUpdatePatientWeight(Number.isNaN(parsed) || parsed < 0 ? 0 : parsed);
                   }}
                   onBlur={() => setWeightDraft(null)}
-                  className="w-14 sm:w-20 font-black text-xl sm:text-2xl text-center bg-transparent border-b-2 border-slate-300 dark:border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-sky-500 text-sky-700 dark:text-sky-400 rounded clinical-tabular-nums"
+                  className="w-16 sm:w-20 font-bold text-sm sm:text-base text-center bg-transparent border-b border-slate-300 dark:border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-sky-500 text-sky-700 dark:text-sky-400 placeholder:text-xs placeholder:font-normal placeholder:text-[var(--text-placeholder)] rounded clinical-tabular-nums"
                 />
-                <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 clinical-unit">kg</span>
+                <span className="text-[11px] font-semibold text-[var(--text-muted)] clinical-unit">kg</span>
               </div>
             </div>
 
@@ -220,7 +216,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               type="button"
               onClick={() => handleWeightDirectChange(Math.min(120, +(patientWeight + 0.5).toFixed(1)))}
               aria-label="Aumentar 0,5 kg"
-              className="w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
+              className="h-8 min-w-[36px] px-2 rounded-lg font-semibold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
               title="Aumentar 0.5 kg"
             >
               +0.5
@@ -229,7 +225,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               type="button"
               onClick={() => handleWeightDirectChange(Math.min(120, +(patientWeight + 1).toFixed(1)))}
               aria-label="Aumentar 1 kg"
-              className="w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl font-extrabold text-xs sm:text-sm flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
+              className="h-8 min-w-[36px] px-2 rounded-lg font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
               title="Aumentar 1 kg"
             >
               +1
@@ -238,19 +234,19 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         </div>
 
         {/* Quick Weight Range Presets */}
-        <div className="mt-2.5 pt-2.5 border-t flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-0.5 max-w-full scrollbar-none fade-scroll-x" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)' }}>
-          <span className="text-xs font-bold whitespace-nowrap text-[var(--text-muted)] dark:text-slate-400 flex items-center gap-1 flex-shrink-0">
-            <Icon name="calculate" className="text-[16px] text-sky-500" /> Faixas:
+        <div className="mt-2.5 pt-2 border-t border-subtle dark:border-strong flex items-center gap-1.5 overflow-x-auto pb-0.5 max-w-full scrollbar-none fade-scroll-x">
+          <span className="text-[11px] font-semibold whitespace-nowrap text-[var(--text-muted)] flex items-center gap-1 shrink-0 mr-0.5">
+            <Icon name="calculate" size={14} className="text-sky-500" /> Faixas:
           </span>
           {weightPresets.map((p) => (
             <button
               key={p.label}
               type="button"
               onClick={() => handleWeightDirectChange(p.weight)}
-              className={`text-xs px-3 py-1.5 min-h-[40px] sm:min-h-[40px] rounded-xl border font-semibold whitespace-nowrap transition cursor-pointer flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums ${
+              className={`text-[11px] h-7 min-h-[28px] px-2.5 rounded-lg border font-medium whitespace-nowrap transition cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums ${
                 patientWeight === p.weight
-                  ? 'bg-navy-900 text-white dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/30 shadow-sm'
-                  : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
+                  ? 'bg-navy-900 text-white dark:bg-[#0369A1] border-navy-900 dark:border-sky-500/30 shadow-xs font-semibold'
+                  : 'bg-slate-50/80 text-slate-700 border-subtle/80 hover:bg-slate-100 dark:bg-white/[0.04] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.08]'
               }`}
             >
               {p.label}
