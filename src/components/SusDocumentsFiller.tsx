@@ -562,7 +562,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       data-state={isExportingPdf ? 'loading' : 'idle'}
       aria-busy={isExportingPdf}
       id="sus-documents-filler-hub"
-      className="space-y-4"
+      className="flex flex-col gap-4 sm:gap-5"
     >
       {/* Toast Notification */}
       {toastMessage && (
@@ -594,15 +594,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
 
       {/* VISÃO 2: FORMULÁRIO UNIFICADO DE PREENCHIMENTO */}
       {viewMode === 'form' && (
-        <div className="space-y-5 animate-tab-fade">
+        <div className="flex flex-col gap-4 sm:gap-5 animate-tab-fade">
           {/* Barra Superior do Formulário */}
-          <div
-            className="tactile-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            style={{
-              backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-            }}
-          >
+          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -653,9 +647,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             )}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 xl:gap-5 items-start">
             {/* Coluna da Esquerda: Formulário de Preenchimento (7 Colunas) */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className="lg:col-span-7 flex flex-col gap-4">
               <SusCommonIdentityFields
                 darkMode={darkMode}
                 doctor={doctor}
@@ -677,15 +671,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
             </div>
 
             {/* Coluna da Direita: Pré-visualização da Folha Oficial SUS e Ações de Emissão (5 Colunas) */}
-            <div className="lg:col-span-5 space-y-3">
+            <div className="lg:col-span-5 flex flex-col gap-3.5">
               {/* Barra de Ações Enxuta */}
-              <div
-                className="tactile-card p-2.5 rounded-2xl border flex flex-col gap-2"
-                style={{
-                  backgroundColor: 'var(--surface-card)',
-                  borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-                }}
-              >
+              <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-2.5">
                 {pendenciasClinicas.length > 0 && (
                   <p
                     role="status"

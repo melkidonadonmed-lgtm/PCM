@@ -69,11 +69,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
     <div
       data-state="idle"
       aria-busy={false}
-      className="tactile-card p-4 rounded-2xl border"
-      style={{
-        backgroundColor: darkMode ? 'var(--surface-card)' : '#FFFFFF',
-        borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-      }}
+      className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong"
     >
       <datalist id="sus-cid10-datalist">
         {COMMON_CID10.map((item) => (

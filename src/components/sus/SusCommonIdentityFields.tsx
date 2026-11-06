@@ -45,11 +45,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
       <div
         data-state="idle"
         aria-busy={false}
-        className="tactile-card p-4 rounded-2xl border"
-        style={{
-          backgroundColor: darkMode ? 'var(--surface-card)' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-        }}
+        className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
@@ -220,13 +216,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
       </div>
 
       {/* CARD 2: DADOS DO PACIENTE COM DESTAQUE EM CAMPOS FALTANTES */}
-      <div
-        className="tactile-card p-4 rounded-2xl border"
-        style={{
-          backgroundColor: darkMode ? 'var(--surface-card)' : '#FFFFFF',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-        }}
-      >
+      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-[var(--border-subtle)] pb-2.5">
           <div className="flex items-center gap-2">
             <Icon name="person" className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />

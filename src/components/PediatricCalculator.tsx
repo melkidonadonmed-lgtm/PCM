@@ -140,16 +140,10 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       data-state={patientWeight <= 0 ? 'error' : 'idle'}
       aria-busy={false}
       id="pediatric-calculator-section"
-      className="@container w-full max-w-full space-y-4 sm:space-y-5"
+      className={`@container w-full flex flex-col gap-4 sm:gap-5 ${isDrawer ? 'max-w-full' : 'max-w-7xl mx-auto'}`}
     >
       {/* Top Controller: Weight Hero Tactile Card */}
-      <div 
-        className="tactile-card p-3 sm:p-5 rounded-2xl relative overflow-hidden w-full"
-        style={{
-          backgroundColor: 'var(--surface-card)',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-        }}
-      >
+      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong relative overflow-hidden w-full">
         <div className="flex flex-col @4xl:flex-row @4xl:items-center justify-between gap-3 sm:gap-6">
           {/* Left: Info */}
           <div className="min-w-0 flex-1">
@@ -339,10 +333,8 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       )}
 
       {/* Medications Table / Cards Container */}
-      <div 
-        className="tactile-card rounded-2xl overflow-hidden"
-      >
-        <div className="p-3.5 sm:p-4 border-b flex items-center justify-between" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+      <div className="cq-card card-surface surface-card-minimal !p-0 rounded-2xl border border-subtle dark:border-strong overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-subtle dark:border-strong flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400" />
             <h3 className="font-semibold text-xs sm:text-sm clinical-tabular-nums" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>

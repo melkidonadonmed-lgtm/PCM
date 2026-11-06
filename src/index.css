@@ -41,6 +41,12 @@
   --shadow-tactile-card-dark: 0 12px 30px -4px rgba(0, 0, 0, 0.5), 0 4px 8px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --shadow-tactile-inset-dark: inset 0 2px 5px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(0, 0, 0, 0.35);
   --shadow-tactile-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+
+  /* Elevações Multicamadas em OKLCH (Umbra + Penumbra + Catch-Light Especular) */
+  --shadow-elevation-low: var(--elevation-low);
+  --shadow-elevation-medium: var(--elevation-medium);
+  --shadow-elevation-high: var(--elevation-high);
+  --shadow-inset-sunken: var(--shadow-inset-sunken);
 }
 
 @layer base {
@@ -445,20 +451,32 @@
      COMPONENTES DE INTERFACE & ELEMENTOS TÁTEIS MINIMALISTAS (98/2)
      ========================================================================== */
 
+  .page-shell-container {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gutter, 1.25rem);
+  }
+
+  .section-flow-root {
+    display: flow-root;
+  }
+
   .card,
   .surface-card-minimal {
     background-color: var(--surface-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-2xl);
-    box-shadow:
-      0 2px 12px -2px rgba(15, 23, 42, 0.05),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
-    transition: background-color 0.3s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: var(--elevation-low);
+    transition: background-color 0.25s ease, border-color 0.22s ease, box-shadow 0.25s var(--ease-spring);
   }
 
   .dark .card,
   .dark .surface-card-minimal {
-    box-shadow: var(--shadow-projected), var(--tactile-card-bevel);
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
   }
 
   .chip-neutral {
@@ -587,17 +605,19 @@
   }
 
   .tactile-card {
-    background-color: var(--bg-surface);
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: var(--shadow-projected), var(--tactile-card-bevel);
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--elevation-low);
     border-radius: var(--radius-2xl);
-    padding: 1.5rem;
+    padding: var(--card-padding, 1.25rem);
     position: relative;
     overflow: hidden;
     isolation: isolate;
-    transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                border-color 0.22s ease;
+    container-type: inline-size;
+    transition: box-shadow 0.25s var(--ease-spring),
+                transform 0.25s var(--ease-spring),
+                border-color 0.22s ease,
+                background-color 0.25s ease;
   }
 
   .tactile-card::after {
@@ -612,8 +632,9 @@
   }
 
   .dark .tactile-card {
-    background-color: var(--bg-surface);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background-color: var(--surface-card);
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
   }
 
   .dark .tactile-card::after {
@@ -625,19 +646,20 @@
 
   /* 3. Z-2 Interactive Elevated Cards & Controls */
   .tactile-card-interactive {
-    background-color: #FFFFFF;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: var(--shadow-card-projected), var(--bevel-tactile-card);
-    border-radius: 18px;
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--elevation-low);
+    border-radius: var(--radius-2xl);
     cursor: pointer;
     position: relative;
     overflow: hidden;
     isolation: isolate;
     touch-action: manipulation;
     user-select: none;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
-                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
-                border-color 0.18s ease;
+    transition: transform 0.22s var(--ease-spring),
+                box-shadow 0.22s var(--ease-spring),
+                border-color 0.18s ease,
+                background-color 0.22s ease;
   }
 
   .tactile-card-interactive::after {
@@ -652,34 +674,45 @@
   }
 
   .dark .tactile-card-interactive {
-    background-color: #141A26;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background-color: var(--surface-card);
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
   }
 
   .dark .tactile-card-interactive::after {
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   }
 
   @media (hover: hover) and (pointer: fine) {
     .tactile-card-interactive:hover {
-      transform: translate3d(0, -4px, 0);
+      transform: translate3d(0, -2px, 0);
       border-color: var(--border-medium);
-      box-shadow: var(--shadow-card-hover), var(--bevel-tactile-card);
+      box-shadow: var(--elevation-medium);
     }
   }
 
   .tactile-card-interactive:active {
-    transform: translate3d(0, 1px, 0);
-    box-shadow: var(--elevation-z0);
+    transform: translate3d(0, 0, 0);
+    box-shadow: var(--elevation-low);
+  }
+
+  .tactile-card-interactive:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
   }
 
   /* Utilitários Canônicos Táteis (DESIGN.md v4.5-soft) */
   .ui-card-soft {
-    background-color: var(--surface-flat);
+    background-color: var(--surface-card);
     border: 1px solid var(--border-subtle);
-    box-shadow: var(--shadow-projected), var(--tactile-card-bevel);
-    border-radius: var(--radius-lg);
-    transition: box-shadow 0.25s var(--ease-spring), transform 0.25s var(--ease-spring);
+    box-shadow: var(--elevation-low);
+    border-radius: var(--radius-2xl);
+    transition: box-shadow 0.25s var(--ease-spring), transform 0.25s var(--ease-spring), border-color 0.22s ease;
+  }
+
+  .dark .ui-card-soft {
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
   }
 
   .ui-btn-tactile {
@@ -697,7 +730,7 @@
 
   .surface-inset {
     background-color: var(--surface-inset);
-    box-shadow: var(--elevation-z0);
+    box-shadow: var(--shadow-inset-sunken, var(--elevation-z0));
   }
 
   .panel-navy .surface-inset,
@@ -746,15 +779,14 @@
   .card-surface {
     background-color: var(--surface-card);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-xl);
-    box-shadow:
-      0 2px 12px -2px rgba(15, 23, 42, 0.05),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
-    transition: background-color 0.3s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--elevation-low);
+    transition: background-color 0.25s ease, border-color 0.22s ease, box-shadow 0.25s var(--ease-spring);
   }
 
   .dark .card-surface {
-    box-shadow: var(--shadow-projected), var(--tactile-card-bevel);
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
   }
   .folha-a4-shadow {
     box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.1), 0 6px 12px -3px rgba(15, 23, 42, 0.04);

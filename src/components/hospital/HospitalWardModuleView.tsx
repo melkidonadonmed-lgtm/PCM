@@ -174,9 +174,9 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
   const suggestedNextBedCode = `110-${beds.length + 15}`;
 
   return (
-    <div id="hospital-ward-module-root" data-state="idle" aria-busy={false} className="space-y-4">
+    <div id="hospital-ward-module-root" data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
       {/* Cabeçalho Principal do Módulo Hospitalar */}
-      <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5 space-y-3.5">
+      <section className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-3.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <span className="w-10 h-10 rounded-xl bg-sky-600/15 border border-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">

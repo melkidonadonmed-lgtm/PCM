@@ -178,13 +178,13 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
   return (
     <section
-      className="space-y-4"
+      className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5"
       aria-label="Módulo de Escores Clínicos e Ferramentas de Apoio"
       aria-busy={false}
       data-state="idle"
     >
       {/* Cabeçalho da Bancada Scoreboard CDSS */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 shadow-xs space-y-2.5">
+      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-3">
         <nav aria-label="Caminho de navegação">
           <ol role="list" className="breadcrumbsList">
             <li>
@@ -253,14 +253,14 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
           </div>
 
           {/* Navegação Segmentada da Bancada */}
-          <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 p-1">
+          <div className="flex flex-wrap items-center gap-1.5 rounded-2xl nav-segmented-track p-1">
             <button
               type="button"
               onClick={() => setTabMode('CALCULATOR')}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                 tabMode === 'CALCULATOR'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
               <Icon name="calculate" className="text-sm" />
@@ -269,10 +269,10 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setTabMode('CATALOG')}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                 tabMode === 'CATALOG'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
               <Icon name="apps" className="text-sm" />
@@ -281,10 +281,10 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setTabMode('BIC_DVA')}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                 tabMode === 'BIC_DVA'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
               <Icon name="Vaccines" className="text-sm" />
@@ -293,10 +293,10 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setTabMode('EPARADA_ONCO')}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                 tabMode === 'EPARADA_ONCO'
                   ? 'bg-red-600 text-white shadow-xs'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
               <Icon name="emergency" className="text-sm" />
@@ -306,7 +306,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
         </div>
 
         {/* Barra de Acesso Rápido (Quick-Pins Favoritos) */}
-        <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-slate-200 dark:border-slate-700 pt-2.5">
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-subtle dark:border-strong pt-2.5">
           <span className="mr-1 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             <Icon name="star" className="text-xs text-amber-500" />
             Acesso Rápido:
@@ -385,8 +385,8 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
       {/* ABA 2: Catálogo Completo (114 Escores) */}
       {tabMode === 'CATALOG' ? (
-        <div className="space-y-4">
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 space-y-3">
+        <div className="flex flex-col gap-4">
+          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[240px]">
                 <Icon
@@ -443,13 +443,13 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3.5 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredManifest.map((item) => {
               const isFav = favoriteSet.has(item.id);
               return (
                 <div
                   key={item.id}
-                  className="flex flex-col justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-3.5 transition hover:border-blue-500/60 hover:shadow-xs"
+                  className="cq-card card-surface surface-card-minimal flex flex-col justify-between rounded-2xl border border-subtle dark:border-strong p-4 transition hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-elevation-medium"
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2">
@@ -511,8 +511,8 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
       {/* ABA 3: Bancada Dedicada de Drogas Vasoativas em BIC */}
       {tabMode === 'BIC_DVA' ? (
-        <div className="space-y-4">
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-col gap-4">
+          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
                 Bancada de Titulação de Drogas Vasoativas em Bomba de Infusão Contínua (BIC)

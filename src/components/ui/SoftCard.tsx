@@ -15,10 +15,10 @@ export const SoftCard: React.FC<SoftCardProps> = ({
 }) => {
   const variantClass =
     variant === 'inset'
-      ? 'surface-inset'
+      ? 'surface-inset border border-subtle dark:border-strong rounded-2xl'
       : variant === 'raised'
-        ? 'surface-raised ui-card-soft'
-        : 'ui-card-soft';
+        ? 'cq-card card-surface surface-raised ui-card-soft rounded-2xl border border-subtle dark:border-strong'
+        : 'cq-card card-surface ui-card-soft rounded-2xl border border-subtle dark:border-strong';
 
   return (
     <div

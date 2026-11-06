@@ -29,15 +29,9 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
   onStartFillingMultiple,
 }) => {
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-4">
       {/* Barra Compacta de Cabeçalho, Busca e Filtros */}
-      <div
-        className="tactile-card p-3 sm:p-3.5 rounded-2xl border space-y-2.5"
-        style={{
-          backgroundColor: 'var(--surface-card)',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-        }}
-      >
+      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-[#0369A1] border border-white/12 shadow-tactile-sm shrink-0">
@@ -126,7 +120,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
       </div>
 
       {/* Grid Compacto de Documentos Oficiais do SUS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
         {filteredCatalog.map((doc) => {
           const isSelected = selectedDocIds.includes(doc.id);
           const isOfficialForm = Boolean(formularioOficialDe(doc.id));
@@ -142,14 +136,11 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
                   onStartFillingSingle(doc.id);
                 }
               }}
-              className={`tactile-card-interactive rounded-xl px-3 py-2.5 flex items-start gap-2.5 border relative group cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+              className={`cq-card tactile-card-interactive rounded-2xl p-3.5 sm:p-4 flex items-start gap-3 border relative group cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 isSelected
-                  ? 'border-sky-500/50 dark:border-sky-400/40 bg-sky-50/70 dark:bg-[#27354A] shadow-tactile-sm'
-                  : 'hover:border-slate-300 dark:hover:border-white/15'
+                  ? 'border-sky-500/50 dark:border-sky-400/40 bg-sky-50/70 dark:bg-[#27354A] shadow-elevation-medium'
+                  : 'border-subtle dark:border-strong hover:border-slate-300 dark:hover:border-white/20'
               }`}
-              style={{
-                backgroundColor: isSelected ? undefined : darkMode ? 'var(--surface-card)' : '#FFFFFF',
-              }}
             >
               {/* Checkbox de Seleção Múltipla */}
               <button

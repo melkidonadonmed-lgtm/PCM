@@ -570,7 +570,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
   };
 
   return (
-    <div data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto space-y-5 surface-raised">
+    <div data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5 surface-raised">
       
       {/* Top Mobile View Switcher em Trilho Segmentado Esculpido */}
       <div className="flex md:hidden items-center justify-between p-1 rounded-2xl nav-segmented-track gap-1">
@@ -604,7 +604,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-5 items-start">
         
         {/* LEFT COLUMN: Composer, Search and Prescribed Items */}
-        <div className={`xl:col-span-7 space-y-4 ${mobileSection === 'preview' ? 'hidden md:block' : 'block'}`}>
+        <div className={`xl:col-span-7 flex flex-col gap-4 ${mobileSection === 'preview' ? 'hidden md:flex' : 'flex'}`}>
           
           {/* Card 1: Identificação rápida do paciente */}
           <PatientQuickCard

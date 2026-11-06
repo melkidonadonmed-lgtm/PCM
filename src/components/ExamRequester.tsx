@@ -144,32 +144,23 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   }, [selectedCategory, searchTerm]);
 
   return (
-    <div data-state="idle" aria-busy={false} id="exam-requester-section" className="space-y-3 sm:space-y-4">
+    <div data-state="idle" aria-busy={false} id="exam-requester-section" className="flex flex-col gap-4 sm:gap-5">
       {/* Top Header Card Compacto */}
-      <div
-        className="tactile-card p-3 sm:p-3.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
-        style={{
-          backgroundColor: 'var(--surface-card)',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-        }}
-      >
+      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white bg-navy-900 dark:bg-sky-600 border border-white/12 shadow-sm shrink-0">
             <Icon name="science" size={16} className="text-slate-100" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2
-                className="text-sm sm:text-base font-bold truncate"
-                style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}
-              >
+              <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] truncate">
                 Solicitação de exames complementares
               </h2>
               <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 dark:bg-[#27354A] dark:text-slate-200 border border-slate-300 dark:border-white/10 font-semibold clinical-tabular-nums">
                 {selectedExams.length} selecionado(s)
               </span>
             </div>
-            <p className="text-[11px] font-medium truncate" style={{ color: darkMode ? '#8E9CAE' : '#64748B' }}>
+            <p className="text-[11px] font-medium text-[var(--text-muted)] truncate">
               Marque exames individuais na lista abaixo ou aplique um kit pronto pelo menu.
             </p>
           </div>
@@ -186,17 +177,11 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       </div>
 
       {/* Main Grid: Catálogo Individual & Menu de Kits à Esquerda (2 Cols) + Pedido & Indicação à Direita (1 Col) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-5 items-start">
         {/* Left 2 Cols: Exam Catalog Matrix + Kits Dropdown Menu */}
-        <div className="lg:col-span-2 space-y-2.5">
+        <div className="lg:col-span-2 flex flex-col gap-4">
           {/* Barra de Seleção Individual + Menu Retrátil de Kits/Painéis */}
-          <div
-            className="tactile-card p-3 rounded-2xl border space-y-2.5"
-            style={{
-              backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-            }}
-          >
+          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-300">
                 <Icon name="fact_check" size={15} className="text-sky-600 dark:text-sky-400 shrink-0" />
@@ -380,11 +365,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             tabIndex={0}
             role="region"
             aria-label="Lista de exames"
-            className="tactile-card p-2.5 rounded-2xl max-h-96 sm:max-h-120 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
-            style={{
-              backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-            }}
+            className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong max-h-96 sm:max-h-120 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
           >
             {filteredCatalog.map((exam) => {
               const selected = isExamSelected(exam.id);
@@ -443,15 +424,9 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         </div>
 
         {/* Right Col: Indicação Clínica + Exames Selecionados no Pedido */}
-        <div className="space-y-3">
+        <div className="flex flex-col gap-4">
           {/* Indicação Clínica */}
-          <div
-            className="tactile-card p-3 rounded-2xl border"
-            style={{
-              backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-            }}
-          >
+          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong">
             <label
               htmlFor="exam-clinical-indication"
               className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400 mb-1.5"
@@ -464,26 +439,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               value={clinicalIndication}
               onChange={(e) => onUpdateClinicalIndication(e.target.value)}
               placeholder="Ex.: Investigação de síndrome febril aguda, controle de rotina..."
-              className="w-full px-3 py-2 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+              className="w-full h-9 px-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
             />
           </div>
 
           {/* Bandeja de Exames Selecionados */}
-          <div
-            className="tactile-card p-3 sm:p-3.5 rounded-2xl flex flex-col h-fit space-y-2.5"
-            style={{
-              backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-            }}
-          >
-            <div
-              className="flex items-center justify-between border-b pb-2"
-              style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}
-            >
-              <h3
-                className="font-semibold text-xs sm:text-sm flex items-center gap-2"
-                style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}
-              >
+          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col h-fit gap-3">
+            <div className="flex items-center justify-between border-b border-subtle dark:border-strong pb-2.5">
+              <h3 className="font-semibold text-xs sm:text-sm text-[var(--text-main)] flex items-center gap-2">
                 <Icon name="fact_check" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
                 Exames no pedido ({selectedExams.length})
               </h3>
@@ -504,21 +467,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 <strong>Kits e painéis prontos</strong>.
               </div>
             ) : (
-              <div className="space-y-1 max-h-80 overflow-y-auto">
+              <div className="flex flex-col gap-1.5 max-h-80 overflow-y-auto">
                 {selectedExams.map((exam, index) => (
                   <div
                     key={exam.id}
-                    className="px-2.5 py-1.5 rounded-xl border flex items-center justify-between gap-2 tactile-flat"
-                    style={{
-                      backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--bg-app)',
-                      borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
-                    }}
+                    className="px-3 py-2 rounded-xl border border-subtle dark:border-strong bg-[var(--surface-inset)] flex items-center justify-between gap-2"
                   >
                     <div className="min-w-0 flex-1">
-                      <div
-                        className="text-xs font-semibold truncate"
-                        style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}
-                      >
+                      <div className="text-xs font-semibold text-[var(--text-main)] truncate">
                         {index + 1}. {exam.name}
                       </div>
                       <span className="text-[11px] text-[var(--text-muted)] dark:text-slate-400 font-medium">
@@ -540,10 +496,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
             )}
 
             {selectedExams.length > 0 && (
-              <div
-                className="pt-2 border-t space-y-2"
-                style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}
-              >
+              <div className="pt-2.5 border-t border-subtle dark:border-strong flex flex-col gap-2">
                 <button
                   type="button"
                   onClick={onNavigateToPrint}

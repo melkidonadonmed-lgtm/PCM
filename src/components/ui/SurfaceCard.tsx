@@ -4,6 +4,8 @@ import type { UIState } from '../../types/index';
 
 export type { UIState };
 export type SurfaceVariant = 'surface' | 'elevated' | 'inset' | 'contrast';
+export type ElevationLevel = 'low' | 'medium' | 'high' | 'none';
+export type CardPaddingMode = 'default' | 'compact' | 'none';
 
 export interface SurfaceCardProps extends React.HTMLAttributes<HTMLElement> {
   as?: 'section' | 'article' | 'div';
@@ -11,6 +13,8 @@ export interface SurfaceCardProps extends React.HTMLAttributes<HTMLElement> {
   eyebrow?: string;
   colSpan?: 3 | 4 | 5 | 6 | 7 | 8 | 12;
   variant?: SurfaceVariant;
+  elevation?: ElevationLevel;
+  padding?: CardPaddingMode;
   state?: UIState;
   isLoading?: boolean;
   error?: string | null;
@@ -28,12 +32,27 @@ const COL_SPAN_MAP: Record<NonNullable<SurfaceCardProps['colSpan']>, string> = {
   12: 'col-span-12',
 };
 
+const ELEVATION_CLASS_MAP: Record<ElevationLevel, string> = {
+  low: 'shadow-elevation-low',
+  medium: 'shadow-elevation-medium',
+  high: 'shadow-elevation-high',
+  none: 'shadow-none',
+};
+
+const PADDING_CLASS_MAP: Record<CardPaddingMode, string> = {
+  default: 'p-4 sm:p-5',
+  compact: 'p-3 sm:p-4',
+  none: 'p-0',
+};
+
 export const SurfaceCard: React.FC<SurfaceCardProps> = ({
   as: Component = 'article',
   title,
   eyebrow,
   colSpan,
   variant = 'surface',
+  elevation = 'low',
+  padding = 'default',
   state,
   isLoading = false,
   error = null,
@@ -47,25 +66,29 @@ export const SurfaceCard: React.FC<SurfaceCardProps> = ({
     state ?? (error ? 'error' : isLoading ? 'loading' : 'idle');
 
   const spanClass = colSpan ? COL_SPAN_MAP[colSpan] : '';
+  const elevationClass = variant === 'inset' ? '' : ELEVATION_CLASS_MAP[elevation];
+  const paddingClass = PADDING_CLASS_MAP[padding];
   const variantClass =
     variant === 'inset'
       ? 'surface-inset border border-subtle dark:border-strong rounded-2xl'
       : variant === 'elevated'
-        ? 'tactile-card surface-raised rounded-2xl'
+        ? 'card-surface surface-raised rounded-2xl border border-subtle dark:border-strong'
         : variant === 'contrast'
           ? 'panel-navy rounded-2xl border'
           : interactive
-            ? 'tactile-card-interactive rounded-2xl'
-            : 'tactile-card rounded-2xl';
+            ? 'tactile-card-interactive rounded-2xl border border-subtle dark:border-strong'
+            : 'card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong';
 
   return (
     <Component
       data-purpose={PRESCMED_TOKENS.purpose}
       data-variant={variant}
+      data-elevation={elevation}
       data-state={resolvedState}
       aria-busy={resolvedState === 'loading'}
       aria-label={title || rest['aria-label']}
-      className={`cq-card ${variantClass} ${spanClass} ${className}`.trim()}
+      tabIndex={interactive && rest.tabIndex === undefined ? 0 : rest.tabIndex}
+      className={`cq-card ${variantClass} ${elevationClass} ${paddingClass} ${spanClass} ${className}`.trim()}
       {...rest}
     >
       {(title || eyebrow || headerRight) && (

@@ -522,7 +522,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   return (
-    <div className={`flex flex-col gap-2.5 mx-auto w-full pb-16 transition ${pageOrientation === 'landscape' ? 'max-w-7xl' : 'max-w-5xl'}`} onClick={() => setLogoSelected(false)}>
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-3.5 sm:gap-4 pb-16 transition" onClick={() => setLogoSelected(false)}>
       {/* Toast Feedback */}
       {toastMessage && (
         <div

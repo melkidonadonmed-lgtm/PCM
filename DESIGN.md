@@ -364,7 +364,11 @@ A arquitetura espacial separa rigorosamente **Macrolayouts** (casca da página) 
 
 - **Propriedades Lógicas Internacionais**: Prefira `inline-size`, `block-size`, `max-inline-size`, `padding-inline`, `padding-block`, `margin-inline`, `margin-block` e `inset-inline-start` em vez de propriedades físicas legadas.
 - **Dynamic Viewport Height (`100dvh`)**: Toda casca de tela cheia e gaveta móvel utiliza `min-block-size: 100dvh` (ou `h-dvh`), adaptando-se às barras retráteis de navegadores mobile e ao modo instalado PWA (`@media (display-mode: standalone)`).
-- **Anti-Colapso de Margem**: Contêineres de seção aplicam `display: flow-root` (criando um *Block Formatting Context* limpo), espaçamento entre irmãos é governado por `gap` no elemento pai Flex/Grid e blocos editoriais usam o seletor coruja (`.prose > * + * { margin-block-start: var(--flow-space, 1.25em); }`).
+- **Anti-Colapso de Margem**: Contêineres de seção aplicam `display: flow-root` (criando um *Block Formatting Context* limpo), espaçamento entre irmãos é governado por `gap` no elemento pai Flex/Grid (`w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5`) e blocos editoriais usam o seletor coruja (`.prose > * + * { margin-block-start: var(--flow-space, 1.25em); }`).
+- **Tokens Semânticos de Espaçamento de Box (`.card-surface` / `.tactile-card`)**:
+  - `--card-padding: clamp(1rem, 1.5vw, 1.25rem)` (`p-4 sm:p-5`, unificando todas as abas ao ritmo da página inicial `PrescriptionBuilder`).
+  - `--grid-gutter: clamp(1rem, 1.5vw, 1.25rem)` (`gap-4 xl:gap-5`).
+  - `--form-gap: 0.75rem` (`gap-3`).
 
 ### 2. Macrolayouts (`CSS Grid` + `@media`) vs. Microlayouts Autônomos (`@container`)
 
@@ -452,7 +456,8 @@ A profundidade visual rejeita sombras lavadas de camada única e aplica **Físic
   --elevation-low: var(--shadow-elevation-1);
   --elevation-medium: var(--shadow-elevation-2);
   --elevation-high: var(--shadow-elevation-3);
-  --sunken-recess: var(--shadow-inset);
+  --shadow-inset-sunken: var(--shadow-inset);
+  --sunken-recess: var(--shadow-inset-sunken);
 }
 
 @media (prefers-color-scheme: dark) {

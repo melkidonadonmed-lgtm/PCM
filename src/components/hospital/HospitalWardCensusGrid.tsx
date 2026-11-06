@@ -69,10 +69,10 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
       data-state="idle"
       aria-busy={false}
       aria-label="Mapa de Leitos e Censo da Enfermaria"
-      className="space-y-4"
+      className="flex flex-col gap-4 sm:gap-5"
     >
       {/* Barra de Filtro por Setor e Busca Rápida no Censo */}
-      <div className="card-surface rounded-2xl border border-[var(--border-subtle)] p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none flex items-center">
             <Icon name="search" size={16} />
@@ -126,7 +126,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
       </div>
 
       {/* Grade de Cards de Leitos + Card de Nova Admissão */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5 items-stretch">
         {/* Card de Admissão Guiada de Novo Paciente */}
         <div className="rounded-2xl border-2 border-dashed border-sky-500/40 bg-sky-500/[0.03] hover:bg-sky-500/[0.06] transition p-4 sm:p-5 flex flex-col justify-between gap-4">
           <div className="space-y-2">
@@ -183,10 +183,10 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
             <article
               key={bed.id}
               aria-label={`Leito ${bed.wardAndBed} — ${bed.patientNameOrInitials || 'Sem identificação'}`}
-              className={`card-surface rounded-2xl border p-4 sm:p-5 flex flex-col justify-between gap-3.5 transition ${
+              className={`cq-card card-surface surface-card-minimal rounded-2xl border p-4 sm:p-5 flex flex-col justify-between gap-3.5 transition ${
                 isSelected
-                  ? 'border-sky-500/60 ring-1 ring-sky-500/25'
-                  : 'border-[var(--border-subtle)]'
+                  ? 'border-sky-500/60 ring-1 ring-sky-500/25 shadow-elevation-medium'
+                  : 'border-subtle dark:border-strong'
               }`}
             >
               <div className="space-y-2.5">

@@ -149,14 +149,16 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
   return (
     <SurfaceCard
       as="div"
+      padding="none"
+      elevation="none"
       state={hubState}
       data-state={hasPatient ? 'success' : 'empty'}
       aria-busy={false}
       id="clinical-documents-hub"
-      className="max-w-7xl mx-auto space-y-4 sm:space-y-5 !p-0 !bg-transparent !border-none !shadow-none"
+      className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5 !p-0 !bg-transparent !border-none !shadow-none"
     >
       {/* Barra de Navegação Superior em Trilho Segmentado Esculpido */}
-      <SoftCard variant="flat" className="card-surface p-2.5 sm:p-3.5 rounded-2xl border border-subtle dark:border-strong flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      <SoftCard variant="flat" className="card-surface p-3 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* Identificação do Contexto Clínico em 3 Níveis (Squint Test) */}
         <div className="flex items-center gap-3 px-1.5 min-w-0">
           <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${

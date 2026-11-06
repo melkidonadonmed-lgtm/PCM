@@ -41,7 +41,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
       variant="flat"
       state="idle"
       aria-label="Resumo rápido de prontidão da consulta"
-      className={`px-2.5 sm:px-3 py-1.5 sm:py-2 mb-2.5 sm:mb-3 rounded-2xl flex items-center justify-between gap-2 no-print overflow-x-auto scrollbar-none ${
+      className={`w-full max-w-7xl mx-auto px-3 sm:px-4 py-2 mb-3.5 sm:mb-4 rounded-2xl flex items-center justify-between gap-2 no-print overflow-x-auto scrollbar-none ${
         hideRedundantDesktop ? 'lg:hidden' : ''
       }`}
     >

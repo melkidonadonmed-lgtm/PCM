@@ -188,15 +188,9 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
   };
 
   return (
-    <div data-state="idle" aria-busy={false} id="clinical-protocols-section" className="space-y-4 sm:space-y-5">
+    <div data-state="idle" aria-busy={false} id="clinical-protocols-section" className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
       {/* Top Banner */}
-      <div 
-        className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-        style={{
-          backgroundColor: 'var(--surface-card)',
-          borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-        }}
-      >
+      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div 
             className="w-10 h-10 rounded-xl flex items-center justify-center text-white"
@@ -312,18 +306,14 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
       </div>
 
       {/* Pathology Decks Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5">
         {filteredProtocols.map((protocol) => {
           const isAdded = addedProtocolsMap[protocol.id];
 
           return (
             <div
               key={protocol.id}
-              className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between space-y-3.5"
-              style={{
-                backgroundColor: 'var(--surface-card)',
-                borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-              }}
+              className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col justify-between gap-3.5"
             >
               {/* Card Header */}
               <div>
@@ -352,13 +342,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               </div>
 
               {/* Medications List with Individual Add Actions */}
-              <div 
-                className="rounded-xl border divide-y tactile-flat"
-                style={{
-                  backgroundColor: 'var(--surface-inset)',
-                  borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-                }}
-              >
+              <div className="rounded-xl border border-subtle dark:border-strong divide-y divide-[var(--border-subtle)] surface-inset">
                 {protocol.medications.map((med, idx) => {
                   const isMedAdded = addedProtocolsMap[`${protocol.id}-med-${idx}`];
                   const isPed = !!med.pediatricMedId;
@@ -514,13 +498,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
         </div>
 
         {/* Lista dos UNIFIED_MEDICATIONS da categoria escolhida */}
-        <div 
-          className="rounded-2xl border divide-y tactile-flat overflow-hidden"
-          style={{
-            backgroundColor: 'var(--surface-card)',
-            borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-          }}
-        >
+        <div className="cq-card card-surface surface-card-minimal !p-0 rounded-2xl border border-subtle dark:border-strong divide-y divide-[var(--border-subtle)] overflow-hidden">
           {filteredUnifiedMeds.map((med) => (
             <div
               key={med.id}
@@ -586,7 +564,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-5">
           {CLINICAL_PROTOCOLS.map((protocol) => {
             const hasWeight = patientWeight > 0;
             const calc = hasWeight ? protocol.calculateVolume(patientWeight) : null;
@@ -598,11 +576,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
             return (
               <div
                 key={protocol.id}
-                className="tactile-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between space-y-3.5 relative overflow-hidden"
-                style={{
-                  backgroundColor: 'var(--surface-card)',
-                  borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-                }}
+                className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col justify-between gap-3.5 relative overflow-hidden"
               >
                 {/* Card Header */}
                 <div>
@@ -629,13 +603,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
 
                 {/* Volume / Dose Result Highlight */}
                 {calc ? (
-                  <div 
-                    className="p-3.5 rounded-xl border space-y-1 text-center tactile-flat"
-                    style={{
-                      backgroundColor: 'var(--surface-inset)',
-                      borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-                    }}
-                  >
+                  <div className="p-3.5 rounded-xl border border-subtle dark:border-strong space-y-1 text-center surface-inset">
                     <span className="text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-300 tracking-wider block clinical-tabular-nums">
                       Volume Calculado ({patientWeight} kg):
                     </span>

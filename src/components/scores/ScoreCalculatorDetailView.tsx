@@ -242,9 +242,9 @@ export const ScoreCalculatorDetailView: React.FC<
   };
 
   return (
-    <div className="space-y-4" data-state="idle" aria-busy={false}>
+    <div className="flex flex-col gap-4 sm:gap-5" data-state="idle" aria-busy={false}>
       {/* Banner de Cabeçalho e Pontuação em Tempo Real */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 shadow-xs">
+      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -350,10 +350,10 @@ export const ScoreCalculatorDetailView: React.FC<
       </div>
 
       {/* Grid Principal: Parâmetros + Condutas (Esquerda) | Radar + Exportação (Direita) */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <div className="space-y-4 lg:col-span-7">
+      <div className="grid grid-cols-1 gap-4 xl:gap-5 lg:grid-cols-12 items-start">
+        <div className="flex flex-col gap-4 lg:col-span-7">
           {/* Parâmetros Clínicos */}
-          <div className="space-y-2.5">
+          <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between px-1">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                 1. Parâmetros Clínicos à Beira do Leito ({sortedGroups.length}{' '}
@@ -375,8 +375,8 @@ export const ScoreCalculatorDetailView: React.FC<
           </div>
 
           {/* Conduta e Intervenção */}
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 space-y-4">
-            <div className="border-b border-slate-200 dark:border-slate-700 pb-3">
+          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-4">
+            <div className="border-b border-subtle dark:border-strong pb-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
                   2. Estratificação de Risco e Plano Terapêutico Imediato
@@ -558,8 +558,8 @@ export const ScoreCalculatorDetailView: React.FC<
         </div>
 
         {/* Coluna Direita: Radar Fisiológico + Faixas + Exportação PEP/SBAR/A4 */}
-        <div className="space-y-4 lg:col-span-5">
-          <div className="sticky top-4 space-y-4">
+        <div className="flex flex-col gap-4 lg:col-span-5">
+          <div className="sticky top-4 flex flex-col gap-4">
             <ScorePhysiologicalRadar
               axes={calculator.radarAxes}
               values={result.radarValues}
@@ -568,8 +568,8 @@ export const ScoreCalculatorDetailView: React.FC<
             />
 
             {/* Matriz de Faixas de Risco */}
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-3.5">
-              <h4 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5">
+              <h4 className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Matriz de Estratificação do Escore
               </h4>
               <div className="space-y-1.5">
@@ -578,10 +578,10 @@ export const ScoreCalculatorDetailView: React.FC<
                   return (
                     <div
                       key={tier.id}
-                      className={`flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-xs ${
+                      className={`flex items-center justify-between rounded-xl border px-3 py-1.5 text-xs ${
                         isActive
                           ? SEVERITY_BADGE_CLASSES[tier.severityLevel]
-                          : 'border-slate-200 dark:border-slate-700/70 bg-slate-50/50 dark:bg-slate-900/40 text-slate-500 dark:text-slate-400'
+                          : 'border-subtle dark:border-strong bg-[var(--surface-inset)] text-slate-500 dark:text-slate-400'
                       }`}
                     >
                       <span className="font-medium">{tier.label}</span>
@@ -597,7 +597,7 @@ export const ScoreCalculatorDetailView: React.FC<
             </div>
 
             {/* Hub de Exportação SOAP / SBAR / Editor A4 */}
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-3.5 space-y-3">
+            <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                   Exportação Prontuário (PEP / SBAR / Editor A4)

@@ -374,16 +374,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
       {/* ATESTADO MÉDICO FORM */}
       {currentSubTab === 'certificate' && (
-        <div className="space-y-4">
-          <div 
-            className="tactile-card p-4 sm:p-5 md:p-6 rounded-2xl space-y-5"
-            style={{
-              backgroundColor: 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-            }}
-          >
+        <div className="flex flex-col gap-4">
+          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-4">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-subtle dark:border-strong pb-3.5">
               <div className="flex items-center gap-3">
                 <div 
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-navy-900 dark:bg-sky-600 border border-white/12"
@@ -537,11 +531,9 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             </div>
 
             {/* CID-10 Section with Search Autocomplete Integration */}
-            <div 
-              className="p-4 sm:p-5 rounded-2xl border space-y-4 bg-slate-50/70 dark:bg-[var(--surface-inset)] border-subtle dark:border-white/10"
-            >
+            <div className="surface-inset p-4 rounded-xl border border-subtle dark:border-strong flex flex-col gap-3.5">
               {/* Checkbox toggle */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-subtle dark:border-strong">
                 <div className="flex items-center gap-2.5">
                   <input
                     type="checkbox"
@@ -550,7 +542,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     onChange={(e) => onUpdateCertificate({ ...certificate, includeCID: e.target.checked })}
                     className="w-4 h-4 rounded text-sky-700 focus:ring-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer"
                   />
-                  <label htmlFor="toggle-include-cid" className="text-xs sm:text-sm font-bold cursor-pointer select-none" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                  <label htmlFor="toggle-include-cid" className="text-xs sm:text-sm font-bold text-[var(--text-main)] cursor-pointer select-none">
                     Incluir Código CID-10 no Atestado
                   </label>
                 </div>
@@ -562,7 +554,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               </div>
 
               {certificate.includeCID ? (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-3.5">
                   {/* Intelligent CID Search & Auto-Fill Component */}
                   <CidSearchBar
                     darkMode={darkMode}
@@ -587,12 +579,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                         value={certificate.cid10Code || ''}
                         onChange={(e) => onUpdateCertificate({ ...certificate, cid10Code: e.target.value.toUpperCase() })}
                         placeholder="Ex.: J00"
-                        className="w-full p-2.5 rounded-xl border text-xs sm:text-sm font-mono font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center clinical-tabular-nums"
-                        style={{
-                          backgroundColor: 'var(--surface-card)',
-                          borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
-                          color: darkMode ? '#388EE6' : '#0369A1'
-                        }}
+                        className="w-full h-9 px-2.5 rounded-xl border border-subtle dark:border-strong bg-[var(--surface-card)] text-sky-700 dark:text-sky-400 text-xs sm:text-sm font-mono font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center clinical-tabular-nums"
                       />
                     </div>
 
@@ -605,12 +592,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                         value={certificate.cid10Description || ''}
                         onChange={(e) => onUpdateCertificate({ ...certificate, cid10Description: e.target.value })}
                         placeholder="Ex.: Nasofaringite aguda (resfriado comum)..."
-                        className="w-full p-2.5 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
-                        style={{
-                          backgroundColor: 'var(--surface-card)',
-                          borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
-                          color: darkMode ? '#F1F5F9' : '#0F172A'
-                        }}
+                        className="w-full h-9 px-3 rounded-xl border border-subtle dark:border-strong bg-[var(--surface-card)] text-[var(--text-main)] text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                       />
                     </div>
                   </div>
@@ -643,20 +625,16 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
 
       {/* ENCAMINHAMENTO MÉDICO FORM */}
       {currentSubTab === 'referral' && (
-        <div className="space-y-4">
-          <div 
-            className="tactile-card p-4 sm:p-5 md:p-6 rounded-2xl space-y-5"
-          >
+        <div className="flex flex-col gap-4">
+          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-4">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-subtle dark:border-strong pb-3.5">
               <div className="flex items-center gap-3">
-                <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-emerald-700 dark:bg-emerald-800 border border-white/12"
-                >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm bg-emerald-700 dark:bg-emerald-800 border border-white/12">
                   <Share2 className="w-5 h-5 text-slate-100" strokeWidth={1.75} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base sm:text-lg" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                  <h3 className="font-bold text-base sm:text-lg text-[var(--text-main)]">
                     Guia de Encaminhamento & Referência Especializada
                   </h3>
                 </div>
@@ -698,7 +676,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             </div>
 
             {/* Patient data for Referral */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
               <div>
                 <label htmlFor="referral-patient-name" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <User className="w-3.5 h-3.5 text-[var(--text-muted)] dark:text-slate-400" />
@@ -710,7 +688,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   value={patient?.name ?? referral.patientName ?? ''}
                   onChange={(e) => handlePatientNameChange(e.target.value)}
                   placeholder="Ex.: Maria de Oliveira Santos"
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+                  className="w-full h-9 px-3 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                 />
               </div>
 
@@ -725,13 +703,13 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   value={patient?.documentNumber ?? referral.documentNumber ?? ''}
                   onChange={(e) => handlePatientDocChange(e.target.value)}
                   placeholder="Ex.: 000.000.000-00"
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+                  className="w-full h-9 px-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
                 />
               </div>
             </div>
 
             {/* Specialty & Destination */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
               <div>
                 <label htmlFor="referral-destination-specialty" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 flex items-center gap-1">
                   <Stethoscope className="w-3.5 h-3.5 text-emerald-500" />
@@ -742,7 +720,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   aria-label="Especialidade de destino"
                   value={referral.destinationSpecialty}
                   onChange={(e) => onUpdateReferral({ ...referral, destinationSpecialty: e.target.value })}
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input cursor-pointer"
+                  className="w-full h-9 px-2.5 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input cursor-pointer"
                 >
                   {specialtiesList.map((s) => (
                     <option key={s} value={s}>{s}</option>
@@ -761,7 +739,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   value={referral.destinationInstitution || ''}
                   onChange={(e) => onUpdateReferral({ ...referral, destinationInstitution: e.target.value })}
                   placeholder="Ex.: Ambulatório de Especialidades / HU..."
-                  className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+                  className="w-full h-9 px-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
                 />
               </div>
 
@@ -773,7 +751,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                       key={p}
                       type="button"
                       onClick={() => onUpdateReferral({ ...referral, priority: p })}
-                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold capitalize border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                      className={`flex-1 h-9 rounded-xl text-xs font-bold capitalize border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                         referral.priority === p
                           ? 'bg-navy-900 dark:bg-[#0369A1] text-white border-transparent shadow-sm'
                           : 'bg-slate-100 dark:bg-[#27354A] text-slate-600 dark:text-slate-300 border-slate-300 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-[#334155]'
@@ -795,7 +773,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 value={referral.reason}
                 onChange={(e) => onUpdateReferral({ ...referral, reason: e.target.value })}
                 placeholder="Ex.: Avaliação especializada e conduta terapêutica..."
-                className="w-full p-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+                className="w-full h-9 px-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
               />
             </div>
 
@@ -811,7 +789,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="referral-relevant-exams" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1">Exames Relevantes Realizados</label>
                 <textarea
@@ -840,13 +818,11 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             </div>
 
             {/* Integrated CID-10 Finder for Referral / Encaminhamento */}
-            <div 
-              className="p-4 sm:p-5 rounded-2xl border space-y-3.5 bg-slate-50/70 dark:bg-[var(--surface-inset)] border-subtle dark:border-white/10"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b pb-2.5" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }}>
+            <div className="surface-inset p-4 rounded-xl border border-subtle dark:border-strong flex flex-col gap-3.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-subtle dark:border-strong pb-2.5">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-emerald-500" />
-                  <h4 className="text-xs sm:text-sm font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                  <h4 className="text-xs sm:text-sm font-bold text-[var(--text-main)]">
                     Buscador de CID-10 para Encaminhamento
                   </h4>
                 </div>
