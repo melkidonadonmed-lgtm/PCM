@@ -30,7 +30,8 @@
 
 ## Implantação e Qualidade
 - **Produção:** https://precmed.web.app *(Firebase Hosting → Cloud Run `prescmed` em `southamerica-east1`, https://prescmed-syqnqsm4iq-rj.a.run.app)*
-- **Qualidade:** `241/241` testes em `26` suítes Vitest (`100.0/100` Nível 4 Determinístico) · `tsc --noEmit` limpo (`0 any`) · `npm run design:lint` limpo (`0 erros`) · `audit_tactile_ui.py` `100.0/100.0 [PASS]`.
+- **Qualidade:** `259/259` testes em `27` suítes Vitest (`100.0/100` Nível 4 Determinístico) · `tsc --noEmit` limpo (`0 any`) · `npm run design:lint` limpo (`0 erros`) · `audit_tactile_ui.py` `100.0/100.0 [PASS]`.
+- **Emissão Direta na Bancada A4 (`08/11/2026`):** O botão `Imprimir / Gerar PDF` na aba principal (`PrescriptionBuilder.tsx` + `PrescriptionPreviewColumn.tsx` + `folhaA4.ts`) agora aciona `prepararRaizDeImpressao` + `window.print()` diretamente sobre a folha `#printable-a4-sheet` da bancada, sem abrir a aba redundante `print_preview` (já que o botão `Editor de Folha A4` fica imediatamente ao lado). Removido também o item redundante `Imprimir / PDF` da barra lateral (`Sidebar.tsx`).
 
 ## Pendências (Backlog Opcional / Revisão Humana)
 1. **APAC (Conferência Regulatória Local):** Validar o impresso nacional (matriz SES/RS, 55 campos) junto à regulação local (SESAU-RO / SEMUSA) quanto aos campos administrativos deixados em branco para preenchimento manual (campos 4, 11, 12, 15 e 21–35).

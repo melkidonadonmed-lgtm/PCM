@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ActiveTab, DoctorProfile, Patient, PrescriptionItem } from '../types';
 import { AcoesDaReceita } from '../components/AcoesDaReceita';
+import { acionarImpressaoDiretaDaBancada } from '../components/PrescriptionBuilder';
 import { PrintPreview } from '../components/PrintPreview';
 import { DocumentoClinico } from '../components/documento/DocumentoClinico';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
@@ -136,6 +137,39 @@ describe('Governança de Rotas e Navegação do Editor', () => {
     expect(copyIdx).toBeGreaterThan(whatsappIdx);
     expect(htmlReady).toContain('btn-tactile-primary');
     expect(htmlReady).toContain('btn-tactile-secondary');
+  });
+
+  it('deve acionar impressão direta na bancada da aba principal sem abrir a aba print_preview quando a folha A4 está presente', () => {
+    const fallbackNavigate = vi.fn();
+    const printSpy = vi.fn();
+
+    const fakeFolha = {
+      classList: {
+        contains: () => false
+      },
+      cloneNode: () => ({
+        removeAttribute: vi.fn(),
+        classList: {
+          add: vi.fn(),
+          remove: vi.fn()
+        },
+        style: {
+          setProperty: vi.fn()
+        },
+        querySelectorAll: () => []
+      }),
+      querySelectorAll: () => []
+    } as unknown as HTMLElement;
+
+    const resultadoDireto = acionarImpressaoDiretaDaBancada(fakeFolha, fallbackNavigate, printSpy);
+    expect(resultadoDireto).toBe('printed');
+    expect(printSpy).toHaveBeenCalledTimes(1);
+    expect(fallbackNavigate).not.toHaveBeenCalled();
+
+    // Caso adversarial: sem folha montada no DOM, cai para o fallback de navegação
+    const resultadoFallback = acionarImpressaoDiretaDaBancada(null, fallbackNavigate, printSpy);
+    expect(resultadoFallback).toBe('fallback');
+    expect(fallbackNavigate).toHaveBeenCalledTimes(1);
   });
 
   it('deve formatar a sincronização clínica dos medicamentos para a folha A4 e fazer roundtrip via parsePrescriptionHtmlToItems', () => {

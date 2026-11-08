@@ -151,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  // Grupo 1: Atendimento Clínico Principal (5 Destinos Canônicos)
+  // Grupo 1: Atendimento Clínico Principal (4 Destinos Canônicos)
   const coreHubNavItems: SidebarNavItem[] = [
     {
       id: 'prescription',
@@ -185,13 +185,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       shortLabel: 'Editor',
       iconName: 'editor',
       shortcut: 'Alt+5'
-    },
-    {
-      id: 'print_preview',
-      label: 'Imprimir / PDF',
-      fullLabel: 'Exportar & Imprimir PDF',
-      shortLabel: 'Exportar',
-      iconName: 'imprimir'
     }
   ];
 

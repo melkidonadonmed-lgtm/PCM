@@ -151,3 +151,27 @@ export function prepararRaizDeImpressao(folha: HTMLElement | null, orientacao: O
   document.body.classList.add(CLASSE_IMPRIMINDO);
 }
 
+/**
+ * Aciona a impressão nativa (`window.print()`) diretamente sobre a folha A4 da bancada
+ * da aba principal (`#printable-a4-sheet`), sem trocar para outra aba (`print_preview`).
+ * Usa `fallbackNavigateToPrint` apenas se não houver folha montada no DOM ou `window.print` indisponível.
+ */
+export function acionarImpressaoDiretaDaBancada(
+  folha: HTMLElement | null,
+  fallbackNavigateToPrint?: () => void,
+  printFn?: () => void
+): 'printed' | 'fallback' {
+  const triggerPrint =
+    printFn ?? (typeof window !== 'undefined' && typeof window.print === 'function' ? () => window.print() : null);
+
+  if (folha && triggerPrint) {
+    prepararRaizDeImpressao(folha, 'landscape');
+    triggerPrint();
+    return 'printed';
+  }
+
+  fallbackNavigateToPrint?.();
+  return 'fallback';
+}
+
+

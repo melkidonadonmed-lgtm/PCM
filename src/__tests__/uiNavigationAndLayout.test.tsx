@@ -234,6 +234,7 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlExpanded).not.toContain('Toque para editar dados ou peso');
     expect(htmlExpanded).not.toContain('active:scale-[0.98]');
     expect(htmlExpanded).not.toContain('active:scale-[0.99]');
+    expect(htmlExpanded).not.toContain('Imprimir / PDF');
 
     const htmlExpandedEmptyIdentity = renderToStaticMarkup(
       <Sidebar

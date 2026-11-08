@@ -5,6 +5,7 @@ import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../data/medicationDataba
 import { medicoConfigurado } from '../utils/medicoConfigurado';
 import { classificarReceita, type RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import { DOCUMENTO_DO_REGIME, separarPorRegime, type TipoDocumento } from '../utils/documentoClinico';
+import { acionarImpressaoDiretaDaBancada } from '../utils/folhaA4';
 import { notificacaoExigida } from '../utils/notificacaoDeReceita';
 import {
   calcularPrescricaoRapida,
@@ -73,6 +74,8 @@ export function resolveMedicationKeyAction(
 
   return { type: 'none' };
 }
+
+export { acionarImpressaoDiretaDaBancada };
 
 /** Como cada tipo de receita é apresentado na tela e no texto compartilhado. */
 const REGIME_INFO: Record<RegimeReceita, { rotulo: string; detalhe: string; tituloTexto: string }> = {
@@ -144,6 +147,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const pediatricDrawerRef = useRef<HTMLDivElement>(null);
+  const folhaPreviewRef = useRef<HTMLDivElement>(null);
 
   // Mobile active tab ('composer' | 'preview')
   const [mobileSection, setMobileSection] = useState<'composer' | 'preview'>('composer');
@@ -238,7 +242,16 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         : (regimesComItens[0] ?? 'simples');
   const itemsInPreview = porRegime[regimeAtivo];
 
-  const handlePrintClick = () => onNavigateToPrint(DOCUMENTO_DO_REGIME[regimeAtivo]);
+  const handlePrintClick = () => {
+    const folha =
+      folhaPreviewRef.current ??
+      (typeof document !== 'undefined'
+        ? (document.getElementById('printable-a4-sheet') as HTMLDivElement | null)
+        : null);
+    acionarImpressaoDiretaDaBancada(folha, () =>
+      onNavigateToPrint(DOCUMENTO_DO_REGIME[regimeAtivo])
+    );
+  };
 
   // Medicamento em digitação que só é dispensado com Notificação de Receita (talonário próprio)
   const notificacaoDoFormulario = notificacaoExigida(selectedMedName);
@@ -732,6 +745,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
           copiedSuccess={copiedSuccess}
           isPediatricDrawerOpen={isPediatricDrawerOpen}
           pediatricDrawerRef={pediatricDrawerRef}
+          folhaRef={folhaPreviewRef}
           onSelectPreviewRegime={setPreviewRegime}
           onNavigateToPrint={handlePrintClick}
           onNavigateToEditor={onNavigateToEditor}

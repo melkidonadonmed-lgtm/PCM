@@ -26,6 +26,7 @@ interface PrescriptionPreviewColumnProps {
   copiedSuccess: boolean;
   isPediatricDrawerOpen: boolean;
   pediatricDrawerRef: React.RefObject<HTMLDivElement | null>;
+  folhaRef?: React.Ref<HTMLDivElement>;
   onSelectPreviewRegime: (regime: RegimeReceita) => void;
   onNavigateToPrint: () => void;
   onNavigateToEditor?: () => void;
@@ -53,6 +54,7 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
   copiedSuccess,
   isPediatricDrawerOpen,
   pediatricDrawerRef,
+  folhaRef,
   onSelectPreviewRegime,
   onNavigateToPrint,
   onNavigateToEditor,
@@ -115,7 +117,7 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
         )}
 
         {/* Folha A4 da bancada: o mesmo documento que será impresso / exportado em PDF (sempre paisagem no padrão PEC do SUS) */}
-        <FolhaA4 id="printable-a4-sheet" orientacao="landscape" imprimivel>
+        <FolhaA4 ref={folhaRef} id="printable-a4-sheet" orientacao="landscape" imprimivel>
           <DocumentoClinico
             tipo={DOCUMENTO_DO_REGIME[regimeAtivo]}
             doctor={doctor}
