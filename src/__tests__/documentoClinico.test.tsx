@@ -12,6 +12,8 @@ import {
   rotuloApresentacao,
   type TipoDocumento
 } from '../utils/documentoClinico';
+import { exportarFolhaPdf } from '../utils/folhaA4';
+import { loadPdfCanvasEngines, sheetsToPdf } from '../utils/renderSheetToPdf';
 import { EXEMPLO_MEDICO } from '../data/exemplos';
 import type { DoctorProfile, MedicalCertificate, MedicalReferral, Patient, PrescriptionItem, WorkContext } from '../types';
 
@@ -258,5 +260,23 @@ describe('Regras de conteúdo do documento (utils/documentoClinico)', () => {
   it('nome do arquivo usa a data local da emissão (não UTC) e remove acentos', () => {
     expect(nomeArquivoDocumento('prescription', 'José da Conceição', emissao)).toBe('Receita_Medica_Jose_da_Conceicao_2026-10-10.pdf');
     expect(nomeArquivoDocumento('special_prescription', '', emissao)).toBe('Receita_Controle_Especial_Paciente_2026-10-10.pdf');
+  });
+
+  it('carrega sob demanda o motor raster/PDF (vendor-pdf-canvas) e rejeita entradas adversariais vazias ou inválidas antes da captura', async () => {
+    await expect(exportarFolhaPdf([], 'vazio.pdf')).rejects.toThrow('Nenhuma folha para exportar.');
+    await expect(exportarFolhaPdf(null as unknown as HTMLElement, 'nulo.pdf')).rejects.toThrow('Nenhuma folha para exportar.');
+    await expect(
+      exportarFolhaPdf([{} as unknown as HTMLElement], 'invalido.pdf')
+    ).rejects.toThrow('Nenhuma folha para exportar.');
+
+    await expect(sheetsToPdf([])).rejects.toThrow('Nenhuma folha para exportar.');
+    await expect(sheetsToPdf([null as unknown as HTMLElement])).rejects.toThrow('Nenhuma folha para exportar.');
+
+    const engines = await loadPdfCanvasEngines();
+    expect(typeof engines.jsPDF).toBe('function');
+    expect(typeof engines.html2canvas).toBe('function');
+
+    const cachedEngines = await loadPdfCanvasEngines();
+    expect(cachedEngines).toBe(engines);
   });
 });

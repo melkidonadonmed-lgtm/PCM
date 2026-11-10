@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { resolveIconName, ICON_ALIASES } from '../components/Icon';
+import {
+  resolveIconName,
+  ICON_ALIASES,
+  CANONICAL_MATERIAL_SYMBOLS_SUBSET,
+  isCanonicalMaterialSymbol,
+  evaluateMaterialSymbolsSubset,
+} from '../components/Icon';
 
-describe('Icon Component — Anti-Mutation & Alias Resolution', () => {
+describe('Icon Component — Anti-Mutation, Alias Resolution & WOFF2 Subset Evaluation', () => {
   it('deve resolver aliases clínicos essenciais para símbolos canônicos do Material Symbols', () => {
     expect(resolveIconName('prescription')).toBe('prescriptions');
     expect(resolveIconName('receita')).toBe('prescriptions');
@@ -46,5 +52,24 @@ describe('Icon Component — Anti-Mutation & Alias Resolution', () => {
 
   it('deve retornar help para strings vazias', () => {
     expect(resolveIconName('')).toBe('help');
+  });
+
+  it('deve auditar o subset WOFF2 de material-symbols sem glifos duplicados, ordenado alfabeticamente e cobrindo 100% dos aliases', () => {
+    const report = evaluateMaterialSymbolsSubset();
+    expect(report.upstreamWoff2Bytes).toBe(4_001_608);
+    expect(report.subsetGlyphCount).toBe(CANONICAL_MATERIAL_SYMBOLS_SUBSET.length);
+    expect(report.subsetGlyphCount).toBeGreaterThanOrEqual(130);
+    expect(report.isSortedAlphabetically).toBe(true);
+    expect(report.hasDuplicateGlyphs).toBe(false);
+    expect(report.unmappedAliasTargets).toEqual([]);
+    expect(report.estimatedSavingsPercent).toBeGreaterThan(95);
+  });
+
+  it('deve rejeitar glifos desconhecidos ou entradas vazias na validação estrita do subset (caso adversarial)', () => {
+    expect(isCanonicalMaterialSymbol('prescriptions')).toBe(true);
+    expect(isCanonicalMaterialSymbol('receita')).toBe(true);
+    expect(isCanonicalMaterialSymbol('')).toBe(false);
+    expect(isCanonicalMaterialSymbol('   ')).toBe(false);
+    expect(isCanonicalMaterialSymbol('glifo_inexistente_inventado_999')).toBe(false);
   });
 });

@@ -39,8 +39,14 @@ export async function exportarFolhaPdf(
   filename: string,
   opts: OpcoesExportacao = {},
 ): Promise<void> {
+  const folhas = (Array.isArray(sheets) ? sheets : [sheets]).filter(
+    (el): el is HTMLElement => Boolean(el && typeof el === 'object' && 'querySelectorAll' in el)
+  );
+  if (folhas.length === 0) {
+    throw new Error('Nenhuma folha para exportar.');
+  }
   const { renderSheetToPdf } = await import('./renderSheetToPdf');
-  await renderSheetToPdf(sheets, filename, opts);
+  await renderSheetToPdf(folhas, filename, opts);
 }
 
 export const ID_RAIZ_IMPRESSAO = 'pcm-print-root';

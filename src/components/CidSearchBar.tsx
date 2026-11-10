@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useId } from 'react';
 import { Icon } from './Icon';
 import { 
   CIDItem, 
@@ -43,6 +43,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<CIDCategoryType>('Todos');
   const [isOpen, setIsOpen] = useState(false);
   const [isQuickListOpen, setIsQuickListOpen] = useState(false);
+  const cidInputId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -120,7 +121,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
     <div data-state="idle" aria-busy={false} ref={containerRef} className="space-y-2.5">
       {/* Label and Quick Diagnoses Pop-up Trigger */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5" style={{ color: darkMode ? '#94A3B8' : '#475569' }}>
+        <label htmlFor={cidInputId} className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5" style={{ color: darkMode ? '#94A3B8' : '#475569' }}>
           <Icon name="search" className="text-[14px] text-sky-600 dark:text-sky-400" />
           <span>{label}</span>
         </label>
@@ -297,6 +298,9 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
 
           <input
             ref={inputRef}
+            id={cidInputId}
+            name="cidSearch"
+            aria-label={label}
             type="text"
             value={searchTerm}
             onChange={(e) => {
@@ -323,6 +327,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
             {searchTerm && (
               <button
                 type="button"
+                aria-label="Limpar busca de CID-10"
                 onClick={() => {
                   setSearchTerm('');
                   inputRef.current?.focus();
@@ -335,6 +340,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
 
             <button
               type="button"
+              aria-label="Abrir catálogo completo de CID-10"
               onClick={() => setIsOpen(!isOpen)}
               className="p-1 rounded-md text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               title="Abrir catálogo completo"

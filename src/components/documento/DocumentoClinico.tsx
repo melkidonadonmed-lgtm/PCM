@@ -158,6 +158,7 @@ export const DocumentoClinico: React.FC<DocumentoClinicoProps> = ({
               <strong style={{ fontWeight: 700 }}>{paciente}</strong>
             ) : (
               <span
+                role="img"
                 aria-label="Linha para nome do paciente à mão"
                 style={{ flex: 1, maxWidth: 380, borderBottom: `1px solid ${FILETE}`, height: 14, display: 'inline-block' }}
               />

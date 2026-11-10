@@ -1,6 +1,9 @@
 ---
 name: ui-pdf-validation
 description: Validates PresCMed UI, responsive behavior, print preview, sharing, and PDF flows. Use for changes affecting React components, CSS, themes, printing, or document generation.
+version: "1.0.0"
+updated_at: "2026-11-09"
+allowed-tools: ["read_file", "run_command", "call_mcp_tool"]
 ---
 
 Validate the affected PresCMed flow end to end:

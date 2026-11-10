@@ -1,12 +1,16 @@
 import React from 'react';
 import { SusDocumentItem, SusFilledFormData } from '../../types';
-import { CAMPO_SUS, ROTULO_SUS } from './SusCommonIdentityFields';
+import { CAMPO_SUS } from './SusCommonIdentityFields';
+import {
+  MESES_DA_LME,
+  linhaVaziaDaLme,
+  LmeMedicationRow,
+  SusLmeMedicationFieldsSection,
+} from './SusLmeMedicationFieldsSection';
 import { COMMON_CID10 } from '../../data/cidCatalog';
 import { Icon } from '../Icon';
 
-export const MESES_DA_LME = ['1º', '2º', '3º', '4º', '5º', '6º'];
-export const linhaVaziaDaLme = () => ({ name: '', quantities: MESES_DA_LME.map(() => '') });
-export type LmeMedicationRow = ReturnType<typeof linhaVaziaDaLme>;
+export { MESES_DA_LME, linhaVaziaDaLme, type LmeMedicationRow };
 
 /** Descrições canônicas dos códigos CID-10 habituais do catálogo SUS. */
 const DESCRICOES_CID_PADRAO: Record<string, string> = {
@@ -20,7 +24,7 @@ const DESCRICOES_CID_PADRAO: Record<string, string> = {
   'A15.0': 'Tuberculose pulmonar, com confirmação por exame microscópico da expectoração',
 };
 
-function buscarDescricaoCid(codigo?: string): string {
+export function buscarDescricaoCid(codigo?: string): string {
   const limpo = (codigo || '').trim().toUpperCase();
   if (!limpo) return '';
   if (DESCRICOES_CID_PADRAO[limpo]) return DESCRICOES_CID_PADRAO[limpo];
@@ -69,7 +73,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
     <div
       data-state="idle"
       aria-busy={false}
-      className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong"
+      className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong"
     >
       <datalist id="sus-cid10-datalist">
         {COMMON_CID10.map((item) => (
@@ -79,7 +83,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
         ))}
       </datalist>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-[var(--border-subtle)] pb-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 border-b border-[var(--border-subtle)] pb-2">
         <div className="flex items-center gap-2">
           <Icon name="auto_awesome" className="w-4 h-4 text-sky-600 dark:text-sky-400" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
@@ -94,10 +98,11 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
             <button
               type="button"
               onClick={onResetDoc}
-              className="text-xs font-semibold px-2 py-0.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-rose-600 cursor-pointer transition"
+              className="chip-neutral h-8 min-h-[32px] px-2.5 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-300 border border-rose-200/90 dark:border-rose-400/25 bg-rose-50/50 dark:bg-rose-950/25 hover:bg-rose-100/80 dark:hover:bg-rose-950/40 inline-flex items-center gap-1 cursor-pointer transition"
               title="Limpar os dados clínicos deste documento"
             >
-              Limpar campos
+              <Icon name="delete" size={14} className="text-rose-600 dark:text-rose-400" />
+              <span>Limpar campos</span>
             </button>
           )}
         </div>
@@ -440,215 +445,12 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
 
         {/* Campos Específicos para LME Farmácia de Alto Custo (numeração do impresso oficial) */}
         {currentDocItem.id === 'lme_medicamentos' && (
-          <div className="space-y-3 p-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
-            <div className="space-y-2">
-              <span className={ROTULO_SUS}>7 e 8 — Medicamento(s) e quantidade solicitada por mês</span>
-              {linhasDaLme.map((linha, indice) => (
-                <div key={indice} className="space-y-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-4 text-xs font-bold text-[var(--text-muted)]">
-                      {indice + 1}
-                    </span>
-                    <input
-                      type="text"
-                      aria-label={`Medicamento ${indice + 1}`}
-                      value={linha.name}
-                      onChange={(e) =>
-                        onAlterarLinhaDaLme(indice, (l) => ({ ...l, name: e.target.value }))
-                      }
-                      placeholder="Ex.: Atorvastatina 40 mg comprimido"
-                      className={`${CAMPO_SUS} font-semibold`}
-                    />
-                    {linhasDaLme.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onFieldChange(
-                            'lmeMedications',
-                            linhasDaLme.filter((_, i) => i !== indice)
-                          )
-                        }
-                        className="h-8 px-2 rounded-lg border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
-                        aria-label={`Remover medicamento ${indice + 1}`}
-                      >
-                        Remover
-                      </button>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-6 gap-1 pl-5">
-                    {MESES_DA_LME.map((mes, m) => (
-                      <input
-                        key={mes}
-                        type="text"
-                        inputMode="numeric"
-                        aria-label={`Quantidade do ${mes} mês, medicamento ${indice + 1}`}
-                        value={linha.quantities[m] || ''}
-                        onChange={(e) =>
-                          onAlterarLinhaDaLme(indice, (l) => ({
-                            ...l,
-                            quantities: MESES_DA_LME.map((_, i) =>
-                              i === m ? e.target.value : l.quantities[i] || ''
-                            ),
-                          }))
-                        }
-                        placeholder={`Ex.: ${mes}`}
-                        className="w-full px-1.5 py-1 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-info clinical-tabular-nums"
-                      />
-                    ))}
-                  </div>
-                  {linha.quantities[0]?.trim() && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onAlterarLinhaDaLme(indice, (l) => ({
-                          ...l,
-                          quantities: MESES_DA_LME.map(() => l.quantities[0]),
-                        }))
-                      }
-                      className="ml-5 text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
-                    >
-                      Repetir a quantidade do 1º mês nos 6 meses
-                    </button>
-                  )}
-                </div>
-              ))}
-              {linhasDaLme.length < 6 && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    onFieldChange('lmeMedications', [...linhasDaLme, linhaVaziaDaLme()])
-                  }
-                  className="h-8 px-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] text-xs font-semibold text-[var(--text-main)] cursor-pointer"
-                >
-                  Adicionar medicamento
-                </button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div>
-                <label htmlFor="lme-peso" className={ROTULO_SUS}>
-                  5 — Peso (kg)
-                </label>
-                <input
-                  id="lme-peso"
-                  type="text"
-                  inputMode="decimal"
-                  value={formData.patientWeightKg || ''}
-                  onChange={(e) => onFieldChange('patientWeightKg', e.target.value)}
-                  className={`${CAMPO_SUS} clinical-tabular-nums`}
-                />
-              </div>
-              <div>
-                <label htmlFor="lme-altura" className={ROTULO_SUS}>
-                  6 — Altura (cm)
-                </label>
-                <input
-                  id="lme-altura"
-                  type="text"
-                  inputMode="numeric"
-                  value={formData.patientHeightCm || ''}
-                  onChange={(e) => onFieldChange('patientHeightCm', e.target.value)}
-                  className={`${CAMPO_SUS} clinical-tabular-nums`}
-                />
-              </div>
-              <div className="col-span-2">
-                <label htmlFor="lme-cns-medico" className={ROTULO_SUS}>
-                  15 — CNS do médico solicitante
-                </label>
-                <input
-                  id="lme-cns-medico"
-                  type="text"
-                  inputMode="numeric"
-                  value={formData.doctorCns || ''}
-                  onChange={(e) => onFieldChange('doctorCns', e.target.value)}
-                  placeholder="Ex.: 700 0000 0000 0000"
-                  className={`${CAMPO_SUS} font-mono clinical-tabular-nums`}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <div>
-                <label htmlFor="lme-tratamento" className={ROTULO_SUS}>
-                  12 — Tratamento prévio?
-                </label>
-                <select
-                  id="lme-tratamento"
-                  value={formData.lmePreviousTreatment || ''}
-                  onChange={(e) => onFieldChange('lmePreviousTreatment', e.target.value)}
-                  className={CAMPO_SUS}
-                >
-                  <option value="">Deixar em branco</option>
-                  <option value="nao">Não</option>
-                  <option value="sim">Sim (relatar)</option>
-                </select>
-              </div>
-              {formData.lmePreviousTreatment === 'sim' && (
-                <div className="sm:col-span-2">
-                  <label htmlFor="lme-tratamento-relato" className={ROTULO_SUS}>
-                    Relato do tratamento prévio
-                  </label>
-                  <input
-                    id="lme-tratamento-relato"
-                    type="text"
-                    value={formData.lmePreviousTreatmentReport || ''}
-                    onChange={(e) => onFieldChange('lmePreviousTreatmentReport', e.target.value)}
-                    className={CAMPO_SUS}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <div>
-                <label htmlFor="lme-incapaz" className={ROTULO_SUS}>
-                  13 — Paciente incapaz?
-                </label>
-                <select
-                  id="lme-incapaz"
-                  value={formData.lmeIncapable || ''}
-                  onChange={(e) => onFieldChange('lmeIncapable', e.target.value)}
-                  className={CAMPO_SUS}
-                >
-                  <option value="">Deixar em branco</option>
-                  <option value="nao">Não</option>
-                  <option value="sim">Sim (indicar responsável)</option>
-                </select>
-              </div>
-              {formData.lmeIncapable === 'sim' && (
-                <div className="sm:col-span-2">
-                  <label htmlFor="lme-responsavel" className={ROTULO_SUS}>
-                    Nome do responsável
-                  </label>
-                  <input
-                    id="lme-responsavel"
-                    type="text"
-                    value={formData.lmeResponsibleName || ''}
-                    onChange={(e) => onFieldChange('lmeResponsibleName', e.target.value)}
-                    className={CAMPO_SUS}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="lme-email" className={ROTULO_SUS}>
-                22 — Correio eletrônico do paciente (opcional)
-              </label>
-              <input
-                id="lme-email"
-                type="email"
-                value={formData.patientEmail || ''}
-                onChange={(e) => onFieldChange('patientEmail', e.target.value)}
-                className={CAMPO_SUS}
-              />
-            </div>
-
-            <p className="text-xs text-[var(--text-muted)]">
-              Os campos 18 e 23 (quem preencheu os dados complementares e assinatura) ficam em branco para preenchimento à mão. A LME não tem campo de posologia: ela vai na receita que acompanha o laudo.
-            </p>
-          </div>
+          <SusLmeMedicationFieldsSection
+            formData={formData}
+            linhasDaLme={linhasDaLme}
+            onFieldChange={onFieldChange}
+            onAlterarLinhaDaLme={onAlterarLinhaDaLme}
+          />
         )}
 
         <div>

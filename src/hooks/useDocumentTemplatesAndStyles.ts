@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import type { Editor } from '@tiptap/react';
 import {
   DoctorProfile,
@@ -13,23 +13,32 @@ import {
   SavedDocument,
   DocumentOrientation,
   DocumentViaLayout,
-  PrescriptionStyle,
 } from '../types';
 import { db, initializeDefaultTemplates } from '../services/db';
-import { storageService } from '../services/storageService';
 import { PRESET_CLINICAL_TEMPLATES } from '../data/presetClinicalTemplates';
-import type { RegimeReceita } from '../utils/isSpecialControlOrAntibiotic';
 import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import {
   PresetQuickTemplateType,
-  INITIAL_EDITOR_CONTENT,
   interpolateMedicalTags,
-  buildActivePrescriptionPayload,
-  buildActiveReferralPayload,
-  buildActiveCertificatePayload,
   buildPresetQuickTemplatePayload,
 } from '../components/editor/editorConfigAndFormatters';
 import { EditorConfirmDialogState } from './useDocumentLogoManager';
+import {
+  ActiveEditorModelMeta,
+  InitialDocumentToLoadPayload,
+  resolveDraftRecipeType,
+  resolveLegacyTypographyId,
+  hasEmbeddedInstitutionalHeader,
+  useDocumentActiveLoadersAndDraft,
+} from './useDocumentActiveLoadersAndDraft';
+
+export {
+  resolveDraftRecipeType,
+  resolveLegacyTypographyId,
+  hasEmbeddedInstitutionalHeader,
+  useDocumentActiveLoadersAndDraft,
+};
+export type { ActiveEditorModelMeta, InitialDocumentToLoadPayload };
 
 export interface UseDocumentTemplatesAndStylesParams {
   editor: Editor | null;
@@ -39,7 +48,7 @@ export interface UseDocumentTemplatesAndStylesParams {
   onUpdatePrescriptionItems?: (items: PrescriptionItem[]) => void;
   referral?: MedicalReferral;
   certificate?: MedicalCertificate;
-  initialDocumentToLoad?: { html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' } | null;
+  initialDocumentToLoad?: InitialDocumentToLoadPayload | null;
   activeContext: WorkContext | null;
   editorInitialSyncTrigger: number;
   fontFamilyId: string;
@@ -119,11 +128,7 @@ export function useDocumentTemplatesAndStyles({
   setConfirmDialog,
   setIsModelsDrawerOpen,
 }: UseDocumentTemplatesAndStylesParams) {
-  const [currentModel, setCurrentModel] = useState<{
-    id: string | null;
-    title: string;
-    isPreset: boolean;
-  }>({
+  const [currentModel, setCurrentModel] = useState<ActiveEditorModelMeta>({
     id: null,
     title: 'Documento Livre (Rascunho)',
     isPreset: false,
@@ -139,359 +144,52 @@ export function useDocumentTemplatesAndStyles({
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
   const [editingTemplateTitle, setEditingTemplateTitle] = useState('');
 
-  const [customStyles, setCustomStyles] = useState<PrescriptionStyle[]>(() => {
-    return storageService.loadItem<PrescriptionStyle[]>('prescmed_custom_styles', []);
+  const {
+    customStyles,
+    isSaveStyleModalOpen,
+    setIsSaveStyleModalOpen,
+    newStyleTitle,
+    setNewStyleTitle,
+    activeLoadedRecipeType,
+    handleSaveCustomStyle,
+    handleDeleteCustomStyle,
+    handleApplyStyle,
+    handleLoadActivePrescription,
+    handleLoadActiveReferral,
+    handleLoadActiveCertificate,
+  } = useDocumentActiveLoadersAndDraft({
+    editor,
+    patient,
+    prescriptionItems,
+    referral,
+    certificate,
+    initialDocumentToLoad,
+    editorInitialSyncTrigger,
+    fontFamilyId,
+    setFontFamilyId,
+    baseFontSize,
+    setBaseFontSize,
+    pageOrientation,
+    setPageOrientation,
+    viaLayout,
+    setViaLayout,
+    headerConfig,
+    setHeaderConfig,
+    setLogoConfig,
+    docWatermark,
+    handleWatermarkChange,
+    setEditorHtml,
+    setCurrentModel,
+    buildDefaultHeader,
+    isDraftRestoredRef,
+    saveTimerRef,
+    draftMetaRef,
+    triggerAutoSave,
+    setSaveStatus,
+    setLastSavedTime,
+    showToast,
+    setConfirmDialog,
   });
-  const [isSaveStyleModalOpen, setIsSaveStyleModalOpen] = useState(false);
-  const [newStyleTitle, setNewStyleTitle] = useState('');
-
-  const [activeLoadedRecipeType, setActiveLoadedRecipeType] = useState<RegimeReceita | null>(null);
-
-  const handleSaveCustomStyle = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newStyleTitle.trim()) return;
-    const newStyle: PrescriptionStyle = {
-      id: 'style-' + Date.now(),
-      name: newStyleTitle.trim(),
-      fontFamilyId,
-      baseFontSize,
-      pageOrientation,
-      viaLayout,
-      showHeader: headerConfig.showHeader ?? true,
-      showFooter: headerConfig.showFooter ?? true,
-      watermarkType: docWatermark,
-      isCustom: true,
-    };
-    const updated = [...customStyles, newStyle];
-    setCustomStyles(updated);
-    storageService.saveItem('prescmed_custom_styles', updated);
-    setIsSaveStyleModalOpen(false);
-    setNewStyleTitle('');
-    showToast(`Estilo "${newStyle.name}" salvo com sucesso!`);
-  };
-
-  const handleDeleteCustomStyle = (id: string, name: string) => {
-    setConfirmDialog({
-      title: 'Remover Estilo Personalizado',
-      description: `Deseja remover o estilo personalizado "${name}"?`,
-      confirmLabel: 'Remover Estilo',
-      variant: 'danger',
-      onConfirm: () => {
-        const updated = customStyles.filter(s => s.id !== id);
-        setCustomStyles(updated);
-        storageService.saveItem('prescmed_custom_styles', updated);
-        setConfirmDialog(null);
-        showToast(`Estilo "${name}" removido.`);
-      },
-    });
-  };
-
-  const handleApplyStyle = (st: PrescriptionStyle) => {
-    setFontFamilyId(st.fontFamilyId);
-    setBaseFontSize(st.baseFontSize);
-    setPageOrientation(st.pageOrientation);
-    setViaLayout(st.viaLayout);
-    setHeaderConfig(prev => ({
-      ...prev,
-      showHeader: st.showHeader,
-      showFooter: st.showFooter,
-      badgeText: st.viaLayout === '2-vias' ? 'RECEITUÁRIO DE CONTROLE ESPECIAL' : prev.badgeText,
-    }));
-    handleWatermarkChange(st.watermarkType);
-    if (editor) triggerAutoSave(editor);
-    showToast(`Estilo "${st.name}" aplicado!`);
-  };
-
-  const handleLoadActivePrescription = useCallback((showToastMsg = true, targetMode: 'auto' | RegimeReceita = 'auto') => {
-    if (!editor) return;
-
-    if (saveTimerRef.current) {
-      clearTimeout(saveTimerRef.current);
-    }
-
-    const {
-      regime,
-      receita,
-      newHtml,
-      nextHeader,
-      nextViaLayout,
-      nextOrientation,
-      nextFontSize,
-    } = buildActivePrescriptionPayload(
-      prescriptionItems || [],
-      patient,
-      draftMetaRef.current.headerConfig,
-      targetMode
-    );
-
-    setActiveLoadedRecipeType(regime);
-    setViaLayout(nextViaLayout);
-    setPageOrientation(nextOrientation);
-    setBaseFontSize(nextFontSize);
-
-    editor.commands.setContent(newHtml);
-    setEditorHtml(newHtml);
-    setHeaderConfig(nextHeader);
-
-    setCurrentModel({
-      id: null,
-      title: receita.modelo,
-      isPreset: false,
-    });
-
-    isDraftRestoredRef.current = true;
-    triggerAutoSave(editor, nextHeader, undefined, {
-      title: receita.modelo,
-      fontSize: nextFontSize,
-      orientation: nextOrientation,
-      viaLayout: nextViaLayout,
-    });
-    if (showToastMsg) {
-      showToast(receita.aviso);
-    }
-  }, [editor, prescriptionItems, patient, triggerAutoSave, showToast, setViaLayout, setPageOrientation, setBaseFontSize, setEditorHtml, setHeaderConfig, isDraftRestoredRef, saveTimerRef, draftMetaRef]);
-
-  const handleLoadActiveReferral = useCallback((showToastMsg = true) => {
-    if (!editor) return;
-
-    const { specialty, referralHtml, nextHeader } = buildActiveReferralPayload(
-      patient,
-      referral,
-      draftMetaRef.current.headerConfig
-    );
-
-    setActiveLoadedRecipeType(null);
-    setViaLayout('1-via');
-    setPageOrientation('portrait');
-    setBaseFontSize(11);
-    editor.commands.setContent(referralHtml);
-    setEditorHtml(referralHtml);
-    setHeaderConfig(nextHeader);
-    setCurrentModel({
-      id: null,
-      title: `Encaminhamento - ${specialty}`,
-      isPreset: false,
-    });
-    isDraftRestoredRef.current = true;
-    triggerAutoSave(editor, nextHeader, undefined, {
-      title: `Encaminhamento - ${specialty}`,
-      fontSize: 11,
-      orientation: 'portrait',
-      viaLayout: '1-via',
-    });
-    if (showToastMsg) {
-      showToast('Encaminhamento carregado no editor com formatação limpa!');
-    }
-  }, [editor, patient, referral, triggerAutoSave, showToast, setViaLayout, setPageOrientation, setBaseFontSize, setEditorHtml, setHeaderConfig, isDraftRestoredRef, draftMetaRef]);
-
-  const handleLoadActiveCertificate = useCallback((showToastMsg = true) => {
-    if (!editor) return;
-
-    const { certHtml, nextHeader } = buildActiveCertificatePayload(
-      patient,
-      certificate,
-      draftMetaRef.current.headerConfig
-    );
-
-    setActiveLoadedRecipeType(null);
-    setViaLayout('1-via');
-    setPageOrientation('portrait');
-    setBaseFontSize(12);
-    editor.commands.setContent(certHtml);
-    setEditorHtml(certHtml);
-    setHeaderConfig(nextHeader);
-    setCurrentModel({
-      id: null,
-      title: 'Atestado Médico',
-      isPreset: false,
-    });
-    isDraftRestoredRef.current = true;
-    triggerAutoSave(editor, nextHeader, undefined, {
-      title: 'Atestado Médico',
-      fontSize: 12,
-      orientation: 'portrait',
-      viaLayout: '1-via',
-    });
-    if (showToastMsg) {
-      showToast('Atestado médico carregado no editor com formatação limpa!');
-    }
-  }, [editor, patient, certificate, triggerAutoSave, showToast, setViaLayout, setPageOrientation, setBaseFontSize, setEditorHtml, setHeaderConfig, isDraftRestoredRef, draftMetaRef]);
-
-  const lastTriggerRef = useRef(0);
-  useEffect(() => {
-    if (editor && editorInitialSyncTrigger && editorInitialSyncTrigger !== lastTriggerRef.current) {
-      lastTriggerRef.current = editorInitialSyncTrigger;
-      handleLoadActivePrescription(true);
-    }
-  }, [editor, editorInitialSyncTrigger, handleLoadActivePrescription]);
-
-  const applyInitialDocumentLayout = useCallback((doc: { html: string; title: string; type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' }) => {
-    if (doc.type !== 'prescription') {
-      setActiveLoadedRecipeType(null);
-      setViaLayout('1-via');
-      setPageOrientation('portrait');
-    }
-    if (doc.type === 'sus') {
-      setHeaderConfig(prev => ({
-        ...prev,
-        showHeader: false,
-        showFooter: false,
-        showPatientBanner: false,
-      }));
-    } else if (doc.type === 'referral') {
-      setHeaderConfig(prev => ({
-        ...prev,
-        showHeader: true,
-        showFooter: true,
-        showPatientBanner: false,
-        badgeText: 'ENCAMINHAMENTO MÉDICO',
-      }));
-    } else if (doc.type === 'certificate') {
-      setHeaderConfig(prev => ({
-        ...prev,
-        showHeader: true,
-        showFooter: true,
-        showPatientBanner: false,
-        badgeText: 'ATESTADO MÉDICO',
-      }));
-    } else if (doc.type === 'prescription') {
-      setPageOrientation('landscape');
-      setHeaderConfig(prev => ({
-        ...prev,
-        showHeader: true,
-        showFooter: true,
-        showPatientBanner: true,
-        badgeText: 'RECEITUÁRIO MÉDICO',
-      }));
-    }
-  }, [setViaLayout, setPageOrientation, setHeaderConfig]);
-
-  const lastInitialDocRef = useRef<UseDocumentTemplatesAndStylesParams['initialDocumentToLoad']>(null);
-  useEffect(() => {
-    if (editor && initialDocumentToLoad && initialDocumentToLoad !== lastInitialDocRef.current) {
-      lastInitialDocRef.current = initialDocumentToLoad;
-      isDraftRestoredRef.current = true;
-      editor.commands.setContent(initialDocumentToLoad.html);
-      setEditorHtml(initialDocumentToLoad.html);
-      applyInitialDocumentLayout(initialDocumentToLoad);
-      setCurrentModel({
-        id: null,
-        title: initialDocumentToLoad.title || 'Documento Clínico',
-        isPreset: false,
-      });
-      triggerAutoSave(editor);
-      showToast(`Documento "${initialDocumentToLoad.title}" carregado no editor!`);
-    }
-  }, [editor, initialDocumentToLoad, applyInitialDocumentLayout, triggerAutoSave, showToast, isDraftRestoredRef, setEditorHtml]);
-
-  useEffect(() => {
-    if (!editor || isDraftRestoredRef.current) return;
-    isDraftRestoredRef.current = true;
-
-    let isMounted = true;
-    const restoreDraft = async () => {
-      if (initialDocumentToLoad) {
-        lastInitialDocRef.current = initialDocumentToLoad;
-        if (isMounted) {
-          editor.commands.setContent(initialDocumentToLoad.html);
-          setEditorHtml(initialDocumentToLoad.html);
-          applyInitialDocumentLayout(initialDocumentToLoad);
-          setCurrentModel({
-            id: null,
-            title: initialDocumentToLoad.title || 'Documento Clínico',
-            isPreset: false,
-          });
-        }
-        return;
-      }
-
-      if (editorInitialSyncTrigger && editorInitialSyncTrigger > 0 && editorInitialSyncTrigger !== lastTriggerRef.current) {
-        lastTriggerRef.current = editorInitialSyncTrigger;
-        if (isMounted) {
-          handleLoadActivePrescription(false);
-        }
-        return;
-      }
-
-      try {
-        const draft = await db.savedDocuments.get('draft-current');
-        if (isMounted) {
-          if (draft && (draft.contentJson || draft.contentHtml)) {
-            if (draft.contentJson) {
-              editor.commands.setContent(draft.contentJson);
-              setEditorHtml(draft.contentHtml || '');
-            } else {
-              editor.commands.setContent(draft.contentHtml);
-              setEditorHtml(draft.contentHtml || '');
-            }
-            if (draft.headerConfig) {
-              setHeaderConfig(draft.headerConfig);
-              if (/controle especial/i.test(draft.headerConfig.badgeText || '')) {
-                setActiveLoadedRecipeType('controle_especial');
-              } else if (/antimicrobiano/i.test(draft.headerConfig.badgeText || '')) {
-                setActiveLoadedRecipeType('antimicrobiano');
-              } else if (/receitu[áa]rio/i.test(draft.headerConfig.badgeText || '')) {
-                setActiveLoadedRecipeType('simples');
-              }
-            }
-            if (draft.logoConfig) {
-              setLogoConfig(draft.logoConfig);
-            }
-            if (draft.typography) {
-              if (draft.typography === 'serif') setFontFamilyId('cormorant');
-              else if (draft.typography === 'sans') setFontFamilyId('jakarta');
-              else if (draft.typography === 'inter') setFontFamilyId('inter');
-              else setFontFamilyId(draft.typography);
-            }
-            if (draft.fontSize) {
-              setBaseFontSize(draft.fontSize);
-            }
-            if (draft.orientation) {
-              setPageOrientation(draft.orientation);
-            }
-            if (draft.viaLayout) {
-              setViaLayout(draft.viaLayout);
-            }
-            if (draft.title && draft.title !== 'Rascunho Automático') {
-              setCurrentModel({
-                id: null,
-                title: draft.title,
-                isPreset: false,
-              });
-            }
-            setLastSavedTime(
-              new Date(draft.updatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-            );
-            setSaveStatus('saved');
-          } else {
-            if (prescriptionItems && prescriptionItems.length > 0) {
-              handleLoadActivePrescription(false);
-            } else {
-              editor.commands.setContent(INITIAL_EDITOR_CONTENT);
-              setEditorHtml(INITIAL_EDITOR_CONTENT);
-              setHeaderConfig(buildDefaultHeader());
-              setSaveStatus('idle');
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Erro ao ler rascunho do IndexedDB:', err);
-        if (isMounted) {
-          editor.commands.setContent(INITIAL_EDITOR_CONTENT);
-          setEditorHtml(INITIAL_EDITOR_CONTENT);
-        }
-      }
-    };
-
-    restoreDraft();
-
-    return () => {
-      isMounted = false;
-      if (saveTimerRef.current) {
-        clearTimeout(saveTimerRef.current);
-      }
-    };
-  }, [editor, buildDefaultHeader, editorInitialSyncTrigger, initialDocumentToLoad, handleLoadActivePrescription, prescriptionItems, applyInitialDocumentLayout, setLogoConfig, isDraftRestoredRef, saveTimerRef, setEditorHtml, setHeaderConfig, setFontFamilyId, setBaseFontSize, setPageOrientation, setViaLayout, setLastSavedTime, setSaveStatus]);
 
   const loadSavedTemplates = useCallback(async () => {
     try {
@@ -642,38 +340,28 @@ export function useDocumentTemplatesAndStyles({
         ...effectiveHeaderConfig,
         dateText: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
       });
+    } else if (hasEmbeddedInstitutionalHeader(tpl.contentHtml)) {
+      setHeaderConfig({
+        ...buildDefaultHeader(),
+        showHeader: false,
+        showFooter: false,
+        showPatientBanner: false,
+        dateText: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
+      });
     } else {
-      const hasEmbeddedHeader = tpl.contentHtml && (
-        tpl.contentHtml.includes('border-bottom: 2px solid') ||
-        tpl.contentHtml.includes('UNIDADE DE SAÚDE') ||
-        tpl.contentHtml.includes('POLICLÍNICA') ||
-        tpl.contentHtml.includes('RECEITUÁRIO DE CONTROLE ESPECIAL')
-      );
-      if (hasEmbeddedHeader) {
-        setHeaderConfig({
-          ...buildDefaultHeader(),
-          showHeader: false,
-          showFooter: false,
-          showPatientBanner: false,
-          dateText: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
-        });
-      } else {
-        setHeaderConfig(prev => ({
-          ...prev,
-          badgeText: tpl.title.toUpperCase().slice(0, 32),
-        }));
-      }
+      setHeaderConfig(prev => ({
+        ...prev,
+        badgeText: tpl.title.toUpperCase().slice(0, 32),
+      }));
     }
 
     if (tpl.logoConfig) {
       setLogoConfig(tpl.logoConfig);
     }
 
-    if (tpl.typography) {
-      if (tpl.typography === 'serif') setFontFamilyId('cormorant');
-      else if (tpl.typography === 'sans') setFontFamilyId('jakarta');
-      else if (tpl.typography === 'inter') setFontFamilyId('inter');
-      else setFontFamilyId(tpl.typography);
+    const nextFontId = resolveLegacyTypographyId(tpl.typography);
+    if (nextFontId) {
+      setFontFamilyId(nextFontId);
     }
 
     if (tpl.fontSize) {

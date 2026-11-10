@@ -174,30 +174,21 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
   const suggestedNextBedCode = `110-${beds.length + 15}`;
 
   return (
-    <div id="hospital-ward-module-root" data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
-      {/* Cabeçalho Principal do Módulo Hospitalar */}
+    <div id="hospital-ward-module-root" data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto flex flex-col gap-3">
+      {/* Cabeçalho Principal Enxuto do Módulo Hospitalar */}
       <section className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-              <Icon name="local_hospital" size={16} />
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <Icon name="local_hospital" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
+              Módulo Hospitalar e Gestão de Pacientes
+            </h1>
+            <Badge tone="clinical" tabular>
+              MOD-03 Ativo
+            </Badge>
+            <span className="text-xs font-semibold text-[var(--text-muted)] clinical-tabular-nums">
+              • {beds.length} leito(s) no censo
             </span>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
-                  Módulo Hospitalar e Gestão de Pacientes
-                </h1>
-                <Badge tone="clinical" tabular>
-                  MOD-03 Ativo
-                </Badge>
-                <span className="text-xs font-semibold text-[var(--text-muted)] clinical-tabular-nums">
-                  • {beds.length} leito(s) no censo
-                </span>
-              </div>
-              <p className="text-[11px] text-[var(--text-muted)] truncate">
-                Mapa de leitos, admissão estruturada, evolução padronizada e curva longitudinal.
-              </p>
-            </div>
           </div>
 
           {/* Ações Globais de Admissão e Escores */}

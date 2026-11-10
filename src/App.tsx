@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
-import { Icon } from './components/Icon';
 import { Sidebar } from './components/Sidebar';
 import { MobileBottomNav } from './components/MobileBottomNav';
-import { PediatricCalculator } from './components/PediatricCalculator';
-import { PrescriptionBuilder } from './components/PrescriptionBuilder';
 import type { DocumentsSubTab } from './components/ClinicalDocumentsHub';
 import { PuxarParaAtualizar } from './components/PuxarParaAtualizar';
 import { ActiveTab, PrescriptionItem, SusDocumentId } from './types';
@@ -17,118 +14,23 @@ import { usePwaInstall } from './hooks/usePwaInstall';
 import { useNavigationSync, runTabViewTransition } from './hooks/useNavigationSync';
 import { useModalAccessibility } from './hooks/useModalAccessibility';
 import { useHospitalWardSession } from './hooks/useHospitalWardSession';
-import { CommandPaletteModal } from './components/layout/CommandPaletteModal';
-import { ConsultationReadinessBar } from './components/bento/ConsultationReadinessBar';
-import { AsyncErrorBoundary } from './components/AsyncErrorBoundary';
-import { LgpdConsentBanner } from './components/lgpd/LgpdConsentBanner';
-import { LgpdLocalModeNotice } from './components/lgpd/LgpdLocalModeNotice';
-import { storageService } from './services/storageService';
-import { lgpdConsentService } from './services/lgpdConsentService';
-import { cloudAuthService, type DoctorUserProfile } from './services/cloud/cloudAuthService';
-import type { LgpdConsentPreferences } from './types';
+import {
+  AppModuleWorkspaceSection,
+  AppGlobalModalsAndOverlays,
+  useAppLgpdAndCloudGovernance,
+  useAppThemeAndSidebarViewport,
+  loadDocumentEditor,
+  buildOncologyScreeningExamItem,
+} from './components/layout/AppWorkspaceAndModals';
 import type { TipoDocumento } from './utils/documentoClinico';
 
-// Carregamento sob demanda com retry resiliente contra falhas de rede ou cache antigo
-const loadDocumentEditor = (): Promise<typeof import('./components/DocumentEditorView')> =>
-  import('./components/DocumentEditorView').catch((err) => {
-    console.warn('[PresCMed] Tentando carregar Editor novamente após falha inicial:', err);
-    return new Promise<typeof import('./components/DocumentEditorView')>((resolve) =>
-      setTimeout(() => resolve(import('./components/DocumentEditorView')), 400)
-    );
-  });
-
-const DocumentEditorView = React.lazy(loadDocumentEditor);
-const PrintPreview = React.lazy(() => import('./components/PrintPreview'));
-const PatientModal = React.lazy(() => import('./components/PatientModal'));
-const DoctorProfileModal = React.lazy(() => import('./components/DoctorProfileModal'));
-const BackupModal = React.lazy(() => import('./components/BackupModal'));
-const LgpdSecurityModal = React.lazy(() => import('./components/lgpd/LgpdSecurityModal'));
-const ClinicalDocumentsHub = React.lazy(() =>
-  import('./components/ClinicalDocumentsHub').then((m) => ({ default: m.ClinicalDocumentsHub }))
-);
-const ClinicalProtocolsView = React.lazy(() =>
-  import('./components/ClinicalProtocolsView').then((m) => ({ default: m.ClinicalProtocolsView }))
-);
-const ScoreboardModuleView = React.lazy(() =>
-  import('./components/scores/ScoreboardModuleView').then((m) => ({ default: m.ScoreboardModuleView }))
-);
-const HospitalWardModuleView = React.lazy(() =>
-  import('./components/hospital/HospitalWardModuleView').then((m) => ({ default: m.HospitalWardModuleView }))
-);
+const preloadDocumentEditorSilently = () => {
+  loadDocumentEditor().catch(() => {});
+};
 
 export default function App() {
-  // Tema visual (Claro como padrão oficial do sistema)
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const saved = storageService.loadRawString('prescmed_theme');
-    return saved !== null ? saved === 'dark' : false;
-  });
-
-  // Estado responsivo da barra lateral
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 1024;
-    }
-    return false;
-  });
-
-  // Sincronização do tema no DOM e localStorage
-  useEffect(() => {
-    storageService.saveRawString('prescmed_theme', darkMode ? 'dark' : 'light');
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  // Sincronização da barra lateral com o breakpoint desktop/mobile
-  useEffect(() => {
-    const DESKTOP_BREAKPOINT = 1024;
-    let wasDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
-
-    const handleBreakpointChange = () => {
-      const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
-      if (isDesktop !== wasDesktop) {
-        wasDesktop = isDesktop;
-        setSidebarOpen(isDesktop);
-      }
-    };
-
-    handleBreakpointChange();
-    window.addEventListener('resize', handleBreakpointChange);
-    return () => window.removeEventListener('resize', handleBreakpointChange);
-  }, []);
-
-  // Trava a rolagem da página de fundo (body) enquanto o menu lateral mobile estiver aberto
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const isMobile = window.innerWidth < 1024;
-    if (isMobile && sidebarOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [sidebarOpen]);
-
-  // Pré-carregamento silencioso do Editor de Documentos em background após inicialização
-  useEffect(() => {
-    const triggerPreload = () => {
-      loadDocumentEditor().catch(() => {});
-    };
-
-    if (typeof window !== 'undefined') {
-      const idleWin = window as Window & {
-        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-      };
-      if (typeof idleWin.requestIdleCallback === 'function') {
-        idleWin.requestIdleCallback(triggerPreload, { timeout: 2500 });
-      } else {
-        setTimeout(triggerPreload, 1200);
-      }
-    }
-  }, []);
+  const { darkMode, setDarkMode, sidebarOpen, setSidebarOpen } =
+    useAppThemeAndSidebarViewport(preloadDocumentEditorSilently);
 
   // Navegação entre abas
   const [activeTab, setActiveTab] = useState<ActiveTab>('prescription');
@@ -155,31 +57,6 @@ export default function App() {
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isLgpdModalOpen, setIsLgpdModalOpen] = useState(false);
-
-  // Governança LGPD, Seleção de Cookies e Estado de Login em Nuvem
-  const [lgpdConsent, setLgpdConsent] = useState<LgpdConsentPreferences>(() =>
-    lgpdConsentService.loadConsent()
-  );
-  const [cloudUser, setCloudUser] = useState<DoctorUserProfile | null>(() =>
-    cloudAuthService.getCurrentUser()
-  );
-
-  useEffect(() => {
-    const unsubscribeLgpd = lgpdConsentService.subscribe((nextPrefs) => {
-      setLgpdConsent(nextPrefs);
-    });
-    let unsubscribeAuth: (() => void) | undefined;
-    cloudAuthService.subscribe((userProfile) => {
-      setCloudUser(userProfile);
-    }).then((unsub) => {
-      unsubscribeAuth = unsub;
-    });
-
-    return () => {
-      unsubscribeLgpd();
-      if (unsubscribeAuth) unsubscribeAuth();
-    };
-  }, []);
 
   // Hook desacoplado de sessão clínica e persistência
   const {
@@ -256,6 +133,23 @@ export default function App() {
     onShowToast: setKitToast,
   });
 
+  const {
+    lgpdConsent,
+    cloudUser,
+    handleAcceptEssentialCookies,
+    handleAcceptAllCookies,
+    handleSaveLgpdPreferences,
+    handleSanitizeShiftData,
+    handleEraseAllLocalData,
+    handleDismissNoLoginNotice,
+  } = useAppLgpdAndCloudGovernance({
+    startNewConsultation,
+    setDoctor,
+    loadContexts,
+    reloadHospitalBedsFromStorage,
+    onShowToast: setKitToast,
+  });
+
   const handleBackupRestored = React.useCallback(async () => {
     await loadContexts();
     await reloadHospitalBedsFromStorage();
@@ -287,96 +181,17 @@ export default function App() {
     setActiveTab('prescription');
   };
 
-  // Handlers de Segurança, Seleção de Cookies e Direitos LGPD
-  const handleAcceptEssentialCookies = React.useCallback(() => {
-    const updated = lgpdConsentService.acceptEssentialOnly();
-    setLgpdConsent(updated);
-    if (cloudUser) {
-      cloudAuthService.logout().catch(() => {});
-    }
-    setKitToast('Modo 100% Local ativado: apenas armazenamento essencial offline permitido.');
-  }, [cloudUser]);
-
-  const handleAcceptAllCookies = React.useCallback(() => {
-    const updated = lgpdConsentService.acceptAllCookies();
-    setLgpdConsent(updated);
-    setKitToast('Preferências LGPD salvas: armazenamento local e nuvem opcional habilitados.');
-  }, []);
-
-  const handleSaveLgpdPreferences = React.useCallback(
-    (prefs: {
-      cloudAuthCookies: boolean;
-      sharedComputerMode: boolean;
-      dismissedNoLoginNotice?: boolean;
-    }) => {
-      const updated = lgpdConsentService.saveConsent(prefs, { markConsentedNow: true });
-      setLgpdConsent(updated);
-      if (!prefs.cloudAuthCookies && cloudUser) {
-        cloudAuthService.logout().catch(() => {});
-      }
-      setKitToast('Configurações de segurança e cookies LGPD atualizadas.');
-    },
-    [cloudUser]
-  );
-
-  const handleSanitizeShiftData = React.useCallback(() => {
-    lgpdConsentService.sanitizeSharedShiftClinicalData();
-    startNewConsultation();
-    setKitToast('Plantão higienizado: dados do paciente e consulta ativa removidos do navegador.');
-  }, [startNewConsultation]);
-
-  const handleEraseAllLocalData = React.useCallback(async () => {
-    if (cloudUser) {
-      await cloudAuthService.logout({ clearLocalSession: true });
-    }
-    await lgpdConsentService.eraseAllLocalData();
-    startNewConsultation();
-    setDoctor({
-      name: '',
-      crm: '',
-      crmState: 'SP',
-      specialty: '',
-      clinicName: '',
-      address: '',
-      cityState: '',
-      phone: '',
-      email: '',
-      showSignature: true,
-    });
-    await loadContexts();
-    await reloadHospitalBedsFromStorage();
-    setKitToast('Base local eliminada com sucesso conforme Art. 18, VI da LGPD.');
-  }, [cloudUser, startNewConsultation, setDoctor, loadContexts, reloadHospitalBedsFromStorage]);
-
-  const handleDismissNoLoginNotice = React.useCallback(() => {
-    const updated = lgpdConsentService.setNoLoginNoticeDismissed(true);
-    setLgpdConsent(updated);
-  }, []);
-
   const handleSelectScoreFromPalette = React.useCallback((calculatorId: string) => {
     setSelectedScoreboardId(calculatorId);
     setActiveTab('scores');
   }, [setActiveTab]);
 
   const handleAddExamFromScoreboard = React.useCallback((examId: string) => {
+    const nextExam = buildOncologyScreeningExamItem(examId);
+    if (!nextExam) return;
     setSelectedExams(prev => {
-      if (prev.some(ex => ex.id === examId)) return prev;
-      return [
-        ...prev,
-        {
-          id: examId,
-          category: 'Rastreamento Oncológico (INCA/SUS)',
-          name: examId === 'mamografia'
-            ? 'Mamografia Bilateral para Rastreamento (SIGTAP 02.04.03.018-8)'
-            : examId === 'usg-mamas'
-              ? 'Ultrassonografia de Mamas Bilateral (SIGTAP 02.05.02.009-7)'
-              : examId === 'papanicolaou'
-                ? 'Exame Citopatológico Cervicovaginal / Papanicolaou (SIGTAP 02.03.01.008-6)'
-                : 'Dosagem de PSA Total e Livre (SIGTAP 02.02.03.010-5)',
-          selected: true,
-          urgency: 'routine',
-        },
-      ];
+      if (prev.some(ex => ex.id === nextExam.id)) return prev;
+      return [...prev, nextExam];
     });
     setKitToast('Exame de rastreio adicionado à Solicitação de Exames.');
   }, [setSelectedExams]);
@@ -535,11 +350,12 @@ export default function App() {
   };
 
   return (
-    <div data-state="idle" aria-busy={false} 
+    <div
+      data-state="idle"
+      aria-busy={false}
       className="min-h-screen font-sans antialiased flex flex-col transition-colors duration-300 surface-raised"
       style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-main)' }}
     >
-      {/* Puxar para atualizar (pull to refresh) desativado com menu ou modal aberto */}
       <PuxarParaAtualizar
         desativado={
           (sidebarOpen && (typeof window !== 'undefined' ? window.innerWidth < 1024 : false)) ||
@@ -552,7 +368,6 @@ export default function App() {
         }
       />
 
-      {/* Top Application Header */}
       <Header
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
@@ -575,9 +390,7 @@ export default function App() {
         onOpenLgpdModal={handleOpenLgpdModal}
       />
 
-      {/* Main Responsive Body Layout */}
-      <div className="flex-1 w-full max-w-screen-2xl container mx-auto px-2.5 sm:px-4 lg:px-4 xl:px-6 py-3 sm:py-4 flex gap-3 lg:gap-4 xl:gap-5 relative min-h-0">
-        {/* Desktop & Tablet Persistent Sidebar */}
+      <div className="flex-1 w-full max-w-screen-2xl container mx-auto px-2.5 sm:px-4 lg:px-4 xl:px-6 py-2.5 sm:py-3 flex gap-3 lg:gap-4 xl:gap-5 relative min-h-0">
         <Sidebar
           darkMode={darkMode}
           onToggleDarkMode={() => setDarkMode(!darkMode)}
@@ -606,247 +419,80 @@ export default function App() {
           onAplicarKit={handleAplicarKit}
         />
 
-        {/* Main Content Area */}
-        <main className="flex-1 min-w-0 pb-20 lg:pb-6">
-          <LgpdLocalModeNotice
-            isCloudAuthenticated={Boolean(cloudUser)}
-            sharedComputerMode={lgpdConsent.sharedComputerMode}
-            isDismissed={Boolean(lgpdConsent.dismissedNoLoginNotice)}
-            hasActiveClinicalData={
-              Boolean(patient?.name?.trim()) ||
-              prescriptionItems.length > 0 ||
-              selectedExams.length > 0
-            }
-            onOpenLgpdModal={handleOpenLgpdModal}
-            onOpenBackupModal={handleOpenBackupModal}
-            onSanitizeShiftData={handleSanitizeShiftData}
-            onDismiss={handleDismissNoLoginNotice}
-          />
-          <ConsultationReadinessBar
-            doctor={doctor}
-            patient={patient}
-            prescriptionCount={prescriptionItems.length}
-            documentsCount={documentsBadgeCount}
-            onOpenDoctorModal={handleOpenDoctorModal}
-            onOpenPatientModal={handleOpenPatientModal}
-            onOpenCommandPalette={handleOpenCommandPalette}
-            compactOnDesktop={true}
-          />
-          <div
-            key={activeTab === 'documents' && documentsSubTab === 'sus' ? 'documents-sus' : activeTab}
-            className="animate-tab-fade"
-          >
-            {activeTab === 'prescription' && (
-              <PrescriptionBuilder
-                darkMode={darkMode}
-                doctor={doctor}
-                onUpdateDoctor={setDoctor}
-                patient={patient}
-                onUpdatePatient={setPatient}
-                activeContext={activeContext}
-                items={prescriptionItems}
-                onUpdateItems={setPrescriptionItems}
-                weightCalcEnabled={patient.weightCalcEnabled}
-                onToggleWeightCalc={handleToggleWeightCalc}
-                onClearPrescription={handleClearPrescription}
-                onClearPatient={handleClearPatient}
-                onNavigateToPrint={(type) => handleNavigateToPrint(type || 'prescription')}
-                onNavigateToPediatricCalc={() => setActiveTab('pediatric_calc')}
-                onNavigateToEditor={handleNavigateToEditor}
-                onNavigateToCertificate={handleNavigateToCertificate}
-                onNavigateToReferral={handleNavigateToReferral}
-                onNavigateToExams={handleNavigateToExams}
-                onNavigateToSus={handleNavigateToSus}
-                onOpenDoctorModal={handleOpenDoctorModal}
-                onOpenPatientModal={handleOpenPatientModal}
-                medicamentoPendente={medicamentoPendente}
-                onConsumirMedicamentoPendente={() => setMedicamentoPendente(null)}
-                onAbrirPerfilMedico={handleOpenDoctorModal}
-              />
-            )}
-
-            {activeTab === 'pediatric_calc' && (
-              <Suspense fallback={null}>
-                <PediatricCalculator
-                  darkMode={darkMode}
-                  patient={patient}
-                  onUpdatePatientWeight={handleUpdatePatientWeight}
-                  onAddPrescriptionItem={handleAddPrescriptionItem}
-                  onNavigateToPrescription={() => setActiveTab('prescription')}
-                />
-              </Suspense>
-            )}
-
-            {(activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus') && (
-              <Suspense fallback={null}>
-                <ClinicalDocumentsHub
-                  darkMode={darkMode}
-                  patient={patient}
-                  onUpdatePatient={setPatient}
-                  doctor={doctor}
-                  activeContext={activeContext}
-                  certificate={certificate}
-                  onUpdateCertificate={setCertificate}
-                  referral={referral}
-                  onUpdateReferral={setReferral}
-                  selectedExams={selectedExams}
-                  onUpdateSelectedExams={setSelectedExams}
-                  clinicalIndication={examIndication}
-                  onUpdateClinicalIndication={setExamIndication}
-                  onNavigateToEditorWithHtml={handleNavigateToEditorWithHtml}
-                  initialSubTab={
-                    activeTab === 'certificate' ? 'certificate' :
-                    activeTab === 'referral' ? 'referral' :
-                    activeTab === 'exams' ? 'exams' :
-                    activeTab === 'sus' ? 'sus' : documentsSubTab
-                  }
-                  initialSusDocId={initialSusDocId}
-                  susCatalogResetTrigger={susCatalogResetTrigger}
-                  onSubTabChange={handleDocumentsSubTabChange}
-                  onNavigateToPrint={(type) => handleNavigateToPrint(type)}
-                />
-              </Suspense>
-            )}
-
-            {activeTab === 'protocols' && (
-              <Suspense fallback={null}>
-                <ClinicalProtocolsView
-                  darkMode={darkMode}
-                  patient={patient}
-                  initialSearchQuery={protocolSearchQuery}
-                  onUpdatePatientWeight={handleUpdatePatientWeight}
-                  onAddPrescriptionItem={handleAddPrescriptionItem}
-                  onNavigateToPrescription={() => setActiveTab('prescription')}
-                  onNavigateToScores={() => handleSelectTab('scores')}
-                  onUsarMedicamento={handleUsarMedicamento}
-                />
-              </Suspense>
-            )}
-
-            {activeTab === 'scores' && (
-              <Suspense fallback={null}>
-                <ScoreboardModuleView
-                  patient={patient}
-                  initialCalculatorId={selectedScoreboardId}
-                  onUpdatePatientWeight={handleUpdatePatientWeight}
-                  onAddPrescriptionItem={(item) => {
-                    handleAddPrescriptionItem(item);
-                    setKitToast(`Item "${item.name}" adicionado à receita.`);
-                  }}
-                  onAddExamById={handleAddExamFromScoreboard}
-                  onSendToA4Editor={(html, title) =>
-                    handleNavigateToEditorWithHtml(html, title || 'Escore Clínico', 'custom')
-                  }
-                  hospitalBeds={hospitalBeds}
-                  activeHospitalBedId={activeHospitalBedId}
-                  onSelectHospitalBed={setActiveHospitalBedId}
-                  onRecordScoreToBed={handleRecordScoreToHospitalBed}
-                  onNavigateToHospitalDashboard={
-                    handleNavigateToHospitalDashboardFromScore
-                  }
-                  onReturnToHospitalBed={(bedId) => {
-                    setActiveHospitalBedId(bedId);
-                    setHospitalSubView('evolution_form');
-                    setActiveTab('hospital');
-                  }}
-                />
-              </Suspense>
-            )}
-
-            {activeTab === 'hospital' && (
-              <Suspense fallback={null}>
-                <HospitalWardModuleView
-                  darkMode={darkMode}
-                  doctor={doctor}
-                  patient={patient}
-                  onSendToA4Editor={(html, title) => handleNavigateToEditorWithHtml(html, title, 'custom')}
-                  beds={hospitalBeds}
-                  activeBedId={activeHospitalBedId}
-                  onSelectBedId={setActiveHospitalBedId}
-                  onUpdateBed={handleUpdateHospitalBed}
-                  onCreateBed={handleCreateHospitalBed}
-                  onDeleteBed={handleDeleteHospitalBed}
-                  initialSubView={hospitalSubView}
-                  initialDashboardMetricSource={hospitalDashboardMetricSource}
-                  initialDashboardScoreAcronym={hospitalDashboardScoreAcronym}
-                  onOpenScoreboardForBed={handleOpenScoreboardForBed}
-                />
-              </Suspense>
-            )}
-
-            {activeTab === 'editor' && (
-              <AsyncErrorBoundary moduleName="o Editor de Prescrições e Documentos">
-                <Suspense fallback={
-                  <div
-                    role="status"
-                    aria-live="polite"
-                    aria-busy="true"
-                    data-state="loading"
-                    className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5"
-                  >
-                    <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
-                    <span className="font-medium text-slate-600 dark:text-slate-300">
-                      Carregando processador de texto clínico e canvas A4...
-                    </span>
-                  </div>
-                }>
-                  <DocumentEditorView
-                    darkMode={darkMode}
-                    doctor={doctor}
-                    patient={patient}
-                    prescriptionItems={prescriptionItems}
-                    onUpdatePrescriptionItems={setPrescriptionItems}
-                    referral={referral}
-                    certificate={certificate}
-                    initialDocumentToLoad={editorCustomDoc}
-                    activeContext={activeContext}
-                    onSaveContext={saveContext}
-                    onNavigateToPrint={() => handleNavigateToPrint('prescription')}
-                    onOpenDoctorModal={handleOpenDoctorModal}
-                    editorInitialSyncTrigger={editorInitialSyncTrigger}
-                    onNavigateBack={() => setActiveTab(returnNavigationTab)}
-                  />
-                </Suspense>
-              </AsyncErrorBoundary>
-            )}
-
-            {activeTab === 'print_preview' && (
-              <AsyncErrorBoundary moduleName="a Prévia de Impressão">
-                <Suspense fallback={
-                  <div
-                    role="status"
-                    aria-live="polite"
-                    aria-busy="true"
-                    data-state="loading"
-                    className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5"
-                  >
-                    <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
-                    <span className="font-medium text-slate-600 dark:text-slate-300">
-                      Carregando visualização médica e módulos de exportação...
-                    </span>
-                  </div>
-                }>
-                  <PrintPreview
-                    doctor={doctor}
-                    patient={patient}
-                    prescriptionItems={prescriptionItems}
-                    exams={selectedExams}
-                    examIndication={examIndication}
-                    certificate={certificate}
-                    referral={referral}
-                    activeContext={activeContext}
-                    initialDocType={printDocType}
-                    onBack={() => setActiveTab(returnNavigationTab)}
-                    onAbrirPerfilMedico={handleOpenDoctorModal}
-                  />
-                </Suspense>
-              </AsyncErrorBoundary>
-            )}
-          </div>
-        </main>
+        <AppModuleWorkspaceSection
+          darkMode={darkMode}
+          activeTab={activeTab}
+          documentsSubTab={documentsSubTab}
+          returnNavigationTab={returnNavigationTab}
+          printDocType={printDocType}
+          doctor={doctor}
+          setDoctor={setDoctor}
+          patient={patient}
+          setPatient={setPatient}
+          activeContext={activeContext}
+          saveContext={saveContext}
+          prescriptionItems={prescriptionItems}
+          setPrescriptionItems={setPrescriptionItems}
+          selectedExams={selectedExams}
+          setSelectedExams={setSelectedExams}
+          examIndication={examIndication}
+          setExamIndication={setExamIndication}
+          certificate={certificate}
+          setCertificate={setCertificate}
+          referral={referral}
+          setReferral={setReferral}
+          lgpdConsent={lgpdConsent}
+          cloudUser={cloudUser}
+          documentsBadgeCount={documentsBadgeCount}
+          initialSusDocId={initialSusDocId}
+          susCatalogResetTrigger={susCatalogResetTrigger}
+          editorInitialSyncTrigger={editorInitialSyncTrigger}
+          editorCustomDoc={editorCustomDoc}
+          selectedScoreboardId={selectedScoreboardId}
+          medicamentoPendente={medicamentoPendente}
+          setMedicamentoPendente={setMedicamentoPendente}
+          protocolSearchQuery={protocolSearchQuery}
+          hospitalBeds={hospitalBeds}
+          activeHospitalBedId={activeHospitalBedId}
+          setActiveHospitalBedId={setActiveHospitalBedId}
+          hospitalSubView={hospitalSubView}
+          setHospitalSubView={setHospitalSubView}
+          hospitalDashboardMetricSource={hospitalDashboardMetricSource}
+          hospitalDashboardScoreAcronym={hospitalDashboardScoreAcronym}
+          setActiveTab={setActiveTab}
+          handleSelectTab={handleSelectTab}
+          handleDocumentsSubTabChange={handleDocumentsSubTabChange}
+          handleNavigateToPrint={handleNavigateToPrint}
+          handleNavigateToEditor={handleNavigateToEditor}
+          handleNavigateToCertificate={handleNavigateToCertificate}
+          handleNavigateToReferral={handleNavigateToReferral}
+          handleNavigateToExams={handleNavigateToExams}
+          handleNavigateToSus={handleNavigateToSus}
+          handleNavigateToEditorWithHtml={handleNavigateToEditorWithHtml}
+          handleOpenDoctorModal={handleOpenDoctorModal}
+          handleOpenPatientModal={handleOpenPatientModal}
+          handleOpenBackupModal={handleOpenBackupModal}
+          handleOpenLgpdModal={handleOpenLgpdModal}
+          handleOpenCommandPalette={handleOpenCommandPalette}
+          handleSanitizeShiftData={handleSanitizeShiftData}
+          handleDismissNoLoginNotice={handleDismissNoLoginNotice}
+          handleToggleWeightCalc={handleToggleWeightCalc}
+          handleUpdatePatientWeight={handleUpdatePatientWeight}
+          handleAddPrescriptionItem={handleAddPrescriptionItem}
+          handleClearPrescription={handleClearPrescription}
+          handleClearPatient={handleClearPatient}
+          handleUsarMedicamento={handleUsarMedicamento}
+          handleAddExamFromScoreboard={handleAddExamFromScoreboard}
+          handleUpdateHospitalBed={handleUpdateHospitalBed}
+          handleCreateHospitalBed={handleCreateHospitalBed}
+          handleDeleteHospitalBed={handleDeleteHospitalBed}
+          handleRecordScoreToHospitalBed={handleRecordScoreToHospitalBed}
+          handleNavigateToHospitalDashboardFromScore={handleNavigateToHospitalDashboardFromScore}
+          handleOpenScoreboardForBed={handleOpenScoreboardForBed}
+          onShowToast={setKitToast}
+        />
       </div>
 
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav
         activeTab={activeTab}
         sidebarOpen={sidebarOpen}
@@ -857,156 +503,52 @@ export default function App() {
         onOpenMenu={() => setSidebarOpen(true)}
       />
 
-      {/* Command Palette Global (Ctrl+K) */}
-      <CommandPaletteModal
-        isOpen={isCommandPaletteOpen}
-        onClose={handleCloseCommandPalette}
-        onSelectTab={handleSelectTab}
-        onSelectSusDoc={handleSelectSusDocFromPalette}
-        onSelectScore={handleSelectScoreFromPalette}
-        onAplicarKit={handleAplicarKit}
-        onUsarMedicamento={handleUsarMedicamento}
-        onOpenPatientModal={handleOpenPatientModal}
-        onOpenDoctorModal={handleOpenDoctorModal}
+      <AppGlobalModalsAndOverlays
+        darkMode={darkMode}
+        doctor={doctor}
+        setDoctor={setDoctor}
+        patient={patient}
+        setPatient={setPatient}
+        activeContext={activeContext}
+        saveContext={saveContext}
         hospitalBeds={hospitalBeds}
-        onSelectHospitalBed={(bedId) => {
-          setActiveHospitalBedId(bedId);
-          setHospitalSubView('evolution_form');
-          setActiveTab('hospital');
-        }}
-        onSelectProtocol={(query) => {
-          setProtocolSearchQuery(query);
-          setActiveTab('protocols');
-        }}
+        setActiveHospitalBedId={setActiveHospitalBedId}
+        setHospitalSubView={setHospitalSubView}
+        setProtocolSearchQuery={setProtocolSearchQuery}
+        setActiveTab={setActiveTab}
+        isCommandPaletteOpen={isCommandPaletteOpen}
+        handleCloseCommandPalette={handleCloseCommandPalette}
+        handleSelectTab={handleSelectTab}
+        handleSelectSusDocFromPalette={handleSelectSusDocFromPalette}
+        handleSelectScoreFromPalette={handleSelectScoreFromPalette}
+        handleAplicarKit={handleAplicarKit}
+        handleUsarMedicamento={handleUsarMedicamento}
+        isPatientModalOpen={isPatientModalOpen}
+        handleOpenPatientModal={handleOpenPatientModal}
+        handleClosePatientModal={handleClosePatientModal}
+        handleClearPatient={handleClearPatient}
+        isDoctorModalOpen={isDoctorModalOpen}
+        handleOpenDoctorModal={handleOpenDoctorModal}
+        handleCloseDoctorModal={handleCloseDoctorModal}
+        isBackupModalOpen={isBackupModalOpen}
+        handleOpenBackupModal={handleOpenBackupModal}
+        handleCloseBackupModal={handleCloseBackupModal}
+        handleBackupRestored={handleBackupRestored}
+        isLgpdModalOpen={isLgpdModalOpen}
+        handleOpenLgpdModal={handleOpenLgpdModal}
+        handleCloseLgpdModal={handleCloseLgpdModal}
+        lgpdConsent={lgpdConsent}
+        cloudUser={cloudUser}
+        handleSaveLgpdPreferences={handleSaveLgpdPreferences}
+        handleAcceptEssentialCookies={handleAcceptEssentialCookies}
+        handleAcceptAllCookies={handleAcceptAllCookies}
+        handleSanitizeShiftData={handleSanitizeShiftData}
+        handleEraseAllLocalData={handleEraseAllLocalData}
+        showInstallHelp={showInstallHelp}
+        closeInstallHelp={closeInstallHelp}
+        installHelpModalRef={installHelpModalRef}
+        kitToast={kitToast}
       />
-
-      {/* Modals */}
-      {isPatientModalOpen && (
-        <Suspense fallback={null}>
-          <PatientModal
-            darkMode={darkMode}
-            patient={patient}
-            onSavePatient={setPatient}
-            onClearPatient={handleClearPatient}
-            onClose={handleClosePatientModal}
-          />
-        </Suspense>
-      )}
-
-      {isDoctorModalOpen && (
-        <Suspense fallback={null}>
-          <DoctorProfileModal
-            darkMode={darkMode}
-            doctor={doctor}
-            onSaveDoctor={setDoctor}
-            onClose={handleCloseDoctorModal}
-            activeContext={activeContext}
-            onSaveContext={saveContext}
-          />
-        </Suspense>
-      )}
-
-      {isBackupModalOpen && (
-        <Suspense fallback={null}>
-          <BackupModal
-            isOpen={isBackupModalOpen}
-            darkMode={darkMode}
-            doctor={doctor}
-            onUpdateDoctor={setDoctor}
-            onBackupRestored={handleBackupRestored}
-            onClose={handleCloseBackupModal}
-          />
-        </Suspense>
-      )}
-
-      {isLgpdModalOpen && (
-        <Suspense fallback={null}>
-          <LgpdSecurityModal
-            isOpen={isLgpdModalOpen}
-            darkMode={darkMode}
-            consent={lgpdConsent}
-            isCloudAuthenticated={Boolean(cloudUser)}
-            cloudUserEmail={cloudUser?.email || cloudUser?.displayName}
-            onSavePreferences={handleSaveLgpdPreferences}
-            onAcceptEssentialOnly={handleAcceptEssentialCookies}
-            onAcceptAll={handleAcceptAllCookies}
-            onSanitizeShiftData={handleSanitizeShiftData}
-            onEraseAllLocalData={handleEraseAllLocalData}
-            onOpenBackupModal={handleOpenBackupModal}
-            onClose={handleCloseLgpdModal}
-          />
-        </Suspense>
-      )}
-
-      {/* Banner Inferior Não-Bloqueante de 1º Acesso — Seleção de Cookies e Aviso LGPD */}
-      <LgpdConsentBanner
-        isOpen={lgpdConsent.consentedAt === null}
-        onAcceptEssential={handleAcceptEssentialCookies}
-        onAcceptAll={handleAcceptAllCookies}
-        onOpenCustomizeModal={handleOpenLgpdModal}
-      />
-
-      {/* Modal de Instruções de Instalação PWA (Mobile / Navegadores sem prompt automático) */}
-      {showInstallHelp && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          data-state="idle"
-          aria-busy={false}
-          aria-labelledby="install-help-modal-title"
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 animate-backdrop-fade"
-          onClick={closeInstallHelp}
-        >
-          <div
-            ref={installHelpModalRef}
-            className="w-full max-w-md rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] p-5 shadow-2xl space-y-4 text-[var(--text-main)] modal-surface-spring"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <h3 id="install-help-modal-title" className="text-sm font-bold">Instalar PresCMed no Dispositivo</h3>
-              <button
-                type="button"
-                onClick={closeInstallHelp}
-                aria-label="Fechar instruções de instalação"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
-              >
-                <Icon name="close" size={18} />
-              </button>
-            </div>
-            <div className="space-y-3 text-xs leading-relaxed text-[var(--text-secondary)]">
-              <div className="p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-1">
-                <p className="font-bold text-[var(--text-main)]">No Android (Chrome / Edge / Samsung):</p>
-                <p>Toque no ícone de menu <strong>⋮</strong> (canto superior ou inferior do navegador) e selecione <strong>&ldquo;Instalar aplicativo&rdquo;</strong> ou <strong>&ldquo;Adicionar à tela inicial&rdquo;</strong>.</p>
-              </div>
-              <div className="p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-1">
-                <p className="font-bold text-[var(--text-main)]">No iPhone / iPad (Safari):</p>
-                <p>Toque no botão <strong>Compartilhar</strong> na barra do navegador e escolha <strong>&ldquo;Adicionar à Tela de Início&rdquo;</strong>.</p>
-              </div>
-            </div>
-            <div className="flex justify-end pt-1">
-              <button
-                type="button"
-                onClick={closeInstallHelp}
-                className="btn-tactile-primary h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
-              >
-                Entendi
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Toast de Confirmação de Kit Adicionado */}
-      {kitToast && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 text-white text-xs font-semibold shadow-tactile-lg border border-slate-700/50"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-          <span>{kitToast}</span>
-        </div>
-      )}
     </div>
   );
 }

@@ -4,7 +4,11 @@ import type {
   ManifestItem,
   ScoreBlockMeta,
 } from '../../utils/scores/scoreTypes';
-import manifestJson from './manifest.json';
+import {
+  DEFAULT_QUICK_PIN_IDS,
+  SCOREBOARD_MANIFEST,
+  searchScoreboardCatalog,
+} from './scoreboardManifest';
 import block01Json from './blocks/block_01.json';
 import block02Json from './blocks/block_02.json';
 import block03Json from './blocks/block_03.json';
@@ -15,7 +19,8 @@ import block07Json from './blocks/block_07.json';
 import block08Json from './blocks/block_08.json';
 import block09Json from './blocks/block_09.json';
 
-export const SCOREBOARD_MANIFEST: ManifestItem[] = manifestJson as ManifestItem[];
+export { DEFAULT_QUICK_PIN_IDS, SCOREBOARD_MANIFEST, searchScoreboardCatalog };
+export type { ManifestItem };
 
 const BLOCK_DATA_MAP: Record<string, BlockData> = {
   block_01: block01Json as BlockData,
@@ -114,57 +119,7 @@ export const SCOREBOARD_BLOCKS_META: ScoreBlockMeta[] = [
   },
 ];
 
-export const DEFAULT_QUICK_PIN_IDS: string[] = SCOREBOARD_MANIFEST.filter(
-  (item) => item.starredDefault
-)
-  .map((item) => item.id)
-  .slice(0, 10);
-
 export function getCalculatorByIdOrSlug(idOrSlug: string): Calculator | undefined {
   const normalized = idOrSlug.trim();
   return CALCULATOR_BY_ID.get(normalized) ?? CALCULATOR_BY_SLUG.get(normalized);
-}
-
-function normalizeSearchToken(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-}
-
-export function searchScoreboardCatalog(
-  query: string,
-  blockFilter: string = 'ALL',
-  favoriteIds?: Set<string>,
-  onlyFavorites: boolean = false
-): ManifestItem[] {
-  const normalizedQuery = normalizeSearchToken(query);
-  return SCOREBOARD_MANIFEST.filter((item) => {
-    if (onlyFavorites && favoriteIds && !favoriteIds.has(item.id)) {
-      return false;
-    }
-    const itemBlockId = item.blockId ?? item.blockFile.replace('.json', '');
-    if (blockFilter !== 'ALL' && itemBlockId !== blockFilter) {
-      return false;
-    }
-    if (!normalizedQuery) {
-      return true;
-    }
-    const haystack = normalizeSearchToken(
-      [
-        item.acronym,
-        item.name,
-        item.summary,
-        item.description ?? '',
-        item.categoryName,
-        item.moduleName,
-        item.id,
-        item.slug,
-        ...(item.synonyms ?? []),
-        ...item.searchSynonyms,
-      ].join(' ')
-    );
-    return haystack.includes(normalizedQuery);
-  }).sort((a, b) => a.acronym.localeCompare(b.acronym, 'pt-BR'));
 }

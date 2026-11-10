@@ -178,74 +178,68 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
   return (
     <section
-      className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5"
+      className="w-full max-w-7xl mx-auto flex flex-col gap-3"
       aria-label="Módulo de Escores Clínicos e Ferramentas de Apoio"
       aria-busy={false}
       data-state="idle"
     >
-      {/* Cabeçalho da Bancada Scoreboard CDSS */}
+      {/* Cabeçalho Enxuto da Bancada Scoreboard CDSS */}
       <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-2.5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 shrink-0">
-              <Icon name="monitor_heart" size={16} />
-            </div>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
-                  Scoreboard CDSS
-                </h1>
-                <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
-                  {ALL_SCOREBOARD_CALCULATORS.length} Escores Monográficos
-                </span>
-                {activeHospitalBed && onReturnToHospitalBed && (
-                  <button
-                    type="button"
-                    onClick={() => onReturnToHospitalBed(activeHospitalBed.id)}
-                    className="inline-flex items-center gap-1 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition-colors cursor-pointer clinical-tabular-nums"
-                    title={`Retornar diretamente ao prontuário do Leito ${activeHospitalBed.wardAndBed}`}
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <Icon name="monitor_heart" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
+              Scoreboard CDSS
+            </h1>
+            <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+              {ALL_SCOREBOARD_CALCULATORS.length} Escores Monográficos
+            </span>
+            {activeHospitalBed && onReturnToHospitalBed && (
+              <button
+                type="button"
+                onClick={() => onReturnToHospitalBed(activeHospitalBed.id)}
+                className="inline-flex items-center gap-1 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition-colors cursor-pointer clinical-tabular-nums"
+                title={`Retornar diretamente ao prontuário do Leito ${activeHospitalBed.wardAndBed}`}
+              >
+                <Icon name="arrow_back" size={12} />
+                <span>Voltar ao Leito {activeHospitalBed.wardAndBed}</span>
+              </button>
+            )}
+            <nav aria-label="Caminho de navegação" className="hidden xl:block">
+              <ol role="list" className="breadcrumbsList">
+                <li>
+                  <a
+                    href="#scoreboard-catalog"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTabMode('CATALOG');
+                    }}
                   >
-                    <Icon name="arrow_back" size={12} />
-                    <span>Voltar ao Leito {activeHospitalBed.wardAndBed}</span>
-                  </button>
-                )}
-              </div>
-              <nav aria-label="Caminho de navegação" className="mt-0.5">
-                <ol role="list" className="breadcrumbsList">
-                  <li>
-                    <a
-                      href="#scoreboard-catalog"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setTabMode('CATALOG');
-                      }}
-                    >
-                      Escores Clínicos
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#scoreboard-block"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setTabMode('CATALOG');
-                      }}
-                    >
-                      {activeCalculator.categoryName || 'Escores Clínicos'}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href={`#calc-${activeCalculator.id}`}
-                      aria-current="page"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      {activeCalculator.acronym}
-                    </a>
-                  </li>
-                </ol>
-              </nav>
-            </div>
+                    Escores Clínicos
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#scoreboard-block"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTabMode('CATALOG');
+                    }}
+                  >
+                    {activeCalculator.categoryName || 'Escores Clínicos'}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={`#calc-${activeCalculator.id}`}
+                    aria-current="page"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    {activeCalculator.acronym}
+                  </a>
+                </li>
+              </ol>
+            </nav>
           </div>
 
           {/* Navegação Segmentada da Bancada */}
@@ -386,9 +380,9 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
       {/* ABA 2: Catálogo Completo (114 Escores) */}
       {tabMode === 'CATALOG' ? (
-        <div className="flex flex-col gap-4">
-          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col gap-3">
+          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
               <div className="relative flex-1 min-w-[240px]">
                 <Icon
                   name="search"
@@ -403,6 +397,22 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                   className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 py-2 pl-9 pr-4 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none"
                 />
               </div>
+
+              {(searchQuery || selectedBlockId !== 'ALL' || onlyFavoritesFilter) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedBlockId('ALL');
+                    setOnlyFavoritesFilter(false);
+                  }}
+                  className="chip-neutral h-9 min-h-[36px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+                  title="Limpar busca e filtros do catálogo"
+                >
+                  <Icon name="close" size={14} />
+                  <span>Limpar</span>
+                </button>
+              )}
 
               <button
                 type="button"
@@ -444,13 +454,13 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3.5 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
             {filteredManifest.map((item) => {
               const isFav = favoriteSet.has(item.id);
               return (
                 <div
                   key={item.id}
-                  className="cq-card card-surface surface-card-minimal flex flex-col justify-between rounded-2xl border border-subtle dark:border-strong p-4 transition hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-elevation-medium"
+                  className="cq-card card-surface surface-card-minimal flex flex-col justify-between rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 transition hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-elevation-medium"
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2">
@@ -512,10 +522,10 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
       {/* ABA 3: Bancada Dedicada de Drogas Vasoativas em BIC */}
       {tabMode === 'BIC_DVA' ? (
-        <div className="flex flex-col gap-4">
-          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-col gap-3">
+          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-2.5">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Bancada de Titulação de Drogas Vasoativas em Bomba de Infusão Contínua (BIC)
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -549,35 +559,22 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-            <ScoreBicInfusionCard
-              protocol={NOREPINEPHRINE_PROTOCOL}
-              patientWeightKg={localWeightKg}
-              onWeightChange={handleWeightUpdate}
-              onAddPrescriptionItem={onAddPrescriptionItem}
-              onSendToA4Editor={onSendToA4Editor}
-            />
-            <ScoreBicInfusionCard
-              protocol={VASOPRESSIN_PROTOCOL}
-              patientWeightKg={localWeightKg}
-              onWeightChange={handleWeightUpdate}
-              onAddPrescriptionItem={onAddPrescriptionItem}
-              onSendToA4Editor={onSendToA4Editor}
-            />
-            <ScoreBicInfusionCard
-              protocol={DOBUTAMINE_PROTOCOL}
-              patientWeightKg={localWeightKg}
-              onWeightChange={handleWeightUpdate}
-              onAddPrescriptionItem={onAddPrescriptionItem}
-              onSendToA4Editor={onSendToA4Editor}
-            />
-            <ScoreBicInfusionCard
-              protocol={NITROGLYCERIN_PROTOCOL}
-              patientWeightKg={localWeightKg}
-              onWeightChange={handleWeightUpdate}
-              onAddPrescriptionItem={onAddPrescriptionItem}
-              onSendToA4Editor={onSendToA4Editor}
-            />
+          <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+            {[
+              NOREPINEPHRINE_PROTOCOL,
+              VASOPRESSIN_PROTOCOL,
+              DOBUTAMINE_PROTOCOL,
+              NITROGLYCERIN_PROTOCOL,
+            ].map((proto) => (
+              <ScoreBicInfusionCard
+                key={proto.drugId ?? proto.drugName}
+                protocol={proto}
+                patientWeightKg={localWeightKg}
+                onWeightChange={handleWeightUpdate}
+                onAddPrescriptionItem={onAddPrescriptionItem}
+                onSendToA4Editor={onSendToA4Editor}
+              />
+            ))}
           </div>
         </div>
       ) : null}

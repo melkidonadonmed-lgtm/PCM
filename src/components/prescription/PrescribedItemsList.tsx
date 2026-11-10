@@ -62,7 +62,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
       data-state={items.length === 0 ? 'empty' : 'idle'}
       aria-busy={false}
       aria-label="Medicamentos prescritos na consulta"
-      className="card-surface surface-card-minimal rounded-2xl p-4 sm:p-5 border border-subtle dark:border-strong space-y-3"
+      className="card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 border border-subtle dark:border-strong space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
@@ -122,9 +122,10 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
             <button
               type="button"
               onClick={onClearPrescription}
-              className="h-9 text-xs font-medium text-rose-500 hover:text-rose-600 inline-flex items-center gap-1 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-rose-500 px-2.5 transition"
+              className="chip-neutral h-9 text-xs font-semibold text-rose-700 dark:text-rose-300 border border-rose-200/90 dark:border-rose-400/25 bg-rose-50/50 dark:bg-rose-950/25 hover:bg-rose-100/80 dark:hover:bg-rose-950/40 inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-rose-500 px-2.5 transition"
+              title="Limpar todos os medicamentos prescritos"
             >
-              <Icon name="delete" size={15} />
+              <Icon name="delete" size={15} className="text-rose-600 dark:text-rose-400" />
               <span>Limpar</span>
             </button>
           )}

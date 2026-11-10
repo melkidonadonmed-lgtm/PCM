@@ -23,7 +23,7 @@ interface MedicationComposerCardProps {
   searchSuggestions: UnifiedMedication[];
   notificacaoDoFormulario: NotificacaoDeReceita | null;
   regimeLabels: Record<RegimeReceita, { rotulo: string; detalhe: string; tituloTexto: string }>;
-  onOpenPediatricDrawer: () => void;
+  onOpenPediatricDrawer?: () => void;
   onCancelEdit: () => void;
   onMedNameChange: (value: string) => void;
   onFocusSearch: () => void;
@@ -64,7 +64,6 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
   searchSuggestions,
   notificacaoDoFormulario,
   regimeLabels,
-  onOpenPediatricDrawer,
   onCancelEdit,
   onMedNameChange,
   onFocusSearch,
@@ -80,7 +79,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
   onSubmitMedication,
 }) => {
   return (
-    <section className="cq-card card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 space-y-2.5 border border-subtle dark:border-strong">
+    <section className="cq-card card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 space-y-2 border border-subtle dark:border-strong">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Icon name="medication" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
@@ -88,15 +87,6 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             Prescrição
           </h2>
         </div>
-        <button
-          type="button"
-          onClick={onOpenPediatricDrawer}
-          className="chip-neutral min-h-[44px] sm:min-h-0 sm:h-8 text-xs px-3 rounded-xl inline-flex items-center gap-1.5 transition active:translate-y-px cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500"
-          title="Abrir Calculadora Pediátrica em painel lateral sem sair da receita"
-        >
-          <Icon name="calculate" size={15} className="text-emerald-600 dark:text-emerald-400" />
-          <span>Calcular dose pelo peso</span>
-        </button>
       </div>
 
       {/* Banner de Edição Direta Ativa */}

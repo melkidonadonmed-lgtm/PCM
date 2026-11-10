@@ -4,6 +4,116 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+export const PWA_WORKBOX_GLOB_IGNORES: readonly string[] = [
+  '**/vendor-firebase-*.js',
+  '**/vendor-canvg-*.js',
+];
+
+export function resolvePwaManualChunk(id: string): string | undefined {
+  if (typeof id !== 'string' || !id.trim()) {
+    return undefined;
+  }
+  if (
+    id.includes('node_modules/react/') ||
+    id.includes('node_modules\\react\\') ||
+    id.includes('node_modules/react-dom/') ||
+    id.includes('node_modules\\react-dom\\') ||
+    id.includes('vite/preload-helper')
+  ) {
+    return 'vendor-react';
+  }
+  if (id.includes('node_modules/dexie') || id.includes('node_modules\\dexie')) {
+    return 'vendor-dexie';
+  }
+  if (
+    id.includes('node_modules/@tiptap') ||
+    id.includes('node_modules\\@tiptap') ||
+    id.includes('node_modules/prosemirror-') ||
+    id.includes('node_modules\\prosemirror-')
+  ) {
+    return 'vendor-tiptap';
+  }
+  if (
+    id.includes('node_modules/firebase') ||
+    id.includes('node_modules\\firebase') ||
+    id.includes('node_modules/@firebase') ||
+    id.includes('node_modules\\@firebase')
+  ) {
+    return 'vendor-firebase';
+  }
+  if (
+    id.includes('node_modules/canvg') ||
+    id.includes('node_modules\\canvg') ||
+    id.includes('node_modules/html2canvas/') ||
+    id.includes('node_modules\\html2canvas\\') ||
+    id.includes('node_modules/dompurify') ||
+    id.includes('node_modules\\dompurify') ||
+    id.includes('node_modules/core-js') ||
+    id.includes('node_modules\\core-js') ||
+    id.includes('node_modules/regenerator-runtime') ||
+    id.includes('node_modules\\regenerator-runtime') ||
+    id.includes('node_modules/svg-pathdata') ||
+    id.includes('node_modules\\svg-pathdata') ||
+    id.includes('node_modules/stackblur-canvas') ||
+    id.includes('node_modules\\stackblur-canvas') ||
+    id.includes('node_modules/rgbcolor') ||
+    id.includes('node_modules\\rgbcolor') ||
+    id.includes('node_modules/raf') ||
+    id.includes('node_modules\\raf')
+  ) {
+    return 'vendor-canvg';
+  }
+  if (
+    id.includes('node_modules/jspdf') ||
+    id.includes('node_modules\\jspdf') ||
+    id.includes('node_modules/html2canvas-pro') ||
+    id.includes('node_modules\\html2canvas-pro')
+  ) {
+    return 'vendor-pdf-canvas';
+  }
+  if (
+    id.includes('data/scores/manifest.json') ||
+    id.includes('data\\scores\\manifest.json') ||
+    id.includes('data/scores/scoreboardManifest') ||
+    id.includes('data\\scores\\scoreboardManifest')
+  ) {
+    return 'scores-manifest';
+  }
+  if (
+    id.includes('data/scores/blocks/') ||
+    id.includes('data\\scores\\blocks\\') ||
+    id.includes('data/scores/scoreboardCatalog') ||
+    id.includes('data\\scores\\scoreboardCatalog')
+  ) {
+    return 'scores-catalog';
+  }
+  if (
+    id.includes('data/cidCatalog') ||
+    id.includes('data\\cidCatalog') ||
+    id.includes('data/cidSpecialtyAndAdminItems') ||
+    id.includes('data\\cidSpecialtyAndAdminItems')
+  ) {
+    return 'cid-catalog';
+  }
+  if (
+    id.includes('data/pediatricMeds') ||
+    id.includes('data\\pediatricMeds') ||
+    id.includes('data/pediatricHospitalAndProtocols') ||
+    id.includes('data\\pediatricHospitalAndProtocols')
+  ) {
+    return 'pediatric-catalog';
+  }
+  if (
+    id.includes('data/medications/') ||
+    id.includes('data\\medications\\') ||
+    id.includes('data/medicationDatabase') ||
+    id.includes('data\\medicationDatabase')
+  ) {
+    return 'clinical-catalogs';
+  }
+  return undefined;
+}
+
 export default defineConfig(() => {
   return {
     plugins: [
@@ -60,7 +170,7 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-          globIgnores: ['**/vendor-firebase-*.js'],
+          globIgnores: [...PWA_WORKBOX_GLOB_IGNORES],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           clientsClaim: true,
@@ -110,34 +220,7 @@ export default defineConfig(() => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks(id) {
-            if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-              return 'vendor-react';
-            }
-            if (id.includes('node_modules/dexie')) {
-              return 'vendor-dexie';
-            }
-            if (id.includes('node_modules/@tiptap') || id.includes('node_modules/prosemirror-')) {
-              return 'vendor-tiptap';
-            }
-            if (id.includes('node_modules/firebase') || id.includes('node_modules/@firebase')) {
-              return 'vendor-firebase';
-            }
-            if (id.includes('node_modules/jspdf') || id.includes('node_modules/html2canvas-pro')) {
-              return 'vendor-pdf-canvas';
-            }
-            if (id.includes('data/scores/blocks/') || id.includes('data\\scores\\blocks\\') || id.includes('data/scores/manifest.json')) {
-              return 'scores-catalog';
-            }
-            if (
-              id.includes('data/medications/') ||
-              id.includes('data\\medications\\') ||
-              id.includes('data/cidCatalog') ||
-              id.includes('data/pediatricMeds')
-            ) {
-              return 'clinical-catalogs';
-            }
-          },
+          manualChunks: resolvePwaManualChunk,
         },
       },
     },

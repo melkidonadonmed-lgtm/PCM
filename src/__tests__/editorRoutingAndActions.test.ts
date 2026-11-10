@@ -10,6 +10,48 @@ import { parsePrescriptionHtmlToItems } from '../utils/parsePrescriptionHtml';
 import {
   converterCamposEditaveisEmTexto
 } from '../utils/folhaA4';
+import {
+  buildSidebarNavGroups,
+  SidebarKitsGroupSection,
+} from '../components/SidebarKitsAndFooterSection';
+import { buildPresetQuickTemplatePayload } from '../components/editor/editorDocumentPayloads';
+import {
+  PRESET_STANDARD_MODELS,
+  EditorStylesDrawerTab,
+} from '../components/editor/EditorStylesTabAndSaveModals';
+import { buscarDescricaoCid } from '../components/sus/SusRegulatorySpecificFields';
+import {
+  SusLmeMedicationFieldsSection,
+  linhaVaziaDaLme,
+} from '../components/sus/SusLmeMedicationFieldsSection';
+import {
+  extractDoctorInitials,
+  LogoGeneratorControlsColumn,
+} from '../components/logo/LogoGeneratorControlsColumn';
+import {
+  buildOncologyScreeningExamItem,
+  resolveActiveDocumentsSubTab,
+} from '../components/layout/AppWorkspaceAndModals';
+import {
+  resolveDraftRecipeType,
+  resolveLegacyTypographyId,
+  hasEmbeddedInstitutionalHeader,
+} from '../hooks/useDocumentTemplatesAndStyles';
+import {
+  calculateSagittalBalance,
+  calculateLawtonYoung,
+  calculatePhasesScore,
+  calculateVasograde,
+} from '../utils/scores/neuroSpineEngine';
+import {
+  normalizeText,
+  stripSaltPrefix,
+  extractCommercialBrands,
+} from '../utils/fuzzySearch';
+import {
+  EditorLogoConfigDropdown,
+  resolveLogoBadgeLabel,
+} from '../components/editor/EditorSheetConfigBar';
 
 describe('Governança de Rotas e Navegação do Editor', () => {
   it('não deve possuir rotas órfãs ou duplicadas na união canônica de ActiveTab e deve bloquear ações sem médico configurado', () => {
@@ -320,6 +362,222 @@ describe('Governança de Rotas e Navegação do Editor', () => {
 
     expect(campoPacienteVazio.removed).toBe(true);
     expect(campoPacienteVazio.replacedWith).toBeNull();
+  });
+
+  it('deve validar grupos de navegação da Sidebar, payloads de modelos padrão do Editor, busca de CID SUS e iniciais do gerador de logo', () => {
+    // 1. SidebarKitsAndFooterSection: badges apenas quando contagem/peso > 0
+    const groupsZero = buildSidebarNavGroups(0, 0, 0);
+    expect(groupsZero.coreHubNavItems[0].badge).toBeUndefined();
+    expect(groupsZero.coreHubNavItems[1].badge).toBeUndefined();
+    expect(groupsZero.clinicalToolsNavItems[0].badge).toBeUndefined();
+    expect(groupsZero.clinicalToolsNavItems[2].badge).toBe('114');
+
+    const groupsActive = buildSidebarNavGroups(3, 5, 18.5);
+    expect(groupsActive.coreHubNavItems[0].badge).toBe('3');
+    expect(groupsActive.coreHubNavItems[1].badge).toBe('5');
+    expect(groupsActive.clinicalToolsNavItems[0].badge).toBe('18.5kg');
+
+    const kitsExpandedHtml = renderToStaticMarkup(
+      React.createElement(SidebarKitsGroupSection, {
+        isOpen: true,
+        showKits: true,
+        onToggleKits: vi.fn(),
+        onExpandAndShowKits: vi.fn(),
+        onApplyKit: vi.fn(),
+      })
+    );
+    expect(kitsExpandedHtml).toContain('id="sidebar-kits-list"');
+
+    // 2. editorDocumentPayloads + EditorStylesTabAndSaveModals: escapa XSS e configura 2 vias na receita_especial
+    expect(PRESET_STANDARD_MODELS.length).toBeGreaterThanOrEqual(9);
+    const specialPreset = buildPresetQuickTemplatePayload(
+      'receita_especial',
+      {
+        id: 'p-xss',
+        name: 'Maria <script>alert(1)</script>',
+        documentNumber: '111.222.333-44',
+        weightKg: 60,
+        gender: 'female',
+        allergies: [],
+      },
+      []
+    );
+    expect(specialPreset.viaLayout).toBe('2-vias');
+    expect(specialPreset.pageOrientation).toBe('landscape');
+    expect(specialPreset.templateHtml).not.toContain('<script>');
+    expect(specialPreset.templateHtml).toContain('Maria &lt;script&gt;alert(1)&lt;/script&gt;');
+
+    const stylesTabHtml = renderToStaticMarkup(
+      React.createElement(EditorStylesDrawerTab, {
+        customStyles: [],
+        setIsModelsDrawerOpen: vi.fn(),
+        setIsSaveStyleModalOpen: vi.fn(),
+        handleDeleteCustomStyle: vi.fn(),
+        handleApplyStyle: vi.fn(),
+      })
+    );
+    expect(stylesTabHtml).toContain('Estilos Padrão de Fábrica');
+
+    // 3. SusRegulatorySpecificFields + SusLmeMedicationFieldsSection
+    expect(buscarDescricaoCid('m54.5')).toContain('Dor lombar baixa');
+    expect(buscarDescricaoCid('   ')).toBe('');
+    expect(buscarDescricaoCid('CODIGO_INEXISTENTE_999')).toBe('');
+
+    const lmeHtmlWithRepeat = renderToStaticMarkup(
+      React.createElement(SusLmeMedicationFieldsSection, {
+        formData: {
+          doctorName: '',
+          doctorCrm: '',
+          doctorCrmState: 'RO',
+          doctorSpecialty: '',
+          doctorCnes: '',
+          doctorClinicName: '',
+          patientName: '',
+          patientCns: '',
+          patientCpf: '',
+          patientBirthDate: '',
+          patientAge: '',
+          patientGender: 'female',
+          patientSex: 'F',
+          patientMotherName: '',
+          patientPhone: '',
+          patientAddress: '',
+          patientNeighborhood: '',
+          patientCity: '',
+          patientState: 'RO',
+          patientCep: '',
+          cid10Code: '',
+          cid10Description: '',
+          clinicalJustification: '',
+        },
+        linhasDaLme: [{ name: 'Atorvastatina 40 mg', quantities: ['30', '', '', '', '', ''] }],
+        onFieldChange: vi.fn(),
+        onAlterarLinhaDaLme: vi.fn(),
+      })
+    );
+    expect(lmeHtmlWithRepeat).toContain('Repetir a quantidade do 1º mês nos 6 meses');
+    expect(linhaVaziaDaLme().quantities).toHaveLength(6);
+
+    // 4. LogoGeneratorControlsColumn: extração de iniciais do médico sem prefixos Dr./Dra.
+    expect(extractDoctorInitials('Dra. Helena Costa')).toBe('HC');
+    expect(extractDoctorInitials('Dr. Marcos')).toBe('M');
+    expect(extractDoctorInitials('   ')).toBe('PCM');
+
+    const logoControlsHtml = renderToStaticMarkup(
+      React.createElement(LogoGeneratorControlsColumn, {
+        symbol: 'monogram',
+        setSymbol: vi.fn(),
+        monogramText: 'HC',
+        setMonogramText: vi.fn(),
+        frame: 'double_circle',
+        setFrame: vi.fn(),
+        paletteKey: 'sus',
+        setPaletteKey: vi.fn(),
+        institutionName: 'UBS CENTRAL',
+        setInstitutionName: vi.fn(),
+        subtitle: 'ATENÇÃO BÁSICA',
+        setSubtitle: vi.fn(),
+        textLayout: 'curved',
+        setTextLayout: vi.fn(),
+      })
+    );
+    expect(logoControlsHtml).toContain('aria-label="Iniciais do monograma"');
+    expect(logoControlsHtml).toContain('Arco Circular');
+  });
+
+  it('deve validar helpers modulares da TASK-09 (exames de rastreio INCA, restauração de rascunho, motores neurovasculares, taxonomia fuzzy e dropdown de logotipo)', () => {
+    // 1. AppWorkspaceAndModals: mapeia exames de rastreio canônicos e bloqueia IDs vazios/desconhecidos sem inventar PSA
+    const mamo = buildOncologyScreeningExamItem('mamografia');
+    expect(mamo?.name).toContain('SIGTAP 02.04.03.018-8');
+    const papa = buildOncologyScreeningExamItem('PAPANICOLAOU');
+    expect(papa?.name).toContain('SIGTAP 02.03.01.008-6');
+    expect(buildOncologyScreeningExamItem('')).toBeNull();
+    expect(buildOncologyScreeningExamItem('   ')).toBeNull();
+    expect(buildOncologyScreeningExamItem('exame-inexistente-999')).toBeNull();
+
+    expect(resolveActiveDocumentsSubTab('sus', 'certificate')).toBe('sus');
+    expect(resolveActiveDocumentsSubTab('referral', 'certificate')).toBe('referral');
+    expect(resolveActiveDocumentsSubTab('documents', 'exams')).toBe('exams');
+
+    // 2. useDocumentActiveLoadersAndDraft: detecção de regime do rascunho, tipografia legada e cabeçalho embutido
+    expect(resolveDraftRecipeType('RECEITUÁRIO DE CONTROLE ESPECIAL')).toBe('controle_especial');
+    expect(resolveDraftRecipeType('RECEITUÁRIO MÉDICO — ANTIMICROBIANO')).toBe('antimicrobiano');
+    expect(resolveDraftRecipeType('RECEITUÁRIO MÉDICO')).toBe('simples');
+    expect(resolveDraftRecipeType('ATESTADO MÉDICO')).toBeNull();
+    expect(resolveDraftRecipeType('')).toBeNull();
+
+    expect(resolveLegacyTypographyId('serif')).toBe('cormorant');
+    expect(resolveLegacyTypographyId('sans')).toBe('jakarta');
+    expect(resolveLegacyTypographyId('inter')).toBe('inter');
+    expect(resolveLegacyTypographyId('   ')).toBeNull();
+
+    expect(hasEmbeddedInstitutionalHeader('<div style="border-bottom: 2px solid #000">UBS</div>')).toBe(true);
+    expect(hasEmbeddedInstitutionalHeader('<p>Texto simples</p>')).toBe(false);
+    expect(hasEmbeddedInstitutionalHeader('')).toBe(false);
+
+    // 3. neuroSpineEngine + neurovascularEngine: alerta geométrico Duval-Beaupère e escores neurovasculares
+    const inconsistentSagittal = calculateSagittalBalance({ pi: 60, pt: 15, ss: 35, ll: 30, sva: 110 });
+    expect(inconsistentSagittal.activeRiskTier.severityLevel).toBe('critical');
+    expect(inconsistentSagittal.warnings?.[0]).toContain('Inconsistência geométrica espinopélvica');
+
+    const lawtonHigh = calculateLawtonYoung({ spetzlerMartin: 4, age: 55, unruptured: true, diffuse: true });
+    expect(lawtonHigh.score).toBe(9);
+    expect(lawtonHigh.activeRiskTier.severityLevel).toBe('critical');
+
+    const phasesHigh = calculatePhasesScore({ population: 'finland', hypertension: true, age: 74, size: 12, earlierSah: true, site: 'pcoa' });
+    expect(phasesHigh.score).toBe(18);
+    expect(phasesHigh.scoreFormatted).toContain('> 17.8%');
+
+    const vasogradeRed = calculateVasograde({ wfns: 4, fisher: 3 });
+    expect(vasogradeRed.activeRiskTier.severityLevel).toBe('critical');
+    expect(vasogradeRed.activeRiskTier.pharmacologicalActions[0].drugName).toContain('Nimodipino');
+
+    // 4. fuzzySearch + fuzzySearchTaxonomy: extração de marcas ignorando dosagens numéricas e preservação de sais minerais
+    const brands = extractCommercialBrands('Dipirona Sódica (1g) (Novalgina, Anador) (500mg/mL)', normalizeText);
+    expect(brands).toEqual(['novalgina', 'anador']);
+    expect(stripSaltPrefix('cloridrato de metformina')).toBe('metformina');
+    expect(stripSaltPrefix('sulfato ferroso')).toBe('sulfato ferroso');
+    expect(stripSaltPrefix('sulfato de zinco')).toBe('sulfato de zinco');
+
+    // 5. EditorLogoConfigDropdown: selo de contagem de logos e renderização do menu aberto
+    expect(resolveLogoBadgeLabel({ dataUrl: null, position: 'header-left', size: 'md', visible: true })).toBeNull();
+    expect(resolveLogoBadgeLabel({ dataUrl: 'data:image/png;base64,AAA', position: 'header-left', size: 'md', visible: true })).toBe('1 Logo');
+    expect(
+      resolveLogoBadgeLabel({
+        dataUrl: 'data:image/png;base64,AAA',
+        position: 'header-left',
+        size: 'md',
+        visible: true,
+        secondaryDataUrl: 'data:image/png;base64,BBB',
+        secondaryVisible: true,
+      })
+    ).toBe('Duplo');
+
+    const logoDropdownHtml = renderToStaticMarkup(
+      React.createElement(EditorLogoConfigDropdown, {
+        logoConfig: { dataUrl: 'data:image/png;base64,AAA', position: 'header-left', size: 'md', visible: true },
+        isLogoMenuOpen: true,
+        setIsLogoMenuOpen: vi.fn(),
+        activeLogoTab: 'left',
+        setActiveLogoTab: vi.fn(),
+        handleChangeLogoPosition: vi.fn(),
+        handleChangeLogoSize: vi.fn(),
+        fileInputRef: { current: null },
+        handleLogoUpload: vi.fn(),
+        logoUploading: false,
+        setIsLogoGeneratorOpen: vi.fn(),
+        handleApplyPresetLogo: vi.fn(),
+        handleRemoveLogo: vi.fn(),
+        handleChangeSecondaryLogoSize: vi.fn(),
+        secondaryFileInputRef: { current: null },
+        handleSecondaryLogoUpload: vi.fn(),
+        secondaryLogoUploading: false,
+        handleApplySecondaryPresetLogo: vi.fn(),
+        handleRemoveSecondaryLogo: vi.fn(),
+      })
+    );
+    expect(logoDropdownHtml).toContain('Timbrado / Logotipos');
+    expect(logoDropdownHtml).toContain('Remover Logo Esquerdo');
   });
 });
 

@@ -43,6 +43,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
   const [protocolSearch, setProtocolSearch] = useState<string>(initialSearchQuery || '');
   const [selectedMedCategory, setSelectedMedCategory] = useState<string>('all');
+  const [showAllUnifiedMeds, setShowAllUnifiedMeds] = useState<boolean>(false);
   const [addedProtocolsMap, setAddedProtocolsMap] = useState<{ [id: string]: boolean }>({});
 
   React.useEffect(() => {
@@ -76,11 +77,19 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
   }, [selectedCategory, protocolSearch]);
 
   const filteredUnifiedMeds = useMemo(() => {
-    if (selectedMedCategory === 'all') {
-      return UNIFIED_MEDICATIONS;
+    const byCat = selectedMedCategory === 'all'
+      ? UNIFIED_MEDICATIONS
+      : UNIFIED_MEDICATIONS.filter(med => med.category === selectedMedCategory);
+    const q = protocolSearch.trim().toLowerCase();
+    return q ? byCat.filter(med => med.name.toLowerCase().includes(q)) : byCat;
+  }, [selectedMedCategory, protocolSearch]);
+
+  const displayedUnifiedMeds = useMemo(() => {
+    if (selectedMedCategory === 'all' && !showAllUnifiedMeds && !protocolSearch.trim()) {
+      return filteredUnifiedMeds.slice(0, 24);
     }
-    return UNIFIED_MEDICATIONS.filter(med => med.category === selectedMedCategory);
-  }, [selectedMedCategory]);
+    return filteredUnifiedMeds;
+  }, [filteredUnifiedMeds, selectedMedCategory, showAllUnifiedMeds, protocolSearch]);
 
   /**
    * Converte uma medicação do protocolo em PrescriptionItem.
@@ -150,14 +159,10 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
   };
 
   const handleAddSingleMedication = (protocolMed: ProtocolMedication, protocol: PathologyProtocol, index: number) => {
-    const item = buildPrescriptionItem(protocolMed, protocol);
-    onAddPrescriptionItem(item);
-
+    onAddPrescriptionItem(buildPrescriptionItem(protocolMed, protocol));
     const key = `${protocol.id}-med-${index}`;
     setAddedProtocolsMap(prev => ({ ...prev, [key]: true }));
-    setTimeout(() => {
-      setAddedProtocolsMap(prev => ({ ...prev, [key]: false }));
-    }, 1800);
+    setTimeout(() => setAddedProtocolsMap(prev => ({ ...prev, [key]: false })), 1800);
   };
 
   const handleAddProtocol = (protocol: PathologyProtocol) => {
@@ -177,58 +182,32 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
       }
     }
 
-    medsToAdd.forEach(protocolMed => {
-      onAddPrescriptionItem(buildPrescriptionItem(protocolMed, protocol));
-    });
-
+    medsToAdd.forEach(protocolMed => onAddPrescriptionItem(buildPrescriptionItem(protocolMed, protocol)));
     setAddedProtocolsMap(prev => ({ ...prev, [protocol.id]: true }));
-    setTimeout(() => {
-      setAddedProtocolsMap(prev => ({ ...prev, [protocol.id]: false }));
-    }, 1800);
+    setTimeout(() => setAddedProtocolsMap(prev => ({ ...prev, [protocol.id]: false })), 1800);
   };
 
   return (
-    <div data-state="idle" aria-busy={false} id="clinical-protocols-section" className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
-      {/* Top Banner */}
-      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-            <Icon name="stethoscope" size={16} />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
-              Protocolos clínicos por patologia
-            </h2>
-            <p className="text-[11px] font-medium text-[var(--text-muted)] truncate">
-              Condutas de 1ª linha • Peso: <span className="text-emerald-700 dark:text-emerald-400 font-semibold clinical-tabular-nums">{patientWeight > 0 ? `${patientWeight} kg` : 'não informado'}</span>
-            </p>
-          </div>
+    <div data-state="idle" aria-busy={false} id="clinical-protocols-section" className="w-full max-w-7xl mx-auto flex flex-col gap-3">
+      {/* Top Banner Enxuto */}
+      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2 min-w-0 flex-wrap">
+          <Icon name="stethoscope" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+          <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">Protocolos clínicos por patologia</h2>
+          <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 clinical-tabular-nums shrink-0">
+            Condutas 1ª linha • Peso: <strong className="font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'não informado'}</strong>
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 self-start sm:self-auto shrink-0">
-          <div className="h-8 px-2.5 rounded-lg border border-subtle/80 dark:border-white/10 bg-[var(--surface-inset)] flex items-center gap-1.5">
-            <Icon name="calculate" size={14} className="text-emerald-700 dark:text-emerald-400" />
-            <span className="text-xs font-medium text-[var(--text-main)]">
-              Peso: <span className="text-emerald-700 dark:text-emerald-400 font-bold clinical-tabular-nums">{patientWeight > 0 ? `${patientWeight} kg` : '—'}</span>
-            </span>
-          </div>
-
           {onNavigateToScores ? (
-            <button
-              type="button"
-              onClick={onNavigateToScores}
-              className="btn-tactile-secondary h-8 min-h-[32px] px-3 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap"
-            >
+            <button type="button" onClick={onNavigateToScores} className="btn-tactile-secondary h-8 min-h-[32px] px-3 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap">
               <Icon name="monitor_heart" size={14} className="text-sky-600 dark:text-sky-400" />
               <span>Escores & BIC (114)</span>
             </button>
           ) : null}
 
-          <button
-            type="button"
-            onClick={onNavigateToPrescription}
-            className="btn-tactile-primary h-8 min-h-[32px] px-3.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
-          >
+          <button type="button" onClick={onNavigateToPrescription} className="btn-tactile-primary h-8 min-h-[32px] px-3.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500">
             <span>Ir para receita</span>
             <Icon name="arrow_forward" size={14} />
           </button>
@@ -236,7 +215,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
       </div>
 
       {/* Aviso YMYL */}
-      <div className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-xs font-medium text-slate-600 dark:text-slate-300 flex items-start gap-2.5">
+      <div className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-xs font-medium text-slate-600 dark:text-slate-300 flex items-start gap-2">
         <Icon name="info" className="text-[15px] text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
         <span>
           Os protocolos abaixo são <span className="font-semibold text-slate-800 dark:text-slate-100">referências de apoio</span> baseadas em protocolos do Ministério da Saúde e diretrizes das sociedades de especialidade. A avaliação do paciente, a adaptação de doses e a <span className="font-semibold text-slate-800 dark:text-slate-100">conduta final são de responsabilidade exclusiva do médico assistente</span>.
@@ -244,35 +223,48 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
       </div>
 
       {/* Busca Rápida de Protocolo + Category Pills */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
-        <div className="relative sm:w-72 shrink-0">
-          <Icon
-            name="search"
-            size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
-          />
-          <input
-            id="protocol-search-input"
-            type="text"
-            value={protocolSearch}
-            onChange={(e) => setProtocolSearch(e.target.value)}
-            placeholder="Ex.: Pneumonia, ITU, Otite, Dengue..."
-            aria-label="Filtrar protocolos por patologia ou medicamento"
-            className="w-full pl-9 pr-8 py-2 min-h-[40px] rounded-xl text-xs font-medium tactile-input focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-          />
-          {protocolSearch && (
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <div className="flex items-center gap-2 sm:w-80 shrink-0">
+          <div className="relative flex-1 min-w-0">
+            <Icon name="search" size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <input
+              id="protocol-search-input"
+              name="protocolSearch"
+              type="text"
+              value={protocolSearch}
+              onChange={(e) => setProtocolSearch(e.target.value)}
+              placeholder="Ex.: Pneumonia, ITU, Otite, Dengue..."
+              aria-label="Filtrar protocolos por patologia ou medicamento"
+              className="w-full h-9 pl-9 pr-8 rounded-xl text-xs font-medium tactile-input focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            />
+            {protocolSearch && (
+              <button
+                type="button"
+                onClick={() => setProtocolSearch('')}
+                aria-label="Limpar busca de protocolo"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
+              >
+                <Icon name="close" size={14} />
+              </button>
+            )}
+          </div>
+          {(protocolSearch || selectedCategory !== 'Todas') && (
             <button
               type="button"
-              onClick={() => setProtocolSearch('')}
-              aria-label="Limpar busca de protocolo"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
+              onClick={() => {
+                setProtocolSearch('');
+                setSelectedCategory('Todas');
+              }}
+              className="chip-neutral h-9 min-h-[36px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              title="Limpar busca e filtro de protocolo"
             >
               <Icon name="close" size={14} />
+              <span>Limpar</span>
             </button>
           )}
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar fade-scroll-x">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 custom-scrollbar fade-scroll-x">
           {categories.map((cat) => {
             const isSelected = selectedCategory === cat;
             return (
@@ -280,7 +272,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                className={`text-xs font-semibold px-3 py-1.5 min-h-[36px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                   isSelected
                     ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
                     : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
@@ -294,18 +286,18 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
       </div>
 
       {/* Pathology Decks Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {filteredProtocols.map((protocol) => {
           const isAdded = addedProtocolsMap[protocol.id];
 
           return (
             <div
               key={protocol.id}
-              className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col justify-between gap-3.5"
+              className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col justify-between gap-3"
             >
               {/* Card Header */}
               <div>
-                <div className="flex items-center justify-between gap-2 mb-1.5">
+                <div className="flex items-center justify-between gap-2 mb-1">
                   <span 
                     className={`text-xs uppercase font-bold px-2 py-0.5 rounded border ${
                       CATEGORY_BADGE_CLASSES[protocol.category] || 'text-sky-700 bg-slate-100 border-slate-300 dark:text-sky-300 dark:bg-[#27354A] dark:border-white/10'
@@ -320,10 +312,10 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   )}
                 </div>
 
-                <h3 className="text-sm sm:text-base font-semibold tracking-tight" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                <h3 className="text-sm font-semibold tracking-tight" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
                   {protocol.name}
                 </h3>
-                <p className="text-xs font-medium mt-1 leading-relaxed text-[var(--text-muted)]">
+                <p className="text-xs font-medium mt-0.5 leading-relaxed text-[var(--text-muted)]">
                   <span className="font-bold text-[var(--text-muted)] dark:text-slate-300">1ª linha: </span>
                   {protocol.firstLineSummary}
                 </p>
@@ -337,14 +329,12 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   const isAdult = !isPed && (med.presentation.toLowerCase().includes('comprimido') || med.posology.toLowerCase().includes('adulto'));
 
                   return (
-                    <div key={`${protocol.id}-med-${idx}`} className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-colors">
-                      <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                    <div key={`${protocol.id}-med-${idx}`} className="p-2.5 sm:p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-colors">
+                      <div className="flex items-start gap-2 min-w-0 flex-1">
                         <Icon name="medication" className="text-[16px] text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-                              {med.name}
-                            </span>
+                            <span className="text-xs font-bold" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>{med.name}</span>
                             {isPed && (
                               <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-emerald-700 border border-slate-300 dark:bg-[#27354A] dark:text-emerald-300 dark:border-white/10 clinical-tabular-nums">
                                 {patientWeight > 0 ? `Dose p/ ${patientWeight} kg` : 'Pediátrico'}
@@ -356,12 +346,8 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                               </span>
                             )}
                           </div>
-                          <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 mt-0.5 clinical-tabular-nums">
-                            {med.presentation}
-                          </div>
-                          <div className="text-xs font-medium mt-0.5 leading-relaxed text-[var(--text-muted)] clinical-tabular-nums">
-                            {med.posology}
-                          </div>
+                          <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 mt-0.5 clinical-tabular-nums">{med.presentation}</div>
+                          <div className="text-xs font-medium mt-0.5 leading-relaxed text-[var(--text-muted)] clinical-tabular-nums">{med.posology}</div>
                         </div>
                       </div>
 
@@ -369,24 +355,13 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAddSingleMedication(med, protocol, idx)}
-                        className={`px-3 py-2 min-h-[40px] rounded-xl font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
-                          isMedAdded 
-                            ? 'bg-navy-900 dark:bg-[#0369A1] text-white shadow-sm' 
-                            : 'btn-tactile-secondary'
+                        className={`px-3 py-1.5 min-h-[36px] rounded-xl font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                          isMedAdded ? 'bg-navy-900 dark:bg-[#0369A1] text-white shadow-sm' : 'btn-tactile-secondary'
                         }`}
                         title={`Adicionar apenas ${med.name} à receita`}
                       >
-                        {isMedAdded ? (
-                          <>
-                            <Icon name="check" className="text-[14px] text-white" />
-                            <span>Adicionado!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Icon name="add" className="text-[14px] text-sky-500" />
-                            <span>Adicionar</span>
-                          </>
-                        )}
+                        <Icon name={isMedAdded ? 'check' : 'add'} className={`text-[14px] ${isMedAdded ? 'text-white' : 'text-sky-500'}`} />
+                        <span>{isMedAdded ? 'Adicionado!' : 'Adicionar'}</span>
                       </button>
                     </div>
                   );
@@ -402,7 +377,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               )}
 
               {/* Footer: reference + actions */}
-              <div className="border-t pt-3 space-y-2.5" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+              <div className="border-t pt-2.5 space-y-2" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
                 <span className="block text-xs italic text-[var(--text-muted)] dark:text-slate-300">
                   Referência: {protocol.reference}
                 </span>
@@ -411,27 +386,18 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddProtocol(protocol)}
-                    className={`flex-1 px-3 py-2 min-h-[44px] rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                    className={`flex-1 px-3 py-2 min-h-[40px] rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                       isAdded ? 'bg-emerald-700 text-white' : 'tactile-btn-primary'
                     }`}
                   >
-                    {isAdded ? (
-                      <>
-                        <Icon name="check" className="text-[16px]" />
-                        <span>Adicionado</span>
-                      </>
-                    ) : (
-                      <>
-                        <Icon name="add" className="text-[16px]" />
-                        <span>Adicionar à prescrição</span>
-                      </>
-                    )}
+                    <Icon name={isAdded ? 'check' : 'add'} className="text-[16px]" />
+                    <span>{isAdded ? 'Adicionado' : 'Adicionar à prescrição'}</span>
                   </button>
                   {isAdded && (
                     <button
                       type="button"
                       onClick={onNavigateToPrescription}
-                      className="btn-tactile-secondary px-3 py-2 min-h-[44px] rounded-xl font-bold text-xs cursor-pointer flex items-center gap-1.5 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+                      className="btn-tactile-secondary px-3 py-2 min-h-[40px] rounded-xl font-bold text-xs cursor-pointer flex items-center gap-1.5 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
                     >
                       <span>Ver receita</span>
                       <Icon name="arrow_forward" className="text-[14px]" />
@@ -445,26 +411,29 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
       </div>
 
       {/* Seção Medicamentos por classe (SUS/RENAME) */}
-      <div className="pt-2 space-y-3">
-        <div className="flex items-center gap-2 mb-1">
-          <div 
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-white"
-            style={{
-              backgroundColor: darkMode ? '#1E3A8A' : '#0369A1',
-              border: '1px solid rgba(255, 255, 255, 0.12)'
-            }}
-          >
-            <Icon name="medication" className="text-[18px] text-slate-100" />
-          </div>
-          <div>
-            <h3 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+      <div className="pt-1 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 min-w-0">
+            <Icon name="medication" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <h3 className="text-sm font-semibold tracking-tight text-[var(--text-main)]">
               Medicamentos por classe (SUS/RENAME)
             </h3>
           </div>
+          {selectedMedCategory !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setSelectedMedCategory('all')}
+              className="chip-neutral h-8 min-h-[32px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              title="Limpar filtro de classe farmacológica"
+            >
+              <Icon name="close" size={14} />
+              <span>Limpar</span>
+            </button>
+          )}
         </div>
 
         {/* Pills de Categoria */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar fade-scroll-x">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 custom-scrollbar fade-scroll-x">
           {Object.entries(CATEGORY_LABELS).map(([catKey, catLabel]) => {
             const isSelected = selectedMedCategory === catKey;
             return (
@@ -473,7 +442,7 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setSelectedMedCategory(catKey)}
-                className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                className={`text-xs font-semibold px-3 py-1.5 min-h-[36px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                   isSelected
                     ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
                     : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
@@ -487,39 +456,23 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
 
         {/* Lista dos UNIFIED_MEDICATIONS da categoria escolhida */}
         <div className="cq-card card-surface surface-card-minimal !p-0 rounded-2xl border border-subtle dark:border-strong divide-y divide-[var(--border-subtle)] overflow-hidden">
-          {filteredUnifiedMeds.map((med) => (
-            <div
-              key={med.id}
-              className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
-            >
+          {displayedUnifiedMeds.map((med) => (
+            <div key={med.id} className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors">
               <div className="flex items-start gap-2.5 min-w-0 flex-1">
                 <Icon name="medication" className="text-[16px] text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
-                      {med.name}
-                    </span>
-                    {med.isSpecialControl && (
-                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-amber-700 border border-slate-300 dark:bg-[#27354A] dark:text-amber-300 dark:border-white/10">
-                        Controle Especial
-                      </span>
-                    )}
-                    {med.isPediatric && (
-                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-emerald-700 border border-slate-300 dark:bg-[#27354A] dark:text-emerald-300 dark:border-white/10">
-                        Pediátrico
-                      </span>
-                    )}
+                    <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">{med.name}</span>
+                    {med.isSpecialControl && <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-amber-700 border border-slate-300 dark:bg-[#27354A] dark:text-amber-300 dark:border-white/10">Controle Especial</span>}
+                    {med.isPediatric && <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-emerald-700 border border-slate-300 dark:bg-[#27354A] dark:text-emerald-300 dark:border-white/10">Pediátrico</span>}
                   </div>
-                  <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 mt-0.5">
-                    {med.defaultQuantity} • {med.route}
-                  </div>
+                  <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 mt-0.5">{med.defaultQuantity} • {med.route}</div>
                 </div>
               </div>
-
               <button
                 type="button"
                 onClick={() => onUsarMedicamento?.(med)}
-                className="btn-tactile-secondary px-3.5 py-2 min-h-[40px] rounded-xl font-semibold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="btn-tactile-secondary px-3 py-1.5 min-h-[36px] rounded-xl font-semibold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                 title={`Usar ${med.name} na receita`}
               >
                 <span>Usar na receita</span>
@@ -527,105 +480,80 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
               </button>
             </div>
           ))}
+          {filteredUnifiedMeds.length > displayedUnifiedMeds.length && (
+            <div className="p-3 flex justify-center bg-[var(--surface-inset)]">
+              <button
+                type="button"
+                onClick={() => setShowAllUnifiedMeds(true)}
+                className="chip-neutral px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <Icon name="expand_more" size={15} />
+                <span>Mostrar todos os {filteredUnifiedMeds.length} medicamentos RENAME</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Urgency Protocols Section */}
-      <div className="pt-2">
-        <div className="flex items-center gap-2 mb-3">
-          <div 
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-white"
-            style={{
-              backgroundColor: darkMode ? '#881337' : '#BE123C',
-              border: '1px solid rgba(255, 255, 255, 0.12)'
-            }}
-          >
-            <Icon name="emergency" className="text-[18px] text-slate-100" />
-          </div>
-          <div>
-            <h3 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-              Urgência e expansão volêmica
-            </h3>
-            <p className="text-xs font-medium text-[var(--text-muted)] dark:text-slate-300">
-              Dengue (Grupos A, C e D), choque séptico e hipoglicemia — cálculo para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
-            </p>
-          </div>
+      <div className="pt-1 flex flex-col gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Icon name="emergency" size={18} className="text-rose-600 dark:text-rose-400 shrink-0" />
+          <h3 className="text-sm font-semibold tracking-tight text-[var(--text-main)]">Urgência e expansão volêmica</h3>
+          <span className="text-xs font-medium text-[var(--text-muted)] dark:text-slate-300">
+            Dengue (Grupos A, C e D), choque séptico e hipoglicemia — cálculo para <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{patientWeight > 0 ? `${patientWeight} kg` : 'peso não informado'}</span>.
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {CLINICAL_PROTOCOLS.map((protocol) => {
             const hasWeight = patientWeight > 0;
             const calc = hasWeight ? protocol.calculateVolume(patientWeight) : null;
-
-            const isEmergency = protocol.id.includes('dengue-grupo-d') || 
-                                protocol.id.includes('choque') || 
-                                protocol.id.includes('hipoglicemia');
+            const isEmergency = protocol.id.includes('dengue-grupo-d') || protocol.id.includes('choque') || protocol.id.includes('hipoglicemia');
 
             return (
               <div
                 key={protocol.id}
-                className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col justify-between gap-3.5 relative overflow-hidden"
+                className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col justify-between gap-3 relative overflow-hidden"
               >
                 {/* Card Header */}
                 <div>
-                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                  <div className="flex items-start justify-between gap-2 mb-1">
                     <span className={`text-xs uppercase font-bold px-2 py-0.5 rounded border ${
-                      isEmergency 
-                        ? 'bg-slate-100 text-rose-700 border-slate-300 dark:bg-[#27354A] dark:text-rose-300 dark:border-white/10' 
+                      isEmergency
+                        ? 'bg-slate-100 text-rose-700 border-slate-300 dark:bg-[#27354A] dark:text-rose-300 dark:border-white/10'
                         : 'bg-slate-100 text-sky-700 border-slate-300 dark:bg-[#27354A] dark:text-sky-300 dark:border-white/10'
                     }`}>
                       {isEmergency ? 'Emergência Crítica' : 'Protocolo Clínico'}
                     </span>
-                    <span className="text-xs font-semibold text-[var(--text-muted)] dark:text-slate-300">
-                      Regra: {protocol.ruleFormula}
-                    </span>
+                    <span className="text-xs font-semibold text-[var(--text-muted)] dark:text-slate-300">Regra: {protocol.ruleFormula}</span>
                   </div>
-
-                  <h3 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                    {protocol.title}
-                  </h3>
-                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mt-0.5">
-                    {protocol.condition}
-                  </p>
+                  <h3 className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">{protocol.title}</h3>
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mt-0.5">{protocol.condition}</p>
                 </div>
 
                 {/* Volume / Dose Result Highlight */}
                 {calc ? (
-                  <div className="p-3.5 rounded-xl border border-subtle dark:border-strong space-y-1 text-center surface-inset">
+                  <div className="p-3 rounded-xl border border-subtle dark:border-strong space-y-1 text-center surface-inset">
                     <span className="text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-300 tracking-wider block clinical-tabular-nums">
                       Volume Calculado ({patientWeight} kg):
                     </span>
-                    <div className="text-lg sm:text-xl font-bold text-emerald-700 dark:text-emerald-400 clinical-tabular-nums">
-                      {calc.volumeText}
-                    </div>
-                    <div className="text-xs font-semibold clinical-tabular-nums" style={{ color: darkMode ? '#CBD5E1' : '#475569' }}>
-                      {calc.detail}
-                    </div>
-                    {calc.rate && (
-                      <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 clinical-tabular-nums">
-                        Taxa: {calc.rate}
-                      </div>
-                    )}
+                    <div className="text-lg sm:text-xl font-bold text-emerald-700 dark:text-emerald-400 clinical-tabular-nums">{calc.volumeText}</div>
+                    <div className="text-xs font-semibold clinical-tabular-nums" style={{ color: darkMode ? '#CBD5E1' : '#475569' }}>{calc.detail}</div>
+                    {calc.rate && <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 clinical-tabular-nums">Taxa: {calc.rate}</div>}
                   </div>
                 ) : (
-                  <div 
-                    className="p-3.5 rounded-xl border space-y-1 text-center tactile-flat"
-                    style={{
-                      backgroundColor: 'var(--surface-inset)',
-                      borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-                    }}
+                  <div
+                    className="p-3 rounded-xl border space-y-1 text-center tactile-flat"
+                    style={{ backgroundColor: 'var(--surface-inset)', borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}
                   >
-                    <span className="text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-300 tracking-wider block">
-                      Volume Calculado:
-                    </span>
-                    <div className="text-xs font-medium py-1.5 text-[var(--text-muted)] dark:text-slate-300">
-                      Informe o peso do paciente para calcular os volumes.
-                    </div>
+                    <span className="text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-300 tracking-wider block">Volume Calculado:</span>
+                    <div className="text-xs font-medium py-1.5 text-[var(--text-muted)] dark:text-slate-300">Informe o peso do paciente para calcular os volumes.</div>
                   </div>
                 )}
 
                 {/* Details & Clinical Notes */}
-                <div className="text-xs space-y-2 border-t pt-3" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
+                <div className="text-xs space-y-1.5 border-t pt-2.5" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }}>
                   <div className="flex items-start gap-1.5">
                     <Icon name="water_drop" className="text-[14px] text-sky-700 dark:text-sky-400 flex-shrink-0 mt-0.5" />
                     <div>

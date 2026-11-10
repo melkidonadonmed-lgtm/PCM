@@ -1,124 +1,150 @@
 import React from 'react';
 
 /**
- * Catálogo Canônico de Ícones PresCMed baseados no Google Material Design Icons (Material Symbols).
- * Esta tipagem rigorosa evita a mutação de ícones durante o desenvolvimento e geração de código por IA.
+ * Subset Canônico de Glifos (Material Symbols Outlined WOFF2) utilizado no PresCMed.
+ * Mantido em ordem alfabética estrita (requisito da especificação `icon_names` do Google Fonts
+ * e de pipelines de subsetting `pyftsubset --layout-features=liga`).
  * Referência: https://github.com/google/material-design-icons
  */
-export type CanonicalIconName =
-  // Prescrição, Farmacologia & Dosagem
-  | 'prescriptions'
-  | 'medication'
-  | 'pill'
-  | 'water_drop'
-  | 'vaccines'
-  | 'syringe'
-  | 'stethoscope'
-  | 'scale'
-  | 'calculate'
-  | 'child_care'
-  | 'baby_changing_station'
-  | 'schedule'
-  | 'alarm'
-  | 'lock'
-  | 'verified_user'
-  // Atendimento Clínico, Médico & Paciente
-  | 'person'
-  | 'person_add'
-  | 'person_remove'
-  | 'groups'
-  | 'badge'
-  | 'signature'
-  | 'approval'
-  | 'draw'
-  | 'call'
-  | 'location_on'
-  | 'local_hospital'
-  | 'clinical_notes'
-  // Exames & Diagnósticos
-  | 'biotech'
-  | 'science'
-  | 'radiology'
-  | 'monitor_heart'
-  | 'ecg_heart'
-  | 'bloodtype'
-  | 'diagnosis'
-  | 'sell'
-  | 'tag'
-  | 'fact_check'
-  | 'rule'
-  // Atestados, Documentos & Encaminhamentos
-  | 'workspace_premium'
-  | 'send'
-  | 'event_available'
-  | 'description'
-  | 'picture_as_pdf'
-  | 'download'
-  | 'print'
-  | 'content_copy'
-  | 'qr_code_2'
-  | 'layers'
-  | 'watermark'
-  | 'visibility'
-  | 'visibility_off'
-  // Ações, CRUD & Navegação
-  | 'search'
-  | 'close'
-  | 'check'
-  | 'check_circle'
-  | 'add'
-  | 'add_circle'
-  | 'delete'
-  | 'edit'
-  | 'edit_document'
-  | 'ink_eraser'
-  | 'save'
-  | 'bookmark_add'
-  | 'folder_open'
-  | 'shield'
-  | 'security'
-  | 'auto_awesome'
-  | 'undo'
-  | 'redo'
-  | 'refresh'
-  | 'sync'
-  | 'progress_activity'
-  | 'arrow_back'
-  | 'arrow_forward'
-  | 'chevron_left'
-  | 'chevron_right'
-  | 'expand_more'
-  | 'expand_less'
-  | 'menu'
-  | 'menu_open'
-  | 'more_vert'
-  | 'more_horiz'
-  | 'filter_list'
-  | 'tune'
-  // Sistema, Tema & Nuvem
-  | 'light_mode'
-  | 'dark_mode'
-  | 'cloud'
-  | 'cloud_upload'
-  | 'cloud_download'
-  | 'cloud_done'
-  | 'cloud_sync'
-  | 'warning'
-  | 'error'
-  | 'info'
-  | 'help'
-  | 'palette'
-  | 'history'
-  | 'calendar_today'
-  // Formatação de Documento (Editor Tiptap)
-  | 'format_bold'
-  | 'format_italic'
-  | 'format_align_left'
-  | 'format_align_center'
-  | 'format_align_right'
-  | 'format_align_justify'
-  | 'format_list_bulleted'
-  | 'format_list_numbered';
+export const CANONICAL_MATERIAL_SYMBOLS_SUBSET = [
+  'add',
+  'add_circle',
+  'alarm',
+  'approval',
+  'apps',
+  'arrow_back',
+  'arrow_forward',
+  'auto_awesome',
+  'baby_changing_station',
+  'badge',
+  'biotech',
+  'bloodtype',
+  'bookmark_add',
+  'calculate',
+  'calendar_today',
+  'call',
+  'check',
+  'check_circle',
+  'chevron_left',
+  'chevron_right',
+  'child_care',
+  'circle',
+  'clinical_notes',
+  'close',
+  'cloud',
+  'cloud_done',
+  'cloud_download',
+  'cloud_sync',
+  'cloud_upload',
+  'content_copy',
+  'content_cut',
+  'crop_landscape',
+  'crop_portrait',
+  'dark_mode',
+  'dashboard',
+  'database',
+  'delete',
+  'description',
+  'diagnosis',
+  'domain',
+  'download',
+  'draw',
+  'ecg_heart',
+  'edit',
+  'edit_document',
+  'error',
+  'event_available',
+  'expand_less',
+  'expand_more',
+  'fact_check',
+  'favorite',
+  'filter_list',
+  'folder_open',
+  'format_align_center',
+  'format_align_justify',
+  'format_align_left',
+  'format_align_right',
+  'format_bold',
+  'format_italic',
+  'format_list_bulleted',
+  'format_list_numbered',
+  'format_underlined',
+  'gastroenterology',
+  'groups',
+  'hard_drive',
+  'help',
+  'hexagon',
+  'history',
+  'image',
+  'info',
+  'ink_eraser',
+  'layers',
+  'light_mode',
+  'local_hospital',
+  'location_on',
+  'lock',
+  'medical_services',
+  'medication',
+  'menu',
+  'menu_open',
+  'monitor_heart',
+  'more_horiz',
+  'more_vert',
+  'neurology',
+  'open_in_full',
+  'open_with',
+  'palette',
+  'person',
+  'person_add',
+  'person_remove',
+  'picture_as_pdf',
+  'pill',
+  'prescriptions',
+  'print',
+  'progress_activity',
+  'pulmonology',
+  'qr_code_2',
+  'radiology',
+  'redo',
+  'refresh',
+  'restart_alt',
+  'rule',
+  'save',
+  'scale',
+  'schedule',
+  'science',
+  'search',
+  'security',
+  'sell',
+  'send',
+  'shield',
+  'shield_with_heart',
+  'signature',
+  'square',
+  'star',
+  'stethoscope',
+  'sync',
+  'syringe',
+  'tag',
+  'title',
+  'tune',
+  'undo',
+  'upload',
+  'vaccines',
+  'verified_user',
+  'visibility',
+  'visibility_off',
+  'warning',
+  'water_drop',
+  'watermark',
+  'workspace_premium',
+] as const;
+
+export type CanonicalIconName = (typeof CANONICAL_MATERIAL_SYMBOLS_SUBSET)[number];
+
+const CANONICAL_MATERIAL_SYMBOLS_SET: ReadonlySet<string> = new Set(
+  CANONICAL_MATERIAL_SYMBOLS_SUBSET
+);
 
 /**
  * Permite autocompletação das chaves canônicas com suporte aberto a qualquer símbolo oficial do Google.
@@ -327,6 +353,63 @@ export function resolveIconName(name: string): string {
   if (!name) return 'help';
   const clean = name.trim().toLowerCase().replace(/-/g, '_');
   return ICON_ALIASES[clean] || clean;
+}
+
+/**
+ * Verifica se um nome ou alias resolve para o subset canônico auditado do Material Symbols.
+ */
+export function isCanonicalMaterialSymbol(name: string): boolean {
+  if (!name?.trim()) return false;
+  return CANONICAL_MATERIAL_SYMBOLS_SET.has(resolveIconName(name));
+}
+
+export interface MaterialSymbolsSubsetEvaluation {
+  packageVersion: string;
+  upstreamWoff2Bytes: number;
+  upstreamTotalGlyphsApprox: number;
+  subsetGlyphCount: number;
+  estimatedSubsetWoff2Bytes: number;
+  estimatedSavingsPercent: number;
+  isSortedAlphabetically: boolean;
+  hasDuplicateGlyphs: boolean;
+  unmappedAliasTargets: string[];
+  offlineStrategy: 'local-woff2-precache-with-canonical-subset-guard';
+}
+
+/**
+ * Avalia deterministicamente o subset WOFF2 de `material-symbols` frente ao pacote
+ * completo empacotado para operação 100% offline no PWA.
+ */
+export function evaluateMaterialSymbolsSubset(): MaterialSymbolsSubsetEvaluation {
+  const upstreamWoff2Bytes = 4_001_608;
+  const subsetGlyphCount = CANONICAL_MATERIAL_SYMBOLS_SUBSET.length;
+  const estimatedSubsetWoff2Bytes = subsetGlyphCount * 960;
+  const estimatedSavingsPercent =
+    Math.round(((upstreamWoff2Bytes - estimatedSubsetWoff2Bytes) / upstreamWoff2Bytes) * 1000) / 10;
+
+  const isSortedAlphabetically = CANONICAL_MATERIAL_SYMBOLS_SUBSET.every(
+    (glyph, i, arr) => i === 0 || arr[i - 1].localeCompare(glyph) < 0
+  );
+  const hasDuplicateGlyphs =
+    CANONICAL_MATERIAL_SYMBOLS_SET.size !== CANONICAL_MATERIAL_SYMBOLS_SUBSET.length;
+  const unmappedAliasTargets = Array.from(
+    new Set(
+      Object.values(ICON_ALIASES).filter((target) => !CANONICAL_MATERIAL_SYMBOLS_SET.has(target))
+    )
+  );
+
+  return {
+    packageVersion: '0.47.5',
+    upstreamWoff2Bytes,
+    upstreamTotalGlyphsApprox: 3500,
+    subsetGlyphCount,
+    estimatedSubsetWoff2Bytes,
+    estimatedSavingsPercent,
+    isSortedAlphabetically,
+    hasDuplicateGlyphs,
+    unmappedAliasTargets,
+    offlineStrategy: 'local-woff2-precache-with-canonical-subset-guard',
+  };
 }
 
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | number;

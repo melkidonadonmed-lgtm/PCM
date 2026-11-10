@@ -40,6 +40,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
     <SoftCard
       variant="flat"
       state="idle"
+      role="region"
       aria-label="Resumo rápido de prontidão da consulta"
       className={`w-full max-w-7xl mx-auto px-3 sm:px-4 py-2 mb-3.5 sm:mb-4 rounded-2xl flex items-center justify-between gap-2 no-print overflow-x-auto scrollbar-none ${
         hideRedundantDesktop ? 'lg:hidden' : ''

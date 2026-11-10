@@ -147,7 +147,7 @@ const Via: React.FC<ViaProps> = ({ via, regime, identidade, patient, nomePacient
       <div style={{ marginTop: 9, flex: 1 }}>
         <p style={{ ...rotulo, fontSize: 8, color: TINTA_SUAVE }}>Prescrição</p>
         {items.length === 0 ? (
-          <div style={{ minHeight: 200 }} aria-label="Espaço em branco para prescrição e anotações à mão" />
+          <div role="region" style={{ minHeight: 200 }} aria-label="Espaço em branco para prescrição e anotações à mão" />
         ) : (
           agruparPorVia(items).map((grupo) => (
             <div key={grupo.via} style={{ marginTop: 4 }}>

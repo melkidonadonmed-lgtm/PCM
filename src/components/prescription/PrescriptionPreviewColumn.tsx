@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { PrescriptionItem, Patient, DoctorProfile, WorkContext } from '../../types';
 import { type RegimeReceita } from '../../utils/isSpecialControlOrAntibiotic';
 import { DOCUMENTO_DO_REGIME } from '../../utils/documentoClinico';
@@ -8,7 +8,10 @@ import { DocumentoClinico } from '../documento/DocumentoClinico';
 import { Icon } from '../Icon';
 import { AcoesDaReceita } from '../AcoesDaReceita';
 import { AvisoNotificacaoReceita } from '../AvisoNotificacaoReceita';
-import { PediatricCalculator } from '../PediatricCalculator';
+
+const PediatricCalculator = React.lazy(() =>
+  import('../PediatricCalculator').then((m) => ({ default: m.PediatricCalculator }))
+);
 
 interface PrescriptionPreviewColumnProps {
   darkMode: boolean;
@@ -79,7 +82,7 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
             <span>Prévia da folha — é exatamente o que será impresso</span>
           </h3>
           {!isDoctorConfigured && (
-            <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
               Folha para carimbo / anotação manual
             </span>
           )}
@@ -177,15 +180,17 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
 
             {/* Corpo do Drawer com rolagem */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar space-y-4">
-              <PediatricCalculator
-                darkMode={darkMode}
-                patient={patient}
-                onUpdatePatientWeight={onUpdatePatientWeight}
-                onAddPrescriptionItem={onAddPediatricItem}
-                onNavigateToPrescription={onClosePediatricDrawer}
-                isDrawer={true}
-                onClose={onClosePediatricDrawer}
-              />
+              <Suspense fallback={null}>
+                <PediatricCalculator
+                  darkMode={darkMode}
+                  patient={patient}
+                  onUpdatePatientWeight={onUpdatePatientWeight}
+                  onAddPrescriptionItem={onAddPediatricItem}
+                  onNavigateToPrescription={onClosePediatricDrawer}
+                  isDrawer={true}
+                  onClose={onClosePediatricDrawer}
+                />
+              </Suspense>
             </div>
           </div>
         </div>

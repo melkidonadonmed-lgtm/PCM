@@ -3,7 +3,7 @@ name: PresCMed Design System
 version: "alpha"
 description: "Contrato Arquitetural e Design System Canônico do PresCMed (PCM) — regido por design-md v8.0.0 (9 Eixos SSOT, Tokens em 3 Camadas OKLCH 60-30-10 + 90/8/2, Física Óptica Zenital, Macro/Microlayouts @container, 4 Variantes de Cards, Navegação em 3 Camadas e Adendos A–I) e design-interface-medica-minimalista v4.0.0."
 colors:
-  primary: "#1E3A8A"
+  primary: "#243447"
   on-primary: "#FFFFFF"
   secondary: "#334155"
   on-secondary: "#FFFFFF"
@@ -11,11 +11,11 @@ colors:
   on-neutral: "#0F172A"
   surface: "#FFFFFF"
   on-surface: "#0F172A"
-  clinical: "#0F766E"
+  clinical: "#115E59"
   on-clinical: "#FFFFFF"
   obsidian: "#0F172A"
   on-obsidian: "#F8FAFC"
-  rose: "#BE123C"
+  rose: "#9F1239"
   on-rose: "#FFFFFF"
 typography:
   display:
@@ -191,11 +191,11 @@ O sistema cromático opera no espaço perceptual **`OKLCH` (`oklch(L C H)`)** em
 
 ### 1. Tokens em 3 Camadas (`OKLCH`, `light-dark()`, `color-mix()` e Sintaxe de Cor Relativa `from`)
 
-- **Primary (`#1E3A8A` / `oklch(0.36 0.14 262)`)**: Azul-marinho institucional reservado ao CTA primário de emissão/impressão e ao anel `:focus-visible`.
+- **Primary (`#243447` / `oklch(0.32 0.04 248)`)**: Mineral Slate Navy sólido e refinado (zero azul cobalto elétrico), reservado ao CTA primário de emissão/impressão e ao anel `:focus-visible`.
 - **Secondary (`#334155` / `oklch(0.34 0.03 255)`)**: Slate estrutural para ações secundárias, barras segmentadas e controles de apoio.
-- **Clinical (`#0F766E` / `oklch(0.51 0.10 182)`)**: Teal clínico (contraste WCAG AA $> 4.5:1$ com `#FFFFFF`) para confirmação de posologia, inclusão na receita e prontidão assistencial.
-- **Neutral & Surface (`#F8FAFC` / `#FFFFFF` no Light; `#0F172A` / `#1E293B` no Dark)**: Base luminosa de 60% (`--bg-app` / `--bg-canvas`) e 30% (`--bg-surface` / `--bg-card` / `--surface-card`).
-- **Rose (`#BE123C` / `oklch(0.51 0.20 16)`)**: Vermelho farmacêutico **estritamente reservado** a alergias medicamentosas, doses acima do teto seguro, interações graves e exclusão destrutiva.
+- **Clinical (`#115E59` / `oklch(0.45 0.075 186)`)**: Mineral Sage Teal sóbrio (sem verde neon, contraste WCAG AA $> 4.5:1$ com `#FFFFFF`) para confirmação de posologia, inclusão na receita e prontidão assistencial.
+- **Neutral & Surface (`#F3F5F8` / `#FFFFFF` no Light; `#141C27` / `#243042` no Dark)**: Base fosca mineral de 60% (`--bg-app` / `--bg-canvas`) e 30% (`--bg-surface` / `--bg-card` / `--surface-card`), com cartões mais claros (`#243042` / `oklch(0.30 0.024 252)`) no modo escuro.
+- **Rose (`#9F1239` / `oklch(0.47 0.15 16)`)**: Carmim farmacêutico sólido **estritamente reservado** a alergias medicamentosas, doses acima do teto seguro, interações graves e exclusão destrutiva.
 
 ```css
 /* ==========================================================================
@@ -205,18 +205,18 @@ O sistema cromático opera no espaço perceptual **`OKLCH` (`oklch(L C H)`)** em
 :root {
   color-scheme: light dark;
 
-  /* --- CAMADA 1: TOKENS PRIMITIVOS (Catálogo Bruto Perceptual OKLCH) --- */
-  --primitive-navy-700: oklch(0.36 0.14 262);      /* #1E3A8A */
-  --primitive-blue-500: oklch(0.62 0.21 258);      /* Azul interativo */
-  --primitive-teal-600: oklch(0.51 0.10 182);      /* #0F766E */
-  --primitive-emerald-500: oklch(0.70 0.17 160);   /* Sucesso semântico */
-  --primitive-amber-600: oklch(0.66 0.17 65);      /* #D97706 Alerta */
-  --primitive-rose-700: oklch(0.51 0.20 16);       /* #BE123C Perigo clínico */
+  /* --- CAMADA 1: TOKENS PRIMITIVOS (Paleta Mineral Refinada, Sólida e Sem Cobalto/Neon) --- */
+  --primitive-navy-700: oklch(0.32 0.04 248);      /* #243447 Mineral Slate Navy */
+  --primitive-blue-500: oklch(0.46 0.06 245);      /* #3B526B Steel Slate Sóbrio */
+  --primitive-teal-600: oklch(0.45 0.075 186);     /* #115E59 Mineral Sage Teal */
+  --primitive-emerald-500: oklch(0.52 0.08 180);   /* #1D7A73 Sage Clínico Sólido */
+  --primitive-amber-600: oklch(0.58 0.12 64);      /* #B45309 Ocre Âmbar Sóbrio */
+  --primitive-rose-700: oklch(0.47 0.15 16);       /* #9F1239 Carmim Farmacêutico */
 
-  --primitive-neutral-50: oklch(0.985 0.004 255);  /* #F8FAFC Clean Slate */
-  --primitive-neutral-100: oklch(0.955 0.008 255); /* #F1F5F9 Inset Light */
-  --primitive-neutral-800: oklch(0.22 0.025 260);  /* #1E293B Surface Dark */
-  --primitive-neutral-900: oklch(0.16 0.02 260);   /* #0F172A Canvas Dark */
+  --primitive-neutral-50: oklch(0.968 0.005 252);  /* #F3F5F8 Matte Mineral Stone */
+  --primitive-neutral-100: oklch(0.952 0.007 252); /* #EEF2F6 Matte Inset Light */
+  --primitive-neutral-800: oklch(0.30 0.024 252);  /* #243042 Lighter Matte Surface Dark */
+  --primitive-neutral-900: oklch(0.21 0.020 252);  /* #141C27 Matte Canvas Dark */
 
   /* --- CAMADA 2: TOKENS SEMÂNTICOS REATIVOS (60-30-10 & light-dark) --- */
   --brand-primary: var(--primitive-navy-700);
@@ -424,34 +424,35 @@ A profundidade visual rejeita sombras lavadas de camada única e aplica **Físic
 3. **`filter: drop-shadow()`**: Utilizada em ícones vetoriais e brasões SVG transparentes onde `box-shadow` recortaria a caixa retangular.
 4. **Isolamento de Empilhamento (`isolation: isolate`)**: Aplicado em cartões interativos, modais e na bancada A4 para confinar `z-index` e *blend modes* sem vazar para o canvas.
 
-### 2. Os 3 Níveis de Elevação (`--elevation-low/medium/high`) e Recesso Côncavo (`--shadow-inset`)
+### 2. Os 3 Níveis de Elevação (`--elevation-low/medium/high` em Shadow-Box Sobreposto Soft) e Recesso Côncavo (`--shadow-inset`)
 
 ```css
 :root {
-  /* Nível 1: Cartões em repouso e pílulas ativas */
+  /* Nível 1: Cartões em repouso e pílulas ativas (4 camadas suaves sem linha branca artificial) */
   --shadow-elevation-1:
-    0px 1px 2px 0px oklch(0.2 0.03 255 / 0.05),
-    0px 2px 4px -1px oklch(0.2 0.03 255 / 0.04),
-    var(--catch-light);
+    0px 1px 2px 0px oklch(0.18 0.02 255 / 0.03),
+    0px 3px 6px -1px oklch(0.18 0.02 255 / 0.04),
+    0px 8px 16px -4px oklch(0.18 0.02 255 / 0.04),
+    0px 14px 28px -8px oklch(0.18 0.02 255 / 0.03);
 
   /* Nível 2: Cartões em hover, popovers e dropdowns */
   --shadow-elevation-2:
-    0px 2px 4px -1px oklch(0.2 0.03 255 / 0.06),
-    0px 6px 12px -2px oklch(0.2 0.03 255 / 0.08),
-    0px 14px 24px -4px oklch(0.2 0.03 255 / 0.05),
-    var(--catch-light);
+    0px 1px 2px 0px oklch(0.18 0.02 255 / 0.04),
+    0px 4px 8px -2px oklch(0.18 0.02 255 / 0.05),
+    0px 10px 20px -4px oklch(0.18 0.02 255 / 0.06),
+    0px 20px 36px -8px oklch(0.18 0.02 255 / 0.05);
 
   /* Nível 3: Modais, Command Palette (Ctrl+K), Drawers e Folha A4 flutuante */
   --shadow-elevation-3:
-    0px 4px 8px -2px oklch(0.2 0.03 255 / 0.06),
-    0px 16px 24px -4px oklch(0.2 0.03 255 / 0.10),
-    0px 32px 48px -8px oklch(0.2 0.03 255 / 0.14),
-    var(--catch-light);
+    0px 2px 4px -1px oklch(0.18 0.02 255 / 0.04),
+    0px 8px 16px -4px oklch(0.18 0.02 255 / 0.06),
+    0px 18px 32px -6px oklch(0.18 0.02 255 / 0.08),
+    0px 32px 56px -12px oklch(0.18 0.02 255 / 0.09);
 
   /* Cavidade Côncava (Trilhos segmentados e inputs vazios) */
   --shadow-inset:
-    inset 0px 2px 4px 0px oklch(0.15 0.02 255 / 0.08),
-    inset 0px 0px 0px 1px oklch(0.15 0.02 255 / 0.05);
+    inset 0px 1px 3px 0px oklch(0.15 0.02 255 / 0.06),
+    inset 0px 1px 2px -1px oklch(0.15 0.02 255 / 0.04);
 
   --elevation-low: var(--shadow-elevation-1);
   --elevation-medium: var(--shadow-elevation-2);
@@ -463,16 +464,17 @@ A profundidade visual rejeita sombras lavadas de camada única e aplica **Físic
 @media (prefers-color-scheme: dark) {
   :root {
     --elevation-low:
-      0px 2px 4px oklch(0.05 0.01 260 / 0.5),
-      inset 0px 1px 0px 0px oklch(1.0 0 0 / 0.08);
+      0px 1px 2px 0px oklch(0.04 0.01 260 / 0.28),
+      0px 4px 10px -2px oklch(0.04 0.01 260 / 0.32),
+      0px 10px 22px -6px oklch(0.04 0.01 260 / 0.26);
     --elevation-medium:
-      0px 8px 16px -2px oklch(0.05 0.01 260 / 0.65),
-      0px 0px 12px 0px oklch(from var(--brand-primary) l c h / 0.16),
-      inset 0px 1px 0px 0px oklch(1.0 0 0 / 0.12);
+      0px 2px 4px -1px oklch(0.04 0.01 260 / 0.34),
+      0px 8px 16px -3px oklch(0.04 0.01 260 / 0.40),
+      0px 18px 32px -6px oklch(0.04 0.01 260 / 0.36);
     --elevation-high:
-      0px 20px 40px -6px oklch(0.02 0.01 260 / 0.8),
-      0px 0px 24px 0px oklch(from var(--brand-primary) l c h / 0.24),
-      inset 0px 1px 0px 0px oklch(1.0 0 0 / 0.16);
+      0px 4px 8px -2px oklch(0.02 0.01 260 / 0.42),
+      0px 14px 28px -6px oklch(0.02 0.01 260 / 0.50),
+      0px 28px 52px -12px oklch(0.02 0.01 260 / 0.55);
   }
 }
 ```

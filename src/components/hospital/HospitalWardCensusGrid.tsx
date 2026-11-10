@@ -69,22 +69,40 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
       data-state="idle"
       aria-busy={false}
       aria-label="Mapa de Leitos e Censo da Enfermaria"
-      className="flex flex-col gap-4 sm:gap-5"
+      className="flex flex-col gap-3"
     >
       {/* Barra de Filtro por Setor e Busca Rápida no Censo */}
-      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none flex items-center">
-            <Icon name="search" size={16} />
-          </span>
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar por leito (110-15), paciente ou diagnóstico..."
-            aria-label="Buscar leito por código, paciente ou diagnóstico"
-            className="w-full h-9 pl-9 pr-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-medium text-[var(--text-main)]"
-          />
+      <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2 flex-1 max-w-md min-w-0">
+          <div className="relative flex-1 min-w-0">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none flex items-center">
+              <Icon name="search" size={16} />
+            </span>
+            <input
+              id="hospital-census-search"
+              name="hospitalCensusSearch"
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por leito (110-15), paciente ou diagnóstico..."
+              aria-label="Buscar leito por código, paciente ou diagnóstico"
+              className="w-full h-9 pl-9 pr-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-medium text-[var(--text-main)]"
+            />
+          </div>
+          {(searchQuery || selectedSpecialty !== 'all') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedSpecialty('all');
+              }}
+              className="chip-neutral h-9 min-h-[36px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              title="Limpar busca e filtro de setor"
+            >
+              <Icon name="close" size={14} />
+              <span>Limpar</span>
+            </button>
+          )}
         </div>
 
         <div
@@ -126,9 +144,9 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
       </div>
 
       {/* Grade de Cards de Leitos + Card de Nova Admissão */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 items-stretch">
         {/* Card de Admissão Guiada de Novo Paciente */}
-        <div className="rounded-2xl border-2 border-dashed border-sky-500/40 bg-sky-500/[0.03] hover:bg-sky-500/[0.06] transition p-4 sm:p-5 flex flex-col justify-between gap-4">
+        <div className="rounded-2xl border-2 border-dashed border-sky-500/40 bg-sky-500/[0.03] hover:bg-sky-500/[0.06] transition p-3.5 sm:p-4 flex flex-col justify-between gap-3">
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
               <span className="w-10 h-10 rounded-xl bg-sky-600/15 border border-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center">
@@ -183,7 +201,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
             <article
               key={bed.id}
               aria-label={`Leito ${bed.wardAndBed} — ${bed.patientNameOrInitials || 'Sem identificação'}`}
-              className={`cq-card card-surface surface-card-minimal rounded-2xl border p-4 sm:p-5 flex flex-col justify-between gap-3.5 transition ${
+              className={`cq-card card-surface surface-card-minimal rounded-2xl border p-3.5 sm:p-4 flex flex-col justify-between gap-3 transition ${
                 isSelected
                   ? 'border-sky-500/60 ring-1 ring-sky-500/25 shadow-elevation-medium'
                   : 'border-subtle dark:border-strong'

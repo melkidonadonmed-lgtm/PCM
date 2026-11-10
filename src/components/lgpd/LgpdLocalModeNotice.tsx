@@ -44,7 +44,7 @@ export const LgpdLocalModeNotice: React.FC<LgpdLocalModeNoticeProps> = ({
       aria-live="polite"
       data-state="idle"
       aria-busy={false}
-      className={`mb-2.5 rounded-2xl border px-3 py-2 text-xs no-print transition-colors flex flex-col md:flex-row md:items-center justify-between gap-2 ${
+      className={`mb-2 rounded-2xl border px-3 py-1.5 text-xs no-print transition-colors flex flex-col md:flex-row md:items-center justify-between gap-2 ${
         sharedComputerMode
           ? 'bg-amber-500/10 border-amber-500/30 text-[var(--text-main)]'
           : 'bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-secondary)] shadow-tactile-sm'

@@ -278,7 +278,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Brand Emblem + Name / Botão Início */}
           <button
             type="button"
-            aria-label="Início"
+            aria-label="PresCMed — Início"
             onClick={onGoHome}
             className="flex items-center gap-2 px-1 h-9 xl:h-10 rounded-xl transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
             title="Voltar ao início (Receitas — Alt+1)"
@@ -380,12 +380,11 @@ export const Header: React.FC<HeaderProps> = ({
               id="btn-open-command-palette"
               type="button"
               onClick={onOpenCommandPalette}
-              aria-label="Busca rápida e navegação global (Ctrl+K)"
               title="Busca rápida de medicamentos, kits, protocolos e guias SUS (Ctrl+K)"
               className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:w-auto sm:px-2.5 xl:h-10 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
             >
               <Icon name="search" size={16} className="text-sky-600 dark:text-sky-400" />
-              <span className="hidden sm:inline text-xs font-medium text-[var(--text-muted)]">
+              <span className="sr-only sm:not-sr-only text-xs font-medium text-[var(--text-muted)]">
                 Buscar
               </span>
               <span className="hidden md:inline kbd-shortcut-chip font-bold text-[var(--text-secondary)] bg-white/80 dark:bg-white/10 border border-[var(--border-subtle)] dark:border-white/10 clinical-tabular-nums">

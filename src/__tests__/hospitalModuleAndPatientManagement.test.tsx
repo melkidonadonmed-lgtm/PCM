@@ -158,6 +158,12 @@ describe('Módulo Hospitalar e Gestão de Pacientes (MOD-03) — Rigor Terapêut
     );
     expect(wardHtml).toContain('Módulo Hospitalar e Gestão de Pacientes');
     expect(wardHtml).toContain('MOD-03 Ativo');
+    expect(wardHtml).toContain('text-sm font-semibold');
+    expect(wardHtml).toContain('font-size:18px');
+    expect(wardHtml).toContain('p-3.5 sm:p-4');
+    expect(wardHtml).toContain('gap-3');
+    expect(wardHtml).not.toContain('gap-4 sm:gap-5');
+    expect(wardHtml).not.toContain('p-4 sm:p-5');
     expect(wardHtml).toContain('id="hospital-ward-census-grid"');
     expect(wardHtml).toContain('+ Admitir Novo Paciente');
     expect(wardHtml).toContain('EF/LT 110-15');
@@ -191,6 +197,10 @@ describe('Módulo Hospitalar e Gestão de Pacientes (MOD-03) — Rigor Terapêut
     expect(formHtml).toContain('Em Uso Atual');
     expect(formHtml).toContain('Suspender → Fez Uso');
     expect(formHtml).toContain('id="hospital-standard-evolution-preview"');
+    expect(formHtml).toContain('p-3.5 sm:p-4');
+    expect(formHtml).toContain('gap-3');
+    expect(formHtml).toContain('text-sm font-semibold');
+    expect(formHtml).not.toContain('p-4 sm:p-5');
 
     const labsHtml = renderToStaticMarkup(
       <HospitalLabsAndAnalyticsPanel
@@ -201,6 +211,10 @@ describe('Módulo Hospitalar e Gestão de Pacientes (MOD-03) — Rigor Terapêut
     );
     expect(labsHtml).toContain('Monitoramento Longitudinal de Exames');
     expect(labsHtml).toContain('↓ Queda');
+    expect(labsHtml).toContain('p-3.5 sm:p-4');
+    expect(labsHtml).toContain('gap-3');
+    expect(labsHtml).toContain('text-sm font-semibold');
+    expect(labsHtml).not.toContain('p-4 sm:p-5');
 
     const dashboardHtml = renderToStaticMarkup(
       <HospitalLabsAndAnalyticsPanel
@@ -211,6 +225,10 @@ describe('Módulo Hospitalar e Gestão de Pacientes (MOD-03) — Rigor Terapêut
     );
     expect(dashboardHtml).toContain('Agente Analítico — Cruzamento Conduta × Evolução');
     expect(dashboardHtml).toContain('Resposta Favorável');
+    expect(dashboardHtml).toContain('p-3.5 sm:p-4');
+    expect(dashboardHtml).toContain('gap-3');
+    expect(dashboardHtml).toContain('text-sm font-semibold');
+    expect(dashboardHtml).not.toContain('p-4 sm:p-5');
 
     const chatHtml = renderToStaticMarkup(
       <HospitalBedChatAndSciencePanel

@@ -85,7 +85,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             {isActive && (
               <span
                 aria-hidden="true"
-                className="absolute top-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.8)]"
+                className="absolute top-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-slate-300"
               />
             )}
             <div className="relative">
@@ -93,7 +93,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 name={item.iconName}
                 filled={isActive}
                 className="text-[20px] transition-colors"
-                style={{ color: isActive ? '#38BDF8' : 'var(--surface-panel-muted)' }}
+                style={{ color: isActive ? '#F8FAFC' : 'var(--surface-panel-muted)' }}
               />
               {item.badge && (
                 <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[11px] flex items-center justify-center bg-sky-500/30 text-sky-100 border border-sky-400/30 clinical-unit clinical-tabular-nums">

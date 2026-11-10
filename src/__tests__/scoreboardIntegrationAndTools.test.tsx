@@ -3,11 +3,17 @@ import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   ALL_SCOREBOARD_CALCULATORS,
+  DEFAULT_QUICK_PIN_IDS as CATALOG_QUICK_PIN_IDS,
   SCOREBOARD_BLOCKS_META,
   SCOREBOARD_MANIFEST,
   getCalculatorByIdOrSlug,
   searchScoreboardCatalog,
 } from '../data/scores/scoreboardCatalog';
+import {
+  DEFAULT_QUICK_PIN_IDS as MANIFEST_QUICK_PIN_IDS,
+  SCOREBOARD_MANIFEST as MANIFEST_ONLY_ITEMS,
+  searchScoreboardCatalog as searchManifestOnlyCatalog,
+} from '../data/scores/scoreboardManifest';
 import {
   SSC_2021_QSOFA_WARNING,
   calculateFullSofa,
@@ -318,6 +324,12 @@ describe('Scoreboard CDSS & Ferramentas de Apoio Clínico Integradas ao PCM', ()
     );
     expect(moduleHtml).toContain('Scoreboard CDSS');
     expect(moduleHtml).toContain('114 Escores Monográficos');
+    expect(moduleHtml).toContain('text-sm font-semibold');
+    expect(moduleHtml).toContain('font-size:18px');
+    expect(moduleHtml).toContain('p-3.5 sm:p-4');
+    expect(moduleHtml).toContain('gap-3');
+    expect(moduleHtml).not.toContain('gap-4 sm:gap-5');
+    expect(moduleHtml).not.toContain('p-4 sm:p-5');
     expect(moduleHtml).not.toContain('py-0.2');
 
     const detailHtml = renderToStaticMarkup(
@@ -333,6 +345,11 @@ describe('Scoreboard CDSS & Ferramentas de Apoio Clínico Integradas ao PCM', ()
     );
     expect(detailHtml).toContain('qSOFA');
     expect(detailHtml).toContain('Radar Fisiológico');
+    expect(detailHtml).toContain('p-3.5 sm:p-4');
+    expect(detailHtml).toContain('gap-3');
+    expect(detailHtml).toContain('text-sm font-semibold');
+    expect(detailHtml).toContain('chip-neutral');
+    expect(detailHtml).not.toContain('p-4 sm:p-5');
 
     const bicHtml = renderToStaticMarkup(
       <ScoreBicInfusionCard
@@ -352,5 +369,30 @@ describe('Scoreboard CDSS & Ferramentas de Apoio Clínico Integradas ao PCM', ()
     );
     expect(eparadaHtml).toContain('EPARADA');
     expect(eparadaHtml).toContain('5H e 5T');
+  });
+
+  it('isola scoreboardManifest (scores-manifest) do catálogo monográfico pesado (scores-catalog) com rejeição de consultas adversariais', () => {
+    expect(MANIFEST_ONLY_ITEMS).toBe(SCOREBOARD_MANIFEST);
+    expect(MANIFEST_QUICK_PIN_IDS).toBe(CATALOG_QUICK_PIN_IDS);
+    expect(searchManifestOnlyCatalog).toBe(searchScoreboardCatalog);
+    expect(MANIFEST_QUICK_PIN_IDS.length).toBeLessThanOrEqual(10);
+    expect(MANIFEST_QUICK_PIN_IDS.length).toBeGreaterThan(0);
+
+    const block01Results = searchManifestOnlyCatalog('', 'block_01');
+    expect(block01Results.length).toBe(
+      SCOREBOARD_BLOCKS_META.find((b) => b.blockId === 'block_01')?.count
+    );
+
+    const favSet = new Set<string>(['calc_qsofa']);
+    const favOnlyResults = searchManifestOnlyCatalog('', 'ALL', favSet, true);
+    expect(favOnlyResults).toHaveLength(1);
+    expect(favOnlyResults[0].id).toBe('calc_qsofa');
+
+    // Casos adversariais e fronteiras inválidas
+    expect(searchManifestOnlyCatalog('<script>alert(1)</script>', 'ALL')).toEqual([]);
+    expect(searchManifestOnlyCatalog('sepse', 'block_inexistente_999')).toEqual([]);
+    expect(getCalculatorByIdOrSlug('')).toBeUndefined();
+    expect(getCalculatorByIdOrSlug('   ')).toBeUndefined();
+    expect(getCalculatorByIdOrSlug('__proto__')).toBeUndefined();
   });
 });

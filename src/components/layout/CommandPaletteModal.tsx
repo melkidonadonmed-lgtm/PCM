@@ -8,7 +8,7 @@ import { CLINICAL_PROTOCOLS } from '../../data/pediatricMeds';
 import { SUS_DOCUMENTS_CATALOG } from '../../data/susDocumentsCatalog';
 import { UNIFIED_MEDICATIONS, UnifiedMedication } from '../../data/medicationDatabase';
 import { searchUnifiedMedicationsFuzzy } from '../../utils/fuzzySearch';
-import { searchScoreboardCatalog } from '../../data/scores/scoreboardCatalog';
+import { searchScoreboardCatalog } from '../../data/scores/scoreboardManifest';
 import { Badge } from '../ui/Badge';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 

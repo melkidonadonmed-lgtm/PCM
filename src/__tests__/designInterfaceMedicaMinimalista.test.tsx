@@ -258,5 +258,7 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
     expect(globalsCss).toContain('.cq-card');
     expect(globalsCss).toContain('container-type: inline-size;');
     expect(globalsCss).toContain('.posology-cq-grid');
+    expect(PRESCMED_TOKENS.colors.primary).toBe('#243447');
+    expect(PRESCMED_TOKENS.colors.clinical).toBe('#115E59');
   });
 });

@@ -45,6 +45,8 @@ export const ScoreParameterGroupInput: React.FC<ScoreParameterGroupInputProps> =
       {group.inputType === 'numeric_input' && group.options.length === 0 ? (
         <div className="mt-2 flex items-center gap-2">
           <input
+            id={`score-param-${group.id}`}
+            name={`scoreParam_${group.id}`}
             type="number"
             aria-label={group.name}
             min={group.minValue}

@@ -14,7 +14,7 @@ export const PRESCMED_TOKENS = {
     'folha_vetorial_impressao_a4',
   ] as const,
   colors: {
-    primary: '#1E3A8A',
+    primary: '#243447',
     onPrimary: '#FFFFFF',
     secondary: '#334155',
     onSecondary: '#FFFFFF',
@@ -22,11 +22,11 @@ export const PRESCMED_TOKENS = {
     onNeutral: '#0F172A',
     surface: '#FFFFFF',
     onSurface: '#0F172A',
-    clinical: '#0F766E',
+    clinical: '#115E59',
     onClinical: '#FFFFFF',
     obsidian: '#0F172A',
     onObsidian: '#F8FAFC',
-    rose: '#BE123C',
+    rose: '#9F1239',
     onRose: '#FFFFFF',
   },
   cssVars: {

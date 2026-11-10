@@ -144,26 +144,17 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
   }, [selectedCategory, searchTerm]);
 
   return (
-    <div data-state="idle" aria-busy={false} id="exam-requester-section" className="flex flex-col gap-4 sm:gap-5">
+    <div data-state="idle" aria-busy={false} id="exam-requester-section" className="flex flex-col gap-3">
       {/* Top Header Card Compacto */}
-      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-            <Icon name="science" size={16} />
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
-                Solicitação de exames complementares
-              </h2>
-              <span className="text-[11px] px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 font-semibold clinical-tabular-nums">
-                {selectedExams.length} selecionado(s)
-              </span>
-            </div>
-            <p className="text-[11px] font-medium text-[var(--text-muted)] truncate">
-              Marque exames individuais na lista abaixo ou aplique um kit pronto pelo menu.
-            </p>
-          </div>
+      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2 min-w-0 flex-wrap">
+          <Icon name="science" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+          <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
+            Solicitação de exames complementares
+          </h2>
+          <span className="text-[11px] px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 font-semibold clinical-tabular-nums shrink-0">
+            {selectedExams.length} selecionado(s)
+          </span>
         </div>
 
         <button
@@ -177,14 +168,14 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
       </div>
 
       {/* Main Grid: Catálogo Individual & Menu de Kits à Esquerda (2 Cols) + Pedido & Indicação à Direita (1 Col) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 items-start">
         {/* Left 2 Cols: Exam Catalog Matrix + Kits Dropdown Menu */}
-        <div className="lg:col-span-2 flex flex-col gap-4">
+        <div className="lg:col-span-2 flex flex-col gap-3">
           {/* Barra de Seleção Individual + Menu Retrátil de Kits/Painéis */}
-          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-3">
+          <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-300">
-                <Icon name="fact_check" size={15} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-main)]">
+                <Icon name="fact_check" size={16} className="text-sky-600 dark:text-sky-400 shrink-0" />
                 <span>Seleção de exames individuais</span>
               </div>
 
@@ -312,6 +303,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400 pointer-events-none"
                 />
                 <input
+                  id="exam-catalog-search"
+                  name="examCatalogSearch"
                   type="text"
                   placeholder="Ex.: Hemograma, PCR, Dengue, Ureia, Raio-X, ECG..."
                   aria-label="Buscar exame no catálogo"
@@ -323,6 +316,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
 
               <form onSubmit={handleAddCustomExam} className="flex gap-1.5">
                 <input
+                  id="exam-custom-name"
+                  name="customExamName"
                   type="text"
                   placeholder="Ex.: Exame avulso..."
                   aria-label="Nome do exame avulso"
@@ -424,17 +419,18 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         </div>
 
         {/* Right Col: Indicação Clínica + Exames Selecionados no Pedido */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {/* Indicação Clínica */}
-          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong">
+          <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong">
             <label
               htmlFor="exam-clinical-indication"
-              className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400 mb-1.5"
+              className="block text-xs font-medium text-[var(--text-muted)] mb-1"
             >
               Indicação clínica / hipótese diagnóstica
             </label>
             <input
               id="exam-clinical-indication"
+              name="examClinicalIndication"
               type="text"
               value={clinicalIndication}
               onChange={(e) => onUpdateClinicalIndication(e.target.value)}
@@ -444,8 +440,8 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
           </div>
 
           {/* Bandeja de Exames Selecionados */}
-          <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col h-fit gap-3">
-            <div className="flex items-center justify-between border-b border-subtle dark:border-strong pb-2.5">
+          <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col h-fit gap-2.5">
+            <div className="flex items-center justify-between border-b border-subtle dark:border-strong pb-2">
               <h3 className="font-semibold text-xs sm:text-sm text-[var(--text-main)] flex items-center gap-2">
                 <Icon name="fact_check" className="text-[16px] text-emerald-700 dark:text-emerald-400" />
                 Exames no pedido ({selectedExams.length})
@@ -454,9 +450,10 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
                 <button
                   type="button"
                   onClick={() => updateExams([])}
-                  className="text-xs font-semibold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none rounded-md px-1 py-0.5"
+                  className="chip-neutral h-8 min-h-[32px] px-2.5 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-300 border border-rose-200/90 dark:border-rose-400/25 bg-rose-50/50 dark:bg-rose-950/25 hover:bg-rose-100/80 dark:hover:bg-rose-950/40 inline-flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none transition"
                 >
-                  Limpar
+                  <Icon name="delete" size={14} className="text-rose-600 dark:text-rose-400" />
+                  <span>Limpar</span>
                 </button>
               )}
             </div>

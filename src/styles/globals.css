@@ -6,17 +6,17 @@
   :root {
     color-scheme: light dark;
 
-    /* 1. Camada 1 — Tokens Primitivos em OKLCH (Catálogo Bruto Perceptual) */
-    --primitive-navy-700: oklch(0.36 0.14 262);
-    --primitive-blue-500: oklch(0.62 0.21 258);
-    --primitive-teal-600: oklch(0.51 0.10 182);
-    --primitive-emerald-500: oklch(0.70 0.17 160);
-    --primitive-amber-600: oklch(0.66 0.17 65);
-    --primitive-rose-700: oklch(0.51 0.20 16);
-    --primitive-neutral-50: oklch(0.985 0.004 255);
-    --primitive-neutral-100: oklch(0.955 0.008 255);
-    --primitive-neutral-800: oklch(0.22 0.025 260);
-    --primitive-neutral-900: oklch(0.16 0.02 260);
+    /* 1. Camada 1 — Tokens Primitivos em OKLCH (Paleta Mineral Refinada, Sólida e Sem Cobalto/Neon) */
+    --primitive-navy-700: oklch(0.32 0.04 248);     /* #243447 Mineral Slate Navy */
+    --primitive-blue-500: oklch(0.46 0.06 245);     /* #3B526B Steel Slate Sóbrio */
+    --primitive-teal-600: oklch(0.45 0.075 186);    /* #115E59 Mineral Sage Teal */
+    --primitive-emerald-500: oklch(0.52 0.08 180);  /* #1D7A73 Sage Clínico Sólido (sem neon) */
+    --primitive-amber-600: oklch(0.58 0.12 64);     /* #B45309 Ocre Âmbar Sóbrio */
+    --primitive-rose-700: oklch(0.47 0.15 16);      /* #9F1239 Carmim Farmacêutico Sólido */
+    --primitive-neutral-50: oklch(0.968 0.005 252);
+    --primitive-neutral-100: oklch(0.952 0.007 252);
+    --primitive-neutral-800: oklch(0.30 0.024 252);
+    --primitive-neutral-900: oklch(0.21 0.020 252);
 
     /* 2. Camada 2 — Tokens Semânticos Reativos (Regra 60-30-10 + Equilíbrio Clínico 90/8/2) */
     --brand-primary: var(--primitive-navy-700);
@@ -99,27 +99,28 @@
     --radius-card: var(--radius-2xl, 1rem);
     --radius-inner: var(--radius-xl, 0.75rem);
 
-    /* 5. Física Óptica Zenital (90°–120° / 135°), Sombras em 3 Níveis e Curvas Físicas */
-    --rim-light: rgba(255, 255, 255, 0.94);
-    --catch-light: inset 0px 1px 0px 0px light-dark(oklch(1 0 0 / 0.85), oklch(1 0 0 / 0.12));
+    /* 5. Shadow-Box Soft em Camadas Sobrepostas com Leve Projeção dos Tokens (Luz realista restrita aos botões) */
+    --rim-light: rgba(255, 255, 255, 0.72);
+    --catch-light: inset 0px 1px 0px 0px light-dark(oklch(1 0 0 / 0.16), oklch(1 0 0 / 0.08));
 
     --shadow-layer-sm:
-      0px 1px 2px 0px oklch(0.20 0.03 255 / 0.05),
-      0px 2px 4px -1px oklch(0.20 0.03 255 / 0.04),
-      var(--catch-light);
+      0px 1px 2px 0px oklch(0.18 0.02 255 / 0.03),
+      0px 3px 6px -1px oklch(0.18 0.02 255 / 0.04),
+      0px 8px 16px -4px oklch(0.18 0.02 255 / 0.04),
+      0px 14px 28px -8px oklch(0.18 0.02 255 / 0.03);
     --shadow-layer-md:
-      0px 2px 4px -1px oklch(0.20 0.03 255 / 0.06),
-      0px 6px 12px -2px oklch(0.20 0.03 255 / 0.08),
-      0px 14px 24px -4px oklch(0.20 0.03 255 / 0.05),
-      var(--catch-light);
+      0px 1px 2px 0px oklch(0.18 0.02 255 / 0.04),
+      0px 4px 8px -2px oklch(0.18 0.02 255 / 0.05),
+      0px 10px 20px -4px oklch(0.18 0.02 255 / 0.06),
+      0px 20px 36px -8px oklch(0.18 0.02 255 / 0.05);
     --shadow-layer-lg:
-      0px 4px 8px -2px oklch(0.20 0.03 255 / 0.06),
-      0px 16px 24px -4px oklch(0.20 0.03 255 / 0.10),
-      0px 32px 48px -8px oklch(0.20 0.03 255 / 0.14),
-      var(--catch-light);
+      0px 2px 4px -1px oklch(0.18 0.02 255 / 0.04),
+      0px 8px 16px -4px oklch(0.18 0.02 255 / 0.06),
+      0px 18px 32px -6px oklch(0.18 0.02 255 / 0.08),
+      0px 32px 56px -12px oklch(0.18 0.02 255 / 0.09);
     --shadow-inset-sunken:
-      inset 0px 2px 4px 0px oklch(0.15 0.02 255 / 0.08),
-      inset 0px 0px 0px 1px oklch(0.15 0.02 255 / 0.05);
+      inset 0px 1px 3px 0px oklch(0.15 0.02 255 / 0.06),
+      inset 0px 1px 2px -1px oklch(0.15 0.02 255 / 0.04);
 
     --shadow-elevation-1: var(--shadow-layer-sm);
     --shadow-elevation-2: var(--shadow-layer-md);
@@ -148,35 +149,36 @@
   .dark,
   [data-theme="dark"] {
     color-scheme: dark;
-    --bg-canvas: var(--bg-app, #0F172A);
-    --bg-surface: var(--surface-card, #1E293B);
+    --bg-canvas: var(--bg-app, #141C27);
+    --bg-surface: var(--surface-card, #243042);
     --bg-surface-1: var(--bg-surface);
-    --bg-card: oklch(0.22 0.03 260);
-    --bg-elevated: #27354A;
-    --bg-modal: var(--surface-hover, #334155);
-    --bg-subtle: var(--surface-inset, #131B2E);
+    --bg-card: oklch(0.30 0.024 252);
+    --bg-elevated: #2D3B50;
+    --bg-modal: var(--surface-hover, #33435A);
+    --bg-subtle: var(--surface-inset, #1B2534);
 
     --ink-primary: var(--text-main, #F8FAFC);
     --ink-secondary: var(--text-secondary, #CBD5E1);
     --ink-muted: var(--text-muted, #94A3B8);
 
-    --rim-light: rgba(255, 255, 255, 0.08);
+    --rim-light: rgba(255, 255, 255, 0.06);
     --shadow-sculpted: var(--shadow-tactile-card-dark);
 
     --shadow-elevation-1:
-      0px 2px 4px oklch(0.05 0.01 260 / 0.5),
-      inset 0px 1px 0px 0px oklch(1.0 0 0 / 0.08);
+      0px 1px 2px 0px oklch(0.04 0.01 260 / 0.28),
+      0px 4px 10px -2px oklch(0.04 0.01 260 / 0.32),
+      0px 10px 22px -6px oklch(0.04 0.01 260 / 0.26);
     --shadow-elevation-2:
-      0px 8px 16px -2px oklch(0.05 0.01 260 / 0.65),
-      0px 0px 12px 0px oklch(from var(--brand-primary) l c h / 0.16),
-      inset 0px 1px 0px 0px oklch(1.0 0 0 / 0.12);
+      0px 2px 4px -1px oklch(0.04 0.01 260 / 0.34),
+      0px 8px 16px -3px oklch(0.04 0.01 260 / 0.40),
+      0px 18px 32px -6px oklch(0.04 0.01 260 / 0.36);
     --shadow-elevation-3:
-      0px 20px 40px -6px oklch(0.02 0.01 260 / 0.8),
-      0px 0px 24px 0px oklch(from var(--brand-primary) l c h / 0.24),
-      inset 0px 1px 0px 0px oklch(1.0 0 0 / 0.16);
+      0px 4px 8px -2px oklch(0.02 0.01 260 / 0.42),
+      0px 14px 28px -6px oklch(0.02 0.01 260 / 0.50),
+      0px 28px 52px -12px oklch(0.02 0.01 260 / 0.55);
     --shadow-inset-sunken:
-      inset 0px 2px 4px 0px oklch(0.02 0.01 260 / 0.55),
-      inset 0px 0px 0px 1px oklch(1.0 0 0 / 0.06);
+      inset 0px 1px 3px 0px oklch(0.02 0.01 260 / 0.42),
+      inset 0px 1px 2px -1px oklch(0.02 0.01 260 / 0.28);
     --shadow-inset: var(--shadow-inset-sunken);
     --elevation-1: var(--shadow-elevation-1);
     --elevation-2: var(--shadow-elevation-2);
@@ -286,33 +288,33 @@
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
   }
 
-  /* Pílula Ativa em Relevo Óptico dentro do Trilho Segmentado */
+  /* Pílula Ativa com Projeção Soft em Camadas dentro do Trilho Segmentado */
   .nav-segmented-pill-active {
     background-color: var(--surface-card);
     color: var(--ink-primary);
     border: 1px solid var(--border-subtle);
     box-shadow:
-      0 2px 6px -1px rgba(15, 23, 42, 0.08),
-      0 1px 2px -1px rgba(15, 23, 42, 0.04),
-      inset 0 1px 0 var(--rim-light);
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 3px 6px -1px rgba(15, 23, 42, 0.06),
+      0 6px 12px -3px rgba(15, 23, 42, 0.04);
   }
 
   .dark .nav-segmented-pill-active {
-    background-color: #1E293B;
+    background-color: #27354A;
     color: #F8FAFC;
-    border-color: rgba(56, 189, 248, 0.28);
+    border-color: rgba(255, 255, 255, 0.14);
     box-shadow:
-      0 4px 10px -2px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      0 1px 2px rgba(0, 0, 0, 0.28),
+      0 4px 8px -2px rgba(0, 0, 0, 0.34);
   }
 
-  /* Indicador Luminoso Vertical na Sidebar Deep Navy */
+  /* Superfície e Indicador Vertical Sóbrio na Sidebar Deep Navy (Sem Glow Neon) */
   .sidebar-active-surface {
-    background: linear-gradient(90deg, rgba(14, 165, 233, 0.22) 0%, rgba(14, 165, 233, 0.08) 70%, rgba(14, 165, 233, 0.02) 100%);
-    border: 1px solid rgba(56, 189, 248, 0.32);
+    background-color: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow:
-      0 4px 12px -2px rgba(2, 132, 199, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      0 2px 6px -1px rgba(0, 0, 0, 0.24),
+      0 4px 10px -2px rgba(0, 0, 0, 0.18);
   }
 
   .sidebar-active-bar {
@@ -322,8 +324,7 @@
     bottom: 22%;
     width: 3px;
     border-radius: 9999px;
-    background-color: #38BDF8;
-    box-shadow: 0 0 8px rgba(56, 189, 248, 0.75);
+    background-color: #CBD5E1;
   }
 
   /* Micro-chip Técnico para Atalhos de Teclado (Alt+1..8 / Ctrl+K) */

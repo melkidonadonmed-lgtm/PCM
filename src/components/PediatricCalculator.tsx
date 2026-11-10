@@ -140,24 +140,20 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       data-state={patientWeight <= 0 ? 'error' : 'idle'}
       aria-busy={false}
       id="pediatric-calculator-section"
-      className={`@container w-full flex flex-col gap-4 sm:gap-5 ${isDrawer ? 'max-w-full' : 'max-w-7xl mx-auto'}`}
+      className={`@container w-full flex flex-col gap-3 ${isDrawer ? 'max-w-full' : 'max-w-7xl mx-auto'}`}
     >
       {/* Top Controller: Weight Hero Tactile Card */}
       <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong relative overflow-hidden w-full">
-        <div className="flex flex-col @3xl:flex-row @3xl:items-center justify-between gap-3">
-          {/* Left: Info */}
-          <div className="flex items-center gap-2.5 min-w-0 flex-1">
-            <span className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-              <Icon name="calculate" size={16} />
+        <div className="flex flex-col @3xl:flex-row @3xl:items-center justify-between gap-2.5">
+          {/* Left: Info Enxuto */}
+          <div className="flex items-center gap-2 min-w-0 flex-1 flex-wrap">
+            <Icon name="calculate" size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
+              Calculadora de doses pediátricas
+            </h2>
+            <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 truncate">
+              Paciente: <span className="font-semibold">{patientName}</span>
             </span>
-            <div className="min-w-0">
-              <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
-                Calculadora de doses pediátricas
-              </h2>
-              <p className="text-[11px] font-medium leading-snug text-[var(--text-muted)] truncate">
-                Paciente: <span className="text-sky-600 dark:text-sky-400 font-semibold">{patientName}</span>
-              </p>
-            </div>
           </div>
 
           {/* Right: Interactive Weight Stepper & Display (Compact & Ergonomic) */}
@@ -261,19 +257,37 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         <div className="relative flex-1 min-w-0">
           <Icon name="search" className="text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400 pointer-events-none" />
           <input
+            id="pediatric-med-search"
+            name="pediatricMedSearch"
             type="text"
+            aria-label="Buscar medicamento pediátrico por nome ou princípio ativo"
             placeholder="Ex.: Paracetamol, Amoxicilina, Dipirona, Ondansetrona..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2.5 min-h-[44px] rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition tactile-input"
+            className="w-full h-9 pl-9 pr-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition tactile-input"
           />
         </div>
+
+        {(searchTerm || selectedCategory !== 'Todos') && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearchTerm('');
+              setSelectedCategory('Todos');
+            }}
+            className="chip-neutral h-9 min-h-[36px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+            title="Limpar busca e filtro de categoria"
+          >
+            <Icon name="close" size={14} />
+            <span>Limpar</span>
+          </button>
+        )}
 
         {/* View Prescription Action Button */}
         <button
           type="button"
           onClick={isDrawer && onClose ? onClose : onNavigateToPrescription}
-          className="tactile-btn-primary px-3.5 sm:px-5 py-2.5 min-h-[44px] flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+          className="tactile-btn-primary px-3.5 sm:px-4 h-9 min-h-[36px] flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
         >
           <span>{isDrawer ? 'Voltar à receita' : 'Ir para receita'}</span>
           <Icon name="arrow_forward" className="text-[15px]" />
@@ -289,7 +303,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+              className={`text-xs font-semibold px-3 py-1.5 min-h-[36px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
                 isSelected
                   ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 shadow-sm'
                   : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
@@ -330,14 +344,14 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
 
       {/* Medications Table / Cards Container */}
       <div className="cq-card card-surface surface-card-minimal !p-0 rounded-2xl border border-subtle dark:border-strong overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-subtle dark:border-strong flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400" />
-            <h3 className="font-semibold text-xs sm:text-sm clinical-tabular-nums" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+        <div className="p-3.5 sm:p-4 border-b border-subtle dark:border-strong flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Icon name="medication" size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <h3 className="font-semibold text-sm text-[var(--text-main)] clinical-tabular-nums truncate">
               Tabela de medicamentos calculados ({filteredMedications.length} itens)
             </h3>
           </div>
-          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 clinical-tabular-nums">
+          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 clinical-tabular-nums shrink-0">
             Dose base: {patientWeight} kg
           </span>
         </div>

@@ -136,6 +136,8 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                     value={headerConfig.clinicName || ''}
                     onChange={e => handleHeaderFieldChange('clinicName', e.target.value)}
                     placeholder="Nome do local de atendimento"
+                    id="editor-header-clinic-name"
+                    name="editorClinicName"
                     aria-label="Nome do local de atendimento"
                     style={{ fontFamily: 'inherit' }}
                     className="text-sm font-bold uppercase tracking-tight text-slate-900 leading-snug w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
@@ -148,6 +150,8 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                     value={headerConfig.clinicAddress || ''}
                     onChange={e => handleHeaderFieldChange('clinicAddress', e.target.value)}
                     placeholder="Endereço e informações de contato"
+                    id="editor-header-clinic-address"
+                    name="editorClinicAddress"
                     aria-label="Endereço e contato do local de atendimento"
                     style={{ fontFamily: 'inherit' }}
                     className="text-xs font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
@@ -187,6 +191,8 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
             <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-subtle">
               <input
                 type="text"
+                id="editor-header-badge-text"
+                name="editorBadgeText"
                 aria-label="Tipo de documento"
                 value={headerConfig.badgeText || ''}
                 onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
@@ -198,6 +204,8 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
 
               <input
                 type="text"
+                id="editor-header-date-text"
+                name="editorDateText"
                 aria-label="Data de emissão"
                 value={headerConfig.dateText || ''}
                 onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
@@ -254,6 +262,8 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
           {/* Nome do Médico na Assinatura */}
           <input
             type="text"
+            id="editor-footer-doc-name"
+            name="editorFooterDocName"
             aria-label="Nome do médico na assinatura"
             value={headerConfig.footerDocName || headerConfig.doctorName || ''}
             onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
@@ -265,6 +275,8 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
           {/* CRM na Assinatura */}
           <input
             type="text"
+            id="editor-footer-crm"
+            name="editorFooterCrm"
             aria-label="CRM na assinatura"
             value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
             onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
@@ -276,6 +288,8 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
           {/* Especialidade na Assinatura */}
           <input
             type="text"
+            id="editor-footer-specialty"
+            name="editorFooterSpecialty"
             aria-label="Especialidade na assinatura"
             value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
             onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
@@ -288,6 +302,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
           <input
             type="text"
             id="editor-footer-subtext"
+            name="editorFooterSubtext"
             aria-label="Subtexto regulamentar CFM"
             value={headerConfig.footerSubtext || ''}
             onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}

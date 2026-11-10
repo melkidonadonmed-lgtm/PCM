@@ -1,6 +1,9 @@
 ---
 name: clinical-change-safety
 description: Applies safety controls to PresCMed medication, dose, protocol, CID, prescription, and legal-text changes. Use before editing or reviewing any clinical behavior or data.
+version: "1.0.0"
+updated_at: "2026-11-09"
+allowed-tools: ["read_file", "run_command", "call_mcp_tool"]
 ---
 
 Treat clinical changes as safety-critical:

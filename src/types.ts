@@ -380,11 +380,25 @@ export interface SusFilledFormData {
   patientHeightCm?: string;
   patientEmail?: string;
   procedureQuantity?: string;
+  patientChartNumber?: string; // Campo 4 da APAC (Nº do Prontuário)
+  apacResponsibleName?: string; // Campo 11 da APAC (Nome do Responsável)
+  apacResponsiblePhone?: string; // Campo 12 da APAC (Telefone de Contato do Responsável)
+  patientCityIbgeCode?: string; // Campo 15 da APAC (Cód. IBGE Município — 7 dígitos)
+  apacSecondaryProcedures?: ApacSecondaryProcedureRow[]; // Campos 21 a 35 da APAC (até 5 procedimentos secundários)
+  cid10Secondary?: string; // Campo 38 da APAC (CID-10 Secundário)
+  cid10AssociatedCauses?: string; // Campo 39 da APAC (CID-10 Causas Associadas)
   lmeMedications?: LmeMedicationRow[];
   lmePreviousTreatment?: '' | 'nao' | 'sim';
   lmePreviousTreatmentReport?: string;
   lmeIncapable?: '' | 'nao' | 'sim';
   lmeResponsibleName?: string;
+}
+
+/** Linha de procedimento secundário da APAC (campos 21–35, até 5 linhas). */
+export interface ApacSecondaryProcedureRow {
+  sigtapCode: string;
+  procedureName: string;
+  quantity?: string;
 }
 
 /** Linha do campo 7/8 da LME: medicamento e quantidade solicitada do 1º ao 6º mês. */

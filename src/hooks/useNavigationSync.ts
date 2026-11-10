@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import type { ActiveTab } from '../types';
 import type { DocumentsSubTab } from '../components/ClinicalDocumentsHub';
 
@@ -10,9 +10,40 @@ interface UseNavigationSyncOptions {
   isAnyModalOpen: boolean;
 }
 
+const VALID_DIRECT_TABS = new Set<ActiveTab>([
+  'prescription',
+  'documents',
+  'certificate',
+  'referral',
+  'exams',
+  'sus',
+  'pediatric_calc',
+  'protocols',
+  'editor',
+  'hospital',
+  'scores',
+  'print_preview',
+]);
+
+/**
+ * Converte um hash de URL (#scores, #documents/referral, #sus, etc.) em ActiveTab válido.
+ */
+export function parseTabFromHash(rawHash: string): ActiveTab | null {
+  const clean = rawHash.replace(/^#+/, '').trim().toLowerCase();
+  if (!clean) return null;
+  if (clean === 'documents/certificate') return 'certificate';
+  if (clean === 'documents/referral') return 'referral';
+  if (clean === 'documents/exams') return 'exams';
+  if (clean === 'documents/sus') return 'sus';
+  if (VALID_DIRECT_TABS.has(clean as ActiveTab)) {
+    return clean as ActiveTab;
+  }
+  return null;
+}
+
 /**
  * Sincroniza atalhos de teclado globais (Alt+1..8 e Ctrl+K / Cmd+K)
- * e hash semântico leve (#prescription, #documents/sus, etc.) sem recarregar a página.
+ * e hash semântico bidirecional (#prescription, #documents/sus, etc.) sem recarregar a página.
  */
 export function useNavigationSync({
   activeTab,
@@ -21,6 +52,33 @@ export function useNavigationSync({
   onOpenCommandPalette,
   isAnyModalOpen,
 }: UseNavigationSyncOptions) {
+  const onSelectTabRef = useRef(onSelectTab);
+  onSelectTabRef.current = onSelectTab;
+  const didSyncInitialHashRef = useRef(false);
+
+  // Sincroniza hash inicial na montagem e escuta mudanças externas de hash (hashchange)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (!didSyncInitialHashRef.current) {
+      didSyncInitialHashRef.current = true;
+      const initialTarget = parseTabFromHash(window.location.hash);
+      if (initialTarget && initialTarget !== activeTab) {
+        onSelectTabRef.current(initialTarget);
+      }
+    }
+
+    const handleHashChange = () => {
+      const target = parseTabFromHash(window.location.hash);
+      if (target) {
+        onSelectTabRef.current(target);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [activeTab]);
+
   // Atualiza hash silenciosamente para preservar contexto visual
   useEffect(() => {
     if (typeof window === 'undefined' || !window.history?.replaceState) return;

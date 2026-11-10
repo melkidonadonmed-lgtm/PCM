@@ -17,8 +17,8 @@
   --color-slate-surface: #1E293B;
   --color-slate-canvas: #0F172A;
 
-  --color-clinical-500: #0D9488;
-  --color-clinical-600: #0F766E;
+  --color-clinical-500: #1D7A73;
+  --color-clinical-600: #115E59;
 
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
@@ -36,11 +36,11 @@
   --color-clinical: var(--clinical);
   --color-clinical-hover: var(--clinical-hover);
 
-  /* Custom shadows para física tátil e sobreposição suave mantidas sem colisão com @utility */
-  --shadow-tactile-card: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 4px 8px -2px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  --shadow-tactile-card-dark: 0 12px 30px -4px rgba(0, 0, 0, 0.5), 0 4px 8px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --shadow-tactile-inset-dark: inset 0 2px 5px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-tactile-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+  /* Shadow-box soft em camadas sobrepostas com leve projeção dos tokens (sem brilho artificial em cards) */
+  --shadow-tactile-card: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 14px 28px -8px rgba(15, 23, 42, 0.03);
+  --shadow-tactile-card-dark: 0 1px 2px rgba(0, 0, 0, 0.28), 0 4px 10px -2px rgba(0, 0, 0, 0.32), 0 10px 22px -6px rgba(0, 0, 0, 0.26);
+  --shadow-tactile-inset-dark: inset 0 1px 3px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-tactile-md: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 8px -2px rgba(15, 23, 42, 0.05), 0 10px 20px -4px rgba(15, 23, 42, 0.05);
 
   /* Elevações Multicamadas em OKLCH (Umbra + Penumbra + Catch-Light Especular) */
   --shadow-elevation-low: var(--elevation-low);
@@ -156,7 +156,7 @@
     --transition-smooth: transform 0.3s var(--ease-spring), opacity 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring), background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
     --transition-snap: transform 0.15s ease-out, opacity 0.15s ease-out, box-shadow 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
 
-    /* TEMA CLARO: Cirúrgico Minimalista (Clean Slate #F8FAFC + Branco Puro #FFFFFF) */
+    /* TEMA CLARO: Mineral Sólido & Harmonioso (Clean Slate #F8FAFC + Ardósia Mineral #243447 sem cobalto) */
     --canvas: #f8fafc;
     --bg-main: #f8fafc;
     --surface: #ffffff;
@@ -165,30 +165,30 @@
     --text-title: #0f172a;
     --text-body: #475569;
     --text-muted: #475569;
-    --primary: #1e3a8a;
-    --primary-hover: #172554;
-    --clinical: #0f766e;
-    --clinical-hover: #115e59;
+    --primary: #243447;
+    --primary-hover: #182433;
+    --clinical: #115e59;
+    --clinical-hover: #0d4b47;
 
-    /* Hierarquia Tonal de 6 Níveis (DESIGN.md v4.5-soft) */
-    --surface-sunken: #E2E8F0;
-    --surface-canvas: #F8FAFC;
-    --surface-inset: #F1F5F9;
+    /* Hierarquia Tonal de 6 Níveis (DESIGN.md v8.0.0 — Acabamento Fosco Mineral) */
+    --surface-sunken: #DFE6EE;
+    --surface-canvas: #F3F5F8;
+    --surface-inset: #EEF2F6;
     --surface-flat: #FFFFFF;
     --surface-raised: #FFFFFF;
     --surface-contrast: #0F172A;
-    --accent-point: #0284C7;
+    --accent-point: #3B526B;
 
-    --bg-canvas: #F8FAFC;
-    --bg-app: #F8FAFC;
+    --bg-canvas: #F3F5F8;
+    --bg-app: #F3F5F8;
     --bg-surface: #FFFFFF;
     --surface-card: #FFFFFF;
     --bg-surface-elevated: #FFFFFF;
     --surface-elevated: #FFFFFF;
-    --surface-hover: #F8FAFC;
-    --surface-active: #E2E8F0;
+    --surface-hover: #F5F7FA;
+    --surface-active: #DFE6EE;
 
-    /* Cores de Navegação & Painéis Estruturais (Deep Navy Equilibrado) */
+    /* Cores de Navegação & Painéis Estruturais (Deep Slate Mineral Sólido) */
     --nav-bg: #0F172A;
     --surface-panel: #0F172A;
     --surface-panel-2: #1E293B;
@@ -199,9 +199,9 @@
     --surface-panel-text: #F8FAFC;
     --nav-text-muted: #94A3B8;
     --surface-panel-muted: #94A3B8;
-    --nav-active-bg: #1E3A8A;
+    --nav-active-bg: #243447;
     --nav-active-text: #FFFFFF;
-    --nav-active-glow: 0 0 14px rgba(30, 58, 138, 0.4);
+    --nav-active-glow: 0 2px 6px rgba(15, 23, 42, 0.22);
 
     /* Texto Geral */
     --text-main: #0F172A;
@@ -210,122 +210,122 @@
     --text-subtle: #64748B;
     --text-inverse: #FFFFFF;
 
-    /* Acentos & Botões Primários */
-    --accent: #1E3A8A;
-    --accent-hover: #172554;
+    /* Acentos & Botões Primários (Sólidos e Refinados, Sem Cobalto/Neon) */
+    --accent: #243447;
+    --accent-hover: #182433;
     --nav-accent: #FFFFFF;
 
-    --accent-primary: #1E3A8A;
-    --accent-primary-hover: #172554;
-    --accent-primary-subtle: rgba(30, 58, 138, 0.08);
-    --accent-primary-border: rgba(30, 58, 138, 0.2);
+    --accent-primary: #243447;
+    --accent-primary-hover: #182433;
+    --accent-primary-subtle: rgba(36, 52, 71, 0.08);
+    --accent-primary-border: rgba(36, 52, 71, 0.18);
 
-    --accent-clinical: #0F766E;
-    --accent-clinical-hover: #115E59;
-    --accent-emerald: #0F766E;
-    --accent-emerald-hover: #115E59;
-    --accent-emerald-subtle: rgba(15, 118, 110, 0.08);
-    --accent-emerald-border: rgba(15, 118, 110, 0.2);
+    --accent-clinical: #115E59;
+    --accent-clinical-hover: #0D4B47;
+    --accent-emerald: #115E59;
+    --accent-emerald-hover: #0D4B47;
+    --accent-emerald-subtle: rgba(17, 94, 89, 0.08);
+    --accent-emerald-border: rgba(17, 94, 89, 0.18);
 
-    --accent-amber: #D97706;
-    --accent-amber-hover: #B45309;
-    --accent-amber-subtle: rgba(217, 119, 6, 0.08);
-    --accent-amber-border: rgba(217, 119, 6, 0.2);
+    --accent-amber: #B45309;
+    --accent-amber-hover: #92400E;
+    --accent-amber-subtle: rgba(180, 83, 9, 0.08);
+    --accent-amber-border: rgba(180, 83, 9, 0.18);
 
-    --accent-rose: #BE123C;
-    --accent-rose-hover: #9F1239;
-    --accent-rose-subtle: rgba(190, 18, 60, 0.08);
-    --accent-rose-border: rgba(190, 18, 60, 0.2);
+    --accent-rose: #9F1239;
+    --accent-rose-hover: #881337;
+    --accent-rose-subtle: rgba(159, 18, 57, 0.08);
+    --accent-rose-border: rgba(159, 18, 57, 0.18);
 
-    /* Sombras e Efeitos Táteis de Sobreposição (Camadas Suaves) */
-    --tactile-bevel: inset 0 1px 1px rgba(255, 255, 255, 0.18), inset 0 -1px 2px rgba(0, 0, 0, 0.35);
-    --bevel-tactile-nav: inset 0 1px 1px rgba(255, 255, 255, 0.18), inset 0 -1px 2px rgba(0, 0, 0, 0.35);
-    --tactile-card-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(0, 0, 0, 0.04);
-    --bevel-tactile-card: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+    /* Luz Tátil Realista Exclusiva para Botões; Shadow-Box em Camadas Sobrepostas para Cards */
+    --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.24);
+    --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.10), inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+    --tactile-card-bevel: 0 0 0 0 transparent;
+    --bevel-tactile-card: 0 0 0 0 transparent;
 
-    /* Elevações táteis para composição com anéis de foco (valores exatos das classes) */
-    --elev-tactile: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    --elev-tactile-sm: 0 2px 4px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-    --elev-tactile-lg: 0 20px 35px -8px rgba(15, 23, 42, 0.12), 0 8px 12px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    --elev-tactile-navy: 0 12px 30px -5px rgba(10, 15, 29, 0.5), 0 4px 8px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    --elev-tactile-dark: 0 10px 25px -4px rgba(0, 0, 0, 0.45), 0 4px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --elev-tactile-btn: 0 1px 2px rgba(15, 23, 42, 0.12), 0 2px 6px -2px rgba(15, 23, 42, 0.2);
-    --elev-tactile-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(0, 0, 0, 0.04);
-    --elev-tactile-blue: 0 6px 16px -6px rgba(2, 132, 199, 0.35);
+    /* Elevações em Camadas Suaves (Shadow-Box com Leve Projeção dos Tokens) */
+    --elev-tactile: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 14px 28px -8px rgba(15, 23, 42, 0.03);
+    --elev-tactile-sm: 0 1px 2px rgba(15, 23, 42, 0.03), 0 2px 5px -1px rgba(15, 23, 42, 0.04);
+    --elev-tactile-lg: 0 2px 4px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.06), 0 20px 36px -8px rgba(15, 23, 42, 0.08);
+    --elev-tactile-navy: 0 4px 10px -2px rgba(10, 15, 29, 0.22), 0 12px 28px -6px rgba(10, 15, 29, 0.28);
+    --elev-tactile-dark: 0 2px 6px -1px rgba(0, 0, 0, 0.26), 0 8px 20px -4px rgba(0, 0, 0, 0.32);
+    --elev-tactile-btn: 0 1px 2px rgba(15, 23, 42, 0.14), 0 3px 6px -1px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+    --elev-tactile-inset: inset 0 1px 3px rgba(15, 23, 42, 0.05), inset 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+    --elev-tactile-blue: 0 2px 6px -2px rgba(36, 52, 71, 0.22);
 
-    --shadow-subtle: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-    --shadow-projected: 0 4px 14px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
-    --shadow-card-projected: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 4px 8px -2px rgba(15, 23, 42, 0.03);
-    --shadow-card-hover: 0 16px 32px -6px rgba(15, 23, 42, 0.08), 0 6px 12px -2px rgba(15, 23, 42, 0.04);
-    --shadow-nav: 0 4px 20px -2px rgba(15, 23, 42, 0.15);
-    --shadow-sidebar-projected: 4px 0 24px -2px rgba(15, 23, 42, 0.15);
-    --shadow-header-projected: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
-    --shadow-bottomnav-projected: 0 -4px 20px -2px rgba(15, 23, 42, 0.15);
+    --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.03), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+    --shadow-projected: 0 1px 2px rgba(15, 23, 42, 0.03), 0 4px 10px -2px rgba(15, 23, 42, 0.05), 0 10px 20px -6px rgba(15, 23, 42, 0.04);
+    --shadow-card-projected: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 14px 28px -8px rgba(15, 23, 42, 0.03);
+    --shadow-card-hover: 0 2px 4px rgba(15, 23, 42, 0.04), 0 6px 12px -2px rgba(15, 23, 42, 0.05), 0 14px 28px -6px rgba(15, 23, 42, 0.06);
+    --shadow-nav: 0 2px 6px -1px rgba(15, 23, 42, 0.08), 0 8px 20px -4px rgba(15, 23, 42, 0.10);
+    --shadow-sidebar-projected: 2px 0 8px -1px rgba(15, 23, 42, 0.08), 6px 0 20px -4px rgba(15, 23, 42, 0.10);
+    --shadow-header-projected: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 14px -2px rgba(15, 23, 42, 0.05);
+    --shadow-bottomnav-projected: 0 -2px 6px -1px rgba(15, 23, 42, 0.08), 0 -6px 18px -4px rgba(15, 23, 42, 0.10);
 
-    --border-subtle: #E2E8F0;
-    --border-medium: #CBD5E1;
+    --border-subtle: #DCE3EC;
+    --border-medium: #C6D1DE;
     --border-strong: #94A3B8;
-    --rim-light-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+    --rim-light-top: 0 0 0 0 transparent;
 
-    --elevation-z0: inset 0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 2px rgba(15, 23, 42, 0.03);
-    --elevation-z1: 0 1px 2px rgba(15, 23, 42, 0.05), 0 3px 6px -1px rgba(15, 23, 42, 0.04);
-    --elevation-z2: 0 1px 3px rgba(15, 23, 42, 0.08), 0 6px 12px -2px rgba(15, 23, 42, 0.06);
-    --elevation-z3: 0 2px 4px rgba(15, 23, 42, 0.08), 0 12px 24px -4px rgba(15, 23, 42, 0.08);
-    --elevation-z4: 0 4px 8px rgba(15, 23, 42, 0.1), 0 20px 40px -8px rgba(15, 23, 42, 0.12);
+    --elevation-z0: inset 0 1px 3px rgba(15, 23, 42, 0.04), inset 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+    --elevation-z1: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 6px 12px -3px rgba(15, 23, 42, 0.03);
+    --elevation-z2: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 8px -2px rgba(15, 23, 42, 0.05), 0 10px 20px -4px rgba(15, 23, 42, 0.05);
+    --elevation-z3: 0 2px 4px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -3px rgba(15, 23, 42, 0.06), 0 16px 32px -6px rgba(15, 23, 42, 0.06);
+    --elevation-z4: 0 4px 8px -2px rgba(15, 23, 42, 0.05), 0 12px 24px -4px rgba(15, 23, 42, 0.07), 0 24px 44px -8px rgba(15, 23, 42, 0.08);
 
-    --shadow-pressed: inset 0 2px 5px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-pressed: inset 0 2px 4px rgba(15, 23, 42, 0.16), inset 0 1px 2px rgba(15, 23, 42, 0.10);
   }
 
-  /* TEMA ESCURO: Deep Slate Acetinado (#0F172A / #1E293B) — Regra 60-30-10 & OKLCH */
+  /* TEMA ESCURO: Ardósia Fosco Mineral com Caixas Mais Claras (#141C27 Canvas / #243042 Cards) */
   .dark, [data-theme="dark"] {
     /* Baseline color-scheme */
     color-scheme: dark;
-    --canvas: #0f172a;
-    --bg-main: #0f172a;
-    --surface: #1e293b;
-    --border: #334155;
+    --canvas: #141c27;
+    --bg-main: #141c27;
+    --surface: #243042;
+    --border: #36455b;
     --text-primary: #f8fafc;
     --text-title: #f8fafc;
     --text-body: #cbd5e1;
     --text-muted: #94a3b8;
-    --primary: oklch(0.54 0.15 250);
-    --primary-hover: oklch(0.49 0.15 250);
-    --clinical: #10b981;
-    --clinical-hover: #059669;
+    --primary: oklch(0.45 0.055 245);
+    --primary-hover: oklch(0.50 0.055 245);
+    --clinical: #1d7a73;
+    --clinical-hover: #16655f;
 
-    /* Hierarquia Tonal de 6 Níveis (60% #0F172A Canvas, 30% #1E293B Card/Nav, #334155 Modal/Hover) */
-    --surface-sunken: #090E1A;
-    --surface-canvas: #0F172A;
-    --surface-inset: #131B2E;
-    --surface-flat: #1E293B;
-    --surface-raised: #27354A;
-    --surface-contrast: #0B1120;
-    --surface-modal: #334155;
-    --accent-point: #38BDF8;
+    /* Hierarquia Tonal de 6 Níveis (60% #141C27 Canvas, 30% #243042 Card Mais Claro Fosco, #2D3B50 Elevated) */
+    --surface-sunken: #101722;
+    --surface-canvas: #141C27;
+    --surface-inset: #1B2534;
+    --surface-flat: #243042;
+    --surface-raised: #2D3B50;
+    --surface-contrast: #0F172A;
+    --surface-modal: #2D3B50;
+    --accent-point: #64748B;
 
-    --bg-canvas: #0F172A;
-    --bg-app: #0F172A;
-    --bg-surface: #1E293B;
-    --surface-card: #1E293B;
-    --bg-surface-elevated: #27354A;
-    --surface-elevated: #27354A;
-    --surface-hover: #334155;
-    --surface-active: #3B4961;
+    --bg-canvas: #141C27;
+    --bg-app: #141C27;
+    --bg-surface: #243042;
+    --surface-card: #243042;
+    --bg-surface-elevated: #2D3B50;
+    --surface-elevated: #2D3B50;
+    --surface-hover: #33435A;
+    --surface-active: #3B4D66;
 
-    /* Cores de Navegação no Dark (30% Secondary Surface #1E293B) */
+    /* Cores de Navegação no Dark */
     --nav-bg: #1E293B;
-    --surface-panel: #131B2E;
-    --surface-panel-2: #1E293B;
-    --surface-panel-hover: #334155;
-    --nav-border: #ffffff14;
-    --surface-panel-border: #ffffff14;
+    --surface-panel: #16202E;
+    --surface-panel-2: #243042;
+    --surface-panel-hover: #33435A;
+    --nav-border: #ffffff1a;
+    --surface-panel-border: #ffffff1a;
     --nav-text: #F8FAFC;
     --surface-panel-text: #F8FAFC;
     --nav-text-muted: #94A3B8;
     --surface-panel-muted: #94A3B8;
-    --nav-active-bg: oklch(0.54 0.15 250);
+    --nav-active-bg: oklch(0.43 0.055 245);
     --nav-active-text: #FFFFFF;
-    --nav-active-glow: 0 0 14px rgba(14, 165, 233, 0.35);
+    --nav-active-glow: 0 2px 6px rgba(0, 0, 0, 0.28);
 
     /* Texto (Hierarquia Visual: #F8FAFC principal sem ofuscamento, #CBD5E1 corpo, #94A3B8 rótulos) */
     --text-main: #F8FAFC;
@@ -334,72 +334,72 @@
     --text-subtle: #64748B;
     --text-inverse: #0F172A;
 
-    /* Acentos & Botões Primários (10% Sky Blue / OKLCH Uniformidade Perceptual) */
-    --accent: #38BDF8;
-    --accent-hover: #7DD3FC;
-    --nav-accent: #38BDF8;
+    /* Acentos & Botões Primários (Steel Slate Sólido em OKLCH — Sem Azul Neon) */
+    --accent: #94A3B8;
+    --accent-hover: #CBD5E1;
+    --nav-accent: #F8FAFC;
 
-    --oklch-primary: oklch(0.54 0.15 250);
-    --oklch-primary-hover: oklch(0.49 0.15 250);
-    --accent-primary: oklch(0.54 0.15 250);
-    --accent-primary-hover: oklch(0.49 0.15 250);
-    --accent-primary-subtle: rgba(56, 189, 248, 0.15);
-    --accent-primary-border: rgba(56, 189, 248, 0.35);
+    --oklch-primary: oklch(0.43 0.055 245);
+    --oklch-primary-hover: oklch(0.48 0.055 245);
+    --accent-primary: oklch(0.43 0.055 245);
+    --accent-primary-hover: oklch(0.48 0.055 245);
+    --accent-primary-subtle: rgba(148, 163, 184, 0.12);
+    --accent-primary-border: rgba(148, 163, 184, 0.26);
 
-    --accent-clinical: #0D9488;
-    --accent-clinical-hover: #0F766E;
-    --accent-emerald: #0D9488;
-    --accent-emerald-hover: #0F766E;
-    --accent-emerald-subtle: rgba(13, 148, 136, 0.15);
-    --accent-emerald-border: rgba(13, 148, 136, 0.35);
+    --accent-clinical: #1D7A73;
+    --accent-clinical-hover: #16655F;
+    --accent-emerald: #1D7A73;
+    --accent-emerald-hover: #16655F;
+    --accent-emerald-subtle: rgba(29, 122, 115, 0.14);
+    --accent-emerald-border: rgba(29, 122, 115, 0.30);
 
-    --accent-amber: #F59E0B;
-    --accent-amber-hover: #D97706;
-    --accent-amber-subtle: rgba(245, 158, 11, 0.15);
-    --accent-amber-border: rgba(245, 158, 11, 0.35);
+    --accent-amber: #D97706;
+    --accent-amber-hover: #B45309;
+    --accent-amber-subtle: rgba(217, 119, 6, 0.14);
+    --accent-amber-border: rgba(217, 119, 6, 0.30);
 
-    --accent-rose: #FB7185;
-    --accent-rose-hover: #F43F5E;
-    --accent-rose-subtle: rgba(251, 113, 133, 0.12);
-    --accent-rose-border: rgba(251, 113, 133, 0.32);
+    --accent-rose: #E11D48;
+    --accent-rose-hover: #BE123C;
+    --accent-rose-subtle: rgba(225, 29, 72, 0.12);
+    --accent-rose-border: rgba(225, 29, 72, 0.28);
 
-    /* Sombras e Efeitos Táteis (Elevação por Luminosidade de Superfície sem Sombras Pesadas) */
-    --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 1px rgba(0, 0, 0, 0.35);
-    --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 1px rgba(0, 0, 0, 0.35);
-    --tactile-card-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 1px rgba(0, 0, 0, 0.25);
-    --bevel-tactile-card: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 1px rgba(0, 0, 0, 0.25);
+    /* Luz Tátil Realista Exclusiva para Botões; Shadow-Box em Camadas para Cards */
+    --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.32);
+    --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    --tactile-card-bevel: 0 0 0 0 transparent;
+    --bevel-tactile-card: 0 0 0 0 transparent;
 
-    /* Elevações táteis suavizadas no tema escuro */
-    --elev-tactile: 0 4px 12px -2px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    --elev-tactile-sm: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    --elev-tactile-lg: 0 10px 24px -4px rgba(0, 0, 0, 0.35), 0 4px 8px -2px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --elev-tactile-navy: 0 8px 20px -4px rgba(10, 15, 29, 0.35), 0 2px 6px -1px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --elev-tactile-dark: 0 6px 16px -3px rgba(0, 0, 0, 0.28), 0 2px 4px -1px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --elev-tactile-btn: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-    --elev-tactile-inset: inset 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.25);
-    --elev-tactile-blue: 0 4px 12px -4px rgba(14, 165, 233, 0.3);
+    /* Elevações em Camadas Suaves no tema escuro (Sem Halos Neon e Sem Linha Branca no Topo dos Cards) */
+    --elev-tactile: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
+    --elev-tactile-sm: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 5px -1px rgba(0, 0, 0, 0.20);
+    --elev-tactile-lg: 0 2px 4px -1px rgba(0, 0, 0, 0.30), 0 8px 18px -4px rgba(0, 0, 0, 0.36), 0 18px 34px -8px rgba(0, 0, 0, 0.34);
+    --elev-tactile-navy: 0 2px 6px -1px rgba(0, 0, 0, 0.28), 0 10px 24px -4px rgba(0, 0, 0, 0.34);
+    --elev-tactile-dark: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
+    --elev-tactile-btn: 0 1px 2px rgba(0, 0, 0, 0.30), 0 3px 6px -1px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    --elev-tactile-inset: inset 0 1px 3px rgba(0, 0, 0, 0.42), inset 0 1px 2px -1px rgba(0, 0, 0, 0.28);
+    --elev-tactile-blue: 0 2px 6px -2px rgba(0, 0, 0, 0.32);
 
-    --shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.2);
-    --shadow-projected: 0 4px 12px -2px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --shadow-card-projected: 0 6px 16px -3px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --shadow-card-hover: 0 10px 24px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --shadow-nav: 0 6px 18px rgba(0, 0, 0, 0.32);
-    --shadow-sidebar-projected: 6px 0 18px rgba(0, 0, 0, 0.3);
-    --shadow-header-projected: 0 4px 14px rgba(0, 0, 0, 0.28);
-    --shadow-bottomnav-projected: 0 -4px 14px rgba(0, 0, 0, 0.28);
+    --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.22);
+    --shadow-projected: 0 1px 2px rgba(0, 0, 0, 0.24), 0 4px 10px -2px rgba(0, 0, 0, 0.28);
+    --shadow-card-projected: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
+    --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.28), 0 8px 18px -4px rgba(0, 0, 0, 0.34), 0 16px 30px -8px rgba(0, 0, 0, 0.32);
+    --shadow-nav: 0 2px 6px rgba(0, 0, 0, 0.24), 0 6px 16px -2px rgba(0, 0, 0, 0.28);
+    --shadow-sidebar-projected: 2px 0 8px rgba(0, 0, 0, 0.22), 6px 0 18px -2px rgba(0, 0, 0, 0.26);
+    --shadow-header-projected: 0 1px 3px rgba(0, 0, 0, 0.20), 0 4px 12px -2px rgba(0, 0, 0, 0.24);
+    --shadow-bottomnav-projected: 0 -2px 6px rgba(0, 0, 0, 0.22), 0 -6px 14px -2px rgba(0, 0, 0, 0.24);
 
-    --border-subtle: #ffffff14;
-    --border-medium: rgba(255, 255, 255, 0.14);
-    --border-strong: rgba(255, 255, 255, 0.22);
-    --rim-light-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+    --border-subtle: rgba(255, 255, 255, 0.11);
+    --border-medium: rgba(255, 255, 255, 0.16);
+    --border-strong: rgba(255, 255, 255, 0.20);
+    --rim-light-top: 0 0 0 0 transparent;
 
-    --elevation-z0: inset 0 2px 4px rgba(0, 0, 0, 0.38), inset 0 1px 2px rgba(0, 0, 0, 0.22);
-    --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 6px -1px rgba(0, 0, 0, 0.18);
-    --elevation-z2: 0 1px 3px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.22);
-    --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 18px -3px rgba(0, 0, 0, 0.26);
-    --elevation-z4: 0 4px 8px rgba(0, 0, 0, 0.34), 0 12px 28px -6px rgba(0, 0, 0, 0.3);
+    --elevation-z0: inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 1px 2px rgba(0, 0, 0, 0.22);
+    --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.22), 0 3px 6px -1px rgba(0, 0, 0, 0.20);
+    --elevation-z2: 0 1px 3px rgba(0, 0, 0, 0.26), 0 5px 12px -2px rgba(0, 0, 0, 0.24), 0 10px 20px -6px rgba(0, 0, 0, 0.20);
+    --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.28), 0 8px 18px -3px rgba(0, 0, 0, 0.28), 0 16px 32px -8px rgba(0, 0, 0, 0.26);
+    --elevation-z4: 0 4px 8px rgba(0, 0, 0, 0.32), 0 12px 28px -6px rgba(0, 0, 0, 0.34), 0 24px 44px -10px rgba(0, 0, 0, 0.32);
 
-    --shadow-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.42), inset 0 1px 2px rgba(0, 0, 0, 0.28);
   }
 
   /* Placeholder e estados de campo base */
@@ -480,36 +480,36 @@
   }
 
   .chip-neutral {
-    background-color: #FFFFFF;
+    background-color: #F7F9FB;
     color: var(--text-secondary);
-    border: 1px solid #CBD5E1;
+    border: 1px solid #CFD8E3;
     border-radius: var(--radius-lg);
     font-weight: 600;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
     transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.16s var(--ease-spring);
   }
 
   .dark .chip-neutral {
-    background-color: #1E293B;
-    color: #CBD5E1;
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    background-color: #2D3B50;
+    color: #E2E8F0;
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
   }
 
   .chip-neutral:hover:not(:disabled) {
-    background-color: #F8FAFC;
+    background-color: #EEF2F6;
     border-color: #94A3B8;
     color: var(--text-main);
     transform: translate3d(0, -1px, 0);
-    box-shadow: 0 3px 6px -1px rgba(15, 23, 42, 0.08), inset 0 1px 0 #FFFFFF;
+    box-shadow: 0 2px 5px -1px rgba(15, 23, 42, 0.06);
   }
 
   .dark .chip-neutral:hover:not(:disabled) {
-    background-color: #27354A;
-    border-color: rgba(255, 255, 255, 0.22);
+    background-color: #35465E;
+    border-color: rgba(255, 255, 255, 0.24);
     color: #FFFFFF;
     transform: translate3d(0, -1px, 0);
-    box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 3px 7px -1px rgba(0, 0, 0, 0.28);
   }
 
   .chip-neutral:active:not(:disabled) {
@@ -524,17 +524,17 @@
   }
 
   .chip-neutral[data-active="true"] {
-    background-color: #EFF6FF;
-    color: #1E3A8A;
-    border-color: #3B82F6;
+    background-color: #F1F5F9;
+    color: #0F172A;
+    border-color: #64748B;
     font-weight: 700;
-    box-shadow: 0 1px 3px rgba(30, 58, 138, 0.12), inset 0 0 0 1px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
   }
 
   .dark .chip-neutral[data-active="true"] {
-    background-color: #173753;
-    color: #7DD3FC;
-    border-color: rgba(56, 189, 248, 0.45);
+    background-color: #27354A;
+    color: #F8FAFC;
+    border-color: rgba(148, 163, 184, 0.38);
   }
 
   /* Aviso discreto opaco (Cinza sobre Cinza com detalhe pontual, sem fundo transparente chamativo) */
@@ -577,16 +577,16 @@
 
   .dark .tactile-input,
   .dark .tactile-inset {
-    background-color: #0E1118;
+    background-color: var(--surface-inset);
     color: #F8FAFC;
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.65), 0 1px 0 rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.32);
   }
 
   .dark .tactile-input:focus {
-    background-color: #121620;
-    border-color: #38BDF8;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(56, 189, 248, 0.22);
+    background-color: #1F2B3D;
+    border-color: #94A3B8;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28), 0 0 0 3px rgba(148, 163, 184, 0.22);
   }
 
   /* 2. Z-1 Resting Base Plates & Static Cards */
@@ -620,31 +620,16 @@
                 background-color 0.25s ease;
   }
 
-  .tactile-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-    pointer-events: none;
-  }
-
   .dark .tactile-card {
     background-color: var(--surface-card);
     border-color: var(--border-strong);
     box-shadow: var(--elevation-low);
   }
 
-  .dark .tactile-card::after {
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
-  }
-
   /* Cartão de conteúdo não reage ao hover: levantar a página inteira fazia tudo parecer botão.
      O que é clicável usa .tactile-card-interactive. */
 
-  /* 3. Z-2 Interactive Elevated Cards & Controls */
+  /* 3. Z-2 Interactive Elevated Cards & Controls (Shadow-Box em Camadas sem Linha Artificial) */
   .tactile-card-interactive {
     background-color: var(--surface-card);
     border: 1px solid var(--border-subtle);
@@ -662,25 +647,10 @@
                 background-color 0.22s ease;
   }
 
-  .tactile-card-interactive::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
-    pointer-events: none;
-  }
-
   .dark .tactile-card-interactive {
     background-color: var(--surface-card);
     border-color: var(--border-strong);
     box-shadow: var(--elevation-low);
-  }
-
-  .dark .tactile-card-interactive::after {
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -792,15 +762,20 @@
     box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.1), 0 6px 12px -3px rgba(15, 23, 42, 0.04);
   }
 
-  /* 4. Tactile Action Switches & CTA Buttons (135° Physical Engine & OKLCH Uniformity) */
+  /* 4. Botões Físicos Realistas (Luz Especular Superior + Espessura de Base Exclusiva nos Botões) */
   .tactile-btn-primary,
   .btn-tactile-primary,
   .btn-primary-tactile,
   .button-primary {
-    background-color: #1E3A8A;
+    background-color: #243447;
     color: #FFFFFF !important;
-    border: 1px solid transparent;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12), 0 2px 6px -2px rgba(30, 58, 138, 0.3);
+    border: 1px solid rgba(15, 23, 42, 0.22);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.14),
+      0 3px 6px -1px rgba(15, 23, 42, 0.12),
+      0 6px 12px -3px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.24);
     border-radius: 12px;
     padding: 0.5rem 0.875rem;
     font-weight: 700;
@@ -822,8 +797,13 @@
     .btn-tactile-primary:hover:not(:disabled),
     .btn-primary-tactile:hover:not(:disabled),
     .button-primary:hover:not(:disabled) {
-      background-color: #172554;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.14), 0 4px 10px -2px rgba(30, 58, 138, 0.35);
+      background-color: #182433;
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.16),
+        0 4px 10px -2px rgba(15, 23, 42, 0.16),
+        0 8px 16px -4px rgba(15, 23, 42, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.28);
     }
   }
 
@@ -832,17 +812,22 @@
   .btn-primary-tactile:active:not(:disabled),
   .button-primary:active:not(:disabled) {
     transform: translate3d(0, 1px, 0);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.28), inset 0 1px 2px rgba(0, 0, 0, 0.18);
   }
 
-  /* NO TEMA ESCURO: 10% Accent Sky Blue com Uniformidade Perceptual OKLCH */
+  /* NO TEMA ESCURO: Steel Slate Sólido em OKLCH (Sem Azul Cobalto/Neon) com Luz Físico-Tátil Realista */
   .dark .tactile-btn-primary,
   .dark .btn-tactile-primary,
   .dark .btn-primary-tactile,
   .dark .button-primary {
-    background-color: oklch(0.54 0.15 250);
+    background-color: oklch(0.43 0.055 245);
     color: #FFFFFF !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 6px -2px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.28),
+      0 4px 8px -2px rgba(0, 0, 0, 0.34),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.28);
     transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), 
                 box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1), 
                 background-color 0.2s ease,
@@ -854,8 +839,12 @@
     .dark .btn-tactile-primary:hover:not(:disabled),
     .dark .btn-primary-tactile:hover:not(:disabled),
     .dark .button-primary:hover:not(:disabled) {
-      background-color: oklch(0.49 0.15 250);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
+      background-color: oklch(0.48 0.055 245);
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.32),
+        0 6px 12px -2px rgba(0, 0, 0, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.30);
     }
   }
 
@@ -864,16 +853,21 @@
   .dark .btn-primary-tactile:active:not(:disabled),
   .dark .button-primary:active:not(:disabled) {
     transform: translate3d(0, 1px, 0);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.42);
   }
 
-  /* BOTÃO CLÍNICO (Ações Afirmativas, Salvar, Prescrever, Imprimir) */
+  /* BOTÃO CLÍNICO (Mineral Sage Teal Sólido com Luz Físico-Tátil Realista) */
   .tactile-btn-success,
   .btn-tactile-clinical {
-    background: #0F766E;
+    background: #115E59;
     color: #FFFFFF !important;
-    border: 1px solid transparent;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12), 0 2px 6px -2px rgba(15, 118, 110, 0.3);
+    border: 1px solid rgba(13, 75, 71, 0.28);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.14),
+      0 3px 6px -1px rgba(17, 94, 89, 0.18),
+      0 6px 12px -3px rgba(17, 94, 89, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.24);
     border-radius: 12px;
     padding: 0.5rem 0.875rem;
     font-weight: 700;
@@ -891,28 +885,47 @@
 
   .dark .tactile-btn-success,
   .dark .btn-tactile-clinical {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
+    background: #1D7A73;
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.28),
+      0 4px 8px -2px rgba(0, 0, 0, 0.34),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.28);
   }
 
   /* No hover o verde escurece: clarear derrubava o contraste do texto branco abaixo de 4,5:1 */
   @media (hover: hover) and (pointer: fine) {
     .tactile-btn-success:hover:not(:disabled),
     .btn-tactile-clinical:hover:not(:disabled) {
-      background: #115E59;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.14), 0 4px 10px -2px rgba(15, 118, 110, 0.35);
+      background: #0D4B47;
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.16),
+        0 4px 10px -2px rgba(17, 94, 89, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    }
+
+    .dark .tactile-btn-success:hover:not(:disabled),
+    .dark .btn-tactile-clinical:hover:not(:disabled) {
+      background: #16655F;
     }
   }
 
   .tactile-btn-success:active:not(:disabled),
   .btn-tactile-clinical:active:not(:disabled) {
     transform: translate3d(0, 1px, 0);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.32);
   }
 
   .tactile-btn-secondary,
   .btn-tactile-secondary {
     border: 1px solid #CBD5E1;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 3px 6px -2px rgba(15, 23, 42, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.05);
     background-color: #FFFFFF;
     color: #0F172A;
     border-radius: 12px;
@@ -935,7 +948,11 @@
     background-color: #1E293B;
     color: #F1F5F9;
     border-color: rgba(255, 255, 255, 0.14);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.26),
+      0 3px 6px -2px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.24);
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -1067,15 +1084,15 @@
     transform: translateX(4px);
   }
 
-  /* Item de navegação ativo: bisel interno + glow (sem duplicar barra com .sidebar-active-bar) */
+  /* Item de navegação ativo: superfície sólida com sombra sobreposta suave (sem brilho neon) */
   .nav-item-active {
     position: relative;
-    background: linear-gradient(90deg, rgba(14, 165, 233, 0.20) 0%, rgba(14, 165, 233, 0.07) 75%, rgba(14, 165, 233, 0.02) 100%);
+    background-color: rgba(255, 255, 255, 0.09);
     color: #FFFFFF !important;
-    border: 1px solid rgba(56, 189, 248, 0.30);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow:
-      0 4px 14px -2px rgba(2, 132, 199, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      0 2px 6px -1px rgba(0, 0, 0, 0.24),
+      0 4px 10px -2px rgba(0, 0, 0, 0.18);
   }
 
   /* Tipografia editorial para títulos de página */

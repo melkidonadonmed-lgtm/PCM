@@ -45,7 +45,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
       <div
         data-state="idle"
         aria-busy={false}
-        className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong"
+        className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
@@ -216,8 +216,8 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
       </div>
 
       {/* CARD 2: DADOS DO PACIENTE COM DESTAQUE EM CAMPOS FALTANTES */}
-      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-[var(--border-subtle)] pb-2.5">
+      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 border-b border-[var(--border-subtle)] pb-2">
           <div className="flex items-center gap-2">
             <Icon name="person" className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">

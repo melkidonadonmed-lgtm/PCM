@@ -8,6 +8,8 @@ import { LOGO_DO_ESTADO, LOGO_DO_SUS } from '../data/presetAssets';
 import { resolverIdentidade } from '../utils/documentoClinico';
 import {
   FORMULARIOS_OFICIAIS_SUS,
+  MATRIZ_CAMPOS_APAC_55,
+  conferirMatrizApac55Campos,
   camposSemEspaco,
   formularioOficialDe,
   type CampoDoFormulario
@@ -194,6 +196,49 @@ describe('APAC — laudo de 55 campos', () => {
   it('não imprime selo de validação nem assinatura eletrônica', () => {
     const html = folha(apac, completo);
     expect(html).not.toMatch(/QR|validação digital|assinatura eletrônica|assinado digitalmente/i);
+  });
+
+  it('conferência regulatória SESAU-RO/SEMUSA: audita integralmente os 55 campos da matriz APAC, preenche opcionais informados e bloqueia campos 46–55', () => {
+    const conferencia = conferirMatrizApac55Campos();
+    expect(conferencia.totalCampos).toBe(55);
+    expect(conferencia.sequenciaCompleta1a55).toBe(true);
+    expect(MATRIZ_CAMPOS_APAC_55).toHaveLength(55);
+    expect(conferencia.reservadosRegulacaoExecutante).toEqual([
+      '46', '47', '48', '49', '50', '51', '52', '53', '54', '55'
+    ]);
+
+    const comOpcionais: SusFilledFormData = {
+      ...completo,
+      patientChartNumber: 'PRT-2026-99',
+      apacResponsibleName: 'Maria Responsavel da Silva',
+      apacResponsiblePhone: '(69) 99200-3344',
+      patientCityIbgeCode: '1100205',
+      cid10Secondary: 'm51.1',
+      cid10AssociatedCauses: 'g55.1',
+      apacSecondaryProcedures: [
+        { sigtapCode: '02.05.02.004-6', procedureName: 'Ultrassonografia complementar', quantity: '01' },
+        { sigtapCode: '02.04.02.003-4', procedureName: 'Radiografia de coluna lombossacra', quantity: '02' }
+      ]
+    };
+
+    const camposComOpcionais = apac.montar(comOpcionais, EMISSAO);
+    expect(textoDe(camposComOpcionais, '4')).toEqual(['PRT-2026-99']);
+    expect(textoDe(camposComOpcionais, '11')).toEqual(['Maria Responsavel da Silva']);
+    expect(textoDe(camposComOpcionais, '12')).toEqual(['69', '992003344']);
+    expect(textoDe(camposComOpcionais, '15')).toEqual(['1100205']);
+    expect(textoDe(camposComOpcionais, '21')).toEqual(['0205020046']);
+    expect(textoDe(camposComOpcionais, '22')).toEqual(['Ultrassonografia complementar']);
+    expect(textoDe(camposComOpcionais, '23')).toEqual(['01']);
+    expect(textoDe(camposComOpcionais, '24')).toEqual(['0204020034']);
+    expect(textoDe(camposComOpcionais, '25')).toEqual(['Radiografia de coluna lombossacra']);
+    expect(textoDe(camposComOpcionais, '26')).toEqual(['02']);
+    expect(textoDe(camposComOpcionais, '38')).toEqual(['M51.1']);
+    expect(textoDe(camposComOpcionais, '39')).toEqual(['G55.1']);
+
+    // Caso adversarial: mesmo com todos os campos do solicitante preenchidos, jamais emite campos 46–55 (exclusivos do autorizador/executante)
+    conferencia.reservadosRegulacaoExecutante.forEach((campoReservado) => {
+      expect(camposDe(camposComOpcionais, campoReservado), `campo reservado ${campoReservado}`).toHaveLength(0);
+    });
   });
 });
 

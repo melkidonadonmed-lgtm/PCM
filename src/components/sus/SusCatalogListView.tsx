@@ -29,27 +29,18 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
   onStartFillingMultiple,
 }) => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {/* Barra Compacta de Cabeçalho, Busca e Filtros */}
-      <div className="cq-card card-surface surface-card-minimal p-4 sm:p-5 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-              <Icon name="description" size={16} />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
-                  Documentos & Requisições Oficiais do SUS
-                </h2>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 clinical-tabular-nums">
-                  9 modelos
-                </span>
-              </div>
-              <p className="text-[11px] text-[var(--text-muted)] font-medium truncate">
-                Toque em uma guia para preencher ou marque várias para emissão em lote.
-              </p>
-            </div>
+      <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <Icon name="description" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
+              Documentos & Requisições Oficiais do SUS
+            </h2>
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 clinical-tabular-nums shrink-0">
+              9 modelos
+            </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -109,6 +100,8 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
             <Icon name="search" size={14} className="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
+              id="sus-catalog-search"
+              name="susCatalogSearch"
               aria-label="Buscar exame ou documento SUS"
               placeholder="Ex.: APAC, LME, Tomografia, Mamografia, Dengue..."
               value={searchTerm}

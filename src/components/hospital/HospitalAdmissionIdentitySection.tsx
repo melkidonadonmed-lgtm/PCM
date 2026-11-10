@@ -47,8 +47,8 @@ export const HospitalAdmissionIdentitySection: React.FC<
     'Sem HD principal registrada';
 
   return (
-    <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-4 space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-2.5">
+    <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-3.5 sm:p-4 space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-2">
         <button
           type="button"
           onClick={() => setIsAdmissionSectionOpen((prev) => !prev)}
@@ -61,7 +61,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
             className="text-sky-600 dark:text-sky-400"
           />
           <div>
-            <h3 className="text-sm font-bold text-[var(--text-main)]">
+            <h3 className="text-sm font-semibold text-[var(--text-main)]">
               1. Identificação do Leito, Admissão, HDA e Antecedentes
             </h3>
             {!isAdmissionSectionOpen && (

@@ -155,35 +155,29 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
       data-state={hasPatient ? 'success' : 'empty'}
       aria-busy={false}
       id="clinical-documents-hub"
-      className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5 !p-0 !bg-transparent !border-none !shadow-none"
+      className="w-full max-w-7xl mx-auto flex flex-col gap-3 !p-0 !bg-transparent !border-none !shadow-none"
     >
       {/* Barra de Navegação Superior em Trilho Segmentado Esculpido */}
-      <SoftCard variant="flat" className="card-surface p-3 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        {/* Identificação do Contexto Clínico em 3 Níveis (Squint Test) */}
-        <div className="flex items-center gap-3 px-1.5 min-w-0">
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
-            hasPatient
-              ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-600 dark:text-emerald-400'
-              : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-muted)]'
-          }`}>
-            <Icon name={activeTabInfo.icon} size={18} filled />
-          </div>
+      <SoftCard variant="flat" className="card-surface p-3 sm:p-3.5 rounded-2xl border border-subtle dark:border-strong flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+        {/* Identificação Enxuta do Contexto Clínico */}
+        <div className="flex items-center gap-2.5 px-1 min-w-0">
+          <Icon name={activeTabInfo.icon} size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              <span className="text-xs font-semibold text-[var(--text-main)]">
                 Central de documentos clínicos
               </span>
-              <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 clinical-tabular-nums">
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 clinical-tabular-nums">
                 {activeTabInfo.regulatoryTag}
               </span>
             </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className={`w-2 h-2 rounded-full shrink-0 ${hasPatient ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-              <span className="text-xs sm:text-sm font-bold text-[var(--text-main)] truncate">
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${hasPatient ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+              <span className="text-xs font-medium text-[var(--text-secondary)] truncate">
                 {hasPatient ? patientName : 'Vincule um paciente para emissão'}
               </span>
               {hasPatient && patient.weightKg > 0 && (
-                <span className="text-xs font-bold text-sky-700 dark:text-sky-300 clinical-unit clinical-tabular-nums shrink-0">
+                <span className="text-xs font-semibold text-sky-700 dark:text-sky-300 clinical-unit clinical-tabular-nums shrink-0">
                   • {patient.weightKg.toLocaleString('pt-BR')} kg
                 </span>
               )}

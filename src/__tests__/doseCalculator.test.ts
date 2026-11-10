@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { calculatePediatricDose, generateScheduleTimes } from '../utils/doseCalculator';
-import { PEDIATRIC_MEDICATIONS } from '../data/pediatricMeds';
+import { PEDIATRIC_MEDICATIONS, CLINICAL_PROTOCOLS } from '../data/pediatricMeds';
+import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
+import { COMMON_CID10, searchCID10 } from '../data/cidCatalog';
 import { PediatricMedication } from '../types';
+import { PWA_WORKBOX_GLOB_IGNORES, resolvePwaManualChunk } from '../../vite.config';
 
 describe('Calculadora de Doses Pediátricas por Peso (YMYL / Segurança Clínica)', () => {
   const getMed = (id: string): PediatricMedication => {
@@ -181,5 +184,79 @@ describe('Gerador de Horários de Posologia (generateScheduleTimes)', () => {
   it('deve retornar array vazio para posologia sem horário fixo (ex: S.O.S)', () => {
     const times = generateScheduleTimes('se dor ou febre (S.O.S)', 8);
     expect(times).toEqual([]);
+  });
+});
+
+describe('Integridade dos Catálogos Clínicos Modularizados (TASK-10 / YMYL)', () => {
+  it('deve preservar 100% dos fármacos adultos/ambulatoriais, pediátricos, protocolos e CID-10 sem duplicatas de ID', () => {
+    // 1. PEDIATRIC_MEDICATIONS (oral + hospitalar/emergência/suplementos)
+    expect(PEDIATRIC_MEDICATIONS.length).toBe(49);
+    const pediatricIds = PEDIATRIC_MEDICATIONS.map((m) => m.id);
+    expect(new Set(pediatricIds).size).toBe(PEDIATRIC_MEDICATIONS.length);
+    expect(pediatricIds).toContain('paracetamol-gotas');
+    expect(pediatricIds).toContain('adrenalina-anafilaxia');
+    expect(pediatricIds).toContain('vitamina-d3-gotas');
+
+    // 2. CLINICAL_PROTOCOLS
+    expect(CLINICAL_PROTOCOLS.length).toBe(5);
+    const protocolIds = CLINICAL_PROTOCOLS.map((p) => p.id);
+    expect(new Set(protocolIds).size).toBe(CLINICAL_PROTOCOLS.length);
+
+    // 3. UNIFIED_MEDICATIONS (todas as fatias clínicas consolidadas)
+    expect(UNIFIED_MEDICATIONS.length).toBe(486);
+    const unifiedIds = UNIFIED_MEDICATIONS.map((m) => m.id);
+    expect(new Set(unifiedIds).size).toBe(UNIFIED_MEDICATIONS.length);
+    expect(unifiedIds).toContain('dipirona-500mg');
+    expect(unifiedIds).toContain('tramadol-50mg');
+    expect(unifiedIds).toContain('amoxicilina-500mg');
+    expect(unifiedIds).toContain('losartana-50mg');
+    expect(unifiedIds).toContain('metoprolol-succinato-50mg');
+    expect(unifiedIds).toContain('metformina-850mg');
+    expect(unifiedIds).toContain('levotiroxina-50mcg');
+    expect(unifiedIds).toContain('salbutamol-spray-100mcg');
+    expect(unifiedIds).toContain('fluoxetina-20mg');
+    expect(unifiedIds).toContain('acido-valproico-250mg');
+    expect(unifiedIds).toContain('risperidona-1mg');
+
+    // 4. COMMON_CID10 (clínica geral + especialidades e administrativo)
+    expect(COMMON_CID10.length).toBe(107);
+    const cidCodes = COMMON_CID10.map((c) => c.code);
+    expect(new Set(cidCodes).size).toBe(COMMON_CID10.length);
+    expect(searchCID10('Z02.7').some((c) => c.code === 'Z02.7')).toBe(true);
+    expect(searchCID10('enxaqueca').some((c) => c.code === 'G43.9')).toBe(true);
+  });
+
+  it('isola vendor-canvg fora do precache PWA (preservando html2canvas-pro em vendor-pdf-canvas) e particiona clinical-catalogs, pediatric-catalog e cid-catalog com rejeição de entradas adversariais (TASK-13)', () => {
+    expect(PWA_WORKBOX_GLOB_IGNORES).toContain('**/vendor-firebase-*.js');
+    expect(PWA_WORKBOX_GLOB_IGNORES).toContain('**/vendor-canvg-*.js');
+    expect(PWA_WORKBOX_GLOB_IGNORES).not.toContain('**/vendor-pdf-canvas-*.js');
+
+    // Motor oficial raster/PDF permanece em vendor-pdf-canvas (100% precacheado no PWA)
+    expect(resolvePwaManualChunk('/app/node_modules/html2canvas-pro/dist/html2canvas-pro.esm.js')).toBe('vendor-pdf-canvas');
+    expect(resolvePwaManualChunk('C:\\repo\\node_modules\\jspdf\\dist\\jspdf.es.min.js')).toBe('vendor-pdf-canvas');
+
+    // Dependências opcionais de SVG/HTML do jspdf (canvg, dompurify e html2canvas legado) vão para vendor-canvg
+    expect(resolvePwaManualChunk('/app/node_modules/canvg/lib/index.es.js')).toBe('vendor-canvg');
+    expect(resolvePwaManualChunk('C:\\repo\\node_modules\\html2canvas\\dist\\html2canvas.esm.js')).toBe('vendor-canvg');
+    expect(resolvePwaManualChunk('/app/node_modules/dompurify/dist/purify.es.mjs')).toBe('vendor-canvg');
+    expect(resolvePwaManualChunk('/app/node_modules/svg-pathdata/lib/SVGPathData.module.js')).toBe('vendor-canvg');
+
+    // Particionamento dos 3 catálogos clínicos (adulto/RENAME vs. pediatria vs. CID-10)
+    expect(resolvePwaManualChunk('/app/src/data/medications/analgesicsAndAntiInflammatories.ts')).toBe('clinical-catalogs');
+    expect(resolvePwaManualChunk('C:\\repo\\src\\data\\medicationDatabase.ts')).toBe('clinical-catalogs');
+    expect(resolvePwaManualChunk('/app/src/data/pediatricMeds.ts')).toBe('pediatric-catalog');
+    expect(resolvePwaManualChunk('C:\\repo\\src\\data\\pediatricHospitalAndProtocols.ts')).toBe('pediatric-catalog');
+    expect(resolvePwaManualChunk('/app/src/data/cidCatalog.ts')).toBe('cid-catalog');
+    expect(resolvePwaManualChunk('C:\\repo\\src\\data\\cidSpecialtyAndAdminItems.ts')).toBe('cid-catalog');
+
+    // Fronteiras adversariais em resolvePwaManualChunk e searchCID10
+    expect(resolvePwaManualChunk('')).toBeUndefined();
+    expect(resolvePwaManualChunk('   ')).toBeUndefined();
+    expect(resolvePwaManualChunk(null as unknown as string)).toBeUndefined();
+    expect(resolvePwaManualChunk('/app/src/utils/sanitizeHtml.ts')).toBeUndefined();
+
+    expect(searchCID10('!@#$%^&*()')).toEqual([]);
+    expect(searchCID10('<script>alert(1)</script>')).toEqual([]);
+    expect(searchCID10(null as unknown as string).length).toBe(COMMON_CID10.length);
   });
 });

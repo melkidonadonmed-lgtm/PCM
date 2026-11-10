@@ -104,14 +104,14 @@ export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
   return (
     <div className="relative w-full group/folha">
       {ajustarALargura && zoom < 0.92 && (
-        <div className="no-print absolute top-2.5 right-2.5 z-20 flex items-center gap-1 rounded-lg bg-slate-900/80 backdrop-blur-xs px-2 py-1 text-[11px] font-semibold text-white shadow-sm opacity-85 hover:opacity-100 transition-opacity">
-          <span className="clinical-tabular-nums text-slate-300 pr-1 border-r border-white/15">
+        <div className="no-print absolute top-2.5 right-2.5 z-20 flex items-center gap-1 rounded-lg bg-slate-900/95 backdrop-blur-xs px-2 py-1 text-[11px] font-semibold text-white shadow-sm transition-opacity">
+          <span className="clinical-tabular-nums text-slate-100 pr-1 border-r border-white/20">
             {Math.round(escalaEfetiva * 100)}%
           </span>
           <button
             type="button"
             onClick={() => setInspecaoReal((v) => !v)}
-            className="px-1.5 py-0.5 rounded hover:bg-white/15 text-sky-300 font-bold cursor-pointer transition-colors"
+            className="px-1.5 py-0.5 rounded hover:bg-white/15 text-sky-200 font-bold cursor-pointer transition-colors"
             title={inspecaoReal ? 'Ajustar folha à largura do painel' : 'Inspecionar folha em tamanho real (100%)'}
           >
             {inspecaoReal ? 'Ajustar' : '100%'}

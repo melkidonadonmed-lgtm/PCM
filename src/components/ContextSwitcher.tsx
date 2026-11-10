@@ -43,6 +43,8 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
 
       <div className="relative">
         <select
+          id="work-context-select"
+          name="workContext"
           value={activeContext.id}
           onChange={(e) => onSwitchContext(e.target.value)}
           aria-label="Selecionar local de atuação institucional"

@@ -1,5 +1,4 @@
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas-pro';
+import type { jsPDF } from 'jspdf';
 import { downloadPdfDoc } from './downloadPdf';
 import {
   alturaFolhaPx,
@@ -8,6 +7,30 @@ import {
   type OpcoesExportacao,
   type OrientacaoFolha
 } from './folhaA4';
+
+export interface PdfCanvasEngines {
+  jsPDF: typeof import('jspdf').default;
+  html2canvas: typeof import('html2canvas-pro').default;
+}
+
+let enginesPromise: Promise<PdfCanvasEngines> | null = null;
+
+/**
+ * Carrega sob demanda (`dynamic import`) os motores raster/PDF (`jspdf` + `html2canvas-pro`,
+ * isolados no chunk `vendor-pdf-canvas`), evitando que entrem no bundle crítico inicial.
+ */
+export function loadPdfCanvasEngines(): Promise<PdfCanvasEngines> {
+  if (!enginesPromise) {
+    enginesPromise = Promise.all([
+      import('jspdf'),
+      import('html2canvas-pro'),
+    ]).then(([jspdfMod, html2canvasMod]) => ({
+      jsPDF: jspdfMod.default,
+      html2canvas: html2canvasMod.default,
+    }));
+  }
+  return enginesPromise;
+}
 
 /**
  * Motor do caminho ÚNICO de exportação de PDF do PresCMed (os componentes o
@@ -52,7 +75,12 @@ async function aguardarRecursos(el: HTMLElement): Promise<void> {
   );
 }
 
-async function capturarFolha(el: HTMLElement, orientation: OrientacaoFolha, scale: number): Promise<HTMLCanvasElement> {
+async function capturarFolha(
+  html2canvas: PdfCanvasEngines['html2canvas'],
+  el: HTMLElement,
+  orientation: OrientacaoFolha,
+  scale: number
+): Promise<HTMLCanvasElement> {
   const largura = larguraFolhaPx(orientation);
   const alturaMinima = alturaFolhaPx(orientation);
 
@@ -196,20 +224,23 @@ export async function sheetsToPdf(
   sheets: HTMLElement | HTMLElement[],
   opts: OpcoesExportacao = {},
 ): Promise<jsPDF> {
-  const folhas = Array.isArray(sheets) ? sheets : [sheets];
+  const folhas = (Array.isArray(sheets) ? sheets : [sheets]).filter(
+    (el): el is HTMLElement => Boolean(el && typeof el === 'object' && 'querySelectorAll' in el)
+  );
   if (folhas.length === 0) {
     throw new Error('Nenhuma folha para exportar.');
   }
+  const { jsPDF: JsPdfCtor, html2canvas } = await loadPdfCanvasEngines();
   const orientation = opts.orientation ?? 'portrait';
-  const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4', compress: true });
+  const pdf = new JsPdfCtor({ orientation, unit: 'mm', format: 'a4', compress: true });
 
   for (let i = 0; i < folhas.length; i += 1) {
     await aguardarRecursos(folhas[i]);
-    let canvas = await capturarFolha(folhas[i], orientation, opts.scale ?? 3);
+    let canvas = await capturarFolha(html2canvas, folhas[i], orientation, opts.scale ?? 3);
     if (!canvasPossuiDimensoesValidas(canvas)) {
       liberarMemoriaCanvas(canvas);
       // Aparelhos com pouca memória recusam canvas grandes: refaz em escala menor.
-      canvas = await capturarFolha(folhas[i], orientation, 2);
+      canvas = await capturarFolha(html2canvas, folhas[i], orientation, 2);
     }
     adicionarCanvasAoPdf(pdf, canvas, orientation, i === 0);
   }

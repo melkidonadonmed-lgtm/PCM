@@ -22,6 +22,7 @@ import {
 import { ScoreParameterGroupInput } from './ScoreParameterGroupInput';
 import { ScorePhysiologicalRadar } from './ScorePhysiologicalRadar';
 import { ScoreBicInfusionCard } from './ScoreBicInfusionCard';
+import { ScoreExportAndBedBridgeCard } from './ScoreExportAndBedBridgeCard';
 
 interface ScoreCalculatorDetailViewProps {
   calculator: Calculator;
@@ -73,65 +74,38 @@ export const ScoreCalculatorDetailView: React.FC<
   onRecordScoreToBed,
   onNavigateToHospitalDashboard,
 }) => {
-  const [inputs, setInputs] = useState<ScoreInputRecord>(() => {
+  const buildBaselineInputs = (): ScoreInputRecord => {
     const initial: ScoreInputRecord = {};
     for (const group of calculator.parameterGroups) {
-      const baseline =
-        group.options.find((o) => o.isNormalBaseline) ?? group.options[0];
-      if (baseline) {
-        initial[group.id] = baseline.id;
-      } else {
-        initial[group.id] = group.normalBaselineValue;
-      }
+      const baseline = group.options.find((o) => o.isNormalBaseline) ?? group.options[0];
+      initial[group.id] = baseline ? baseline.id : group.normalBaselineValue;
     }
     return initial;
-  });
+  };
 
+  const [inputs, setInputs] = useState<ScoreInputRecord>(buildBaselineInputs);
   const [openBicDrugId, setOpenBicDrugId] = useState<string | null>(null);
-  const [copyFeedback, setCopyFeedback] = useState<
-    'PEP' | 'SBAR' | 'A4' | 'BED_RECORDED' | null
-  >(null);
+  const [copyFeedback, setCopyFeedback] = useState<'PEP' | 'SBAR' | 'A4' | 'BED_RECORDED' | null>(null);
   const [appendConductToBed, setAppendConductToBed] = useState<boolean>(true);
-  const [prescribedIds, setPrescribedIds] = useState<Record<string, boolean>>(
-    {}
-  );
+  const [prescribedIds, setPrescribedIds] = useState<Record<string, boolean>>({});
 
   const selectedHospitalBed = useMemo(
-    () =>
-      hospitalBeds.find((b) => b.id === activeHospitalBedId) ?? hospitalBeds[0],
+    () => hospitalBeds.find((b) => b.id === activeHospitalBedId) ?? hospitalBeds[0],
     [hospitalBeds, activeHospitalBedId]
   );
 
-  const result = useMemo(
-    () => calculateScore(calculator, inputs),
-    [calculator, inputs]
-  );
-
+  const result = useMemo(() => calculateScore(calculator, inputs), [calculator, inputs]);
   const activeTier = result.activeRiskTier;
   const sortedGroups = useMemo(
-    () =>
-      [...calculator.parameterGroups].sort(
-        (a, b) => a.sortOrder - b.sortOrder
-      ),
+    () => [...calculator.parameterGroups].sort((a, b) => a.sortOrder - b.sortOrder),
     [calculator.parameterGroups]
   );
 
-  const handleInputChange = (
-    groupId: string,
-    value: string | number | boolean
-  ) => {
+  const handleInputChange = (groupId: string, value: string | number | boolean) => {
     setInputs((prev) => ({ ...prev, [groupId]: value }));
   };
 
-  const handleResetBaseline = () => {
-    const reset: ScoreInputRecord = {};
-    for (const group of calculator.parameterGroups) {
-      const baseline =
-        group.options.find((o) => o.isNormalBaseline) ?? group.options[0];
-      reset[group.id] = baseline ? baseline.id : group.normalBaselineValue;
-    }
-    setInputs(reset);
-  };
+  const handleResetBaseline = () => setInputs(buildBaselineInputs());
 
   const buildExportContext = () => {
     const activeInfusions = activeTier.pharmacologicalActions
@@ -196,10 +170,12 @@ export const ScoreCalculatorDetailView: React.FC<
     const findings = summarizePositiveFindings(calculator, inputs);
     const recommendedConducts: string[] = [
       ...activeTier.nonPharmacologicalActions.map(
-        (a) => `[${calculator.acronym} -> ${a.dispositionTarget}] ${a.recommendationTitle}: ${a.monitoringPlan}`
+        (a) =>
+          `[${calculator.acronym} -> ${a.dispositionTarget}] ${a.recommendationTitle}: ${a.monitoringPlan}`
       ),
       ...activeTier.pharmacologicalActions.map(
-        (rx) => `[${calculator.acronym}] ${rx.drugName} ${rx.dosage} (${rx.route}, ${rx.frequency})`
+        (rx) =>
+          `[${calculator.acronym}] ${rx.drugName} ${rx.dosage} (${rx.route}, ${rx.frequency})`
       ),
     ];
 
@@ -230,7 +206,7 @@ export const ScoreCalculatorDetailView: React.FC<
   };
 
   const handlePrescribeDrug = (
-    rx: typeof activeTier.pharmacologicalActions[number]
+    rx: (typeof activeTier.pharmacologicalActions)[number]
   ) => {
     if (!onAddPrescriptionItem) return;
     const item = convertPharmacologicalActionToPrescriptionItem(
@@ -242,7 +218,7 @@ export const ScoreCalculatorDetailView: React.FC<
   };
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-5" data-state="idle" aria-busy={false}>
+    <div className="flex flex-col gap-3" data-state="idle" aria-busy={false}>
       {/* Banner de Cabeçalho e Pontuação em Tempo Real */}
       <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -281,7 +257,7 @@ export const ScoreCalculatorDetailView: React.FC<
                 <button
                   type="button"
                   onClick={handleResetBaseline}
-                  className="inline-flex items-center gap-1 rounded-md border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
+                  className="chip-neutral inline-flex items-center gap-1 rounded-md border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
                 >
                   <Icon name="restart_alt" size={12} />
                   <span>Zerar Basal</span>
@@ -289,9 +265,16 @@ export const ScoreCalculatorDetailView: React.FC<
               </div>
             </div>
 
-            <h2 className="mt-1 text-sm sm:text-base font-semibold tracking-tight text-[var(--text-main)]">
-              {calculator.name}
-            </h2>
+            <div className="mt-1 flex items-center gap-2">
+              <Icon
+                name="calculate"
+                size={18}
+                className="text-sky-600 dark:text-sky-400 shrink-0"
+              />
+              <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)]">
+                {calculator.name}
+              </h2>
+            </div>
             <p className="mt-0.5 text-xs leading-snug text-[var(--text-muted)] line-clamp-2">
               {calculator.summary}
             </p>
@@ -352,8 +335,8 @@ export const ScoreCalculatorDetailView: React.FC<
       </div>
 
       {/* Grid Principal: Parâmetros + Condutas (Esquerda) | Radar + Exportação (Direita) */}
-      <div className="grid grid-cols-1 gap-4 xl:gap-5 lg:grid-cols-12 items-start">
-        <div className="flex flex-col gap-4 lg:col-span-7">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 items-start">
+        <div className="flex flex-col gap-3 lg:col-span-7">
           {/* Parâmetros Clínicos */}
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between px-1">
@@ -377,19 +360,26 @@ export const ScoreCalculatorDetailView: React.FC<
           </div>
 
           {/* Conduta e Intervenção */}
-          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-4">
-            <div className="border-b border-subtle dark:border-strong pb-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
-                  2. Estratificação de Risco e Plano Terapêutico Imediato
-                </h3>
+          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-3">
+            <div className="border-b border-subtle dark:border-strong pb-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Icon
+                    name="shield_with_heart"
+                    size={18}
+                    className="text-sky-600 dark:text-sky-400 shrink-0"
+                  />
+                  <h3 className="text-sm font-semibold text-[var(--text-main)]">
+                    2. Estratificação de Risco e Plano Terapêutico Imediato
+                  </h3>
+                </div>
                 <span
                   className={`rounded-md border px-2 py-0.5 text-[11px] font-bold ${SEVERITY_BADGE_CLASSES[activeTier.severityLevel]}`}
                 >
                   {activeTier.label}
                 </span>
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-slate-700 dark:text-slate-200">
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-700 dark:text-slate-200">
                 <strong>Desfecho / Evidência:</strong>{' '}
                 {activeTier.statisticalOutcome}
               </p>
@@ -560,8 +550,8 @@ export const ScoreCalculatorDetailView: React.FC<
         </div>
 
         {/* Coluna Direita: Radar Fisiológico + Faixas + Exportação PEP/SBAR/A4 */}
-        <div className="flex flex-col gap-4 lg:col-span-5">
-          <div className="sticky top-4 flex flex-col gap-4">
+        <div className="flex flex-col gap-3 lg:col-span-5">
+          <div className="sticky top-4 flex flex-col gap-3">
             <ScorePhysiologicalRadar
               axes={calculator.radarAxes}
               values={result.radarValues}
@@ -569,229 +559,27 @@ export const ScoreCalculatorDetailView: React.FC<
               size={290}
             />
 
-            {/* Matriz de Faixas de Risco */}
-            <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5">
-              <h4 className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Matriz de Estratificação do Escore
-              </h4>
-              <div className="space-y-1.5">
-                {calculator.riskTiers.map((tier) => {
-                  const isActive = tier.id === activeTier.id;
-                  return (
-                    <div
-                      key={tier.id}
-                      className={`flex items-center justify-between rounded-xl border px-3 py-1.5 text-xs ${
-                        isActive
-                          ? SEVERITY_BADGE_CLASSES[tier.severityLevel]
-                          : 'border-subtle dark:border-strong bg-[var(--surface-inset)] text-slate-500 dark:text-slate-400'
-                      }`}
-                    >
-                      <span className="font-medium">{tier.label}</span>
-                      <span className="font-mono text-[11px] font-bold clinical-tabular-nums">
-                        {tier.minScore === tier.maxScore
-                          ? `${tier.minScore} pt`
-                          : `${tier.minScore} a ${tier.maxScore} pts`}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Hub de Exportação SOAP / SBAR / Editor A4 */}
-            <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-4 sm:p-5 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                  Exportação Prontuário (PEP / SBAR / Editor A4)
-                </h4>
-                <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
-                  Zero-PII / LGPD
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label
-                    htmlFor="score-bed-id"
-                    className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400"
-                  >
-                    Identificador de Leito
-                  </label>
-                  <input
-                    id="score-bed-id"
-                    type="text"
-                    placeholder="Ex.: UTI-04, Sala Vermelha"
-                    value={bedIdentifier}
-                    onChange={(e) => onBedIdentifierChange(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="score-patient-weight"
-                    className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400"
-                  >
-                    Peso p/ BIC (<span className="clinical-unit">kg</span>)
-                  </label>
-                  <input
-                    id="score-patient-weight"
-                    type="number"
-                    min={1}
-                    max={300}
-                    placeholder="Ex.: 70"
-                    value={patientWeightKg > 0 ? patientWeightKg : 70}
-                    onChange={(e) =>
-                      onWeightChange(
-                        Math.max(1, parseFloat(e.target.value) || 70)
-                      )
-                    }
-                    className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 font-mono text-xs text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none clinical-tabular-nums"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => handleCopyText('PEP')}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
-                >
-                  <Icon
-                    name={copyFeedback === 'PEP' ? 'check' : 'content_copy'}
-                    className="text-sm text-emerald-600"
-                  />
-                  {copyFeedback === 'PEP'
-                    ? 'SOAP Copiado!'
-                    : 'Copiar Evolução SOAP'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleCopyText('SBAR')}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
-                >
-                  <Icon
-                    name={copyFeedback === 'SBAR' ? 'check' : 'share'}
-                    className="text-sm text-blue-600"
-                  />
-                  {copyFeedback === 'SBAR' ? 'SBAR Copiado!' : 'Copiar SBAR'}
-                </button>
-              </div>
-
-              {onSendToA4Editor ? (
-                <button
-                  type="button"
-                  onClick={handleSendScoreToA4}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-blue-700 cursor-pointer"
-                >
-                  <Icon
-                    name={copyFeedback === 'A4' ? 'check' : 'description'}
-                    className="text-base"
-                  />
-                  {copyFeedback === 'A4'
-                    ? 'Enviado para o Editor A4!'
-                    : 'Enviar Relatório Estruturado para o Editor A4'}
-                </button>
-              ) : null}
-
-              {/* Ponte Direta: Registrar Escore no Módulo de Internação (MOD-03) e Dashboard */}
-              {onRecordScoreToBed && selectedHospitalBed ? (
-                <div className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-3 space-y-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-300">
-                      <Icon name="local_hospital" size={14} />
-                      Integração Internação & Dashboard (MOD-03)
-                    </span>
-                    <span className="rounded bg-sky-500/15 px-1.5 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
-                      EF/LT {selectedHospitalBed.wardAndBed}
-                    </span>
-                  </div>
-
-                  {hospitalBeds.length > 1 && onSelectHospitalBed ? (
-                    <div>
-                      <label
-                        htmlFor="score-hospital-bed-select"
-                        className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1"
-                      >
-                        Leito Hospitalar Alvo (MOD-03)
-                      </label>
-                      <select
-                        id="score-hospital-bed-select"
-                        value={selectedHospitalBed.id}
-                        onChange={(e) => {
-                          onSelectHospitalBed(e.target.value);
-                          const chosen = hospitalBeds.find(
-                            (b) => b.id === e.target.value
-                          );
-                          if (chosen) {
-                            onBedIdentifierChange(chosen.wardAndBed);
-                          }
-                        }}
-                        className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-900 dark:text-slate-100 clinical-tabular-nums"
-                      >
-                        {hospitalBeds.map((b) => (
-                          <option key={b.id} value={b.id}>
-                            EF/LT {b.wardAndBed} —{' '}
-                            {b.patientNameOrInitials || 'Leito sem ID'}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ) : null}
-
-                  <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={appendConductToBed}
-                      onChange={(e) => setAppendConductToBed(e.target.checked)}
-                      className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                    />
-                    <span>
-                      Sincronizar conduta sugerida na lista <strong>CD</strong> do leito
-                    </span>
-                  </label>
-
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <button
-                      type="button"
-                      onClick={handleRecordScoreInHospitalBed}
-                      className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-sky-700 cursor-pointer"
-                    >
-                      <Icon
-                        name={
-                          copyFeedback === 'BED_RECORDED' ? 'check' : 'add_chart'
-                        }
-                        size={15}
-                      />
-                      <span>
-                        {copyFeedback === 'BED_RECORDED'
-                          ? `Registrado no Leito ${selectedHospitalBed.wardAndBed}!`
-                          : `Registrar no Leito ${selectedHospitalBed.wardAndBed} (Dashboard)`}
-                      </span>
-                    </button>
-
-                    {onNavigateToHospitalDashboard ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onNavigateToHospitalDashboard(
-                            selectedHospitalBed.id,
-                            calculator.acronym
-                          )
-                        }
-                        className="flex items-center justify-center gap-1 rounded-lg border border-sky-500/40 bg-white dark:bg-slate-900 px-2.5 py-2 text-xs font-bold text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-slate-800 cursor-pointer"
-                      >
-                        <Icon name="monitor_heart" size={14} />
-                        <span>Ver no Dashboard</span>
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              ) : null}
-
-              <div className="border-t border-slate-200 dark:border-slate-700 pt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                <strong>Fonte Científica:</strong> {calculator.evidenceSource}
-              </div>
-            </div>
+            <ScoreExportAndBedBridgeCard
+              calculator={calculator}
+              activeTier={activeTier}
+              severityBadgeClasses={SEVERITY_BADGE_CLASSES}
+              bedIdentifier={bedIdentifier}
+              onBedIdentifierChange={onBedIdentifierChange}
+              patientWeightKg={patientWeightKg}
+              onWeightChange={onWeightChange}
+              copyFeedback={copyFeedback}
+              onCopyText={handleCopyText}
+              onSendToA4Editor={onSendToA4Editor}
+              onSendScoreToA4={handleSendScoreToA4}
+              hospitalBeds={hospitalBeds}
+              selectedHospitalBed={selectedHospitalBed}
+              onSelectHospitalBed={onSelectHospitalBed}
+              appendConductToBed={appendConductToBed}
+              onToggleAppendConductToBed={setAppendConductToBed}
+              onRecordScoreToBed={onRecordScoreToBed}
+              onRecordScoreInHospitalBed={handleRecordScoreInHospitalBed}
+              onNavigateToHospitalDashboard={onNavigateToHospitalDashboard}
+            />
           </div>
         </div>
       </div>

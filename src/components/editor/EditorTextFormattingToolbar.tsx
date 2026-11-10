@@ -126,6 +126,8 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           }}
           className="bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-main)] rounded-xl px-2 py-1 text-xs font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shrink-0"
           title="Estilo de texto (Parágrafo ou Título)"
+          id="editor-block-style-select"
+          name="editorBlockStyle"
           aria-label="Estilo de texto"
         >
           <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="p">Normal</option>
@@ -150,6 +152,8 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
             onChange={(e) => setBaseFontSize(Number(e.target.value))}
             className="bg-transparent text-[var(--text-main)] px-1 py-0.5 font-bold text-center text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded cursor-pointer clinical-tabular-nums"
             title="Tamanho da fonte em pontos (pt)"
+            id="editor-font-size-select"
+            name="editorFontSize"
             aria-label="Tamanho da fonte em pontos (pt)"
           >
             {[8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28].map(sz => (
