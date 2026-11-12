@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '../Icon';
 import { storageService } from '../../services/storageService';
 import type { Patient, PrescriptionItem } from '../../types';
@@ -6,14 +6,19 @@ import type {
   HospitalBedPatientRecord,
   HospitalBedScoreEntry,
 } from '../../core/domain/clinicalEntities';
+import type { Calculator } from '../../utils/scores/scoreTypes';
 import {
-  ALL_SCOREBOARD_CALCULATORS,
   DEFAULT_QUICK_PIN_IDS,
-  SCOREBOARD_BLOCKS_META,
   SCOREBOARD_MANIFEST,
-  getCalculatorByIdOrSlug,
+  SCOREBOARD_TOTAL_COUNT,
   searchScoreboardCatalog,
-} from '../../data/scores/scoreboardCatalog';
+} from '../../data/scores/scoreboardManifest';
+import {
+  DEFAULT_SCOREBOARD_CALCULATOR,
+  getLoadedCalculatorByIdOrSlug,
+  loadCalculatorByIdOrSlug,
+  loadScoreBlock,
+} from '../../data/scores/scoreboardBlockLoader';
 import {
   DOBUTAMINE_PROTOCOL,
   NITROGLYCERIN_PROTOCOL,
@@ -21,6 +26,7 @@ import {
   VASOPRESSIN_PROTOCOL,
 } from '../../utils/scores/infusionEngine';
 import { ScoreCalculatorDetailView } from './ScoreCalculatorDetailView';
+import { ScoreCatalogTabSection } from './ScoreCatalogTabSection';
 import { ScoreBicInfusionCard } from './ScoreBicInfusionCard';
 import { EparadaAndScreeningPanel } from './EparadaAndScreeningPanel';
 
@@ -66,9 +72,13 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
   onReturnToHospitalBed,
 }) => {
   const [tabMode, setTabMode] = useState<ScoreboardTabMode>('CALCULATOR');
-  const [activeCalculatorId, setActiveCalculatorId] = useState<string>(
-    initialCalculatorId || 'calc_qsofa'
+  const [activeCalculator, setActiveCalculator] = useState<Calculator>(
+    () =>
+      getLoadedCalculatorByIdOrSlug(initialCalculatorId || 'calc_qsofa') ??
+      DEFAULT_SCOREBOARD_CALCULATOR
   );
+  const [isLoadingBlock, setIsLoadingBlock] = useState<boolean>(false);
+  const requestSeqRef = useRef<number>(0);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedBlockId, setSelectedBlockId] = useState<string>('ALL');
   const [onlyFavoritesFilter, setOnlyFavoritesFilter] =
@@ -106,15 +116,38 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
       : DEFAULT_QUICK_PIN_IDS;
   });
 
-  useEffect(() => {
-    if (initialCalculatorId) {
-      const found = getCalculatorByIdOrSlug(initialCalculatorId);
-      if (found) {
-        setActiveCalculatorId(found.id);
+  const handleSelectScore = useCallback((idOrSlug: string) => {
+    const syncCalc = getLoadedCalculatorByIdOrSlug(idOrSlug);
+    if (syncCalc) {
+      requestSeqRef.current += 1;
+      setIsLoadingBlock(false);
+      setActiveCalculator(syncCalc);
+      setTabMode('CALCULATOR');
+      return;
+    }
+    const seq = ++requestSeqRef.current;
+    setIsLoadingBlock(true);
+    void loadCalculatorByIdOrSlug(idOrSlug).then((loaded) => {
+      if (seq !== requestSeqRef.current) return;
+      setIsLoadingBlock(false);
+      if (loaded) {
+        setActiveCalculator(loaded);
         setTabMode('CALCULATOR');
       }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (initialCalculatorId) {
+      handleSelectScore(initialCalculatorId);
     }
-  }, [initialCalculatorId]);
+  }, [initialCalculatorId, handleSelectScore]);
+
+  useEffect(() => {
+    if (selectedBlockId !== 'ALL') {
+      void loadScoreBlock(selectedBlockId);
+    }
+  }, [selectedBlockId]);
 
   useEffect(() => {
     if (Number.isFinite(patient.weightKg) && patient.weightKg > 0) {
@@ -141,13 +174,6 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
     }
   };
 
-  const activeCalculator = useMemo(
-    () =>
-      getCalculatorByIdOrSlug(activeCalculatorId) ??
-      ALL_SCOREBOARD_CALCULATORS[0],
-    [activeCalculatorId]
-  );
-
   const filteredManifest = useMemo(
     () =>
       searchScoreboardCatalog(
@@ -168,20 +194,12 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
     [favoriteSet]
   );
 
-  const handleSelectScore = (idOrSlug: string) => {
-    const found = getCalculatorByIdOrSlug(idOrSlug);
-    if (found) {
-      setActiveCalculatorId(found.id);
-      setTabMode('CALCULATOR');
-    }
-  };
-
   return (
     <section
       className="w-full max-w-7xl mx-auto flex flex-col gap-3"
       aria-label="Módulo de Escores Clínicos e Ferramentas de Apoio"
-      aria-busy={false}
-      data-state="idle"
+      aria-busy={isLoadingBlock}
+      data-state={isLoadingBlock ? 'loading' : 'idle'}
     >
       {/* Cabeçalho Enxuto da Bancada Scoreboard CDSS */}
       <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-2.5">
@@ -192,7 +210,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               Scoreboard CDSS
             </h1>
             <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
-              {ALL_SCOREBOARD_CALCULATORS.length} Escores Monográficos
+              {SCOREBOARD_TOTAL_COUNT} Escores Monográficos
             </span>
             {activeHospitalBed && onReturnToHospitalBed && (
               <button
@@ -266,7 +284,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               }`}
             >
               <Icon name="apps" size={14} />
-              <span>Catálogo ({ALL_SCOREBOARD_CALCULATORS.length})</span>
+              <span>Catálogo ({SCOREBOARD_TOTAL_COUNT})</span>
             </button>
             <button
               type="button"
@@ -350,7 +368,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               className="inline-flex items-center gap-1 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] h-7 px-2.5 text-[11px] font-semibold text-[var(--text-main)] cursor-pointer whitespace-nowrap"
             >
               <Icon name="search" size={13} className="text-sky-600 dark:text-sky-400" />
-              <span>Buscar ({ALL_SCOREBOARD_CALCULATORS.length})</span>
+              <span>Buscar ({SCOREBOARD_TOTAL_COUNT})</span>
             </button>
           </div>
         </div>
@@ -380,144 +398,24 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
       {/* ABA 2: Catálogo Completo (114 Escores) */}
       {tabMode === 'CATALOG' ? (
-        <div className="flex flex-col gap-3">
-          <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="relative flex-1 min-w-[240px]">
-                <Icon
-                  name="search"
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-                <input
-                  type="text"
-                  aria-label="Buscar escore clínico por sigla, nome, síndrome ou CID"
-                  placeholder="Ex.: qSOFA, SOFA, Glasgow-P, Wells TEP, CHA2DS2-VASc, Child-Pugh, Balanço Sagital..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 py-2 pl-9 pr-4 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none"
-                />
-              </div>
-
-              {(searchQuery || selectedBlockId !== 'ALL' || onlyFavoritesFilter) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedBlockId('ALL');
-                    setOnlyFavoritesFilter(false);
-                  }}
-                  className="chip-neutral h-9 min-h-[36px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
-                  title="Limpar busca e filtros do catálogo"
-                >
-                  <Icon name="close" size={14} />
-                  <span>Limpar</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setOnlyFavoritesFilter((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition-colors cursor-pointer ${
-                  onlyFavoritesFilter
-                    ? 'border-amber-500 bg-amber-500 text-white'
-                    : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300'
-                }`}
-              >
-                <Icon name="star" className="text-sm" />
-                Apenas Favoritos ({favoriteIds.length})
-              </button>
-            </div>
-
-            {/* Pílulas de Blocos de Especialidades */}
-            <div className="flex flex-wrap gap-1.5">
-              {SCOREBOARD_BLOCKS_META.map((blk) => {
-                const isSelected = selectedBlockId === blk.blockId;
-                return (
-                  <button
-                    key={blk.blockId}
-                    type="button"
-                    onClick={() => setSelectedBlockId(blk.blockId)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
-                      isSelected
-                        ? 'border-blue-600 bg-blue-600 text-white'
-                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-slate-400'
-                    }`}
-                  >
-                    <Icon name={blk.icon} className="text-sm" />
-                    <span>{blk.shortLabel}</span>
-                    <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[11px] clinical-tabular-nums">
-                      {blk.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {filteredManifest.map((item) => {
-              const isFav = favoriteSet.has(item.id);
-              return (
-                <div
-                  key={item.id}
-                  className="cq-card card-surface surface-card-minimal flex flex-col justify-between rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 transition hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-elevation-medium"
-                >
-                  <div>
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="rounded-md bg-blue-600/10 dark:bg-blue-500/20 px-2 py-0.5 font-mono text-xs font-bold text-blue-700 dark:text-blue-300">
-                        {item.acronym}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        {item.hasInfusionProtocol ? (
-                          <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
-                            +BIC
-                          </span>
-                        ) : null}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleFavorite(item.id)}
-                          aria-label={
-                            isFav
-                              ? `Remover ${item.acronym} dos favoritos`
-                              : `Fixar ${item.acronym} nos favoritos`
-                          }
-                          className={`rounded p-1 transition-colors cursor-pointer ${
-                            isFav
-                              ? 'text-amber-500'
-                              : 'text-slate-400 hover:text-slate-600'
-                          }`}
-                        >
-                          <Icon name="star" className="text-sm" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <h3 className="mt-1.5 text-sm font-bold text-slate-900 dark:text-white leading-snug">
-                      {item.name}
-                    </h3>
-                    <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 line-clamp-2">
-                      {item.summary}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-700/70 pt-2.5">
-                    <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-44">
-                      {item.categoryName}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleSelectScore(item.id)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer"
-                    >
-                      Abrir Escore
-                      <Icon name="arrow_forward" className="text-xs" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <ScoreCatalogTabSection
+          searchQuery={searchQuery}
+          selectedBlockId={selectedBlockId}
+          onlyFavoritesFilter={onlyFavoritesFilter}
+          favoriteIdsCount={favoriteIds.length}
+          favoriteSet={favoriteSet}
+          filteredManifest={filteredManifest}
+          onSearchQueryChange={setSearchQuery}
+          onSelectBlockId={setSelectedBlockId}
+          onToggleOnlyFavorites={() => setOnlyFavoritesFilter((prev) => !prev)}
+          onClearFilters={() => {
+            setSearchQuery('');
+            setSelectedBlockId('ALL');
+            setOnlyFavoritesFilter(false);
+          }}
+          onToggleFavorite={handleToggleFavorite}
+          onSelectScore={handleSelectScore}
+        />
       ) : null}
 
       {/* ABA 3: Bancada Dedicada de Drogas Vasoativas em BIC */}

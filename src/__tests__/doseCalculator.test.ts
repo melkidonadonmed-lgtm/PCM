@@ -4,7 +4,13 @@ import { PEDIATRIC_MEDICATIONS, CLINICAL_PROTOCOLS } from '../data/pediatricMeds
 import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
 import { COMMON_CID10, searchCID10 } from '../data/cidCatalog';
 import { PediatricMedication } from '../types';
-import { PWA_WORKBOX_GLOB_IGNORES, resolvePwaManualChunk } from '../../vite.config';
+import {
+  PWA_INCLUDE_ASSETS,
+  PWA_INCLUDE_MANIFEST_ICONS,
+  PWA_WORKBOX_GLOB_IGNORES,
+  isIgnoredFromPwaPrecache,
+  resolvePwaManualChunk,
+} from '../../vite.config';
 
 describe('Calculadora de Doses Pediátricas por Peso (YMYL / Segurança Clínica)', () => {
   const getMed = (id: string): PediatricMedication => {
@@ -258,5 +264,47 @@ describe('Integridade dos Catálogos Clínicos Modularizados (TASK-10 / YMYL)', 
     expect(searchCID10('!@#$%^&*()')).toEqual([]);
     expect(searchCID10('<script>alert(1)</script>')).toEqual([]);
     expect(searchCID10(null as unknown as string).length).toBe(COMMON_CID10.length);
+  });
+
+  it('deduplica ícones estáticos no manifesto Workbox e particiona block_01..09.json em chunks individuais scores-block-01..09 (TASK-14)', () => {
+    expect(PWA_INCLUDE_ASSETS).toEqual([]);
+    expect(PWA_INCLUDE_MANIFEST_ICONS).toBe(false);
+
+    for (let i = 1; i <= 9; i++) {
+      const n = `0${i}`;
+      expect(resolvePwaManualChunk(`/app/src/data/scores/blocks/block_${n}.json`)).toBe(
+        `scores-block-${n}`
+      );
+      expect(
+        resolvePwaManualChunk(`C:\\repo\\src\\data\\scores\\blocks\\block_${n}.json?import`)
+      ).toBe(`scores-block-${n}`);
+    }
+
+    // Rejeição de blocos fora do intervalo 01..09
+    expect(resolvePwaManualChunk('/app/src/data/scores/blocks/block_00.json')).toBeUndefined();
+    expect(resolvePwaManualChunk('/app/src/data/scores/blocks/block_10.json')).toBeUndefined();
+    expect(resolvePwaManualChunk('/app/src/data/scores/blocks/block_01.json.bak')).toBeUndefined();
+  });
+
+  it('exclui scans raster legados (formularios-sus/*.png) do precache Workbox preservando a central vetorial offline e ícones oficiais (TASK-15)', () => {
+    expect(PWA_WORKBOX_GLOB_IGNORES).toContain('**/formularios-sus/*.png');
+
+    expect(isIgnoredFromPwaPrecache('formularios-sus/apac-laudo.png')).toBe(true);
+    expect(isIgnoredFromPwaPrecache('/formularios-sus/lme.png')).toBe(true);
+    expect(isIgnoredFromPwaPrecache('assets/vendor-firebase-BYhIg_hw.js')).toBe(true);
+    expect(isIgnoredFromPwaPrecache('assets/vendor-canvg-D6c-glFS.js')).toBe(true);
+
+    // Ativos obrigatórios do fluxo offline nunca são ignorados
+    expect(isIgnoredFromPwaPrecache('formularios-sus-offline.html')).toBe(false);
+    expect(isIgnoredFromPwaPrecache('logos/sus.png')).toBe(false);
+    expect(isIgnoredFromPwaPrecache('watermarks/sus.png')).toBe(false);
+    expect(isIgnoredFromPwaPrecache('pwa-192x192.png')).toBe(false);
+    expect(isIgnoredFromPwaPrecache('assets/vendor-pdf-canvas-D1v1qYO1.js')).toBe(false);
+
+    // Casos adversariais (path traversal, vazios e tipos inválidos)
+    expect(isIgnoredFromPwaPrecache('../formularios-sus/apac-laudo.png')).toBe(false);
+    expect(isIgnoredFromPwaPrecache('formularios-sus/sub/apac-laudo.png')).toBe(false);
+    expect(isIgnoredFromPwaPrecache('')).toBe(false);
+    expect(isIgnoredFromPwaPrecache(null as unknown as string)).toBe(false);
   });
 });

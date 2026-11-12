@@ -1,20 +1,18 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Icon, type IconName } from '../Icon';
 import {
+  LmeMedicationRow,
   SusDocumentId,
   SusDocumentItem,
   SusFilledFormData,
 } from '../../types';
 import {
   SUS_DOCUMENTS_CATALOG,
-  buildSusDocumentHtml,
   timbreDoDocumentoSus,
 } from '../../data/susDocumentsCatalog';
-import { camposSemEspaco, formularioOficialDe } from '../../data/formulariosOficiaisSus';
 import { exportarFolhaPdf, prepararRaizDeImpressao } from '../../utils/folhaA4';
 import { DOMPurify } from '../../utils/sanitizeHtml';
 import { FolhaA4 } from '../documento/FolhaA4';
-import { FormularioOficialSus } from '../documento/FormularioOficialSus';
 import { SusInteractiveVectorSheet } from './SusInteractiveVectorSheet';
 
 const makeIcon = (name: IconName) => ({ className = '', size }: { className?: string; size?: number }) => (
@@ -30,7 +28,6 @@ const Edit3 = makeIcon('edit_document');
 
 interface SusFormHeaderBarProps {
   currentDocItem: SusDocumentItem;
-  hasOfficialForm: boolean;
   selectedDocIds: SusDocumentId[];
   activeFormDocId: SusDocumentId;
   onBackToList: () => void;
@@ -39,7 +36,6 @@ interface SusFormHeaderBarProps {
 
 export const SusFormHeaderBar: React.FC<SusFormHeaderBarProps> = ({
   currentDocItem,
-  hasOfficialForm,
   selectedDocIds,
   activeFormDocId,
   onBackToList,
@@ -57,10 +53,7 @@ export const SusFormHeaderBar: React.FC<SusFormHeaderBarProps> = ({
       </button>
       <div>
         <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] block">
-          {hasOfficialForm
-            ? 'Impresso oficial do Ministério da Saúde'
-            : 'Modelo do PresCMed (sem impresso nacional único)'}{' '}
-          • {currentDocItem.system}
+          Folha A4 Vetorial Editável • {currentDocItem.system}
         </span>
         <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] truncate max-w-lg">
           {currentDocItem.title}
@@ -108,6 +101,7 @@ interface SusSheetPreviewAndActionsColumnProps {
     field: K,
     value: SusFilledFormData[K] | string
   ) => void;
+  onUpdateLmeRow?: (index: number, nextRow: LmeMedicationRow) => void;
   onOpenInEditor: () => void;
   onOpenAllInEditor: () => void;
   onCopyMarkdown: () => void;
@@ -123,14 +117,12 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
   getFilledDataForDoc,
   timbreDe,
   onFieldChange,
+  onUpdateLmeRow,
   onOpenInEditor,
   onOpenAllInEditor,
   onCopyMarkdown,
   showToast,
 }) => {
-  const [modoFolhaSus, setModoFolhaSus] = useState<'padrao' | 'vetorial_interativo'>(
-    'vetorial_interativo'
-  );
   const folhaSusRef = useRef<HTMLDivElement>(null);
 
   const pendenciasClinicas = [
@@ -146,11 +138,6 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
       !(formData.renalCreatinine?.trim() && formData.renalEtfg?.trim()) &&
       'função renal',
   ].filter(Boolean) as string[];
-
-  const formularioOficial = formularioOficialDe(currentDocItem.id);
-  const camposCortados = formularioOficial ? camposSemEspaco(formularioOficial, formData) : [];
-  const classeDaFolha = (oficial: boolean) =>
-    `select-text ${oficial ? 'folha-a4--formulario' : ''}`;
 
   const nomeArquivo = (prefixo: string) =>
     `${prefixo}_${(formData.patientName || 'Paciente').trim().replace(/\s+/g, '_')}.pdf`;
@@ -173,7 +160,7 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
           folhaAtual,
           nomeArquivo(currentDocItem.shortTitle.replace(/\s+/g, '_'))
         );
-        showToast('PDF do documento gerado.');
+        showToast('PDF editável de alta definição gerado.');
         return;
       }
 
@@ -183,16 +170,19 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
       const folhas = selectedDocIds.flatMap((docId) => {
         const docItem = SUS_DOCUMENTS_CATALOG.find((d) => d.id === docId);
         if (!docItem) return [];
-        const oficial = formularioOficialDe(docId);
         const folha = document.createElement('div');
-        folha.className = `folha-a4 ${classeDaFolha(Boolean(oficial))}`;
+        folha.className = 'folha-a4 select-text';
         folha.style.width = `${folhaAtual.offsetWidth}px`;
         folha.innerHTML = DOMPurify.sanitize(
-          oficial
-            ? renderToStaticMarkup(
-                <FormularioOficialSus formulario={oficial} dados={getFilledDataForDoc(docId)} />
-              )
-            : buildSusDocumentHtml(docItem, getFilledDataForDoc(docId), timbreDe(docItem))
+          renderToStaticMarkup(
+            <SusInteractiveVectorSheet
+              docItem={docItem}
+              formData={getFilledDataForDoc(docId)}
+              timbre={timbreDe(docItem)}
+              staticPrintMode
+              onFieldChange={() => {}}
+            />
+          )
         );
         bancadaOculta!.appendChild(folha);
         return [folha];
@@ -200,7 +190,7 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
       document.body.appendChild(bancadaOculta);
 
       await exportarFolhaPdf(folhas, nomeArquivo('Documentos_SUS'));
-      showToast(`PDF com ${folhas.length} documentos gerado.`);
+      showToast(`PDF com ${folhas.length} documentos vetoriais gerado.`);
     } catch (err) {
       console.error('Erro ao gerar PDF do documento SUS:', err);
       showToast('Não foi possível gerar o PDF. Tente novamente ou use Imprimir.');
@@ -223,16 +213,6 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
           </p>
         )}
 
-        {camposCortados.length > 0 && (
-          <p
-            role="alert"
-            className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-[#27354A] text-rose-700 dark:text-rose-300 border border-slate-300 dark:border-white/10"
-          >
-            Texto cortado com […] {camposCortados.length > 1 ? 'nos campos' : 'no campo'}{' '}
-            {camposCortados.join(', ')}.
-          </p>
-        )}
-
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -250,7 +230,7 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
             onClick={() => handleDownloadPdf(false)}
             disabled={isExportingPdf}
             aria-label="Baixar PDF do documento atual"
-            title="Baixar PDF do documento atual"
+            title="Baixar PDF vetorial de alta definição do documento atual"
             className="btn-tactile-secondary h-11 min-h-[44px] px-3 text-xs font-bold flex-1 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
           >
             <Download className="w-4 h-4" />
@@ -297,69 +277,31 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
         </div>
       </div>
 
-      {/* Folha Física A4 Prévia (Papel Branco com Tipografia Grafite) */}
+      {/* Folha Física A4 Editável Vetorial (Única, Nítida e Sincronizada) */}
       <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-subtle dark:border-strong space-y-2">
         <div className="no-print flex items-center justify-between gap-2 px-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-            <Icon name="layers" size={14} className="text-sky-600 dark:text-sky-400" />
-            <span>Padrão de Folha SUS</span>
+            <Icon name="edit_document" size={14} className="text-sky-600 dark:text-sky-400" />
+            <span>Folha A4 Vetorial Editável</span>
           </span>
-          <div className="inline-flex items-center gap-1 p-0.5 rounded-lg bg-slate-200/80 dark:bg-slate-900 border border-slate-300/80 dark:border-white/10">
-            <button
-              type="button"
-              onClick={() => setModoFolhaSus('vetorial_interativo')}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition cursor-pointer ${
-                modoFolhaSus === 'vetorial_interativo'
-                  ? 'bg-white dark:bg-[#1E293B] text-sky-700 dark:text-sky-300 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-              title="Grade Vetorial SIA/SUS 12 colunas com edição direta clicando na folha A4"
-            >
-              Grade Vetorial Interativa
-            </button>
-            <button
-              type="button"
-              onClick={() => setModoFolhaSus('padrao')}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition cursor-pointer ${
-                modoFolhaSus === 'padrao'
-                  ? 'bg-white dark:bg-[#1E293B] text-sky-700 dark:text-sky-300 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-              title={
-                formularioOficial
-                  ? 'Impresso oficial escaneado do Ministério da Saúde'
-                  : 'Laudo técnico estruturado clássico'
-              }
-            >
-              {formularioOficial ? 'Impresso Oficial MS' : 'Laudo Clássico'}
-            </button>
-          </div>
+          <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+            Edição direta na folha
+          </span>
         </div>
 
         <FolhaA4
           ref={folhaSusRef}
           id="sus-document-print-sheet"
           imprimivel
-          className={classeDaFolha(Boolean(formularioOficial && modoFolhaSus === 'padrao'))}
+          className="select-text"
         >
-          {modoFolhaSus === 'vetorial_interativo' ? (
-            <SusInteractiveVectorSheet
-              docItem={currentDocItem}
-              formData={formData}
-              timbre={timbreDe(currentDocItem)}
-              onFieldChange={(key, val) => onFieldChange(key, val as never)}
-            />
-          ) : formularioOficial ? (
-            <FormularioOficialSus formulario={formularioOficial} dados={formData} />
-          ) : (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(
-                  buildSusDocumentHtml(currentDocItem, formData, timbreDe(currentDocItem))
-                ),
-              }}
-            />
-          )}
+          <SusInteractiveVectorSheet
+            docItem={currentDocItem}
+            formData={formData}
+            timbre={timbreDe(currentDocItem)}
+            onFieldChange={(key, val) => onFieldChange(key, val as never)}
+            onUpdateLmeRow={onUpdateLmeRow}
+          />
         </FolhaA4>
       </div>
     </div>

@@ -7,7 +7,35 @@ import { VitePWA } from 'vite-plugin-pwa';
 export const PWA_WORKBOX_GLOB_IGNORES: readonly string[] = [
   '**/vendor-firebase-*.js',
   '**/vendor-canvg-*.js',
+  '**/formularios-sus/*.png',
 ];
+
+export function isIgnoredFromPwaPrecache(assetPath: string): boolean {
+  if (typeof assetPath !== 'string') {
+    return false;
+  }
+  const normalized = assetPath.trim().replace(/\\/g, '/').replace(/^\/+/, '');
+  if (!normalized || normalized.includes('..')) {
+    return false;
+  }
+  if (/^(?:assets\/)?vendor-firebase-[A-Za-z0-9_-]+\.js$/.test(normalized)) {
+    return true;
+  }
+  if (/^(?:assets\/)?vendor-canvg-[A-Za-z0-9_-]+\.js$/.test(normalized)) {
+    return true;
+  }
+  if (/^formularios-sus\/[^/]+\.png$/i.test(normalized)) {
+    return true;
+  }
+  return false;
+}
+
+// Deduplicação determinística do manifesto Workbox (TASK-14):
+// Como workbox.globPatterns já varre dist/ para js, css, html, ico, png, svg e woff2,
+// manter includeAssets vazio e includeManifestIcons = false elimina entradas duplicadas
+// de ícones estáticos em self.__WB_MANIFEST.
+export const PWA_INCLUDE_ASSETS: readonly string[] = [];
+export const PWA_INCLUDE_MANIFEST_ICONS = false;
 
 export function resolvePwaManualChunk(id: string): string | undefined {
   if (typeof id !== 'string' || !id.trim()) {
@@ -79,9 +107,11 @@ export function resolvePwaManualChunk(id: string): string | undefined {
   ) {
     return 'scores-manifest';
   }
+  const scoreBlockMatch = id.match(/data[/\\]scores[/\\]blocks[/\\](block_0[1-9])\.json(?:$|\?)/);
+  if (scoreBlockMatch) {
+    return `scores-${scoreBlockMatch[1].replace('_', '-')}`;
+  }
   if (
-    id.includes('data/scores/blocks/') ||
-    id.includes('data\\scores\\blocks\\') ||
     id.includes('data/scores/scoreboardCatalog') ||
     id.includes('data\\scores\\scoreboardCatalog')
   ) {
@@ -122,13 +152,8 @@ export default defineConfig(() => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
-        includeAssets: [
-          'favicon.svg',
-          'apple-touch-icon.png',
-          'pwa-192x192.png',
-          'pwa-512x512.png',
-          'maskable-icon-512x512.png',
-        ],
+        includeAssets: [...PWA_INCLUDE_ASSETS],
+        includeManifestIcons: PWA_INCLUDE_MANIFEST_ICONS,
         manifest: {
           name: 'PresCMed — Prescrição Médica & Cálculos',
           short_name: 'PresCMed',

@@ -10,7 +10,11 @@ import {
   DocumentViaLayout,
   PrescriptionStyle,
 } from '../../types';
-import { resolverIdentidade, separarPorRegime } from '../../utils/documentoClinico';
+import {
+  resolverIdentidade,
+  rotuloApresentacao,
+  separarPorRegime,
+} from '../../utils/documentoClinico';
 import { escapeHtml } from '../../utils/sanitizeHtml';
 import type { RegimeReceita } from '../../utils/isSpecialControlOrAntibiotic';
 
@@ -218,12 +222,12 @@ export function buildDefaultHeaderConfig(
   activeContext: WorkContext | null
 ): DocumentHeaderConfig {
   const { cabecalho } = resolverIdentidade(doctor, activeContext);
-  const rawCrm = (activeContext?.doctorCredentials?.crm || doctor?.crm || '').trim();
-  const docCrmState = (activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP').trim();
-  const docRqe = (activeContext?.doctorCredentials?.rqe || doctor?.rqe || '').trim();
+  const rawCrm = (doctor?.crm || activeContext?.doctorCredentials?.crm || '').trim();
+  const docCrmState = (doctor?.crmState || activeContext?.doctorCredentials?.uf || 'SP').trim();
+  const docRqe = (doctor?.rqe || activeContext?.doctorCredentials?.rqe || '').trim();
   const docSpecialty = (
-    activeContext?.doctorCredentials?.specialty ||
     doctor?.specialty ||
+    activeContext?.doctorCredentials?.specialty ||
     ''
   ).trim();
   const docName = doctor?.name?.trim() || '';
@@ -259,15 +263,8 @@ export function formatPrescriptionItemsList(items: PrescriptionItem[]): string {
   }
   return items
     .map((item, idx) => {
-      const presLower = (item.presentation || '').toLowerCase();
-      const qtdLower = (item.quantity || '').toLowerCase();
-      const showPres =
-        item.presentation &&
-        presLower !== qtdLower &&
-        !presLower.includes('caixa') &&
-        presLower !== 'uso oral' &&
-        !qtdLower.includes(presLower);
-      const presLabel = showPres ? ` (${escapeHtml(item.presentation)})` : '';
+      const pres = rotuloApresentacao(item);
+      const presLabel = pres ? ` (${escapeHtml(pres)})` : '';
       const routeLabel = item.route ? ` (${escapeHtml(item.route)})` : '';
       const qtyLabel = item.quantity ? ` &nbsp;—&nbsp; <strong>${escapeHtml(item.quantity)}</strong>` : '';
       const instructions = escapeHtml(item.instructions || 'Conforme orientação médica.');
@@ -391,15 +388,8 @@ export function buildActivePrescriptionPayload(
       ? itemsToLoad
           .map((item, idx) => {
             const route = item.route ? `(${escapeHtml(item.route)})` : '';
-            const presLower = (item.presentation || '').toLowerCase();
-            const qtdLower = (item.quantity || '').toLowerCase();
-            const showPres =
-              item.presentation &&
-              presLower !== qtdLower &&
-              !presLower.includes('caixa') &&
-              presLower !== 'uso oral' &&
-              !qtdLower.includes(presLower);
-            const presentation = showPres ? ` (${escapeHtml(item.presentation)})` : '';
+            const pres = rotuloApresentacao(item);
+            const presentation = pres ? ` (${escapeHtml(pres)})` : '';
             const quantity = item.quantity ? ` &nbsp;—&nbsp; <strong>${escapeHtml(item.quantity)}</strong>` : '';
             const instructions = escapeHtml(item.instructions || '');
             const times =

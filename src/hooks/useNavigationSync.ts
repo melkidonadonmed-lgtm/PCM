@@ -10,7 +10,7 @@ interface UseNavigationSyncOptions {
   isAnyModalOpen: boolean;
 }
 
-const VALID_DIRECT_TABS = new Set<ActiveTab>([
+export const VALID_DIRECT_TABS = new Set<ActiveTab>([
   'prescription',
   'documents',
   'certificate',

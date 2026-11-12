@@ -27,5 +27,5 @@
 ## 3. Critério de Aceite e Parada (Definition of Done)
 - [x] Passar no linter/typecheck sem erros (`npm run lint` / `tsc --noEmit`).
 - [x] Passar no linter de design tokens sem erros ou avisos (`npm run design:lint`).
-- [x] Passar em 100% da suíte determinística Vitest (`npm run test` — `28/28` suítes, `270/270` testes).
+- [x] Passar em 100% da suíte determinística Vitest (`npm run test` — `29/29` suítes, `280/280` testes).
 - [x] Gerar build de produção e service worker PWA sem erros (`npm run build`).

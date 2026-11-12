@@ -1,6 +1,5 @@
 import React from 'react';
 import { SusDocumentItem, SusDocumentId } from '../../types';
-import { formularioOficialDe } from '../../data/formulariosOficiaisSus';
 import { Icon } from '../Icon';
 
 interface SusCatalogListViewProps {
@@ -17,7 +16,6 @@ interface SusCatalogListViewProps {
 }
 
 export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
-  darkMode,
   selectedCategory,
   searchTerm,
   selectedDocIds,
@@ -39,7 +37,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
               Documentos & Requisições Oficiais do SUS
             </h2>
             <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 clinical-tabular-nums shrink-0">
-              9 modelos
+              9 modelos A4 editáveis
             </span>
           </div>
 
@@ -116,7 +114,6 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
         {filteredCatalog.map((doc) => {
           const isSelected = selectedDocIds.includes(doc.id);
-          const isOfficialForm = Boolean(formularioOficialDe(doc.id));
           return (
             <div
               key={doc.id}
@@ -162,14 +159,12 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
                     {doc.shortTitle}
                   </h3>
                   <div className="flex items-center gap-1 shrink-0">
-                    {isOfficialForm && (
-                      <span
-                        title="Emissão sobre o impresso oficial do Ministério da Saúde"
-                        className="text-[11px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 whitespace-nowrap"
-                      >
-                        Impresso MS
-                      </span>
-                    )}
+                    <span
+                      title="Folha A4 vetorial nítida e editável em alta definição"
+                      className="text-[11px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 whitespace-nowrap"
+                    >
+                      A4 Editável
+                    </span>
                     <span className="text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#27354A] text-sky-700 dark:text-sky-300 border border-slate-200 dark:border-white/10 whitespace-nowrap">
                       {doc.system.split(' ')[0].replace(',', '')}
                     </span>

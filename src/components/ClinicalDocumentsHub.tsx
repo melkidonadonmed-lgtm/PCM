@@ -19,6 +19,7 @@ interface ClinicalDocumentsHubProps {
   patient: Patient;
   onUpdatePatient?: (patient: Patient) => void;
   doctor: DoctorProfile;
+  onUpdateDoctor?: (doctor: DoctorProfile) => void;
   activeContext?: WorkContext | null;
   certificate: MedicalCertificate;
   onUpdateCertificate: (cert: MedicalCertificate) => void;
@@ -41,6 +42,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
   patient,
   onUpdatePatient,
   doctor,
+  onUpdateDoctor,
   activeContext,
   certificate,
   onUpdateCertificate,
@@ -279,11 +281,11 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
             patient={patient}
             onUpdatePatient={onUpdatePatient}
             doctor={doctor}
+            onUpdateDoctor={onUpdateDoctor}
             activeContext={activeContext}
             initialDocId={initialSusDocId}
             catalogResetTrigger={susCatalogResetTrigger + localSusResetTrigger}
             onNavigateToEditorWithHtml={onNavigateToEditorWithHtml}
-            onNavigateToPrint={() => onNavigateToPrint()}
           />
         )}
       </div>

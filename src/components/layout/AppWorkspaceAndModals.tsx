@@ -334,6 +334,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
               patient={patient}
               onUpdatePatient={setPatient}
               doctor={doctor}
+              onUpdateDoctor={setDoctor}
               activeContext={activeContext}
               certificate={certificate}
               onUpdateCertificate={setCertificate}

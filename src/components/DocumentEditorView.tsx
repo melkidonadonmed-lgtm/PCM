@@ -87,10 +87,13 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   );
 
   const [headerConfig, setHeaderConfig] = useState<DocumentHeaderConfig>(buildDefaultHeader);
+  const lastDefaultHeaderRef = useRef<DocumentHeaderConfig>(headerConfig);
 
   useEffect(() => {
     const fresh = buildDefaultHeader();
-    setHeaderConfig((prev) => mergeHeaderConfigWithDoctorProfile(prev, fresh));
+    const prevDefault = lastDefaultHeaderRef.current;
+    lastDefaultHeaderRef.current = fresh;
+    setHeaderConfig((prev) => mergeHeaderConfigWithDoctorProfile(prev, fresh, prevDefault));
   }, [buildDefaultHeader]);
 
   const [isLogoGeneratorOpen, setIsLogoGeneratorOpen] = useState(false);

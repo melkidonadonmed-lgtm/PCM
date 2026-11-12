@@ -190,7 +190,6 @@ export type ActiveTab =
   | 'scores'
   | 'editor'
   | 'print_preview' 
-  | 'patients'
   | 'hospital';
 
 // Tipagem para os Contextos de Atendimento (Multi-Instituição)

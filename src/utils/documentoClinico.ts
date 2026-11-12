@@ -71,11 +71,11 @@ export function resolverIdentidade(
   const configurado = medicoConfigurado(doctor);
 
   const nome = configurado ? doctor!.name.trim() : '';
-  const crm = configurado ? (activeContext?.doctorCredentials?.crm || doctor!.crm || '').trim() : '';
-  const uf = (activeContext?.doctorCredentials?.uf || doctor?.crmState || 'SP').trim();
-  const rqe = configurado ? (activeContext?.doctorCredentials?.rqe || doctor!.rqe || '').trim() : '';
+  const crm = configurado ? (doctor!.crm || activeContext?.doctorCredentials?.crm || '').trim() : '';
+  const uf = (doctor?.crmState || activeContext?.doctorCredentials?.uf || 'SP').trim();
+  const rqe = configurado ? (doctor!.rqe || activeContext?.doctorCredentials?.rqe || '').trim() : '';
   const especialidade = configurado
-    ? (activeContext?.doctorCredentials?.specialty || doctor!.specialty || '').trim()
+    ? (doctor!.specialty || activeContext?.doctorCredentials?.specialty || '').trim()
     : '';
 
   const local = activeContext?.clinicName?.trim() || doctor?.clinicName?.trim() || '';

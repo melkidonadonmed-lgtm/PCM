@@ -427,7 +427,18 @@ export function useDocumentActiveLoadersAndDraft({
               setEditorHtml(draft.contentHtml || '');
             }
             if (draft.headerConfig) {
-              setHeaderConfig(draft.headerConfig);
+              const freshHeader = buildDefaultHeader();
+              setHeaderConfig({
+                ...draft.headerConfig,
+                doctorName: freshHeader.doctorName || draft.headerConfig.doctorName,
+                doctorCrm: freshHeader.doctorCrm || draft.headerConfig.doctorCrm,
+                doctorSpecialty: freshHeader.doctorSpecialty || draft.headerConfig.doctorSpecialty,
+                footerDocName: freshHeader.footerDocName || draft.headerConfig.footerDocName,
+                footerCrm: freshHeader.footerCrm || draft.headerConfig.footerCrm,
+                footerSpecialty: freshHeader.footerSpecialty || draft.headerConfig.footerSpecialty,
+                clinicName: freshHeader.clinicName || draft.headerConfig.clinicName,
+                clinicAddress: freshHeader.clinicAddress || draft.headerConfig.clinicAddress,
+              });
               const detectedRegime = resolveDraftRecipeType(draft.headerConfig.badgeText);
               if (detectedRegime) {
                 setActiveLoadedRecipeType(detectedRegime);

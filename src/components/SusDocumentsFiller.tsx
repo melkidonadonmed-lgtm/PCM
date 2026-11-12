@@ -14,7 +14,12 @@ import {
   buildSusDocumentHtml,
   timbreDoDocumentoSus,
 } from '../data/susDocumentsCatalog';
-import { formularioOficialDe } from '../data/formulariosOficiaisSus';
+import {
+  SusClinicOverride,
+  SusPatientExtras,
+  resolveSusCommonData,
+  routeSusFieldUpdate,
+} from '../utils/susFormSync';
 import { SusCatalogListView } from './sus/SusCatalogListView';
 import { SusCommonIdentityFields } from './sus/SusCommonIdentityFields';
 import {
@@ -32,15 +37,8 @@ const makeIcon = (name: IconName) => ({ className = '', size }: { className?: st
 
 const Check = makeIcon('check');
 
-/**
- * Sub-ilha de Preenchimento e Emissão dos 9 Documentos SUS.
- * Estados de UI cobertos: empty (campos clínicos em branco por padrão), loading (carregando PDF A4),
- * success (documento copiado/exportado com sucesso) e error (alerta de truncamento ou médico ausente).
- */
-
 /** Campos próprios de cada documento. Dado clínico abre em branco: quem informa é o médico. */
 const camposIniciaisDoDocumento = (_doc: SusDocumentItem): Partial<SusFilledFormData> => ({
-  // Procedimento (código SIGTAP e descrição) é dado clínico do caso: abre sempre em branco (o padrão do catálogo é oferecido por botão)
   sigtapCode: '',
   procedureName: '',
   procedureQuantity: '',
@@ -49,7 +47,6 @@ const camposIniciaisDoDocumento = (_doc: SusDocumentItem): Partial<SusFilledForm
   apacResponsiblePhone: '',
   patientCityIbgeCode: '',
   apacSecondaryProcedures: [],
-  // Diagnóstico e justificativa são do caso: abrem em branco (o modelo é oferecido por botão)
   cid10Code: '',
   cid10Description: '',
   cid10Secondary: '',
@@ -79,6 +76,7 @@ interface SusDocumentsFillerProps {
   patient: Patient;
   onUpdatePatient?: (patient: Patient) => void;
   doctor: DoctorProfile;
+  onUpdateDoctor?: (doctor: DoctorProfile) => void;
   activeContext?: WorkContext | null;
   initialDocId?: SusDocumentId | null;
   catalogResetTrigger?: number;
@@ -87,7 +85,6 @@ interface SusDocumentsFillerProps {
     title: string,
     type?: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom'
   ) => void;
-  onNavigateToPrint?: () => void;
 }
 
 export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
@@ -95,19 +92,17 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   patient,
   onUpdatePatient,
   doctor,
+  onUpdateDoctor,
   activeContext,
   initialDocId = null,
   catalogResetTrigger = 0,
   onNavigateToEditorWithHtml,
 }) => {
-  // Estados de Navegação Interna: 'list' (catálogo) ou 'form' (preenchimento)
   const [viewMode, setViewMode] = useState<'list' | 'form'>(() =>
     initialDocId ? 'form' : 'list'
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
-
-  // Seleção múltipla de documentos
   const [selectedDocIds, setSelectedDocIds] = useState<SusDocumentId[]>(() =>
     initialDocId ? [initialDocId] : []
   );
@@ -115,7 +110,44 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     () => initialDocId || 'apac_principal'
   );
 
-  // Volta para a visão de catálogo ao clicar novamente na aba/atalho de Guias SUS
+  const [localDoctor, setLocalDoctor] = useState<DoctorProfile>(doctor);
+  const [localPatient, setLocalPatient] = useState<Patient>(patient);
+
+  useEffect(() => {
+    setLocalDoctor(doctor);
+  }, [doctor]);
+
+  useEffect(() => {
+    setLocalPatient(patient);
+  }, [patient]);
+
+  const effectiveDoctor = onUpdateDoctor ? doctor : localDoctor;
+  const effectivePatient = onUpdatePatient ? patient : localPatient;
+
+  const doctorRef = useRef<DoctorProfile>(effectiveDoctor);
+  const patientRef = useRef<Patient>(effectivePatient);
+  doctorRef.current = effectiveDoctor;
+  patientRef.current = effectivePatient;
+
+  const [susPatientExtras, setSusPatientExtras] = useState<SusPatientExtras>({
+    patientRaceColor: '',
+    patientEthnicity: '',
+    patientHeightCm: '',
+    patientEmail: '',
+  });
+  const [weightDraft, setWeightDraft] = useState<string | null>(null);
+  const [clinicOverride, setClinicOverride] = useState<SusClinicOverride>({});
+
+  useEffect(() => {
+    setClinicOverride({});
+  }, [
+    activeContext?.id,
+    activeContext?.clinicName,
+    activeContext?.cnes,
+    doctor?.clinicName,
+    doctor?.cnes,
+  ]);
+
   const lastResetTriggerRef = useRef(catalogResetTrigger);
   useEffect(() => {
     if (catalogResetTrigger !== lastResetTriggerRef.current) {
@@ -124,7 +156,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     }
   }, [catalogResetTrigger]);
 
-  // Abre diretamente o documento quando acionado via Command Palette (Ctrl+K)
   useEffect(() => {
     if (initialDocId) {
       setSelectedDocIds((prev) => (prev.includes(initialDocId) ? prev : [initialDocId]));
@@ -133,10 +164,8 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     }
   }, [initialDocId]);
 
-  // Helper para dados padrão específicos de um documento
   const getDocDefaultFields = useCallback(camposIniciaisDoDocumento, []);
 
-  // Dados específicos isolados por documento para evitar contaminação na seleção múltipla
   const [docsSpecificData, setDocsSpecificData] = useState<
     Record<string, Partial<SusFilledFormData>>
   >(() => {
@@ -147,112 +176,48 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     return map;
   });
 
-  // Rastreia atualizações internas do paciente para não sobrescrever espaços durante a digitação
-  const isInternalPatientUpdateRef = useRef(false);
-  const lastPatientIdRef = useRef(patient?.id || '');
-
-  // Dados comuns compartilhados (Médico e Paciente) — preserva espaços durante a digitação
-  const [commonData, setCommonData] = useState(() => ({
-    doctorName: doctor?.name ?? '',
-    doctorCrm: doctor?.crm ?? '',
-    doctorCrmState: doctor?.crmState || 'SP',
-    doctorSpecialty: doctor?.specialty || 'Clínica Médica',
-    doctorCnes: doctor?.cnes || activeContext?.cnes || '',
-    doctorClinicName:
-      activeContext?.clinicName || doctor?.clinicName || 'Unidade Básica de Saúde',
-    doctorCpf: doctor?.cpf || '',
-    doctorCns: doctor?.cns || '',
-
-    // Só para os impressos oficiais; sexo e raça/cor abrem em branco se o médico não informou explicitamente
-    patientSex: (patient?.sex || '') as SusFilledFormData['patientSex'],
-    patientRaceColor: '' as SusFilledFormData['patientRaceColor'],
-    patientEthnicity: '',
-    patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : '',
-    patientHeightCm: '',
-    patientEmail: '',
-
-    patientName: patient?.name ?? '',
-    patientCns: patient?.cns ?? '',
-    patientCpf: patient?.documentNumber ?? '',
-    patientBirthDate: patient?.birthDate ?? '',
-    patientAge: patient?.ageText ?? '',
-    patientGender: patient?.gender || 'female',
-    patientMotherName: patient?.motherName ?? '',
-    patientPhone: patient?.phone ?? '',
-    patientAddress: patient?.address ?? '',
-    patientNeighborhood: patient?.neighborhood ?? '',
-    patientCity: patient?.city ?? '',
-    patientState: patient?.state ?? '',
-    patientCep: patient?.cep ?? '',
-  }));
-
-  // Sincroniza dados do médico/unidade apenas quando alterados externamente (Perfil ou Posto de Trabalho)
+  const lastPatientIdRef = useRef(effectivePatient?.id || '');
   useEffect(() => {
-    setCommonData((prev) => ({
-      ...prev,
-      doctorName: doctor?.name ?? prev.doctorName,
-      doctorCrm: doctor?.crm ?? prev.doctorCrm,
-      doctorCrmState: doctor?.crmState || prev.doctorCrmState,
-      doctorSpecialty: doctor?.specialty || prev.doctorSpecialty,
-      doctorCnes: doctor?.cnes || activeContext?.cnes || prev.doctorCnes,
-      doctorClinicName:
-        activeContext?.clinicName || doctor?.clinicName || prev.doctorClinicName,
-      doctorCpf: doctor?.cpf ?? prev.doctorCpf,
-      doctorCns: doctor?.cns ?? prev.doctorCns,
-    }));
-  }, [doctor, activeContext]);
-
-  // Sincroniza dados do paciente apenas quando alterados externamente (ex.: Modal do Paciente ou Nova Consulta)
-  useEffect(() => {
-    if (isInternalPatientUpdateRef.current) {
-      isInternalPatientUpdateRef.current = false;
-      lastPatientIdRef.current = patient?.id || '';
-      return;
-    }
-
+    const currentId = effectivePatient?.id || '';
     const isNewConsultationReset =
-      patient?.id !== lastPatientIdRef.current && !patient?.name && !patient?.documentNumber;
-    lastPatientIdRef.current = patient?.id || '';
-
-    setCommonData((prev) => ({
-      ...prev,
-      patientSex: (patient?.sex || '') as SusFilledFormData['patientSex'],
-      patientRaceColor: isNewConsultationReset ? '' : prev.patientRaceColor,
-      patientEthnicity: isNewConsultationReset ? '' : prev.patientEthnicity,
-      patientWeightKg: patient?.weightKg > 0 ? String(patient.weightKg) : '',
-      patientHeightCm: isNewConsultationReset ? '' : prev.patientHeightCm,
-      patientEmail: isNewConsultationReset ? '' : prev.patientEmail,
-
-      patientName: patient?.name ?? '',
-      patientCns: patient?.cns ?? '',
-      patientCpf: patient?.documentNumber ?? '',
-      patientBirthDate: patient?.birthDate ?? '',
-      patientAge: patient?.ageText ?? '',
-      patientGender: patient?.gender || 'female',
-      patientMotherName: patient?.motherName ?? '',
-      patientPhone: patient?.phone ?? '',
-      patientAddress: patient?.address ?? '',
-      patientNeighborhood: patient?.neighborhood ?? '',
-      patientCity: patient?.city ?? '',
-      patientState: patient?.state ?? '',
-      patientCep: patient?.cep ?? '',
-    }));
+      currentId !== lastPatientIdRef.current &&
+      !effectivePatient?.name &&
+      !effectivePatient?.documentNumber;
+    lastPatientIdRef.current = currentId;
 
     if (isNewConsultationReset) {
+      setSusPatientExtras({
+        patientRaceColor: '',
+        patientEthnicity: '',
+        patientHeightCm: '',
+        patientEmail: '',
+      });
+      setWeightDraft(null);
       const cleanMap: Record<string, Partial<SusFilledFormData>> = {};
       SUS_DOCUMENTS_CATALOG.forEach((d) => {
         cleanMap[d.id] = camposIniciaisDoDocumento(d);
       });
       setDocsSpecificData(cleanMap);
     }
-  }, [patient]);
+  }, [effectivePatient?.id, effectivePatient?.name, effectivePatient?.documentNumber]);
 
-  // Documento atualmente selecionado para edição dos dados específicos
+  const commonData = useMemo(
+    () =>
+      resolveSusCommonData(
+        effectiveDoctor,
+        effectivePatient,
+        activeContext,
+        clinicOverride,
+        susPatientExtras,
+        weightDraft
+      ),
+    [effectiveDoctor, effectivePatient, activeContext, clinicOverride, susPatientExtras, weightDraft]
+  );
+
   const currentDocItem = useMemo(() => {
     return SUS_DOCUMENTS_CATALOG.find((d) => d.id === activeFormDocId) || SUS_DOCUMENTS_CATALOG[0];
   }, [activeFormDocId]);
 
-  // Monta objeto completo para o documento ativo
   const formData: SusFilledFormData = useMemo(() => {
     const specific = docsSpecificData[activeFormDocId] || getDocDefaultFields(currentDocItem);
     return {
@@ -261,7 +226,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     } as SusFilledFormData;
   }, [commonData, docsSpecificData, activeFormDocId, currentDocItem, getDocDefaultFields]);
 
-  // Função utilitária para obter os dados completos de qualquer documento
   const getFilledDataForDoc = useCallback(
     (docId: SusDocumentId): SusFilledFormData => {
       const docItem = SUS_DOCUMENTS_CATALOG.find((d) => d.id === docId) || currentDocItem;
@@ -274,7 +238,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     [commonData, docsSpecificData, currentDocItem, getDocDefaultFields]
   );
 
-  // Filtro de catálogo
   const filteredCatalog = useMemo(() => {
     return SUS_DOCUMENTS_CATALOG.filter((doc) => {
       const matchCategory = selectedCategory === 'todos' || doc.category === selectedCategory;
@@ -288,7 +251,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     });
   }, [selectedCategory, searchTerm]);
 
-  // Alternar seleção de documento
   const toggleDocSelection = (id: SusDocumentId) => {
     setSelectedDocIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
@@ -309,7 +271,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     setViewMode('form');
   };
 
-  // Feedback Toast e estado de exportação PDF
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const showToast = (msg: string) => {
@@ -317,98 +278,54 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     setTimeout(() => setToastMessage(null), 3200);
   };
 
-  // Atualização dos campos do formulário (comum vs específico do documento ativo)
   const handleFieldChange = <K extends keyof SusFilledFormData>(
     field: K,
     value: SusFilledFormData[K] | string
   ) => {
-    const commonFieldKeys: (keyof typeof commonData)[] = [
-      'doctorName',
-      'doctorCrm',
-      'doctorCrmState',
-      'doctorSpecialty',
-      'doctorCnes',
-      'doctorClinicName',
-      'doctorCpf',
-      'doctorCns',
-      'patientSex',
-      'patientRaceColor',
-      'patientEthnicity',
-      'patientWeightKg',
-      'patientHeightCm',
-      'patientEmail',
-      'patientName',
-      'patientCns',
-      'patientCpf',
-      'patientBirthDate',
-      'patientAge',
-      'patientGender',
-      'patientMotherName',
-      'patientPhone',
-      'patientAddress',
-      'patientNeighborhood',
-      'patientCity',
-      'patientState',
-      'patientCep',
-    ];
+    const routed = routeSusFieldUpdate(field, value);
 
-    if ((commonFieldKeys as Array<keyof SusFilledFormData>).includes(field)) {
-      setCommonData((prev) => ({ ...prev, [field]: value }));
-
-      // Se for dado do paciente, propaga para onUpdatePatient para persistir na consulta
-      if (onUpdatePatient && patient) {
-        if (
-          field === 'patientName' ||
-          field === 'patientCpf' ||
-          field === 'patientCns' ||
-          field === 'patientMotherName' ||
-          field === 'patientPhone' ||
-          field === 'patientAddress' ||
-          field === 'patientNeighborhood' ||
-          field === 'patientCity' ||
-          field === 'patientState' ||
-          field === 'patientCep' ||
-          field === 'patientBirthDate' ||
-          field === 'patientAge' ||
-          field === 'patientSex' ||
-          field === 'patientWeightKg'
-        ) {
-          const strVal: string = typeof value === 'string' ? value : '';
-          isInternalPatientUpdateRef.current = true;
-          onUpdatePatient({
-            ...patient,
-            name: field === 'patientName' ? strVal : patient.name,
-            documentNumber: field === 'patientCpf' ? strVal : patient.documentNumber,
-            cns: field === 'patientCns' ? strVal : patient.cns,
-            motherName: field === 'patientMotherName' ? strVal : patient.motherName,
-            phone: field === 'patientPhone' ? strVal : patient.phone,
-            address: field === 'patientAddress' ? strVal : patient.address,
-            neighborhood: field === 'patientNeighborhood' ? strVal : patient.neighborhood,
-            city: field === 'patientCity' ? strVal : patient.city,
-            state: field === 'patientState' ? strVal : patient.state,
-            cep: field === 'patientCep' ? strVal : patient.cep,
-            birthDate: field === 'patientBirthDate' ? strVal : patient.birthDate,
-            ageText: field === 'patientAge' ? strVal : patient.ageText,
-            sex: field === 'patientSex' ? (strVal === 'M' || strVal === 'F' ? strVal : '') : patient.sex,
-            weightKg:
-              field === 'patientWeightKg'
-                ? parseFloat(strVal.replace(',', '.')) || 0
-                : patient.weightKg,
-          });
-        }
+    if (routed.kind === 'doctor') {
+      if (routed.clinicOverride) {
+        setClinicOverride((prev) => ({ ...prev, ...routed.clinicOverride }));
       }
-    } else {
-      setDocsSpecificData((prev) => ({
-        ...prev,
-        [activeFormDocId]: {
-          ...(prev[activeFormDocId] || {}),
-          [field]: value,
-        },
-      }));
+      const nextDoctor: DoctorProfile = { ...doctorRef.current, ...routed.patch };
+      doctorRef.current = nextDoctor;
+      if (onUpdateDoctor) {
+        onUpdateDoctor(nextDoctor);
+      } else {
+        setLocalDoctor(nextDoctor);
+      }
+      return;
     }
+
+    if (routed.kind === 'susExtra') {
+      setSusPatientExtras((prev) => ({
+        ...prev,
+        [routed.key]: routed.value,
+      }));
+      return;
+    }
+
+    if (routed.kind === 'patient') {
+      if (routed.weightDraft !== undefined) {
+        setWeightDraft(routed.weightDraft);
+      }
+      const nextPatient: Patient = { ...patientRef.current, ...routed.patch };
+      patientRef.current = nextPatient;
+      if (onUpdatePatient) {
+        onUpdatePatient(nextPatient);
+      } else {
+        setLocalPatient(nextPatient);
+      }
+      return;
+    }
+
+    setDocsSpecificData((prev) => ({
+      ...prev,
+      [activeFormDocId]: { ...(prev[activeFormDocId] || {}), [field]: value },
+    }));
   };
 
-  // Ação: Limpar campos clínicos apenas do documento ativo
   const handleResetActiveDoc = () => {
     setDocsSpecificData((prev) => ({
       ...prev,
@@ -417,21 +334,18 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     showToast('Campos clínicos do documento limpos.');
   };
 
-  // Ação: Copiar Markdown / Laudo Estruturado
   const handleCopyMarkdown = () => {
     const md = buildSusDocumentMarkdown(currentDocItem, formData);
     navigator.clipboard.writeText(md);
     showToast('Laudo do documento copiado para a área de transferência!');
   };
 
-  // Documentos sem impresso nacional: logo do SUS + logo do órgão
   const timbreDe = useCallback(
     (doc: SusDocumentItem) =>
       timbreDoDocumentoSus(doc, activeContext?.logoDataUrl || undefined),
     [activeContext?.logoDataUrl]
   );
 
-  // Ação: Abrir documento ativo no Editor A4 / Timbrados
   const handleOpenInEditor = () => {
     const html = buildSusDocumentHtml(currentDocItem, formData, timbreDe(currentDocItem));
     if (onNavigateToEditorWithHtml) {
@@ -441,7 +355,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     }
   };
 
-  // Ação: Abrir todos os documentos selecionados no Editor A4 com quebra de página
   const handleOpenAllInEditor = () => {
     const docsToOpen = selectedDocIds.length > 0 ? selectedDocIds : [activeFormDocId];
     const combinedHtml = docsToOpen
@@ -470,8 +383,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     }
   };
 
-  const formularioOficial = formularioOficialDe(currentDocItem.id);
-
   const linhasDaLme = formData.lmeMedications?.length
     ? formData.lmeMedications
     : [linhaVaziaDaLme()];
@@ -492,7 +403,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       id="sus-documents-filler-hub"
       className="flex flex-col gap-3"
     >
-      {/* Toast Notification */}
       {toastMessage && (
         <div
           role="status"
@@ -504,7 +414,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         </div>
       )}
 
-      {/* VISÃO 1: LISTA / CATÁLOGO DOS EXAMES E DOCUMENTOS OFICIAIS DO SUS */}
       {viewMode === 'list' && (
         <SusCatalogListView
           darkMode={darkMode}
@@ -520,12 +429,10 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
         />
       )}
 
-      {/* VISÃO 2: FORMULÁRIO UNIFICADO DE PREENCHIMENTO */}
       {viewMode === 'form' && (
         <div className="flex flex-col gap-3 animate-tab-fade">
           <SusFormHeaderBar
             currentDocItem={currentDocItem}
-            hasOfficialForm={Boolean(formularioOficial)}
             selectedDocIds={selectedDocIds}
             activeFormDocId={activeFormDocId}
             onBackToList={() => setViewMode('list')}
@@ -533,14 +440,12 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
-            {/* Coluna da Esquerda: Formulário de Preenchimento (7 Colunas) */}
             <div className="lg:col-span-7 flex flex-col gap-3">
               <SusCommonIdentityFields
                 darkMode={darkMode}
-                doctor={doctor}
+                doctor={effectiveDoctor}
                 currentDocItem={currentDocItem}
                 formData={formData}
-                hasOfficialForm={Boolean(formularioOficial)}
                 onFieldChange={handleFieldChange}
               />
 
@@ -555,7 +460,6 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               />
             </div>
 
-            {/* Coluna da Direita: Pré-visualização da Folha Oficial SUS e Ações de Emissão (5 Colunas) */}
             <SusSheetPreviewAndActionsColumn
               currentDocItem={currentDocItem}
               formData={formData}
@@ -565,6 +469,7 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
               getFilledDataForDoc={getFilledDataForDoc}
               timbreDe={timbreDe}
               onFieldChange={handleFieldChange}
+              onUpdateLmeRow={(idx, nextRow) => alterarLinhaDaLme(idx, () => nextRow)}
               onOpenInEditor={handleOpenInEditor}
               onOpenAllInEditor={handleOpenAllInEditor}
               onCopyMarkdown={handleCopyMarkdown}

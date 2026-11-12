@@ -12,8 +12,16 @@ import {
 import {
   DEFAULT_QUICK_PIN_IDS as MANIFEST_QUICK_PIN_IDS,
   SCOREBOARD_MANIFEST as MANIFEST_ONLY_ITEMS,
+  getManifestItemByIdOrSlug,
   searchScoreboardCatalog as searchManifestOnlyCatalog,
 } from '../data/scores/scoreboardManifest';
+import {
+  DEFAULT_SCOREBOARD_CALCULATOR,
+  getLoadedCalculatorByIdOrSlug,
+  isScoreBlockLoaded,
+  loadCalculatorByIdOrSlug,
+  loadScoreBlock,
+} from '../data/scores/scoreboardBlockLoader';
 import {
   SSC_2021_QSOFA_WARNING,
   calculateFullSofa,
@@ -67,6 +75,13 @@ describe('Scoreboard CDSS & Ferramentas de Apoio Clínico Integradas ao PCM', ()
     expect(SCOREBOARD_MANIFEST.length).toBe(114);
     expect(ALL_SCOREBOARD_CALCULATORS.length).toBe(114);
     expect(SCOREBOARD_BLOCKS_META.length).toBe(10); // ALL + 9 blocos
+    const blockLabels = SCOREBOARD_BLOCKS_META.map((b) => b.shortLabel);
+    expect(new Set(blockLabels).size).toBe(blockLabels.length);
+    expect(SCOREBOARD_BLOCKS_META.find((b) => b.blockId === 'block_05')?.shortLabel).toBe('Cirurgia & Trauma');
+    expect(SCOREBOARD_BLOCKS_META.find((b) => b.blockId === 'block_06')?.shortLabel).toBe('Nefro & Meio Interno');
+    expect(SCOREBOARD_BLOCKS_META.find((b) => b.blockId === 'block_07')?.shortLabel).toBe('Gastro & Hepato');
+    expect(SCOREBOARD_BLOCKS_META.find((b) => b.blockId === 'block_08')?.shortLabel).toBe('Pediatria & Neo');
+    expect(SCOREBOARD_BLOCKS_META.find((b) => b.blockId === 'block_09')?.shortLabel).toBe('Hemato & Hemostasia');
 
     const qsofa = getCalculatorByIdOrSlug('qsofa');
     expect(qsofa).toBeDefined();
@@ -394,5 +409,44 @@ describe('Scoreboard CDSS & Ferramentas de Apoio Clínico Integradas ao PCM', ()
     expect(getCalculatorByIdOrSlug('')).toBeUndefined();
     expect(getCalculatorByIdOrSlug('   ')).toBeUndefined();
     expect(getCalculatorByIdOrSlug('__proto__')).toBeUndefined();
+  });
+
+  it('carrega blocos block_02..09 sob demanda via scoreboardBlockLoader com cache determinístico e bloqueio adversarial (TASK-14)', async () => {
+    const sampleBlock03Item = SCOREBOARD_MANIFEST.find((m) => m.blockId === 'block_03')!;
+    expect(sampleBlock03Item).toBeDefined();
+
+    expect(DEFAULT_SCOREBOARD_CALCULATOR.slug).toBe('qsofa');
+    expect(isScoreBlockLoaded('block_01')).toBe(true);
+    expect(isScoreBlockLoaded('block_03')).toBe(false);
+    expect(getLoadedCalculatorByIdOrSlug('qsofa')?.id).toBe('calc_qsofa');
+    expect(getLoadedCalculatorByIdOrSlug(sampleBlock03Item.slug)).toBeUndefined();
+
+    // Carregamento sob demanda de bloco secundário (block_03)
+    const loadedBlock03Calc = await loadCalculatorByIdOrSlug(sampleBlock03Item.slug);
+    expect(loadedBlock03Calc).toBeDefined();
+    expect(loadedBlock03Calc?.id).toBe(getCalculatorByIdOrSlug(sampleBlock03Item.slug)?.id);
+    expect(isScoreBlockLoaded('block_03')).toBe(true);
+    expect(getLoadedCalculatorByIdOrSlug(sampleBlock03Item.slug)?.id).toBe(loadedBlock03Calc?.id);
+
+    // Deduplicação concorrente de todos os demais blocos (block_02..09)
+    const allBlocks = await Promise.all(
+      ['block_02', 'block_04', 'block_05', 'block_06', 'block_07', 'block_08', 'block_09'].map(
+        (id) => loadScoreBlock(id)
+      )
+    );
+    expect(allBlocks.every((blk) => blk && blk.calculators.length > 0)).toBe(true);
+
+    // Casos adversariais (prototype pollution, path traversal e tipos inválidos)
+    expect(isScoreBlockLoaded('__proto__')).toBe(false);
+    expect(isScoreBlockLoaded('constructor')).toBe(false);
+    expect(isScoreBlockLoaded('')).toBe(false);
+    expect(getManifestItemByIdOrSlug('__proto__')).toBeUndefined();
+    expect(getManifestItemByIdOrSlug(null as unknown as string)).toBeUndefined();
+    expect(await loadScoreBlock('__proto__')).toBeUndefined();
+    expect(await loadScoreBlock('constructor')).toBeUndefined();
+    expect(await loadScoreBlock('../block_01')).toBeUndefined();
+    expect(await loadScoreBlock('block_99')).toBeUndefined();
+    expect(await loadCalculatorByIdOrSlug('__proto__')).toBeUndefined();
+    expect(await loadCalculatorByIdOrSlug('<img src=x onerror=alert(1)>')).toBeUndefined();
   });
 });

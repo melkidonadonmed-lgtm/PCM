@@ -27,19 +27,42 @@ import { EditorTwoViasCanvas } from './EditorTwoViasCanvas';
  */
 export function mergeHeaderConfigWithDoctorProfile(
   prev: DocumentHeaderConfig,
-  fresh: DocumentHeaderConfig
+  fresh: DocumentHeaderConfig,
+  previousDefault?: DocumentHeaderConfig
 ): DocumentHeaderConfig {
+  const medicoIgualAoDefaultAnterior = Boolean(
+    previousDefault &&
+      prev.doctorName === previousDefault.doctorName &&
+      prev.doctorCrm === previousDefault.doctorCrm
+  );
+  const rodapeIgualAoDefaultAnterior = Boolean(
+    previousDefault &&
+      prev.footerDocName === previousDefault.footerDocName &&
+      prev.footerCrm === previousDefault.footerCrm
+  );
+  const clinicaIgualAoDefaultAnterior = Boolean(
+    previousDefault &&
+      prev.clinicName === previousDefault.clinicName &&
+      prev.clinicAddress === previousDefault.clinicAddress
+  );
+
   const medicoEraPadrao =
+    medicoIgualAoDefaultAnterior ||
     !prev.doctorName ||
     prev.doctorName === 'Dr(a). Médico(a)' ||
     !prev.doctorCrm ||
     prev.doctorCrm.includes('------');
   const rodapeEraPadrao =
+    rodapeIgualAoDefaultAnterior ||
     !prev.footerDocName ||
     prev.footerDocName === 'Dr(a). Médico(a)' ||
     !prev.footerCrm ||
-    prev.footerCrm.includes('------');
-  const clinicaEraPadrao = !prev.clinicName || prev.clinicName === 'Dr(a). Médico(a)';
+    prev.footerCrm.includes('------') ||
+    prev.footerCrm === 'Assinatura e carimbo do(a) médico(a) — CRM';
+  const clinicaEraPadrao =
+    clinicaIgualAoDefaultAnterior ||
+    !prev.clinicName ||
+    prev.clinicName === 'Dr(a). Médico(a)';
 
   if (!medicoEraPadrao && !rodapeEraPadrao && !clinicaEraPadrao) {
     return prev;

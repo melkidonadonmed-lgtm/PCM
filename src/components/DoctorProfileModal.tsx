@@ -149,7 +149,8 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           doctorCredentials: {
             crm: trimmedCrm,
             uf: cleanedData.crmState,
-            rqe: cleanedData.rqe?.trim() || ''
+            rqe: cleanedData.rqe?.trim() || '',
+            specialty: cleanedData.specialty?.trim() || '',
           }
         });
       } catch (err) {

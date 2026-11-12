@@ -16,6 +16,44 @@ interface PatientModalProps {
   onClose: () => void;
 }
 
+export function buildInitialPatientModalState(patient: Patient, fallbackId = 'pat-modal'): Patient {
+  return {
+    ...patient,
+    id: patient?.id || fallbackId,
+    name: patient?.name || '',
+    weightKg: patient?.weightKg ?? 0,
+    weightCalcEnabled: patient?.weightCalcEnabled ?? false,
+    ageText: patient?.ageText || '',
+    birthDate: patient?.birthDate || '',
+    gender: patient?.gender || 'male',
+    sex: patient?.sex || '',
+    documentNumber: patient?.documentNumber || '',
+    motherName: patient?.motherName || '',
+    phone: patient?.phone || '',
+    allergies: patient?.allergies || [],
+    notes: patient?.notes || ''
+  };
+}
+
+export function applyAgeOrBirthDateInput(current: Patient, rawVal: string): Patient {
+  const looksLikeDate = /^\d{1,2}\/\d{1,2}(\/\d{0,4})?$|^\d{4}-\d{1,2}(-\d{1,2})?$/.test(rawVal.trim());
+  if (!rawVal.trim()) {
+    return { ...current, birthDate: '', ageText: '' };
+  }
+  if (looksLikeDate) {
+    return {
+      ...current,
+      birthDate: rawVal,
+      ageText: current.ageText === current.birthDate ? '' : current.ageText,
+    };
+  }
+  return {
+    ...current,
+    ageText: rawVal,
+    birthDate: current.birthDate === current.ageText ? '' : current.birthDate,
+  };
+}
+
 export const PatientModal: React.FC<PatientModalProps> = ({
   darkMode,
   patient,
@@ -33,21 +71,9 @@ export const PatientModal: React.FC<PatientModalProps> = ({
     initialFocusRef: nameInputRef,
   });
 
-  const [formData, setFormData] = useState<Patient>({
-    id: patient?.id || 'pat-' + Date.now(),
-    name: patient?.name || '',
-    weightKg: patient?.weightKg ?? 0,
-    weightCalcEnabled: patient?.weightCalcEnabled ?? false,
-    ageText: patient?.ageText || '',
-    birthDate: patient?.birthDate || '',
-    gender: patient?.gender || 'male',
-    sex: patient?.sex || '',
-    documentNumber: patient?.documentNumber || '',
-    motherName: patient?.motherName || '',
-    phone: patient?.phone || '',
-    allergies: patient?.allergies || [],
-    notes: patient?.notes || ''
-  });
+  const [formData, setFormData] = useState<Patient>(() =>
+    buildInitialPatientModalState(patient, 'pat-' + Date.now())
+  );
   const [allergiesText, setAllergiesText] = useState<string>(() =>
     patient?.allergies?.join(', ') || ''
   );
@@ -220,9 +246,9 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 id="patient-modal-age"
                 type="text"
                 enterKeyHint="next"
-                value={formData.birthDate || formData.ageText || ''}
-                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value, ageText: e.target.value })}
-                placeholder="Ex.: 35 anos ou 2a"
+                value={formData.ageText || formData.birthDate || ''}
+                onChange={(e) => setFormData(applyAgeOrBirthDateInput(formData, e.target.value))}
+                placeholder="Ex.: 35 anos ou 07/03/1990"
                 className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
               />
             </div>

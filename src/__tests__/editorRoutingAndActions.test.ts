@@ -52,25 +52,24 @@ import {
   EditorLogoConfigDropdown,
   resolveLogoBadgeLabel,
 } from '../components/editor/EditorSheetConfigBar';
+import { VALID_DIRECT_TABS, parseTabFromHash } from '../hooks/useNavigationSync';
 
 describe('Governança de Rotas e Navegação do Editor', () => {
   it('não deve possuir rotas órfãs ou duplicadas na união canônica de ActiveTab e deve bloquear ações sem médico configurado', () => {
-    const validTabs: ActiveTab[] = [
-      'prescription',
-      'pediatric_calc',
-      'documents',
-      'exams',
-      'certificate',
-      'referral',
-      'protocols',
-      'editor',
-      'print_preview',
-      'patients'
-    ];
-
+    const exhaustiveRouteMap: Record<ActiveTab, true> = {
+      prescription: true, pediatric_calc: true, documents: true, exams: true,
+      certificate: true, referral: true, sus: true, protocols: true,
+      scores: true, editor: true, print_preview: true, hospital: true,
+    };
+    const validTabs = Object.keys(exhaustiveRouteMap) as ActiveTab[];
     const uniqueTabs = new Set(validTabs);
-    expect(uniqueTabs.size).toBe(validTabs.length);
-    expect((validTabs as string[]).includes('models')).toBe(false);
+    expect(uniqueTabs.size).toBe(12);
+    expect(uniqueTabs).toEqual(VALID_DIRECT_TABS);
+    for (const tab of validTabs) {
+      expect(parseTabFromHash(`#${tab}`)).toBe(tab);
+    }
+    expect(parseTabFromHash('#patients')).toBeNull();
+    expect(parseTabFromHash('#models')).toBeNull();
 
     const htmlBlocked = renderToStaticMarkup(
       React.createElement(AcoesDaReceita, {

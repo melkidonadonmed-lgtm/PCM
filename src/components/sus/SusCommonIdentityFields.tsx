@@ -18,7 +18,7 @@ interface SusCommonIdentityFieldsProps {
   doctor: DoctorProfile;
   currentDocItem: SusDocumentItem;
   formData: SusFilledFormData;
-  hasOfficialForm: boolean;
+  hasOfficialForm?: boolean;
   onFieldChange: <K extends keyof SusFilledFormData>(field: K, value: SusFilledFormData[K] | string) => void;
 }
 
@@ -27,7 +27,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
   doctor,
   currentDocItem,
   formData,
-  hasOfficialForm,
+  hasOfficialForm = true,
   onFieldChange,
 }) => {
   const isDoctorReady = medicoConfigurado(doctor);

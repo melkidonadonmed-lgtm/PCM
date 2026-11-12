@@ -122,14 +122,39 @@ export function createCleanConsultationState(cityState?: string, nextPatientId =
   };
 }
 
+export function syncDoctorCityToCertificate(
+  nextDoctor: DoctorProfile,
+  prevDoctor: DoctorProfile | null,
+  certificate: MedicalCertificate
+): MedicalCertificate {
+  const nextCity = (nextDoctor.cityState || '').trim();
+  const prevCity = (prevDoctor?.cityState || '').trim();
+  const currentText = certificate.cityDateText || '';
+  const commaIdx = currentText.indexOf(',');
+  if (commaIdx === -1) return certificate;
+
+  const currentPrefix = currentText.slice(0, commaIdx).trim();
+  const dateSuffix = currentText.slice(commaIdx);
+  const targetPrefix = nextCity || 'Brasil';
+
+  if (currentPrefix === targetPrefix) return certificate;
+  if (currentPrefix === 'Brasil' || (prevCity && currentPrefix === prevCity)) {
+    return {
+      ...certificate,
+      cityDateText: `${targetPrefix}${dateSuffix}`,
+    };
+  }
+  return certificate;
+}
+
 export function usePrescriptionSession() {
   // 1. Doctor Profile
-  const [doctor, setDoctor] = useState<DoctorProfile>(() =>
+  const [doctor, setDoctorState] = useState<DoctorProfile>(() =>
     storageService.loadItem('prescmed_doctor', DEFAULT_DOCTOR)
   );
 
   // 2. Patient
-  const [patient, setPatient] = useState<Patient>(() =>
+  const [patient, setPatientState] = useState<Patient>(() =>
     storageService.loadItem('prescmed_patient', DEFAULT_PATIENT)
   );
 
@@ -149,14 +174,47 @@ export function usePrescriptionSession() {
   );
 
   // 6. Medical Certificate
-  const [certificate, setCertificate] = useState<MedicalCertificate>(() =>
-    storageService.loadItem('prescmed_certificate', createDefaultCertificate(doctor.cityState))
-  );
+  const [certificate, setCertificate] = useState<MedicalCertificate>(() => {
+    const loaded = storageService.loadItem(
+      'prescmed_certificate',
+      createDefaultCertificate(doctor.cityState)
+    );
+    return syncDoctorCityToCertificate(
+      doctor,
+      null,
+      syncPatientToDocuments(patient, loaded, createDefaultReferral()).certificate
+    );
+  });
 
   // 7. Medical Referral
-  const [referral, setReferral] = useState<MedicalReferral>(() =>
-    storageService.loadItem('prescmed_referral', createDefaultReferral())
-  );
+  const [referral, setReferral] = useState<MedicalReferral>(() => {
+    const loaded = storageService.loadItem('prescmed_referral', createDefaultReferral());
+    return syncPatientToDocuments(patient, createDefaultCertificate(doctor.cityState), loaded)
+      .referral;
+  });
+
+  // Atualização atômica no mesmo ciclo de renderização para Médico (sincroniza cidade no Atestado)
+  const setDoctor: React.Dispatch<React.SetStateAction<DoctorProfile>> = useCallback((action) => {
+    setDoctorState((prevDoc) => {
+      const nextDoc = typeof action === 'function' ? action(prevDoc) : action;
+      setCertificate((prevCert) => syncDoctorCityToCertificate(nextDoc, prevDoc, prevCert));
+      return nextDoc;
+    });
+  }, []);
+
+  // Atualização atômica no mesmo ciclo de renderização para Paciente (sincroniza Atestado e Encaminhamento simultaneamente)
+  const setPatient: React.Dispatch<React.SetStateAction<Patient>> = useCallback((action) => {
+    setPatientState((prevPat) => {
+      const nextPat = typeof action === 'function' ? action(prevPat) : action;
+      setCertificate((prevCert) =>
+        syncPatientToDocuments(nextPat, prevCert, createDefaultReferral()).certificate
+      );
+      setReferral((prevRef) =>
+        syncPatientToDocuments(nextPat, createDefaultCertificate(), prevRef).referral
+      );
+      return nextPat;
+    });
+  }, []);
 
   // Sincronização automática com localStorage via storageService
   useEffect(() => {
@@ -165,9 +223,6 @@ export function usePrescriptionSession() {
 
   useEffect(() => {
     storageService.saveItem('prescmed_patient', patient);
-    // Sincroniza dados básicos do paciente com atestados e encaminhamentos
-    setCertificate(prev => syncPatientToDocuments(patient, prev, referral).certificate);
-    setReferral(prev => syncPatientToDocuments(patient, certificate, prev).referral);
   }, [patient]);
 
   useEffect(() => {

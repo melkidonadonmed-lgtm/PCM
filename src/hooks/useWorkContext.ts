@@ -5,8 +5,13 @@ import { PRESET_LOGOS } from '../data/presetAssets';
 
 const ACTIVE_CONTEXT_KEY = 'pcm_active_context_id';
 
-export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: string }) {
-  const { crm = '', uf = 'SP', rqe = '' } = doctorProfile || {};
+export function useWorkContext(doctorProfile: {
+  crm: string;
+  uf: string;
+  rqe?: string;
+  specialty?: string;
+}) {
+  const { crm = '', uf = 'SP', rqe = '', specialty = '' } = doctorProfile || {};
   const [contexts, setContexts] = useState<WorkContext[]>([]);
   const [activeContext, setActiveContext] = useState<WorkContext | null>(null);
   const [loading, setLoading] = useState(true);
@@ -98,6 +103,27 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
         allContexts = [ubsContext, polContext, consultorioContext];
       }
 
+      // Mantém credenciais médicas sincronizadas em todos os postos quando o perfil do médico é atualizado
+      const trimmedCrm = crm.trim();
+      if (trimmedCrm) {
+        const staleContexts = allContexts.filter(
+          (c) =>
+            c.doctorCredentials?.crm !== trimmedCrm ||
+            c.doctorCredentials?.uf !== uf ||
+            (c.doctorCredentials?.rqe || '') !== rqe ||
+            (c.doctorCredentials?.specialty || '') !== specialty
+        );
+        if (staleContexts.length > 0) {
+          const syncedAt = Date.now();
+          allContexts = allContexts.map((c) => ({
+            ...c,
+            doctorCredentials: { crm: trimmedCrm, uf, rqe, specialty },
+            updatedAt: syncedAt,
+          }));
+          await db.workContexts.bulkPut(allContexts);
+        }
+      }
+
       setContexts(prev => {
         if (
           prev.length === allContexts.length &&
@@ -122,7 +148,7 @@ export function useWorkContext(doctorProfile: { crm: string; uf: string; rqe?: s
     } finally {
       setLoading(false);
     }
-  }, [crm, uf, rqe]);
+  }, [crm, uf, rqe, specialty]);
 
   useEffect(() => {
     loadContexts();

@@ -45,7 +45,7 @@ export default function App() {
     if (type) {
       setPrintDocType(type);
     }
-    if (activeTab !== 'print_preview') {
+    if (activeTab !== 'print_preview' && activeTab !== 'editor') {
       setReturnNavigationTab(activeTab);
     }
     setActiveTab('print_preview');
@@ -81,8 +81,9 @@ export default function App() {
   const doctorCredentials = React.useMemo(() => ({
     crm: doctor.crm,
     uf: doctor.crmState,
-    rqe: doctor.rqe
-  }), [doctor.crm, doctor.crmState, doctor.rqe]);
+    rqe: doctor.rqe,
+    specialty: doctor.specialty,
+  }), [doctor.crm, doctor.crmState, doctor.rqe, doctor.specialty]);
 
   const {
     contexts: workContexts,
@@ -213,15 +214,11 @@ export default function App() {
   }, []);
 
   const handleSelectTab = React.useCallback((tab: ActiveTab) => {
-    if (tab === 'patients') {
-      handleOpenPatientModal();
-      return;
-    }
     runTabViewTransition(() => {
       if (tab === 'editor') {
         setEditorCustomDoc(null);
         setEditorInitialSyncTrigger(prev => prev + 1);
-        if (activeTab !== 'editor') {
+        if (activeTab !== 'editor' && activeTab !== 'print_preview') {
           setReturnNavigationTab(activeTab);
         }
         setActiveTab('editor');
@@ -249,7 +246,7 @@ export default function App() {
       }
       setActiveTab(tab);
     });
-  }, [activeTab, handleOpenPatientModal, lastClinicalDocSubTab]);
+  }, [activeTab, lastClinicalDocSubTab]);
 
   const handleNavigateToEditor = React.useCallback(() => handleSelectTab('editor'), [handleSelectTab]);
   const handleNavigateToCertificate = React.useCallback(() => handleSelectTab('certificate'), [handleSelectTab]);
@@ -260,7 +257,7 @@ export default function App() {
   const handleCloseCommandPalette = React.useCallback(() => setIsCommandPaletteOpen(false), []);
 
   const handleNavigateToEditorWithHtml = (html: string, title: string, type: 'prescription' | 'referral' | 'certificate' | 'sus' | 'custom' = 'custom') => {
-    if (activeTab !== 'editor') {
+    if (activeTab !== 'editor' && activeTab !== 'print_preview') {
       setReturnNavigationTab(activeTab);
     }
     setEditorCustomDoc({ html, title, type });

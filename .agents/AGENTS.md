@@ -8,7 +8,7 @@
   - `npm ci` — Instalação reproduzível (`package-lock.json`)
   - `npm run dev` — Dev server Vite na porta `3001` (`host 0.0.0.0`)
   - `npm run lint` — Type-check estrito (`tsc --noEmit`)
-  - `npm run test` — Suíte completa Vitest (`28` suítes / `270` testes determinísticos)
+  - `npm run test` — Suíte completa Vitest (`29` suítes / `280` testes determinísticos)
   - `npm run design:lint` — Validação de conformidade [`DESIGN.md`](DESIGN.md)
   - `npm run build` — Build de produção em `dist/`
 - **Arquitetura de Estado (Tríade de Governança v2.0):**
