@@ -3,10 +3,18 @@ name: review-squad
 description: "Coordenador do Review Squad (Zero-Context + SoC): audita Plano, Read-After-Write, Coerência Spec vs. Código, Segurança Zero-Trust e E2E/UI."
 subagent: true
 mainAgent: false
-enable_write_tools: false
-enable_mcp_tools: true
-enable_subagent_tools: true
-commandExecutionPolicy: auto
+model: inherit
+commandExecutionPolicy: sandbox
+inheritMcp: true
+inheritCustomizations: true
+tools:
+  - view_file
+  - list_dir
+  - find_by_name
+  - grep_search
+  - run_command
+  - invoke_subagent
+  - send_message
 ---
 
 # Subagente Global: `review-squad` (Goldfish & SoC Review Group)
