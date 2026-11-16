@@ -3,9 +3,9 @@
     {
       "path": "C:/Users/melki/dev/repos/franklin-quebragalho/skills",
       "include_only": [
-        "design-interface-medica-minimalista",
-        "conversor-html-pdf",
-        "redator-tecnico-markdown",
+        "clinical-minimalist-ui",
+        "html-pdf-converter",
+        "technical-markdown-writer",
         "design-md",
         "frontend-code-architect",
         "frontend-testing-auditor",
