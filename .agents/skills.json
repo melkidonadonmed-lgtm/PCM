@@ -8,7 +8,7 @@
       ]
     },
     {
-      "path": "C:/Users/melki/.agents/skills",
+      "path": "C:/Users/melki/.gemini/skill-catalog/user-skills",
       "include_only": [
         "clinical-change-safety",
         "ui-pdf-validation",
