@@ -29,3 +29,11 @@
 - [x] Passar no linter de design tokens sem erros ou avisos (`npm run design:lint`).
 - [x] Passar em 100% da suíte determinística Vitest (`npm run test` — `29/29` suítes, `280/280` testes).
 - [x] Gerar build de produção e service worker PWA sem erros (`npm run build`).
+
+## 4. Active Feature Contract: `TASK-17` — 4-Axis Frontend Refactoring & Functional Verification
+- **Scope:**
+  1. **Axis 4 (CSS Specificity, Multi-Layer Shadow & `4px/8px` Grid Hygiene):** Replace flat single-pass `rgba(0,0,0)` shadow on `.dark .chip-neutral` with `var(--elevation-1)`, drop `!important` on `.button-primary` / `.tactile-btn-success` / `.nav-item-active` (preserving `@media print`, `.a4-editor-canvas`, `.paper-sheet-floating`, and `prefers-reduced-motion`), and normalize `w-[1px]` dividers to `w-px` in `EditorTextFormattingToolbar.tsx`.
+  2. **Axis 3 (`OKLCH` / `light-dark()` Token Consolidation):** Define semantic component variables (`--pill-active-bg`, `--pill-active-border`, `--surface-chip-muted`, `--surface-chip-muted-hover`, `--surface-info-subtle`, `--border-info-subtle`) in `src/styles/globals.css` and migrate interactive UI components off hardcoded `#27354A`, `#0369A1`, and `darkMode ? '#...' : '#...'` inline styles while keeping `FolhaA4`, `src/components/documento/*`, and SVG palettes untouched.
+  3. **Axis 1 (Adaptive Navigation Deduplication & Decompression):** Make `Header` context-aware of `isSidebarOpen` (rendering 3 Macro-Modules `MOD-01..03` when Sidebar is open, and 8 quick workspace routes when collapsed) while enforcing `text-[13px]`, `gap-1.5` (`6px`), and `min-h-[44px]` (`crampedMenus = 0`).
+  4. **Axis 2 (Ergonomic Touch Target Normalization):** Enforce `>= 44×44px` (`>= 48×48px` under `any-pointer: coarse` via `.touch-target`) across `Header`, `Sidebar`, `ContextSwitcher`, `ConsultationReadinessBar`, `LgpdLocalModeNotice`, and primary `#prescription` view controls without exceeding `600` lines per `.ts`/`.tsx` file.
+- **Verification Gate (`TASK-17`):** `npm run lint`, `npm run design:lint`, `npm run test` (including new `uiFourAxesRefactorAudit.test.tsx`), `frontend_inventory_and_slop_scanner.py`, `ui_judge_gatekeeper.py`, live Chrome DevTools MCP functional & telemetry E2E (`1440×900` Light/Dark and `390×844` Mobile), and `npm run build`.

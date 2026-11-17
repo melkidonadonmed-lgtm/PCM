@@ -3,15 +3,8 @@
     {
       "path": "C:/Users/melki/dev/repos/franklin-quebragalho/skills",
       "include_only": [
-        "clinical-minimalist-ui",
         "html-pdf-converter",
-        "technical-markdown-writer",
-        "design-md",
-        "frontend-code-architect",
-        "frontend-testing-auditor",
-        "frontend-ui-ux-auditor",
-        "plan-uiux",
-        "complex-zero"
+        "technical-markdown-writer"
       ]
     },
     {
