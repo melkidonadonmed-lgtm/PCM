@@ -84,7 +84,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
           <button
             type="button"
             onClick={onOpenModelsModal}
-            className="chip-neutral h-9 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5"
+            className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-3"
             title="Abrir biblioteca de modelos de receitas salvos"
           >
             <Icon name="folder_open" size={15} className="text-sky-600 dark:text-sky-400" />
@@ -100,7 +100,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
             <button
               type="button"
               onClick={onOpenSaveModelModal}
-              className="chip-neutral h-9 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5"
+              className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-3"
               title="Salvar esta combinação de medicamentos como um modelo reutilizável"
             >
               <Icon name="bookmark_add" size={15} className="text-sky-600 dark:text-sky-400" />
@@ -110,7 +110,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
             <button
               type="button"
               onClick={onOpenCreateCustomModel}
-              className="chip-neutral h-9 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-2.5"
+              className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-3"
               title="Criar e salvar um novo modelo de receita reutilizável mesmo sem receita ativa na consulta"
             >
               <Icon name="add" size={15} className="text-sky-600 dark:text-sky-400" />
@@ -122,10 +122,10 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
             <button
               type="button"
               onClick={onClearPrescription}
-              className="chip-neutral h-9 text-xs font-semibold text-rose-700 dark:text-rose-300 border border-rose-200/90 dark:border-rose-400/25 bg-rose-50/50 dark:bg-rose-950/25 hover:bg-rose-100/80 dark:hover:bg-rose-950/40 inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-rose-500 px-2.5 transition"
+              className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs font-semibold text-rose-800 dark:text-rose-200 border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-rose-500 px-3 transition"
               title="Limpar todos os medicamentos prescritos"
             >
-              <Icon name="delete" size={15} className="text-rose-600 dark:text-rose-400" />
+              <Icon name="delete" size={15} className="text-rose-800 dark:text-rose-200" />
               <span>Limpar</span>
             </button>
           )}
@@ -136,7 +136,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
       {regimesComItens.length > 1 && (
         <div
           role="alert"
-          className="px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs flex items-center gap-2.5"
+          className="px-3 py-2.5 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)] text-[var(--text-secondary)] text-xs flex items-center gap-2.5"
         >
           <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" aria-hidden="true" />
           <p className="flex-1 min-w-0 leading-relaxed font-medium">
@@ -150,7 +150,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
       )}
 
       {items.length === 0 ? (
-        <div className="p-6 text-center rounded-xl bg-[var(--surface-inset)] border border-dashed border-subtle dark:border-strong text-[var(--text-muted)] text-xs">
+        <div className="p-6 text-center rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-[var(--text-muted)] text-xs">
           Nenhum medicamento adicionado ainda. Busque acima ou aplique um kit de plantão na barra lateral.
         </div>
       ) : (
@@ -165,7 +165,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                 key={it.id}
                 className={`p-3 rounded-xl border flex items-start justify-between gap-3 shadow-tactile-sm transition ${
                   isEditing
-                    ? 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/15 ring-1 ring-sky-500/40'
+                    ? 'bg-[var(--surface-chip-muted)] border-[var(--border-info-subtle)] ring-1 ring-sky-500/40'
                     : 'bg-[var(--surface-inset)] border border-subtle dark:border-strong'
                 }`}
               >
@@ -218,7 +218,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                   <button
                     type="button"
                     onClick={() => onStartEdit(it)}
-                    className={`p-1.5 rounded-lg transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
+                    className={`touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
                       isEditing
                         ? 'bg-sky-600 text-white shadow-tactile-sm'
                         : 'hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
@@ -232,7 +232,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                     type="button"
                     onClick={() => onMoveItem(idx, 'up')}
                     disabled={idx === 0}
-                    className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
+                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
                     title="Mover para cima"
                     aria-label={`Mover ${it.name} para cima`}
                   >
@@ -242,7 +242,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                     type="button"
                     onClick={() => onMoveItem(idx, 'down')}
                     disabled={idx === items.length - 1}
-                    className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
+                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
                     title="Mover para baixo"
                     aria-label={`Mover ${it.name} para baixo`}
                   >
@@ -251,7 +251,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                   <button
                     type="button"
                     onClick={() => onRemoveItem(it.id)}
-                    className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
+                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 transition focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
                     title="Remover medicamento"
                     aria-label={`Remover ${it.name}`}
                   >

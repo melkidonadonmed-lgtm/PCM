@@ -305,7 +305,7 @@ export const EditorSaveModelAndStyleModals: React.FC<EditorSaveModelAndStyleModa
           role="dialog"
           aria-modal="true"
           aria-labelledby="editor-save-model-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 no-print animate-tab-fade"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.50)] no-print animate-tab-fade"
           onClick={() => setIsSaveModelModalOpen(false)}
         >
           <div
@@ -324,7 +324,7 @@ export const EditorSaveModelAndStyleModals: React.FC<EditorSaveModelAndStyleModa
                 type="button"
                 onClick={() => setIsSaveModelModalOpen(false)}
                 aria-label="Fechar modal de salvar modelo"
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -396,7 +396,7 @@ export const EditorSaveModelAndStyleModals: React.FC<EditorSaveModelAndStyleModa
           role="dialog"
           aria-modal="true"
           aria-labelledby="editor-save-style-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 no-print animate-tab-fade"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.50)] no-print animate-tab-fade"
           onClick={() => setIsSaveStyleModalOpen(false)}
         >
           <div
@@ -415,7 +415,7 @@ export const EditorSaveModelAndStyleModals: React.FC<EditorSaveModelAndStyleModa
                 type="button"
                 onClick={() => setIsSaveStyleModalOpen(false)}
                 aria-label="Fechar modal de salvar estilo"
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
               >
                 <X className="w-4 h-4" />
               </button>

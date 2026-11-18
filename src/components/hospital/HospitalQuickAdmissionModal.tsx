@@ -188,7 +188,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[1100] flex items-center justify-center p-3 sm:p-4 bg-black/65 backdrop-blur-xs animate-backdrop-fade no-print"
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-3 sm:p-4 bg-[oklch(0.14_0.02_258/0.65)] backdrop-blur-xs animate-backdrop-fade no-print"
     >
       <div
         ref={modalRef}
@@ -213,7 +213,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de nova admissão"
-            className="w-9 h-9 rounded-xl border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
           >
             <Icon name="close" size={18} />
           </button>

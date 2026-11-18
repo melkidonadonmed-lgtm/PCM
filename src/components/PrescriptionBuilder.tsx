@@ -315,7 +315,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         <button
           type="button"
           onClick={() => setMobileSection('composer')}
-          className={`flex-1 py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
+          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
             mobileSection === 'composer' ? 'nav-segmented-pill-active font-bold' : 'text-[var(--text-secondary)] font-semibold'
           }`}
         >
@@ -325,7 +325,7 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         <button
           type="button"
           onClick={() => setMobileSection('preview')}
-          className={`flex-1 py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer clinical-tabular-nums ${
+          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer clinical-tabular-nums ${
             mobileSection === 'preview' ? 'nav-segmented-pill-active font-bold' : 'text-[var(--text-secondary)] font-semibold'
           }`}
         >

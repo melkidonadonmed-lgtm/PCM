@@ -414,7 +414,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[1200] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-black/60 backdrop-blur-xs animate-backdrop-fade no-print"
+      className="fixed inset-0 z-[1200] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-[oklch(0.14_0.02_258/0.60)] backdrop-blur-xs animate-backdrop-fade no-print"
     >
       <div
         ref={dialogRef}
@@ -439,7 +439,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
               type="button"
               onClick={() => setQuery('')}
               aria-label="Limpar busca"
-              className="btn-tactile-icon !w-9 !h-9 !min-w-9 !min-h-9"
+              className="btn-tactile-icon touch-target"
             >
               <Icon name="close" size={16} />
             </button>
@@ -448,7 +448,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar busca rápida"
-            className="px-2.5 py-1.5 rounded-lg border border-subtle dark:border-strong text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
+            className="touch-target min-w-[44px] min-h-[44px] px-2.5 py-1.5 rounded-lg border border-subtle dark:border-strong text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] inline-flex items-center justify-center cursor-pointer"
           >
             ESC
           </button>

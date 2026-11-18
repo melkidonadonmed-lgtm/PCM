@@ -109,7 +109,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                 type="button"
                 onClick={onCloseSaveModelModal}
                 aria-label="Fechar modal"
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none transition"
               >
                 <Icon name="close" className="text-[20px]" />
               </button>
@@ -186,7 +186,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                     type="button"
                     onClick={onExitCreateCustomModel}
                     aria-label="Voltar para a lista de modelos"
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none transition"
                     title="Voltar para a lista de modelos"
                   >
                     <Icon name="arrow_back" className="text-[18px]" />
@@ -219,7 +219,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   type="button"
                   onClick={onCloseLoadModelModal}
                   aria-label="Fechar biblioteca de modelos"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                  className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none transition"
                 >
                   <Icon name="close" className="text-[20px]" />
                 </button>
@@ -287,7 +287,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   </span>
 
                   {customModelDraftItems.length === 0 ? (
-                    <div className="p-4 text-center rounded-xl bg-slate-50 dark:bg-slate-950 border border-dashed border-subtle dark:border-strong text-xs text-slate-500">
+                    <div className="p-4 text-center rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-xs text-slate-600 dark:text-slate-300">
                       Nenhum medicamento incluído ainda. Digite o nome acima para adicionar.
                     </div>
                   ) : (
@@ -345,7 +345,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
             ) : (
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
                 {savedPrescriptionModels.length === 0 ? (
-                  <div className="p-8 text-center rounded-xl bg-slate-50 dark:bg-slate-950 border border-dashed border-subtle dark:border-strong space-y-3">
+                  <div className="p-8 text-center rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-3">
                     <Icon name="bookmark_add" className="text-[32px] text-slate-400 mx-auto" />
                     <div>
                       <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">

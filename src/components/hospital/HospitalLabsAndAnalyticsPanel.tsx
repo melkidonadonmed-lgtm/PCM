@@ -132,9 +132,9 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                 key={d.key}
                 className={`p-2.5 rounded-xl border space-y-1 ${
                   d.alertLevel === 'critical'
-                    ? 'border-rose-500/50 bg-rose-500/10'
+                    ? 'border-[var(--accent-rose-border)] bg-[var(--accent-rose-subtle)]'
                     : d.alertLevel === 'abnormal'
-                      ? 'border-amber-500/40 bg-amber-500/5'
+                      ? 'border-[var(--accent-amber-border)] bg-[var(--accent-amber-subtle)]'
                       : 'border-[var(--border-subtle)] bg-[var(--surface-inset)]'
                 }`}
               >
@@ -197,7 +197,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
               <button
                 type="button"
                 onClick={() => setNewLabValues({})}
-                className="chip-neutral h-7 px-2 rounded-lg text-[11px] font-medium inline-flex items-center gap-1 cursor-pointer"
+                className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
                 title="Limpar valores digitados da nova coleta"
               >
                 <Icon name="close" size={12} />
@@ -264,7 +264,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                 setNewImgModality('');
                 setNewImgFindings('');
               }}
-              className="chip-neutral h-7 px-2 rounded-lg text-[11px] font-medium inline-flex items-center gap-1 cursor-pointer"
+              className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
               title="Limpar campos de novo exame de imagem"
             >
               <Icon name="close" size={12} />

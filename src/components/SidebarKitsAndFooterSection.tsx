@@ -142,7 +142,7 @@ export const SidebarKitsGroupSection: React.FC<SidebarKitsGroupSectionProps> = (
         onClick={onToggleKits}
         aria-expanded={showKits}
         aria-controls="sidebar-kits-list"
-        className="w-full h-9 px-2.5 rounded-xl text-[13px] tracking-[-0.01em] font-medium text-[var(--sidebar-text-secondary,#E2E8F0)] border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.07] hover:border-white/10 active:translate-y-px transition-colors duration-150 ease-out cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+        className="w-full min-h-[44px] py-1.5 px-2.5 rounded-xl text-[13px] tracking-[-0.01em] font-medium text-[var(--sidebar-text-secondary,#E2E8F0)] border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.07] hover:border-white/10 active:translate-y-px transition-colors duration-150 ease-out cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
       >
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.06] group-hover:bg-white/[0.10] group-hover:border-white/15 transition-colors duration-150 flex items-center justify-center shrink-0">
@@ -164,10 +164,10 @@ export const SidebarKitsGroupSection: React.FC<SidebarKitsGroupSectionProps> = (
               key={kit.id}
               type="button"
               onClick={() => onApplyKit(kit)}
-              className="w-full text-left px-2.5 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 active:translate-y-px transition-colors duration-150 cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+              className="w-full min-h-[44px] text-left px-2.5 py-2 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 active:translate-y-px transition-colors duration-150 cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400 flex items-center"
               title={`Aplicar kit: ${kit.name} (${kit.badge})`}
             >
-              <div className="flex items-center justify-between gap-1.5">
+              <div className="flex items-center justify-between gap-1.5 w-full min-w-0">
                 <span className="text-xs font-medium text-slate-200 group-hover:text-white truncate">
                   {kit.name}
                 </span>
@@ -212,7 +212,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
 }) => {
   return (
     <div
-      className={`shrink-0 border-t border-white/10 bg-black/15 rounded-b-2xl overflow-hidden ${
+      className={`shrink-0 border-t border-white/10 bg-[oklch(0.12_0.02_258/0.28)] rounded-b-2xl overflow-hidden ${
         isOpen
           ? 'p-2 space-y-1.5 pb-[calc(0.875rem+env(safe-area-inset-bottom))] lg:pb-2'
           : 'py-2.5 px-1.5 space-y-2 flex flex-col items-center'
@@ -229,7 +229,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
                 onInstallApp();
                 if (!isDesktop) onClose?.();
               }}
-              className="w-full h-9 min-h-9 px-2.5 rounded-xl border border-sky-400/35 bg-sky-500/20 text-sky-100 hover:bg-sky-500/30 hover:text-white hover:border-sky-400/50 active:translate-y-[1px] transition duration-150 cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shadow-tactile-sm"
+              className="w-full min-h-[44px] py-2 px-2.5 rounded-xl border border-sky-400/35 bg-sky-400/20 text-sky-100 hover:bg-sky-400/30 hover:text-white hover:border-sky-400/50 active:translate-y-[1px] transition duration-150 cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shadow-tactile-sm"
               title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
             >
               <Icon name="download" size={15} className="text-sky-300 shrink-0" />
@@ -241,7 +241,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
           <button
             type="button"
             onClick={onTriggerResetAll}
-            className="w-full h-9 flex items-center justify-center gap-1.5 px-2.5 rounded-xl text-xs font-semibold text-white bg-white/[0.08] hover:bg-white/[0.14] hover:border-white/20 active:translate-y-px border border-white/10 transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-sky-400 whitespace-nowrap group"
+            className="w-full min-h-[44px] py-2 flex items-center justify-center gap-1.5 px-2.5 rounded-xl text-xs font-semibold text-white bg-white/[0.08] hover:bg-white/[0.14] hover:border-white/20 active:translate-y-px border border-white/10 transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-sky-400 whitespace-nowrap group"
             title="Iniciar uma nova consulta do zero"
           >
             <Icon
@@ -258,7 +258,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
               <button
                 type="button"
                 onClick={onOpenBackup}
-                className="flex-1 min-w-0 h-8 px-1 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                className="flex-1 min-w-0 min-h-[44px] py-1.5 px-1.5 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                 title="Exportar ou restaurar arquivo de backup (.pcm.json)"
               >
                 <Icon name="cloud_download" size={13} className="text-slate-300 shrink-0" />
@@ -271,7 +271,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
                 id="btn-sidebar-lgpd-security"
                 type="button"
                 onClick={onOpenLgpd}
-                className="h-8 px-2 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shrink-0"
+                className="min-h-[44px] min-w-[44px] py-1.5 px-2 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shrink-0"
                 title="Segurança, Seleção de Cookies e Conformidade LGPD"
                 aria-label="Segurança, Seleção de Cookies e LGPD"
               >
@@ -283,7 +283,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             <button
               type="button"
               onClick={onToggleOpen}
-              className="hidden lg:flex w-8 h-8 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 items-center justify-center transition duration-150 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none shrink-0"
+              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 items-center justify-center transition duration-150 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none shrink-0"
               title="Recolher menu lateral"
               aria-label="Recolher Menu"
             >
@@ -350,7 +350,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
           <button
             type="button"
             onClick={onToggleOpen}
-            className="hidden lg:flex w-11 h-10 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none"
+            className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none"
             title="Expandir Menu Lateral"
             aria-label="Expandir Menu Lateral"
           >

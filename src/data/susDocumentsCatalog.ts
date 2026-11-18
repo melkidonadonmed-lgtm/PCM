@@ -465,7 +465,7 @@ export function buildSusDocumentHtml(item: SusDocumentItem, data: SusFilledFormD
         ${data.sinanNumber ? `<p style="margin: 3px 0;"><strong>Nº Notificação SINAN:</strong> ${escapeHtml(data.sinanNumber)} &nbsp;|&nbsp; <strong>Início dos Sintomas (D1):</strong> ${escapeHtml(data.symptomsStartDate || 'não informado')}</p>` : ''}
         ${item.id === 'apac_complementar' || data.renalCreatinine || data.renalEtfg ? `<p style="margin: 3px 0;"><strong>Função Renal:</strong> ${escapeHtml(funcaoRenal(data))}</p>` : ''}
         
-        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed #CBD5E1;">
+        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #CBD5E1;">
           <p style="margin: 0 0 3px 0; font-weight: bold; color: #334155;">Justificativa Técnica (Anti-Glosa):</p>
           <p style="margin: 0; text-align: justify; color: #1E293B;">${escapeHtml(data.clinicalJustification || VAZIO)}</p>
         </div>

@@ -98,10 +98,10 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
             <button
               type="button"
               onClick={onResetDoc}
-              className="chip-neutral h-8 min-h-[32px] px-2.5 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-300 border border-rose-200/90 dark:border-rose-400/25 bg-rose-50/50 dark:bg-rose-950/25 hover:bg-rose-100/80 dark:hover:bg-rose-950/40 inline-flex items-center gap-1 cursor-pointer transition"
+              className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-semibold text-rose-800 dark:text-rose-200 border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
               title="Limpar os dados clínicos deste documento"
             >
-              <Icon name="delete" size={14} className="text-rose-600 dark:text-rose-400" />
+              <Icon name="delete" size={14} className="text-rose-800 dark:text-rose-200" />
               <span>Limpar campos</span>
             </button>
           )}
@@ -230,7 +230,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
 
         {/* Campos Específicos para GAL / LACEN (Geral e TRM-TB) */}
         {currentDocItem.category === 'gal' && (
-          <div className="space-y-2.5 p-3 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
+          <div className="space-y-2.5 p-3 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)]">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label htmlFor="sus-sinan" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
@@ -312,7 +312,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
 
         {/* Campos Específicos para SISCAN (Citopatológico, Mamografia e Histopatológico) */}
         {currentDocItem.category === 'siscan' && (
-          <div className="space-y-2.5 p-3 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
+          <div className="space-y-2.5 p-3 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)]">
             {currentDocItem.id === 'siscan_citopatologico' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
@@ -398,7 +398,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
 
         {/* Campos Específicos para APAC Complementar */}
         {currentDocItem.id === 'apac_complementar' && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-3 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-3 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)]">
             <div>
               <label htmlFor="sus-creatinina" className="text-xs font-semibold text-[var(--text-muted)] block mb-1 truncate">
                 Creatinina Sérica (mg/dL)

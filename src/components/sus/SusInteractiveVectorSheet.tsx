@@ -39,7 +39,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
   return (
     <div className="sus-document-rendered w-full text-slate-950 font-sans select-text">
       {/* Cabeçalho Institucional SIA/SUS */}
-      <div className="border-2 border-black mb-2 p-2.5 flex items-center justify-between gap-3 bg-white">
+      <div className="border-2 border-[#0F172A] mb-2 p-2.5 flex items-center justify-between gap-3 bg-white">
         {logoLocal ? (
           <img
             src={logoLocal}
@@ -47,7 +47,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
             className="h-10 max-w-[128px] object-contain shrink-0"
           />
         ) : (
-          <div className="px-2.5 py-1 border border-black font-black text-xs tracking-wider shrink-0">
+          <div className="px-2.5 py-1 border border-[#0F172A] font-black text-xs tracking-wider shrink-0">
             SUS
           </div>
         )}
@@ -56,7 +56,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
           <div className="text-[0.5625rem] font-bold uppercase tracking-widest text-slate-700">
             Ministério da Saúde • Sistema Único de Saúde • {docItem.system}
           </div>
-          <div className="text-[13px] font-black uppercase tracking-tight text-black leading-tight mt-0.5">
+          <div className="text-[13px] font-black uppercase tracking-tight text-[#0F172A] leading-tight mt-0.5">
             {docItem.title}
           </div>
           {!staticPrintMode && (
@@ -70,15 +70,17 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
           <img
             src={logoSus}
             alt="Logotipo do SUS"
-            className="h-9 max-w-[96px] object-contain shrink-0"
+            width={logoSus.startsWith('data:') ? undefined : 770}
+            height={logoSus.startsWith('data:') ? undefined : 398}
+            className="h-9 w-auto max-w-[96px] object-contain shrink-0"
           />
         )}
       </div>
 
       {/* Bloc-Grid Vetorial 12 Colunas Padrão SIA/SUS */}
-      <div className="grid grid-cols-12 border-t-2 border-l-2 border-r border-b border-black bg-white">
+      <div className="grid grid-cols-12 border-t-2 border-l-2 border-r border-b border-[#0F172A] bg-white">
         {/* BLOCO 1: ESTABELECIMENTO */}
-        <div className="col-span-12 bg-black text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-black">
+        <div className="col-span-12 bg-[#0F172A] text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-[#0F172A]">
           1. Identificação do Estabelecimento de Saúde Solicitante
         </div>
         <VectorCell
@@ -102,7 +104,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
         />
 
         {/* BLOCO 2: PACIENTE */}
-        <div className="col-span-12 bg-black text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-black">
+        <div className="col-span-12 bg-[#0F172A] text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-[#0F172A]">
           2. Identificação do Paciente / Usuário SUS
         </div>
         <VectorCell
@@ -240,7 +242,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
           />
         ) : (
           <>
-            <div className="col-span-12 bg-black text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-black">
+            <div className="col-span-12 bg-[#0F172A] text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-[#0F172A]">
               3. Procedimento Solicitado &amp; Codificação Diagnóstica (SIGTAP / CID-10)
             </div>
             <VectorCell
@@ -300,7 +302,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
           docItem.id.startsWith('gal_') ||
           docItem.id.startsWith('siscan_')) && (
           <>
-            <div className="col-span-12 bg-black text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-black">
+            <div className="col-span-12 bg-[#0F172A] text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-[#0F172A]">
               4. Parâmetros Técnicos e Vigilância do Programa ({docItem.system})
             </div>
             {docItem.id === 'apac_complementar' && (
@@ -325,7 +327,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
                   staticPrintMode={staticPrintMode}
                   onFieldChange={onFieldChange}
                 />
-                <div className="col-span-4 border-r border-b border-black p-1.5 flex flex-col justify-between bg-white">
+                <div className="col-span-4 border-r border-b border-[#0F172A] p-1.5 flex flex-col justify-between bg-white">
                   <span className="text-[0.5rem] font-bold uppercase tracking-tight text-slate-800 leading-none">
                     23 - Contraste Endovenoso
                   </span>
@@ -339,7 +341,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
                         type="checkbox"
                         checked={Boolean(formData.isContrastNeeded)}
                         onChange={(e) => onFieldChange('isContrastNeeded', e.target.checked)}
-                        className="w-3.5 h-3.5 accent-black cursor-pointer"
+                        className="w-3.5 h-3.5 accent-[#0F172A] cursor-pointer"
                       />
                       <span>
                         {formData.isContrastNeeded
@@ -413,7 +415,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
         )}
 
         {/* BLOCO 5: JUSTIFICATIVA CLÍNICA */}
-        <div className="col-span-12 bg-black text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-black">
+        <div className="col-span-12 bg-[#0F172A] text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-[#0F172A]">
           5. Justificativa Clínica, Anamnese, Exame Físico e Exames Complementares
         </div>
         <VectorCell
@@ -429,7 +431,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
         />
 
         {/* BLOCO 6: MÉDICO SOLICITANTE E ASSINATURA */}
-        <div className="col-span-12 bg-black text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-black">
+        <div className="col-span-12 bg-[#0F172A] text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-[#0F172A]">
           6. Identificação do Profissional Solicitante e Assinatura
         </div>
         <VectorCell
@@ -480,7 +482,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
           onFieldChange={onFieldChange}
         />
 
-        <div className="col-span-4 border-r border-b border-black p-2 flex flex-col justify-between bg-white min-h-[64px]">
+        <div className="col-span-4 border-r border-b border-[#0F172A] p-2 flex flex-col justify-between bg-white min-h-[64px]">
           <span className="text-[0.5rem] font-bold uppercase tracking-tight text-slate-800 leading-none">
             30 - Data da Solicitação
           </span>
@@ -488,8 +490,8 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
             {todayFormatted}
           </span>
         </div>
-        <div className="col-span-8 border-r border-b border-black p-2 flex flex-col justify-end items-center bg-white min-h-[64px]">
-          <div className="w-64 border-t border-black pt-1 text-center">
+        <div className="col-span-8 border-r border-b border-[#0F172A] p-2 flex flex-col justify-end items-center bg-white min-h-[64px]">
+          <div className="w-64 border-t border-[#0F172A] pt-1 text-center">
             <div className="text-[0.625rem] font-bold text-slate-950 leading-tight">
               {formData.doctorName || 'Assinatura e Carimbo do Médico Solicitante'}
             </div>

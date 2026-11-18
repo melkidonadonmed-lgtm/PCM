@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   alturaFolhaPx,
   larguraFolhaPx,
@@ -21,6 +21,7 @@ interface FolhaA4Props {
   id?: string;
   className?: string;
   children: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
 /**
@@ -31,14 +32,15 @@ interface FolhaA4Props {
  *
  * A folha é papel: sempre branca com texto escuro, nos dois temas.
  */
-export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
+export const FolhaA4: React.FC<FolhaA4Props> = ({
   orientacao = 'portrait',
   ajustarALargura = true,
   imprimivel = false,
   id,
   className = '',
-  children
-}, ref) => {
+  children,
+  ref
+}) => {
   const molduraRef = useRef<HTMLDivElement>(null);
   const folhaRef = useRef<HTMLDivElement | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -48,29 +50,42 @@ export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
   const largura = larguraFolhaPx(orientacao);
   const altura = alturaFolhaPx(orientacao);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const moldura = molduraRef.current;
+    const folha = folhaRef.current;
     if (!moldura || !ajustarALargura) {
       setZoom(1);
       return;
     }
-    const medir = () => {
+    if (typeof ResizeObserver === 'undefined') {
       const disponivel = moldura.clientWidth;
       if (disponivel > 0) {
         setZoom(Math.min(1, Number((disponivel / largura).toFixed(4))));
       }
-      if (folhaRef.current) {
-        setAlturaNatural(folhaRef.current.offsetHeight || altura);
+      if (folha) {
+        setAlturaNatural(folha.offsetHeight || altura);
       }
-    };
-    medir();
-    const observador = new ResizeObserver(medir);
+      return;
+    }
+    const observador = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === moldura) {
+          const disponivel = entry.contentRect.width;
+          if (disponivel > 0) {
+            setZoom(Math.min(1, Number((disponivel / largura).toFixed(4))));
+          }
+        } else if (entry.target === folha) {
+          const blockSize = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
+          setAlturaNatural(Math.max(altura, Math.round(blockSize || altura)));
+        }
+      }
+    });
     observador.observe(moldura);
-    if (folhaRef.current) {
-      observador.observe(folhaRef.current);
+    if (folha) {
+      observador.observe(folha);
     }
     return () => observador.disconnect();
-  }, [ajustarALargura, largura, altura, children]);
+  }, [ajustarALargura, largura, altura]);
 
   // Impressão fiel: na hora de imprimir, uma cópia da folha vira o único
   // conteúdo da página, em tamanho real e sem margens do navegador.
@@ -104,14 +119,14 @@ export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
   return (
     <div className="relative w-full group/folha">
       {ajustarALargura && zoom < 0.92 && (
-        <div className="no-print absolute top-2.5 right-2.5 z-20 flex items-center gap-1 rounded-lg bg-slate-900/95 backdrop-blur-xs px-2 py-1 text-[11px] font-semibold text-white shadow-sm transition-opacity">
-          <span className="clinical-tabular-nums text-slate-100 pr-1 border-r border-white/20">
+        <div className="no-print absolute top-2.5 right-2.5 z-20 flex items-center gap-1 rounded-lg bg-slate-900/95 backdrop-blur-xs px-1.5 py-0.5 text-[11px] font-semibold text-white shadow-sm transition-opacity">
+          <span className="clinical-tabular-nums text-slate-100 px-1.5 border-r border-white/20">
             {Math.round(escalaEfetiva * 100)}%
           </span>
           <button
             type="button"
             onClick={() => setInspecaoReal((v) => !v)}
-            className="px-1.5 py-0.5 rounded hover:bg-white/15 text-sky-200 font-bold cursor-pointer transition-colors"
+            className="touch-target min-w-[44px] min-h-[44px] px-2 rounded-md hover:bg-white/15 text-sky-200 font-bold cursor-pointer transition-colors inline-flex items-center justify-center"
             title={inspecaoReal ? 'Ajustar folha à largura do painel' : 'Inspecionar folha em tamanho real (100%)'}
           >
             {inspecaoReal ? 'Ajustar' : '100%'}
@@ -141,8 +156,6 @@ export const FolhaA4 = React.forwardRef<HTMLDivElement, FolhaA4Props>(({
       </div>
     </div>
   );
-});
-
-FolhaA4.displayName = 'FolhaA4';
+};
 
 export default FolhaA4;

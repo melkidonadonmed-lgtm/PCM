@@ -8,7 +8,7 @@ import {
 } from '../../utils/documentoClinico';
 import { CabecalhoInstitucional } from './CabecalhoInstitucional';
 import { AssinaturaMedico } from './AssinaturaMedico';
-import { SIMBOLO_CORTE } from '../../utils/compartilhamentoTexto';
+import { Icon } from '../Icon';
 
 /** Regime da receita em folha A4 paisagem: simples (1 via à esquerda), antimicrobiano (2 vias) ou controle especial (2 vias Portaria 344/98). */
 export type RegimeDuasVias = 'simples' | 'controle_especial' | 'antimicrobiano';
@@ -253,9 +253,11 @@ export const ReceitaDuasVias: React.FC<ReceitaDuasViasProps> = (props) => (
     <Via via={1} {...props} />
     <div
       aria-hidden="true"
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderLeft: `1px dashed ${FILETE}`, width: 0 }}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderLeft: `1px dotted ${FILETE}`, width: 0 }}
     >
-      <span style={{ backgroundColor: '#FFFFFF', fontSize: 11, color: TINTA_APAGADA, transform: 'translateX(-0.5px)', padding: '4px 0' }}>{SIMBOLO_CORTE}</span>
+      <span style={{ backgroundColor: '#FFFFFF', color: TINTA_APAGADA, transform: 'translateX(-0.5px)', padding: '4px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="content_cut" size={12} style={{ transform: 'rotate(90deg)' }} />
+      </span>
     </div>
     {props.regime === 'simples' ? <div aria-hidden="true" /> : <Via via={2} {...props} />}
   </div>

@@ -1,9 +1,15 @@
 @import "tailwindcss";
+@import "./styles/globals.css";
+@import "./styles/dark-theme.css";
+@import "./styles/tactile-components.css";
+@import "./styles/a4-and-editor.css";
 @source not "../GEMINI.md";
 @source not "../AGENTS.md";
 @source not "../DESIGN.md";
 @source not "../docs";
-@import "./styles/globals.css";
+@source not "../.agents";
+@source not "../agents";
+@source not "../.context";
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -17,7 +23,7 @@
   --color-slate-surface: #1E293B;
   --color-slate-canvas: #0F172A;
 
-  --color-clinical-500: #1D7A73;
+  --color-clinical-500: #14635D;
   --color-clinical-600: #115E59;
 
   --color-canvas: var(--canvas);
@@ -36,13 +42,11 @@
   --color-clinical: var(--clinical);
   --color-clinical-hover: var(--clinical-hover);
 
-  /* Shadow-box soft em camadas sobrepostas com leve projeção dos tokens (sem brilho artificial em cards) */
   --shadow-tactile-card: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 14px 28px -8px rgba(15, 23, 42, 0.03);
   --shadow-tactile-card-dark: 0 1px 2px rgba(0, 0, 0, 0.28), 0 4px 10px -2px rgba(0, 0, 0, 0.32), 0 10px 22px -6px rgba(0, 0, 0, 0.26);
   --shadow-tactile-inset-dark: inset 0 1px 3px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(0, 0, 0, 0.28);
   --shadow-tactile-md: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 8px -2px rgba(15, 23, 42, 0.05), 0 10px 20px -4px rgba(15, 23, 42, 0.05);
 
-  /* Elevações Multicamadas em OKLCH (Umbra + Penumbra + Catch-Light Especular) */
   --shadow-elevation-low: var(--elevation-low);
   --shadow-elevation-medium: var(--elevation-medium);
   --shadow-elevation-high: var(--elevation-high);
@@ -52,10 +56,7 @@
 @layer base {
   html, body {
     width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-    /* clip corta o excesso lateral sem transformar html/body em contêiner de rolagem.
-       Só com hidden, nada "sticky" ficava preso: cabeçalho, menu lateral e barra do editor rolavam junto com a página. */
+    max-width: 100%;
     overflow-x: clip;
     margin: 0;
     padding: 0;
@@ -88,11 +89,12 @@
     transition: background-color 0.25s ease, color 0.25s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+    text-rendering: auto;
   }
 
   h1, h2, h3 {
     color: var(--text-title, var(--text-main));
+    text-rendering: optimizeLegibility;
   }
 
   .panel-navy :is(h1, h2, h3) {
@@ -119,28 +121,18 @@
   }
 
   :root {
-    /* Baseline color-scheme */
     color-scheme: light;
-    /* ==========================================================================
-       OPTICAL PHYSICS ENGINE: 135° DIRECTIONAL LIGHT MATRIX (2026 LUXURY)
-       Infinite Point Light Source at Top-Left (-45° / 135° Incident Vector)
-       TEMA CLARO: Clean Slate Mineral (#F8FAFC) & Botões Azul Marinho Nobre (#0F172A)
-       ========================================================================== */
-
-    /* Tipografia de Alta Precisão */
     --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-serif-doc: 'Cormorant Garamond', Georgia, Cambria, 'Times New Roman', Times, serif;
 
-    /* Scrollbar base e variáveis */
     --scrollbar-thumb: rgba(142, 156, 174, 0.35);
     --scrollbar-thumb-hover: rgba(142, 156, 174, 0.55);
     --scrollbar-track: transparent;
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 
-    /* Dimensões Estruturais (escala monotônica compatível com Tailwind v4) */
     --sidebar-width: 256px;
     --navbar-height: 72px;
     --radius-sm: 6px;
@@ -151,12 +143,11 @@
     --radius-card: 18px;
     --radius-pill: 9999px;
 
-    /* Transições de Física Tátil */
     --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
     --transition-smooth: transform 0.3s var(--ease-spring), opacity 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring), background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
     --transition-snap: transform 0.15s ease-out, opacity 0.15s ease-out, box-shadow 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
 
-    /* TEMA CLARO: Mineral Sólido & Harmonioso (Clean Slate #F8FAFC + Ardósia Mineral #243447 sem cobalto) */
+    /* TEMA CLARO: Mineral Sólido & Harmonioso (Clean Slate #F8FAFC + Ardósia Mineral #243447) */
     --canvas: #f8fafc;
     --bg-main: #f8fafc;
     --surface: #ffffff;
@@ -170,7 +161,6 @@
     --clinical: #115e59;
     --clinical-hover: #0d4b47;
 
-    /* Hierarquia Tonal de 6 Níveis (DESIGN.md v8.0.0 — Acabamento Fosco Mineral) */
     --surface-sunken: #DFE6EE;
     --surface-canvas: #F3F5F8;
     --surface-inset: #EEF2F6;
@@ -188,7 +178,6 @@
     --surface-hover: #F5F7FA;
     --surface-active: #DFE6EE;
 
-    /* Cores de Navegação & Painéis Estruturais (Deep Slate Mineral Sólido) */
     --nav-bg: #0F172A;
     --surface-panel: #0F172A;
     --surface-panel-2: #1E293B;
@@ -203,14 +192,12 @@
     --nav-active-text: #FFFFFF;
     --nav-active-glow: 0 2px 6px rgba(15, 23, 42, 0.22);
 
-    /* Texto Geral */
     --text-main: #0F172A;
     --text-secondary: #334155;
     --text-placeholder: #5B6B80;
     --text-subtle: #64748B;
     --text-inverse: #FFFFFF;
 
-    /* Acentos & Botões Primários (Sólidos e Refinados, Sem Cobalto/Neon) */
     --accent: #243447;
     --accent-hover: #182433;
     --nav-accent: #FFFFFF;
@@ -237,13 +224,11 @@
     --accent-rose-subtle: rgba(159, 18, 57, 0.08);
     --accent-rose-border: rgba(159, 18, 57, 0.18);
 
-    /* Luz Tátil Realista Exclusiva para Botões; Shadow-Box em Camadas Sobrepostas para Cards */
     --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.24);
     --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.10), inset 0 -1px 0 rgba(0, 0, 0, 0.22);
     --tactile-card-bevel: 0 0 0 0 transparent;
     --bevel-tactile-card: 0 0 0 0 transparent;
 
-    /* Elevações em Camadas Suaves (Shadow-Box com Leve Projeção dos Tokens) */
     --elev-tactile: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 14px 28px -8px rgba(15, 23, 42, 0.03);
     --elev-tactile-sm: 0 1px 2px rgba(15, 23, 42, 0.03), 0 2px 5px -1px rgba(15, 23, 42, 0.04);
     --elev-tactile-lg: 0 2px 4px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.06), 0 20px 36px -8px rgba(15, 23, 42, 0.08);
@@ -276,133 +261,6 @@
     --shadow-pressed: inset 0 2px 4px rgba(15, 23, 42, 0.16), inset 0 1px 2px rgba(15, 23, 42, 0.10);
   }
 
-  /* TEMA ESCURO: Ardósia Fosco Mineral com Caixas Mais Claras (#141C27 Canvas / #243042 Cards) */
-  .dark, [data-theme="dark"] {
-    /* Baseline color-scheme */
-    color-scheme: dark;
-    --canvas: #141c27;
-    --bg-main: #141c27;
-    --surface: #243042;
-    --border: #36455b;
-    --text-primary: #f8fafc;
-    --text-title: #f8fafc;
-    --text-body: #cbd5e1;
-    --text-muted: #94a3b8;
-    --primary: oklch(0.45 0.055 245);
-    --primary-hover: oklch(0.50 0.055 245);
-    --clinical: #1d7a73;
-    --clinical-hover: #16655f;
-
-    /* Hierarquia Tonal de 6 Níveis (60% #141C27 Canvas, 30% #243042 Card Mais Claro Fosco, #2D3B50 Elevated) */
-    --surface-sunken: #101722;
-    --surface-canvas: #141C27;
-    --surface-inset: #1B2534;
-    --surface-flat: #243042;
-    --surface-raised: #2D3B50;
-    --surface-contrast: #0F172A;
-    --surface-modal: #2D3B50;
-    --accent-point: #64748B;
-
-    --bg-canvas: #141C27;
-    --bg-app: #141C27;
-    --bg-surface: #243042;
-    --surface-card: #243042;
-    --bg-surface-elevated: #2D3B50;
-    --surface-elevated: #2D3B50;
-    --surface-hover: #33435A;
-    --surface-active: #3B4D66;
-
-    /* Cores de Navegação no Dark */
-    --nav-bg: #1E293B;
-    --surface-panel: #16202E;
-    --surface-panel-2: #243042;
-    --surface-panel-hover: #33435A;
-    --nav-border: #ffffff1a;
-    --surface-panel-border: #ffffff1a;
-    --nav-text: #F8FAFC;
-    --surface-panel-text: #F8FAFC;
-    --nav-text-muted: #94A3B8;
-    --surface-panel-muted: #94A3B8;
-    --nav-active-bg: oklch(0.43 0.055 245);
-    --nav-active-text: #FFFFFF;
-    --nav-active-glow: 0 2px 6px rgba(0, 0, 0, 0.28);
-
-    /* Texto (Hierarquia Visual: #F8FAFC principal sem ofuscamento, #CBD5E1 corpo, #94A3B8 rótulos) */
-    --text-main: #F8FAFC;
-    --text-secondary: #CBD5E1;
-    --text-placeholder: #94A3B8;
-    --text-subtle: #64748B;
-    --text-inverse: #0F172A;
-
-    /* Acentos & Botões Primários (Steel Slate Sólido em OKLCH — Sem Azul Neon) */
-    --accent: #94A3B8;
-    --accent-hover: #CBD5E1;
-    --nav-accent: #F8FAFC;
-
-    --oklch-primary: oklch(0.43 0.055 245);
-    --oklch-primary-hover: oklch(0.48 0.055 245);
-    --accent-primary: oklch(0.43 0.055 245);
-    --accent-primary-hover: oklch(0.48 0.055 245);
-    --accent-primary-subtle: rgba(148, 163, 184, 0.12);
-    --accent-primary-border: rgba(148, 163, 184, 0.26);
-
-    --accent-clinical: #1D7A73;
-    --accent-clinical-hover: #16655F;
-    --accent-emerald: #1D7A73;
-    --accent-emerald-hover: #16655F;
-    --accent-emerald-subtle: rgba(29, 122, 115, 0.14);
-    --accent-emerald-border: rgba(29, 122, 115, 0.30);
-
-    --accent-amber: #D97706;
-    --accent-amber-hover: #B45309;
-    --accent-amber-subtle: rgba(217, 119, 6, 0.14);
-    --accent-amber-border: rgba(217, 119, 6, 0.30);
-
-    --accent-rose: #E11D48;
-    --accent-rose-hover: #BE123C;
-    --accent-rose-subtle: rgba(225, 29, 72, 0.12);
-    --accent-rose-border: rgba(225, 29, 72, 0.28);
-
-    /* Luz Tátil Realista Exclusiva para Botões; Shadow-Box em Camadas para Cards */
-    --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.32);
-    --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
-    --tactile-card-bevel: 0 0 0 0 transparent;
-    --bevel-tactile-card: 0 0 0 0 transparent;
-
-    /* Elevações em Camadas Suaves no tema escuro (Sem Halos Neon e Sem Linha Branca no Topo dos Cards) */
-    --elev-tactile: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
-    --elev-tactile-sm: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 5px -1px rgba(0, 0, 0, 0.20);
-    --elev-tactile-lg: 0 2px 4px -1px rgba(0, 0, 0, 0.30), 0 8px 18px -4px rgba(0, 0, 0, 0.36), 0 18px 34px -8px rgba(0, 0, 0, 0.34);
-    --elev-tactile-navy: 0 2px 6px -1px rgba(0, 0, 0, 0.28), 0 10px 24px -4px rgba(0, 0, 0, 0.34);
-    --elev-tactile-dark: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
-    --elev-tactile-btn: 0 1px 2px rgba(0, 0, 0, 0.30), 0 3px 6px -1px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
-    --elev-tactile-inset: inset 0 1px 3px rgba(0, 0, 0, 0.42), inset 0 1px 2px -1px rgba(0, 0, 0, 0.28);
-    --elev-tactile-blue: 0 2px 6px -2px rgba(0, 0, 0, 0.32);
-
-    --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.22);
-    --shadow-projected: 0 1px 2px rgba(0, 0, 0, 0.24), 0 4px 10px -2px rgba(0, 0, 0, 0.28);
-    --shadow-card-projected: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
-    --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.28), 0 8px 18px -4px rgba(0, 0, 0, 0.34), 0 16px 30px -8px rgba(0, 0, 0, 0.32);
-    --shadow-nav: 0 2px 6px rgba(0, 0, 0, 0.24), 0 6px 16px -2px rgba(0, 0, 0, 0.28);
-    --shadow-sidebar-projected: 2px 0 8px rgba(0, 0, 0, 0.22), 6px 0 18px -2px rgba(0, 0, 0, 0.26);
-    --shadow-header-projected: 0 1px 3px rgba(0, 0, 0, 0.20), 0 4px 12px -2px rgba(0, 0, 0, 0.24);
-    --shadow-bottomnav-projected: 0 -2px 6px rgba(0, 0, 0, 0.22), 0 -6px 14px -2px rgba(0, 0, 0, 0.24);
-
-    --border-subtle: rgba(255, 255, 255, 0.11);
-    --border-medium: rgba(255, 255, 255, 0.16);
-    --border-strong: rgba(255, 255, 255, 0.20);
-    --rim-light-top: 0 0 0 0 transparent;
-
-    --elevation-z0: inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 1px 2px rgba(0, 0, 0, 0.22);
-    --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.22), 0 3px 6px -1px rgba(0, 0, 0, 0.20);
-    --elevation-z2: 0 1px 3px rgba(0, 0, 0, 0.26), 0 5px 12px -2px rgba(0, 0, 0, 0.24), 0 10px 20px -6px rgba(0, 0, 0, 0.20);
-    --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.28), 0 8px 18px -3px rgba(0, 0, 0, 0.28), 0 16px 32px -8px rgba(0, 0, 0, 0.26);
-    --elevation-z4: 0 4px 8px rgba(0, 0, 0, 0.32), 0 12px 28px -6px rgba(0, 0, 0, 0.34), 0 24px 44px -10px rgba(0, 0, 0, 0.32);
-
-    --shadow-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.42), inset 0 1px 2px rgba(0, 0, 0, 0.28);
-  }
-
-  /* Placeholder e estados de campo base */
   ::placeholder {
     color: var(--text-placeholder);
     opacity: 1;
@@ -410,17 +268,6 @@
     font-style: normal;
   }
 
-  /* Acessibilidade: Movimento reduzido */
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-
-  /* Tipografia moderna e legibilidade (Baseline) */
   h1, h2, h3, h4, h5, h6, .headline-balance {
     text-wrap: balance;
   }
@@ -428,347 +275,16 @@
   p, .text-pretty {
     text-wrap: pretty;
   }
-
-  /* Filtro de profundidade mobile adaptativo */
-  @media (max-width: 767px) {
-    :root {
-      --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-      --elevation-z2: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
-      --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.08), 0 8px 16px -3px rgba(0, 0, 0, 0.08);
-      --elevation-z4: 0 3px 6px rgba(0, 0, 0, 0.1), 0 14px 28px -6px rgba(0, 0, 0, 0.12);
-    }
-    .dark {
-      --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.6), 0 3px 6px -1px rgba(0, 0, 0, 0.45);
-      --elevation-z2: 0 1px 3px rgba(0, 0, 0, 0.7), 0 5px 10px -2px rgba(0, 0, 0, 0.55);
-      --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.75), 0 10px 20px -3px rgba(0, 0, 0, 0.6);
-      --elevation-z4: 0 3px 8px rgba(0, 0, 0, 0.85), 0 16px 32px -6px rgba(0, 0, 0, 0.7);
-    }
-  }
 }
 
 @layer components {
-  /* ==========================================================================
-     COMPONENTES DE INTERFACE & ELEMENTOS TÁTEIS MINIMALISTAS (98/2)
-     ========================================================================== */
-
-  .page-shell-container {
-    width: 100%;
-    max-width: 80rem;
-    margin-inline: auto;
-    display: flex;
-    flex-direction: column;
-    gap: var(--grid-gutter, 1.25rem);
-  }
-
-  .section-flow-root {
-    display: flow-root;
-  }
-
-  .card,
-  .surface-card-minimal {
-    background-color: var(--surface-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--elevation-low);
-    transition: background-color 0.25s ease, border-color 0.22s ease, box-shadow 0.25s var(--ease-spring);
-  }
-
-  .dark .card,
-  .dark .surface-card-minimal {
-    border-color: var(--border-strong);
-    box-shadow: var(--elevation-low);
-  }
-
-  .chip-neutral {
-    background-color: #F7F9FB;
-    color: var(--text-secondary);
-    border: 1px solid #CFD8E3;
-    border-radius: var(--radius-lg);
-    font-weight: 600;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
-    transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.16s var(--ease-spring);
-  }
-
-  .dark .chip-neutral {
-    background-color: #2D3B50;
-    color: #E2E8F0;
-    border-color: rgba(255, 255, 255, 0.14);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
-  }
-
-  .chip-neutral:hover:not(:disabled) {
-    background-color: #EEF2F6;
-    border-color: #94A3B8;
-    color: var(--text-main);
-    transform: translate3d(0, -1px, 0);
-    box-shadow: 0 2px 5px -1px rgba(15, 23, 42, 0.06);
-  }
-
-  .dark .chip-neutral:hover:not(:disabled) {
-    background-color: #35465E;
-    border-color: rgba(255, 255, 255, 0.24);
-    color: #FFFFFF;
-    transform: translate3d(0, -1px, 0);
-    box-shadow: 0 3px 7px -1px rgba(0, 0, 0, 0.28);
-  }
-
-  .chip-neutral:active:not(:disabled) {
-    transform: translate3d(0, 1px, 0);
-  }
-
-  @media (pointer: coarse) {
-    .chip-neutral {
-      min-block-size: 44px;
-      padding-inline: 0.75rem;
-    }
-  }
-
-  .chip-neutral[data-active="true"] {
-    background-color: #F1F5F9;
-    color: #0F172A;
-    border-color: #64748B;
-    font-weight: 700;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
-  }
-
-  .dark .chip-neutral[data-active="true"] {
-    background-color: #27354A;
-    color: #F8FAFC;
-    border-color: rgba(148, 163, 184, 0.38);
-  }
-
-  /* Aviso discreto opaco (Cinza sobre Cinza com detalhe pontual, sem fundo transparente chamativo) */
-  .notice-discreet {
-    background-color: #F1F5F9;
-    color: #334155;
-    border: 1px solid #CBD5E1;
-    border-radius: 12px;
-  }
-
-  .dark .notice-discreet {
-    background-color: #27354A;
-    color: #CBD5E1;
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  /* 1. Z-0 Inset Tray / Form Input Fields (Micro-Cavidade Côncava) */
-  .tactile-input,
-  .tactile-inset {
-    background-color: #FFFFFF;
-    color: #0F172A;
-    border: 1px solid rgba(15, 23, 42, 0.12);
-    border-radius: var(--radius-xl);
-    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.8);
-    transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
-                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
-                background-color 0.2s ease;
-  }
-  .tactile-input:not(.h-8):not(.h-9):not(.h-10):not(.h-11),
-  .tactile-inset:not(.h-8):not(.h-9):not(.h-10):not(.h-11) {
-    min-height: 44px;
-  }
-
-  .tactile-input:focus {
-    outline: none;
-    background-color: #FFFFFF;
-    border-color: var(--accent-sky-dark, #0284C7);
-    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03), 0 0 0 3.5px rgba(2, 132, 199, 0.18);
-  }
-
-  .dark .tactile-input,
-  .dark .tactile-inset {
-    background-color: var(--surface-inset);
-    color: #F8FAFC;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.32);
-  }
-
-  .dark .tactile-input:focus {
-    background-color: #1F2B3D;
-    border-color: #94A3B8;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28), 0 0 0 3px rgba(148, 163, 184, 0.22);
-  }
-
-  /* 2. Z-1 Resting Base Plates & Static Cards */
-  .tactile-flat {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--shadow-subtle), var(--tactile-card-bevel);
-    border-radius: var(--radius-2xl);
-    position: relative;
-    isolation: isolate;
-  }
-
-  .dark .tactile-flat {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-  }
-
-  .tactile-card {
-    background-color: var(--surface-card);
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--elevation-low);
-    border-radius: var(--radius-2xl);
-    padding: var(--card-padding, 1.25rem);
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    container-type: inline-size;
-    transition: box-shadow 0.25s var(--ease-spring),
-                transform 0.25s var(--ease-spring),
-                border-color 0.22s ease,
-                background-color 0.25s ease;
-  }
-
-  .dark .tactile-card {
-    background-color: var(--surface-card);
-    border-color: var(--border-strong);
-    box-shadow: var(--elevation-low);
-  }
-
-  /* Cartão de conteúdo não reage ao hover: levantar a página inteira fazia tudo parecer botão.
-     O que é clicável usa .tactile-card-interactive. */
-
-  /* 3. Z-2 Interactive Elevated Cards & Controls (Shadow-Box em Camadas sem Linha Artificial) */
-  .tactile-card-interactive {
-    background-color: var(--surface-card);
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--elevation-low);
-    border-radius: var(--radius-2xl);
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    touch-action: manipulation;
-    user-select: none;
-    transition: transform 0.22s var(--ease-spring),
-                box-shadow 0.22s var(--ease-spring),
-                border-color 0.18s ease,
-                background-color 0.22s ease;
-  }
-
-  .dark .tactile-card-interactive {
-    background-color: var(--surface-card);
-    border-color: var(--border-strong);
-    box-shadow: var(--elevation-low);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .tactile-card-interactive:hover {
-      transform: translate3d(0, -2px, 0);
-      border-color: var(--border-medium);
-      box-shadow: var(--elevation-medium);
-    }
-  }
-
-  .tactile-card-interactive:active {
-    transform: translate3d(0, 0, 0);
-    box-shadow: var(--elevation-low);
-  }
-
-  .tactile-card-interactive:focus-visible {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 2px;
-  }
-
-  /* Utilitários Canônicos Táteis (DESIGN.md v4.5-soft) */
-  .ui-card-soft {
-    background-color: var(--surface-card);
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--elevation-low);
-    border-radius: var(--radius-2xl);
-    transition: box-shadow 0.25s var(--ease-spring), transform 0.25s var(--ease-spring), border-color 0.22s ease;
-  }
-
-  .dark .ui-card-soft {
-    border-color: var(--border-strong);
-    box-shadow: var(--elevation-low);
-  }
-
-  .ui-btn-tactile {
-    box-shadow: var(--tactile-bevel);
-    transition: transform 0.15s var(--ease-spring), box-shadow 0.15s var(--ease-spring), background-color 0.18s ease;
-    cursor: pointer;
-    user-select: none;
-    touch-action: manipulation;
-  }
-
-  .ui-btn-tactile:active:not(:disabled) {
-    transform: translateY(1px);
-    box-shadow: var(--elevation-z0);
-  }
-
-  .surface-inset {
-    background-color: var(--surface-inset);
-    box-shadow: var(--shadow-inset-sunken, var(--elevation-z0));
-  }
-
-  .panel-navy .surface-inset,
-  .panel-navy.surface-inset {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-  }
-
-  .surface-raised {
-    isolation: isolate;
-  }
-
-  .unit-badge {
-    display: inline-flex;
-    align-items: center;
-    white-space: nowrap;
-    flex-shrink: 0;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .scrollbar-none {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
-  }
-
-  #sidebar-active-tracker {
-    pointer-events: none;
-    transition: transform 0.28s var(--ease-spring), opacity 0.2s ease;
-  }
-
-  .tactile-btn {
-    box-shadow: var(--tactile-bevel);
-    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-    cursor: pointer;
-    user-select: none;
-  }
-  .tactile-btn:active {
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
-  }
-  .card-surface {
-    background-color: var(--surface-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--elevation-low);
-    transition: background-color 0.25s ease, border-color 0.22s ease, box-shadow 0.25s var(--ease-spring);
-  }
-
-  .dark .card-surface {
-    border-color: var(--border-strong);
-    box-shadow: var(--elevation-low);
-  }
-  .folha-a4-shadow {
-    box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.1), 0 6px 12px -3px rgba(15, 23, 42, 0.04);
-  }
-
-  /* 4. Botões Físicos Realistas (Luz Especular Superior + Espessura de Base Exclusiva nos Botões) */
+  /* Botões Primários & Clínicos (Light & Dark >= 7:1 AAA com #FFFFFF via --text-inverse) */
   .tactile-btn-primary,
   .btn-tactile-primary,
   .btn-primary-tactile,
   .button-primary {
     background-color: #243447;
-    color: #FFFFFF !important;
+    color: var(--text-inverse, #FFFFFF);
     border: 1px solid rgba(15, 23, 42, 0.22);
     box-shadow:
       0 1px 2px rgba(15, 23, 42, 0.14),
@@ -786,8 +302,8 @@
     cursor: pointer;
     isolation: isolate;
     will-change: transform, box-shadow;
-    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), 
-                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1), 
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1),
+                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1),
                 background-color 0.2s ease,
                 color 0.2s ease;
   }
@@ -815,21 +331,20 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.28), inset 0 1px 2px rgba(0, 0, 0, 0.18);
   }
 
-  /* NO TEMA ESCURO: Steel Slate Sólido em OKLCH (Sem Azul Cobalto/Neon) com Luz Físico-Tátil Realista */
   .dark .tactile-btn-primary,
   .dark .btn-tactile-primary,
   .dark .btn-primary-tactile,
   .dark .button-primary {
     background-color: oklch(0.43 0.055 245);
-    color: #FFFFFF !important;
+    color: var(--text-inverse, #FFFFFF);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.28),
       0 4px 8px -2px rgba(0, 0, 0, 0.34),
       inset 0 1px 0 rgba(255, 255, 255, 0.16),
       inset 0 -1px 0 rgba(0, 0, 0, 0.28);
-    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), 
-                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1), 
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1),
+                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1),
                 background-color 0.2s ease,
                 color 0.2s ease;
   }
@@ -839,7 +354,7 @@
     .dark .btn-tactile-primary:hover:not(:disabled),
     .dark .btn-primary-tactile:hover:not(:disabled),
     .dark .button-primary:hover:not(:disabled) {
-      background-color: oklch(0.48 0.055 245);
+      background-color: oklch(0.45 0.055 245);
       box-shadow:
         0 2px 4px rgba(0, 0, 0, 0.32),
         0 6px 12px -2px rgba(0, 0, 0, 0.38),
@@ -856,11 +371,10 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.42);
   }
 
-  /* BOTÃO CLÍNICO (Mineral Sage Teal Sólido com Luz Físico-Tátil Realista) */
   .tactile-btn-success,
   .btn-tactile-clinical {
     background: #115E59;
-    color: #FFFFFF !important;
+    color: var(--text-inverse, #FFFFFF);
     border: 1px solid rgba(13, 75, 71, 0.28);
     box-shadow:
       0 1px 2px rgba(15, 23, 42, 0.14),
@@ -878,14 +392,15 @@
     cursor: pointer;
     isolation: isolate;
     will-change: transform, box-shadow;
-    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), 
-                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1), 
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1),
+                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1),
                 background 0.2s ease;
   }
 
   .dark .tactile-btn-success,
   .dark .btn-tactile-clinical {
-    background: #1D7A73;
+    background: #14635D;
+    color: var(--text-inverse, #FFFFFF);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.28),
@@ -894,7 +409,6 @@
       inset 0 -1px 0 rgba(0, 0, 0, 0.28);
   }
 
-  /* No hover o verde escurece: clarear derrubava o contraste do texto branco abaixo de 4,5:1 */
   @media (hover: hover) and (pointer: fine) {
     .tactile-btn-success:hover:not(:disabled),
     .btn-tactile-clinical:hover:not(:disabled) {
@@ -908,7 +422,7 @@
 
     .dark .tactile-btn-success:hover:not(:disabled),
     .dark .btn-tactile-clinical:hover:not(:disabled) {
-      background: #16655F;
+      background: #0F4F4A;
     }
   }
 
@@ -918,763 +432,152 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.32);
   }
 
-  .tactile-btn-secondary,
-  .btn-tactile-secondary {
-    border: 1px solid #CBD5E1;
-    box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.05),
-      0 3px 6px -2px rgba(15, 23, 42, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.92),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.05);
-    background-color: #FFFFFF;
-    color: #0F172A;
-    border-radius: 12px;
-    padding: 0.5rem 0.875rem;
-    font-weight: 600;
-    min-height: 44px;
-    min-width: 44px;
-    touch-action: manipulation;
-    user-select: none;
-    cursor: pointer;
-    isolation: isolate;
-    transition: transform 0.14s cubic-bezier(0.2, 0, 0, 1), 
-                box-shadow 0.14s cubic-bezier(0.2, 0, 0, 1), 
-                background-color 0.18s ease, 
-                border-color 0.18s ease;
-  }
-
-  .dark .tactile-btn-secondary,
-  .dark .btn-tactile-secondary {
-    background-color: #1E293B;
-    color: #F1F5F9;
-    border-color: rgba(255, 255, 255, 0.14);
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.26),
-      0 3px 6px -2px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.24);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .tactile-btn-secondary:hover:not(:disabled),
-    .btn-tactile-secondary:hover:not(:disabled) {
-      background-color: #F8FAFC;
-      color: #0F172A;
-      border-color: #94A3B8;
-      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.09), inset 0 1px 0 #FFFFFF;
-    }
-
-    .dark .tactile-btn-secondary:hover:not(:disabled),
-    .dark .btn-tactile-secondary:hover:not(:disabled) {
-      border-color: rgba(255, 255, 255, 0.24);
-      background-color: #27354A;
-      color: #FFFFFF;
-    }
-  }
-
-  .tactile-btn-secondary:active:not(:disabled),
-  .btn-tactile-secondary:active:not(:disabled) {
-    transform: translate3d(0, 1px, 0);
-    box-shadow: var(--shadow-pressed);
-  }
-
-  /* Botão Ícone Quadrado Acessível Padronizado (44x44px) */
-  .btn-tactile-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
-    border-radius: 12px;
-    border: 1px solid var(--border-subtle);
-    background-color: var(--bg-app);
-    color: var(--text-main);
-    box-shadow: var(--elevation-z1);
-    transition: transform 0.14s cubic-bezier(0.2, 0, 0, 1), 
-                background-color 0.18s ease,
-                border-color 0.18s ease;
-    touch-action: manipulation;
-    cursor: pointer;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .btn-tactile-icon:hover:not(:disabled) {
-      background-color: var(--surface-hover);
-      border-color: var(--border-medium);
-      transform: translate3d(0, -1px, 0);
-    }
-  }
-
-  .btn-tactile-icon:active:not(:disabled) {
-    transform: translate3d(0, 1px, 0);
-  }
-
-  /* 5. Z-3 Floating Elements / Popovers / Sticky Bars (Sobreposição de Camadas) */
-  .tactile-floating {
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--rim-light-top), var(--elevation-z3);
-    background-color: var(--surface-card);
-    border-radius: 16px;
-    isolation: isolate;
-  }
-
-  .dark .tactile-floating {
-    background-color: var(--surface-elevated);
-    border-color: var(--border-subtle);
-  }
-
-  /* 6. Z-4 Critical Modals & Dialogs (Elevação por Tom Mais Claro sem Sombras Pesadas no Dark) */
-  .tactile-modal,
-  .modal-content {
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--rim-light-top), var(--elevation-z3);
-    background-color: var(--surface-card);
-    border-radius: 20px;
-    isolation: isolate;
-  }
-
-  .dark .tactile-modal,
-  .dark .modal-content {
-    background-color: var(--surface-hover);
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--rim-light-top), var(--elevation-z3);
-  }
-
-  /* 7. Deep Navy Structural Panel (Menus / Sidebar / Header Chrome — Ambos os Temas) */
-  .panel-navy {
-    background: linear-gradient(180deg, var(--surface-panel-2) 0%, var(--surface-panel) 100%);
-    color: var(--surface-panel-text);
-    border-color: var(--surface-panel-border);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: geometricPrecision;
-  }
-
-  .panel-navy-inset {
-    background-color: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--surface-panel-border);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-  }
-
-  /* Chrome projetado: sidebar, header e bottom nav flutuam com aspecto de sobreposição */
-  .panel-projected-right {
-    box-shadow: var(--shadow-sidebar-projected), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-  }
-
-  .panel-projected-bottom {
-    box-shadow: var(--shadow-header-projected), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-  }
-
-  .panel-projected-top {
-    box-shadow: var(--shadow-bottomnav-projected), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-  }
-
-  /* Item de navegação: hover slide tátil + micro-transição */
-  .nav-btn-tactile {
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                background-color 0.2s ease,
-                color 0.2s ease,
-                box-shadow 0.2s ease;
-  }
-
-  .nav-btn-tactile:hover {
-    transform: translateX(4px);
-  }
-
-  /* Item de navegação ativo: superfície sólida com sombra sobreposta suave (sem brilho neon) */
   .nav-item-active {
     position: relative;
     background-color: rgba(255, 255, 255, 0.09);
-    color: #FFFFFF !important;
+    color: var(--text-inverse, #FFFFFF);
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow:
       0 2px 6px -1px rgba(0, 0, 0, 0.24),
       0 4px 10px -2px rgba(0, 0, 0, 0.18);
   }
+}
 
-  /* Tipografia editorial para títulos de página */
-  .font-display {
-    font-family: var(--font-display);
+/* Acessibilidade: Movimento reduzido (fora de @layer para vencer utilidades com especificidade limpa) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+    scroll-behavior: auto;
+  }
+}
+
+/* Print Stylesheet Unlayered (vence @layer base/components/utilities sem override forçado e sem vazamento de sombra) */
+@media print {
+  @page {
+    size: auto;
+    margin: 0;
   }
 
-  /* Tipografia médica nobre para documentos impressos A4 */
-  .font-serif-doc {
-    font-family: var(--font-serif-doc);
-  }
-
-  /* 8. Crisp Vector Icons (sem filtro raster drop-shadow para evitar blur sub-pixel no Windows) */
-  .icon-sculpted {
-    -webkit-font-smoothing: antialiased;
-    text-rendering: geometricPrecision;
-  }
-
-  .dark .icon-sculpted {
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* 9. Engraved Groove Separator (Double-Line: 1px Shadow + 1px Specular Reflection) */
-  .groove-divider {
-    height: 2px;
-    border-top: 1px solid var(--border-subtle);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .animate-tab-fade {
-    animation: tabFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  /* Menus, Popovers e Dropdowns com sombra tátil difusa e oclusão de contato */
-  .tactile-dropdown {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-
-  .dark .tactile-dropdown {
-    background-color: var(--surface-elevated);
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--rim-light-top), var(--elevation-z2);
-  }
-
-  /* Folha A4 Flutuante / Papel Clínico Real */
-  .paper-sheet-floating {
-    background-color: #FFFFFF !important;
-    color: #0F172A !important;
-    box-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.06);
-  }
-
-  .dark .paper-sheet-floating {
-    box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.6), 0 6px 16px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
-  }
-
-  /* Folha A4 em tamanho real (components/documento/FolhaA4.tsx): fonte única da
-     prévia, da impressão e do PDF. Diagramação fixa, sem variantes responsivas. */
-  .folha-a4 {
-    box-sizing: border-box;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 15mm 16mm 14mm;
-    border-radius: 2px;
-    font-family: var(--font-sans);
-    font-size: 13px;
-    line-height: 1.5;
-    text-align: left;
-  }
-
-  .folha-a4--paisagem {
-    padding: 9mm 10mm;
-  }
-
-  /* Formulário oficial do SUS: o impresso do órgão ocupa a folha inteira, sem margem do app */
-  .folha-a4--formulario {
+  html,
+  html.dark,
+  body,
+  .dark body,
+  body.dark {
+    margin: 0;
     padding: 0;
+    background: #FFFFFF;
+    background-color: #FFFFFF;
+    color: #0F172A;
+    transition: none;
   }
 
-  /* Cópia da folha montada só durante a impressão (invisível na tela) */
-  #pcm-print-root {
+  ::placeholder {
+    color: transparent;
+    opacity: 0;
+  }
+
+  *, *::before, *::after,
+  .paper-sheet-floating,
+  .dark .paper-sheet-floating,
+  .folha-a4,
+  .folha-a4-shadow,
+  .a4-editor-canvas {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    box-shadow:none;
+    text-shadow: none;
+    outline: none;
+    transition: none;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .a4-editor-canvas,
+  .a4-editor-canvas *,
+  #printable-a4-sheet,
+  #printable-a4-sheet * {
+    visibility: visible;
+  }
+
+  .a4-editor-canvas {
+    zoom: 1;
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    max-width: 210mm;
+    min-height: 296mm;
+    margin: 0;
+    padding: 15mm;
+    box-shadow:none;
+    border: none;
+    border-radius: 0;
+    background: #FFFFFF;
+    color: #0F172A;
+    box-sizing: border-box;
+  }
+
+  .a4-editor-canvas.canvas-landscape {
+    width: 297mm;
+    max-width: 297mm;
+    min-height: 209mm;
+    padding: 10mm 14mm;
+    box-sizing: border-box;
+  }
+
+  header:not(.a4-editor-canvas header),
+  aside,
+  nav,
+  .editor-toolbar,
+  .no-print,
+  #prescmed-header,
+  #sidebar-nav,
+  #prescmed-sidebar,
+  #sidebar-backdrop,
+  #mobile-bottom-nav,
+  .tactile-card.no-print {
     display: none;
   }
 
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  .print-avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
-  @supports not (scrollbar-color: auto) {
-    ::-webkit-scrollbar,
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track,
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb,
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: var(--scrollbar-thumb);
-      border-radius: 8px;
-    }
-    ::-webkit-scrollbar-thumb:hover,
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: var(--scrollbar-thumb-hover);
-    }
+  body.pcm-imprimindo {
+    margin: 0;
+    padding: 0;
+    background: #FFFFFF;
   }
 
-  /* Soft Edge Content Fade (CSS Masking with Linear Gradient) */
-  .fade-scroll-x {
-    -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
-    mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+  body.pcm-imprimindo > *:not(#pcm-print-root) {
+    display: none;
   }
 
-  .fade-scroll-dual-x {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  #pcm-print-root {
+    display: block;
   }
 
-  /* Tipografia e Formatação Rica para o Canvas A4 e Tiptap */
-  .a4-editor-canvas .via-preview-content {
-    outline: none;
-    font-size: inherit;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+  #pcm-print-root,
+  #pcm-print-root * {
+    visibility: visible;
   }
 
-  .a4-editor-canvas input,
-  .a4-editor-canvas textarea {
-    background-color: transparent !important;
+  #pcm-print-root .folha-a4 {
+    zoom: 1;
+    width: 210mm;
+    min-height: 296mm;
+    margin: 0;
+    border-radius: 0;
+    box-shadow:none;
   }
 
-  .a4-editor-canvas .ProseMirror {
-    outline: none;
-    font-size: inherit;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-
-  .a4-editor-canvas .ProseMirror:focus-visible {
-    outline: 2px solid #0EA5E9;
-    outline-offset: 4px;
-    border-radius: 4px;
-  }
-
-  .a4-editor-canvas .ProseMirror-separator {
-    display: none !important;
-  }
-
-  .a4-editor-canvas .via-preview-content p:empty,
-  .a4-editor-canvas .ProseMirror p:empty {
-    min-height: 1.6em;
-  }
-
-  .a4-editor-canvas .via-preview-content p:empty::before,
-  .a4-editor-canvas .ProseMirror p:empty::before {
-    content: "\00a0";
-    display: inline-block;
-  }
-
-  /* Em modo 2 vias (paisagem e retrato), garante flexibilidade e simetria perfeita */
-  .a4-editor-canvas.vias-2 .ProseMirror,
-  .a4-editor-canvas.vias-2 .via-preview-content {
-    min-height: 180px !important;
-  }
-
-  .a4-editor-canvas.canvas-landscape.vias-2 .ProseMirror,
-  .a4-editor-canvas.canvas-landscape.vias-2 .via-preview-content {
-    min-height: 220px !important;
-  }
-
-  .a4-editor-canvas .ProseMirror h1,
-  .a4-editor-canvas .via-preview-content h1 {
-    font-size: 1.55em;
-    font-weight: 700;
-    margin-top: 0.6em;
-    margin-bottom: 0.3em;
-    line-height: 1.25;
-  }
-
-  .a4-editor-canvas .ProseMirror h2,
-  .a4-editor-canvas .via-preview-content h2 {
-    font-size: 1.3em;
-    font-weight: 700;
-    margin-top: 0.5em;
-    margin-bottom: 0.25em;
-    line-height: 1.3;
-  }
-
-  .a4-editor-canvas .ProseMirror h3,
-  .a4-editor-canvas .via-preview-content h3 {
-    font-size: 1.15em;
-    font-weight: 600;
-    margin-top: 0.4em;
-    margin-bottom: 0.2em;
-    line-height: 1.35;
-  }
-
-  .a4-editor-canvas .ProseMirror p,
-  .a4-editor-canvas .via-preview-content p {
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-  }
-
-  .a4-editor-canvas .ProseMirror ul,
-  .a4-editor-canvas .via-preview-content ul {
-    list-style-type: disc !important;
-    padding-left: 1.5rem !important;
-    margin-top: 0.35rem !important;
-    margin-bottom: 0.35rem !important;
-  }
-
-  .a4-editor-canvas .ProseMirror ol,
-  .a4-editor-canvas .via-preview-content ol {
-    list-style-type: decimal !important;
-    padding-left: 1.5rem !important;
-    margin-top: 0.35rem !important;
-    margin-bottom: 0.35rem !important;
-  }
-
-  .a4-editor-canvas .ProseMirror li,
-  .a4-editor-canvas .via-preview-content li {
-    margin-top: 0.15em;
-    margin-bottom: 0.15em;
-  }
-
-  /* Print Stylesheet for Real Medical Document Output */
-  @media print {
-    @page {
-      size: auto;
-      margin: 0;
-    }
-
-    html,
-    html.dark,
-    body {
-      margin: 0 !important;
-      padding: 0 !important;
-      background: #FFFFFF !important;
-      background-color: #FFFFFF !important;
-      color: #0F172A !important;
-    }
-
-    ::placeholder {
-      color: transparent !important;
-      opacity: 0 !important;
-    }
-
-    *, *::before, *::after {
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      box-shadow: none !important;
-      text-shadow: none !important;
-      outline: none !important;
-    }
-
-    body * {
-      visibility: hidden !important;
-    }
-
-    .a4-editor-canvas,
-    .a4-editor-canvas *,
-    #printable-a4-sheet,
-    #printable-a4-sheet * {
-      visibility: visible !important;
-    }
-
-    .a4-editor-canvas {
-      zoom: 1 !important;
-      position: relative !important;
-      left: 0 !important;
-      top: 0 !important;
-      width: 210mm !important;
-      max-width: 210mm !important;
-      min-height: 296mm !important;
-      margin: 0 !important;
-      padding: 15mm !important;
-      box-shadow: none !important;
-      border: none !important;
-      border-radius: 0 !important;
-      background: #ffffff !important;
-      color: #0F172A !important;
-      box-sizing: border-box !important;
-    }
-
-    .a4-editor-canvas.canvas-landscape {
-      width: 297mm !important;
-      max-width: 297mm !important;
-      min-height: 209mm !important;
-      padding: 10mm 14mm !important;
-      box-sizing: border-box !important;
-    }
-
-    /* Oculta barras de ferramentas, sidebar, header e botões do sistema */
-    header:not(.a4-editor-canvas header),
-    aside,
-    nav,
-    .editor-toolbar,
-    .no-print,
-    #prescmed-header,
-    #sidebar-nav,
-    #prescmed-sidebar,
-    #sidebar-backdrop,
-    #mobile-bottom-nav,
-    .tactile-card.no-print {
-      display: none !important;
-    }
-
-    .print-avoid-break {
-      break-inside: avoid !important;
-      page-break-inside: avoid !important;
-    }
-
-    /* Impressão fiel da FolhaA4: a cópia em #pcm-print-root é o único conteúdo
-       da página, em tamanho real (a regra @page é injetada junto com a cópia). */
-    body.pcm-imprimindo {
-      margin: 0 !important;
-      padding: 0 !important;
-      background: #FFFFFF !important;
-    }
-
-    body.pcm-imprimindo > *:not(#pcm-print-root) {
-      display: none !important;
-    }
-
-    #pcm-print-root {
-      display: block !important;
-    }
-
-    #pcm-print-root,
-    #pcm-print-root * {
-      visibility: visible !important;
-    }
-
-    #pcm-print-root .folha-a4 {
-      zoom: 1 !important;
-      width: 210mm !important;
-      min-height: 296mm !important;
-      margin: 0 !important;
-      border-radius: 0 !important;
-    }
-
-    #pcm-print-root .folha-a4--paisagem {
-      width: 297mm !important;
-      min-height: 209mm !important;
-    }
-  }
-
-  /* Google Material Symbols — Canonical Icon Styling */
-  .material-symbols-outlined {
-    font-family: 'Material Symbols Outlined';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-transform: none;
-    letter-spacing: normal;
-    word-wrap: normal;
-    white-space: nowrap;
-    direction: ltr;
-    vertical-align: middle;
-    user-select: none;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    font-feature-settings: 'liga';
-  }
-
-  .icon-spin {
-    animation: icon-spin 1s linear infinite;
-  }
-
-  .animate-backdrop-fade {
-    animation: backdropFadeIn 0.18s ease-out both;
-  }
-
-  .animate-drawer-right {
-    animation: drawerSlideInRight 0.28s var(--ease-drawer, cubic-bezier(0.32, 0.72, 0, 1)) both;
-  }
-
-  .modal-surface-spring {
-    animation: modalSurfaceSpring 0.22s var(--ease-spring) both;
-    @starting-style {
-      opacity: 0;
-      transform: scale(0.96) translate3d(0, 8px, 0);
-    }
-  }
-
-  @keyframes tabFadeIn {
-    0% {
-      opacity: 0;
-      transform: translate3d(0, 6px, 0);
-    }
-    100% {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  @keyframes backdropFadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes drawerSlideInRight {
-    0% {
-      opacity: 0.6;
-      transform: translate3d(100%, 0, 0);
-    }
-    100% {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  @keyframes modalSurfaceSpring {
-    0% {
-      opacity: 0;
-      transform: scale(0.96) translate3d(0, 8px, 0);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1) translate3d(0, 0, 0);
-    }
-  }
-
-  @keyframes icon-spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+  #pcm-print-root .folha-a4--paisagem {
+    width: 297mm;
+    min-height: 209mm;
   }
 }
-
-/* ==========================================================================
-   SOMBRAS TÁTEIS COMPONÍVEIS COM O ANEL DE FOCO (@utility)
-   ========================================================================== */
-@utility shadow-tactile {
-  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile);
-}
-
-@utility shadow-tactile-sm {
-  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-sm);
-}
-
-@utility shadow-tactile-lg {
-  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-lg);
-}
-
-@utility shadow-tactile-navy {
-  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-navy);
-}
-
-@utility shadow-tactile-dark {
-  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-dark);
-}
-
-@utility shadow-tactile-btn {
-  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-btn);
-}
-
-@utility shadow-tactile-inset {
-  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-inset);
-}
-
-@utility shadow-tactile-blue {
-  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-blue);
-}
-
-/* ==========================================================================
-   ESTADOS DE FORMULÁRIO & VALIDAÇÃO DINÂMICA (@layer utilities)
-   ========================================================================== */
-@layer utilities {
-  /* Isola inputs e formulários dentro da folha física A4 (.a4-editor-canvas e #printable-a4-sheet) */
-  :is(.a4-editor-canvas, #printable-a4-sheet) :is(input, textarea):placeholder-shown {
-    background-color: transparent !important;
-  }
-
-  :is(.a4-editor-canvas, #printable-a4-sheet) ::placeholder {
-    color: #64748b !important;
-  }
-
-  :is(.a4-editor-canvas, #printable-a4-sheet) :is(input, textarea) {
-    color: #0f172a !important;
-  }
-
-  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]), textarea):not(:is(.a4-editor-canvas, #printable-a4-sheet) *):placeholder-shown {
-    background-color: var(--surface-inset);
-  }
-
-  select:has(option[value=""]:checked) {
-    background-color: var(--surface-inset);
-    color: var(--text-placeholder);
-    font-weight: 400;
-  }
-
-  :is(input, textarea, select):user-invalid {
-    border-color: #BE123C;
-  }
-
-  /* Escala Tipográfica Fluida Linear (clamp), Números Tabulares e Ritmo de Leitura */
-  .text-fluid-sm {
-    font-size: clamp(0.8125rem, 0.78rem + 0.16vw, 0.875rem);
-    line-height: 1.5;
-  }
-
-  .text-fluid-base {
-    font-size: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
-    line-height: 1.6;
-  }
-
-  .text-fluid-lg {
-    font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
-    line-height: 1.4;
-  }
-
-  .text-fluid-xl {
-    font-size: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-    line-height: 1.3;
-  }
-
-  .clinical-reading-measure {
-    max-width: 65ch;
-    max-inline-size: 65ch;
-    line-height: 1.65;
-  }
-
-  .flow-root {
-    display: flow-root;
-  }
-
-  @media (display-mode: standalone) {
-    body {
-      overscroll-behavior-y: none;
-    }
-
-    #prescmed-header,
-    #prescmed-sidebar,
-    #mobile-bottom-nav {
-      user-select: none;
-      -webkit-user-select: none;
-    }
-  }
-
-  .clinical-tabular-nums,
-  .tabular-metric,
-  .tabular-nums,
-  input[type="number"] {
-    font-variant-numeric: tabular-nums;
-  }
-
-  body:has([role="dialog"][aria-modal="true"]) {
-    overflow: hidden;
-  }
-
-  .btn-anti-squish {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-}
-

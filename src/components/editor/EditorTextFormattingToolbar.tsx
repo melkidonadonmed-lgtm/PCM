@@ -60,7 +60,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
               className={`h-8 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 isSheetConfigOpen
                   ? 'bg-navy-900 text-white dark:bg-sky-600 border-navy-900 dark:border-sky-500/40 shadow-tactile-sm font-bold'
-                  : 'bg-sky-500/10 border-sky-500/25 text-sky-700 dark:text-sky-300 hover:bg-sky-500/15'
+                  : 'bg-[var(--surface-info-subtle)] border-[var(--border-info-subtle)] text-sky-700 dark:text-sky-300 hover:bg-sky-100/70 dark:hover:bg-sky-950/50'
               }`}
               title="Abrir ou recolher ajustes de página, orientação, 1/2 vias, cabeçalho, logotipos e marca d'água"
             >
@@ -81,7 +81,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
                 className={`transition-transform duration-150 ${isSheetConfigOpen ? 'rotate-180' : ''}`}
               />
             </button>
-            <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
+            <div className="h-5 w-px bg-[var(--border-subtle)] mx-0.5 shrink-0" />
           </>
         )}
 
@@ -108,7 +108,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           <Redo className="w-4 h-4" />
         </button>
 
-        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
+        <div className="h-5 w-px bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
         {/* Estilo do Parágrafo / Título */}
         <select
@@ -171,7 +171,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           </button>
         </div>
 
-        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
+        <div className="h-5 w-px bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
         {/* Formatação básica: Negrito, Itálico, Sublinhado */}
         <button
@@ -219,7 +219,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           <UnderlineIcon className="w-4 h-4" />
         </button>
 
-        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
+        <div className="h-5 w-px bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
         {/* Alinhamento de Texto */}
         <button
@@ -278,7 +278,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           <AlignJustify className="w-4 h-4" />
         </button>
 
-        <div className="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 shrink-0" />
+        <div className="h-5 w-px bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
         {/* Listas */}
         <button
@@ -312,7 +312,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
 
       {/* SELETOR RÁPIDO ENTRE RECEITAS QUANDO HOUVER ITENS SIMPLES E ESPECIAIS NA MESMA CONSULTA */}
       {regimesNaConsulta.length > 1 && (
-        <div className="no-print p-3 rounded-2xl bg-amber-500/10 border border-warning flex flex-col sm:flex-row items-center justify-between gap-3 shadow-tactile-sm">
+        <div className="no-print p-3 rounded-2xl bg-[var(--accent-amber-subtle)] border border-[var(--accent-amber-border)] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-tactile-sm">
           <div className="flex items-center gap-2 text-xs text-amber-900 dark:text-amber-200">
             <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <div>

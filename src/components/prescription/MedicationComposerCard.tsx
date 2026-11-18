@@ -91,7 +91,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
 
       {/* Banner de Edição Direta Ativa */}
       {editingItemId && (
-        <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 flex items-center justify-between gap-3 text-xs text-[var(--text-secondary)] shadow-tactile-sm animate-in fade-in duration-150">
+        <div className="p-2.5 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)] flex items-center justify-between gap-3 text-xs text-[var(--text-secondary)] shadow-tactile-sm animate-in fade-in duration-150">
           <div className="flex items-center gap-2 min-w-0">
             <Icon name="edit" size={16} className="text-sky-600 dark:text-sky-400 shrink-0" />
             <span className="font-semibold truncate">
@@ -101,7 +101,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-white/12 bg-white dark:bg-[#334155] hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 font-bold text-xs shrink-0 cursor-pointer shadow-tactile-sm"
+            className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] font-bold text-xs shrink-0 cursor-pointer shadow-tactile-sm"
           >
             Cancelar
           </button>
@@ -144,17 +144,17 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                 onBlur={onBlurSearch}
                 onKeyDown={onMedInputKeyDown}
                 placeholder="Ex.: Dipirona 500 mg, Amoxicilina 500 mg, Losartana 50 mg..."
-                className="w-full h-9 pl-8 pr-12 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition placeholder:text-[var(--text-placeholder)] placeholder:font-normal shadow-tactile-sm"
+                className="w-full h-11 min-h-[44px] pl-8 pr-16 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition placeholder:text-[var(--text-placeholder)] placeholder:font-normal shadow-tactile-sm"
               />
               {selectedMedName ? (
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                <div className="absolute right-0.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
                   <Icon name="check" size={15} className="text-emerald-500 pointer-events-none" />
                   <button
                     type="button"
                     onClick={onClearMedication}
                     aria-label="Limpar medicamento"
                     title="Limpar medicamento"
-                    className="text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer p-1 rounded-lg hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500"
+                    className="text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500"
                   >
                     <Icon name="close" size={15} />
                   </button>
@@ -198,7 +198,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                               {med.name}
                             </p>
                             {medRegime !== 'simples' && (
-                              <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#27354A] text-amber-700 dark:text-amber-300 border border-slate-300 dark:border-white/10 shrink-0">
+                              <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-[var(--surface-chip-muted)] text-amber-700 dark:text-amber-300 border border-[var(--border-subtle)] shrink-0">
                                 {regimeLabels[medRegime].rotulo}
                               </span>
                             )}
@@ -229,13 +229,13 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               value={selectedQuantity}
               onChange={(e) => onChangeQuantity(e.target.value)}
               placeholder="Ex.: 15 comp, 1 frasco"
-              className="w-full h-9 px-2.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-[var(--text-main)] shadow-tactile-sm clinical-tabular-nums"
+              className="w-full h-11 min-h-[44px] px-2.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-[var(--text-main)] shadow-tactile-sm clinical-tabular-nums"
             />
           </div>
         </div>
 
         {notificacaoDoFormulario && (
-          <p role="status" className="mt-2 text-xs font-medium text-[var(--text-secondary)] bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 rounded-xl px-3 py-1.5">
+          <p role="status" className="mt-2 text-xs font-medium text-[var(--text-secondary)] bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)] rounded-xl px-3 py-1.5">
             Exige {descreverNotificacao(notificacaoDoFormulario)}. O PresCMed não emite a notificação, e a folha impressa aqui não a substitui.
           </p>
         )}
@@ -258,7 +258,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = parseFloat(e.target.value) || 1;
               onAtualizarConstrutor(val, doseUnit, doseFrequency, doseDays, isContinuousDose);
             }}
-            className="w-full h-9 px-1 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+            className="w-full h-11 min-h-[44px] px-1 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
           />
         </div>
 
@@ -274,7 +274,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = e.target.value as UnidadeDose;
               onAtualizarConstrutor(doseAmount, val, doseFrequency, doseDays, isContinuousDose);
             }}
-            className="w-full h-9 px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+            className="w-full h-11 min-h-[44px] px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
           >
             <option value="comprimido">Comprimido</option>
             <option value="cápsula">Cápsula</option>
@@ -299,7 +299,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = e.target.value as FrequenciaHorario;
               onAtualizarConstrutor(doseAmount, doseUnit, val, doseDays, isContinuousDose);
             }}
-            className="w-full h-9 px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+            className="w-full h-11 min-h-[44px] px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
           >
             <option value="8/8h">8/8h</option>
             <option value="12/12h">12/12h</option>
@@ -338,7 +338,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                 onAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, dias, false);
               }
             }}
-            className="w-full h-9 px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+            className="w-full h-11 min-h-[44px] px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
           />
         </div>
 
@@ -355,7 +355,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               onChangeRoute(novaVia);
               onAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, doseDays, isContinuousDose, novaVia);
             }}
-            className="w-full h-9 px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-[var(--text-main)] shadow-tactile-sm cursor-pointer"
+            className="w-full h-11 min-h-[44px] px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-[var(--text-main)] shadow-tactile-sm cursor-pointer"
           >
             <option value="Uso Oral">Uso Oral</option>
             <option value="Uso Tópico">Uso Tópico</option>

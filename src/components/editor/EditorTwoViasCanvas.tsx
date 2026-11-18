@@ -61,7 +61,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                         placeholder="DR(A). MÉDICO(A)"
                         aria-label="Nome do médico emitente (1ª via)"
-                        className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
+                        className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
                       />
                       <input
                         type="text"
@@ -70,7 +70,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         placeholder="CRM-SP 000000"
                         aria-label="CRM do médico emitente (1ª via)"
                         style={{ fontFamily: 'inherit' }}
-                        className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
+                        className="text-xs font-bold text-sky-800 mt-0.5 w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
                       />
                       <p className="text-xs text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                     </div>
@@ -160,7 +160,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
           </div>
 
           {/* LINHA DE CORTE VERTICAL */}
-          <div className="flex flex-col items-center justify-center relative border-l border-dashed border-medium px-1 select-none">
+          <div className="flex flex-col items-center justify-center relative border-l border-dotted border-medium px-1 select-none">
             <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
               <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
               <span style={{ writingMode: 'vertical-rl' }}>CORTE AQUI</span>
@@ -304,7 +304,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         placeholder="DR(A). MÉDICO(A)"
                         aria-label="Nome do médico emitente (1ª via retrato)"
                         style={{ fontFamily: 'inherit' }}
-                        className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full !bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
+                        className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                       />
                       <input
                         type="text"
@@ -313,7 +313,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         placeholder="CRM-SP 000000"
                         aria-label="CRM do médico emitente (1ª via retrato)"
                         style={{ fontFamily: 'inherit' }}
-                        className="text-xs font-bold text-sky-800 mt-0.5 w-full !bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
+                        className="text-xs font-bold text-sky-800 mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                       />
                     </div>
                     <div className="text-right shrink-0">
@@ -382,7 +382,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
           </div>
 
           {/* LINHA DE CORTE HORIZONTAL */}
-          <div className="relative border-t border-dashed border-medium my-1 flex items-center justify-center select-none">
+          <div className="relative border-t border-dotted border-medium my-1 flex items-center justify-center select-none">
             <span className="absolute bg-white px-3 text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
               <Scissors className="w-3 h-3 text-slate-500" />
               <span>CORTE AQUI</span>

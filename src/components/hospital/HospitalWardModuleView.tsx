@@ -196,7 +196,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => handleOpenQuickAdmissionModal('manual')}
-              className="btn-tactile-primary h-8 min-h-[32px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              className="btn-tactile-primary touch-target min-h-[44px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
             >
               <Icon name="person_add" size={14} />
               <span>+ Admitir Paciente</span>
@@ -205,7 +205,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setIsMultimodalModalOpen(true)}
-              className="btn-tactile-secondary h-8 min-h-[32px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              className="btn-tactile-secondary touch-target min-h-[44px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
             >
               <Icon name="auto_awesome" size={14} className="text-sky-600 dark:text-sky-400" />
               <span>Importação Multimodal IA</span>
@@ -215,7 +215,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenScoreboardForBed(activeBed)}
-                className="btn-tactile-secondary h-8 min-h-[32px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer clinical-tabular-nums"
+                className="btn-tactile-secondary touch-target min-h-[44px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer clinical-tabular-nums"
               >
                 <Icon name="monitor_heart" size={14} className="text-sky-600 dark:text-sky-400" />
                 <span>Escores do Leito ({activeBed.scoreEntries?.length || 0})</span>
@@ -234,7 +234,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                 type="button"
                 onClick={() => setActiveSubView(tab.id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex-1 h-8 min-h-[32px] px-2.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                className={`touch-target flex-1 min-h-[44px] px-2.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   isActive
                     ? 'nav-segmented-pill-active font-bold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold'
@@ -255,7 +255,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
         {/* Barra de Contexto do Paciente Ativo e Troca Rápida (exibida ao entrar em um leito) */}
         {activeSubView !== 'ward_map' && (
           <div className="pt-2 border-t border-[var(--border-subtle)] space-y-2">
-            <nav aria-label="Caminho de navegação">
+            <div aria-label="Caminho de navegação">
               <ol role="list" className="breadcrumbsList">
                 <li>
                   <a
@@ -289,14 +289,14 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                   </a>
                 </li>
               </ol>
-            </nav>
+            </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setActiveSubView('ward_map')}
-                  className="btn-tactile-secondary h-8 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
+                  className="btn-tactile-secondary touch-target min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
                 >
                   <Icon name="arrow_back" size={14} />
                   <span>Mapa de Leitos</span>
@@ -327,7 +327,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                       role="tab"
                       aria-selected={isSelected}
                       onClick={() => handleSelectBed(bed.id)}
-                      className={`px-3 py-1.5 rounded-xl border text-left transition cursor-pointer shrink-0 ${
+                      className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl border text-left transition cursor-pointer shrink-0 ${
                         isSelected
                           ? 'bg-sky-600/15 border-sky-500/50 text-[var(--text-main)] font-bold'
                           : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] font-medium'

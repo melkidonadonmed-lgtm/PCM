@@ -24,7 +24,7 @@ export const AvisoNotificacaoReceita: React.FC<AvisoNotificacaoReceitaProps> = (
   return (
     <div data-state="idle" aria-busy={false}
       role="status"
-      className="no-print px-3.5 py-3 rounded-xl border text-xs bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10 flex items-start gap-2.5 surface-raised"
+      className="no-print px-3.5 py-3 rounded-xl border text-xs bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)] flex items-start gap-2.5 surface-raised"
     >
       <Icon name="warning" className="text-amber-600 dark:text-amber-400 text-[18px] shrink-0 mt-0.5" />
       <div className="min-w-0 space-y-1">

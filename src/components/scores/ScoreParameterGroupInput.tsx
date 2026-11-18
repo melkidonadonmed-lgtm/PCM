@@ -130,8 +130,8 @@ export const ScoreParameterGroupInput: React.FC<ScoreParameterGroupInputProps> =
                   className={`shrink-0 rounded px-2 py-0.5 font-mono text-[11px] font-bold clinical-tabular-nums ${
                     isSelected
                       ? opt.isNormalBaseline
-                        ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-200'
-                        : 'bg-blue-500/20 text-blue-800 dark:text-blue-200'
+                        ? 'bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] text-emerald-800 dark:text-emerald-200'
+                        : 'bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] text-blue-800 dark:text-blue-200'
                       : 'bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >

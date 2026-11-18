@@ -152,7 +152,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
           strokeWidth={2.25}
           style={{
             transition:
-              'all 240ms cubic-bezier(0.22, 1, 0.36, 1), fill 200ms ease, stroke 200ms ease',
+              'fill 200ms ease, stroke 200ms ease, opacity 200ms ease',
           }}
         />
 

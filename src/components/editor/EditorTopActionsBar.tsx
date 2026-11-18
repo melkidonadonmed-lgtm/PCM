@@ -239,7 +239,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleLoadActivePrescription(true);
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-sky-500/10 flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 <Pill className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                 <span>Carregar Receita Ativa</span>
@@ -251,7 +251,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleLoadActiveReferral(true);
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-sky-500/10 flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 <Stethoscope className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Carregar Encaminhamento</span>
@@ -263,7 +263,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleLoadActiveCertificate(true);
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-sky-500/10 flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 <Award className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>Carregar Atestado Médico</span>
@@ -281,7 +281,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleSaveModelDirectly();
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-sky-500/10 flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 <Save className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                 <span>Salvar na Receita Ativa</span>
@@ -294,7 +294,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   setIsSaveModelModalOpen(true);
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-sky-500/10 flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               >
                 <BookmarkPlus className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
                 <span>Salvar como Novo Modelo...</span>
@@ -308,7 +308,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleStartNewDocument();
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-rose-500/10 flex items-center gap-2 text-rose-700 dark:text-rose-300 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--accent-rose-subtle)] flex items-center gap-2 text-rose-800 dark:text-rose-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
               >
                 <Plus className="w-3.5 h-3.5 shrink-0" />
                 <span>Novo Documento em Branco</span>

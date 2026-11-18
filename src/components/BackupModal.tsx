@@ -197,7 +197,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
       ref={modalRef}
       data-state={isExporting || isImporting ? 'loading' : 'idle'}
       aria-busy={isExporting || isImporting}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 isolate animate-backdrop-fade surface-raised"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[oklch(0.14_0.02_258/0.70)] isolate animate-backdrop-fade surface-raised"
       role="dialog"
       aria-modal="true"
       aria-labelledby="backup-modal-title"
@@ -226,7 +226,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de backup"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             <X className="w-5 h-5" />
           </button>
@@ -315,12 +315,12 @@ export const BackupModal: React.FC<BackupModalProps> = ({
               tabIndex={0}
               role="button"
               aria-label="Selecionar arquivo de backup"
-              className={`p-6 rounded-2xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+              className={`p-6 rounded-2xl border transition cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                 isDragOver 
                   ? 'border-info bg-sky-50/50 dark:bg-sky-950/30' 
                   : selectedFile
                   ? 'border-clinical bg-emerald-50/20 dark:bg-emerald-950/20'
-                  : 'border-[var(--border-subtle)] hover:border-info hover:bg-[var(--surface-hover)]'
+                  : 'border-[var(--border-medium)] bg-[var(--surface-inset)] hover:border-info hover:bg-[var(--surface-hover)]'
               }`}
             >
               <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
@@ -465,7 +465,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="touch-target min-h-[44px] min-w-[44px] px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             Fechar
           </button>

@@ -166,7 +166,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       ref={modalRef}
       data-state={validationError ? 'error' : 'idle'}
       aria-busy={false}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 isolate animate-backdrop-fade surface-raised"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.70)] isolate animate-backdrop-fade surface-raised"
       role="dialog"
       aria-modal="true"
       aria-labelledby="doctor-modal-title"
@@ -181,7 +181,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-card)] flex items-center justify-between"
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-sky-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-[var(--surface-info-subtle)] text-navy-900 dark:text-blue-300 border border-[var(--border-info-subtle)] flex items-center justify-center font-bold">
               <UserCheck className="w-4 h-4" strokeWidth={2} />
             </div>
             <div>
@@ -197,7 +197,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             <X className="w-5 h-5" strokeWidth={2} />
           </button>
@@ -223,21 +223,21 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
               <span className="text-xs uppercase font-bold tracking-wider text-sky-700 dark:text-sky-400">
                 Identificação Obrigatória
               </span>
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 <button 
                   type="button"
                   onClick={handleFillSample}
-                  className="text-xs font-semibold text-sky-700 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 flex items-center gap-1 cursor-pointer transition"
+                  className="touch-target min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-xs font-semibold text-sky-700 dark:text-sky-300 hover:bg-[var(--surface-info-subtle)] flex items-center gap-1 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                   title="Preencher com dados de exemplo (Dr. Melki Donadon / CRM 123456-SP)"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                   <span>Usar exemplo</span>
                 </button>
-                <span className="text-slate-300 dark:text-slate-700">•</span>
+                <span className="text-slate-300 dark:text-slate-700" aria-hidden="true">•</span>
                 <button 
                   type="button"
                   onClick={handleClear}
-                  className="text-xs font-semibold text-rose-700 hover:text-rose-800 flex items-center gap-1 cursor-pointer transition"
+                  className="touch-target min-h-[44px] min-w-[44px] px-3 rounded-lg text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 flex items-center justify-center gap-1 cursor-pointer transition bg-rose-50/90 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-400/35 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
                 >
                   <Eraser className="w-3.5 h-3.5" />
                   <span>Limpar</span>
@@ -456,7 +456,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           {/* Timbrado e Logotipo Institucional */}
           <div className="p-3.5 rounded-xl border flex items-center justify-between bg-slate-50 dark:bg-navy-950 border-subtle dark:border-navy-800">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[var(--accent-amber-subtle)] text-amber-800 dark:text-amber-300 border border-[var(--accent-amber-border)] flex items-center justify-center font-bold shrink-0">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
@@ -508,7 +508,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-100 dark:hover:bg-navy-800 text-slate-600 dark:text-slate-300 transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="touch-target min-h-[44px] px-4 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-100 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-200 cursor-pointer transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             >
               Cancelar
             </button>

@@ -167,7 +167,6 @@ export function formatarDocumentoPreviewTexto(params: {
   examIndication: string;
 }): string {
   const {
-    isConfigured,
     docType,
     emissao,
     identidade,

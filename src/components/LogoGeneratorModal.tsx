@@ -114,15 +114,14 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
   // Gera o código SVG como string limpa
   const generateSvgString = (): string => {
     if (!svgRef.current) return '';
-    const serializer = new XMLSerializer();
-    let source = serializer.serializeToString(svgRef.current);
-    if (!source.includes(`xmlns="${SVG_XML_NAMESPACES.svg}"`)) {
-      source = source.replace(/^<svg/, `<svg xmlns="${SVG_XML_NAMESPACES.svg}"`);
+    const clone = svgRef.current.cloneNode(true) as SVGSVGElement;
+    if (!clone.getAttribute('xmlns')) {
+      clone.setAttribute('xmlns', SVG_XML_NAMESPACES.svg);
     }
-    if (!source.includes(`xmlns:xlink="${SVG_XML_NAMESPACES.xlink}"`)) {
-      source = source.replace(/^<svg/, `<svg xmlns:xlink="${SVG_XML_NAMESPACES.xlink}"`);
+    if (!clone.getAttribute('xmlns:xlink')) {
+      clone.setAttribute('xmlns:xlink', SVG_XML_NAMESPACES.xlink);
     }
-    return source;
+    return new XMLSerializer().serializeToString(clone);
   };
 
   // Ação: Aplicar ao contexto institucional ativo no IndexedDB
@@ -171,7 +170,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
     <div
       data-state="idle"
       aria-busy={false}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 isolate animate-tab-fade"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[oklch(0.14_0.02_258/0.70)] isolate animate-tab-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="logo-modal-title"
@@ -204,16 +203,16 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar gerador de logotipo"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {errorMsg && (
-          <div role="alert" className="px-4 py-2 bg-rose-500/15 border-b border-rose-500/30 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center justify-between">
+          <div role="alert" className="px-4 py-2 bg-[var(--accent-rose-subtle)] border-b border-[var(--accent-rose-border)] text-xs font-semibold text-rose-700 dark:text-rose-300 flex items-center justify-between">
             <span>{errorMsg}</span>
-            <button type="button" onClick={() => setErrorMsg(null)} className="underline ml-2 cursor-pointer">Fechar</button>
+            <button type="button" onClick={() => setErrorMsg(null)} className="touch-target min-h-[44px] px-2 inline-flex items-center underline ml-2 cursor-pointer">Fechar</button>
           </div>
         )}
 
@@ -222,7 +221,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveModalTab('presets')}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+            className={`touch-target min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               activeModalTab === 'presets'
                 ? 'bg-sky-600 text-white shadow-tactile-sm'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
@@ -235,7 +234,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveModalTab('generator')}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+            className={`touch-target min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
               activeModalTab === 'generator'
                 ? 'bg-sky-600 text-white shadow-tactile-sm'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'

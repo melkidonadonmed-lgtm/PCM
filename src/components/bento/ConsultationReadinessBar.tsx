@@ -50,7 +50,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
         <button
           type="button"
           onClick={onOpenDoctorModal}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg px-1.5 py-1 shrink-0"
+          className="touch-target inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg min-h-[44px] min-w-[44px] px-2.5 py-1.5 shrink-0"
         >
           <Icon
             name={isDoctorOk ? 'verified_user' : 'warning'}
@@ -74,7 +74,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
         <button
           type="button"
           onClick={onOpenPatientModal}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg px-1.5 py-1 min-w-0"
+          className="touch-target inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg min-h-[44px] min-w-[44px] px-2.5 py-1.5 min-w-0"
         >
           <Icon
             name={hasPatient ? 'person' : 'person_add'}
@@ -107,7 +107,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
         type="button"
         onClick={onOpenCommandPalette}
         aria-label="Abrir busca rápida e navegação global (Ctrl+K)"
-        className="inline-flex items-center gap-1.5 px-2.5 py-1 min-h-[32px] rounded-xl border border-subtle dark:border-strong bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
+        className="touch-target inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[44px] min-w-[44px] rounded-xl border border-subtle dark:border-strong bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
       >
         <Icon name="search" size={15} className="text-sky-600 dark:text-sky-400" />
         <span className="hidden md:inline">Busca rápida (Medicamentos, SUS, Kits)</span>

@@ -1,0 +1,149 @@
+/**
+ * Dark Mode Semantic Tokens & Mobile Elevation Overrides (Mineral Slate Matte)
+ */
+@layer base {
+  /* TEMA ESCURO: Ardósia Fosco Mineral com Caixas Mais Claras (#141C27 Canvas / #243042 Cards) */
+  /* Especificidade (0,2,0) garante precedência sobre :root (0,1,0) após @import */
+  :root.dark,
+  .dark:is(.dark),
+  [data-theme="dark"]:is([data-theme="dark"]) {
+    color-scheme: dark;
+    --canvas: #141c27;
+    --bg-main: #141c27;
+    --surface: #243042;
+    --border: #36455b;
+    --text-primary: #f8fafc;
+    --text-title: #f8fafc;
+    --text-body: #cbd5e1;
+    --text-muted: #94a3b8;
+    --primary: oklch(0.43 0.055 245);
+    --primary-hover: oklch(0.45 0.055 245);
+    --clinical: #14635d;
+    --clinical-hover: #0f4f4a;
+
+    /* Hierarquia Tonal de 6 Níveis (60% #141C27 Canvas, 30% #243042 Card Mais Claro Fosco, #2D3B50 Elevated) */
+    --surface-sunken: #101722;
+    --surface-canvas: #141C27;
+    --surface-inset: #1B2534;
+    --surface-flat: #243042;
+    --surface-raised: #2D3B50;
+    --surface-contrast: #0F172A;
+    --surface-modal: #2D3B50;
+    --accent-point: #64748B;
+
+    --bg-canvas: #141C27;
+    --bg-app: #141C27;
+    --bg-surface: #243042;
+    --surface-card: #243042;
+    --bg-surface-elevated: #2D3B50;
+    --surface-elevated: #2D3B50;
+    --surface-hover: #33435A;
+    --surface-active: #3B4D66;
+
+    /* Cores de Navegação no Dark */
+    --nav-bg: #1E293B;
+    --surface-panel: #16202E;
+    --surface-panel-2: #243042;
+    --surface-panel-hover: #33435A;
+    --nav-border: #ffffff1a;
+    --surface-panel-border: #ffffff1a;
+    --nav-text: #F8FAFC;
+    --surface-panel-text: #F8FAFC;
+    --nav-text-muted: #94A3B8;
+    --surface-panel-muted: #94A3B8;
+    --nav-active-bg: oklch(0.43 0.055 245);
+    --nav-active-text: #FFFFFF;
+    --nav-active-glow: 0 2px 6px rgba(0, 0, 0, 0.28);
+
+    /* Texto: #FFFFFF em --text-inverse para garantir >= 7:1 (AAA) nos botões primários e clínicos */
+    --text-main: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-placeholder: #94A3B8;
+    --text-subtle: #64748B;
+    --text-inverse: #FFFFFF;
+
+    /* Acentos & Botões Primários (Steel Slate Sólido em OKLCH — Sem Azul Neon) */
+    --accent: #94A3B8;
+    --accent-hover: #CBD5E1;
+    --nav-accent: #F8FAFC;
+
+    --oklch-primary: oklch(0.43 0.055 245);
+    --oklch-primary-hover: oklch(0.45 0.055 245);
+    --accent-primary: oklch(0.43 0.055 245);
+    --accent-primary-hover: oklch(0.45 0.055 245);
+    --accent-primary-subtle: rgba(148, 163, 184, 0.12);
+    --accent-primary-border: rgba(148, 163, 184, 0.26);
+
+    --accent-clinical: #14635D;
+    --accent-clinical-hover: #0F4F4A;
+    --accent-emerald: #14635D;
+    --accent-emerald-hover: #0F4F4A;
+    --accent-emerald-subtle: rgba(29, 122, 115, 0.16);
+    --accent-emerald-border: rgba(29, 122, 115, 0.34);
+
+    --accent-amber: #D97706;
+    --accent-amber-hover: #B45309;
+    --accent-amber-subtle: rgba(217, 119, 6, 0.16);
+    --accent-amber-border: rgba(217, 119, 6, 0.34);
+
+    --accent-rose: #E11D48;
+    --accent-rose-hover: #BE123C;
+    --accent-rose-subtle: rgba(225, 29, 72, 0.14);
+    --accent-rose-border: rgba(225, 29, 72, 0.30);
+
+    /* Luz Tátil Realista Exclusiva para Botões; Shadow-Box em Camadas para Cards */
+    --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.32);
+    --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    --tactile-card-bevel: 0 0 0 0 transparent;
+    --bevel-tactile-card: 0 0 0 0 transparent;
+
+    /* Elevações em Camadas Suaves no tema escuro */
+    --elev-tactile: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
+    --elev-tactile-sm: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 5px -1px rgba(0, 0, 0, 0.20);
+    --elev-tactile-lg: 0 2px 4px -1px rgba(0, 0, 0, 0.30), 0 8px 18px -4px rgba(0, 0, 0, 0.36), 0 18px 34px -8px rgba(0, 0, 0, 0.34);
+    --elev-tactile-navy: 0 2px 6px -1px rgba(0, 0, 0, 0.28), 0 10px 24px -4px rgba(0, 0, 0, 0.34);
+    --elev-tactile-dark: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
+    --elev-tactile-btn: 0 1px 2px rgba(0, 0, 0, 0.30), 0 3px 6px -1px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    --elev-tactile-inset: inset 0 1px 3px rgba(0, 0, 0, 0.42), inset 0 1px 2px -1px rgba(0, 0, 0, 0.28);
+    --elev-tactile-blue: 0 2px 6px -2px rgba(0, 0, 0, 0.32);
+
+    --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 6px -1px rgba(0, 0, 0, 0.24);
+    --shadow-projected: 0 1px 2px rgba(0, 0, 0, 0.24), 0 4px 10px -2px rgba(0, 0, 0, 0.28);
+    --shadow-card-projected: 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 10px -2px rgba(0, 0, 0, 0.30), 0 10px 22px -6px rgba(0, 0, 0, 0.24);
+    --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.28), 0 8px 18px -4px rgba(0, 0, 0, 0.34), 0 16px 30px -8px rgba(0, 0, 0, 0.32);
+    --shadow-nav: 0 2px 6px rgba(0, 0, 0, 0.24), 0 6px 16px -2px rgba(0, 0, 0, 0.28);
+    --shadow-sidebar-projected: 2px 0 8px rgba(0, 0, 0, 0.22), 6px 0 18px -2px rgba(0, 0, 0, 0.26);
+    --shadow-header-projected: 0 1px 3px rgba(0, 0, 0, 0.20), 0 4px 12px -2px rgba(0, 0, 0, 0.24);
+    --shadow-bottomnav-projected: 0 -2px 6px rgba(0, 0, 0, 0.22), 0 -6px 14px -2px rgba(0, 0, 0, 0.24);
+
+    --border-subtle: rgba(255, 255, 255, 0.11);
+    --border-medium: rgba(255, 255, 255, 0.16);
+    --border-strong: rgba(255, 255, 255, 0.20);
+    --rim-light-top: 0 0 0 0 transparent;
+
+    --elevation-z0: inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 1px 2px rgba(0, 0, 0, 0.22);
+    --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.22), 0 3px 6px -1px rgba(0, 0, 0, 0.20);
+    --elevation-z2: 0 1px 3px rgba(0, 0, 0, 0.26), 0 5px 12px -2px rgba(0, 0, 0, 0.24), 0 10px 20px -6px rgba(0, 0, 0, 0.20);
+    --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.28), 0 8px 18px -3px rgba(0, 0, 0, 0.28), 0 16px 32px -8px rgba(0, 0, 0, 0.26);
+    --elevation-z4: 0 4px 8px rgba(0, 0, 0, 0.32), 0 12px 28px -6px rgba(0, 0, 0, 0.34), 0 24px 44px -10px rgba(0, 0, 0, 0.32);
+
+    --shadow-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.42), inset 0 1px 2px rgba(0, 0, 0, 0.28);
+  }
+
+  /* Filtro de profundidade mobile adaptativo */
+  @media (max-width: 767px) {
+    html:root {
+      --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+      --elevation-z2: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
+      --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.08), 0 8px 16px -3px rgba(0, 0, 0, 0.08);
+      --elevation-z4: 0 3px 6px rgba(0, 0, 0, 0.1), 0 14px 28px -6px rgba(0, 0, 0, 0.12);
+    }
+    :root.dark,
+    .dark:is(.dark) {
+      --elevation-z1: 0 1px 2px rgba(0, 0, 0, 0.6), 0 3px 6px -1px rgba(0, 0, 0, 0.45);
+      --elevation-z2: 0 1px 3px rgba(0, 0, 0, 0.7), 0 5px 10px -2px rgba(0, 0, 0, 0.55);
+      --elevation-z3: 0 2px 4px rgba(0, 0, 0, 0.75), 0 10px 20px -3px rgba(0, 0, 0, 0.6);
+      --elevation-z4: 0 3px 8px rgba(0, 0, 0, 0.85), 0 16px 32px -6px rgba(0, 0, 0, 0.7);
+    }
+  }
+}

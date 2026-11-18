@@ -77,7 +77,7 @@ const CloudAuthButton: React.FC = () => {
     const cloudState = loading || syncStatus === 'syncing' ? 'loading' : syncStatus === 'error' ? 'error' : 'idle';
     return (
       <div data-state={cloudState} aria-busy={cloudState === 'loading'} 
-        className="flex items-center gap-1.5 px-2 h-9 xl:h-10 rounded-xl border text-xs shadow-tactile-sm transition bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] shrink-0"
+        className="flex items-center gap-1.5 pl-2.5 pr-1 min-h-[44px] rounded-xl border text-xs shadow-tactile-sm transition bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] shrink-0"
         title={`Conectado à nuvem: ${user.email || user.displayName} | Status: ${syncStatus}`}
       >
         <div className="relative flex-shrink-0">
@@ -139,7 +139,7 @@ const CloudAuthButton: React.FC = () => {
         <button
           type="button"
           onClick={handleToggleAuth}
-          className="p-1 hover:text-rose-500 rounded transition-colors text-[var(--text-muted)] dark:text-slate-400 cursor-pointer ml-0.5 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none shrink-0"
+          className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center hover:text-rose-500 rounded-lg transition-colors text-[var(--text-muted)] dark:text-slate-400 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none shrink-0"
           title="Desconectar da nuvem"
           aria-label="Desconectar da Nuvem"
         >
@@ -156,7 +156,7 @@ const CloudAuthButton: React.FC = () => {
       disabled={loading}
       data-state={loading ? 'loading' : 'idle'}
       aria-busy={loading || undefined}
-      className="flex items-center justify-center gap-1.5 w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 2xl:w-auto 2xl:px-3 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
+      className="touch-target flex items-center justify-center gap-1.5 w-11 h-11 min-w-[44px] min-h-[44px] 2xl:w-auto 2xl:px-3 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
       title="Conectar Conta Google para sincronização em nuvem (opcional)"
       aria-label="Conectar Nuvem"
     >
@@ -228,11 +228,11 @@ export const Header: React.FC<HeaderProps> = ({
       badge: patientWeight > 0 ? `${patientWeight}kg` : undefined
     },
     {
-      id: 'protocols',
-      label: 'Protocolos',
-      icon: 'coracao',
-      shortcut: 'Alt+4',
-      shortKey: '4'
+      id: 'hospital',
+      label: 'Hospitalar',
+      icon: 'local_hospital',
+      shortcut: 'Alt+7',
+      shortKey: '7'
     },
     {
       id: 'scores',
@@ -240,21 +240,47 @@ export const Header: React.FC<HeaderProps> = ({
       icon: 'monitor_heart',
       shortcut: 'Alt+8',
       shortKey: '8'
+    }
+  ];
+
+  const totalAmbCount = prescriptionCount + selectedExamsCount;
+  const isAmbMacroActive = activeTab !== 'scores' && activeTab !== 'hospital';
+
+  const macroModuleTabs: Array<{
+    id: ActiveTab;
+    macroId: string;
+    label: string;
+    icon: string;
+    shortcut: string;
+    badge?: string;
+    isActive: boolean;
+  }> = [
+    {
+      id: 'prescription',
+      macroId: 'mod-01',
+      label: 'Ambulatorial & SUS',
+      icon: 'receita',
+      shortcut: 'Alt+1..6',
+      badge: totalAmbCount > 0 ? `${totalAmbCount}` : undefined,
+      isActive: isAmbMacroActive,
     },
     {
-      id: 'editor',
-      label: 'Editor',
-      icon: 'editor',
-      shortcut: 'Alt+5',
-      shortKey: '5'
+      id: 'scores',
+      macroId: 'mod-02',
+      label: 'Escores CDSS',
+      icon: 'monitor_heart',
+      shortcut: 'Alt+8',
+      badge: '114',
+      isActive: activeTab === 'scores',
     },
     {
       id: 'hospital',
+      macroId: 'mod-03',
       label: 'Hospitalar',
       icon: 'local_hospital',
       shortcut: 'Alt+7',
-      shortKey: '7'
-    }
+      isActive: activeTab === 'hospital',
+    },
   ];
 
   return (
@@ -262,7 +288,7 @@ export const Header: React.FC<HeaderProps> = ({
       id="prescmed-header" 
       className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)]/80 backdrop-blur-md border-[var(--border-subtle)] panel-projected-bottom"
     >
-      <div className="w-full max-w-screen-2xl container mx-auto h-16 px-2.5 sm:px-4 lg:px-4 xl:px-6 flex items-center justify-between gap-2">
+      <div className="w-full max-w-screen-2xl container mx-auto min-h-16 py-1.5 px-2.5 sm:px-4 lg:px-4 xl:px-6 flex items-center justify-between gap-2">
         {/* Left side: Menu trigger & Unified Brand Home Button */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           <button
@@ -270,7 +296,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
-            className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px flex-shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
           >
             <Icon name="menu" size={18} />
           </button>
@@ -280,7 +306,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             aria-label="PresCMed — Início"
             onClick={onGoHome}
-            className="flex items-center gap-2 px-1 h-9 xl:h-10 rounded-xl transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
+            className="touch-target flex items-center justify-center gap-2 px-1.5 min-h-[44px] min-w-[44px] rounded-xl transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none group"
             title="Voltar ao início (Receitas — Alt+1)"
           >
             <span
@@ -307,69 +333,106 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
 
-        {/* Desktop Fluid Segmented Workspace Navigation */}
+        {/* Desktop Fluid Segmented Workspace Navigation:
+            - Sidebar expandida: exibe apenas os 3 Macro-Módulos (MOD-01..03) sem duplicar as 8 rotas laterais
+            - Sidebar recolhida: exibe acesso rápido às 6 áreas (incluindo os 3 Macro-Módulos) em 13px / gap 8px / min-h 44px */}
         {onSelectTab && (
           <nav
             aria-label="Navegação rápida entre áreas clínicas"
-            className="hidden lg:flex items-center gap-0.5 p-1 rounded-2xl nav-segmented-track min-w-0 max-w-full overflow-x-auto scrollbar-none"
+            className="hidden lg:flex items-center gap-2 p-1 rounded-2xl nav-segmented-track min-w-0 max-w-full overflow-x-auto scrollbar-none"
           >
-            {quickNavTabs.map((tab) => {
-              const isSusActive =
-                activeTab === 'sus' || (activeTab === 'documents' && documentsSubTab === 'sus');
-              const isActive =
-                tab.id === 'documents'
-                  ? (activeTab === 'documents' && documentsSubTab !== 'sus') ||
-                    activeTab === 'certificate' ||
-                    activeTab === 'referral' ||
-                    activeTab === 'exams'
-                  : tab.id === 'sus'
-                    ? isSusActive
-                    : activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => onSelectTab(tab.id)}
-                  aria-current={isActive ? 'page' : undefined}
-                  title={`${tab.label} (${tab.shortcut})`}
-                  className={`px-1.5 xl:px-2 py-1 min-h-[32px] xl:min-h-[40px] rounded-xl text-[11px] xl:text-xs flex items-center gap-1 transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
-                    isActive
-                      ? 'nav-segmented-pill-active font-bold'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] font-semibold border border-transparent'
-                  }`}
-                >
-                  <Icon
-                    name={tab.icon}
-                    size={14}
-                    filled={isActive}
-                    className={`${isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'} hidden xl:inline-flex`}
-                  />
-                  <span>{tab.label}</span>
-                  {tab.badge ? (
-                    <span
-                      className={`text-[11px] font-extrabold px-1.5 py-0.5 rounded-full clinical-unit clinical-tabular-nums ${
+            {isSidebarOpen
+              ? macroModuleTabs.map((macro) => (
+                  <button
+                    key={macro.macroId}
+                    type="button"
+                    data-macro-module={macro.macroId}
+                    onClick={() => onSelectTab(macro.id)}
+                    aria-current={macro.isActive ? 'page' : undefined}
+                    title={`${macro.label} (${macro.shortcut})`}
+                    className={`touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl text-[13px] flex items-center gap-1.5 transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
+                      macro.isActive
+                        ? 'nav-segmented-pill-active font-bold'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[oklch(0.20_0.02_255/0.04)] dark:hover:bg-white/[0.04] font-semibold border border-transparent'
+                    }`}
+                  >
+                    <Icon
+                      name={macro.icon}
+                      size={16}
+                      filled={macro.isActive}
+                      className={macro.isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'}
+                    />
+                    <span>{macro.label}</span>
+                    {macro.badge && (
+                      <span
+                        className={`text-[11px] font-extrabold px-1.5 py-0.5 rounded-full clinical-unit clinical-tabular-nums ${
+                          macro.isActive
+                            ? 'bg-sky-700 text-white shadow-xs'
+                            : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
+                        }`}
+                      >
+                        {macro.badge}
+                      </span>
+                    )}
+                  </button>
+                ))
+              : quickNavTabs.map((tab) => {
+                  const isSusActive =
+                    activeTab === 'sus' || (activeTab === 'documents' && documentsSubTab === 'sus');
+                  const isActive =
+                    tab.id === 'documents'
+                      ? (activeTab === 'documents' && documentsSubTab !== 'sus') ||
+                        activeTab === 'certificate' ||
+                        activeTab === 'referral' ||
+                        activeTab === 'exams'
+                      : tab.id === 'sus'
+                        ? isSusActive
+                        : activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => onSelectTab(tab.id)}
+                      aria-current={isActive ? 'page' : undefined}
+                      title={`${tab.label} (${tab.shortcut})`}
+                      className={`touch-target px-2.5 py-1.5 min-h-[44px] min-w-[44px] rounded-xl text-[13px] flex items-center gap-1.5 transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none whitespace-nowrap shrink-0 ${
                         isActive
-                          ? 'bg-sky-700 text-white shadow-xs'
-                          : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
+                          ? 'nav-segmented-pill-active font-bold'
+                          : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[oklch(0.20_0.02_255/0.04)] dark:hover:bg-white/[0.04] font-semibold border border-transparent'
                       }`}
                     >
-                      {tab.badge}
-                    </span>
-                  ) : (
-                    <span
-                      aria-hidden="true"
-                      className={`sr-only kbd-shortcut-chip ${
-                        isActive
-                          ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300 font-bold'
-                          : 'text-[var(--text-muted)] opacity-60'
-                      }`}
-                    >
-                      {tab.shortcut}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+                      <Icon
+                        name={tab.icon}
+                        size={15}
+                        filled={isActive}
+                        className={`${isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'} hidden xl:inline-flex`}
+                      />
+                      <span>{tab.label}</span>
+                      {tab.badge ? (
+                        <span
+                          className={`text-[11px] font-extrabold px-1.5 py-0.5 rounded-full clinical-unit clinical-tabular-nums ${
+                            isActive
+                              ? 'bg-sky-700 text-white shadow-xs'
+                              : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
+                          }`}
+                        >
+                          {tab.badge}
+                        </span>
+                      ) : (
+                        <span
+                          aria-hidden="true"
+                          className={`sr-only kbd-shortcut-chip ${
+                            isActive
+                              ? 'bg-[var(--surface-info-subtle)] text-sky-700 dark:text-sky-300 font-bold'
+                              : 'text-[var(--text-muted)] opacity-60'
+                          }`}
+                        >
+                          {tab.shortcut}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
           </nav>
         )}
 
@@ -381,7 +444,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onOpenCommandPalette}
               title="Busca rápida de medicamentos, kits, protocolos e guias SUS (Ctrl+K)"
-              className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:w-auto sm:px-2.5 xl:h-10 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] dark:bg-[#1E293B] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
+              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] sm:w-auto sm:px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
             >
               <Icon name="search" size={16} className="text-sky-600 dark:text-sky-400" />
               <span className="sr-only sm:not-sr-only text-xs font-medium text-[var(--text-muted)]">
@@ -397,7 +460,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onNavigateToEditor}
-              className="hidden md:flex items-center gap-1.5 px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
+              className="touch-target hidden md:flex items-center gap-1.5 px-2.5 min-h-[44px] min-w-[44px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
               title="Abrir Editor Livre de Documentos A4"
             >
               <Icon name="editor" size={16} className="text-sky-600 dark:text-sky-400" />
@@ -414,7 +477,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenLgpdModal}
               aria-label="Segurança, Seleção de Cookies e LGPD"
               title="Central de Privacidade, Seleção de Cookies e Conformidade LGPD (Lei nº 13.709/2018)"
-              className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
+              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
             >
               <Icon name="shield" size={16} className="text-emerald-600 dark:text-emerald-400" />
             </button>
@@ -425,9 +488,9 @@ export const Header: React.FC<HeaderProps> = ({
               id="btn-header-install-pwa"
               type="button"
               onClick={onInstallApp}
-              className={`${
+              className={`touch-target ${
                 isSidebarOpen ? 'flex lg:hidden 2xl:flex' : 'flex'
-              } items-center justify-center gap-1.5 px-2.5 min-h-[44px] sm:min-h-0 lg:w-9 lg:px-0 2xl:w-auto 2xl:px-2.5 h-9 xl:h-10 rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-sky-500/10 dark:bg-sky-500/15 border-sky-500/30 dark:border-sky-400/30 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0`}
+              } items-center justify-center gap-1.5 px-2.5 min-w-[44px] min-h-[44px] lg:w-11 lg:px-0 2xl:w-auto 2xl:px-2.5 rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--surface-info-subtle)] border-[var(--border-info-subtle)] text-sky-700 dark:text-sky-300 hover:bg-sky-100/70 dark:hover:bg-sky-950/50 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0`}
               title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
               aria-label="Instalar Aplicativo PresCMed"
             >
@@ -441,7 +504,7 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="w-9 h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
             title={darkMode ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
           >
             {darkMode ? (

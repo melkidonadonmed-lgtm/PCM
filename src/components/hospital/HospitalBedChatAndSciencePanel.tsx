@@ -209,9 +209,9 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
                 key={msg.id}
                 className={`p-4 rounded-xl border text-xs leading-relaxed space-y-1.5 ${
                   msg.role === 'user'
-                    ? 'bg-sky-500/10 border-sky-500/30 ml-6'
+                    ? 'bg-[var(--surface-info-subtle)] border-[var(--border-info-subtle)] ml-6'
                     : msg.role === 'science'
-                      ? 'bg-emerald-500/10 border-emerald-500/30 mr-4'
+                      ? 'bg-[var(--accent-emerald-subtle)] border-[var(--accent-emerald-border)] mr-4'
                       : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] mr-4'
                 }`}
               >

@@ -104,7 +104,7 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
                 type="button"
                 onClick={() => onSelectPreviewRegime(regime)}
                 aria-pressed={regimeAtivo === regime}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
                   regimeAtivo === regime
                     ? 'bg-white dark:bg-navy-800 text-sky-700 dark:text-blue-300 shadow-tactile-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -152,7 +152,7 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
           role="dialog"
           aria-modal="true"
           aria-label="Calculadora pediátrica por peso"
-          className="fixed inset-0 z-50 flex justify-end bg-black/50 animate-backdrop-fade"
+          className="fixed inset-0 z-50 flex justify-end bg-[oklch(0.14_0.02_258/0.50)] animate-backdrop-fade"
           onClick={onClosePediatricDrawer}
         >
           <div

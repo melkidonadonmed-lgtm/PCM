@@ -408,7 +408,7 @@ export const AppGlobalModalsAndOverlays: React.FC<AppGlobalModalsAndOverlaysProp
           data-state="idle"
           aria-busy={false}
           aria-labelledby="install-help-modal-title"
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 animate-backdrop-fade"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.60)] animate-backdrop-fade"
           onClick={closeInstallHelp}
         >
           <div
@@ -422,7 +422,7 @@ export const AppGlobalModalsAndOverlays: React.FC<AppGlobalModalsAndOverlaysProp
                 type="button"
                 onClick={closeInstallHelp}
                 aria-label="Fechar instruções de instalação"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
                 <Icon name="close" size={18} />
               </button>

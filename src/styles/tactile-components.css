@@ -1,0 +1,582 @@
+/**
+ * Tactile Minimalist Components, Panels, Inputs, Modals & Scroll Utilities
+ */
+@layer components {
+  .page-shell-container {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gutter, 1.25rem);
+  }
+
+  .section-flow-root {
+    display: flow-root;
+  }
+
+  .card,
+  .surface-card-minimal,
+  .card-surface {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--elevation-low);
+    transition: background-color 0.25s ease, border-color 0.22s ease, box-shadow 0.25s var(--ease-spring);
+  }
+
+  .dark .card,
+  .dark .surface-card-minimal,
+  .dark .card-surface {
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
+  }
+
+  .chip-neutral {
+    background-color: #F7F9FB;
+    color: var(--text-secondary);
+    border: 1px solid #CFD8E3;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.16s var(--ease-spring);
+  }
+
+  .dark .chip-neutral {
+    background-color: var(--surface-chip-muted, #2D3B50);
+    color: #E2E8F0;
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: var(--elevation-1);
+  }
+
+  .chip-neutral:hover:not(:disabled) {
+    background-color: #EEF2F6;
+    border-color: #94A3B8;
+    color: var(--text-main);
+    transform: translate3d(0, -1px, 0);
+    box-shadow: 0 2px 5px -1px rgba(15, 23, 42, 0.06);
+  }
+
+  .dark .chip-neutral:hover:not(:disabled) {
+    background-color: #35465E;
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #FFFFFF;
+    transform: translate3d(0, -1px, 0);
+    box-shadow: 0 3px 7px -1px rgba(0, 0, 0, 0.28);
+  }
+
+  .chip-neutral:active:not(:disabled) {
+    transform: translate3d(0, 1px, 0);
+  }
+
+  @media (pointer: coarse) {
+    .chip-neutral {
+      min-block-size: 44px;
+      padding-inline: 0.75rem;
+    }
+  }
+
+  .chip-neutral[data-active="true"] {
+    background-color: #F1F5F9;
+    color: #0F172A;
+    border-color: #64748B;
+    font-weight: 700;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+  }
+
+  .dark .chip-neutral[data-active="true"] {
+    background-color: #27354A;
+    color: #F8FAFC;
+    border-color: rgba(148, 163, 184, 0.38);
+  }
+
+  .notice-discreet {
+    background-color: #F1F5F9;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 12px;
+  }
+
+  .dark .notice-discreet {
+    background-color: #27354A;
+    color: #CBD5E1;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* 1. Z-0 Inset Tray / Form Input Fields */
+  .tactile-input,
+  .tactile-inset {
+    background-color: #FFFFFF;
+    color: #0F172A;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: var(--radius-xl);
+    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease;
+  }
+
+  .tactile-input:not(.h-8):not(.h-9):not(.h-10):not(.h-11),
+  .tactile-inset:not(.h-8):not(.h-9):not(.h-10):not(.h-11) {
+    min-height: 44px;
+  }
+
+  .tactile-input:focus {
+    outline: none;
+    background-color: #FFFFFF;
+    border-color: var(--accent-sky-dark, #0284C7);
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03), 0 0 0 3.5px rgba(2, 132, 199, 0.18);
+  }
+
+  .dark .tactile-input,
+  .dark .tactile-inset {
+    background-color: var(--surface-inset);
+    color: #F8FAFC;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.32);
+  }
+
+  .dark .tactile-input:focus {
+    background-color: #1F2B3D;
+    border-color: #94A3B8;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28), 0 0 0 3px rgba(148, 163, 184, 0.22);
+  }
+
+  /* 2. Z-1 Resting Base Plates & Static Cards */
+  .tactile-flat {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-subtle), var(--tactile-card-bevel);
+    border-radius: var(--radius-2xl);
+    position: relative;
+    isolation: isolate;
+  }
+
+  .dark .tactile-flat {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .tactile-card {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--elevation-low);
+    border-radius: var(--radius-2xl);
+    padding: var(--card-padding, 1.25rem);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    transition: box-shadow 0.25s var(--ease-spring),
+                transform 0.25s var(--ease-spring),
+                border-color 0.22s ease,
+                background-color 0.25s ease;
+  }
+
+  .dark .tactile-card {
+    background-color: var(--surface-card);
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
+  }
+
+  /* 3. Z-2 Interactive Elevated Cards & Controls */
+  .tactile-card-interactive {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--elevation-low);
+    border-radius: var(--radius-2xl);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    touch-action: manipulation;
+    user-select: none;
+    transition: transform 0.22s var(--ease-spring),
+                box-shadow 0.22s var(--ease-spring),
+                border-color 0.18s ease,
+                background-color 0.22s ease;
+  }
+
+  .dark .tactile-card-interactive {
+    background-color: var(--surface-card);
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tactile-card-interactive:hover {
+      transform: translate3d(0, -2px, 0);
+      border-color: var(--border-medium);
+      box-shadow: var(--elevation-medium);
+    }
+  }
+
+  .tactile-card-interactive:active {
+    transform: translate3d(0, 0, 0);
+    box-shadow: var(--elevation-low);
+  }
+
+  .tactile-card-interactive:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  .ui-card-soft {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--elevation-low);
+    border-radius: var(--radius-2xl);
+    transition: box-shadow 0.25s var(--ease-spring), transform 0.25s var(--ease-spring), border-color 0.22s ease;
+  }
+
+  .dark .ui-card-soft {
+    border-color: var(--border-strong);
+    box-shadow: var(--elevation-low);
+  }
+
+  .ui-btn-tactile {
+    box-shadow: var(--tactile-bevel);
+    transition: transform 0.15s var(--ease-spring), box-shadow 0.15s var(--ease-spring), background-color 0.18s ease;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .ui-btn-tactile:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: var(--elevation-z0);
+  }
+
+  .surface-inset {
+    background-color: var(--surface-inset);
+    box-shadow: var(--shadow-inset-sunken, var(--elevation-z0));
+  }
+
+  .panel-navy .surface-inset,
+  .panel-navy.surface-inset {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .surface-raised {
+    isolation: isolate;
+  }
+
+  .unit-badge {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  #sidebar-active-tracker {
+    pointer-events: none;
+    transition: transform 0.28s var(--ease-spring), opacity 0.2s ease;
+  }
+
+  .tactile-btn {
+    box-shadow: var(--tactile-bevel);
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .tactile-btn:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  .tactile-btn-secondary,
+  .btn-tactile-secondary {
+    border: 1px solid #CBD5E1;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 3px 6px -2px rgba(15, 23, 42, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.05);
+    background-color: #FFFFFF;
+    color: #0F172A;
+    border-radius: 12px;
+    padding: 0.5rem 0.875rem;
+    font-weight: 600;
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+    user-select: none;
+    cursor: pointer;
+    isolation: isolate;
+    transition: transform 0.14s cubic-bezier(0.2, 0, 0, 1),
+                box-shadow 0.14s cubic-bezier(0.2, 0, 0, 1),
+                background-color 0.18s ease,
+                border-color 0.18s ease;
+  }
+
+  .dark .tactile-btn-secondary,
+  .dark .btn-tactile-secondary {
+    background-color: #1E293B;
+    color: #F1F5F9;
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.26),
+      0 3px 6px -2px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.24);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tactile-btn-secondary:hover:not(:disabled),
+    .btn-tactile-secondary:hover:not(:disabled) {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      border-color: #94A3B8;
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.09), inset 0 1px 0 #FFFFFF;
+    }
+
+    .dark .tactile-btn-secondary:hover:not(:disabled),
+    .dark .btn-tactile-secondary:hover:not(:disabled) {
+      border-color: rgba(255, 255, 255, 0.24);
+      background-color: #27354A;
+      color: #FFFFFF;
+    }
+  }
+
+  .tactile-btn-secondary:active:not(:disabled),
+  .btn-tactile-secondary:active:not(:disabled) {
+    transform: translate3d(0, 1px, 0);
+    box-shadow: var(--shadow-pressed);
+  }
+
+  /* Botão Ícone Quadrado Acessível Padronizado (44x44px) */
+  .btn-tactile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    box-shadow: var(--elevation-z1);
+    transition: transform 0.14s cubic-bezier(0.2, 0, 0, 1),
+                background-color 0.18s ease,
+                border-color 0.18s ease;
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-tactile-icon:hover:not(:disabled) {
+      background-color: var(--surface-hover);
+      border-color: var(--border-medium);
+      transform: translate3d(0, -1px, 0);
+    }
+  }
+
+  .btn-tactile-icon:active:not(:disabled) {
+    transform: translate3d(0, 1px, 0);
+  }
+
+  /* 5. Z-3 Floating Elements / Popovers / Sticky Bars */
+  .tactile-floating {
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--rim-light-top), var(--elevation-z3);
+    background-color: var(--surface-card);
+    border-radius: 16px;
+    isolation: isolate;
+  }
+
+  .dark .tactile-floating {
+    background-color: var(--surface-elevated);
+    border-color: var(--border-subtle);
+  }
+
+  /* 6. Z-4 Critical Modals & Dialogs */
+  .tactile-modal,
+  .modal-content {
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--rim-light-top), var(--elevation-z3);
+    background-color: var(--surface-card);
+    border-radius: 20px;
+    isolation: isolate;
+  }
+
+  .dark .tactile-modal,
+  .dark .modal-content {
+    background-color: var(--surface-hover);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--rim-light-top), var(--elevation-z3);
+  }
+
+  /* 7. Deep Navy Structural Panel */
+  .panel-navy {
+    background: linear-gradient(180deg, var(--surface-panel-2) 0%, var(--surface-panel) 100%);
+    color: var(--surface-panel-text);
+    border-color: var(--surface-panel-border);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: geometricPrecision;
+  }
+
+  .panel-navy-inset {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--surface-panel-border);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .panel-projected-right {
+    box-shadow: var(--shadow-sidebar-projected), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .panel-projected-bottom {
+    box-shadow: var(--shadow-header-projected), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .panel-projected-top {
+    box-shadow: var(--shadow-bottomnav-projected), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .nav-btn-tactile {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+  }
+
+  .nav-btn-tactile:hover {
+    transform: translateX(4px);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-serif-doc {
+    font-family: var(--font-serif-doc);
+  }
+
+  .icon-sculpted {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  .dark .icon-sculpted {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .groove-divider {
+    height: 2px;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .animate-tab-fade {
+    animation: tabFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .tactile-dropdown {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .dark .tactile-dropdown {
+    background-color: var(--surface-elevated);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--rim-light-top), var(--elevation-z2);
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  @supports not (scrollbar-color: auto) {
+    ::-webkit-scrollbar,
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track,
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb,
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb:hover,
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: var(--scrollbar-thumb-hover);
+    }
+  }
+
+  .fade-scroll-x {
+    -webkit-mask-image: linear-gradient(to right, #0f172a calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to right, #0f172a calc(100% - 28px), transparent 100%);
+  }
+
+  .fade-scroll-dual-x {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #0f172a 16px, #0f172a calc(100% - 16px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #0f172a 16px, #0f172a calc(100% - 16px), transparent 100%);
+  }
+}
+
+/* ==========================================================================
+   SOMBRAS TÁTEIS COMPONÍVEIS COM O ANEL DE FOCO (@utility)
+   ========================================================================== */
+@utility shadow-tactile {
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile);
+}
+
+@utility shadow-tactile-sm {
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-sm);
+}
+
+@utility shadow-tactile-lg {
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-lg);
+}
+
+@utility shadow-tactile-navy {
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-navy);
+}
+
+@utility shadow-tactile-dark {
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-dark);
+}
+
+@utility shadow-tactile-btn {
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-btn);
+}
+
+@utility shadow-tactile-inset {
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-inset);
+}
+
+@utility shadow-tactile-blue {
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--elev-tactile-blue);
+}

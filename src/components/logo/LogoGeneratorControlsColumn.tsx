@@ -239,11 +239,11 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
               >
                 <div className="flex items-center gap-1">
                   <span
-                    className="w-4 h-4 rounded-full border border-black/10 shadow-xs"
+                    className="w-4 h-4 rounded-full border border-[oklch(0.20_0.02_255/0.15)] shadow-xs"
                     style={{ backgroundColor: pal.primary }}
                   />
                   <span
-                    className="w-3.5 h-3.5 rounded-full border border-black/10 shadow-xs"
+                    className="w-3.5 h-3.5 rounded-full border border-[oklch(0.20_0.02_255/0.15)] shadow-xs"
                     style={{ backgroundColor: pal.secondary }}
                   />
                 </div>

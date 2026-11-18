@@ -100,9 +100,9 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                 <span
                   className={`text-[11px] font-bold px-2 py-0.5 rounded-full clinical-tabular-nums ${
                     corr.efficacyStatus === 'favorable'
-                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                      ? 'bg-[var(--accent-emerald-subtle)] text-emerald-800 dark:text-emerald-200 border border-[var(--accent-emerald-border)]'
                       : corr.efficacyStatus === 'attention'
-                        ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30'
+                        ? 'bg-[var(--accent-rose-subtle)] text-rose-800 dark:text-rose-200 border border-[var(--accent-rose-border)]'
                         : 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border border-slate-500/30'
                   }`}
                 >
@@ -150,7 +150,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
               <button
                 type="button"
                 onClick={() => setMetricSource('labs')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                className={`touch-target min-h-[44px] px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
                   metricSource === 'labs'
                     ? 'bg-sky-600 text-white shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'
@@ -162,7 +162,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
               <button
                 type="button"
                 onClick={() => setMetricSource('scores')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                className={`touch-target min-h-[44px] px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
                   metricSource === 'scores'
                     ? 'bg-blue-600 text-white shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'
@@ -177,7 +177,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
               <button
                 type="button"
                 onClick={() => onOpenScoreboardForBed()}
-                className="btn-tactile-primary h-8 px-3 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
+                className="btn-tactile-primary touch-target min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
               >
                 <Icon name="calculate" size={14} />
                 <span>+ Calcular Escore p/ Leito</span>
@@ -194,7 +194,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                   key={m.key}
                   type="button"
                   onClick={() => setSelectedTrendKey(m.key)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer clinical-tabular-nums ${
+                  className={`touch-target min-h-[44px] px-3 py-1.5 inline-flex items-center rounded-lg text-xs font-bold transition cursor-pointer clinical-tabular-nums ${
                     selectedTrendKey === m.key
                       ? 'bg-sky-600 text-white'
                       : 'bg-[var(--surface-inset)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
@@ -281,7 +281,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                   <button
                     type="button"
                     onClick={() => onOpenScoreboardForBed('calc_qsofa')}
-                    className="btn-tactile-primary h-9 px-4 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                    className="btn-tactile-primary touch-target min-h-[44px] px-4 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
                   >
                     <Icon name="calculate" size={14} />
                     <span>Abrir Scoreboard Vinculado ao Leito {bedRecord.wardAndBed}</span>
@@ -326,9 +326,9 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                           <span
                             className={`text-[11px] font-bold px-2 py-0.5 rounded-full clinical-tabular-nums ${
                               sd.clinicalTrendStatus === 'favorable'
-                                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                                ? 'bg-[var(--accent-emerald-subtle)] text-emerald-800 dark:text-emerald-200 border border-[var(--accent-emerald-border)]'
                                 : sd.clinicalTrendStatus === 'attention'
-                                  ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30'
+                                  ? 'bg-[var(--accent-rose-subtle)] text-rose-800 dark:text-rose-200 border border-[var(--accent-rose-border)]'
                                   : 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border border-slate-500/30'
                             }`}
                           >
@@ -480,7 +480,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                           })
                         }
                         aria-label={`Remover registro do escore ${entry.acronym} de ${entry.dateBr}`}
-                        className="text-[var(--text-muted)] hover:text-rose-500 cursor-pointer shrink-0"
+                        className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] -mr-2 flex items-center justify-center rounded-xl text-[var(--text-muted)] hover:text-rose-500 hover:bg-[var(--surface-hover)] cursor-pointer shrink-0"
                       >
                         <Icon name="delete" size={15} />
                       </button>

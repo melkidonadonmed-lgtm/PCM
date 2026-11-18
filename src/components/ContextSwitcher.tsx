@@ -48,7 +48,7 @@ export const ContextSwitcher: React.FC<ContextSwitcherProps> = ({
           value={activeContext.id}
           onChange={(e) => onSwitchContext(e.target.value)}
           aria-label="Selecionar local de atuação institucional"
-          className="w-full h-7 text-xs font-semibold rounded-lg bg-white/[0.08] text-[var(--sidebar-text-primary,#F8FAFC)] border border-white/15 pl-2 pr-6 appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 truncate shadow-tactile-sm hover:bg-white/[0.14] hover:border-white/25 transition duration-150 ui-btn-tactile"
+          className="w-full min-h-[44px] py-1.5 text-xs font-semibold rounded-lg bg-white/[0.08] text-[var(--sidebar-text-primary,#F8FAFC)] border border-white/15 pl-2 pr-6 appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 truncate shadow-tactile-sm hover:bg-white/[0.14] hover:border-white/25 transition duration-150 ui-btn-tactile"
         >
           {contexts.map((ctx) => (
             <option key={ctx.id} value={ctx.id} className="bg-slate-900 text-white">

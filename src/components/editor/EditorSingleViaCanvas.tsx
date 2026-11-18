@@ -140,7 +140,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                     name="editorClinicName"
                     aria-label="Nome do local de atendimento"
                     style={{ fontFamily: 'inherit' }}
-                    className="text-sm font-bold uppercase tracking-tight text-slate-900 leading-snug w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
+                    className="text-sm font-bold uppercase tracking-tight text-slate-900 leading-snug w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
                     title="Clique para editar o nome do local de atendimento"
                   />
 
@@ -154,7 +154,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                     name="editorClinicAddress"
                     aria-label="Endereço e contato do local de atendimento"
                     style={{ fontFamily: 'inherit' }}
-                    className="text-xs font-medium text-slate-600 mt-0.5 w-full !bg-transparent hover:bg-slate-50/80 focus:!bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
+                    className="text-xs font-medium text-slate-600 mt-0.5 w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
                     title="Clique para editar o endereço"
                   />
                 </div>
@@ -329,7 +329,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
       <div className="flex flex-col justify-between h-full pr-2 min-w-0">
         {conteudoViaUnica}
       </div>
-      <div className="flex flex-col items-center justify-center relative border-l border-dashed border-medium px-1 select-none">
+      <div className="flex flex-col items-center justify-center relative border-l border-dotted border-medium px-1 select-none">
         <div className="absolute top-1/2 -translate-y-1/2 bg-white py-3 px-1 flex flex-col items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
           <Scissors className="w-3.5 h-3.5 text-slate-500 rotate-90" />
           <span style={{ writingMode: 'vertical-rl' }}>CORTE AQUI</span>

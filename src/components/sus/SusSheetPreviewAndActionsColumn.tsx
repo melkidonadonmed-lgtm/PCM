@@ -46,7 +46,7 @@ export const SusFormHeaderBar: React.FC<SusFormHeaderBarProps> = ({
       <button
         type="button"
         onClick={onBackToList}
-        className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-[var(--text-main)] transition cursor-pointer"
+        className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-[var(--text-main)] transition cursor-pointer"
         title="Voltar para a lista de exames SUS"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -76,8 +76,8 @@ export const SusFormHeaderBar: React.FC<SusFormHeaderBarProps> = ({
               onClick={() => onSelectActiveDocId(id)}
               className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'bg-navy-900 dark:bg-[#0369A1] text-white border-navy-900 dark:border-sky-500/30 shadow-tactile-sm'
-                  : 'bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10'
+                  ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] shadow-tactile-sm'
+                  : 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
               }`}
             >
               {doc?.shortTitle || id}
@@ -207,7 +207,7 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
         {pendenciasClinicas.length > 0 && (
           <p
             role="status"
-            className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-white/10"
+            className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)]"
           >
             Em branco: {pendenciasClinicas.join(', ')}.
           </p>

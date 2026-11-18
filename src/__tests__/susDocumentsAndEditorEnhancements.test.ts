@@ -244,7 +244,7 @@ describe('Catálogo e Gerador de Documentos Regulatórios Oficiais do SUS', () =
     const html1 = buildSusDocumentHtml(doc1, dummyFormData);
     const html2 = buildSusDocumentHtml(doc2, dummyFormData);
 
-    const combinedHtml = `${html1}<div style="page-break-before: always; margin-top: 32px; border-top: 2px dashed #94A3B8; padding-top: 24px;"></div>${html2}`;
+    const combinedHtml = `${html1}<div style="page-break-before: always; margin-top: 32px; border-top: 2px dotted #94A3B8; padding-top: 24px;"></div>${html2}`;
 
     expect(combinedHtml).toContain('page-break-before: always');
     expect(combinedHtml).toContain('APAC — Laudo de Solicitação de Procedimento Ambulatorial');

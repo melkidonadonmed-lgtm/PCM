@@ -55,7 +55,7 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
             <button
               type="button"
               onClick={onClearFilters}
-              className="chip-neutral h-9 min-h-[36px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+              className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-xl border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 transition"
               title="Limpar busca e filtros do catálogo"
             >
               <Icon name="close" size={14} />
@@ -94,7 +94,7 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
               >
                 <Icon name={blk.icon} className="text-sm" />
                 <span>{blk.shortLabel}</span>
-                <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[11px] clinical-tabular-nums">
+                <span className="rounded bg-[oklch(0.20_0.02_255/0.10)] dark:bg-white/10 px-1.5 py-0.5 font-mono text-[11px] clinical-tabular-nums">
                   {blk.count}
                 </span>
               </button>
@@ -118,7 +118,7 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
                   </span>
                   <div className="flex items-center gap-1">
                     {item.hasInfusionProtocol ? (
-                      <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                      <span className="rounded bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] px-1.5 py-0.5 font-mono text-[11px] font-bold text-emerald-800 dark:text-emerald-200">
                         +BIC
                       </span>
                     ) : null}
@@ -130,7 +130,7 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
                           ? `Remover ${item.acronym} dos favoritos`
                           : `Fixar ${item.acronym} nos favoritos`
                       }
-                      className={`rounded p-1 transition-colors cursor-pointer ${
+                      className={`touch-target w-11 h-11 min-w-[44px] min-h-[44px] -mr-2 -mt-2 inline-flex items-center justify-center rounded-xl transition-colors cursor-pointer ${
                         isFav
                           ? 'text-amber-500'
                           : 'text-slate-400 hover:text-slate-600'
@@ -156,7 +156,7 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => onSelectScore(item.id)}
-                  className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer"
+                  className="touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer"
                 >
                   Abrir Escore
                   <Icon name="arrow_forward" className="text-xs" />

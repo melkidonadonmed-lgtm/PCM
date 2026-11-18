@@ -7,137 +7,29 @@ import React from 'react';
  * Referência: https://github.com/google/material-design-icons
  */
 export const CANONICAL_MATERIAL_SYMBOLS_SUBSET = [
-  'add',
-  'add_circle',
-  'alarm',
-  'approval',
-  'apps',
-  'arrow_back',
-  'arrow_forward',
-  'auto_awesome',
-  'baby_changing_station',
-  'badge',
-  'biotech',
-  'bloodtype',
-  'bookmark_add',
-  'calculate',
-  'calendar_today',
-  'call',
-  'check',
-  'check_circle',
-  'chevron_left',
-  'chevron_right',
-  'child_care',
-  'circle',
-  'clinical_notes',
-  'close',
-  'cloud',
-  'cloud_done',
-  'cloud_download',
-  'cloud_sync',
-  'cloud_upload',
-  'content_copy',
-  'content_cut',
-  'crop_landscape',
-  'crop_portrait',
-  'dark_mode',
-  'dashboard',
-  'database',
-  'delete',
-  'description',
-  'diagnosis',
-  'domain',
-  'download',
-  'draw',
-  'ecg_heart',
-  'edit',
-  'edit_document',
-  'error',
-  'event_available',
-  'expand_less',
-  'expand_more',
-  'fact_check',
-  'favorite',
-  'filter_list',
-  'folder_open',
-  'format_align_center',
-  'format_align_justify',
-  'format_align_left',
-  'format_align_right',
-  'format_bold',
-  'format_italic',
-  'format_list_bulleted',
-  'format_list_numbered',
-  'format_underlined',
-  'gastroenterology',
-  'groups',
-  'hard_drive',
-  'help',
-  'hexagon',
-  'history',
-  'image',
-  'info',
-  'ink_eraser',
-  'layers',
-  'light_mode',
-  'local_hospital',
-  'location_on',
-  'lock',
-  'medical_services',
-  'medication',
-  'menu',
-  'menu_open',
-  'monitor_heart',
-  'more_horiz',
-  'more_vert',
-  'neurology',
-  'open_in_full',
-  'open_with',
-  'palette',
-  'person',
-  'person_add',
-  'person_remove',
-  'picture_as_pdf',
-  'pill',
-  'prescriptions',
-  'print',
-  'progress_activity',
-  'pulmonology',
-  'qr_code_2',
-  'radiology',
-  'redo',
-  'refresh',
-  'restart_alt',
-  'rule',
-  'save',
-  'scale',
-  'schedule',
-  'science',
-  'search',
-  'security',
-  'sell',
-  'send',
-  'shield',
-  'shield_with_heart',
-  'signature',
-  'square',
-  'star',
-  'stethoscope',
-  'sync',
-  'syringe',
-  'tag',
-  'title',
-  'tune',
-  'undo',
-  'upload',
-  'vaccines',
-  'verified_user',
-  'visibility',
-  'visibility_off',
-  'warning',
-  'water_drop',
-  'watermark',
-  'workspace_premium',
+  'add', 'add_chart', 'add_circle', 'alarm', 'analytics', 'approval',
+  'apps', 'arrow_back', 'arrow_forward', 'auto_awesome', 'baby_changing_station', 'badge',
+  'biotech', 'bloodtype', 'bookmark_add', 'calculate', 'calendar_today', 'call',
+  'check', 'check_circle', 'chevron_left', 'chevron_right', 'child_care', 'circle',
+  'clinical_notes', 'close', 'close_fullscreen', 'cloud', 'cloud_done', 'cloud_download',
+  'cloud_sync', 'cloud_upload', 'content_copy', 'content_cut', 'crop_landscape', 'crop_portrait',
+  'dark_mode', 'dashboard', 'database', 'delete', 'description', 'diagnosis',
+  'domain', 'download', 'draw', 'ecg_heart', 'edit', 'edit_document',
+  'error', 'event_available', 'expand_less', 'expand_more', 'fact_check', 'favorite',
+  'filter_list', 'folder_open', 'format_align_center', 'format_align_justify', 'format_align_left', 'format_align_right',
+  'format_bold', 'format_italic', 'format_list_bulleted', 'format_list_numbered', 'format_underlined', 'gastroenterology',
+  'groups', 'hard_drive', 'help', 'hexagon', 'history', 'image',
+  'info', 'ink_eraser', 'layers', 'light_mode', 'local_hospital', 'location_on',
+  'lock', 'medical_services', 'medication', 'menu', 'menu_open', 'monitor_heart',
+  'monitoring', 'more_horiz', 'more_vert', 'neurology', 'open_in_full', 'open_with',
+  'palette', 'person', 'person_add', 'person_remove', 'picture_as_pdf', 'pill',
+  'prescriptions', 'print', 'progress_activity', 'pulmonology', 'qr_code_2', 'radiology',
+  'redo', 'refresh', 'restart_alt', 'rule', 'save', 'scale',
+  'schedule', 'science', 'search', 'security', 'sell', 'send',
+  'share', 'shield', 'shield_with_heart', 'signature', 'square', 'star',
+  'stethoscope', 'sync', 'syringe', 'tag', 'title', 'tune',
+  'undo', 'upload', 'vaccines', 'verified_user', 'visibility', 'visibility_off',
+  'warning', 'water_drop', 'workspace_premium',
 ] as const;
 
 export type CanonicalIconName = (typeof CANONICAL_MATERIAL_SYMBOLS_SUBSET)[number];
@@ -369,7 +261,10 @@ export interface MaterialSymbolsSubsetEvaluation {
   upstreamTotalGlyphsApprox: number;
   subsetGlyphCount: number;
   estimatedSubsetWoff2Bytes: number;
+  actualSubsetWoff2Bytes: number;
   estimatedSavingsPercent: number;
+  preservedAxes: readonly ('FILL' | 'opsz')[];
+  instancedAxes: Readonly<{ wght: 400; GRAD: 0 }>;
   isSortedAlphabetically: boolean;
   hasDuplicateGlyphs: boolean;
   unmappedAliasTargets: string[];
@@ -382,10 +277,11 @@ export interface MaterialSymbolsSubsetEvaluation {
  */
 export function evaluateMaterialSymbolsSubset(): MaterialSymbolsSubsetEvaluation {
   const upstreamWoff2Bytes = 4_001_608;
+  const actualSubsetWoff2Bytes = 39_512;
   const subsetGlyphCount = CANONICAL_MATERIAL_SYMBOLS_SUBSET.length;
-  const estimatedSubsetWoff2Bytes = subsetGlyphCount * 960;
+  const estimatedSubsetWoff2Bytes = actualSubsetWoff2Bytes;
   const estimatedSavingsPercent =
-    Math.round(((upstreamWoff2Bytes - estimatedSubsetWoff2Bytes) / upstreamWoff2Bytes) * 1000) / 10;
+    Math.round(((upstreamWoff2Bytes - actualSubsetWoff2Bytes) / upstreamWoff2Bytes) * 1000) / 10;
 
   const isSortedAlphabetically = CANONICAL_MATERIAL_SYMBOLS_SUBSET.every(
     (glyph, i, arr) => i === 0 || arr[i - 1].localeCompare(glyph) < 0
@@ -404,7 +300,10 @@ export function evaluateMaterialSymbolsSubset(): MaterialSymbolsSubsetEvaluation
     upstreamTotalGlyphsApprox: 3500,
     subsetGlyphCount,
     estimatedSubsetWoff2Bytes,
+    actualSubsetWoff2Bytes,
     estimatedSavingsPercent,
+    preservedAxes: ['FILL', 'opsz'],
+    instancedAxes: { wght: 400, GRAD: 0 },
     isSortedAlphabetically,
     hasDuplicateGlyphs,
     unmappedAliasTargets,
@@ -454,8 +353,8 @@ export const Icon: React.FC<IconProps> = ({
   name,
   size,
   filled = false,
-  weight = 400,
-  grade = 0,
+  weight: _weight = 400,
+  grade: _grade = 0,
   opticalSize,
   spin = false,
   className = '',
@@ -474,7 +373,7 @@ export const Icon: React.FC<IconProps> = ({
   const pixelSize = typeof resolvedSize === 'number' ? resolvedSize : SIZE_MAP[resolvedSize] || 20;
   const opsz = opticalSize || (pixelSize <= 20 ? 20 : pixelSize <= 24 ? 24 : pixelSize <= 40 ? 40 : 48);
 
-  const fontVariation = `'FILL' ${filled ? 1 : 0}, 'wght' ${weight}, 'GRAD' ${grade}, 'opsz' ${opsz}`;
+  const fontVariation = `'FILL' ${filled ? 1 : 0}, 'opsz' ${opsz}`;
 
   return (
     <span

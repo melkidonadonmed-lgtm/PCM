@@ -3,7 +3,6 @@ import type {
   HospitalBedScoreEntry,
   HospitalImagingExamEntry,
   HospitalLabPanelEntry,
-  HospitalSpecialtyTemplate,
 } from '../../core/domain/clinicalEntities';
 import { escapeHtml } from '../sanitizeHtml';
 

@@ -55,7 +55,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       ref={modalRef}
       data-state="idle"
       aria-busy={false}
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 animate-backdrop-fade surface-raised"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.60)] animate-backdrop-fade surface-raised"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
@@ -73,8 +73,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <div 
             className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
               isDanger 
-                ? 'bg-rose-500/15 text-rose-500 border-rose-500/30' 
-                : 'bg-sky-600/10 text-blue-800 dark:bg-sky-500/20 dark:text-blue-300 border-info dark:border-info'
+                ? 'bg-[var(--accent-rose-subtle)] text-rose-700 dark:text-rose-300 border-[var(--accent-rose-border)]' 
+                : 'bg-[var(--surface-info-subtle)] text-blue-800 dark:text-blue-300 border-info dark:border-info'
             }`}
           >
             <Icon name="warning" className="text-[24px]" />
@@ -98,7 +98,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <button
             onClick={onCancel}
             aria-label="Fechar modal de confirmação"
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
           >
             <Icon name="close" className="text-[18px]" />
           </button>

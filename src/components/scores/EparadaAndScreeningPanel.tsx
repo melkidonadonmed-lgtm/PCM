@@ -134,7 +134,7 @@ export const EparadaAndScreeningPanel: React.FC<
                 <span className="text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
                   Cronômetro de Ciclo RCP (2:00 min)
                 </span>
-                <span className="rounded bg-red-500/10 px-2 py-0.5 font-mono text-xs font-bold text-red-700 dark:text-red-300 clinical-tabular-nums">
+                <span className="rounded bg-[var(--accent-rose-subtle)] border border-[var(--accent-rose-border)] px-2 py-0.5 font-mono text-xs font-bold text-rose-800 dark:text-rose-200 clinical-tabular-nums">
                   Ciclo #{cyclesCount}
                 </span>
               </div>
@@ -361,7 +361,7 @@ export const EparadaAndScreeningPanel: React.FC<
                           {d.drugOrAction}
                         </span>
                         {d.ceilingApplied ? (
-                          <span className="rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                          <span className="rounded bg-[var(--accent-amber-subtle)] border border-[var(--accent-amber-border)] px-1.5 py-0.5 font-mono text-[11px] font-semibold text-amber-800 dark:text-amber-200">
                             Teto Máx
                           </span>
                         ) : null}

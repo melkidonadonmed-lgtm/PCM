@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Icon,
   Image as ImageIcon,
   X,
   Building2,
@@ -71,7 +72,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
       <button
         type="button"
         onClick={() => setIsLogoMenuOpen(prev => !prev)}
-        className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+        className={`touch-target min-h-[44px] px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
           (logoConfig.dataUrl && logoConfig.visible) || (logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false)
             ? 'border-medium bg-slate-100 dark:bg-slate-800 text-[var(--text-main)] font-bold'
             : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -98,7 +99,8 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
             <button
               type="button"
               onClick={() => setIsLogoMenuOpen(false)}
-              className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-pointer"
+              aria-label="Fechar configuração de logotipos"
+              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -109,13 +111,14 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
             <button
               type="button"
               onClick={() => setActiveLogoTab('left')}
-              className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              className={`touch-target min-h-[44px] flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                 activeLogoTab === 'left'
                   ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              <span>⇱ Logo Esquerdo</span>
+              <Icon name="format_align_left" size={14} />
+              <span>Logo Esquerdo</span>
               {logoConfig.dataUrl && logoConfig.visible && (
                 <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo esquerdo ativo" />
               )}
@@ -124,13 +127,14 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
             <button
               type="button"
               onClick={() => setActiveLogoTab('right')}
-              className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+              className={`touch-target min-h-[44px] flex-1 py-1.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                 activeLogoTab === 'right'
                   ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              <span>Logo Direito ⇲</span>
+              <span>Logo Direito</span>
+              <Icon name="format_align_right" size={14} />
               {logoConfig.secondaryDataUrl && logoConfig.secondaryVisible !== false && (
                 <span className="w-2 h-2 rounded-full bg-emerald-400" title="Logo direito ativo" />
               )}
@@ -149,7 +153,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                   <button
                     type="button"
                     onClick={() => handleChangeLogoPosition('header-left')}
-                    className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                    className={`touch-target min-h-[44px] p-1.5 rounded-lg border flex flex-col items-center justify-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                       logoConfig.position === 'header-left' ? 'border-info bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                     }`}
                   >
@@ -159,21 +163,21 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                   <button
                     type="button"
                     onClick={() => handleChangeLogoPosition('top-left')}
-                    className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                    className={`touch-target min-h-[44px] p-1.5 rounded-lg border flex flex-col items-center justify-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                       logoConfig.position === 'top-left' ? 'border-info bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                     }`}
                   >
-                    <span className="text-xs">⇱</span>
+                    <Icon name="format_align_left" size={14} />
                     <span className="text-xs">Topo Esq.</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleChangeLogoPosition('top-center')}
-                    className={`p-1.5 rounded-lg border flex flex-col items-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                    className={`touch-target min-h-[44px] p-1.5 rounded-lg border flex flex-col items-center justify-center gap-0.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                       logoConfig.position === 'top-center' ? 'border-info bg-sky-50 dark:bg-sky-950 font-bold' : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
                     }`}
                   >
-                    <span className="text-xs">⬌</span>
+                    <Icon name="format_align_center" size={14} />
                     <span className="text-xs">Topo Centro</span>
                   </button>
                 </div>
@@ -190,7 +194,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                       key={sz}
                       type="button"
                       onClick={() => handleChangeLogoSize(sz)}
-                      className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                      className={`touch-target min-h-[44px] py-1.5 rounded-lg border flex items-center justify-center text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                         logoConfig.size === sz
                           ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border-navy-800 dark:border-info font-bold shadow-tactile-sm'
                           : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
@@ -216,7 +220,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={logoUploading}
-                    className="flex-1 py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                    className="touch-target min-h-[44px] flex-1 py-2 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     <span>{logoUploading ? 'Carregando...' : 'Upload Logo Esq.'}</span>
@@ -228,7 +232,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                       setIsLogoMenuOpen(false);
                       setIsLogoGeneratorOpen(true);
                     }}
-                    className="py-1.5 px-2.5 rounded-xl border border-warning dark:border-warning bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                    className="touch-target min-h-[44px] py-2 px-2.5 rounded-xl border border-warning dark:border-warning bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
                     title="Criar brasão vetorial SVG"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
@@ -243,21 +247,21 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                     <button
                       type="button"
                       onClick={() => handleApplyPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
-                      className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
+                      className="touch-target min-h-[44px] flex-1 text-xs py-1.5 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium flex items-center justify-center text-center truncate cursor-pointer"
                     >
                       SEMUSA
                     </button>
                     <button
                       type="button"
                       onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
-                      className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
+                      className="touch-target min-h-[44px] flex-1 text-xs py-1.5 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium flex items-center justify-center text-center truncate cursor-pointer"
                     >
                       SESAU
                     </button>
                     <button
                       type="button"
                       onClick={() => handleApplyPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
-                      className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
+                      className="touch-target min-h-[44px] flex-1 text-xs py-1.5 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium flex items-center justify-center text-center truncate cursor-pointer"
                     >
                       SUS
                     </button>
@@ -268,7 +272,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                   <button
                     type="button"
                     onClick={handleRemoveLogo}
-                    className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                    className="touch-target min-h-[44px] py-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Remover Logo Esquerdo</span>
@@ -296,7 +300,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                       key={sz}
                       type="button"
                       onClick={() => handleChangeSecondaryLogoSize(sz)}
-                      className={`py-1 rounded-lg border text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                      className={`touch-target min-h-[44px] py-1.5 rounded-lg border flex items-center justify-center text-center cursor-pointer transition focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
                         (logoConfig.secondarySize || 'md') === sz
                           ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border-navy-800 dark:border-info font-bold shadow-tactile-sm'
                           : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
@@ -321,7 +325,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                   type="button"
                   onClick={() => secondaryFileInputRef.current?.click()}
                   disabled={secondaryLogoUploading}
-                  className="w-full py-1.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
+                  className="touch-target min-h-[44px] w-full py-2 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-tactile-sm transition"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   <span>{secondaryLogoUploading ? 'Carregando...' : 'Upload Logo Direito (SUS / Clínica)'}</span>
@@ -334,21 +338,21 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                     <button
                       type="button"
                       onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sus.publicUrl, 'SUS')}
-                      className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer font-bold text-sky-600 dark:text-sky-400"
+                      className="touch-target min-h-[44px] flex-1 text-xs py-1.5 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium flex items-center justify-center text-center truncate cursor-pointer font-bold text-sky-600 dark:text-sky-400"
                     >
                       SUS
                     </button>
                     <button
                       type="button"
                       onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.sesau_ro.publicUrl, 'SESAU')}
-                      className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
+                      className="touch-target min-h-[44px] flex-1 text-xs py-1.5 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium flex items-center justify-center text-center truncate cursor-pointer"
                     >
                       SESAU
                     </button>
                     <button
                       type="button"
                       onClick={() => handleApplySecondaryPresetLogo(PRESET_LOGOS.semusa.publicUrl, 'SEMUSA')}
-                      className="flex-1 text-xs py-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium text-center truncate cursor-pointer"
+                      className="touch-target min-h-[44px] flex-1 text-xs py-1.5 px-2 rounded-lg border border-[var(--border-subtle)] hover:border-medium flex items-center justify-center text-center truncate cursor-pointer"
                     >
                       SEMUSA
                     </button>
@@ -359,7 +363,7 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
                   <button
                     type="button"
                     onClick={handleRemoveSecondaryLogo}
-                    className="py-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                    className="touch-target min-h-[44px] py-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Remover Logo Direito</span>

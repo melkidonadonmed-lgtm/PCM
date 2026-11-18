@@ -59,7 +59,7 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
           {{medicamentos_prescritos}}
         </div>
 
-        <div style="margin-top: 24px; padding-top: 12px; border-top: 1px dashed #CBD5E1;">
+        <div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #CBD5E1;">
           <p style="font-size: 11px; color: #64748B; margin: 0;"><strong>Orientações Gerais:</strong> Tomar as medicações conforme os horários prescritos. Retornar à Unidade de Saúde em caso de febre persistente, piora dos sintomas ou reações adversas.</p>
         </div>
 
@@ -135,7 +135,7 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
           {{medicamentos_prescritos}}
         </div>
 
-        <div style="margin-top: 28px; padding: 8px; background: #FAF5FF; border-left: 3px solid #9333EA; font-size: 11px;">
+        <div style="margin-top: 28px; padding: 8px; background: #F1F5F9; border-left: 3px solid #243447; font-size: 11px;">
           <strong>Acompanhamento Ambulatorial:</strong> Manter uso regular das medicações. Trazer esta receita e exames complementares na próxima consulta de retorno agendada.
         </div>
 
@@ -214,7 +214,7 @@ export const PRESET_CLINICAL_TEMPLATES: SavedDocument[] = [
           <p style="margin: 3px 0 0 0;"><strong>ENDEREÇO:</strong> {{paciente_endereco}}</p>
         </div>
 
-        <div style="min-height: 140px; padding: 8px; border: 1px dashed #94A3B8; margin-bottom: 12px;">
+        <div style="min-height: 140px; padding: 8px; border: 1px solid #94A3B8; margin-bottom: 12px;">
           <p style="font-weight: bold; margin: 0 0 8px 0; text-transform: uppercase; color: #0F172A;">PRESCRIÇÃO MEDICAMENTOSA:</p>
           <p style="margin: 0 0 4px 0;"><strong>1. Cloridrato de Amitriptilina 25 mg (Comprimidos)</strong> • 30 comprimidos (trinta comprimidos)</p>
           <p style="margin: 0 0 10px 16px; color: #334155;">Tomar 01 (um) comprimido por via oral às 21:00 horas, diariamente durante 30 dias.</p>

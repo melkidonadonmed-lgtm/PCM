@@ -162,9 +162,9 @@ class CloudSyncManager {
         this.triggerSyncDebounced();
       });
 
-      db.workContexts.hook('updating', (modifications: Record<string, unknown>) => {
+      db.workContexts.hook('updating', (modifications) => {
         if (this.isApplyingRemoteChanges) return;
-        modifications.updatedAt = Date.now();
+        (modifications as Record<string, unknown>).updatedAt = Date.now();
         this.triggerSyncDebounced();
       });
 
@@ -187,10 +187,11 @@ class CloudSyncManager {
         }
       });
 
-      db.savedDocuments.hook('updating', (modifications: Record<string, unknown>, _primKey, obj) => {
+      db.savedDocuments.hook('updating', (modifications, _primKey, obj) => {
         if (this.isApplyingRemoteChanges) return;
-        modifications.updatedAt = Date.now();
-        if (obj.isTemplate || Boolean(modifications.isTemplate)) {
+        const mods = modifications as Record<string, unknown>;
+        mods.updatedAt = Date.now();
+        if (obj.isTemplate || Boolean(mods.isTemplate)) {
           this.triggerSyncDebounced();
         }
       });

@@ -43,7 +43,7 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="h-9 px-3 rounded-xl border border-medium dark:border-navy-700 bg-white dark:bg-navy-900 hover:bg-slate-50 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+        className="touch-target min-h-[44px] px-3 rounded-xl border border-medium dark:border-navy-700 bg-white dark:bg-navy-900 hover:bg-slate-50 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
         title="Selecionar marca d'água de papel timbrado para a folha A4"
       >
         <Icon name="layers" className="text-[15px] text-sky-600 dark:text-sky-400" />
@@ -75,7 +75,7 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
                     onChange(item.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left p-2 rounded-xl text-xs flex items-center justify-between gap-2.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none border ${
+                  className={`touch-target min-h-[44px] w-full text-left p-2 rounded-xl text-xs flex items-center justify-between gap-2.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none border ${
                     isSelected
                       ? 'bg-slate-100 dark:bg-[#27354A] text-slate-900 dark:text-slate-100 font-semibold border-slate-300 dark:border-white/15'
                       : 'border-transparent hover:bg-slate-100 dark:hover:bg-[#27354A]/60 text-slate-700 dark:text-slate-300 font-medium'

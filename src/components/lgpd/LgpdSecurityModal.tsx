@@ -106,7 +106,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
       aria-labelledby="lgpd-security-modal-title"
       data-state={isErasingAll ? 'loading' : 'idle'}
       aria-busy={isErasingAll}
-      className="fixed inset-0 z-[65] flex items-center justify-center p-3 sm:p-5 bg-black/70 isolate animate-backdrop-fade no-print"
+      className="fixed inset-0 z-[65] flex items-center justify-center p-3 sm:p-5 bg-[oklch(0.14_0.02_258/0.70)] isolate animate-backdrop-fade no-print"
       onClick={onClose}
     >
       <div
@@ -133,7 +133,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar central de segurança e LGPD"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
           >
             <Icon name="close" size={20} />
           </button>
@@ -145,15 +145,15 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
           <div
             className={`p-3.5 rounded-2xl border flex items-start gap-3 ${
               isCloudAuthenticated
-                ? 'bg-emerald-500/10 border-emerald-500/30'
-                : 'bg-sky-500/10 border-sky-500/30'
+                ? 'bg-[var(--accent-emerald-subtle)] border-[var(--accent-emerald-border)]'
+                : 'bg-[var(--surface-info-subtle)] border-[var(--border-info-subtle)]'
             }`}
           >
             <div
               className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
                 isCloudAuthenticated
-                  ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
-                  : 'bg-sky-500/20 text-sky-700 dark:text-sky-300'
+                  ? 'bg-[var(--accent-emerald-subtle)] text-emerald-700 dark:text-emerald-300 border border-[var(--accent-emerald-border)]'
+                  : 'bg-[var(--surface-info-subtle)] text-sky-700 dark:text-sky-300 border border-[var(--border-info-subtle)]'
               }`}
             >
               <Icon name={isCloudAuthenticated ? 'cloud_done' : 'lock'} size={18} />
@@ -197,7 +197,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                     Cookies e Armazenamento Estritamente Necessários (Offline-First)
                   </span>
                 </div>
-                <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-[11px] font-bold shrink-0">
+                <span className="px-2.5 py-1 rounded-lg bg-[var(--accent-emerald-subtle)] text-emerald-800 dark:text-emerald-200 border border-[var(--accent-emerald-border)] text-[11px] font-bold shrink-0">
                   Sempre Ativo
                 </span>
               </div>
@@ -319,7 +319,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                 id="btn-lgpd-modal-sanitize-shift"
                 type="button"
                 onClick={handleSanitizeClick}
-                className="p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-left flex flex-col justify-between gap-2 transition cursor-pointer group focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
+                className="p-3.5 rounded-2xl border border-[var(--accent-amber-border)] bg-[var(--accent-amber-subtle)] hover:bg-amber-100/80 dark:hover:bg-amber-950/50 text-left flex flex-col justify-between gap-2 transition cursor-pointer group focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
               >
                 <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs">
                   <Icon name="ink_eraser" size={18} />
@@ -335,9 +335,9 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                 id="btn-lgpd-modal-erase-all"
                 type="button"
                 onClick={() => setConfirmEraseAllOpen(true)}
-                className="p-3.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-left flex flex-col justify-between gap-2 transition cursor-pointer group focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                className="p-3.5 rounded-2xl border border-[var(--accent-rose-border)] bg-[var(--accent-rose-subtle)] hover:bg-rose-100/80 dark:hover:bg-rose-950/50 text-left flex flex-col justify-between gap-2 transition cursor-pointer group focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
               >
-                <div className="flex items-center gap-2 text-rose-700 dark:text-rose-300 font-bold text-xs">
+                <div className="flex items-center gap-2 text-rose-800 dark:text-rose-200 font-bold text-xs">
                   <Icon name="delete" size={18} />
                   <span>Eliminar Base Local</span>
                 </div>
@@ -353,7 +353,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             <div
               role="status"
               aria-live="polite"
-              className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-tab-fade"
+              className="p-3 rounded-xl bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-tab-fade"
             >
               <Icon name="check_circle" size={16} className="shrink-0" />
               <span>{feedbackMessage}</span>
@@ -370,7 +370,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                 onAcceptEssentialOnly();
                 onClose();
               }}
-              className="flex-1 sm:flex-initial min-h-[40px] px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="touch-target flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             >
               Apenas Necessários
             </button>
@@ -380,7 +380,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                 onAcceptAll();
                 onClose();
               }}
-              className="flex-1 sm:flex-initial min-h-[40px] px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="touch-target flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             >
               Aceitar Todos
             </button>
@@ -390,7 +390,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             id="btn-lgpd-save-preferences"
             type="button"
             onClick={handleSaveCustom}
-            className="w-full sm:w-auto btn-tactile-primary min-h-[40px] px-5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-tactile-btn cursor-pointer transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="touch-target w-full sm:w-auto btn-tactile-primary min-h-[44px] px-5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-tactile-btn cursor-pointer transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
           >
             <Icon name="check" size={16} />
             <span>Salvar Preferências LGPD</span>

@@ -39,7 +39,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
       {isDisabledSemMedico && (
         <div data-state="idle" aria-busy={false}
           id={avisoId}
-          className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#27354A] border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 text-xs flex items-center justify-between gap-2"
+          className="px-3 py-2 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)] text-[var(--text-secondary)] text-xs flex items-center justify-between gap-2"
         >
           <div className="flex items-center gap-2 min-w-0">
             <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
@@ -51,7 +51,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             <button
               type="button"
               onClick={onAbrirPerfilMedico}
-              className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#334155] hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-white/12 font-semibold text-xs transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-lg bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] border border-[var(--border-subtle)] font-semibold text-xs transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             >
               Configurar médico
             </button>
@@ -67,7 +67,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             iconName="print"
             onClick={onNavigateToPrint}
             aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-            className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-btn"
+            className="px-2.5 py-2 gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-btn"
             title={
               itemsCount === 0
                 ? 'Imprimir ou gerar PDF da receita em branco (para anotações à mão e carimbo)'
@@ -83,7 +83,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
               variant="secondary"
               iconName="description"
               onClick={onNavigateToEditor}
-              className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm text-slate-700 dark:text-slate-300"
+              className="px-2.5 py-2 gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm text-slate-700 dark:text-slate-300"
               title="Abrir no Editor visual A4 para ajustes de texto livre, layout ou timbrados"
             >
               Editor de Folha A4
@@ -97,7 +97,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             onClick={onSendWhatsApp}
             disabled={isTextShareDisabled}
             aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-            className="!px-2.5 !py-2 !gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm"
+            className="px-2.5 py-2 gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm"
             title={
               isTextShareDisabled
                 ? 'Adicione ao menos um medicamento para enviar o texto pelo WhatsApp'
@@ -114,7 +114,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
           onClick={onCopyText}
           disabled={isTextShareDisabled}
           aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-          className="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:underline flex items-center gap-1.5 py-2 px-1 cursor-pointer transition rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500"
+          className="touch-target min-h-[44px] min-w-[44px] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:underline flex items-center justify-center gap-1.5 py-2 px-2 cursor-pointer transition rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500"
           title={
             isTextShareDisabled
               ? 'Adicione ao menos um medicamento para copiar o texto'

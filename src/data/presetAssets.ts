@@ -68,7 +68,7 @@ export const PRESET_WATERMARKS: PresetWatermarkItem[] = [
     name: 'SUS — 1 Via (Folha Inteira)',
     description: "Logotipo do SUS centralizado suavemente na folha A4",
     layout: 'single',
-    publicUrl: '/watermarks/sus.png',
+    publicUrl: LOGO_DO_SUS,
     defaultOpacity: 0.09
   },
   {
@@ -76,7 +76,7 @@ export const PRESET_WATERMARKS: PresetWatermarkItem[] = [
     name: 'SUS — 2 Vias (Lado a Lado)',
     description: "Duas marcas d'água do SUS para receituários em 2 colunas",
     layout: 'double',
-    publicUrl: '/watermarks/sus.png',
+    publicUrl: LOGO_DO_SUS,
     defaultOpacity: 0.08
   },
   {
@@ -84,7 +84,7 @@ export const PRESET_WATERMARKS: PresetWatermarkItem[] = [
     name: 'SUS — 3 Vias (Três Colunas)',
     description: "Três marcas d'água do SUS para pedidos de exames e guias triplas",
     layout: 'triple',
-    publicUrl: '/watermarks/sus.png',
+    publicUrl: LOGO_DO_SUS,
     defaultOpacity: 0.08
   },
   {

@@ -149,20 +149,25 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
       setSheetZoom(1);
       return;
     }
-    const medir = () => {
-      const disponivel = moldura.clientWidth;
+    const atualizarZoom = (disponivel: number) => {
       if (disponivel > 0) {
         setSheetZoom(Math.min(1, disponivel / larguraFolhaEditor));
       }
     };
-    medir();
     if (typeof ResizeObserver !== 'undefined') {
-      const obs = new ResizeObserver(medir);
+      const obs = new ResizeObserver((entries) => {
+        const disponivel = entries[0]?.contentRect.width;
+        if (typeof disponivel === 'number' && disponivel > 0) {
+          atualizarZoom(disponivel);
+        }
+      });
       obs.observe(moldura);
       return () => obs.disconnect();
     }
-    window.addEventListener('resize', medir);
-    return () => window.removeEventListener('resize', medir);
+    const onResize = () => atualizarZoom(moldura.clientWidth);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, [larguraFolhaEditor]);
 
   useEffect(() => {
@@ -195,26 +200,27 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
       <div
         ref={sheetRef}
         id="printable-a4-sheet"
-        className={`a4-editor-canvas shrink-0 bg-white text-slate-900 rounded-lg shadow-2xl relative transition duration-200 ${
+        className={`a4-editor-canvas shrink-0 bg-white text-slate-900 rounded-lg folha-a4-shadow relative transition duration-200 ${
           pageOrientation === 'landscape' ? 'canvas-landscape' : 'canvas-portrait'
         } ${viaLayout === '2-vias' ? 'vias-2' : ''}`}
-        style={{
-          width: `${larguraFolhaEditor}px`,
-          minHeight: `${alturaFolhaEditor}px`,
-          zoom: sheetZoom,
-          marginInline: 'auto',
-          padding: pageOrientation === 'landscape' ? '10mm 14mm' : '20mm',
-          boxSizing: 'border-box',
-          backgroundColor: '#FFFFFF',
-          color: '#0F172A',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          boxShadow: '0 24px 48px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08)',
-          position: 'relative',
-          fontFamily: selectedFont.family,
-          fontSize: `${baseFontSize}pt`,
-        }}
+        style={
+          {
+            width: `${larguraFolhaEditor}px`,
+            minHeight: `${alturaFolhaEditor}px`,
+            '--sheet-zoom': sheetZoom,
+            marginInline: 'auto',
+            padding: pageOrientation === 'landscape' ? '10mm 14mm' : '20mm',
+            boxSizing: 'border-box',
+            backgroundColor: '#FFFFFF',
+            color: '#0F172A',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative',
+            fontFamily: selectedFont.family,
+            fontSize: `${baseFontSize}pt`,
+          } as React.CSSProperties
+        }
       >
         <WatermarkOverlay type={docWatermark} opacity={watermarkOpacity} />
 
@@ -262,7 +268,7 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
 
         {/* AVISO E RESTAURAÇÃO DE CABEÇALHO OCULTADO (no-print) */}
         {!headerConfig.showHeader && (
-          <div className="no-print mb-4 p-2.5 rounded-xl border border-dashed border-warning bg-amber-50/70 text-amber-800 text-xs flex items-center justify-between">
+          <div className="no-print mb-4 p-2.5 rounded-xl border border-amber-300 bg-amber-50/70 text-amber-800 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Icon name="visibility_off" size={16} className="text-amber-600 shrink-0" />
               <span>
@@ -314,7 +320,7 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
 
         {/* AVISO E RESTAURAÇÃO DE RODAPÉ OCULTADO (no-print) */}
         {!headerConfig.showFooter && (
-          <div className="no-print mt-4 p-2 rounded-xl border border-dashed border-medium bg-slate-50 text-slate-600 text-xs flex items-center justify-between">
+          <div className="no-print mt-4 p-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-600 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Icon name="visibility_off" size={14} className="text-slate-500 shrink-0" />
               <span>

@@ -1,8 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { calculatePediatricDose, generateScheduleTimes } from '../utils/doseCalculator';
 import { PEDIATRIC_MEDICATIONS, CLINICAL_PROTOCOLS } from '../data/pediatricMeds';
 import { UNIFIED_MEDICATIONS } from '../data/medicationDatabase';
 import { COMMON_CID10, searchCID10 } from '../data/cidCatalog';
+import { LOGO_DO_SUS, PRESET_WATERMARKS } from '../data/presetAssets';
 import { PediatricMedication } from '../types';
 import {
   PWA_INCLUDE_ASSETS,
@@ -294,12 +297,20 @@ describe('Integridade dos Catálogos Clínicos Modularizados (TASK-10 / YMYL)', 
     expect(isIgnoredFromPwaPrecache('assets/vendor-firebase-BYhIg_hw.js')).toBe(true);
     expect(isIgnoredFromPwaPrecache('assets/vendor-canvg-D6c-glFS.js')).toBe(true);
 
-    // Ativos obrigatórios do fluxo offline nunca são ignorados
+    // Ativos obrigatórios do fluxo offline nunca são ignorados e marca d'água SUS é unificada em LOGO_DO_SUS (TASK-15 & TASK-16)
     expect(isIgnoredFromPwaPrecache('formularios-sus-offline.html')).toBe(false);
     expect(isIgnoredFromPwaPrecache('logos/sus.png')).toBe(false);
-    expect(isIgnoredFromPwaPrecache('watermarks/sus.png')).toBe(false);
     expect(isIgnoredFromPwaPrecache('pwa-192x192.png')).toBe(false);
     expect(isIgnoredFromPwaPrecache('assets/vendor-pdf-canvas-D1v1qYO1.js')).toBe(false);
+
+    const susWatermarks = PRESET_WATERMARKS.filter((w) => w.id.startsWith('sus_'));
+    expect(susWatermarks.length).toBe(3);
+    for (const wm of susWatermarks) {
+      expect(wm.publicUrl).toBe(LOGO_DO_SUS);
+    }
+    const repoRoot = path.resolve(__dirname, '../..');
+    expect(fs.existsSync(path.join(repoRoot, 'public/logos/sus.png'))).toBe(true);
+    expect(fs.existsSync(path.join(repoRoot, 'public/watermarks/sus.png'))).toBe(false);
 
     // Casos adversariais (path traversal, vazios e tipos inválidos)
     expect(isIgnoredFromPwaPrecache('../formularios-sus/apac-laudo.png')).toBe(false);

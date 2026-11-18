@@ -177,7 +177,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[1100] flex items-center justify-center p-3 sm:p-4 bg-black/65 backdrop-blur-xs animate-backdrop-fade no-print"
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-3 sm:p-4 bg-[oklch(0.14_0.02_258/0.65)] backdrop-blur-xs animate-backdrop-fade no-print"
     >
       <div
         ref={modalRef}
@@ -202,7 +202,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
             type="button"
             onClick={onClose}
             aria-label="Fechar importação multimodal"
-            className="w-9 h-9 rounded-xl border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
           >
             <Icon name="close" size={18} />
           </button>
@@ -266,7 +266,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
             </div>
 
             {voiceStatusMessage && (
-              <div role="status" className="px-3 py-2 rounded-xl bg-sky-500/10 border border-sky-500/25 text-xs text-sky-700 dark:text-sky-300">
+              <div role="status" className="px-3 py-2 rounded-xl bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] text-xs text-sky-700 dark:text-sky-300">
                 {voiceStatusMessage}
               </div>
             )}

@@ -43,7 +43,7 @@ export const LgpdConsentBanner: React.FC<LgpdConsentBannerProps> = ({
               <span className="text-xs sm:text-sm font-bold text-[var(--text-main)]">
                 Segurança Clínica, Cookies &amp; LGPD (Lei nº 13.709/2018)
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--accent-emerald-subtle)] text-emerald-800 dark:text-emerald-200 border border-[var(--accent-emerald-border)]">
                 100% Local-First • Zero Rastreadores
               </span>
             </div>
@@ -71,7 +71,7 @@ export const LgpdConsentBanner: React.FC<LgpdConsentBannerProps> = ({
             id="btn-lgpd-accept-essential"
             type="button"
             onClick={onAcceptEssential}
-            className="flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl border border-sky-500/35 bg-sky-500/10 hover:bg-sky-500/20 text-sky-800 dark:text-sky-200 text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] hover:bg-sky-100/70 dark:hover:bg-sky-950/50 text-sky-800 dark:text-sky-200 text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             title="Ativar apenas armazenamento local essencial offline e bloquear cookies de nuvem"
           >
             <Icon name="lock" size={15} className="shrink-0" />

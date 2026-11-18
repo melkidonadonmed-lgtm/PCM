@@ -1,6 +1,6 @@
 import React from 'react';
 import { WatermarkType } from '../types';
-import { PRESET_WATERMARKS } from '../data/presetAssets';
+import { LOGO_DO_SUS, PRESET_WATERMARKS } from '../data/presetAssets';
 
 /**
  * Camada de Marca d'Água da Folha A4.
@@ -24,7 +24,10 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
 
   const preset = PRESET_WATERMARKS.find(w => w.id === type);
   const effectiveOpacity = opacity !== undefined ? opacity : (preset?.defaultOpacity || 0.08);
-  const logoSrc = customDataUrl || preset?.publicUrl || '/watermarks/sus.png';
+  const normalizedCustomUrl = customDataUrl === '/watermarks/sus.png' ? LOGO_DO_SUS : customDataUrl;
+  const logoSrc = normalizedCustomUrl || preset?.publicUrl || LOGO_DO_SUS;
+  const intrinsicWidth = normalizedCustomUrl && normalizedCustomUrl !== LOGO_DO_SUS ? undefined : 770;
+  const intrinsicHeight = normalizedCustomUrl && normalizedCustomUrl !== LOGO_DO_SUS ? undefined : 398;
 
   return (
     <div 
@@ -37,7 +40,9 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
           <img 
             src={logoSrc} 
             alt="" 
-            className="w-[55%] max-w-80 max-h-80 object-contain filter grayscale-20"
+            width={intrinsicWidth}
+            height={intrinsicHeight}
+            className="w-[55%] h-auto max-w-80 max-h-80 object-contain filter grayscale-20"
             draggable={false}
           />
         </div>
@@ -49,7 +54,9 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[65%] max-w-52 max-h-52 object-contain filter grayscale-20"
+              width={intrinsicWidth}
+              height={intrinsicHeight}
+              className="w-[65%] h-auto max-w-52 max-h-52 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -57,7 +64,9 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[65%] max-w-52 max-h-52 object-contain filter grayscale-20"
+              width={intrinsicWidth}
+              height={intrinsicHeight}
+              className="w-[65%] h-auto max-w-52 max-h-52 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -70,7 +79,9 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[75%] max-w-36 max-h-36 object-contain filter grayscale-20"
+              width={intrinsicWidth}
+              height={intrinsicHeight}
+              className="w-[75%] h-auto max-w-36 max-h-36 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -78,7 +89,9 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[75%] max-w-36 max-h-36 object-contain filter grayscale-20"
+              width={intrinsicWidth}
+              height={intrinsicHeight}
+              className="w-[75%] h-auto max-w-36 max-h-36 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -86,7 +99,9 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
             <img 
               src={logoSrc} 
               alt="" 
-              className="w-[75%] max-w-36 max-h-36 object-contain filter grayscale-20"
+              width={intrinsicWidth}
+              height={intrinsicHeight}
+              className="w-[75%] h-auto max-w-36 max-h-36 object-contain filter grayscale-20"
               draggable={false}
             />
           </div>
@@ -98,6 +113,8 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
           <img 
             src="/logos/rondonia-brasao.svg" 
             alt="" 
+            width={595}
+            height={842}
             className="w-[65%] max-w-96 max-h-125 object-contain filter"
             draggable={false}
           />

@@ -137,7 +137,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
         >
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 transition-opacity cursor-pointer"
+            className="fixed inset-0 bg-[oklch(0.14_0.02_258/0.50)] transition-opacity cursor-pointer"
             onClick={() => setIsModelsDrawerOpen(false)}
           />
 
@@ -160,7 +160,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                 type="button"
                 onClick={() => setIsModelsDrawerOpen(false)}
                 aria-label="Fechar modelos e estilos"
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -287,7 +287,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                   </div>
 
                   {filteredSavedTemplates.length === 0 ? (
-                    <div className="p-4 rounded-xl border border-dashed border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
+                    <div className="p-4 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
                       {templateSearch ? (
                         'Nenhum modelo encontrado para esta busca.'
                       ) : (

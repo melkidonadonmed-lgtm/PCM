@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import {
   resolveIconName,
@@ -57,12 +59,78 @@ describe('Icon Component — Anti-Mutation, Alias Resolution & WOFF2 Subset Eval
   it('deve auditar o subset WOFF2 de material-symbols sem glifos duplicados, ordenado alfabeticamente e cobrindo 100% dos aliases', () => {
     const report = evaluateMaterialSymbolsSubset();
     expect(report.upstreamWoff2Bytes).toBe(4_001_608);
+    expect(report.actualSubsetWoff2Bytes).toBe(39_512);
     expect(report.subsetGlyphCount).toBe(CANONICAL_MATERIAL_SYMBOLS_SUBSET.length);
-    expect(report.subsetGlyphCount).toBeGreaterThanOrEqual(130);
+    expect(report.subsetGlyphCount).toBe(135);
+    expect(report.preservedAxes).toEqual(['FILL', 'opsz']);
+    expect(report.instancedAxes).toEqual({ wght: 400, GRAD: 0 });
     expect(report.isSortedAlphabetically).toBe(true);
     expect(report.hasDuplicateGlyphs).toBe(false);
     expect(report.unmappedAliasTargets).toEqual([]);
-    expect(report.estimatedSavingsPercent).toBeGreaterThan(95);
+    expect(report.estimatedSavingsPercent).toBeGreaterThanOrEqual(99);
+  });
+
+  it('deve carregar o binário local material-symbols-outlined.subset.woff2 (< 100 KB, magic wOF2) e cobrir 100% dos ícones de src/ (TASK-16)', () => {
+    const srcDir = path.resolve(__dirname, '..');
+    const mainTsx = fs.readFileSync(path.join(srcDir, 'main.tsx'), 'utf8');
+    expect(mainTsx).not.toContain('material-symbols/outlined.css');
+
+    const a4Css = fs.readFileSync(path.join(srcDir, 'styles/a4-and-editor.css'), 'utf8');
+    expect(a4Css).toContain("url('../assets/fonts/material-symbols-outlined.subset.woff2')");
+    expect(a4Css).toContain('font-weight: 100 700;');
+    expect(a4Css).toContain('font-synthesis: none;');
+
+    const woff2Path = path.join(srcDir, 'assets/fonts/material-symbols-outlined.subset.woff2');
+    expect(fs.existsSync(woff2Path)).toBe(true);
+    const woff2Buf = fs.readFileSync(woff2Path);
+    expect(woff2Buf.subarray(0, 4).toString('ascii')).toBe('wOF2');
+    expect(woff2Buf.length).toBe(39_512);
+    expect(woff2Buf.length).toBeLessThan(100_000);
+
+    const walk = (dir: string): string[] => {
+      const res: string[] = [];
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const p = path.join(dir, e.name);
+        if (e.isDirectory()) res.push(...walk(p));
+        else if (/\.(ts|tsx)$/.test(e.name)) res.push(p);
+      }
+      return res;
+    };
+
+    const nonIconStateLiterals = new Set([
+      'PEP',
+      'SBAR',
+      'A4',
+      'BED_RECORDED',
+      'PCR_SOAP',
+      'btn-tactile-icon w-11 h-11 min-w-[44px] min-h-[44px]',
+    ]);
+    const unmappedUsages: string[] = [];
+
+    for (const file of walk(srcDir)) {
+      if (file.includes('__tests__')) continue;
+      const txt = fs.readFileSync(file, 'utf8');
+      const rel = path.relative(srcDir, file);
+      const candidates: string[] = [];
+
+      for (const m of txt.matchAll(/<Icon[^>]*?\bname=["']([^"']+)["']/g)) candidates.push(m[1]);
+      for (const m of txt.matchAll(/<Icon[^>]*?\bname=\{([^}]+)\}/g)) {
+        for (const s of m[1].matchAll(/['"]([a-zA-Z0-9_-]+)['"]/g)) candidates.push(s[1]);
+      }
+      for (const m of txt.matchAll(/createMaterialIcon\(['"]([^'"]+)['"]\)/g)) candidates.push(m[1]);
+      for (const m of txt.matchAll(/\b(?:icon|icone|iconName|iconRight)\s*[:=]\s*['"]([^'"]+)['"]/g)) {
+        candidates.push(m[1]);
+      }
+
+      for (const name of candidates) {
+        if (nonIconStateLiterals.has(name)) continue;
+        if (!isCanonicalMaterialSymbol(name)) {
+          unmappedUsages.push(`${rel}: ${name}`);
+        }
+      }
+    }
+
+    expect(unmappedUsages).toEqual([]);
   });
 
   it('deve rejeitar glifos desconhecidos ou entradas vazias na validação estrita do subset (caso adversarial)', () => {

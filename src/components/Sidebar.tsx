@@ -228,7 +228,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => handleNavClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`relative w-full h-9 flex items-center justify-between px-2.5 rounded-xl text-[13px] tracking-[-0.01em] transition-colors duration-150 ease-out cursor-pointer group active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
+        className={`relative w-full min-h-[44px] py-1.5 flex items-center justify-between px-2.5 rounded-xl text-[13px] tracking-[-0.01em] transition-colors duration-150 ease-out cursor-pointer group active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-400 outline-none ${
           isActive
             ? 'nav-item-active sidebar-active-surface text-[var(--sidebar-text-primary,#F8FAFC)] font-semibold'
             : 'text-[var(--sidebar-text-secondary,#E2E8F0)] hover:bg-white/[0.07] hover:border-white/10 hover:text-white font-medium border border-transparent'
@@ -293,7 +293,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div 
         onClick={onClose || onToggleOpen}
         aria-hidden="true"
-        className={`fixed inset-0 z-[55] bg-black/70 lg:hidden transition-opacity duration-300 cursor-pointer ${
+        className={`fixed inset-0 z-[55] bg-[oklch(0.14_0.02_258/0.70)] lg:hidden transition-opacity duration-300 cursor-pointer ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       />
@@ -333,7 +333,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--sidebar-text-secondary,#E2E8F0)] truncate">
                   Navegação
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-400/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
                   {activeMacroModuleLabel}
                 </span>
               </div>
@@ -342,7 +342,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={onClose || onToggleOpen}
                 aria-label="Fechar menu lateral"
                 title={isDesktop ? 'Recolher menu lateral' : 'Fechar menu lateral'}
-                className="w-7 h-7 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.12] hover:border-white/20 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors duration-150 shrink-0"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.12] hover:border-white/20 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors duration-150 shrink-0"
               >
                 <Icon name={isDesktop ? 'chevron_left' : 'close'} size={15} />
               </button>
@@ -384,7 +384,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className="h-9 px-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer group shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset"
+              className="min-h-[44px] py-1.5 px-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer group shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset"
               title={
                 hasDoctor
                   ? `${doctor?.name} — CRM ${doctor?.crm}/${doctor?.crmState || 'SP'}${doctor?.rqe ? ' • RQE ' + doctor.rqe : ''}`
@@ -392,7 +392,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }
             >
               <div className="flex items-center gap-2 min-w-0 flex-1">
-                <div className="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-200 border border-sky-400/25 flex items-center justify-center font-bold text-[10px] shrink-0 shadow-tactile-sm">
+                <div className="w-6 h-6 rounded-lg bg-sky-400/15 text-sky-200 border border-sky-400/25 flex items-center justify-center font-bold text-[10px] shrink-0 shadow-tactile-sm">
                   CRM
                 </div>
                 <span className="text-[13px] font-semibold tracking-[-0.01em] truncate text-[var(--sidebar-text-primary,#F8FAFC)]">
@@ -412,7 +412,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               id="sidebar-doctor-chip"
               type="button"
               onClick={handleOpenDoctor}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-sky-500/15 text-sky-200 border border-sky-400/25 hover:bg-sky-500/25 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-sky-400/15 text-sky-200 border border-sky-400/25 hover:bg-sky-400/25 font-bold text-xs flex items-center justify-center shadow-tactile-sm transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
               aria-label="Perfil do Médico"
             >
               <span>CRM</span>
@@ -435,9 +435,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className={`h-9 px-2.5 rounded-xl border transition-colors duration-150 active:translate-y-px cursor-pointer group shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset ${
+              className={`min-h-[44px] py-1.5 px-2.5 rounded-xl border transition-colors duration-150 active:translate-y-px cursor-pointer group shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset ${
                 hasPatient
-                  ? 'border-sky-400/30 bg-sky-500/[0.10] hover:bg-sky-500/[0.16] hover:border-sky-400/45'
+                  ? 'border-sky-400/30 bg-sky-400/[0.10] hover:bg-sky-400/[0.16] hover:border-sky-400/45'
                   : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20'
               }`}
               title={
@@ -450,7 +450,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div
                   className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 shadow-tactile-sm border ${
                     hasPatient
-                      ? 'bg-sky-500/20 text-sky-200 border-sky-400/30'
+                      ? 'bg-sky-400/20 text-sky-200 border-sky-400/30'
                       : 'bg-white/10 text-slate-300 border-white/15'
                   }`}
                 >
@@ -461,7 +461,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
               </div>
               {hasPatient && patientWeight > 0 ? (
-                <span className="text-[11px] font-extrabold px-1.5 py-0.5 rounded-md bg-sky-500/25 text-sky-200 border border-sky-400/30 shrink-0 clinical-unit clinical-tabular-nums">
+                <span className="text-[11px] font-extrabold px-1.5 py-0.5 rounded-md bg-sky-400/25 text-sky-200 border border-sky-400/30 shrink-0 clinical-unit clinical-tabular-nums">
                   {patientWeight.toLocaleString('pt-BR')} kg
                 </span>
               ) : (
@@ -475,7 +475,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={handleOpenPatient}
               className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl border flex items-center justify-center shadow-tactile-sm transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group ${
                 hasPatient
-                  ? 'bg-sky-500/20 text-sky-200 border-sky-400/30 hover:bg-sky-500/30'
+                  ? 'bg-sky-400/20 text-sky-200 border-sky-400/30 hover:bg-sky-400/30'
                   : 'bg-white/[0.06] text-slate-300 border-white/10 hover:bg-white/15 hover:text-white'
               }`}
               aria-label="Identificar paciente"
@@ -504,32 +504,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'overflow-visible py-2.5 px-1.5 space-y-2 flex flex-col items-center'
           }`}
         >
-          <div className={isOpen ? 'w-full space-y-2 relative' : 'w-full flex flex-col items-center space-y-2 relative'}>
-            {/* Grupo 1: Atendimento Clínico Principal */}
-            <div>
+          <nav
+            aria-label="Menu Lateral de Navegação"
+            className={isOpen ? 'w-full flex flex-col gap-2 relative' : 'w-full flex flex-col items-center gap-2 relative'}
+          >
+            {/* Grupo 1: Atendimento Clínico Principal (4 itens <= 6 por <nav>) */}
+            <div role="group" aria-label="Atendimento" className="w-full">
               {isOpen && (
                 <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted,#94A3B8)] px-2.5 mb-1 leading-none">
                   Atendimento
                 </p>
               )}
-              <nav className={isOpen ? 'space-y-0.5' : 'space-y-1.5 w-full flex flex-col items-center'}>
+              <div className={isOpen ? 'space-y-0.5' : 'space-y-1.5 w-full flex flex-col items-center'}>
                 {coreHubNavItems.map(renderNavButton)}
-              </nav>
+              </div>
             </div>
+          </nav>
 
-            {/* Grupo 2: Módulo de Apoio Clínico */}
-            <div>
-              {isOpen && (
-                <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted,#94A3B8)] px-2.5 mb-1 leading-none">
-                  Módulo de Apoio Clínico
-                </p>
-              )}
-              <nav className={isOpen ? 'space-y-0.5' : 'space-y-1.5 w-full flex flex-col items-center'}>
-                {clinicalToolsNavItems.map(renderNavButton)}
-              </nav>
+          {/* Grupo 2: Módulo de Apoio Clínico (fora de <nav> para respeitar <= 6 itens por landmark) */}
+          <div role="region" aria-label="Módulo de Apoio Clínico" className="w-full">
+            {isOpen && (
+              <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted,#94A3B8)] px-2.5 mb-1 leading-none">
+                Módulo de Apoio Clínico
+              </p>
+            )}
+            <div className={isOpen ? 'space-y-0.5' : 'space-y-1.5 w-full flex flex-col items-center'}>
+              {clinicalToolsNavItems.map(renderNavButton)}
             </div>
+          </div>
 
-            {/* Grupo 3: Kits de Plantão */}
+          {/* Grupo 3: Kits de Plantão */}
+          <div role="region" aria-label="Kits de Plantão" className="w-full">
             <SidebarKitsGroupSection
               isOpen={isOpen}
               showKits={showKits}

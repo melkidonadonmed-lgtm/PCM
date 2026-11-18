@@ -49,7 +49,7 @@ export const VectorCell: React.FC<VectorCellProps> = ({
 
   return (
     <div
-      className={`${colClass} relative group/suscell border-r border-b border-black p-1.5 flex flex-col justify-between bg-white focus-within:bg-sky-50/70 transition-colors`}
+      className={`${colClass} relative group/suscell border-r border-b border-[#0F172A] p-1.5 flex flex-col justify-between bg-white focus-within:bg-sky-50/70 transition-colors`}
     >
       <div className="flex items-center justify-between gap-1 mb-0.5">
         <span className="text-[0.5rem] font-bold uppercase tracking-tight text-slate-800 leading-none select-none">
@@ -125,7 +125,7 @@ export const SusVectorLmeBlock: React.FC<SusVectorLmeBlockProps> = ({
 
   return (
     <>
-      <div className="col-span-12 bg-black text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-black">
+      <div className="col-span-12 bg-[#0F172A] text-white text-[0.5625rem] font-extrabold uppercase tracking-wider px-2 py-1 border-r border-b border-[#0F172A]">
         3. Solicitação de Medicamentos — Componente Especializado da Assistência Farmacêutica (LME / CEAF)
       </div>
 
@@ -170,13 +170,13 @@ export const SusVectorLmeBlock: React.FC<SusVectorLmeBlockProps> = ({
       />
 
       {/* Cabeçalho da Grade Mensal de Medicamentos (1º ao 6º Mês) */}
-      <div className="col-span-6 border-r border-b border-black px-1.5 py-1 bg-slate-100 text-[0.5rem] font-extrabold uppercase tracking-tight text-slate-900">
+      <div className="col-span-6 border-r border-b border-[#0F172A] px-1.5 py-1 bg-slate-100 text-[0.5rem] font-extrabold uppercase tracking-tight text-slate-900">
         Medicamento Solicitado (Nome Genérico / DCB, Concentração e Forma Farmacêutica)
       </div>
       {[1, 2, 3, 4, 5, 6].map((mes) => (
         <div
           key={mes}
-          className="col-span-1 border-r border-b border-black px-1 py-1 bg-slate-100 text-center text-[0.5rem] font-extrabold uppercase tracking-tight text-slate-900 clinical-tabular-nums"
+          className="col-span-1 border-r border-b border-[#0F172A] px-1 py-1 bg-slate-100 text-center text-[0.5rem] font-extrabold uppercase tracking-tight text-slate-900 clinical-tabular-nums"
         >
           {mes}º Mês
         </div>
@@ -184,7 +184,7 @@ export const SusVectorLmeBlock: React.FC<SusVectorLmeBlockProps> = ({
 
       {rows.map((row, idx) => (
         <React.Fragment key={idx}>
-          <div className="col-span-6 border-r border-b border-black p-1.5 bg-white focus-within:bg-sky-50/70">
+          <div className="col-span-6 border-r border-b border-[#0F172A] p-1.5 bg-white focus-within:bg-sky-50/70">
             {staticPrintMode ? (
               <div className="text-[11px] font-semibold text-slate-950 min-h-[16px]">
                 {row.name ? `${idx + 1}. ${row.name}` : `${idx + 1}.`}
@@ -210,7 +210,7 @@ export const SusVectorLmeBlock: React.FC<SusVectorLmeBlockProps> = ({
             return (
               <div
                 key={mIdx}
-                className="col-span-1 border-r border-b border-black p-1 bg-white flex items-center justify-center focus-within:bg-sky-50/70"
+                className="col-span-1 border-r border-b border-[#0F172A] p-1 bg-white flex items-center justify-center focus-within:bg-sky-50/70"
               >
                 {staticPrintMode ? (
                   <div className="text-[11px] font-mono font-bold text-slate-950 text-center clinical-tabular-nums min-h-[16px]">

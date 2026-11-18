@@ -110,7 +110,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
               Exportação Prontuário (PEP / SBAR / Editor A4)
             </h4>
           </div>
-          <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 shrink-0">
+          <span className="rounded bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] px-1.5 py-0.5 text-[11px] font-semibold text-emerald-800 dark:text-emerald-200 shrink-0">
             Zero-PII / LGPD
           </span>
         </div>
@@ -128,10 +128,10 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                 <button
                   type="button"
                   onClick={() => onBedIdentifierChange('')}
-                  className="chip-neutral px-1.5 py-0.5 rounded text-[10px] font-medium inline-flex items-center gap-0.5 cursor-pointer"
+                  className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
                   title="Limpar identificador de leito"
                 >
-                  <Icon name="close" size={11} />
+                  <Icon name="close" size={14} />
                   <span>Limpar</span>
                 </button>
               )}
@@ -218,7 +218,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                 <Icon name="local_hospital" size={14} />
                 Integração Internação & Dashboard (MOD-03)
               </span>
-              <span className="rounded bg-sky-500/15 px-1.5 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+              <span className="rounded bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] px-1.5 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
                 EF/LT {selectedHospitalBed.wardAndBed}
               </span>
             </div>

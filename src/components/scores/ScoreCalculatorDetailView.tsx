@@ -224,7 +224,7 @@ export const ScoreCalculatorDetailView: React.FC<
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300">
+              <span className="rounded-md bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] px-2 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300">
                 {calculator.acronym}
               </span>
               <span className="text-[11px] font-medium text-[var(--text-muted)] truncate max-w-md">
@@ -287,7 +287,7 @@ export const ScoreCalculatorDetailView: React.FC<
               <span className="text-[10px] font-bold uppercase tracking-wider opacity-85">
                 Escore Calculado
               </span>
-              <span className="rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 font-mono text-[10px] uppercase clinical-tabular-nums">
+              <span className="rounded bg-[oklch(0.20_0.02_255/0.10)] dark:bg-white/10 px-1.5 py-0.5 font-mono text-[10px] uppercase clinical-tabular-nums">
                 Faixa: {calculator.minPossibleScore} a{' '}
                 {calculator.maxPossibleScore}
               </span>
@@ -404,7 +404,7 @@ export const ScoreCalculatorDetailView: React.FC<
                       <span className="font-bold text-slate-900 dark:text-white">
                         {act.recommendationTitle}
                       </span>
-                      <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                      <span className="rounded-md bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-800 dark:text-emerald-200">
                         Destino: {act.dispositionTarget}
                       </span>
                     </div>

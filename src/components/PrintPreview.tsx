@@ -188,7 +188,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   const temTextoCompartilhavel = Boolean(getFormattedDocumentText());
   const tituloAcao = (texto: string) => texto;
   const classeBotaoSecundario =
-    'btn-tactile-secondary h-10 sm:h-11 px-3.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 shrink-0 whitespace-nowrap transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none';
+    'btn-tactile-secondary touch-target min-h-[44px] px-3.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 shrink-0 whitespace-nowrap transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none';
 
   return (
     <div data-state="idle" aria-busy={false} id="print-preview-section" className="space-y-4 sm:space-y-5 pb-12">
@@ -216,7 +216,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           {!isConfigured && (
             <div
               role="status"
-              className="w-full flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl text-xs font-medium border bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-300 border-slate-300 dark:border-white/10"
+              className="w-full flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl text-xs font-medium border bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)]"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
@@ -226,7 +226,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                 <button
                   type="button"
                   onClick={onAbrirPerfilMedico}
-                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#334155] hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-white/12 font-semibold text-xs shrink-0 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                  className="touch-target px-3 py-1.5 min-h-[44px] rounded-lg bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] border border-[var(--border-subtle)] font-semibold text-xs shrink-0 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
                 >
                   Configurar médico
                 </button>
@@ -237,13 +237,13 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           {pdfError && (
             <div
               role="alert"
-              className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-medium border bg-slate-100 dark:bg-[#27354A] text-rose-700 dark:text-rose-300 border-slate-300 dark:border-white/10"
+              className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-medium border bg-[var(--surface-chip-muted)] text-rose-700 dark:text-rose-300 border-[var(--border-subtle)]"
             >
               <span>{pdfError}</span>
               <button
                 type="button"
                 onClick={() => setPdfError(null)}
-                className="text-slate-600 dark:text-slate-300 font-semibold hover:underline shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target min-h-[44px] px-2 inline-flex items-center text-slate-600 dark:text-slate-300 font-semibold hover:underline shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
                 Fechar
               </button>
@@ -306,7 +306,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               type="button"
               onClick={handlePrint}
               aria-label="Imprimir a folha"
-              className="btn-tactile-primary h-10 sm:h-11 px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="btn-tactile-primary touch-target min-h-[44px] px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               title={tituloAcao('Imprimir a folha direto na impressora (Ctrl+P)')}
             >
               <Icon name="print" className="text-[16px] shrink-0" />
@@ -325,10 +325,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               type="button"
               onClick={() => setDocType(id)}
               aria-pressed={docType === id}
-              className={`text-xs font-semibold px-4 py-2 min-h-[40px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+              className={`touch-target text-xs font-semibold px-4 py-2 min-h-[44px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                 docType === id
-                  ? 'bg-navy-900 dark:bg-[#0369A1] text-white border-transparent shadow-tactile-sm font-bold'
-                  : 'bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-[#334155]'
+                  ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] shadow-tactile-sm font-bold'
+                  : 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--surface-chip-muted-hover)]'
               }`}
             >
               <Icon name={icone} className="text-[16px]" />
@@ -343,7 +343,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setAjustarATela(!ajustarATela)}
-            className="lg:hidden px-3 py-2 min-h-[40px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 btn-tactile-secondary transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="lg:hidden touch-target px-3 py-2 min-h-[44px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 btn-tactile-secondary transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             title={ajustarATela ? 'Ver em tamanho real' : 'Ajustar à tela'}
           >
             <Icon name={ajustarATela ? 'open_in_full' : 'close_fullscreen'} className="text-[16px]" />
@@ -354,7 +354,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
       {/* Mais de uma receita na mesma consulta: cada uma é um documento e precisa ser emitida */}
       {receitasComItens.length > 1 && itensDoTipo(docType) !== null && (
-        <div role="status" className="no-print px-4 py-2.5 rounded-xl border text-xs font-medium bg-slate-100 dark:bg-[#27354A] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10">
+        <div role="status" className="no-print px-4 py-2.5 rounded-xl border text-xs font-medium bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)]">
           Esta consulta gera {receitasComItens.length} receitas separadas ({receitasComItens.map((r) => NOME_DO_REGIME[r]).join(', ')}).
           Emita cada uma pela sua aba.
         </div>

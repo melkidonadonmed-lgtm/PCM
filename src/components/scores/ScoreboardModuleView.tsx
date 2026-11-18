@@ -209,21 +209,21 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
               Scoreboard CDSS
             </h1>
-            <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+            <span className="rounded-md bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] px-2 py-0.5 font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
               {SCOREBOARD_TOTAL_COUNT} Escores Monográficos
             </span>
             {activeHospitalBed && onReturnToHospitalBed && (
               <button
                 type="button"
                 onClick={() => onReturnToHospitalBed(activeHospitalBed.id)}
-                className="inline-flex items-center gap-1 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition-colors cursor-pointer clinical-tabular-nums"
+                className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] px-2 py-0.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-100/70 dark:hover:bg-sky-950/50 transition-colors cursor-pointer clinical-tabular-nums"
                 title={`Retornar diretamente ao prontuário do Leito ${activeHospitalBed.wardAndBed}`}
               >
                 <Icon name="arrow_back" size={12} />
                 <span>Voltar ao Leito {activeHospitalBed.wardAndBed}</span>
               </button>
             )}
-            <nav aria-label="Caminho de navegação" className="hidden xl:block">
+            <div aria-label="Caminho de navegação" className="hidden xl:block">
               <ol role="list" className="breadcrumbsList">
                 <li>
                   <a
@@ -257,7 +257,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                   </a>
                 </li>
               </ol>
-            </nav>
+            </div>
           </div>
 
           {/* Navegação Segmentada da Bancada */}
@@ -342,7 +342,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
           <div className="flex items-center gap-1.5 shrink-0">
             {hospitalBeds.length > 0 && activeHospitalBed && onSelectHospitalBed ? (
-              <div className="inline-flex items-center gap-1 rounded-lg border border-sky-500/25 bg-sky-500/10 h-7 px-2 text-[11px] font-semibold text-sky-800 dark:text-sky-200">
+              <div className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] h-7 px-2 text-[11px] font-semibold text-sky-800 dark:text-sky-200">
                 <Icon name="local_hospital" size={13} className="text-sky-600 dark:text-sky-400 shrink-0" />
                 <label htmlFor="scoreboard-top-bed-select" className="sr-only">
                   Leito Hospitalar Vinculado (MOD-03)

@@ -198,11 +198,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
       {/* Subtabs Switcher (apenas quando não estiver sob o ClinicalDocumentsHub) */}
       {!hideSubNav && (
         <div
-          className="tactile-card p-1.5 rounded-2xl flex items-center gap-1.5 max-w-sm mx-auto"
-          style={{
-            backgroundColor: darkMode ? 'var(--surface-card)' : 'var(--surface-card)',
-            borderColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(11, 19, 43, 0.08)',
-          }}
+          className="tactile-card p-1.5 rounded-2xl flex items-center gap-1.5 max-w-sm mx-auto bg-[var(--surface-card)] border border-[var(--border-subtle)]"
         >
           <button
             type="button"
@@ -511,7 +507,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="p-3 rounded-xl border border-dashed border-strong text-center text-xs text-[var(--text-muted)]">
+                <div className="p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
                   <span>
                     Inclusão de CID desativada. O atestado será gerado sem a informação codificada
                     da doença.

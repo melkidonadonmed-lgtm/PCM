@@ -119,7 +119,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       ref={modalRef}
       data-state="idle"
       aria-busy={false}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 isolate animate-backdrop-fade"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.60)] isolate animate-backdrop-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="patient-modal-title"
@@ -132,7 +132,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         {/* Header */}
         <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-card)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-navy-900/10 dark:bg-sky-500/20 text-navy-900 dark:text-blue-300 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-[var(--surface-info-subtle)] text-navy-900 dark:text-blue-300 border border-[var(--border-info-subtle)] flex items-center justify-center font-bold">
               <Icon name="person" className="text-[18px]" />
             </div>
             <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-[var(--text-main)]">
@@ -143,7 +143,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de dados do paciente"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
           >
             <Icon name="close" className="text-[20px]" />
           </button>
@@ -170,18 +170,14 @@ export const PatientModal: React.FC<PatientModalProps> = ({
 
           {/* Toggle de cálculo de dose por peso */}
           <div
-            className="p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors"
-            style={{
-              backgroundColor: formData.weightCalcEnabled
-                ? (darkMode ? 'rgba(6, 78, 59, 0.25)' : 'rgba(236, 253, 245, 0.9)')
-                : (darkMode ? 'var(--surface-inset)' : 'var(--surface-inset)'),
-              borderColor: formData.weightCalcEnabled
-                ? (darkMode ? 'rgba(52, 211, 153, 0.4)' : 'rgba(16, 185, 129, 0.4)')
-                : (darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(11,19,43,0.08)')
-            }}
+            className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
+              formData.weightCalcEnabled
+                ? 'bg-[var(--accent-emerald-subtle)] border-[var(--accent-emerald-border)]'
+                : 'bg-[var(--surface-inset)] border-[var(--border-subtle)]'
+            }`}
           >
             <div className="min-w-0">
-              <span className="text-xs font-bold block" style={{ color: darkMode ? '#F4F7FC' : '#0B132B' }}>
+              <span className="text-xs font-bold block text-[var(--text-main)]">
                 Cálculo de Dose por Peso (Pediátrico)
               </span>
               <span className="text-xs text-[var(--text-muted)] dark:text-slate-400 block">
@@ -330,7 +326,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             <button
               type="button"
               onClick={handleClear}
-              className="h-11 min-h-[44px] px-3.5 rounded-xl border border-subtle dark:border-white/12 bg-slate-50 dark:bg-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300 hover:border-rose-200 dark:hover:border-rose-500/30 transition duration-150 inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="h-11 min-h-[44px] px-3.5 rounded-xl border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-bold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 transition duration-150 inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
               title="Limpar todos os campos para digitar novo paciente"
             >
               <Icon name="ink_eraser" className="text-[16px]" />

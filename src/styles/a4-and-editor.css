@@ -1,0 +1,346 @@
+/**
+ * Physical A4 Sheet Styling, ProseMirror Canvas, Icon Ligatures, Keyframes & Utilities
+ * Unlayered overrides beat Tailwind @layer base/utilities cleanly via CSS Cascade Layers.
+ */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url('../assets/fonts/material-symbols-outlined.subset.woff2') format('woff2');
+}
+
+@layer components {
+  .folha-a4-shadow {
+    box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08);
+  }
+
+  /* Folha A4 em tamanho real (components/documento/FolhaA4.tsx): fonte única da prévia, impressão e PDF. */
+  .folha-a4 {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 15mm 16mm 14mm;
+    border-radius: 2px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  .folha-a4--paisagem {
+    padding: 9mm 10mm;
+  }
+
+  .folha-a4--formulario {
+    padding: 0;
+  }
+
+  #pcm-print-root {
+    display: none;
+  }
+
+  /* Google Material Symbols — Canonical Icon Styling */
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    vertical-align: middle;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'liga';
+    font-synthesis: none;
+  }
+
+  .icon-spin {
+    animation: icon-spin 1s linear infinite;
+  }
+
+  .animate-backdrop-fade {
+    animation: backdropFadeIn 0.18s ease-out both;
+  }
+
+  .animate-drawer-right {
+    animation: drawerSlideInRight 0.28s var(--ease-drawer, cubic-bezier(0.32, 0.72, 0, 1)) both;
+  }
+
+  .modal-surface-spring {
+    animation: modalSurfaceSpring 0.22s var(--ease-spring) both;
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.96) translate3d(0, 8px, 0);
+    }
+  }
+
+  @keyframes tabFadeIn {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 6px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes backdropFadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes drawerSlideInRight {
+    0% {
+      opacity: 0.6;
+      transform: translate3d(100%, 0, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes modalSurfaceSpring {
+    0% {
+      opacity: 0;
+      transform: scale(0.96) translate3d(0, 8px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes icon-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* Unlayered Physical Paper & Rich-Text Editor Overrides */
+.paper-sheet-floating {
+  background-color: #FFFFFF;
+  color: #0F172A;
+  box-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+.dark .paper-sheet-floating {
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.6), 0 6px 16px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.a4-editor-canvas {
+  zoom: var(--sheet-zoom, 1);
+}
+
+.a4-editor-canvas .via-preview-content {
+  outline: none;
+  font-size: inherit;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.a4-editor-canvas :is(input, textarea):not(:focus) {
+  background-color: transparent;
+}
+
+.a4-editor-canvas .ProseMirror {
+  outline: none;
+  font-size: inherit;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.a4-editor-canvas .ProseMirror:focus-visible {
+  outline: 2px solid #0EA5E9;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.a4-editor-canvas .ProseMirror-separator {
+  display: none;
+}
+
+.a4-editor-canvas .via-preview-content p:empty,
+.a4-editor-canvas .ProseMirror p:empty {
+  min-height: 1.6em;
+}
+
+.a4-editor-canvas .via-preview-content p:empty::before,
+.a4-editor-canvas .ProseMirror p:empty::before {
+  content: "\00a0";
+  display: inline-block;
+}
+
+.a4-editor-canvas.vias-2 .ProseMirror,
+.a4-editor-canvas.vias-2 .via-preview-content {
+  min-height: 180px;
+}
+
+.a4-editor-canvas.canvas-landscape.vias-2 .ProseMirror,
+.a4-editor-canvas.canvas-landscape.vias-2 .via-preview-content {
+  min-height: 220px;
+}
+
+.a4-editor-canvas .ProseMirror h1,
+.a4-editor-canvas .via-preview-content h1 {
+  font-size: 1.55em;
+  font-weight: 700;
+  margin-top: 0.6em;
+  margin-bottom: 0.3em;
+  line-height: 1.25;
+}
+
+.a4-editor-canvas .ProseMirror h2,
+.a4-editor-canvas .via-preview-content h2 {
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-top: 0.5em;
+  margin-bottom: 0.25em;
+  line-height: 1.3;
+}
+
+.a4-editor-canvas .ProseMirror h3,
+.a4-editor-canvas .via-preview-content h3 {
+  font-size: 1.15em;
+  font-weight: 600;
+  margin-top: 0.4em;
+  margin-bottom: 0.2em;
+  line-height: 1.35;
+}
+
+.a4-editor-canvas .ProseMirror p,
+.a4-editor-canvas .via-preview-content p {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.a4-editor-canvas .ProseMirror ul,
+.a4-editor-canvas .via-preview-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.a4-editor-canvas .ProseMirror ol,
+.a4-editor-canvas .via-preview-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.a4-editor-canvas .ProseMirror li,
+.a4-editor-canvas .via-preview-content li {
+  margin-top: 0.15em;
+  margin-bottom: 0.15em;
+}
+
+:is(.a4-editor-canvas, #printable-a4-sheet) :is(input, textarea):not(:focus):placeholder-shown {
+  background-color: transparent;
+}
+
+:is(.a4-editor-canvas, #printable-a4-sheet) ::placeholder {
+  color: #64748b;
+}
+
+:is(.a4-editor-canvas, #printable-a4-sheet) :is(input, textarea) {
+  color: #0f172a;
+}
+
+@layer utilities {
+  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]), textarea):not(:is(.a4-editor-canvas, #printable-a4-sheet) *):placeholder-shown {
+    background-color: var(--surface-inset);
+  }
+
+  select:has(option[value=""]:checked) {
+    background-color: var(--surface-inset);
+    color: var(--text-placeholder);
+    font-weight: 400;
+  }
+
+  :is(input, textarea, select):user-invalid {
+    border-color: #BE123C;
+  }
+
+  .text-fluid-sm {
+    font-size: clamp(0.8125rem, 0.78rem + 0.16vw, 0.875rem);
+    line-height: 1.5;
+  }
+
+  .text-fluid-base {
+    font-size: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
+    line-height: 1.6;
+  }
+
+  .text-fluid-lg {
+    font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+    line-height: 1.4;
+  }
+
+  .text-fluid-xl {
+    font-size: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+    line-height: 1.3;
+  }
+
+  .clinical-reading-measure {
+    max-width: 65ch;
+    max-inline-size: 65ch;
+    line-height: 1.65;
+  }
+
+  .flow-root {
+    display: flow-root;
+  }
+
+  @media (display-mode: standalone) {
+    body {
+      overscroll-behavior-y: none;
+    }
+
+    #prescmed-header,
+    #prescmed-sidebar,
+    #mobile-bottom-nav {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  }
+
+  .clinical-tabular-nums,
+  .tabular-metric,
+  .tabular-nums,
+  input[type="number"] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  body:has([role="dialog"][aria-modal="true"]) {
+    overflow: hidden;
+  }
+
+  .btn-anti-squish {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}

@@ -27,7 +27,6 @@ interface CidSearchBarProps {
 }
 
 export const CidSearchBar: React.FC<CidSearchBarProps> = ({
-  darkMode,
   selectedCode = '',
   selectedDescription = '',
   onSelectCid,
@@ -121,7 +120,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
     <div data-state="idle" aria-busy={false} ref={containerRef} className="space-y-2.5">
       {/* Label and Quick Diagnoses Pop-up Trigger */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label htmlFor={cidInputId} className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5" style={{ color: darkMode ? '#94A3B8' : '#475569' }}>
+        <label htmlFor={cidInputId} className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 text-[var(--text-muted)]">
           <Icon name="search" className="text-[14px] text-sky-600 dark:text-sky-400" />
           <span>{label}</span>
         </label>
@@ -153,18 +152,10 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               <div
                 role="dialog"
                 aria-label="Diagnósticos mais frequentes"
-                className="absolute right-0 left-auto z-40 top-full mt-1.5 w-72 sm:w-80 max-w-[calc(100vw-2.5rem)] rounded-2xl border shadow-tactile-lg overflow-hidden animate-tab-fade"
-                style={{
-                  backgroundColor: 'var(--surface-card)',
-                  borderColor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)'
-                }}
+                className="absolute right-0 left-auto z-40 top-full mt-1.5 w-72 sm:w-80 max-w-[calc(100vw-2.5rem)] rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] shadow-tactile-lg overflow-hidden animate-tab-fade"
               >
                 <div
-                  className="px-3 py-2 border-b flex items-center justify-between gap-2"
-                  style={{
-                    backgroundColor: darkMode ? 'var(--surface-inset)' : '#F8FAFC',
-                    borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-                  }}
+                  className="px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--surface-inset)] flex items-center justify-between gap-2"
                 >
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400">
                     Diagnósticos frequentes (1 clique)
@@ -194,9 +185,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                           }}
                           className={`w-full px-3 py-2 text-left flex items-center justify-between gap-2.5 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 outline-none ${
                             isSelected
-                              ? darkMode
-                                ? 'bg-sky-950/50 text-white'
-                                : 'bg-sky-50 text-slate-900'
+                              ? 'bg-[var(--surface-info-subtle)] text-[var(--text-main)]'
                               : 'hover:bg-slate-500/10'
                           }`}
                         >
@@ -204,10 +193,8 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                             <span
                               className={`px-1.5 py-0.5 rounded font-mono font-bold text-xs shrink-0 clinical-tabular-nums ${
                                 isSelected
-                                  ? 'bg-sky-600 text-white'
-                                  : darkMode
-                                    ? 'bg-slate-800 text-sky-400'
-                                    : 'bg-sky-100 text-sky-800'
+                                  ? 'bg-[var(--pill-active-bg)] text-white'
+                                  : 'bg-[var(--surface-chip-muted)] text-sky-700 dark:text-sky-300'
                               }`}
                             >
                               {pick.code}
@@ -233,11 +220,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
       {/* Selected CID Visual Summary Card (if present and in single selection mode) */}
       {selectedCode && (
         <div 
-          className="p-3 rounded-xl border flex items-start justify-between gap-3 transition animate-tab-fade"
-          style={{
-            backgroundColor: darkMode ? '#161A21' : '#F0F7FF',
-            borderColor: darkMode ? 'rgba(56, 142, 230, 0.3)' : 'rgba(15, 98, 146, 0.25)'
-          }}
+          className="p-3 rounded-xl border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] flex items-start justify-between gap-3 transition animate-tab-fade"
         >
           <div className="flex items-start gap-2.5 min-w-0">
             <span 
@@ -250,7 +233,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               {selectedCode}
             </span>
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm font-bold truncate leading-tight" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+              <p className="text-xs sm:text-sm font-bold truncate leading-tight text-[var(--text-main)]">
                 {selectedDescription || 'Diagnóstico selecionado'}
               </p>
               <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 mt-0.5">
@@ -266,11 +249,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 setIsOpen(true);
                 inputRef.current?.focus();
               }}
-              className="text-xs font-bold px-2.5 py-1 rounded-lg border hover:bg-slate-500/10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
-              style={{
-                borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.1)',
-                color: darkMode ? '#93C5FD' : '#0369A1'
-              }}
+              className="text-xs font-bold px-2.5 py-1 rounded-lg border border-[var(--border-subtle)] text-sky-700 dark:text-sky-300 hover:bg-slate-500/10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
             >
               Trocar
             </button>
@@ -280,7 +259,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 type="button"
                 onClick={onClearCid}
                 title="Remover CID selecionado"
-                className="p-1 rounded-lg text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                className="p-1 rounded-lg text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-[var(--accent-rose-subtle)] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
               >
                 <Icon name="close" className="text-[16px]" />
               </button>
@@ -313,17 +292,12 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               setIsQuickListOpen(false);
             }}
             placeholder={placeholder}
-            className="w-full pl-9 pr-20 py-2.5 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40 tactile-input transition"
-            style={{
-              backgroundColor: darkMode ? 'var(--surface-inset)' : 'var(--surface-card)',
-              borderColor: isOpen 
-                ? (darkMode ? '#388EE6' : '#0F6292') 
-                : (darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.1)'),
-              color: darkMode ? '#F1F5F9' : '#0F172A'
-            }}
+            className={`w-full min-h-[44px] pl-9 pr-24 py-2.5 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40 tactile-input transition bg-[var(--surface-card)] dark:bg-[var(--surface-inset)] text-[var(--text-main)] ${
+              isOpen ? 'border-[var(--border-info-subtle)]' : 'border-[var(--border-subtle)]'
+            }`}
           />
 
-          <div className="absolute right-2 flex items-center gap-1">
+          <div className="absolute right-1 flex items-center">
             {searchTerm && (
               <button
                 type="button"
@@ -332,7 +306,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   setSearchTerm('');
                   inputRef.current?.focus();
                 }}
-                className="p-1 rounded-md text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
                 <Icon name="close" className="text-[14px]" />
               </button>
@@ -342,7 +316,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               type="button"
               aria-label="Abrir catálogo completo de CID-10"
               onClick={() => setIsOpen(!isOpen)}
-              className="p-1 rounded-md text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               title="Abrir catálogo completo"
             >
               <Icon name="expand_more" className={`text-[16px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -353,19 +327,11 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
         {/* Dropdown Floating Results Panel */}
         {isOpen && (
           <div 
-            className="absolute z-30 top-full left-0 right-0 mt-1.5 rounded-2xl border shadow-tactile-lg overflow-hidden animate-tab-fade"
-            style={{
-              backgroundColor: darkMode ? 'var(--surface-card)' : 'var(--surface-card)',
-              borderColor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)'
-            }}
+            className="absolute z-30 top-full left-0 right-0 mt-1.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] shadow-tactile-lg overflow-hidden animate-tab-fade"
           >
             {/* Category Filter Pills in Dropdown Header */}
             <div 
-              className="p-2 border-b overflow-x-auto flex items-center gap-1.5"
-              style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : '#F8FAFC',
-                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-              }}
+              className="p-2 border-b border-[var(--border-subtle)] bg-[var(--surface-inset)] overflow-x-auto flex items-center gap-1.5"
             >
               <div className="flex items-center gap-1 text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 pl-1 pr-1 flex-shrink-0">
                 <Icon name="filter_list" className="text-[14px]" />
@@ -379,8 +345,8 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   onClick={() => setSelectedCategory(cat)}
                   className={`text-xs px-2.5 py-1 rounded-lg font-semibold whitespace-nowrap transition cursor-pointer border focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
                     selectedCategory === cat
-                      ? 'bg-navy-900 text-white dark:bg-[#0369A1] dark:text-white border-navy-900 dark:border-sky-500/30 font-bold shadow-xs'
-                      : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-[#27354A] dark:text-slate-200 dark:border-white/10 dark:hover:bg-[#334155]'
+                      ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] font-bold shadow-xs'
+                      : 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--surface-chip-muted-hover)]'
                   }`}
                 >
                   {cat}
@@ -399,7 +365,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                       onClick={() => handleSelect(item)}
                       className={`p-2.5 sm:p-3 flex items-center justify-between gap-3 cursor-pointer transition-colors group ${
                         isCurrent 
-                          ? (darkMode ? 'bg-sky-950/40' : 'bg-sky-50') 
+                          ? 'bg-[var(--surface-info-subtle)]' 
                           : 'hover:bg-slate-500/10'
                       }`}
                     >
@@ -407,17 +373,15 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                         <span 
                           className={`px-2 py-0.5 rounded-md font-mono font-bold text-xs flex-shrink-0 ${
                             isCurrent
-                              ? 'bg-sky-600 text-white'
-                              : darkMode
-                              ? 'bg-slate-800 text-sky-400 group-hover:bg-sky-900/50 group-hover:text-sky-300'
-                              : 'bg-sky-100 text-sky-800 group-hover:bg-sky-200'
+                              ? 'bg-[var(--pill-active-bg)] text-white'
+                              : 'bg-[var(--surface-chip-muted)] text-sky-700 dark:text-sky-300 group-hover:bg-[var(--surface-chip-muted-hover)]'
                           }`}
                         >
                           {item.code}
                         </span>
 
                         <div className="min-w-0">
-                          <p className="text-xs sm:text-sm font-semibold leading-snug" style={{ color: darkMode ? '#F1F5F9' : '#0F172A' }}>
+                          <p className="text-xs sm:text-sm font-semibold leading-snug text-[var(--text-main)]">
                             {item.description}
                           </p>
                           {item.keywords && item.keywords.length > 0 && (
@@ -475,11 +439,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
 
             {/* Footer summary & manual action */}
             <div 
-              className="p-2.5 border-t text-xs flex items-center justify-between text-[var(--text-muted)] dark:text-slate-400"
-              style={{
-                backgroundColor: darkMode ? 'var(--surface-inset)' : '#F8FAFC',
-                borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)'
-              }}
+              className="p-2.5 border-t border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs flex items-center justify-between text-[var(--text-muted)] dark:text-slate-400"
             >
               <span className="clinical-tabular-nums">{results.length} resultados no catálogo</span>
 

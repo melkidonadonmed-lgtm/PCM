@@ -157,7 +157,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
       data-state={hasPatient ? 'success' : 'empty'}
       aria-busy={false}
       id="clinical-documents-hub"
-      className="w-full max-w-7xl mx-auto flex flex-col gap-3 !p-0 !bg-transparent !border-none !shadow-none"
+      className="w-full max-w-7xl mx-auto flex flex-col gap-3 p-0 bg-transparent border-none shadow-none"
     >
       {/* Barra de Navegação Superior em Trilho Segmentado Esculpido */}
       <SoftCard variant="flat" className="card-surface p-3 sm:p-3.5 rounded-2xl border border-subtle dark:border-strong flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
@@ -169,7 +169,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
               <span className="text-xs font-semibold text-[var(--text-main)]">
                 Central de documentos clínicos
               </span>
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 clinical-tabular-nums">
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[var(--surface-info-subtle)] text-sky-700 dark:text-sky-300 border border-[var(--border-info-subtle)] clinical-tabular-nums">
                 {activeTabInfo.regulatoryTag}
               </span>
             </div>
@@ -188,7 +188,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
         </div>
 
         {/* Abas dos documentos em Trilho Segmentado Esculpido (.nav-segmented-track) */}
-        <nav
+        <div
           role="tablist"
           aria-label="Documentos clínicos disponíveis"
           className="grid grid-cols-2 sm:flex sm:items-center gap-1 p-1 rounded-2xl nav-segmented-track w-full lg:w-auto"
@@ -208,8 +208,8 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                 onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
                 className={`h-9 min-h-[40px] w-full sm:w-auto min-w-0 px-2.5 sm:px-4 rounded-xl border text-xs flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 transition cursor-pointer sm:shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                   isActive
-                    ? 'bg-navy-900 border-navy-900 text-white dark:bg-[#0369A1] dark:border-sky-400/30 font-bold shadow-tactile-sm'
-                    : 'bg-transparent border-transparent text-[var(--text-secondary)] hover:text-[var(--text-main)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] font-semibold'
+                    ? 'bg-[var(--pill-active-bg)] border-[var(--pill-active-border)] text-white font-bold shadow-tactile-sm'
+                    : 'bg-transparent border-transparent text-[var(--text-secondary)] hover:text-[var(--text-main)] hover:bg-[oklch(0.20_0.02_255/0.04)] dark:hover:bg-white/[0.06] font-semibold'
                 }`}
               >
                 <Icon
@@ -231,7 +231,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
               </button>
             );
           })}
-        </nav>
+        </div>
       </SoftCard>
 
       {/* Renderização Condicional da Ilha Selecionada com Tabpanel Semântico */}
