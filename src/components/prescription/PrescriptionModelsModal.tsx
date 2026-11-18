@@ -233,6 +233,8 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                     Nome do modelo
                   </label>
                   <input
+                    id="custom-model-title-input"
+                    name="customModelDraftTitle"
                     type="text"
                     value={customModelDraftTitle}
                     onChange={(e) => onChangeCustomModelDraftTitle(e.target.value)}
@@ -249,6 +251,8 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   <div className="relative">
                     <Icon name="search" className="text-[16px] text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
+                      id="custom-model-med-search"
+                      name="customModelSearchTerm"
                       type="text"
                       value={customModelSearchTerm}
                       onChange={(e) => onCustomModelSearchChange(e.target.value)}
@@ -317,6 +321,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                               Quantidade
                             </label>
                             <input
+                              name={`customModelItemQty_${idx}`}
                               type="text"
                               value={item.quantity}
                               onChange={(e) => onUpdateCustomModelItem(item.id, { quantity: e.target.value })}
@@ -329,6 +334,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                               Posologia / Instruções
                             </label>
                             <input
+                              name={`customModelItemInstructions_${idx}`}
                               type="text"
                               value={item.instructions}
                               onChange={(e) => onUpdateCustomModelItem(item.id, { instructions: e.target.value })}
@@ -393,7 +399,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                         <button
                           type="button"
                           onClick={() => onApplyPrescriptionModel(model, 'append')}
-                          className="chip-neutral px-3 py-1 rounded-lg text-xs cursor-pointer transition"
+                          className="touch-target chip-neutral min-h-[44px] px-3 py-1 rounded-lg text-xs cursor-pointer transition"
                           title="Adicionar estes medicamentos mantendo os que já estão na receita"
                         >
                           Adicionar (+)
@@ -401,7 +407,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                         <button
                           type="button"
                           onClick={() => onApplyPrescriptionModel(model, 'replace')}
-                          className="btn-tactile-primary px-3 py-1 min-h-9 rounded-lg text-xs font-bold cursor-pointer transition"
+                          className="touch-target btn-tactile-primary px-3 py-1 min-h-[44px] rounded-lg text-xs font-bold cursor-pointer transition"
                           title="Substituir todos os medicamentos da receita por este modelo"
                         >
                           Substituir receita

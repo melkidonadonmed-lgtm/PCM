@@ -242,7 +242,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
           <button
             type="button"
             onClick={handleAddLabPanel}
-            className="btn-tactile-primary h-9 px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            className="touch-target btn-tactile-primary min-h-[44px] px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
           >
             <Icon name="add" size={15} />
             <span>Inserir Coleta em Ordem Cronológica</span>
@@ -335,7 +335,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
           <button
             type="button"
             onClick={handleAddImagingExam}
-            className="sm:col-span-2 btn-tactile-secondary h-9 px-3 rounded-xl text-xs font-bold cursor-pointer"
+            className="touch-target sm:col-span-2 btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-bold cursor-pointer"
           >
             + Imagem
           </button>

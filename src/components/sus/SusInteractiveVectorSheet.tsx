@@ -338,6 +338,8 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
                   ) : (
                     <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-950 cursor-pointer mt-1">
                       <input
+                        id="sus-vec-contrast-needed"
+                        name="isContrastNeeded"
                         type="checkbox"
                         checked={Boolean(formData.isContrastNeeded)}
                         onChange={(e) => onFieldChange('isContrastNeeded', e.target.checked)}

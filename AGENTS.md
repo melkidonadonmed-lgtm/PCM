@@ -11,7 +11,7 @@
   - `npm run dev` — Vite dev server on port `3001` (`host 0.0.0.0`)
   - `npm run lint` — Strict type-check (`tsc --noEmit`)
   - `npm run design:lint` — Validate [`DESIGN.md`](file:///C:/Users/melki/dev/repos/PCM/DESIGN.md) compliance
-  - `npm run test` — Full Vitest suite (`29` suites / `280` deterministic tests)
+  - `npm run test` — Full Vitest suite (`30` suites / `286` deterministic tests)
   - `npm run build` — Production build in `dist/`
 - **State Triad:** [`.context/context.md`](file:///C:/Users/melki/dev/repos/PCM/.context/context.md) | [`.context/spec.md`](file:///C:/Users/melki/dev/repos/PCM/.context/spec.md) | [`docs/CLINICAL_AND_RUNTIME_SPEC.md`](file:///C:/Users/melki/dev/repos/PCM/docs/CLINICAL_AND_RUNTIME_SPEC.md)
 

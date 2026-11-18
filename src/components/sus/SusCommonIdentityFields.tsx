@@ -71,7 +71,7 @@ export const SusCommonIdentityFields: React.FC<SusCommonIdentityFieldsProps> = (
             <button
               type="button"
               onClick={() => setIsDoctorExpanded((prev) => !prev)}
-              className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition"
+              className="touch-target min-h-[44px] text-xs font-semibold px-2.5 py-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition"
             >
               <Icon name={isDoctorExpanded ? 'expand_less' : 'expand_more'} size={15} />
               <span>{isDoctorExpanded ? 'Recolher' : 'Editar emitente'}</span>

@@ -177,7 +177,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
         <button
           type="button"
           onClick={() => setPageOrientation('portrait')}
-          className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             pageOrientation === 'portrait' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
           }`}
           title="Orientação Retrato (Vertical 210×297mm)"
@@ -188,7 +188,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
         <button
           type="button"
           onClick={() => setPageOrientation('landscape')}
-          className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             pageOrientation === 'landscape' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
           }`}
           title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
@@ -203,7 +203,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
         <button
           type="button"
           onClick={() => setViaLayout('1-via')}
-          className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             viaLayout === '1-via' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
           }`}
           title="Folha Única (1 Via Padrão)"
@@ -220,7 +220,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
               showToast('Modo 2 Vias ativado! Paisagem recomendada para imprimir as duas vias lado a lado.');
             }
           }}
-          className={`px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             viaLayout === '2-vias' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
           }`}
           title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
@@ -234,7 +234,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       <button
         type="button"
         onClick={() => handleHeaderFieldChange('showHeader', !headerConfig.showHeader)}
-        className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+        className={`touch-target min-h-[44px] px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
           headerConfig.showHeader
             ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
             : 'border-warning bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
@@ -250,7 +250,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       <button
         type="button"
         onClick={() => handleHeaderFieldChange('showFooter', !headerConfig.showFooter)}
-        className={`h-9 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+        className={`touch-target min-h-[44px] px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
           headerConfig.showFooter
             ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
             : 'border-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
@@ -266,7 +266,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       <button
         type="button"
         onClick={() => handleLoadActivePrescription(true)}
-        className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
+        className="touch-target min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
         title="Preencher a folha A4 com os dados do paciente e medicamentos prescritos nesta consulta"
       >
         <RotateCcw className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
@@ -314,7 +314,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
           onClick={onClose}
           aria-label="Recolher ajustes da folha"
           title="Recolher barra de ajustes da folha"
-          className="ml-auto h-8 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition shrink-0"
+          className="touch-target ml-auto min-h-[44px] px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition shrink-0"
         >
           <X className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Fechar</span>

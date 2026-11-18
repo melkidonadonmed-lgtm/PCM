@@ -56,6 +56,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                     )}
                     <div className="flex-1 min-w-0">
                       <input
+                        name="via1DoctorName"
                         type="text"
                         value={headerConfig.doctorName || ''}
                         onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
@@ -64,6 +65,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
                       />
                       <input
+                        name="via1DoctorCrm"
                         type="text"
                         value={headerConfig.doctorCrm || ''}
                         onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}
@@ -298,6 +300,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <input
+                        name="via1PortraitDoctorName"
                         type="text"
                         value={headerConfig.doctorName || ''}
                         onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
@@ -307,6 +310,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
                       />
                       <input
+                        name="via1PortraitDoctorCrm"
                         type="text"
                         value={headerConfig.doctorCrm || ''}
                         onChange={e => handleHeaderFieldChange('doctorCrm', e.target.value)}

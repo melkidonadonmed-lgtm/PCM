@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   SUS_DOCUMENTS_CATALOG,
@@ -12,13 +12,21 @@ import {
   buildInitialPatientModalState,
 } from '../components/PatientModal';
 import {
+  clearSusSessionDraft,
+  loadSusSessionDraft,
   resolveSusCommonData,
   routeSusFieldUpdate,
+  saveSusSessionDraft,
+  SUS_SESSION_DRAFT_STORAGE_KEY,
 } from '../utils/susFormSync';
+import { storageService } from '../services/storageService';
+import { lgpdConsentService } from '../services/lgpdConsentService';
+import { DocumentoClinico } from '../components/documento/DocumentoClinico';
 import { DOMPurify } from '../utils/sanitizeHtml';
 import {
   DEFAULT_DOCTOR,
   DEFAULT_PATIENT,
+  createCleanConsultationState,
   createDefaultCertificate,
   createDefaultReferral,
   syncDoctorCityToCertificate,
@@ -31,6 +39,7 @@ import {
   DoctorProfile,
   LmeMedicationRow,
   Patient,
+  PrescriptionItem,
   SusFilledFormData,
   WorkContext,
 } from '../types';
@@ -392,5 +401,174 @@ describe('Documentos SUS exclusivamente em Folha A4 Vetorial Editável & Sincron
     const withNewDate = applyAgeOrBirthDateInput(withAgeText, '15/09/1979');
     expect(withNewDate.birthDate).toBe('15/09/1979');
     expect(withNewDate.ageText).toBe('47 anos');
+  });
+
+  describe('Persistência de Sessão, Alternância Receita <-> SUS e Limpeza Completa', () => {
+    const originalWindow = globalThis.window;
+    const originalLocalStorage = globalThis.localStorage;
+
+    beforeEach(() => {
+      const store = new Map<string, string>();
+      const mockStorage: Storage = {
+        get length() {
+          return store.size;
+        },
+        clear() {
+          store.clear();
+        },
+        getItem(key: string) {
+          return store.has(key) ? store.get(key)! : null;
+        },
+        key(index: number) {
+          return Array.from(store.keys())[index] ?? null;
+        },
+        removeItem(key: string) {
+          store.delete(key);
+        },
+        setItem(key: string, value: string) {
+          store.set(key, String(value));
+        },
+      };
+
+      Object.defineProperty(globalThis, 'localStorage', {
+        value: mockStorage,
+        configurable: true,
+        writable: true,
+      });
+      Object.defineProperty(globalThis, 'window', {
+        value: { localStorage: mockStorage },
+        configurable: true,
+        writable: true,
+      });
+    });
+
+    afterEach(() => {
+      Object.defineProperty(globalThis, 'localStorage', {
+        value: originalLocalStorage,
+        configurable: true,
+        writable: true,
+      });
+      Object.defineProperty(globalThis, 'window', {
+        value: originalWindow,
+        configurable: true,
+        writable: true,
+      });
+    });
+
+    it('mantém medicamentos prescritos e rascunho SUS na alternância entre módulos até o reset clínico', () => {
+      const rxItems: PrescriptionItem[] = [
+        {
+          id: 'rx-1',
+          name: 'Dipirona Sódica 500 mg',
+          presentation: 'Comprimidos',
+          route: 'Uso Oral',
+          quantity: '10 comprimidos',
+          doseCalculatedText: '1 comprimido',
+          frequencyText: 'de 6/6h se dor ou febre',
+          scheduleInterval: '6/6h',
+          scheduleTimes: ['06:00', '12:00', '18:00', '00:00'],
+          durationDays: 3,
+          instructions: 'Tomar 1 comprimido VO de 6/6h se dor ou febre.',
+          isContinuous: false,
+        },
+      ];
+
+      storageService.saveItem('prescmed_doctor', BASE_DOCTOR);
+      storageService.saveItem('prescmed_patient', BASE_PATIENT);
+      storageService.saveItem('prescmed_prescription', rxItems);
+
+      saveSusSessionDraft({
+        patientId: BASE_PATIENT.id,
+        viewMode: 'form',
+        selectedDocIds: ['lme_medicamentos'],
+        activeFormDocId: 'lme_medicamentos',
+        docsSpecificData: {
+          lme_medicamentos: {
+            cid10Code: 'M45',
+            cid10Description: 'Espondilite ancilosante',
+            clinicalJustification: 'Dor inflamatória axial refratária a AINEs.',
+            lmeMedications: [BASE_LME_ROW],
+          },
+        },
+        susPatientExtras: {
+          patientRaceColor: 'parda',
+          patientEthnicity: '',
+          patientHeightCm: '176',
+          patientEmail: 'carlos@exemplo.br',
+        },
+        clinicOverride: {},
+      });
+
+      // Simula remontagem de SusDocumentsFiller ao voltar da Receita sem initialDocId
+      const restoredSusHtml = renderToStaticMarkup(
+        <SusDocumentsFiller
+          darkMode={false}
+          doctor={BASE_DOCTOR}
+          patient={BASE_PATIENT}
+        />
+      );
+      expect(restoredSusHtml).toContain('Folha A4 Vetorial Editável');
+      expect(restoredSusHtml).toContain('Adalimumabe 40 mg solução injetável');
+      expect(restoredSusHtml).toContain('Dor inflamatória axial refratária a AINEs.');
+
+      // Alternância bidirecional: alteração no SUS reflete em Receita, Atestado e Encaminhamento
+      const patUpdate = routeSusFieldUpdate('patientName', 'Carlos E. Nogueira Atualizado');
+      expect(patUpdate).toEqual({
+        kind: 'patient',
+        patch: { name: 'Carlos E. Nogueira Atualizado' },
+      });
+      const updatedPatient: Patient = {
+        ...BASE_PATIENT,
+        ...(patUpdate.kind === 'patient' ? patUpdate.patch : {}),
+      };
+      const syncedDocs = syncPatientToDocuments(
+        updatedPatient,
+        createDefaultCertificate(BASE_DOCTOR.cityState),
+        createDefaultReferral()
+      );
+      const rxDocHtml = renderToStaticMarkup(
+        <DocumentoClinico
+          tipo="prescription"
+          doctor={BASE_DOCTOR}
+          patient={updatedPatient}
+          prescriptionItems={storageService.loadItem<PrescriptionItem[]>('prescmed_prescription', [])}
+        />
+      );
+      expect(rxDocHtml).toContain('Carlos E. Nogueira Atualizado');
+      expect(rxDocHtml).toContain('Dipirona Sódica 500 mg');
+      expect(syncedDocs.certificate.patientName).toBe('Carlos E. Nogueira Atualizado');
+      expect(syncedDocs.referral.patientName).toBe('Carlos E. Nogueira Atualizado');
+
+      // Descarta rascunho SUS órfão quando um novo paciente vazio inicia atendimento
+      expect(loadSusSessionDraft('pat-novo', false)).toBeNull();
+      expect(storageService.loadRawString(SUS_SESSION_DRAFT_STORAGE_KEY)).toBeNull();
+
+      // Regrava e verifica limpeza completa via higienização de plantão / reset
+      saveSusSessionDraft({
+        patientId: BASE_PATIENT.id,
+        viewMode: 'form',
+        selectedDocIds: ['apac_principal'],
+        activeFormDocId: 'apac_principal',
+        docsSpecificData: { apac_principal: { sigtapCode: '02.07.01.006-4' } },
+        susPatientExtras: {
+          patientRaceColor: '',
+          patientEthnicity: '',
+          patientHeightCm: '',
+          patientEmail: '',
+        },
+        clinicOverride: {},
+      });
+      lgpdConsentService.sanitizeSharedShiftClinicalData();
+      clearSusSessionDraft();
+      const cleanConsultation = createCleanConsultationState(BASE_DOCTOR.cityState, 'pat-clean-2');
+
+      expect(storageService.loadItem('prescmed_prescription', null)).toBeNull();
+      expect(storageService.loadRawString(SUS_SESSION_DRAFT_STORAGE_KEY)).toBeNull();
+      expect(storageService.loadItem<DoctorProfile | null>('prescmed_doctor', null)?.name).toBe(
+        'Dra. Helena Vasconcelos'
+      );
+      expect(cleanConsultation.prescriptionItems).toEqual([]);
+      expect(cleanConsultation.patient.name).toBe('');
+    });
   });
 });

@@ -210,6 +210,8 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
               <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <input
+                    id="editor-logo-left-upload"
+                    name="logoLeftUpload"
                     type="file"
                     ref={fileInputRef}
                     onChange={handleLogoUpload}
@@ -315,6 +317,8 @@ export const EditorLogoConfigDropdown: React.FC<EditorLogoConfigDropdownProps> =
               {/* Ações: Upload, Presets */}
               <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-col gap-2">
                 <input
+                  id="editor-logo-right-upload"
+                  name="logoRightUpload"
                   type="file"
                   ref={secondaryFileInputRef}
                   onChange={handleSecondaryLogoUpload}

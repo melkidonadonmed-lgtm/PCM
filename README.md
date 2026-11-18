@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Dexie v4](https://img.shields.io/badge/IndexedDB-Dexie%20v4-f59e0b?style=flat-square)](https://dexie.org/)
-[![Vitest](https://img.shields.io/badge/Testes-254%2F254%20Vitest%20(27%20suítes)-22c55e?style=flat-square&logo=vitest)](#8-testes-automatizados-e-portões-de-qualidade-27-suítes--254-testes)
+[![Vitest](https://img.shields.io/badge/Testes-286%2F286%20Vitest%20(30%20suítes)-22c55e?style=flat-square&logo=vitest)](#8-testes-automatizados-e-portões-de-qualidade-30-suítes--286-testes)
 [![LGPD & CFM](https://img.shields.io/badge/Privacidade-LGPD%20%26%20Sigilo%20CFM-10b981?style=flat-square)](#3-segurança-seleção-de-cookies-e-conformidade-regulatória-lgpd-cfm-e-anvisa)
 [![Design System](https://img.shields.io/badge/DESIGN.md-v8.0.0%20OKLCH-0284c7?style=flat-square)](DESIGN.md)
 [![PWA](https://img.shields.io/badge/PWA-100%25%20Offline--First-8b5cf6?style=flat-square)](https://web.dev/progressive-web-apps/)
@@ -31,10 +31,10 @@ Integra em uma única bancada de alta precisão:
 2. [Macro-Módulos e Funcionalidades Clínicas](#2-macro-módulos-e-funcionalidades-clínicas)
 3. [Segurança, Seleção de Cookies e Conformidade Regulatória (LGPD, CFM e Anvisa)](#3-segurança-seleção-de-cookies-e-conformidade-regulatória-lgpd-cfm-e-anvisa)
 4. [Stack Tecnológica](#4-stack-tecnológica)
-5. [Estrutura do Repositório (`176` arquivos em `src/`)](#5-estrutura-do-repositório-176-arquivos-em-src)
+5. [Estrutura do Repositório (`219` arquivos em `src/`)](#5-estrutura-do-repositório-219-arquivos-em-src)
 6. [Atalhos Globais de Produtividade](#6-atalhos-globais-de-produtividade)
 7. [Como Executar Localmente](#7-como-executar-localmente)
-8. [Testes Automatizados e Portões de Qualidade (`27` suítes / `254` testes)](#8-testes-automatizados-e-portões-de-qualidade-27-suítes--254-testes)
+8. [Testes Automatizados e Portões de Qualidade (`30` suítes / `286` testes)](#8-testes-automatizados-e-portões-de-qualidade-30-suítes--286-testes)
 9. [Deploy em Produção (Google Cloud Run & Firebase Hosting)](#9-deploy-em-produção-google-cloud-run--firebase-hosting)
 10. [Termo de Responsabilidade Clínica](#10-termo-de-responsabilidade-clínica)
 
@@ -161,24 +161,23 @@ O PresCMed implementa **Privacidade desde a Concepção (*Privacy by Design & by
 
 | Camada | Tecnologias |
 | :--- | :--- |
-| **Frontend & UI** | React 19 (`19.0.1`), TypeScript `~5.8.2`, Tailwind CSS v4 (`@tailwindcss/vite`) e Google Material Symbols (100% offline via `<Icon />`) |
-| **Bundler & Code-Splitting** | Vite 6 (`6.2.3`) com chunks isolados (`vendor-react`, `vendor-tiptap`, `vendor-dexie`, `vendor-firebase`, `scores-catalog`, `LgpdSecurityModal`) |
+| **Frontend & UI** | React 19 (`19.0.1`), TypeScript `~5.8.2`, Tailwind CSS v4 (`@tailwindcss/vite` `4.3.5`) e Google Material Symbols (100% offline via `<Icon />` + subset WOFF2 `39,5 KB`) |
+| **Bundler & Code-Splitting** | Vite 6 (`6.4.6`) com chunks isolados (`vendor-react`, `vendor-tiptap`, `vendor-dexie`, `vendor-firebase`, `vendor-pdf-canvas`, `scores-manifest`, `scores-block-01..09`, `clinical-catalogs`, `pediatric-catalog`, `cid-catalog`) |
 | **Editor Rich-Text A4** | Tiptap 3 (`@tiptap/react`, `starter-kit`, `extension-text-align`, `extension-placeholder`) |
-| **Persistência Local** | Dexie.js 4 (`4.4.6` — IndexedDB esquema v3: `workContexts`, `savedDocuments`, `hospitalBeds`) + `localStorage` |
-| **Motor de PDF Vetorial/A4** | `html2canvas-pro` (`2.4.5`, suporte nativo a cores `oklch()`) + `jsPDF` (`4.2.1`) |
-| **PWA / Offline** | `vite-plugin-pwa` (`1.3.0` / Workbox `generateSW`) |
+| **Persistência Local** | Dexie.js 4 (`4.4.7` — IndexedDB esquema v3: `workContexts`, `savedDocuments`, `hospitalBeds`) + `localStorage` |
+| **Motor de PDF Vetorial/A4** | `html2canvas-pro` (`2.4.5`, suporte nativo a cores `oklch()`) + `jsPDF` (`4.2.1`) sob demanda |
+| **PWA / Offline** | `vite-plugin-pwa` (`1.3.0` / Workbox `generateSW`, precache `< 5 MB`) |
 | **Nuvem Opcional** | Firebase 12 (`12.19.0` — Google Auth + Cloud Firestore sob demanda, governado por consentimento LGPD) |
-| **Qualidade & Testes** | Vitest 5 (`5.0.2` — 27 suítes, 254 testes determinísticos) + `@google/design.md` (`DESIGN.md` v8.0.0) |
+| **Qualidade & Testes** | Vitest 5 (`5.1.0` — 30 suítes, 286 testes determinísticos) + `@google/design.md` (`DESIGN.md` v8.0.0) |
 | **Infraestrutura** | Google Cloud Run (`southamerica-east1`) + Firebase Hosting (`precmed.web.app`), container `node:24-alpine` -> `nginx:alpine` |
 
 ---
 
-## 5. Estrutura do Repositório (`176` arquivos em `src/`)
+## 5. Estrutura do Repositório (`219` arquivos em `src/`)
 
 ```plaintext
 PCM/
 ├── AGENTS.md                        # Governança, comandos e invariantes clínicas/sanitárias (leitura obrigatória)
-├── GEMINI.md / CLAUDE.md            # Memória arquitetural e diretrizes para agentes de IA
 ├── DESIGN.md                        # Contrato de Design System v8.0.0 OKLCH (validado por `npm run design:lint`)
 ├── Dockerfile                       # Multi-stage: lint + test + build (node:24-alpine) -> runtime (nginx:alpine)
 ├── cloudbuild.yaml                  # Pipeline CI/CD Cloud Build (build, push, deploy e smoke test em /health)
@@ -186,21 +185,24 @@ PCM/
 ├── nginx-security-headers.conf      # CSP ativa, HSTS, X-Frame-Options, X-Content-Type-Options e Permissions-Policy
 ├── firestore.rules                  # Isolamento estrito por request.auth.uid no Cloud Firestore
 ├── deploy-cloudrun.ps1 / .sh        # Scripts para disparo manual do Cloud Build
+├── .context/                        # Tríade de estado e contratos (context.md, spec.md)
 ├── docs/
-│   ├── CLINICAL_AND_RUNTIME_SPEC.md # Especificação completa de runtime, 12 chaves localStorage e regras SUS/CFM/Anvisa
-│   └── historico/                   # Relatórios técnicos de auditoria e evolução arquitetural
+│   └── CLINICAL_AND_RUNTIME_SPEC.md # Especificação completa de runtime, 12 chaves localStorage e regras SUS/CFM/Anvisa
+├── scripts/
+│   └── subset-material-symbols.py   # Gerador determinístico do subset offline WOFF2 de Material Symbols
 ├── public/
-│   ├── formularios-sus/             # Fundos oficiais do Ministério da Saúde (apac-laudo.png, lme.png)
+│   ├── formularios-sus/             # Referências oficiais do Ministério da Saúde (apac-laudo.png, lme.png — fora do precache PWA)
 │   ├── formularios-sus-offline.html # Catálogo HTML standalone para consulta/impressão offline de guias SUS
 │   ├── logos/                       # Brasões e logos institucionais (sus.png, semusa.png, sesau-ro.png, rondonia-brasao.svg)
-│   └── watermarks/                  # Marcas d'água institucionais
-└── src/                             # 176 arquivos de código-fonte e testes automatizados
+│   └── watermarks/                  # Marcas d'água institucionais em PDF
+└── src/                             # 219 arquivos de código-fonte, assets e testes automatizados
     ├── main.tsx                     # Bootstrap React 19 (StrictMode)
     ├── App.tsx                      # Orquestrador de estado global, modais, leitos hospitalares, LGPD e abas
     ├── types.ts                     # Contratos globais (DoctorProfile, Patient, PrescriptionItem, LgpdConsentPreferences, etc.)
+    ├── assets/fonts/                # Fonte offline subsetada material-symbols-outlined.subset.woff2 (39,5 KB)
     ├── config/tokens.ts             # Registro canônico de tokens semânticos OKLCH e densidade
-    ├── styles/globals.css           # Tokens CSS (:root), escala fluida clamp(), .clinical-unit e curvas de transição
-    ├── index.css                    # Tailwind CSS v4 (@layer components e @utility)
+    ├── styles/                      # globals.css, dark-theme.css, tactile-components.css e a4-and-editor.css (<= 600 linhas)
+    ├── index.css                    # Tailwind CSS v4, @theme e orquestração de folhas de estilo
     ├── core/
     │   ├── domain/                  # clinicalEntities.ts (MOD-01..03, HospitalBedPatientRecord, HospitalBedScoreEntry, SOAP)
     │   └── storage/                 # clinicalRepository.ts (IClinicalRepository / LocalDexieClinicalRepository)
@@ -208,21 +210,22 @@ PCM/
     │   ├── Header.tsx               # Barra superior com navegação segmentada (Alt+1..8), Ctrl+K, Nuvem e Escudo LGPD
     │   ├── Sidebar.tsx              # Menu lateral Deep Navy (recolhível 68px), posto SUS, macro-módulos, kits e rodapé LGPD/Backup
     │   ├── MobileBottomNav.tsx      # Navegação inferior mobile com 5 destinos principais
+    │   ├── layout/                  # AppWorkspaceAndModals, AppGlobalModalsAndOverlays e CommandPaletteModal (Ctrl+K)
     │   ├── lgpd/                    # Governança LGPD & Cookies: LgpdConsentBanner, LgpdLocalModeNotice, LgpdSecurityModal
     │   ├── prescription/            # Subcomponentes do Construtor de Receitas (PatientQuickCard, MedicationComposerCard, etc.)
     │   ├── sus/                     # Guias SUS e grade vetorial interativa de 12 colunas (SusInteractiveVectorSheet)
-    │   ├── editor/                  # 7 módulos do Editor A4 Rico (Tiptap 3, 1 via retrato e 2 vias paisagem)
+    │   ├── editor/                  # Módulos do Editor A4 Rico (Tiptap 3, 1 via retrato e 2 vias paisagem)
     │   ├── hospital/                # Módulo Hospitalar (MOD-03): Mapa de Leitos, Evolução, Exames/Analytics, Chat/Science e Ingestão
     │   ├── scores/                  # Scoreboard CDSS: 114 calculadoras, EPARADA, BIC, Radar Fisiológico e Rastreio INCA
     │   ├── documento/               # Motor de folha A4 única: FolhaA4, DocumentoClinico, ReceitaDuasVias, FormularioOficialSus
     │   └── [Modais e Utilitários]   # PrescriptionBuilder, PediatricCalculator, ClinicalDocumentsHub, CertificateAndReferral,
     │                                # ExamRequester, SusDocumentsFiller, ClinicalProtocolsView, DocumentEditorView,
     │                                # PatientModal, DoctorProfileModal, BackupModal, LogoGeneratorModal, PrintPreview, Icon
-    ├── data/                        # Catálogos farmacológicos (4 domínios), 114 escores (block_01..09), kits, protocolos, CID-10 e SUS
-    ├── hooks/                       # 8 hooks customizados de sessão, modelos, contexto, acessibilidade e navegação
+    ├── data/                        # Catálogos farmacológicos modulares (11 subarquivos), 114 escores (block_01..09), kits, protocolos, CID-10 e SUS
+    ├── hooks/                       # 10 hooks customizados de sessão, modelos, contexto, hospital, acessibilidade e navegação
     ├── services/                    # db.ts (Dexie v3), storageService.ts, lgpdConsentService.ts, backupService.ts e cloud/
     ├── utils/                       # Motores clínicos determinísticos (doses, regimes, notificações, escores, evolução hospitalar e PDF)
-    └── __tests__/                   # 27 suítes Vitest (254 testes determinísticos Nível 4)
+    └── __tests__/                   # 30 suítes Vitest (286 testes determinísticos Nível 4)
 ```
 
 ---
@@ -268,11 +271,11 @@ O aplicativo funciona 100% localmente sem necessidade de cadastro ou chaves exte
 
 ---
 
-## 8. Testes Automatizados e Portões de Qualidade (`27` suítes / `254` testes)
+## 8. Testes Automatizados e Portões de Qualidade (`30` suítes / `286` testes)
 
 ```powershell
 npm run lint         # Type-check estrito: tsc --noEmit (zero erros de tipagem)
-npm run test         # Suíte completa Vitest (27 suítes, 254 testes determinísticos)
+npm run test         # Suíte completa Vitest (30 suítes, 286 testes determinísticos)
 npm run test:watch   # Execução contínua em modo watch
 npm run design:lint  # Validação do contrato arquitetural DESIGN.md (@google/design.md)
 npm run build        # Compilação otimizada de produção e geração do Service Worker PWA em dist/

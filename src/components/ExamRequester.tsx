@@ -159,7 +159,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
         <button
           type="button"
           onClick={onNavigateToPrint}
-          className="btn-tactile-primary text-xs font-semibold px-3 h-8 min-h-[32px] rounded-lg flex items-center justify-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
+          className="touch-target btn-tactile-primary text-xs font-semibold px-3 min-h-[44px] rounded-lg flex items-center justify-center gap-1.5 cursor-pointer shrink-0 clinical-tabular-nums"
         >
           <Icon name="download" size={14} />
           <span>Visualizar e baixar PDF ({selectedExams.length})</span>

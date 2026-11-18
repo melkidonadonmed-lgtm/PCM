@@ -83,7 +83,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
           <button
             type="button"
             onClick={onOpenMultimodalModal}
-            className="btn-tactile-secondary h-8 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
           >
             <Icon
               name="auto_awesome"
@@ -95,7 +95,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
           <button
             type="button"
             onClick={() => setIsAdmissionSectionOpen((prev) => !prev)}
-            className="h-8 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-[11px] font-bold text-[var(--text-secondary)] cursor-pointer"
+            className="touch-target min-h-[44px] px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-[11px] font-bold text-[var(--text-secondary)] cursor-pointer"
           >
             {isAdmissionSectionOpen ? 'Recolher' : 'Expandir'}
           </button>
@@ -267,6 +267,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                     {hd.codeNumber} -
                   </span>
                   <input
+                    name={`hdDisease_${idx}`}
                     type="text"
                     value={hd.diseaseAndDate}
                     onChange={(e) => {
@@ -291,7 +292,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                         updateField('diagnosticHypotheses', next);
                       }}
                       aria-label={`Remover hipótese diagnóstica ${hd.codeNumber}`}
-                      className="h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
+                      className="touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center px-2.5 rounded-xl border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
                     >
                       <Icon name="close" size={14} />
                     </button>

@@ -17,8 +17,11 @@ import {
 import {
   SusClinicOverride,
   SusPatientExtras,
+  clearSusSessionDraft,
+  loadSusSessionDraft,
   resolveSusCommonData,
   routeSusFieldUpdate,
+  saveSusSessionDraft,
 } from '../utils/susFormSync';
 import { SusCatalogListView } from './sus/SusCatalogListView';
 import { SusCommonIdentityFields } from './sus/SusCommonIdentityFields';
@@ -98,16 +101,31 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   catalogResetTrigger = 0,
   onNavigateToEditorWithHtml,
 }) => {
+  const restoredDraft = useMemo(
+    () =>
+      loadSusSessionDraft(
+        patient?.id || '',
+        Boolean(patient?.name?.trim() || patient?.documentNumber?.trim())
+      ),
+    // Executa apenas na montagem do preenchedor SUS para reidratar a sessão após alternância de abas
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const [viewMode, setViewMode] = useState<'list' | 'form'>(() =>
-    initialDocId ? 'form' : 'list'
+    initialDocId ? 'form' : restoredDraft?.viewMode || 'list'
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
-  const [selectedDocIds, setSelectedDocIds] = useState<SusDocumentId[]>(() =>
-    initialDocId ? [initialDocId] : []
-  );
+  const [selectedDocIds, setSelectedDocIds] = useState<SusDocumentId[]>(() => {
+    if (initialDocId) {
+      const prev = restoredDraft?.selectedDocIds || [];
+      return prev.includes(initialDocId) ? prev : [...prev, initialDocId];
+    }
+    return restoredDraft?.selectedDocIds || [];
+  });
   const [activeFormDocId, setActiveFormDocId] = useState<SusDocumentId>(
-    () => initialDocId || 'apac_principal'
+    () => initialDocId || restoredDraft?.activeFormDocId || 'apac_principal'
   );
 
   const [localDoctor, setLocalDoctor] = useState<DoctorProfile>(doctor);
@@ -129,14 +147,18 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   doctorRef.current = effectiveDoctor;
   patientRef.current = effectivePatient;
 
-  const [susPatientExtras, setSusPatientExtras] = useState<SusPatientExtras>({
-    patientRaceColor: '',
-    patientEthnicity: '',
-    patientHeightCm: '',
-    patientEmail: '',
-  });
+  const [susPatientExtras, setSusPatientExtras] = useState<SusPatientExtras>(() =>
+    restoredDraft?.susPatientExtras || {
+      patientRaceColor: '',
+      patientEthnicity: '',
+      patientHeightCm: '',
+      patientEmail: '',
+    }
+  );
   const [weightDraft, setWeightDraft] = useState<string | null>(null);
-  const [clinicOverride, setClinicOverride] = useState<SusClinicOverride>({});
+  const [clinicOverride, setClinicOverride] = useState<SusClinicOverride>(
+    () => restoredDraft?.clinicOverride || {}
+  );
 
   useEffect(() => {
     setClinicOverride({});
@@ -171,7 +193,10 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
   >(() => {
     const map: Record<string, Partial<SusFilledFormData>> = {};
     SUS_DOCUMENTS_CATALOG.forEach((d) => {
-      map[d.id] = camposIniciaisDoDocumento(d);
+      map[d.id] = {
+        ...camposIniciaisDoDocumento(d),
+        ...(restoredDraft?.docsSpecificData?.[d.id] || {}),
+      };
     });
     return map;
   });
@@ -186,6 +211,9 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
     lastPatientIdRef.current = currentId;
 
     if (isNewConsultationReset) {
+      clearSusSessionDraft();
+      setViewMode('list');
+      setSelectedDocIds([]);
       setSusPatientExtras({
         patientRaceColor: '',
         patientEthnicity: '',
@@ -200,6 +228,26 @@ export const SusDocumentsFiller: React.FC<SusDocumentsFillerProps> = ({
       setDocsSpecificData(cleanMap);
     }
   }, [effectivePatient?.id, effectivePatient?.name, effectivePatient?.documentNumber]);
+
+  useEffect(() => {
+    saveSusSessionDraft({
+      patientId: effectivePatient?.id || '',
+      viewMode,
+      selectedDocIds,
+      activeFormDocId,
+      docsSpecificData,
+      susPatientExtras,
+      clinicOverride,
+    });
+  }, [
+    effectivePatient?.id,
+    viewMode,
+    selectedDocIds,
+    activeFormDocId,
+    docsSpecificData,
+    susPatientExtras,
+    clinicOverride,
+  ]);
 
   const commonData = useMemo(
     () =>

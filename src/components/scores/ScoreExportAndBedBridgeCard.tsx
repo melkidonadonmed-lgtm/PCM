@@ -173,7 +173,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
           <button
             type="button"
             onClick={() => onCopyText('PEP')}
-            className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="touch-target min-h-[44px] flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
           >
             <Icon
               name={copyFeedback === 'PEP' ? 'check' : 'content_copy'}
@@ -184,7 +184,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
           <button
             type="button"
             onClick={() => onCopyText('SBAR')}
-            className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="touch-target min-h-[44px] flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
           >
             <Icon
               name={copyFeedback === 'SBAR' ? 'check' : 'share'}
@@ -198,7 +198,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
           <button
             type="button"
             onClick={onSendScoreToA4}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-700 cursor-pointer"
+            className="touch-target min-h-[44px] flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-700 cursor-pointer"
           >
             <Icon
               name={copyFeedback === 'A4' ? 'check' : 'description'}
@@ -277,7 +277,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
               <button
                 type="button"
                 onClick={onRecordScoreInHospitalBed}
-                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-sky-700 cursor-pointer"
+                className="touch-target min-h-[44px] flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-sky-700 cursor-pointer"
               >
                 <Icon
                   name={
@@ -301,7 +301,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                       calculator.acronym
                     )
                   }
-                  className="flex items-center justify-center gap-1 rounded-lg border border-sky-500/40 bg-white dark:bg-slate-900 px-2.5 py-2 text-xs font-bold text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-slate-800 cursor-pointer"
+                  className="touch-target min-h-[44px] flex items-center justify-center gap-1 rounded-lg border border-sky-500/40 bg-white dark:bg-slate-900 px-2.5 py-2 text-xs font-bold text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   <Icon name="monitor_heart" size={14} />
                   <span>Ver no Dashboard</span>

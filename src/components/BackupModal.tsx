@@ -299,6 +299,8 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
             {/* Dropzone */}
             <input
+              id="backup-file-upload-input"
+              name="backupFile"
               type="file"
               ref={fileInputRef}
               onChange={handleFileInputChange}

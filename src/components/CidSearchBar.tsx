@@ -136,7 +136,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 setIsQuickListOpen((prev) => !prev);
                 setIsOpen(false);
               }}
-              className="chip-neutral h-8 px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="touch-target chip-neutral min-h-[44px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
               title="Abrir lista rápida de diagnósticos mais frequentes"
             >
               <Icon name="sell" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
@@ -362,7 +362,15 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   return (
                     <div
                       key={item.code}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => handleSelect(item)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleSelect(item);
+                        }
+                      }}
                       className={`p-2.5 sm:p-3 flex items-center justify-between gap-3 cursor-pointer transition-colors group ${
                         isCurrent 
                           ? 'bg-[var(--surface-info-subtle)]' 

@@ -359,6 +359,8 @@ export const EditorSaveModelAndStyleModals: React.FC<EditorSaveModelAndStyleModa
 
                 <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] cursor-pointer mt-1">
                   <input
+                    id="editor-save-model-global"
+                    name="saveAsGlobal"
                     type="checkbox"
                     checked={saveAsGlobal}
                     onChange={(e) => setSaveAsGlobal(e.target.checked)}

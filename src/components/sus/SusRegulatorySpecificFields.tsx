@@ -174,7 +174,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   if (currentDocItem.id === 'apac_principal' && !formData.procedureQuantity?.trim())
                     onFieldChange('procedureQuantity', '01');
                 }}
-                className="font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                className="touch-target min-h-[44px] inline-flex items-center font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
               >
                 Usar o procedimento habitual deste documento ({currentDocItem.defaultSigtap})
               </button>
@@ -217,7 +217,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
             <button
               type="button"
               onClick={handleApplyDefaultCid}
-              className="font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+              className="touch-target min-h-[44px] inline-flex items-center font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
             >
               Usar o código habitual deste documento ({currentDocItem.defaultCid10}
               {buscarDescricaoCid(currentDocItem.defaultCid10)
@@ -474,7 +474,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               onClick={() =>
                 onFieldChange('clinicalJustification', currentDocItem.defaultJustification || '')
               }
-              className="h-8 px-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] cursor-pointer transition active:scale-95"
+              className="touch-target min-h-[44px] px-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] cursor-pointer transition active:scale-95"
               title="Preenche o campo com um texto-modelo deste documento, para você adaptar ao caso"
             >
               {formData.clinicalJustification?.trim()

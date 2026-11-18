@@ -216,7 +216,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               <button
                 type="button"
                 onClick={() => onReturnToHospitalBed(activeHospitalBed.id)}
-                className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] px-2 py-0.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-100/70 dark:hover:bg-sky-950/50 transition-colors cursor-pointer clinical-tabular-nums"
+                className="touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] px-2 py-0.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-100/70 dark:hover:bg-sky-950/50 transition-colors cursor-pointer clinical-tabular-nums"
                 title={`Retornar diretamente ao prontuário do Leito ${activeHospitalBed.wardAndBed}`}
               >
                 <Icon name="arrow_back" size={12} />
@@ -228,6 +228,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                 <li>
                   <a
                     href="#scoreboard-catalog"
+                    className="touch-target min-h-[44px] inline-flex items-center px-1"
                     onClick={(e) => {
                       e.preventDefault();
                       setTabMode('CATALOG');
@@ -239,6 +240,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                 <li>
                   <a
                     href="#scoreboard-block"
+                    className="touch-target min-h-[44px] inline-flex items-center px-1"
                     onClick={(e) => {
                       e.preventDefault();
                       setTabMode('CATALOG');
@@ -250,6 +252,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                 <li>
                   <a
                     href={`#calc-${activeCalculator.id}`}
+                    className="touch-target min-h-[44px] inline-flex items-center px-1"
                     aria-current="page"
                     onClick={(e) => e.preventDefault()}
                   >
@@ -265,7 +268,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setTabMode('CALCULATOR')}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg h-8 px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`touch-target inline-flex items-center justify-center gap-1.5 rounded-lg min-h-[44px] px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'CALCULATOR'
                   ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -277,7 +280,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setTabMode('CATALOG')}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg h-8 px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`touch-target inline-flex items-center justify-center gap-1.5 rounded-lg min-h-[44px] px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'CATALOG'
                   ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -289,7 +292,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setTabMode('BIC_DVA')}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg h-8 px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`touch-target inline-flex items-center justify-center gap-1.5 rounded-lg min-h-[44px] px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'BIC_DVA'
                   ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -301,7 +304,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setTabMode('EPARADA_ONCO')}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg h-8 px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`touch-target inline-flex items-center justify-center gap-1.5 rounded-lg min-h-[44px] px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'EPARADA_ONCO'
                   ? 'bg-red-600 text-white shadow-xs font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -328,7 +331,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                   key={pin.id}
                   type="button"
                   onClick={() => handleSelectScore(pin.id)}
-                  className={`rounded-lg border h-7 px-2 font-mono text-[11px] font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  className={`touch-target rounded-lg border min-h-[44px] px-2 font-mono text-[11px] font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                     isActive
                       ? 'border-navy-900 bg-navy-900 dark:border-sky-500/30 dark:bg-[#0369A1] text-white'
                       : 'border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.08]'
@@ -365,7 +368,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
             <button
               type="button"
               onClick={() => setTabMode('CATALOG')}
-              className="inline-flex items-center gap-1 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] h-7 px-2.5 text-[11px] font-semibold text-[var(--text-main)] cursor-pointer whitespace-nowrap"
+              className="touch-target inline-flex items-center gap-1 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] min-h-[44px] px-2.5 text-[11px] font-semibold text-[var(--text-main)] cursor-pointer whitespace-nowrap"
             >
               <Icon name="search" size={13} className="text-sky-600 dark:text-sky-400" />
               <span>Buscar ({SCOREBOARD_TOTAL_COUNT})</span>

@@ -430,7 +430,7 @@ export const AppGlobalModalsAndOverlays: React.FC<AppGlobalModalsAndOverlaysProp
             <div className="space-y-3 text-xs leading-relaxed text-[var(--text-secondary)]">
               <div className="p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-1">
                 <p className="font-bold text-[var(--text-main)]">No Android (Chrome / Edge / Samsung):</p>
-                <p>Toque no ícone de menu <strong>⋮</strong> (canto superior ou inferior do navegador) e selecione <strong>&ldquo;Instalar aplicativo&rdquo;</strong> ou <strong>&ldquo;Adicionar à tela inicial&rdquo;</strong>.</p>
+                <p>Toque no ícone de menu <Icon name="more_vert" size={14} className="inline-block align-text-bottom text-[var(--text-main)]" /> (canto superior ou inferior do navegador) e selecione <strong>&ldquo;Instalar aplicativo&rdquo;</strong> ou <strong>&ldquo;Adicionar à tela inicial&rdquo;</strong>.</p>
               </div>
               <div className="p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-1">
                 <p className="font-bold text-[var(--text-main)]">No iPhone / iPad (Safari):</p>
@@ -441,7 +441,7 @@ export const AppGlobalModalsAndOverlays: React.FC<AppGlobalModalsAndOverlaysProp
               <button
                 type="button"
                 onClick={closeInstallHelp}
-                className="btn-tactile-primary h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target btn-tactile-primary min-h-[44px] px-4 rounded-xl text-xs font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
               >
                 Entendi
               </button>

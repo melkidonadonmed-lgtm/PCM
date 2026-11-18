@@ -191,16 +191,20 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               aria-checked={formData.weightCalcEnabled}
               aria-label="Ativar cálculo pediátrico de dose por peso"
               onClick={() => setFormData({ ...formData, weightCalcEnabled: !formData.weightCalcEnabled })}
-              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none ${
-                formData.weightCalcEnabled ? 'bg-emerald-600' : 'bg-slate-400 dark:bg-slate-700'
-              }`}
+              className="touch-target relative inline-flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center cursor-pointer rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
             >
               <span
                 aria-hidden="true"
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${
-                  formData.weightCalcEnabled ? 'translate-x-5' : 'translate-x-0'
+                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                  formData.weightCalcEnabled ? 'bg-emerald-600' : 'bg-slate-400 dark:bg-slate-700'
                 }`}
-              />
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${
+                    formData.weightCalcEnabled ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </span>
             </button>
           </div>
 

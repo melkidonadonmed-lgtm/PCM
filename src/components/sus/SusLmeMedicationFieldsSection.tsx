@@ -30,6 +30,8 @@ export const SusLmeMedicationFieldsSection: React.FC<SusLmeMedicationFieldsSecti
                 {indice + 1}
               </span>
               <input
+                id={`sus-lme-med-${indice}`}
+                name={`lmeMedName_${indice}`}
                 type="text"
                 aria-label={`Medicamento ${indice + 1}`}
                 value={linha.name}
@@ -48,7 +50,7 @@ export const SusLmeMedicationFieldsSection: React.FC<SusLmeMedicationFieldsSecti
                       linhasDaLme.filter((_, i) => i !== indice)
                     )
                   }
-                  className="h-8 px-2 rounded-lg border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
+                  className="touch-target min-h-[44px] px-2 rounded-lg border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
                   aria-label={`Remover medicamento ${indice + 1}`}
                 >
                   Remover
@@ -59,6 +61,7 @@ export const SusLmeMedicationFieldsSection: React.FC<SusLmeMedicationFieldsSecti
               {MESES_DA_LME.map((mes, m) => (
                 <input
                   key={mes}
+                  name={`lmeMedQty_${indice}_${m}`}
                   type="text"
                   inputMode="numeric"
                   aria-label={`Quantidade do ${mes} mês, medicamento ${indice + 1}`}
@@ -85,7 +88,7 @@ export const SusLmeMedicationFieldsSection: React.FC<SusLmeMedicationFieldsSecti
                     quantities: MESES_DA_LME.map(() => l.quantities[0]),
                   }))
                 }
-                className="ml-5 text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                className="touch-target min-h-[44px] inline-flex items-center ml-5 text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
               >
                 Repetir a quantidade do 1º mês nos 6 meses
               </button>
@@ -98,7 +101,7 @@ export const SusLmeMedicationFieldsSection: React.FC<SusLmeMedicationFieldsSecti
             onClick={() =>
               onFieldChange('lmeMedications', [...linhasDaLme, linhaVaziaDaLme()])
             }
-            className="h-8 px-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] text-xs font-semibold text-[var(--text-main)] cursor-pointer"
+            className="touch-target min-h-[44px] px-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] text-xs font-semibold text-[var(--text-main)] cursor-pointer"
           >
             Adicionar medicamento
           </button>

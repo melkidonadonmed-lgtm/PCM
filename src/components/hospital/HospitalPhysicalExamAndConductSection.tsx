@@ -223,6 +223,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
               </button>
             </div>
             <input
+              name={`customExamSection_${idx}`}
               type="text"
               value={sec.content}
               onChange={(e) => {
@@ -239,6 +240,8 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
 
         <div className="flex items-center gap-2">
           <input
+            id="hospital-new-free-category-input"
+            name="newFreeCategoryTitle"
             type="text"
             value={newFreeCategoryTitle}
             onChange={(e) => setNewFreeCategoryTitle(e.target.value)}
@@ -249,7 +252,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
           <button
             type="button"
             onClick={handleAddFreeCategory}
-            className="btn-tactile-secondary h-9 px-3 rounded-xl text-xs font-bold cursor-pointer"
+            className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-bold cursor-pointer"
           >
             + Categoria Livre
           </button>

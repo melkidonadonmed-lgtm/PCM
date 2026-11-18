@@ -3,12 +3,10 @@
 @import "./styles/dark-theme.css";
 @import "./styles/tactile-components.css";
 @import "./styles/a4-and-editor.css";
-@source not "../GEMINI.md";
 @source not "../AGENTS.md";
 @source not "../DESIGN.md";
 @source not "../docs";
 @source not "../.agents";
-@source not "../agents";
 @source not "../.context";
 @custom-variant dark (&:where(.dark, .dark *));
 

@@ -196,8 +196,12 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     }, 600);
   }, []);
 
+  const isMountedRef = useRef(false);
+
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
+      isMountedRef.current = false;
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
   }, []);
@@ -218,11 +222,9 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
       },
     },
     onCreate: ({ editor: ed }) => {
-      queueMicrotask(() => {
-        if ((ed as { isDestroyed?: boolean }).isDestroyed) return;
-        const html = htmlDoEditorMontado(ed);
-        if (html !== null) setEditorDomHtml(html);
-      });
+      if (!isMountedRef.current || !ed || (ed as { isDestroyed?: boolean }).isDestroyed) return;
+      const html = htmlDoEditorMontado(ed);
+      if (html !== null) setEditorDomHtml(html);
     },
     onUpdate: ({ editor: ed }) => {
       setEditorHtml(ed.getHTML());
@@ -331,7 +333,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-3.5 sm:gap-4 pb-16 transition" onClick={() => setLogoSelected(false)}>
+    <div role="presentation" className="w-full max-w-7xl mx-auto flex flex-col gap-3.5 sm:gap-4 pb-16 transition" onClick={() => setLogoSelected(false)}>
       {toastMessage && (
         <div
           role="status"

@@ -221,17 +221,21 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                   role="switch"
                   aria-checked={cloudCookiesEnabled}
                   onClick={() => setCloudCookiesEnabled((prev) => !prev)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
-                    cloudCookiesEnabled ? 'bg-sky-600' : 'bg-slate-400 dark:bg-slate-700'
-                  }`}
+                  className="touch-target relative inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
                 >
                   <span className="sr-only">Permitir cookies de autenticação Google Firebase</span>
                   <span
                     aria-hidden="true"
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${
-                      cloudCookiesEnabled ? 'translate-x-5' : 'translate-x-0'
+                    className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                      cloudCookiesEnabled ? 'bg-sky-600' : 'bg-slate-400 dark:bg-slate-700'
                     }`}
-                  />
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${
+                        cloudCookiesEnabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </span>
                 </button>
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -254,17 +258,21 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                   role="switch"
                   aria-checked={sharedPcEnabled}
                   onClick={() => setSharedPcEnabled((prev) => !prev)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:ring-2 focus-visible:ring-amber-500 outline-none ${
-                    sharedPcEnabled ? 'bg-amber-600' : 'bg-slate-400 dark:bg-slate-700'
-                  }`}
+                  className="touch-target relative inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
                 >
                   <span className="sr-only">Ativar modo computador compartilhado de plantão</span>
                   <span
                     aria-hidden="true"
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${
-                      sharedPcEnabled ? 'translate-x-5' : 'translate-x-0'
+                    className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                      sharedPcEnabled ? 'bg-amber-600' : 'bg-slate-400 dark:bg-slate-700'
                     }`}
-                  />
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${
+                        sharedPcEnabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </span>
                 </button>
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -276,6 +284,8 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             {!isCloudAuthenticated && !sharedPcEnabled && (
               <label className="flex items-center gap-2.5 px-3 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs cursor-pointer">
                 <input
+                  id="lgpd-show-no-login-banner"
+                  name="showNoLoginBanner"
                   type="checkbox"
                   checked={showNoLoginBanner}
                   onChange={(e) => setShowNoLoginBanner(e.target.checked)}

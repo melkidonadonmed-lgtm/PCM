@@ -225,7 +225,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
             <button
               type="button"
               onClick={() => setMode('manual')}
-              className={`min-h-9 px-3 py-1.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
+              className={`touch-target min-h-[44px] px-3 py-1.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 mode === 'manual'
                   ? 'nav-segmented-pill-active font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold'
@@ -237,7 +237,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
             <button
               type="button"
               onClick={() => setMode('multimodal')}
-              className={`min-h-9 px-3 py-1.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
+              className={`touch-target min-h-[44px] px-3 py-1.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 mode === 'multimodal'
                   ? 'nav-segmented-pill-active font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold'

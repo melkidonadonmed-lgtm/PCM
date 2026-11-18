@@ -15,6 +15,7 @@ export const CLINICAL_SESSION_STORAGE_KEYS = [
   'prescmed_exam_indication',
   'prescmed_certificate',
   'prescmed_referral',
+  'prescmed_sus_draft',
   'prescmed_draft_referral',
   'prescmed_draft_certificate',
 ] as const;
@@ -170,6 +171,9 @@ class LgpdConsentService {
     CLINICAL_SESSION_STORAGE_KEYS.forEach((key) => {
       storageService.removeItem(key);
     });
+    if (typeof indexedDB !== 'undefined') {
+      db.savedDocuments.delete('draft-current').catch(() => {});
+    }
   }
 
   /**

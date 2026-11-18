@@ -227,6 +227,8 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
         {/* LOGOTIPO NO MODO LIVRE (Arrastável / Drag & Drop em qualquer coordenada) */}
         {logoConfig.dataUrl && logoConfig.visible && logoConfig.position === 'free' && (
           <div
+            role="group"
+            aria-label="Logotipo institucional posicionável"
             onPointerDown={handleLogoPointerDown}
             onPointerMove={handleLogoPointerMove}
             onPointerUp={handleLogoPointerUp}

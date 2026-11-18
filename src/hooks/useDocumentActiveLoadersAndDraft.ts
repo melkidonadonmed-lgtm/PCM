@@ -62,6 +62,14 @@ export function hasEmbeddedInstitutionalHeader(html?: string | null): boolean {
   );
 }
 
+export function isEditorReady(editor: Editor | null | undefined): editor is Editor {
+  return Boolean(
+    editor &&
+      !editor.isDestroyed &&
+      (editor as unknown as { commandManager?: unknown }).commandManager
+  );
+}
+
 export interface UseDocumentActiveLoadersAndDraftParams {
   editor: Editor | null;
   patient: Patient;
@@ -200,12 +208,12 @@ export function useDocumentActiveLoadersAndDraft({
       badgeText: st.viaLayout === '2-vias' ? 'RECEITUÁRIO DE CONTROLE ESPECIAL' : prev.badgeText,
     }));
     handleWatermarkChange(st.watermarkType);
-    if (editor) triggerAutoSave(editor);
+    if (isEditorReady(editor)) triggerAutoSave(editor);
     showToast(`Estilo "${st.name}" aplicado!`);
   };
 
   const handleLoadActivePrescription = useCallback((showToastMsg = true, targetMode: 'auto' | RegimeReceita = 'auto') => {
-    if (!editor) return;
+    if (!isEditorReady(editor)) return;
 
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
@@ -254,7 +262,7 @@ export function useDocumentActiveLoadersAndDraft({
   }, [editor, prescriptionItems, patient, triggerAutoSave, showToast, setViaLayout, setPageOrientation, setBaseFontSize, setEditorHtml, setHeaderConfig, setCurrentModel, isDraftRestoredRef, saveTimerRef, draftMetaRef]);
 
   const handleLoadActiveReferral = useCallback((showToastMsg = true) => {
-    if (!editor) return;
+    if (!isEditorReady(editor)) return;
 
     const { specialty, referralHtml, nextHeader } = buildActiveReferralPayload(
       patient,
@@ -287,7 +295,7 @@ export function useDocumentActiveLoadersAndDraft({
   }, [editor, patient, referral, triggerAutoSave, showToast, setViaLayout, setPageOrientation, setBaseFontSize, setEditorHtml, setHeaderConfig, setCurrentModel, isDraftRestoredRef, draftMetaRef]);
 
   const handleLoadActiveCertificate = useCallback((showToastMsg = true) => {
-    if (!editor) return;
+    if (!isEditorReady(editor)) return;
 
     const { certHtml, nextHeader } = buildActiveCertificatePayload(
       patient,
@@ -321,7 +329,7 @@ export function useDocumentActiveLoadersAndDraft({
 
   const lastTriggerRef = useRef(0);
   useEffect(() => {
-    if (editor && editorInitialSyncTrigger && editorInitialSyncTrigger !== lastTriggerRef.current) {
+    if (isEditorReady(editor) && editorInitialSyncTrigger && editorInitialSyncTrigger !== lastTriggerRef.current) {
       lastTriggerRef.current = editorInitialSyncTrigger;
       handleLoadActivePrescription(true);
     }
@@ -370,7 +378,7 @@ export function useDocumentActiveLoadersAndDraft({
 
   const lastInitialDocRef = useRef<InitialDocumentToLoadPayload | null | undefined>(null);
   useEffect(() => {
-    if (editor && initialDocumentToLoad && initialDocumentToLoad !== lastInitialDocRef.current) {
+    if (isEditorReady(editor) && initialDocumentToLoad && initialDocumentToLoad !== lastInitialDocRef.current) {
       lastInitialDocRef.current = initialDocumentToLoad;
       isDraftRestoredRef.current = true;
       editor.commands.setContent(initialDocumentToLoad.html);
@@ -387,14 +395,14 @@ export function useDocumentActiveLoadersAndDraft({
   }, [editor, initialDocumentToLoad, applyInitialDocumentLayout, triggerAutoSave, showToast, isDraftRestoredRef, setEditorHtml, setCurrentModel]);
 
   useEffect(() => {
-    if (!editor || isDraftRestoredRef.current) return;
-    isDraftRestoredRef.current = true;
+    if (!isEditorReady(editor) || isDraftRestoredRef.current) return;
 
     let isMounted = true;
     const restoreDraft = async () => {
       if (initialDocumentToLoad) {
         lastInitialDocRef.current = initialDocumentToLoad;
-        if (isMounted) {
+        if (isMounted && isEditorReady(editor)) {
+          isDraftRestoredRef.current = true;
           editor.commands.setContent(initialDocumentToLoad.html);
           setEditorHtml(initialDocumentToLoad.html);
           applyInitialDocumentLayout(initialDocumentToLoad);
@@ -409,7 +417,8 @@ export function useDocumentActiveLoadersAndDraft({
 
       if (editorInitialSyncTrigger && editorInitialSyncTrigger > 0 && editorInitialSyncTrigger !== lastTriggerRef.current) {
         lastTriggerRef.current = editorInitialSyncTrigger;
-        if (isMounted) {
+        if (isMounted && isEditorReady(editor)) {
+          isDraftRestoredRef.current = true;
           handleLoadActivePrescription(false);
         }
         return;
@@ -417,7 +426,8 @@ export function useDocumentActiveLoadersAndDraft({
 
       try {
         const draft = await db.savedDocuments.get('draft-current');
-        if (isMounted) {
+        if (isMounted && isEditorReady(editor)) {
+          isDraftRestoredRef.current = true;
           if (draft && (draft.contentJson || draft.contentHtml)) {
             if (draft.contentJson) {
               editor.commands.setContent(draft.contentJson);
@@ -484,7 +494,8 @@ export function useDocumentActiveLoadersAndDraft({
         }
       } catch (err) {
         console.error('Erro ao ler rascunho do IndexedDB:', err);
-        if (isMounted) {
+        if (isMounted && isEditorReady(editor)) {
+          isDraftRestoredRef.current = true;
           editor.commands.setContent(INITIAL_EDITOR_CONTENT);
           setEditorHtml(INITIAL_EDITOR_CONTENT);
         }

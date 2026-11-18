@@ -244,6 +244,8 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
         <div className="pt-2 border-t border-[var(--border-subtle)] space-y-2">
           <div className="flex items-center gap-2">
             <input
+              id="hospital-chat-file-upload"
+              name="hospitalChatFile"
               ref={fileInputRef}
               type="file"
               accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
@@ -261,6 +263,8 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
               <Icon name="upload" size={18} />
             </button>
             <input
+              id="hospital-chat-prompt-input"
+              name="hospitalChatPrompt"
               type="text"
               value={promptInput}
               onChange={(e) => setPromptInput(e.target.value)}

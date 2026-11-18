@@ -14,6 +14,7 @@ import { usePwaInstall } from './hooks/usePwaInstall';
 import { useNavigationSync, runTabViewTransition } from './hooks/useNavigationSync';
 import { useModalAccessibility } from './hooks/useModalAccessibility';
 import { useHospitalWardSession } from './hooks/useHospitalWardSession';
+import { db } from './services/db';
 import {
   AppModuleWorkspaceSection,
   AppGlobalModalsAndOverlays,
@@ -171,6 +172,9 @@ export default function App() {
 
   const handleClearPrescription = () => {
     setPrescriptionItems([]);
+    if (typeof indexedDB !== 'undefined') {
+      db.savedDocuments.delete('draft-current').catch(() => {});
+    }
   };
 
   const handleClearPatient = () => {
@@ -225,8 +229,12 @@ export default function App() {
         return;
       }
       if (tab === 'sus') {
+        const isAlreadyOnSus =
+          activeTab === 'sus' || (activeTab === 'documents' && documentsSubTab === 'sus');
         setInitialSusDocId(null);
-        setSusCatalogResetTrigger(prev => prev + 1);
+        if (isAlreadyOnSus) {
+          setSusCatalogResetTrigger(prev => prev + 1);
+        }
         setDocumentsSubTab('sus');
         setActiveTab('documents');
         return;
@@ -246,7 +254,7 @@ export default function App() {
       }
       setActiveTab(tab);
     });
-  }, [activeTab, lastClinicalDocSubTab]);
+  }, [activeTab, documentsSubTab, lastClinicalDocSubTab]);
 
   const handleNavigateToEditor = React.useCallback(() => handleSelectTab('editor'), [handleSelectTab]);
   const handleNavigateToCertificate = React.useCallback(() => handleSelectTab('certificate'), [handleSelectTab]);

@@ -113,7 +113,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
           <button
             type="button"
             onClick={() => setSelectedSpecialty('all')}
-            className={`h-8 px-3 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+            className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
               selectedSpecialty === 'all'
                 ? 'bg-sky-600/15 border border-sky-500/40 text-sky-700 dark:text-sky-300'
                 : 'bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -130,7 +130,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                 key={spec.id}
                 type="button"
                 onClick={() => setSelectedSpecialty(spec.id)}
-                className={`h-8 px-3 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer clinical-tabular-nums ${
+                className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer clinical-tabular-nums ${
                   isActive
                     ? 'bg-sky-600/15 border border-sky-500/40 text-sky-700 dark:text-sky-300 font-bold'
                     : 'bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -284,46 +284,46 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
 
               {/* Ações Rápidas do Card */}
               <div className="pt-2.5 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-1.5">
+              <button
+                type="button"
+                onClick={() => onOpenBedSubView(bed.id, 'evolution_form')}
+                className="touch-target btn-tactile-primary flex-1 min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Icon name="clinical_notes" size={15} />
+                <span>Evoluir Leito</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenBedSubView(bed.id, 'longitudinal_labs')}
+                title="Ver curva de exames laboratoriais"
+                className="touch-target btn-tactile-secondary min-h-[44px] px-2.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer clinical-tabular-nums"
+              >
+                <Icon name="biotech" size={14} />
+                <span>Exames ({bed.labPanels.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenBedSubView(bed.id, 'analytics_dashboard')}
+                title="Abrir Dashboard e Conduta × Evolução"
+                aria-label={`Abrir Dashboard do leito ${bed.wardAndBed}`}
+                className="touch-target btn-tactile-secondary min-h-[44px] min-w-[44px] px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
+              >
+                <Icon name="monitor_heart" size={14} />
+              </button>
+
+              {onDeleteBed && (
                 <button
                   type="button"
-                  onClick={() => onOpenBedSubView(bed.id, 'evolution_form')}
-                  className="btn-tactile-primary flex-1 h-9 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                  onClick={() => onDeleteBed(bed.id)}
+                  title="Dar alta ou remover este leito do mapa"
+                  aria-label={`Dar alta ou remover leito ${bed.wardAndBed}`}
+                  className="touch-target min-h-[44px] min-w-[44px] px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--accent-rose-subtle)] hover:border-[var(--accent-rose-border)] text-[var(--text-muted)] hover:text-rose-800 dark:hover:text-rose-200 text-xs font-semibold flex items-center justify-center gap-1 transition cursor-pointer"
                 >
-                  <Icon name="clinical_notes" size={15} />
-                  <span>Evoluir Leito</span>
+                  <Icon name="delete" size={14} />
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => onOpenBedSubView(bed.id, 'longitudinal_labs')}
-                  title="Ver curva de exames laboratoriais"
-                  className="btn-tactile-secondary h-9 px-2.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer clinical-tabular-nums"
-                >
-                  <Icon name="biotech" size={14} />
-                  <span>Exames ({bed.labPanels.length})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => onOpenBedSubView(bed.id, 'analytics_dashboard')}
-                  title="Abrir Dashboard e Conduta × Evolução"
-                  aria-label={`Abrir Dashboard do leito ${bed.wardAndBed}`}
-                  className="btn-tactile-secondary h-9 px-2.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
-                >
-                  <Icon name="monitor_heart" size={14} />
-                </button>
-
-                {onDeleteBed && (
-                  <button
-                    type="button"
-                    onClick={() => onDeleteBed(bed.id)}
-                    title="Dar alta ou remover este leito do mapa"
-                    aria-label={`Dar alta ou remover leito ${bed.wardAndBed}`}
-                    className="h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--accent-rose-subtle)] hover:border-[var(--accent-rose-border)] text-[var(--text-muted)] hover:text-rose-800 dark:hover:text-rose-200 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
-                  >
-                    <Icon name="delete" size={14} />
-                  </button>
-                )}
+              )}
               </div>
             </article>
           );

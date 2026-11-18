@@ -214,6 +214,8 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
           <div className="lg:col-span-7 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <input
+                id="hospital-multimodal-file-input"
+                name="multimodalFile"
                 ref={fileInputRef}
                 type="file"
                 accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp"
@@ -224,7 +226,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="btn-tactile-secondary h-9 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               >
                 <Icon name="upload" size={15} className="text-sky-600 dark:text-sky-400" />
                 <span>Arquivo (.pdf, .docx, Foto)</span>
@@ -233,7 +235,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
               <button
                 type="button"
                 onClick={handlePasteFromClipboard}
-                className="btn-tactile-secondary h-9 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               >
                 <Icon name="content_copy" size={15} className="text-sky-600 dark:text-sky-400" />
                 <span>Colar Prontuário</span>
@@ -242,7 +244,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
               <button
                 type="button"
                 onClick={handleToggleVoiceDictation}
-                className={`h-9 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition cursor-pointer ${
+                className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition cursor-pointer ${
                   isRecordingVoice
                     ? 'bg-rose-600 text-white border-rose-500'
                     : 'btn-tactile-secondary'
@@ -259,7 +261,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                   setSourceLabel('Prontuário de Demonstração (Rigor Terapêutico)');
                   handleRunDeterministicExtraction(SAMPLE_RAW_CLINICAL_TEXT, 'Prontuário de Demonstração');
                 }}
-                className="h-9 px-3 rounded-xl text-xs font-semibold border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] cursor-pointer"
+                className="touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] cursor-pointer"
               >
                 Carregar Exemplo Realista
               </button>
@@ -357,7 +359,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
               <button
                 type="button"
                 onClick={onClose}
-                className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                className="touch-target min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] cursor-pointer"
               >
                 Cancelar
               </button>
@@ -370,7 +372,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                     onClose();
                   }
                 }}
-                className="btn-tactile-primary h-9 px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
+                className="touch-target btn-tactile-primary min-h-[44px] px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
               >
                 <Icon name="check_circle" size={15} />
                 <span>Aplicar ao Leito {activeBedCode}</span>

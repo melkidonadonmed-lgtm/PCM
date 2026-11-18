@@ -200,13 +200,13 @@ export const ClinicalProtocolsView: React.FC<ClinicalProtocolsViewProps> = ({
 
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 self-start sm:self-auto shrink-0">
           {onNavigateToScores ? (
-            <button type="button" onClick={onNavigateToScores} className="btn-tactile-secondary h-8 min-h-[32px] px-3 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap">
+            <button type="button" onClick={onNavigateToScores} className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap">
               <Icon name="monitor_heart" size={14} className="text-sky-600 dark:text-sky-400" />
               <span>Escores & BIC (114)</span>
             </button>
           ) : null}
 
-          <button type="button" onClick={onNavigateToPrescription} className="btn-tactile-primary h-8 min-h-[32px] px-3.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500">
+          <button type="button" onClick={onNavigateToPrescription} className="touch-target btn-tactile-primary min-h-[44px] px-3.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500">
             <span>Ir para receita</span>
             <Icon name="arrow_forward" size={14} />
           </button>

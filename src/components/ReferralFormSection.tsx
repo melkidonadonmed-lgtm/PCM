@@ -357,7 +357,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
                   key={p}
                   type="button"
                   onClick={() => onUpdateReferral({ ...referral, priority: p })}
-                  className={`flex-1 h-9 rounded-xl text-xs font-bold capitalize border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                  className={`touch-target flex-1 min-h-[44px] rounded-xl text-xs font-bold capitalize border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                     referral.priority === p
                       ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] shadow-sm'
                       : 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--surface-chip-muted-hover)]'

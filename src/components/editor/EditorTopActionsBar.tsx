@@ -111,7 +111,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
               syncWithActivePrescription();
               onNavigateBack();
             }}
-            className="h-9 px-2 sm:px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-bold text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="touch-target min-h-[44px] px-2 sm:px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-bold text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             title="Sincronizar e voltar à tela de montagem de receitas"
             aria-label="Voltar à Receita"
           >
@@ -126,6 +126,8 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
           {isEditingModelTitle ? (
             <div className="flex items-center gap-1 min-w-0" onClick={e => e.stopPropagation()}>
               <input
+                id="editor-model-title-input"
+                name="editorModelTitle"
                 type="text"
                 value={tempModelTitle}
                 onChange={e => setTempModelTitle(e.target.value)}
@@ -140,7 +142,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
               <button
                 type="button"
                 onClick={handleSaveCurrentModelTitle}
-                className="p-1 rounded bg-slate-800 text-white hover:bg-slate-900 dark:bg-slate-700 cursor-pointer shrink-0"
+                className="touch-target min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-slate-800 text-white hover:bg-slate-900 dark:bg-slate-700 cursor-pointer shrink-0"
                 title="Salvar título"
               >
                 <Check className="w-3 h-3" />
@@ -148,7 +150,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
               <button
                 type="button"
                 onClick={() => setIsEditingModelTitle(false)}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer text-slate-500 shrink-0"
+                className="touch-target min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer text-slate-500 shrink-0"
                 title="Cancelar"
               >
                 <X className="w-3 h-3" />
@@ -162,7 +164,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                 setTempModelTitle(currentModel.title);
                 setIsEditingModelTitle(true);
               }}
-              className="flex items-center gap-1.5 min-w-0 text-left cursor-pointer group focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded"
+              className="touch-target min-h-[44px] flex items-center gap-1.5 min-w-0 text-left cursor-pointer group focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded"
               title={`Documento: ${currentModel.title} (clique para renomear)`}
             >
               <span className="font-bold text-[var(--text-main)] truncate max-w-28 sm:max-w-48 md:max-w-64">
@@ -211,7 +213,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
             aria-haspopup="menu"
             aria-expanded={isActionsMenuOpen}
             onClick={() => setIsActionsMenuOpen((prev) => !prev)}
-            className="h-9 px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="touch-target min-h-[44px] px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
             title="Carregar dados da consulta, salvar modelo ou criar documento em branco"
           >
             <FileText className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
@@ -321,7 +323,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
         <button
           type="button"
           onClick={() => setIsModelsDrawerOpen(true)}
-          className="h-9 px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+          className="touch-target min-h-[44px] px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
           title="Abrir biblioteca de modelos clínicos e laudos salvos"
           aria-label="Abrir biblioteca de modelos"
         >
@@ -340,7 +342,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
           onClick={handleDownloadPdf}
           disabled={isExportingPdf}
           aria-label="Baixar PDF"
-          className="btn-tactile-secondary h-9 min-h-9 px-2.5 sm:px-3 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+          className="touch-target btn-tactile-secondary min-h-[44px] px-2.5 sm:px-3 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
           title="Baixar documento em PDF preservando rigorosamente a tipografia e o layout visual do editor"
         >
           {isExportingPdf ? (
@@ -356,7 +358,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
           type="button"
           onClick={handlePrint}
           aria-label="Imprimir folha A4"
-          className={`btn-tactile-primary h-9 min-h-9 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
+          className={`touch-target btn-tactile-primary min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
             !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
           }`}
           title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica (Ctrl+P)' : 'Clique para configurar o médico emitente e imprimir'}

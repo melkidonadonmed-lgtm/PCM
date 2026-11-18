@@ -245,7 +245,7 @@ export const ScoreCalculatorDetailView: React.FC<
                       ? `Remover ${calculator.acronym} dos favoritos`
                       : `Fixar ${calculator.acronym} nos favoritos`
                   }
-                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+                  className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
                     isFavorite
                       ? 'border-amber-500/40 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
                       : 'border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -257,7 +257,7 @@ export const ScoreCalculatorDetailView: React.FC<
                 <button
                   type="button"
                   onClick={handleResetBaseline}
-                  className="chip-neutral inline-flex items-center gap-1 rounded-md border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
+                  className="touch-target min-h-[44px] chip-neutral inline-flex items-center gap-1 rounded-md border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
                 >
                   <Icon name="restart_alt" size={12} />
                   <span>Zerar Basal</span>
@@ -325,7 +325,7 @@ export const ScoreCalculatorDetailView: React.FC<
               <button
                 type="button"
                 onClick={() => onOpenScoreBySlug('sofa')}
-                className="shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700 cursor-pointer"
+                className="touch-target min-h-[44px] shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700 cursor-pointer"
               >
                 Abrir SOFA Completo
               </button>
@@ -472,7 +472,7 @@ export const ScoreCalculatorDetailView: React.FC<
                             <button
                               type="button"
                               onClick={() => handlePrescribeDrug(rx)}
-                              className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
+                              className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
                                 alreadyPrescribed
                                   ? 'border-emerald-600 bg-emerald-600 text-white'
                                   : 'border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-100'
@@ -496,7 +496,7 @@ export const ScoreCalculatorDetailView: React.FC<
                               onClick={() =>
                                 setOpenBicDrugId(isBicOpen ? null : rx.id)
                               }
-                              className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
+                              className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
                                 isBicOpen
                                   ? 'border-blue-600 bg-blue-600 text-white'
                                   : 'border-blue-500/40 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100'

@@ -1,9 +1,76 @@
 import {
   DoctorProfile,
   Patient,
+  SusDocumentId,
   SusFilledFormData,
   WorkContext,
 } from '../types';
+import { storageService } from '../services/storageService';
+
+export const SUS_SESSION_DRAFT_STORAGE_KEY = 'prescmed_sus_draft';
+
+export interface SusSessionDraftState {
+  patientId: string;
+  viewMode: 'list' | 'form';
+  selectedDocIds: SusDocumentId[];
+  activeFormDocId: SusDocumentId;
+  docsSpecificData: Record<string, Partial<SusFilledFormData>>;
+  susPatientExtras: SusPatientExtras;
+  clinicOverride: SusClinicOverride;
+}
+
+export function loadSusSessionDraft(
+  currentPatientId: string,
+  hasPatientData: boolean
+): SusSessionDraftState | null {
+  const draft = storageService.loadItem<SusSessionDraftState | null>(
+    SUS_SESSION_DRAFT_STORAGE_KEY,
+    null
+  );
+  if (!draft || typeof draft !== 'object') {
+    return null;
+  }
+  if (!hasPatientData && draft.patientId && draft.patientId !== currentPatientId) {
+    storageService.removeItem(SUS_SESSION_DRAFT_STORAGE_KEY);
+    return null;
+  }
+  return {
+    patientId: typeof draft.patientId === 'string' ? draft.patientId : '',
+    viewMode: draft.viewMode === 'form' ? 'form' : 'list',
+    selectedDocIds: Array.isArray(draft.selectedDocIds) ? draft.selectedDocIds : [],
+    activeFormDocId: draft.activeFormDocId || 'apac_principal',
+    docsSpecificData:
+      draft.docsSpecificData && typeof draft.docsSpecificData === 'object'
+        ? draft.docsSpecificData
+        : {},
+    susPatientExtras:
+      draft.susPatientExtras && typeof draft.susPatientExtras === 'object'
+        ? {
+            patientRaceColor: draft.susPatientExtras.patientRaceColor || '',
+            patientEthnicity: draft.susPatientExtras.patientEthnicity || '',
+            patientHeightCm: draft.susPatientExtras.patientHeightCm || '',
+            patientEmail: draft.susPatientExtras.patientEmail || '',
+          }
+        : {
+            patientRaceColor: '',
+            patientEthnicity: '',
+            patientHeightCm: '',
+            patientEmail: '',
+          },
+    clinicOverride:
+      draft.clinicOverride && typeof draft.clinicOverride === 'object'
+        ? draft.clinicOverride
+        : {},
+  };
+}
+
+export function saveSusSessionDraft(draft: SusSessionDraftState): void {
+  storageService.saveItem(SUS_SESSION_DRAFT_STORAGE_KEY, draft);
+}
+
+export function clearSusSessionDraft(): void {
+  storageService.removeItem(SUS_SESSION_DRAFT_STORAGE_KEY);
+}
 
 export interface SusPatientExtras {
   patientRaceColor: SusFilledFormData['patientRaceColor'];

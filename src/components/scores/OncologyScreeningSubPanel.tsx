@@ -149,6 +149,7 @@ export const OncologyScreeningSubPanel: React.FC<
             <div className="space-y-1 text-xs">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
+                  name="breastHighRisk"
                   type="checkbox"
                   checked={breastHighRisk}
                   onChange={(e) => setBreastHighRisk(e.target.checked)}
@@ -159,6 +160,7 @@ export const OncologyScreeningSubPanel: React.FC<
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
+                  name="breastRedFlag"
                   type="checkbox"
                   checked={breastRedFlag}
                   onChange={(e) => setBreastRedFlag(e.target.checked)}
@@ -261,6 +263,7 @@ export const OncologyScreeningSubPanel: React.FC<
             <div className="space-y-1 text-xs">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
+                  name="twoConsecutiveNormals"
                   type="checkbox"
                   checked={twoConsecutiveNormals}
                   onChange={(e) => setTwoConsecutiveNormals(e.target.checked)}
@@ -271,6 +274,7 @@ export const OncologyScreeningSubPanel: React.FC<
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
+                  name="cervicalImmunosuppressed"
                   type="checkbox"
                   checked={cervicalImmunosuppressed}
                   onChange={(e) =>
@@ -378,6 +382,7 @@ export const OncologyScreeningSubPanel: React.FC<
             <div className="space-y-1 text-xs">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
+                  name="prostateHighRisk"
                   type="checkbox"
                   checked={prostateHighRisk}
                   onChange={(e) => setProstateHighRisk(e.target.checked)}
@@ -389,6 +394,7 @@ export const OncologyScreeningSubPanel: React.FC<
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
+                  name="abnormalDre"
                   type="checkbox"
                   checked={abnormalDre}
                   onChange={(e) => setAbnormalDre(e.target.checked)}

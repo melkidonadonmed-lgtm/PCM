@@ -214,6 +214,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                   <div className="relative mb-2">
                     <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
+                      name="presetTemplateSearch"
                       type="text"
                       value={templateSearch}
                       onChange={(e) => setTemplateSearch(e.target.value)}
@@ -263,6 +264,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                     <div className="relative">
                       <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
+                        name="savedTemplateSearch"
                         type="text"
                         value={templateSearch}
                         onChange={(e) => setTemplateSearch(e.target.value)}
@@ -310,6 +312,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                           {editingTemplateId === tpl.id ? (
                             <div className="flex items-center gap-2">
                               <input
+                                name="renameTemplateTitle"
                                 type="text"
                                 value={editingTemplateTitle}
                                 onChange={(e) => setEditingTemplateTitle(e.target.value)}

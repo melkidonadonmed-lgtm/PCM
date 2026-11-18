@@ -29,6 +29,7 @@ import {
   resolveDraftRecipeType,
   resolveLegacyTypographyId,
   hasEmbeddedInstitutionalHeader,
+  isEditorReady,
   useDocumentActiveLoadersAndDraft,
 } from './useDocumentActiveLoadersAndDraft';
 
@@ -216,7 +217,7 @@ export function useDocumentTemplatesAndStyles({
   }, [loadSavedTemplates]);
 
   const syncWithActivePrescription = useCallback(() => {
-    if (!editor || !onUpdatePrescriptionItems) return;
+    if (!isEditorReady(editor) || !onUpdatePrescriptionItems) return;
     try {
       const currentHtml = editor.getHTML();
       if (!currentHtml || !currentHtml.trim()) return;
@@ -230,7 +231,7 @@ export function useDocumentTemplatesAndStyles({
   }, [editor, onUpdatePrescriptionItems, prescriptionItems]);
 
   const handleSaveModelDirectly = async () => {
-    if (!editor) return;
+    if (!isEditorReady(editor)) return;
 
     syncWithActivePrescription();
     triggerAutoSave(editor);
@@ -276,7 +277,7 @@ export function useDocumentTemplatesAndStyles({
 
   const handleSaveAsTemplate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editor || !newModelTitle.trim()) return;
+    if (!isEditorReady(editor) || !newModelTitle.trim()) return;
 
     try {
       const tplId = 'tpl-' + Date.now();
@@ -321,7 +322,7 @@ export function useDocumentTemplatesAndStyles({
   };
 
   const handleApplyTemplate = (tpl: SavedDocument) => {
-    if (!editor) return;
+    if (!isEditorReady(editor)) return;
 
     if (tpl.contentHtml) {
       const interpolated = interpolateMedicalTags(tpl.contentHtml, patient, prescriptionItems, doctor, activeContext);
@@ -388,13 +389,14 @@ export function useDocumentTemplatesAndStyles({
   };
 
   const handleStartNewDocument = () => {
-    if (!editor) return;
+    if (!isEditorReady(editor)) return;
     setConfirmDialog({
       title: 'Novo Documento em Branco',
       description: 'Deseja iniciar um novo documento em branco na folha A4?',
       confirmLabel: 'Iniciar em Branco',
       variant: 'warning',
       onConfirm: () => {
+        if (!isEditorReady(editor)) return;
         editor.commands.setContent('<p><br></p>');
         setEditorHtml('<p><br></p>');
         setCurrentModel({
@@ -469,13 +471,13 @@ export function useDocumentTemplatesAndStyles({
     if (tempModelTitle.trim()) {
       setCurrentModel(prev => ({ ...prev, title: tempModelTitle.trim() }));
       setIsEditingModelTitle(false);
-      if (editor) triggerAutoSave(editor);
+      if (isEditorReady(editor)) triggerAutoSave(editor);
       showToast('Nome do modelo atualizado.');
     }
   };
 
   const applyPresetTemplate = (type: PresetQuickTemplateType) => {
-    if (!editor) return;
+    if (!isEditorReady(editor)) return;
     const {
       templateHtml,
       presetTitle,

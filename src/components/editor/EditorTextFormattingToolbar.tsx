@@ -57,7 +57,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
               type="button"
               aria-expanded={isSheetConfigOpen}
               onClick={onToggleSheetConfig}
-              className={`h-8 px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+              className={`touch-target min-h-[44px] px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
                 isSheetConfigOpen
                   ? 'bg-navy-900 text-white dark:bg-sky-600 border-navy-900 dark:border-sky-500/40 shadow-tactile-sm font-bold'
                   : 'bg-[var(--surface-info-subtle)] border-[var(--border-info-subtle)] text-sky-700 dark:text-sky-300 hover:bg-sky-100/70 dark:hover:bg-sky-950/50'
@@ -90,7 +90,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           type="button"
           onClick={() => editor?.chain().focus().undo().run()}
           disabled={!editor?.can().undo()}
-          className="p-1.5 rounded-lg hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition shrink-0"
+          className="touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition shrink-0"
           title="Desfazer (Ctrl+Z)"
           aria-label="Desfazer"
         >
@@ -101,7 +101,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           type="button"
           onClick={() => editor?.chain().focus().redo().run()}
           disabled={!editor?.can().redo()}
-          className="p-1.5 rounded-lg hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition shrink-0"
+          className="touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-[var(--surface-hover)] disabled:opacity-30 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition shrink-0"
           title="Refazer (Ctrl+Y)"
           aria-label="Refazer"
         >
@@ -141,7 +141,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           <button
             type="button"
             onClick={() => setBaseFontSize(prev => Math.max(8, prev - 1))}
-            className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
+            className="touch-target min-h-[44px] min-w-[44px] rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
             title="Diminuir tamanho da fonte da folha (A-)"
             aria-label="Diminuir fonte"
           >
@@ -163,11 +163,11 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           <button
             type="button"
             onClick={() => setBaseFontSize(prev => Math.min(32, prev + 1))}
-            className="w-6 h-6 rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
+            className="touch-target min-h-[44px] min-w-[44px] rounded hover:bg-[var(--surface-hover)] flex items-center justify-center font-bold text-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none text-[var(--text-main)]"
             title="Aumentar tamanho da fonte da folha (A+)"
             aria-label="Aumentar fonte"
           >
-            +
+            <Icon name="add" size={14} />
           </button>
         </div>
 
@@ -178,7 +178,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           type="button"
           onClick={() => editor?.chain().focus().toggleBold().run()}
           disabled={!editor}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('bold')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -193,7 +193,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           type="button"
           onClick={() => editor?.chain().focus().toggleItalic().run()}
           disabled={!editor}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('italic')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -208,7 +208,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
           type="button"
           onClick={() => editor?.chain().focus().toggleMark('underline').run()}
           disabled={!editor}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('underline')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -225,7 +225,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'left' })
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -239,7 +239,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'center' })
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -253,7 +253,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'right' })
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -267,7 +267,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive({ textAlign: 'justify' })
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -284,7 +284,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleBulletList().run()}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('bulletList')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -298,7 +298,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-          className={`p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+          className={`touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 rounded-lg transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
             editor?.isActive('orderedList')
               ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm font-bold'
               : 'hover:bg-[var(--surface-hover)] text-[var(--text-main)]'
@@ -329,7 +329,7 @@ export const EditorTextFormattingToolbar: React.FC<EditorTextFormattingToolbarPr
                 type="button"
                 onClick={() => handleLoadActivePrescription(true, regime)}
                 aria-pressed={activeLoadedRecipeType === regime}
-                className={`flex-1 sm:flex-initial h-8 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 shadow-tactile-sm ${
+                className={`touch-target flex-1 sm:flex-initial min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95 shadow-tactile-sm ${
                   activeLoadedRecipeType === regime
                     ? 'bg-sky-600 text-white border border-info'
                     : 'bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-200 border border-info dark:border-info hover:bg-sky-50'

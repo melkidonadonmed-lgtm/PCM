@@ -80,6 +80,7 @@ export const VectorCell: React.FC<VectorCellProps> = ({
         </div>
       ) : multiline ? (
         <textarea
+          name={`sus_vec_${String(fieldKey)}`}
           rows={rows}
           value={value}
           onChange={(e) => onFieldChange(fieldKey, e.target.value)}
@@ -91,6 +92,7 @@ export const VectorCell: React.FC<VectorCellProps> = ({
         />
       ) : (
         <input
+          name={`sus_vec_${String(fieldKey)}`}
           type="text"
           value={value}
           onChange={(e) => onFieldChange(fieldKey, e.target.value)}
@@ -191,6 +193,8 @@ export const SusVectorLmeBlock: React.FC<SusVectorLmeBlockProps> = ({
               </div>
             ) : (
               <input
+                id={`sus-vec-lme-med-${idx}`}
+                name={`susVecLmeMed_${idx}`}
                 type="text"
                 value={row.name || ''}
                 onChange={(e) =>
@@ -218,6 +222,7 @@ export const SusVectorLmeBlock: React.FC<SusVectorLmeBlockProps> = ({
                   </div>
                 ) : (
                   <input
+                    name={`susVecLmeQty_${idx}_${mIdx}`}
                     type="text"
                     inputMode="numeric"
                     value={qVal}

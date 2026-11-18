@@ -42,6 +42,8 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
+              id="score-catalog-search-input"
+              name="scoreCatalogSearch"
               type="text"
               aria-label="Buscar escore clínico por sigla, nome, síndrome ou CID"
               placeholder="Ex.: qSOFA, SOFA, Glasgow-P, Wells TEP, CHA2DS2-VASc, Child-Pugh, Balanço Sagital..."

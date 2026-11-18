@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   DoctorProfile,
   Patient,
@@ -8,6 +8,7 @@ import {
   MedicalReferral
 } from '../types';
 import { storageService } from '../services/storageService';
+import { db } from '../services/db';
 import { dataLocalISO } from '../utils/documentoClinico';
 
 export const DEFAULT_DOCTOR: DoctorProfile = {
@@ -152,11 +153,15 @@ export function usePrescriptionSession() {
   const [doctor, setDoctorState] = useState<DoctorProfile>(() =>
     storageService.loadItem('prescmed_doctor', DEFAULT_DOCTOR)
   );
+  const doctorRef = useRef(doctor);
+  doctorRef.current = doctor;
 
   // 2. Patient
   const [patient, setPatientState] = useState<Patient>(() =>
     storageService.loadItem('prescmed_patient', DEFAULT_PATIENT)
   );
+  const patientRef = useRef(patient);
+  patientRef.current = patient;
 
   // 3. Prescription Items
   const [prescriptionItems, setPrescriptionItems] = useState<PrescriptionItem[]>(() =>
@@ -193,27 +198,27 @@ export function usePrescriptionSession() {
       .referral;
   });
 
-  // Atualização atômica no mesmo ciclo de renderização para Médico (sincroniza cidade no Atestado)
+  // Atualização em lote (batch React 19) para Médico fora da função updater (evita warning em unmount/mount de filhos)
   const setDoctor: React.Dispatch<React.SetStateAction<DoctorProfile>> = useCallback((action) => {
-    setDoctorState((prevDoc) => {
-      const nextDoc = typeof action === 'function' ? action(prevDoc) : action;
-      setCertificate((prevCert) => syncDoctorCityToCertificate(nextDoc, prevDoc, prevCert));
-      return nextDoc;
-    });
+    const prevDoc = doctorRef.current;
+    const nextDoc = typeof action === 'function' ? action(prevDoc) : action;
+    doctorRef.current = nextDoc;
+    setDoctorState(nextDoc);
+    setCertificate((prevCert) => syncDoctorCityToCertificate(nextDoc, prevDoc, prevCert));
   }, []);
 
-  // Atualização atômica no mesmo ciclo de renderização para Paciente (sincroniza Atestado e Encaminhamento simultaneamente)
+  // Atualização em lote (batch React 19) para Paciente fora da função updater
   const setPatient: React.Dispatch<React.SetStateAction<Patient>> = useCallback((action) => {
-    setPatientState((prevPat) => {
-      const nextPat = typeof action === 'function' ? action(prevPat) : action;
-      setCertificate((prevCert) =>
-        syncPatientToDocuments(nextPat, prevCert, createDefaultReferral()).certificate
-      );
-      setReferral((prevRef) =>
-        syncPatientToDocuments(nextPat, createDefaultCertificate(), prevRef).referral
-      );
-      return nextPat;
-    });
+    const prevPat = patientRef.current;
+    const nextPat = typeof action === 'function' ? action(prevPat) : action;
+    patientRef.current = nextPat;
+    setPatientState(nextPat);
+    setCertificate((prevCert) =>
+      syncPatientToDocuments(nextPat, prevCert, createDefaultReferral()).certificate
+    );
+    setReferral((prevRef) =>
+      syncPatientToDocuments(nextPat, createDefaultCertificate(), prevRef).referral
+    );
   }, []);
 
   // Sincronização automática com localStorage via storageService
@@ -261,6 +266,10 @@ export function usePrescriptionSession() {
     storageService.removeItem('prescmed_exam_indication');
     storageService.removeItem('prescmed_certificate');
     storageService.removeItem('prescmed_referral');
+    storageService.removeItem('prescmed_sus_draft');
+    if (typeof indexedDB !== 'undefined') {
+      db.savedDocuments.delete('draft-current').catch(() => {});
+    }
   }, [doctor.cityState]);
 
   return {

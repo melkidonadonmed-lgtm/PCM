@@ -141,6 +141,8 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
           <div className="mt-2.5 flex items-center gap-2">
             <span className="text-xs text-[var(--text-muted)] font-medium">Iniciais:</span>
             <input
+              id="logo-monogram-initials"
+              name="monogramText"
               type="text"
               maxLength={4}
               aria-label="Iniciais do monograma"
@@ -267,6 +269,8 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
             Nome da Instituição (Texto Superior / Principal)
           </span>
           <input
+            id="logo-institution-name"
+            name="institutionName"
             type="text"
             aria-label="Nome da Instituição"
             value={institutionName}
@@ -281,6 +285,8 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
             Subtítulo / Esfera (Texto Inferior)
           </span>
           <input
+            id="logo-institution-subtitle"
+            name="subtitle"
             type="text"
             aria-label="Subtítulo ou esfera institucional"
             value={subtitle}

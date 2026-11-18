@@ -225,9 +225,9 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
               type="button"
               onClick={handleAddMedicationOrDevice}
               aria-label="Adicionar medicação ou dispositivo"
-              className="sm:col-span-1 btn-tactile-primary h-9 rounded-xl text-xs font-bold flex items-center justify-center cursor-pointer"
+              className="touch-target sm:col-span-1 btn-tactile-primary min-h-[44px] min-w-[44px] rounded-xl text-xs font-bold flex items-center justify-center cursor-pointer"
             >
-              +
+              <Icon name="add" size={16} />
             </button>
           </div>
 
@@ -341,7 +341,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
             <button
               type="button"
               onClick={handleCopyEvolutionText}
-              className="btn-tactile-primary h-8 px-3 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
+              className="touch-target btn-tactile-primary min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
             >
               <Icon name={copiedFeedback ? 'check' : 'content_copy'} size={14} />
               <span>{copiedFeedback ? 'Copiado!' : 'Copiar Evolução'}</span>
@@ -354,7 +354,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
                   `Evolução Hospitalar — Leito ${bedRecord.wardAndBed}`
                 )
               }
-              className="btn-tactile-secondary h-8 px-2.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
+              className="touch-target btn-tactile-secondary min-h-[44px] px-2.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
             >
               <Icon name="editor" size={14} />
               <span>A4 / PDF</span>
@@ -372,7 +372,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
         <button
           type="button"
           onClick={handleSaveSnapshotToTimeline}
-          className="w-full btn-tactile-secondary h-9 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+          className="touch-target w-full btn-tactile-secondary min-h-[44px] rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <Icon name="save" size={15} className="text-sky-600 dark:text-sky-400" />
           <span>

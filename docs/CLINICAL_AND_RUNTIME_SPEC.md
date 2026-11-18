@@ -4,27 +4,33 @@
 
 ---
 
-## 1. Árvore Completa de Código (`src/` — 170 Arquivos)
+## 1. Árvore Completa de Código (`src/` — 219 Arquivos)
 
 ```text
 index.html                     # Entry HTML com script inline de tema e fontes
-vite.config.ts                 # Plugins React + Tailwind; alias '@' → raiz do projeto
+vite.config.ts                 # Plugins React + Tailwind + VitePWA; code-splitting granular e alias '@' → raiz
 src/
-  main.tsx                     # Bootstrap React (StrictMode)
+  main.tsx                     # Bootstrap React 19 (StrictMode)
   App.tsx                      # Estado global da aplicação + roteamento por abas (activeTab)
   types.ts                     # Interfaces de domínio (DoctorProfile, Patient, PrescriptionItem, etc.)
   types/
     index.ts                   # Contratos de estado finito (UIState) e reexportações de tipos
+  assets/
+    fonts/
+      material-symbols-outlined.subset.woff2 # Subset determinístico offline dos 135 glifos canônicos (39,5 KB)
   config/
     tokens.ts                  # Registro canônico de tokens semânticos, propósito e densidade
   styles/
-    globals.css                # Tokens semânticos CSS (:root), escala tipográfica clamp(), .clinical-unit e curvas de transição
+    globals.css                # Tokens semânticos CSS (:root), escala tipográfica clamp(), .clinical-unit e .touch-target
+    dark-theme.css             # Tokens de contraste Dark Mode AAA e superfícies minerais
+    tactile-components.css     # Primitivas táteis (.card-surface, .btn-tactile-*, .chip-neutral, .nav-segmented-*)
+    a4-and-editor.css          # Estilos isolados da folha A4 (#FFFFFF) e @font-face offline de Material Symbols
   core/
     domain/
       clinicalEntities.ts      # Registro de macro-módulos (MOD-01..03) e contratos SOAP/PEP e Hospitalar
     storage/
       clinicalRepository.ts    # Repositório desacoplado (IClinicalRepository / LocalDexieClinicalRepository)
-  index.css                    # Tailwind v4, tokens CSS, componentes em @layer e utilitários @utility
+  index.css                    # Tailwind v4, @theme e orquestração das folhas em src/styles/
   components/
     Header.tsx                 # Header superior (fundo claro no Light, Command Bar unificada, perfil e nuvem)
     Sidebar.tsx                # Menu lateral de navegação, macro-módulos e kits clínicos de plantão (deep navy contínuo)
@@ -115,24 +121,36 @@ src/
     clinicalKits.ts            # Kits clínicos de plantão ambulatorial (amigdalite, GECA, IVAS, ITU, etc.)
     clinicalProtocols.ts       # Protocolos patológicos com doses de emergência e cálculo de hidratação
     medicationDatabase.ts      # Ponto único de agregação (barrel) da base de medicamentos SUS/RENAME
-    medications/
-      analgesicsAndAntiInflammatories.ts # Analgésicos, antitérmicos, AINEs, corticoides e relaxantes musculares
-      antimicrobialsAndAntiparasitics.ts # Antibióticos, antifúngicos, antivirais e antiparasitários
-      cardioAndMetabolicMeds.ts # Anti-hipertensivos, antidiabéticos, hipolipemiantes, tireoide e vitaminas
-      respiratoryGastroAndCnsMeds.ts # Respiratórios, anti-histamínicos, gastrointestinais, psicotrópicos e tópicos
+    medications/               # Base modular RENAME (11 submódulos por classe terapêutica <= 600 linhas)
+      analgesicsAndAntiInflammatories.ts
+      antimicrobialsAndAntiparasitics.ts
+      cardioAndMetabolicMeds.ts
+      cardioBetablockersLipidsAndAntithrombotics.ts
+      cnsAntidepressantsMeds.ts
+      cnsAntipsychoticsSedativesAndOphthalmicMeds.ts
+      cnsMoodStabilizersAndAnticonvulsantsMeds.ts
+      diabetesAndIncretinsMeds.ts
+      opioidsSteroidsAndTriptans.ts
+      respiratoryGastroAndCnsMeds.ts
+      thyroidAndVitaminsMeds.ts
     scores/
       manifest.json            # Manifesto indexado das 114 calculadoras clínicas CDSS
+      scoreboardBlockLoader.ts # Carregamento sob demanda por bloco (scores-block-01..09)
       scoreboardCatalog.ts     # Catálogo, busca fonética/sinônimos e metadados dos 9 blocos de especialidades
+      scoreboardManifest.ts    # Índice leve do Scoreboard para boot e Ctrl+K
       blocks/
         block_01.json..block_09.json # 9 blocos monográficos (Emergência/UTI, Cardio, Neuro, Pneumo, Nefro, Gastro, Trauma, Infecto, Ped/GO/Tox)
     exemplos.ts                # Dados fictícios de exemplo (Melki Donadon / Seu Melki) para prévia e placeholders
+    externalUrlsConfig.ts      # Endpoints externos isolados (documentação/links seguros)
     presetAssets.ts            # Logos e marcas d'água predefinidos (apontam para arquivos em public/; nunca embutir base64 aqui)
     presetClinicalTemplates.ts # Modelos estruturados de documentos e atestados clínicos
     susDocumentsCatalog.ts     # Catálogo dos 9 documentos SUS, laudo copiável e HTML do modelo do app (`TimbreSus`)
-    formulariosOficiaisSus.ts  # Campos numerados da APAC e da LME: coordenadas no impresso oficial e fonte conferida
+    formulariosOficiaisSus.ts  # Campos numerados da APAC (matriz 55 campos) e da LME: coordenadas e grade vetorial
   hooks/
+    useDocumentActiveLoadersAndDraft.ts # Carregamento de consulta ativa e rascunho no Editor A4
     useDocumentLogoManager.ts  # Estado e persistência de logotipos esquerdo/direito e estilos do Editor A4
     useDocumentTemplatesAndStyles.ts # Gerenciamento de modelos personalizados, estilos visuais e sincronização com a receita
+    useHospitalWardSession.ts  # Estado e persistência do censo hospitalar (MOD-03)
     useModalAccessibility.ts   # Focus trap, restauração de foco e fechamento por Escape em modais
     useNavigationSync.ts       # Sincronização de abas com URL hash e atalhos de teclado Alt+1..8 / Ctrl+K
     usePrescriptionModels.ts   # Persistência local de modelos reutilizáveis de prescrição
@@ -157,6 +175,7 @@ src/
       calculationEngine.ts     # Motor principal de avaliação numérica e estratificação das 114 calculadoras
       clinicalSpecialtyScores.ts # Fórmulas clínicas especializadas por domínio
       neuroSpineEngine.ts      # Motor de neuro-intensivismo, Glasgow-P e escalas de coluna (TLICS, SLIC, ASIA, ODI)
+      neurovascularEngine.ts   # Motor neurovascular complementar (NIHSS, ABCD2, escalas de AVC)
       eparadaAndScreeningEngine.ts # Motor de PCR (ACLS/PALS por peso) e Rastreio Oncológico INCA/MS (BI-RADS, Colo, PSA)
       infusionEngine.ts        # Motor de diluição e vazão em Bomba de Infusão Contínua (BIC)
       radarEngine.ts           # Normalizador de eixos fisiológicos para o Radar SVG
@@ -164,6 +183,7 @@ src/
       scoreTypes.ts            # Contratos tipados das calculadoras, parâmetros e interpretações
     doseCalculator.ts          # Motor de cálculo pediátrico, volumes, gotas e horários de tomada
     fuzzySearch.ts             # Algoritmo de busca textual fonética/aproximada com priorização de monofármacos
+    fuzzySearchTaxonomy.ts     # Taxonomia e sinônimos farmacológicos para busca clínica
     medicoConfigurado.ts       # Validador de obrigatoriedade de identificação médica (nome e CRM)
     montarItensDoKit.ts        # Montagem inteligente e cálculo por peso de kits clínicos de plantão
     documentoClinico.ts        # Regras de conteúdo dos documentos (identidade do cabeçalho, título, orientação, textos)
@@ -177,17 +197,17 @@ src/
     parsePrescriptionHtml.ts   # Converte o HTML do Editor A4 de volta em itens tipados da receita
     sanitizeHtml.ts            # Sanitizador anti-XSS (DOMPurify + escapeHtml preservando operadores < e >)
     compartilhamentoTexto.ts   # Formatadores puros de texto para cópia e WhatsApp por regime sanitário
-  __tests__/                   # 26 suítes Vitest (241 testes Nível 4) cobrindo cálculo pediátrico, Portaria 344/98, RDC 471/2021, CFM CID-10, APAC/LME, Módulo Hospitalar (MOD-03), Scoreboard CDSS (114 escores) e UI/A11y
+    susFormSync.ts             # Sincronização 0ms bidirecional entre Paciente, Médico, Posto e Formulários SUS
+  __tests__/                   # 30 suítes Vitest (286 testes Nível 4) cobrindo cálculo pediátrico, Portaria 344/98, RDC 471/2021, CFM CID-10, APAC/LME, Módulo Hospitalar (MOD-03), Scoreboard CDSS (114 escores) e UI/A11y/PWA
 ```
 
 ---
 
 ## 2. Estado em Tempo de Execução e Chaves `localStorage`
 
-- **SPA sem roteador (`activeTab: ActiveTab` em `App.tsx`):** Valores `'prescription'`, `'pediatric_calc'`, `'documents'`, `'exams'`, `'certificate'`, `'referral'`, `'sus'`, `'protocols'`, `'scores'`, `'editor'`, `'print_preview'`, `'patients'`, `'hospital'`.
+- **SPA sem roteador (`activeTab: ActiveTab` em `App.tsx`):** Valores `'prescription'`, `'pediatric_calc'`, `'documents'`, `'exams'`, `'certificate'`, `'referral'`, `'sus'`, `'protocols'`, `'scores'`, `'editor'`, `'print_preview'`, `'hospital'` (`12` rotas válidas).
   - `'documents'`, `'certificate'`, `'referral'` e `'exams'` abrem a Central de Documentos (`ClinicalDocumentsHub.tsx`) na aba correspondente; documentos SUS são a 4ª aba.
-  - `'patients'` apenas abre o `PatientModal`.
-- **11 Chaves Oficiais de `localStorage` (`storageService`):**
+- **12 Chaves Oficiais de `localStorage` (`storageService`):**
   1. `prescmed_theme`: `'light'` ou `'dark'`.
   2. `prescmed_doctor`: Perfil cadastrado do médico (`DoctorProfile`).
   3. `prescmed_patient`: Dados do paciente atual (`Patient`).
