@@ -79,7 +79,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   );
   const [weightDraft, setWeightDraft] = useState<string | null>(null);
 
-  // Acessibilidade WCAG 2.1: Foco inicial executado apenas na montagem (Escape e Focus Trap gerenciados por useModalAccessibility)
+  // Acessibilidade WCAG 2.2: Foco inicial executado apenas na montagem (Escape e Focus Trap gerenciados por useModalAccessibility)
   useEffect(() => {
     nameInputRef.current?.focus();
   }, []);

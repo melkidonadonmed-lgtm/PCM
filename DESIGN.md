@@ -123,7 +123,7 @@ components:
 
 # Diretrizes e Arquitetura de Design System Frontend — PresCMed (`DESIGN.md` v8.0.0)
 
-> **Escopo do Contrato:** Especificação normativa de engenharia de interface, tokens em 3 camadas (`OKLCH`), física óptica zenital, macro/microlayouts (`@container`), acessibilidade WCAG 2.1 AA/AAA, navegação semântica em 3 camadas, máquina de estados Real-State e adendos especializados (A–I) para o **PresCMed (`PCM`)**, em conformidade com `design-md v8.0.0`, `design-interface-medica-minimalista v4.0.0` e `@google/design.md`.
+> **Escopo do Contrato:** Especificação normativa de engenharia de interface, tokens em 3 camadas (`OKLCH`), física óptica zenital, macro/microlayouts (`@container`), acessibilidade WCAG 2.2 AA/AAA, navegação semântica em 3 camadas, máquina de estados Real-State e adendos especializados (A–I) para o **PresCMed (`PCM`)**, em conformidade com `design-md v8.0.0`, `design-interface-medica-minimalista v4.0.0`, `shredded-shape` e `@google/design.md`.
 
 ---
 

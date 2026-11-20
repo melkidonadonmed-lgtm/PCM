@@ -125,7 +125,7 @@ export interface UseModalAccessibilityOptions {
 }
 
 /**
- * Hook de acessibilidade para Modais e Drawers (modern-web-guidance & WCAG 2.1 AA).
+ * Hook de acessibilidade para Modais e Drawers (modern-web-guidance & WCAG 2.2 AA).
  * Gerencia pilha de modais aninhados, tecla Escape, Focus Trap cíclico (Tab / Shift+Tab)
  * e restauração determinística do foco ao fechar, sem roubar foco em re-renderizações.
  */
