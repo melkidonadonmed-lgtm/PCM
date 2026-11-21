@@ -261,4 +261,42 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
     expect(PRESCMED_TOKENS.colors.primary).toBe('#243447');
     expect(PRESCMED_TOKENS.colors.clinical).toBe('#115E59');
   });
+
+  it('impõe elevação projetada sem efeito escavado em inputs/trilhos, contraste AAA em breadcrumbs/badges no Dark Mode, skip-link e isolamento A4 em forced-colors', () => {
+    const indexCss = fs.readFileSync(path.resolve(__dirname, '../index.css'), 'utf8');
+    const globalsCss = fs.readFileSync(path.resolve(__dirname, '../styles/globals.css'), 'utf8');
+    const darkThemeCss = fs.readFileSync(path.resolve(__dirname, '../styles/dark-theme.css'), 'utf8');
+    const tactileCss = fs.readFileSync(path.resolve(__dirname, '../styles/tactile-components.css'), 'utf8');
+    const a4EditorCss = fs.readFileSync(path.resolve(__dirname, '../styles/a4-and-editor.css'), 'utf8');
+    const appSrc = fs.readFileSync(path.resolve(__dirname, '../App.tsx'), 'utf8');
+    const workspaceSrc = fs.readFileSync(
+      path.resolve(__dirname, '../components/layout/AppWorkspaceAndModals.tsx'),
+      'utf8'
+    );
+
+    // Positivos: controles elevados, SC 1.4.11 >= 3:1, AAA --ink-accent em Light/Dark, skip-link e media fallbacks
+    expect(indexCss).toContain('--border-control: #8594A6;');
+    expect(indexCss).toContain('--ink-accent: #243447;');
+    expect(darkThemeCss).toContain('--surface-inset: #2C3B50;');
+    expect(darkThemeCss).toContain('--border-control: #73869F;');
+    expect(darkThemeCss).toContain('--ink-accent: #C5DCF8;');
+    expect(darkThemeCss).toContain('--surface-modal: #202B3C;');
+    expect(globalsCss).toContain('color: var(--ink-accent, #243447);');
+    expect(globalsCss).toContain('.skip-link');
+    expect(globalsCss).toContain('@media (prefers-reduced-transparency: reduce)');
+    expect(globalsCss).toContain('@media (forced-colors: active)');
+    expect(globalsCss).toContain('forced-color-adjust: none;');
+    expect(appSrc).toContain('href="#conteudo-principal"');
+    expect(workspaceSrc).toContain('id="conteudo-principal"');
+
+    // Adversariais (rejeição determinística de regressões escavadas e contraste invisível)
+    expect(a4EditorCss).not.toMatch(/:placeholder-shown\s*\{\s*background-color:\s*var\(--surface-inset\)/);
+    expect(tactileCss).not.toContain('inset 0 2px 4px rgba(15, 23, 42, 0.04)');
+    expect(tactileCss).not.toContain('inset 0 1px 3px rgba(0, 0, 0, 0.32)');
+    expect(tactileCss).not.toContain('--accent-sky-dark');
+    expect(tactileCss).not.toContain('.groove-divider');
+    expect(globalsCss).not.toContain('inset 0 1px 2px rgba(15, 23, 42, 0.06)');
+    expect(globalsCss).not.toContain('inset 0 1px 3px rgba(0, 0, 0, 0.45)');
+    expect(globalsCss).not.toMatch(/\.breadcrumbsList\s+a\[aria-current="page"\][\s\S]{0,120}color:\s*var\(--brand-primary\)/);
+  });
 });

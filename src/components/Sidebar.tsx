@@ -331,7 +331,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div className="flex items-center gap-1.5 min-w-0">
                 <Icon name="layers" size={15} className="text-sky-400 shrink-0" />
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--sidebar-text-secondary,#E2E8F0)] truncate">
-                  Navegação
+                  Menu
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-400/20 border border-emerald-400/30 px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
                   {activeMacroModuleLabel}
@@ -342,7 +342,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={onClose || onToggleOpen}
                 aria-label="Fechar menu lateral"
                 title={isDesktop ? 'Recolher menu lateral' : 'Fechar menu lateral'}
-                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.12] hover:border-white/20 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors duration-150 shrink-0"
+                className="lg:hidden touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.12] hover:border-white/20 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-400 outline-none transition-colors duration-150 shrink-0"
               >
                 <Icon name={isDesktop ? 'chevron_left' : 'close'} size={15} />
               </button>
@@ -384,7 +384,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className="min-h-[44px] py-1.5 px-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer group shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset"
+              className="min-h-[44px] py-1.5 px-2.5 rounded-xl border border-white/10 bg-white/[0.06] hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer group shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset"
               title={
                 hasDoctor
                   ? `${doctor?.name} — CRM ${doctor?.crm}/${doctor?.crmState || 'SP'}${doctor?.rqe ? ' • RQE ' + doctor.rqe : ''}`
@@ -435,7 +435,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               role="button"
               tabIndex={0}
-              className={`min-h-[44px] py-1.5 px-2.5 rounded-xl border transition-colors duration-150 active:translate-y-px cursor-pointer group shadow-tactile-inset focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset ${
+              className={`min-h-[44px] py-1.5 px-2.5 rounded-xl border transition-colors duration-150 active:translate-y-px cursor-pointer group shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-sky-400 outline-none flex items-center justify-between gap-2 surface-inset ${
                 hasPatient
                   ? 'border-sky-400/30 bg-sky-400/[0.10] hover:bg-sky-400/[0.16] hover:border-sky-400/45'
                   : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20'

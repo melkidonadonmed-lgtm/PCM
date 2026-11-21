@@ -257,7 +257,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
   onShowToast,
 }) => {
   return (
-    <main className="flex-1 min-w-0 pb-20 lg:pb-6">
+    <main id="conteudo-principal" tabIndex={-1} className="flex-1 min-w-0 pb-20 lg:pb-6 focus:outline-none">
       <LgpdLocalModeNotice
         isCloudAuthenticated={Boolean(cloudUser)}
         sharedComputerMode={lgpdConsent.sharedComputerMode}

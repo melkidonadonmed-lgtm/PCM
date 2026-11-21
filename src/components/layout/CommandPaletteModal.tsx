@@ -180,7 +180,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         id: 'nav-scores',
         group: 'Navegação Rápida',
         title: 'Escores Clínicos & Scoreboard CDSS (114 Escores, BIC & EPARADA)',
-        subtitle: 'Catálogo monográfico de 114 escores, Radar SVG 60fps, Drogas Vasoativas em BIC, EPARADA e Rastreio INCA',
+        subtitle: 'Catálogo monográfico de 114 escores, Radar Fisiológico SVG, Drogas Vasoativas em BIC, EPARADA e Rastreio INCA',
         shortcut: 'Alt+8',
         icon: 'monitor_heart',
         action: () => {

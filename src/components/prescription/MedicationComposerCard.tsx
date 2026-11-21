@@ -143,8 +143,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                 onFocus={onFocusSearch}
                 onBlur={onBlurSearch}
                 onKeyDown={onMedInputKeyDown}
-                placeholder="Ex.: Dipirona 500 mg, Amoxicilina 500 mg, Losartana 50 mg..."
-                className="w-full h-11 min-h-[44px] pl-8 pr-16 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition placeholder:text-[var(--text-placeholder)] placeholder:font-normal shadow-tactile-sm"
+                placeholder="Ex.: Dipirona 500 mg, Amoxicilina, Losartana..."
+                className="w-full h-11 min-h-[44px] pl-8 pr-20 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition placeholder:text-[var(--text-placeholder)] placeholder:font-normal shadow-tactile-sm"
               />
               {selectedMedName ? (
                 <div className="absolute right-0.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">

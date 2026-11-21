@@ -119,18 +119,20 @@ export const FolhaA4: React.FC<FolhaA4Props> = ({
   return (
     <div className="relative w-full group/folha">
       {ajustarALargura && zoom < 0.92 && (
-        <div className="no-print absolute top-2.5 right-2.5 z-20 flex items-center gap-1 rounded-lg bg-slate-900/95 backdrop-blur-xs px-1.5 py-0.5 text-[11px] font-semibold text-white shadow-sm transition-opacity">
-          <span className="clinical-tabular-nums text-slate-100 px-1.5 border-r border-white/20">
-            {Math.round(escalaEfetiva * 100)}%
-          </span>
-          <button
-            type="button"
-            onClick={() => setInspecaoReal((v) => !v)}
-            className="touch-target min-w-[44px] min-h-[44px] px-2 rounded-md hover:bg-white/15 text-sky-200 font-bold cursor-pointer transition-colors inline-flex items-center justify-center"
-            title={inspecaoReal ? 'Ajustar folha à largura do painel' : 'Inspecionar folha em tamanho real (100%)'}
-          >
-            {inspecaoReal ? 'Ajustar' : '100%'}
-          </button>
+        <div className="no-print mb-2 flex justify-end">
+          <div className="inline-flex items-center gap-1 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] px-2 py-0.5 text-xs font-semibold text-[var(--text-main)] shadow-tactile-sm">
+            <span className="clinical-tabular-nums text-[var(--text-secondary)] px-1.5 border-r border-[var(--border-subtle)]">
+              {Math.round(escalaEfetiva * 100)}%
+            </span>
+            <button
+              type="button"
+              onClick={() => setInspecaoReal((v) => !v)}
+              className="touch-target min-w-[44px] min-h-[44px] px-2 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--ink-accent)] font-bold cursor-pointer transition-colors inline-flex items-center justify-center focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              title={inspecaoReal ? 'Ajustar folha à largura do painel' : 'Inspecionar folha em tamanho real (100%)'}
+            >
+              {inspecaoReal ? 'Ajustar' : '100%'}
+            </button>
+          </div>
         </div>
       )}
       <div

@@ -105,28 +105,25 @@
     --radius-card: var(--radius-2xl, 1rem);
     --radius-inner: var(--radius-xl, 0.75rem);
 
-    /* 5. Shadow-Box Soft em Camadas Sobrepostas com Leve Projeção dos Tokens (Luz realista restrita aos botões) */
+    /* 5. Shadow-Box Projetado em 3 Camadas Calibradas (Contact + Penumbra + Ambient, sem efeito escavado) */
     --rim-light: rgba(255, 255, 255, 0.72);
-    --catch-light: inset 0px 1px 0px 0px light-dark(oklch(1 0 0 / 0.16), oklch(1 0 0 / 0.08));
+    --catch-light: inset 0px 1px 0px 0px light-dark(oklch(1 0 0 / 0.16), oklch(1 0 0 / 0.11));
 
     --shadow-layer-sm:
-      0px 1px 2px 0px oklch(0.18 0.02 255 / 0.03),
-      0px 3px 6px -1px oklch(0.18 0.02 255 / 0.04),
-      0px 8px 16px -4px oklch(0.18 0.02 255 / 0.04),
-      0px 14px 28px -8px oklch(0.18 0.02 255 / 0.03);
+      0px 1px 2px 0px oklch(0.18 0.025 252 / 0.06),
+      0px 4px 10px -2px oklch(0.18 0.025 252 / 0.07),
+      0px 12px 24px -6px oklch(0.18 0.025 252 / 0.05);
     --shadow-layer-md:
-      0px 1px 2px 0px oklch(0.18 0.02 255 / 0.04),
-      0px 4px 8px -2px oklch(0.18 0.02 255 / 0.05),
-      0px 10px 20px -4px oklch(0.18 0.02 255 / 0.06),
-      0px 20px 36px -8px oklch(0.18 0.02 255 / 0.05);
+      0px 2px 4px -1px oklch(0.18 0.025 252 / 0.06),
+      0px 8px 16px -4px oklch(0.18 0.025 252 / 0.09),
+      0px 18px 32px -8px oklch(0.18 0.025 252 / 0.07);
     --shadow-layer-lg:
-      0px 2px 4px -1px oklch(0.18 0.02 255 / 0.04),
-      0px 8px 16px -4px oklch(0.18 0.02 255 / 0.06),
-      0px 18px 32px -6px oklch(0.18 0.02 255 / 0.08),
-      0px 32px 56px -12px oklch(0.18 0.02 255 / 0.09);
+      0px 4px 8px -2px oklch(0.18 0.025 252 / 0.07),
+      0px 14px 28px -6px oklch(0.18 0.025 252 / 0.11),
+      0px 28px 50px -12px oklch(0.18 0.025 252 / 0.10);
     --shadow-inset-sunken:
-      inset 0px 1px 3px 0px oklch(0.15 0.02 255 / 0.06),
-      inset 0px 1px 2px -1px oklch(0.15 0.02 255 / 0.04);
+      0px 1px 2px 0px oklch(0.18 0.025 252 / 0.06),
+      0px 2px 4px -1px oklch(0.18 0.025 252 / 0.04);
 
     --shadow-elevation-1: var(--shadow-layer-sm);
     --shadow-elevation-2: var(--shadow-layer-md);
@@ -160,39 +157,43 @@
     --bg-surface: var(--surface-card, #243042);
     --bg-surface-1: var(--bg-surface);
     --bg-card: oklch(0.30 0.024 252);
-    --bg-elevated: #2D3B50;
-    --bg-modal: var(--surface-hover, #33435A);
-    --bg-subtle: var(--surface-inset, #1B2534);
+    --bg-elevated: #2E3E54;
+    --bg-modal: var(--surface-modal, #202B3C);
+    --bg-subtle: var(--surface-inset, #2C3B50);
 
     --ink-primary: var(--text-main, #F8FAFC);
     --ink-secondary: var(--text-secondary, #CBD5E1);
-    --ink-muted: var(--text-muted, #94A3B8);
+    --ink-muted: var(--text-muted, #C4D2E3);
 
     --pill-active-bg: oklch(0.48 0.115 242);
     --pill-active-border: oklch(0.62 0.12 240 / 0.35);
-    --surface-chip-muted: oklch(0.32 0.03 254);
-    --surface-chip-muted-hover: oklch(0.37 0.032 254);
-    --surface-info-subtle: oklch(0.22 0.025 252);
+    --surface-chip-muted: oklch(0.34 0.03 254);
+    --surface-chip-muted-hover: oklch(0.39 0.032 254);
+    --surface-info-subtle: oklch(0.27 0.028 252);
     --border-info-subtle: oklch(0.62 0.13 242 / 0.32);
 
-    --rim-light: rgba(255, 255, 255, 0.06);
+    --rim-light: rgba(255, 255, 255, 0.11);
     --shadow-sculpted: var(--shadow-tactile-card-dark);
 
     --shadow-elevation-1:
-      0px 1px 2px 0px oklch(0.04 0.01 260 / 0.28),
-      0px 4px 10px -2px oklch(0.04 0.01 260 / 0.32),
-      0px 10px 22px -6px oklch(0.04 0.01 260 / 0.26);
+      0px 1px 2px 0px oklch(0.05 0.015 258 / 0.34),
+      0px 6px 14px -3px oklch(0.05 0.015 258 / 0.36),
+      0px 14px 28px -8px oklch(0.05 0.015 258 / 0.28),
+      inset 0px 1px 0px 0px oklch(1 0 0 / 0.11);
     --shadow-elevation-2:
-      0px 2px 4px -1px oklch(0.04 0.01 260 / 0.34),
-      0px 8px 16px -3px oklch(0.04 0.01 260 / 0.40),
-      0px 18px 32px -6px oklch(0.04 0.01 260 / 0.36);
+      0px 2px 4px -1px oklch(0.04 0.015 258 / 0.40),
+      0px 10px 20px -4px oklch(0.04 0.015 258 / 0.42),
+      0px 20px 36px -8px oklch(0.04 0.015 258 / 0.34),
+      inset 0px 1px 0px 0px oklch(1 0 0 / 0.14);
     --shadow-elevation-3:
-      0px 4px 8px -2px oklch(0.02 0.01 260 / 0.42),
-      0px 14px 28px -6px oklch(0.02 0.01 260 / 0.50),
-      0px 28px 52px -12px oklch(0.02 0.01 260 / 0.55);
+      0px 4px 8px -2px oklch(0.02 0.012 260 / 0.46),
+      0px 14px 28px -6px oklch(0.02 0.012 260 / 0.52),
+      0px 28px 52px -12px oklch(0.02 0.012 260 / 0.48),
+      inset 0px 1px 0px 0px oklch(1 0 0 / 0.15);
     --shadow-inset-sunken:
-      inset 0px 1px 3px 0px oklch(0.02 0.01 260 / 0.42),
-      inset 0px 1px 2px -1px oklch(0.02 0.01 260 / 0.28);
+      0px 1px 2px 0px oklch(0.05 0.015 258 / 0.32),
+      0px 2px 6px -1px oklch(0.05 0.015 258 / 0.24),
+      inset 0px 1px 0px 0px oklch(1 0 0 / 0.09);
     --shadow-inset: var(--shadow-inset-sunken);
     --elevation-1: var(--shadow-elevation-1);
     --elevation-2: var(--shadow-elevation-2);
@@ -246,36 +247,47 @@
     flex-shrink: 0;
   }
 
-  /* Navegação em 3 Camadas: Breadcrumbs Silenciosos via CSS ::before */
+  /* Navegação em 3 Camadas: Breadcrumbs Silenciosos via CSS ::before (AAA em Light & Dark via --ink-accent) */
   .breadcrumbsList {
     display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
     list-style: none;
-    gap: 0.5rem;
+    gap: 0.375rem;
     font-size: 0.8125rem;
+    min-width: 0;
+  }
+
+  .breadcrumbsList li {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
   }
 
   .breadcrumbsList li + li::before {
     content: "/";
-    margin-inline-end: 0.5rem;
+    margin-inline-end: 0.375rem;
     color: var(--ink-muted);
+    flex-shrink: 0;
   }
 
   .breadcrumbsList a {
     color: var(--ink-secondary);
     text-decoration: none;
+    white-space: nowrap;
   }
 
   .breadcrumbsList a:is(:hover, :focus-visible),
   .breadcrumbsList a[aria-current="page"] {
-    color: var(--brand-primary);
-    font-weight: 600;
+    color: var(--ink-accent, #243447);
+    font-weight: 700;
   }
 
-  /* Badge Semântico com Interpolação color-mix(in oklab) */
+  /* Badge Semântico com Interpolação color-mix(in oklab) e contraste AAA em Light/Dark */
   .badgeInfo {
-    background-color: color-mix(in oklab, var(--brand-primary) 15%, transparent);
-    color: var(--brand-primary);
-    border: 1px solid color-mix(in oklab, var(--brand-primary) 30%, transparent);
+    background-color: color-mix(in oklab, var(--ink-accent, var(--brand-primary)) 14%, transparent);
+    color: var(--ink-accent, var(--brand-primary));
+    border: 1px solid color-mix(in oklab, var(--ink-accent, var(--brand-primary)) 28%, transparent);
     padding: 0.2rem 0.5rem;
     border-radius: 6px;
     font-size: 0.75rem;
@@ -300,39 +312,41 @@
     padding: 1.25rem;
   }
 
-  /* Trilho Côncavo Esculpido para Navegação Segmentada (Header & Central de Documentos) */
+  /* Cápsula Elevada para Navegação Segmentada (zero sombra inset escura) */
   .nav-segmented-track {
-    background-color: var(--surface-inset);
-    border: 1px solid var(--border-subtle);
+    background-color: #E8EEF5;
+    border: 1px solid #CFD9E6;
     box-shadow:
-      inset 0 1px 2px rgba(15, 23, 42, 0.06),
-      0 1px 0 rgba(255, 255, 255, 0.6);
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
   }
 
   .dark .nav-segmented-track {
-    background-color: rgba(15, 23, 42, 0.65);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+    background-color: #1C2738;
+    border-color: rgba(255, 255, 255, 0.10);
+    box-shadow:
+      0 1px 3px rgba(4, 9, 18, 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
-  /* Pílula Ativa com Projeção Soft em Camadas dentro do Trilho Segmentado */
+  /* Pílula Ativa Projetada dentro da Cápsula Segmentada (sombra <= 5px sem recorte em overflow-x-auto) */
   .nav-segmented-pill-active {
     background-color: var(--surface-card);
     color: var(--ink-primary);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid #CBD5E1;
     box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.04),
-      0 3px 6px -1px rgba(15, 23, 42, 0.06),
-      0 6px 12px -3px rgba(15, 23, 42, 0.04);
+      0 1px 2px rgba(15, 23, 42, 0.08),
+      0 2px 5px -1px rgba(15, 23, 42, 0.06);
   }
 
   .dark .nav-segmented-pill-active {
-    background-color: #27354A;
+    background-color: #31425A;
     color: #F8FAFC;
-    border-color: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.18);
     box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.28),
-      0 4px 8px -2px rgba(0, 0, 0, 0.34);
+      0 1px 2px rgba(4, 9, 18, 0.34),
+      0 2px 5px -1px rgba(4, 9, 18, 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
   }
 
   /* Superfície e Indicador Vertical Sóbrio na Sidebar Deep Navy (Sem Glow Neon) */
@@ -363,5 +377,48 @@
     letter-spacing: -0.01em;
     padding: 2px 4px;
     border-radius: 6px;
+  }
+
+  /* Salto por Teclado GPU (transform-only) */
+  .skip-link {
+    position: fixed;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 100;
+    padding: 0.625rem 1rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 12px;
+    background-color: var(--primary);
+    color: var(--text-inverse, #FFFFFF);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: var(--elevation-medium);
+    transform: translate3d(0, -160%, 0);
+    transition: transform 0.18s var(--ease-spring);
+  }
+
+  .skip-link:focus-visible {
+    transform: translate3d(0, 0, 0);
+    outline: 2px solid var(--accent-focus);
+    outline-offset: 2px;
+  }
+}
+
+/* Acessibilidade: Transparência reduzida & Alto Contraste (Forced Colors — isolando Folha A4) */
+@media (prefers-reduced-transparency: reduce) {
+  #prescmed-header {
+    background-color: var(--surface-card);
+    backdrop-filter: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .folha-a4,
+  #printable-a4-sheet,
+  .a4-editor-canvas {
+    forced-color-adjust: none;
   }
 }

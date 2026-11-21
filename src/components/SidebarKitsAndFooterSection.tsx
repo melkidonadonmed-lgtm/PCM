@@ -79,7 +79,7 @@ export function buildSidebarNavGroups(
       {
         id: 'scores',
         label: 'Scores',
-        fullLabel: 'Escores Clínicos, Radar 60fps, BIC, EPARADA & Rastreio INCA',
+        fullLabel: 'Escores Clínicos, Radar Fisiológico, BIC, EPARADA & Rastreio INCA',
         shortLabel: 'Scores',
         iconName: 'monitor_heart',
         shortcut: 'Alt+8',

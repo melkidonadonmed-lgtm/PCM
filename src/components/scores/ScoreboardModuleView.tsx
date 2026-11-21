@@ -318,7 +318,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
         {/* Barra de Acesso Rápido (Quick-Pins Favoritos) em Linha Única */}
         <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 border-t border-subtle dark:border-strong pt-2">
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0 flex-1 py-0.5">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none fade-scroll-x pr-6 min-w-0 flex-1 py-0.5">
             <span className="mr-1 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] shrink-0">
               <Icon name="star" size={12} className="text-amber-500" />
               Rápido:
@@ -345,8 +345,8 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
           <div className="flex items-center gap-1.5 shrink-0">
             {hospitalBeds.length > 0 && activeHospitalBed && onSelectHospitalBed ? (
-              <div className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] h-7 px-2 text-[11px] font-semibold text-sky-800 dark:text-sky-200">
-                <Icon name="local_hospital" size={13} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <div className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] min-h-[44px] px-2.5 text-[11px] font-semibold text-sky-800 dark:text-sky-200">
+                <Icon name="local_hospital" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
                 <label htmlFor="scoreboard-top-bed-select" className="sr-only">
                   Leito Hospitalar Vinculado (MOD-03)
                 </label>
@@ -354,7 +354,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                   id="scoreboard-top-bed-select"
                   value={activeHospitalBed.id}
                   onChange={(e) => onSelectHospitalBed(e.target.value)}
-                  className="bg-transparent font-mono text-[11px] font-semibold focus:outline-none cursor-pointer clinical-tabular-nums max-w-44 truncate"
+                  className="bg-transparent min-h-[44px] font-mono text-[11px] font-semibold focus:outline-none cursor-pointer clinical-tabular-nums max-w-44 truncate"
                 >
                   {hospitalBeds.map((b) => (
                     <option key={b.id} value={b.id} className="text-slate-900">

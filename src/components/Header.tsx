@@ -77,7 +77,7 @@ const CloudAuthButton: React.FC = () => {
     const cloudState = loading || syncStatus === 'syncing' ? 'loading' : syncStatus === 'error' ? 'error' : 'idle';
     return (
       <div data-state={cloudState} aria-busy={cloudState === 'loading'} 
-        className="flex items-center gap-1.5 pl-2.5 pr-1 min-h-[44px] rounded-xl border text-xs shadow-tactile-sm transition bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-main)] shrink-0"
+        className="flex items-center gap-1.5 pl-2.5 pr-1 min-h-[44px] rounded-xl border text-xs shadow-tactile-sm transition bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-main)] shrink-0"
         title={`Conectado à nuvem: ${user.email || user.displayName} | Status: ${syncStatus}`}
       >
         <div className="relative flex-shrink-0">
@@ -156,7 +156,7 @@ const CloudAuthButton: React.FC = () => {
       disabled={loading}
       data-state={loading ? 'loading' : 'idle'}
       aria-busy={loading || undefined}
-      className="touch-target flex items-center justify-center gap-1.5 w-11 h-11 min-w-[44px] min-h-[44px] 2xl:w-auto 2xl:px-3 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
+      className="touch-target flex items-center justify-center gap-1.5 w-11 h-11 min-w-[44px] min-h-[44px] 2xl:w-auto 2xl:px-3 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
       title="Conectar Conta Google para sincronização em nuvem (opcional)"
       aria-label="Conectar Nuvem"
     >
@@ -477,7 +477,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenLgpdModal}
               aria-label="Segurança, Seleção de Cookies e LGPD"
               title="Central de Privacidade, Seleção de Cookies e Conformidade LGPD (Lei nº 13.709/2018)"
-              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
+              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-sky-500 outline-none bg-[var(--surface-inset)] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
             >
               <Icon name="shield" size={16} className="text-emerald-600 dark:text-emerald-400" />
             </button>

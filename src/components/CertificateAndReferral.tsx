@@ -507,12 +507,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="p-3 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
-                  <span>
-                    Inclusão de CID desativada. O atestado será gerado sem a informação codificada
-                    da doença.
-                  </span>
-                </div>
+                <p className="py-1.5 text-center text-xs text-[var(--text-muted)]">
+                  Inclusão de CID desativada. O atestado será gerado sem a informação codificada
+                  da doença.
+                </p>
               )}
             </div>
 

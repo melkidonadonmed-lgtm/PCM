@@ -361,6 +361,9 @@ export default function App() {
       className="min-h-screen font-sans antialiased flex flex-col transition-colors duration-300 surface-raised"
       style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-main)' }}
     >
+      <a href="#conteudo-principal" className="skip-link no-print">
+        Pular para o conteúdo principal
+      </a>
       <PuxarParaAtualizar
         desativado={
           (sidebarOpen && (typeof window !== 'undefined' ? window.innerWidth < 1024 : false)) ||

@@ -87,7 +87,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
     >
       <div className="mb-1.5 flex w-full items-center justify-between px-1">
         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-          Radar Fisiológico (60fps)
+          Radar Fisiológico
         </span>
         <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
           <span className="flex items-center gap-1">
@@ -107,8 +107,8 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
       <svg
         width="100%"
         height="100%"
-        viewBox={`0 0 ${size} ${size}`}
-        className="max-h-64 max-w-64 overflow-visible select-none"
+        viewBox={`-36 -6 ${size + 72} ${size + 12}`}
+        className="max-h-64 w-full max-w-[340px] overflow-visible select-none"
         role="img"
         aria-label="Gráfico polar de desvio fisiológico multissistêmico"
       >
@@ -194,7 +194,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
                 dominantBaseline={lbl.dominantBaseline}
                 className="fill-slate-700 dark:fill-slate-200 text-[11px] font-semibold"
               >
-                {lbl.label.length > 20 ? `${lbl.label.slice(0, 18)}…` : lbl.label}
+                {lbl.label.length > 24 ? `${lbl.label.slice(0, 22)}…` : lbl.label}
               </text>
               <text
                 x={lbl.x}

@@ -28,7 +28,7 @@
   .dark .card,
   .dark .surface-card-minimal,
   .dark .card-surface {
-    border-color: var(--border-strong);
+    border-color: var(--border-subtle);
     box-shadow: var(--elevation-low);
   }
 
@@ -103,17 +103,16 @@
     border-color: rgba(255, 255, 255, 0.1);
   }
 
-  /* 1. Z-0 Inset Tray / Form Input Fields */
+  /* 1. Projected Form Input Controls (SC 1.4.11 >= 3.0:1 boundary, zero sunken inset shadows) */
   .tactile-input,
   .tactile-inset {
-    background-color: #FFFFFF;
-    color: #0F172A;
-    border: 1px solid rgba(15, 23, 42, 0.12);
+    background-color: var(--surface-inset);
+    color: var(--text-main);
+    border: 1px solid var(--border-control);
     border-radius: var(--radius-xl);
-    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.8);
-    transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                background-color 0.2s ease;
+    box-shadow: var(--shadow-control);
+    transition: border-color 0.18s var(--ease-spring),
+                background-color 0.18s ease;
   }
 
   .tactile-input:not(.h-8):not(.h-9):not(.h-10):not(.h-11),
@@ -122,24 +121,27 @@
   }
 
   .tactile-input:focus {
-    outline: none;
-    background-color: #FFFFFF;
-    border-color: var(--accent-sky-dark, #0284C7);
-    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03), 0 0 0 3.5px rgba(2, 132, 199, 0.18);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    background-color: var(--surface-inset);
+    border-color: var(--accent-focus);
+    box-shadow: var(--shadow-control-focus);
   }
 
   .dark .tactile-input,
   .dark .tactile-inset {
     background-color: var(--surface-inset);
     color: #F8FAFC;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.32);
+    border: 1px solid var(--border-control);
+    box-shadow: var(--shadow-control);
   }
 
   .dark .tactile-input:focus {
-    background-color: #1F2B3D;
-    border-color: #94A3B8;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28), 0 0 0 3px rgba(148, 163, 184, 0.22);
+    background-color: var(--surface-raised);
+    border-color: var(--accent-focus);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: var(--shadow-control-focus);
   }
 
   /* 2. Z-1 Resting Base Plates & Static Cards */
@@ -175,7 +177,7 @@
 
   .dark .tactile-card {
     background-color: var(--surface-card);
-    border-color: var(--border-strong);
+    border-color: var(--border-subtle);
     box-shadow: var(--elevation-low);
   }
 
@@ -199,7 +201,7 @@
 
   .dark .tactile-card-interactive {
     background-color: var(--surface-card);
-    border-color: var(--border-strong);
+    border-color: var(--border-subtle);
     box-shadow: var(--elevation-low);
   }
 
@@ -230,13 +232,13 @@
   }
 
   .dark .ui-card-soft {
-    border-color: var(--border-strong);
+    border-color: var(--border-subtle);
     box-shadow: var(--elevation-low);
   }
 
   .ui-btn-tactile {
     box-shadow: var(--tactile-bevel);
-    transition: transform 0.15s var(--ease-spring), box-shadow 0.15s var(--ease-spring), background-color 0.18s ease;
+    transition: transform 0.15s var(--ease-spring), background-color 0.18s ease;
     cursor: pointer;
     user-select: none;
     touch-action: manipulation;
@@ -244,19 +246,19 @@
 
   .ui-btn-tactile:active:not(:disabled) {
     transform: translateY(1px);
-    box-shadow: var(--elevation-z0);
+    box-shadow: var(--shadow-pressed);
   }
 
   .surface-inset {
     background-color: var(--surface-inset);
-    box-shadow: var(--shadow-inset-sunken, var(--elevation-z0));
+    box-shadow: var(--shadow-control);
   }
 
   .panel-navy .surface-inset,
   .panel-navy.surface-inset {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 2px 6px -1px rgba(4, 9, 18, 0.26), inset 0 1px 0 0 rgba(255, 255, 255, 0.09);
   }
 
   .surface-raised {
@@ -368,9 +370,9 @@
     min-height: 44px;
     border-radius: 12px;
     border: 1px solid var(--border-subtle);
-    background-color: var(--bg-app);
+    background-color: var(--surface-card);
     color: var(--text-main);
-    box-shadow: var(--elevation-z1);
+    box-shadow: var(--elev-tactile-sm);
     transition: transform 0.14s cubic-bezier(0.2, 0, 0, 1),
                 background-color 0.18s ease,
                 border-color 0.18s ease;
@@ -416,9 +418,9 @@
 
   .dark .tactile-modal,
   .dark .modal-content {
-    background-color: var(--surface-hover);
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--rim-light-top), var(--elevation-z3);
+    background-color: var(--surface-modal);
+    border: 1px solid var(--border-medium);
+    box-shadow: var(--elevation-z3);
   }
 
   /* 7. Deep Navy Structural Panel */
@@ -478,14 +480,8 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .groove-divider {
-    height: 2px;
-    border-top: 1px solid var(--border-subtle);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
   .animate-tab-fade {
-    animation: tabFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: tabFadeIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .tactile-dropdown {

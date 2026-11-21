@@ -40,10 +40,10 @@
   --color-clinical: var(--clinical);
   --color-clinical-hover: var(--clinical-hover);
 
-  --shadow-tactile-card: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 14px 28px -8px rgba(15, 23, 42, 0.03);
-  --shadow-tactile-card-dark: 0 1px 2px rgba(0, 0, 0, 0.28), 0 4px 10px -2px rgba(0, 0, 0, 0.32), 0 10px 22px -6px rgba(0, 0, 0, 0.26);
-  --shadow-tactile-inset-dark: inset 0 1px 3px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(0, 0, 0, 0.28);
-  --shadow-tactile-md: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 8px -2px rgba(15, 23, 42, 0.05), 0 10px 20px -4px rgba(15, 23, 42, 0.05);
+  --shadow-tactile-card: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.06), 0 12px 24px -6px rgba(15, 23, 42, 0.05);
+  --shadow-tactile-card-dark: 0 1px 2px rgba(4, 9, 18, 0.34), 0 6px 14px -3px rgba(4, 9, 18, 0.36), 0 14px 28px -8px rgba(4, 9, 18, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --shadow-tactile-inset-dark: 0 1px 2px rgba(4, 9, 18, 0.28), 0 2px 6px -1px rgba(4, 9, 18, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --shadow-tactile-md: 0 2px 4px -1px rgba(15, 23, 42, 0.06), 0 6px 14px -3px rgba(15, 23, 42, 0.08), 0 14px 28px -6px rgba(15, 23, 42, 0.06);
 
   --shadow-elevation-low: var(--elevation-low);
   --shadow-elevation-medium: var(--elevation-medium);
@@ -141,15 +141,15 @@
     --radius-card: 18px;
     --radius-pill: 9999px;
 
-    --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-smooth: transform 0.3s var(--ease-spring), opacity 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring), background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
-    --transition-snap: transform 0.15s ease-out, opacity 0.15s ease-out, box-shadow 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
+    --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+    --transition-smooth: transform 0.26s var(--ease-spring), opacity 0.24s var(--ease-spring), background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    --transition-snap: transform 0.15s ease-out, opacity 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
 
-    /* TEMA CLARO: Mineral Sólido & Harmonioso (Clean Slate #F8FAFC + Ardósia Mineral #243447) */
-    --canvas: #f8fafc;
+    /* TEMA CLARO: Elevated Clinical Matte (Mineral Alabaster #EFF3F8 + Cartões e Controles Projetados #FFFFFF) */
+    --canvas: #eff3f8;
     --bg-main: #f8fafc;
     --surface: #ffffff;
-    --border: #e2e8f0;
+    --border: #d8e0ea;
     --text-primary: #0f172a;
     --text-title: #0f172a;
     --text-body: #475569;
@@ -159,22 +159,24 @@
     --clinical: #115e59;
     --clinical-hover: #0d4b47;
 
-    --surface-sunken: #DFE6EE;
-    --surface-canvas: #F3F5F8;
-    --surface-inset: #EEF2F6;
+    --surface-sunken: #E2E8F0;
+    --surface-canvas: #EFF3F8;
+    --surface-inset: #FFFFFF;
     --surface-flat: #FFFFFF;
     --surface-raised: #FFFFFF;
     --surface-contrast: #0F172A;
     --accent-point: #3B526B;
+    --accent-focus: #243447;
+    --ink-accent: #243447;
 
-    --bg-canvas: #F3F5F8;
-    --bg-app: #F3F5F8;
+    --bg-canvas: #EFF3F8;
+    --bg-app: #EFF3F8;
     --bg-surface: #FFFFFF;
     --surface-card: #FFFFFF;
     --bg-surface-elevated: #FFFFFF;
     --surface-elevated: #FFFFFF;
-    --surface-hover: #F5F7FA;
-    --surface-active: #DFE6EE;
+    --surface-hover: #F4F7FB;
+    --surface-active: #E6ECF4;
 
     --nav-bg: #0F172A;
     --surface-panel: #0F172A;
@@ -227,36 +229,40 @@
     --tactile-card-bevel: 0 0 0 0 transparent;
     --bevel-tactile-card: 0 0 0 0 transparent;
 
-    --elev-tactile: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 14px 28px -8px rgba(15, 23, 42, 0.03);
-    --elev-tactile-sm: 0 1px 2px rgba(15, 23, 42, 0.03), 0 2px 5px -1px rgba(15, 23, 42, 0.04);
-    --elev-tactile-lg: 0 2px 4px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.06), 0 20px 36px -8px rgba(15, 23, 42, 0.08);
-    --elev-tactile-navy: 0 4px 10px -2px rgba(10, 15, 29, 0.22), 0 12px 28px -6px rgba(10, 15, 29, 0.28);
-    --elev-tactile-dark: 0 2px 6px -1px rgba(0, 0, 0, 0.26), 0 8px 20px -4px rgba(0, 0, 0, 0.32);
+    --elev-tactile: var(--elevation-low);
+    --elev-tactile-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.05);
+    --elev-tactile-lg: var(--elevation-high);
+    --elev-tactile-navy: 0 4px 12px -2px rgba(10, 15, 29, 0.22), 0 12px 28px -6px rgba(10, 15, 29, 0.28);
+    --elev-tactile-dark: 0 2px 6px -1px rgba(4, 9, 18, 0.28), 0 8px 20px -4px rgba(4, 9, 18, 0.34);
     --elev-tactile-btn: 0 1px 2px rgba(15, 23, 42, 0.14), 0 3px 6px -1px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.22);
-    --elev-tactile-inset: inset 0 1px 3px rgba(15, 23, 42, 0.05), inset 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+    --elev-tactile-inset: var(--shadow-control);
     --elev-tactile-blue: 0 2px 6px -2px rgba(36, 52, 71, 0.22);
 
-    --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.03), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
-    --shadow-projected: 0 1px 2px rgba(15, 23, 42, 0.03), 0 4px 10px -2px rgba(15, 23, 42, 0.05), 0 10px 20px -6px rgba(15, 23, 42, 0.04);
-    --shadow-card-projected: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 14px 28px -8px rgba(15, 23, 42, 0.03);
-    --shadow-card-hover: 0 2px 4px rgba(15, 23, 42, 0.04), 0 6px 12px -2px rgba(15, 23, 42, 0.05), 0 14px 28px -6px rgba(15, 23, 42, 0.06);
+    --shadow-control: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px -1px rgba(15, 23, 42, 0.04);
+    --shadow-control-focus: 0 1px 3px rgba(15, 23, 42, 0.08), 0 0 0 3px color-mix(in oklab, var(--accent-focus) 16%, transparent);
+    --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.05);
+    --shadow-projected: var(--elevation-medium);
+    --shadow-card-projected: var(--elevation-low);
+    --shadow-card-hover: var(--elevation-medium);
     --shadow-nav: 0 2px 6px -1px rgba(15, 23, 42, 0.08), 0 8px 20px -4px rgba(15, 23, 42, 0.10);
-    --shadow-sidebar-projected: 2px 0 8px -1px rgba(15, 23, 42, 0.08), 6px 0 20px -4px rgba(15, 23, 42, 0.10);
-    --shadow-header-projected: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 14px -2px rgba(15, 23, 42, 0.05);
+    --shadow-sidebar-projected: 2px 0 10px -1px rgba(15, 23, 42, 0.10), 6px 0 22px -4px rgba(15, 23, 42, 0.12);
+    --shadow-header-projected: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 14px -2px rgba(15, 23, 42, 0.06);
     --shadow-bottomnav-projected: 0 -2px 6px -1px rgba(15, 23, 42, 0.08), 0 -6px 18px -4px rgba(15, 23, 42, 0.10);
 
-    --border-subtle: #DCE3EC;
-    --border-medium: #C6D1DE;
+    --border-subtle: #D8E0EA;
+    --border-medium: #BCC8D7;
     --border-strong: #94A3B8;
-    --rim-light-top: 0 0 0 0 transparent;
+    --border-control: #8594A6;
+    --border-control-hover: #5E7087;
+    --rim-light-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
 
-    --elevation-z0: inset 0 1px 3px rgba(15, 23, 42, 0.04), inset 0 1px 2px -1px rgba(15, 23, 42, 0.03);
-    --elevation-z1: 0 1px 2px rgba(15, 23, 42, 0.03), 0 3px 6px -1px rgba(15, 23, 42, 0.04), 0 6px 12px -3px rgba(15, 23, 42, 0.03);
-    --elevation-z2: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 8px -2px rgba(15, 23, 42, 0.05), 0 10px 20px -4px rgba(15, 23, 42, 0.05);
-    --elevation-z3: 0 2px 4px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -3px rgba(15, 23, 42, 0.06), 0 16px 32px -6px rgba(15, 23, 42, 0.06);
-    --elevation-z4: 0 4px 8px -2px rgba(15, 23, 42, 0.05), 0 12px 24px -4px rgba(15, 23, 42, 0.07), 0 24px 44px -8px rgba(15, 23, 42, 0.08);
+    --elevation-z0: var(--shadow-control);
+    --elevation-z1: var(--elevation-low);
+    --elevation-z2: var(--elevation-medium);
+    --elevation-z3: var(--elevation-high);
+    --elevation-z4: 0 4px 10px -2px rgba(15, 23, 42, 0.07), 0 14px 28px -4px rgba(15, 23, 42, 0.09), 0 26px 48px -8px rgba(15, 23, 42, 0.10);
 
-    --shadow-pressed: inset 0 2px 4px rgba(15, 23, 42, 0.16), inset 0 1px 2px rgba(15, 23, 42, 0.10);
+    --shadow-pressed: 0 1px 1px rgba(15, 23, 42, 0.10);
   }
 
   ::placeholder {
@@ -437,7 +443,8 @@
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow:
       0 2px 6px -1px rgba(0, 0, 0, 0.24),
-      0 4px 10px -2px rgba(0, 0, 0, 0.18);
+      0 4px 10px -2px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 }
 

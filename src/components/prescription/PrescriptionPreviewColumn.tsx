@@ -97,7 +97,7 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
 
         {/* Alternador de regime da folha: visível quando há mais de uma receita ou quando a receita está em branco (para imprimir 1 ou 2 vias em branco) */}
         {(regimesComItens.length > 1 || itemsCount === 0) && (
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/80 dark:bg-navy-900 border border-medium dark:border-navy-700 w-full overflow-x-auto shadow-tactile-sm">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl nav-segmented-track w-full overflow-x-auto">
             {(regimesComItens.length > 1 ? regimesComItens : (['simples', 'antimicrobiano', 'controle_especial'] as RegimeReceita[])).map((regime) => (
               <button
                 key={regime}
@@ -106,8 +106,8 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
                 aria-pressed={regimeAtivo === regime}
                 className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
                   regimeAtivo === regime
-                    ? 'bg-white dark:bg-navy-800 text-sky-700 dark:text-blue-300 shadow-tactile-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'nav-segmented-pill-active text-[var(--ink-accent)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-transparent'
                 }`}
               >
                 <span>

@@ -164,11 +164,11 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
   };
 
   const subNavItems: ReadonlyArray<{ id: HospitalSubViewId; label: string; icon: string }> = [
-    { id: 'ward_map', label: `Mapa de Leitos (${beds.length})`, icon: 'local_hospital' },
-    { id: 'evolution_form', label: 'Evolução & Admissão (EF/LT)', icon: 'clinical_notes' },
-    { id: 'longitudinal_labs', label: 'Monitoramento de Exames', icon: 'biotech' },
-    { id: 'analytics_dashboard', label: 'Dashboard & Conduta × Evolução', icon: 'monitor_heart' },
-    { id: 'science_and_chat', label: 'Assistente Live & Agente Science', icon: 'science' },
+    { id: 'ward_map', label: `Leitos (${beds.length})`, icon: 'local_hospital' },
+    { id: 'evolution_form', label: 'Evolução (EF/LT)', icon: 'clinical_notes' },
+    { id: 'longitudinal_labs', label: 'Exames', icon: 'biotech' },
+    { id: 'analytics_dashboard', label: 'Conduta × Evolução', icon: 'monitor_heart' },
+    { id: 'science_and_chat', label: 'Assistente IA', icon: 'science' },
   ];
 
   const suggestedNextBedCode = `110-${beds.length + 15}`;

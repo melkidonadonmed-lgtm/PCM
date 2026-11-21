@@ -271,12 +271,25 @@
 }
 
 @layer utilities {
-  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]), textarea):not(:is(.a4-editor-canvas, #printable-a4-sheet) *):placeholder-shown {
+  /* Elevated Projected Form Controls (WCAG 2.2 SC 1.4.11 >= 3.0:1 boundary, zero sunken inset shadows, A4-isolated) */
+  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]), textarea, select):not(:is(.a4-editor-canvas, #printable-a4-sheet, .panel-navy) *):not(.bg-transparent) {
     background-color: var(--surface-inset);
+    border-color: var(--border-control);
+    box-shadow: var(--shadow-control);
   }
 
-  select:has(option[value=""]:checked) {
-    background-color: var(--surface-inset);
+  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]), textarea, select):not(:is(.a4-editor-canvas, #printable-a4-sheet, .panel-navy) *):not(.bg-transparent):hover:not(:disabled, :focus) {
+    border-color: var(--border-control-hover);
+  }
+
+  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]), textarea, select):not(:is(.a4-editor-canvas, #printable-a4-sheet, .panel-navy) *):not(.bg-transparent):focus-visible {
+    border-color: var(--accent-focus);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: var(--shadow-control-focus);
+  }
+
+  select:not(:is(.a4-editor-canvas, #printable-a4-sheet, .panel-navy) *):has(option[value=""]:checked) {
     color: var(--text-placeholder);
     font-weight: 400;
   }
