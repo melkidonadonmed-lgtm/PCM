@@ -30,8 +30,13 @@
     --surface-contrast: #0F172A;
     --surface-modal: #202B3C;
     --accent-point: #93B7DB;
-    --accent-focus: #93B7DB;
+    --accent-focus: #5EEAD4;
     --ink-accent: #C5DCF8;
+    --ink-clinical: #5EEAD4;
+    --surface-clinical-subtle: rgba(20, 184, 166, 0.14);
+    --border-clinical-subtle: rgba(94, 234, 212, 0.28);
+    --a4-bench-bg: #101722;
+    --a4-bench-border: rgba(255, 255, 255, 0.10);
 
     --bg-canvas: #141C27;
     --bg-app: #141C27;
@@ -120,7 +125,7 @@
     --shadow-header-projected: 0 1px 3px rgba(4, 9, 18, 0.24), 0 4px 14px -2px rgba(4, 9, 18, 0.28);
     --shadow-bottomnav-projected: 0 -2px 6px rgba(4, 9, 18, 0.24), 0 -6px 14px -2px rgba(4, 9, 18, 0.28);
 
-    --border-subtle: rgba(255, 255, 255, 0.09);
+    --border-subtle: rgba(255, 255, 255, 0.075);
     --border-medium: rgba(255, 255, 255, 0.13);
     --border-strong: rgba(255, 255, 255, 0.12);
     --border-control: #73869F;

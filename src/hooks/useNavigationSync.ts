@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, startTransition } from 'react';
 import type { ActiveTab } from '../types';
 import type { DocumentsSubTab } from '../components/ClinicalDocumentsHub';
 
@@ -148,5 +148,5 @@ export function useNavigationSync({
  * sem congelar o drawer da Sidebar ou capturar snapshots assíncronos do root viewport.
  */
 export function runTabViewTransition(updateFn: () => void) {
-  updateFn();
+  startTransition(updateFn);
 }

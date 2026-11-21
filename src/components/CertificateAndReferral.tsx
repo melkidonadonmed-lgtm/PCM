@@ -299,7 +299,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   value={patient?.name ?? certificate.patientName ?? ''}
                   onChange={(e) => handlePatientNameChange(e.target.value)}
                   placeholder="Ex.: Maria de Oliveira Santos"
-                  className="w-full h-9 px-3 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+                  className="w-full h-11 min-h-[44px] px-3 rounded-lg border-[var(--border-control)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input"
                 />
               </div>
 
@@ -316,7 +316,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   value={patient?.documentNumber ?? certificate.documentNumber ?? ''}
                   onChange={(e) => handlePatientDocChange(e.target.value)}
                   placeholder="Ex.: 000.000.000-00"
-                  className="w-full h-9 px-2.5 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border-[var(--border-control)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input clinical-tabular-nums"
                 />
               </div>
 
@@ -334,7 +334,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   onChange={(e) =>
                     onUpdateCertificate({ ...certificate, periodText: e.target.value })
                   }
-                  className="w-full h-9 px-2.5 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input cursor-pointer"
+                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border-[var(--border-control)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input cursor-pointer"
                 >
                   <option value="por motivo de doença e necessidade de repouso">
                     Afastamento por motivo de doença / Repouso
@@ -375,7 +375,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   max="180"
                   value={certificate.daysOff}
                   onChange={(e) => handleDaysChange(parseInt(e.target.value) || 0)}
-                  className="w-full h-9 px-2.5 rounded-xl font-bold text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center clinical-tabular-nums"
+                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border-[var(--border-control)] font-bold text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input text-center clinical-tabular-nums"
                 />
               </div>
 
@@ -392,7 +392,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="date"
                   value={certificate.startDate}
                   onChange={(e) => handleStartDateChange(e.target.value)}
-                  className="w-full h-9 px-2.5 rounded-xl font-medium text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border-[var(--border-control)] font-medium text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input clinical-tabular-nums"
                 />
               </div>
 
@@ -409,7 +409,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="date"
                   value={certificate.endDate}
                   onChange={(e) => onUpdateCertificate({ ...certificate, endDate: e.target.value })}
-                  className="w-full h-9 px-2.5 rounded-xl font-medium text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border-[var(--border-control)] font-medium text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input clinical-tabular-nums"
                 />
               </div>
             </div>
@@ -478,7 +478,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                           })
                         }
                         placeholder="Ex.: J00"
-                        className="w-full h-9 px-2.5 rounded-xl border border-subtle dark:border-strong bg-[var(--surface-card)] text-sky-700 dark:text-sky-400 text-xs font-mono font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-center clinical-tabular-nums"
+                        className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-card)] text-[var(--ink-clinical)] text-xs font-mono font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input text-center clinical-tabular-nums"
                       />
                     </div>
 
@@ -501,7 +501,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                           })
                         }
                         placeholder="Ex.: Nasofaringite aguda (resfriado comum)..."
-                        className="w-full h-9 px-3 rounded-xl border border-subtle dark:border-strong bg-[var(--surface-card)] text-[var(--text-main)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+                        className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-card)] text-[var(--text-main)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input"
                       />
                     </div>
                   </div>

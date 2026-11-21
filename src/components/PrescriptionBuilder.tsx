@@ -311,25 +311,38 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
   return (
     <div data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto flex flex-col gap-3 sm:gap-3.5 surface-raised">
+      <header className="hidden lg:flex items-baseline justify-between gap-4 pb-2 border-b border-[var(--border-subtle)]">
+        <div className="flex items-baseline gap-3 min-w-0">
+          <h1 className="font-serif-doc text-[26px] leading-none font-bold tracking-tight text-[var(--text-main)]">
+            Prescrição Médica
+          </h1>
+          <span className="text-xs font-medium text-[var(--text-muted)]">
+            Instrumento clínico • prévia simultânea em folha A4
+          </span>
+        </div>
+        <span className="text-[11px] font-semibold clinical-tabular-nums text-[var(--ink-clinical)] shrink-0">
+          {items.length} {items.length === 1 ? 'item prescrito' : 'itens prescritos'}
+        </span>
+      </header>
       <div className="flex md:hidden items-center justify-between p-1 rounded-2xl nav-segmented-track gap-1">
         <button
           type="button"
           onClick={() => setMobileSection('composer')}
-          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
+          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 cursor-pointer ${
             mobileSection === 'composer' ? 'nav-segmented-pill-active font-bold' : 'text-[var(--text-secondary)] font-semibold'
           }`}
         >
-          <Icon name="medication" size={15} filled={mobileSection === 'composer'} className={mobileSection === 'composer' ? 'text-sky-600 dark:text-sky-400' : 'opacity-70'} />
+          <Icon name="medication" size={15} filled={mobileSection === 'composer'} className={mobileSection === 'composer' ? 'text-[var(--ink-clinical)]' : 'opacity-70'} />
           <span>Prescrever medicamentos</span>
         </button>
         <button
           type="button"
           onClick={() => setMobileSection('preview')}
-          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer clinical-tabular-nums ${
+          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 cursor-pointer clinical-tabular-nums ${
             mobileSection === 'preview' ? 'nav-segmented-pill-active font-bold' : 'text-[var(--text-secondary)] font-semibold'
           }`}
         >
-          <Icon name="description" size={15} filled={mobileSection === 'preview'} className={mobileSection === 'preview' ? 'text-sky-600 dark:text-sky-400' : 'opacity-70'} />
+          <Icon name="description" size={15} filled={mobileSection === 'preview'} className={mobileSection === 'preview' ? 'text-[var(--ink-clinical)]' : 'opacity-70'} />
           <span>Visualizar receita ({items.length})</span>
         </button>
       </div>

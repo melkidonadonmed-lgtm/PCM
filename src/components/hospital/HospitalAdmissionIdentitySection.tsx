@@ -58,7 +58,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
           <Icon
             name={isAdmissionSectionOpen ? 'expand_less' : 'expand_more'}
             size={18}
-            className="text-sky-600 dark:text-sky-400"
+            className="text-[var(--ink-clinical)]"
           />
           <div>
             <h3 className="text-sm font-semibold text-[var(--text-main)]">
@@ -86,9 +86,9 @@ export const HospitalAdmissionIdentitySection: React.FC<
             className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
           >
             <Icon
-              name="auto_awesome"
+              name="upload"
               size={14}
-              className="text-sky-600 dark:text-sky-400"
+              className="text-[var(--ink-clinical)]"
             />
             <span>Importar via IA / Documento</span>
           </button>
@@ -232,7 +232,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                   updateField('chiefComplaintQp', e.target.value)
                 }
                 placeholder="Ex.: Falta de ar aos pequenos esforços e tosse produtiva há 4 dias"
-                className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
               />
             </div>
 
@@ -256,7 +256,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                       },
                     ])
                   }
-                  className="text-xs font-bold text-sky-600 dark:text-sky-400 cursor-pointer"
+                  className="text-xs font-bold text-[var(--ink-clinical)] cursor-pointer"
                 >
                   + Adicionar HD
                 </button>
@@ -277,7 +277,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                     }}
                     placeholder="Ex.: Pneumonia Adquirida na Comunidade (20/10/2026)"
                     aria-label={`Hipótese diagnóstica ${hd.codeNumber}`}
-                    className="flex-1 h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                    className="flex-1 h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
                   />
                   {bedRecord.diagnosticHypotheses.length > 1 && (
                     <button
@@ -334,7 +334,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 onChange={(e) => updateField('allergiesText', e.target.value)}
                 placeholder="Ex.: Dipirona ou Nega alergias"
                 aria-label="Alergias"
-                className="w-full h-9 px-3 rounded-xl border border-rose-500/40 bg-rose-500/5 text-xs font-semibold"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-rose-500/40 bg-rose-500/5 text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
               />
             </div>
 
@@ -352,7 +352,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 onChange={(e) => updateField('serologiesText', e.target.value)}
                 placeholder="Ex.: HIV NR | VDRL NR | HBsAg NR"
                 aria-label="Sorologias"
-                className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
               />
             </div>
 
@@ -372,7 +372,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 }
                 placeholder="Ex.: HAS há 12 anos, DM2"
                 aria-label="História Patológica Pregressa"
-                className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
               />
             </div>
 
@@ -398,7 +398,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 }
                 placeholder="Ex.: Nega tabagismo; Mora com esposa"
                 aria-label="História familiar e social"
-                className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
               />
             </div>
           </div>

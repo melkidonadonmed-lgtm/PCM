@@ -21,12 +21,16 @@ import {
   useAppLgpdAndCloudGovernance,
   useAppThemeAndSidebarViewport,
   loadDocumentEditor,
+  loadScoreboardModule,
+  loadHospitalWardModule,
   buildOncologyScreeningExamItem,
 } from './components/layout/AppWorkspaceAndModals';
 import type { TipoDocumento } from './utils/documentoClinico';
 
 const preloadDocumentEditorSilently = () => {
   loadDocumentEditor().catch(() => {});
+  loadScoreboardModule().catch(() => {});
+  loadHospitalWardModule().catch(() => {});
 };
 
 export default function App() {
@@ -358,7 +362,7 @@ export default function App() {
     <div
       data-state="idle"
       aria-busy={false}
-      className="min-h-screen font-sans antialiased flex flex-col transition-colors duration-300 surface-raised"
+      className="min-h-screen font-sans antialiased flex flex-col surface-raised"
       style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-main)' }}
     >
       <a href="#conteudo-principal" className="skip-link no-print">

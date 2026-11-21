@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon } from '../Icon';
 import { Badge } from '../ui/Badge';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
@@ -167,7 +168,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
     }
   };
 
-  return (
+  const modalMarkup = (
     <div
       role="dialog"
       aria-modal="true"
@@ -186,8 +187,8 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
         {/* Header */}
         <div className="px-5 py-3.5 border-b border-[var(--border-subtle)] flex items-center justify-between gap-3 bg-[var(--surface-inset)]">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-9 h-9 rounded-xl bg-sky-600/15 border border-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-              <Icon name="auto_awesome" size={18} />
+            <span className="w-9 h-9 rounded-xl bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)] flex items-center justify-center shrink-0">
+              <Icon name="upload" size={18} />
             </span>
             <div className="min-w-0">
               <h2 id="hospital-multimodal-modal-title" className="text-sm sm:text-base font-bold truncate">
@@ -383,4 +384,6 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalMarkup, document.body) : modalMarkup;
 };

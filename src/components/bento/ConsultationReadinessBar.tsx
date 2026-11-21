@@ -14,6 +14,7 @@ export interface ConsultationReadinessBarProps {
   onOpenPatientModal: () => void;
   onOpenCommandPalette: () => void;
   compactOnDesktop?: boolean;
+  hideSearchTrigger?: boolean;
 }
 
 /**
@@ -29,6 +30,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
   onOpenPatientModal,
   onOpenCommandPalette,
   compactOnDesktop = false,
+  hideSearchTrigger = false,
 }) => {
   const isDoctorOk = medicoConfigurado(doctor);
   const hasPatient = Boolean(patient?.name?.trim());
@@ -50,7 +52,7 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
         <button
           type="button"
           onClick={onOpenDoctorModal}
-          className="touch-target inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg min-h-[44px] min-w-[44px] px-2.5 py-1.5 shrink-0"
+          className="touch-target inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 rounded-lg min-h-[44px] min-w-[44px] px-2.5 py-1.5 shrink-0"
         >
           <Icon
             name={isDoctorOk ? 'verified_user' : 'warning'}
@@ -74,12 +76,12 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
         <button
           type="button"
           onClick={onOpenPatientModal}
-          className="touch-target inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg min-h-[44px] min-w-[44px] px-2.5 py-1.5 min-w-0"
+          className="touch-target inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 rounded-lg min-h-[44px] min-w-[44px] px-2.5 py-1.5 min-w-0"
         >
           <Icon
             name={hasPatient ? 'person' : 'person_add'}
             size={15}
-            className={hasPatient ? 'text-sky-600 dark:text-sky-400' : 'text-[var(--text-muted)]'}
+            className={hasPatient ? 'text-[var(--ink-clinical)]' : 'text-[var(--text-muted)]'}
           />
           <span className="truncate max-w-28 sm:max-w-44">
             {hasPatient ? patient.name : 'Sem paciente'}
@@ -103,19 +105,21 @@ export const ConsultationReadinessBar: React.FC<ConsultationReadinessBarProps> =
         )}
       </div>
 
-      <button
-        type="button"
-        onClick={onOpenCommandPalette}
-        aria-label="Abrir busca rápida e navegação global (Ctrl+K)"
-        className="touch-target inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[44px] min-w-[44px] rounded-xl border border-subtle dark:border-strong bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none shrink-0"
-      >
-        <Icon name="search" size={15} className="text-sky-600 dark:text-sky-400" />
-        <span className="hidden md:inline">Busca rápida (Medicamentos, SUS, Kits)</span>
-        <span className="md:hidden">Buscar</span>
-        <Badge tone="neutral" tabular className="hidden sm:inline-flex">
-          Ctrl+K
-        </Badge>
-      </button>
+      {!hideSearchTrigger && (
+        <button
+          type="button"
+          onClick={onOpenCommandPalette}
+          aria-label="Abrir busca rápida e navegação global (Ctrl+K)"
+          className="touch-target inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[44px] min-w-[44px] rounded-xl border border-subtle dark:border-strong bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-main)] transition cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none shrink-0"
+        >
+          <Icon name="search" size={15} className="text-[var(--ink-clinical)]" />
+          <span className="hidden md:inline">Busca rápida (Medicamentos, SUS, Kits)</span>
+          <span className="md:hidden">Buscar</span>
+          <Badge tone="neutral" tabular className="hidden sm:inline-flex">
+            Ctrl+K
+          </Badge>
+        </button>
+      )}
     </SoftCard>
   );
 };

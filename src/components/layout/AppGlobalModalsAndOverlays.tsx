@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback, Suspense } from 'react';
 import { Icon } from '../Icon';
 import {
   ActiveTab,
@@ -25,6 +25,8 @@ const DoctorProfileModal = React.lazy(() => import('../DoctorProfileModal'));
 const BackupModal = React.lazy(() => import('../BackupModal'));
 const LgpdSecurityModal = React.lazy(() => import('../lgpd/LgpdSecurityModal'));
 
+const useIsomorphicLayoutEffect = typeof document !== 'undefined' ? useLayoutEffect : useEffect;
+
 export function useAppThemeAndSidebarViewport(onIdlePreload?: () => void) {
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = storageService.loadRawString('prescmed_theme');
@@ -38,13 +40,24 @@ export function useAppThemeAndSidebarViewport(onIdlePreload?: () => void) {
     return false;
   });
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     storageService.saveRawString('prescmed_theme', darkMode ? 'dark' : 'light');
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+    const root = document.documentElement;
+    root.classList.add('theme-switching');
     if (darkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     }
+    void root.offsetHeight;
+    const rafId = window.requestAnimationFrame(() => {
+      root.classList.remove('theme-switching');
+    });
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      root.classList.remove('theme-switching');
+    };
   }, [darkMode]);
 
   useEffect(() => {

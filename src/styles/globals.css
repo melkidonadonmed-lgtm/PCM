@@ -5,6 +5,7 @@
 @layer base {
   :root {
     color-scheme: light dark;
+    accent-color: var(--clinical);
 
     /* 1. Camada 1 — Tokens Primitivos em OKLCH (Paleta Mineral Refinada, Sólida e Sem Cobalto/Neon) */
     --primitive-navy-700: oklch(0.32 0.04 248);     /* #243447 Mineral Slate Navy */
@@ -46,12 +47,12 @@
     --btn-primary-hover: oklch(from var(--brand-primary) calc(l - 0.08) c h);
     --btn-primary-active: oklch(from var(--brand-primary) calc(l - 0.14) c h);
     --badge-bg: oklch(from var(--brand-primary) l c h / 0.12);
-    --pill-active-bg: light-dark(oklch(0.24 0.035 252), oklch(0.48 0.115 242));
-    --pill-active-border: light-dark(oklch(0.24 0.035 252), oklch(0.62 0.12 240 / 0.35));
+    --pill-active-bg: light-dark(oklch(0.24 0.035 252), oklch(0.42 0.065 205));
+    --pill-active-border: light-dark(oklch(0.24 0.035 252), oklch(0.65 0.09 190 / 0.35));
     --surface-chip-muted: light-dark(oklch(0.96 0.008 250), oklch(0.32 0.03 254));
     --surface-chip-muted-hover: light-dark(oklch(0.92 0.012 250), oklch(0.37 0.032 254));
-    --surface-info-subtle: light-dark(oklch(0.97 0.015 240), oklch(0.22 0.025 252));
-    --border-info-subtle: light-dark(oklch(0.45 0.09 240 / 0.25), oklch(0.62 0.13 242 / 0.32));
+    --surface-info-subtle: light-dark(oklch(0.965 0.010 230), oklch(0.24 0.022 245));
+    --border-info-subtle: light-dark(oklch(0.55 0.04 235 / 0.28), oklch(0.62 0.05 235 / 0.30));
 
     /* Tokens de Componente: Sidebar Deep Navy & Tipografia de Alta Nitidez */
     --sidebar-surface-bg: oklch(0.16 0.022 260);
@@ -165,12 +166,12 @@
     --ink-secondary: var(--text-secondary, #CBD5E1);
     --ink-muted: var(--text-muted, #C4D2E3);
 
-    --pill-active-bg: oklch(0.48 0.115 242);
-    --pill-active-border: oklch(0.62 0.12 240 / 0.35);
+    --pill-active-bg: oklch(0.42 0.065 205);
+    --pill-active-border: oklch(0.65 0.09 190 / 0.35);
     --surface-chip-muted: oklch(0.34 0.03 254);
     --surface-chip-muted-hover: oklch(0.39 0.032 254);
-    --surface-info-subtle: oklch(0.27 0.028 252);
-    --border-info-subtle: oklch(0.62 0.13 242 / 0.32);
+    --surface-info-subtle: oklch(0.24 0.022 245);
+    --border-info-subtle: oklch(0.62 0.05 235 / 0.30);
 
     --rim-light: rgba(255, 255, 255, 0.11);
     --shadow-sculpted: var(--shadow-tactile-card-dark);
@@ -202,6 +203,11 @@
     --elevation-medium: var(--shadow-elevation-2);
     --elevation-high: var(--shadow-elevation-3);
     --sunken-recess: var(--shadow-inset-sunken);
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--clinical) 20%, transparent);
+    color: inherit;
   }
 }
 
@@ -349,23 +355,130 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.16);
   }
 
-  /* Superfície e Indicador Vertical Sóbrio na Sidebar Deep Navy (Sem Glow Neon) */
+  /* Superfície e Indicador Vertical Sóbrio na Sidebar Deep Navy (Swiss Clinical) */
   .sidebar-active-surface {
-    background-color: rgba(255, 255, 255, 0.09);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background-color: rgba(255, 255, 255, 0.085);
+    border: 1px solid rgba(255, 255, 255, 0.10);
     box-shadow:
-      0 2px 6px -1px rgba(0, 0, 0, 0.24),
-      0 4px 10px -2px rgba(0, 0, 0, 0.18);
+      0 1px 3px rgba(0, 0, 0, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.07);
   }
 
   .sidebar-active-bar {
     position: absolute;
-    left: 3px;
-    top: 22%;
-    bottom: 22%;
-    width: 3px;
+    left: 4px;
+    top: 26%;
+    bottom: 26%;
+    width: 2.5px;
     border-radius: 9999px;
-    background-color: #CBD5E1;
+    background-color: #5EEAD4;
+    opacity: 0.85;
+  }
+
+  /* Customização Branded de <select> (Modern Web Guidance: branded-select-styling) */
+  .dark select.pcm-select option {
+    background-color: #243042;
+    color: #F8FAFC;
+  }
+
+  .panel-navy select.pcm-select option {
+    background-color: #162231;
+    color: #F8FAFC;
+  }
+
+  @supports (appearance: base-select) {
+    select.pcm-select,
+    select.pcm-select::picker(select) {
+      appearance: base-select;
+    }
+
+    select.pcm-select {
+      align-items: center;
+    }
+
+    select.pcm-select::picker-icon {
+      display: none;
+    }
+
+    select.pcm-select::picker(select) {
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      border-radius: 12px;
+      padding: 4px;
+      margin-top: 4px;
+      min-width: anchor-size(width);
+      box-shadow: var(--elevation-medium);
+    }
+
+    .dark select.pcm-select::picker(select) {
+      background-color: var(--surface-elevated);
+      border-color: var(--border-medium);
+    }
+
+    .panel-navy select.pcm-select::picker(select) {
+      background-color: #1B283A;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #F8FAFC;
+      box-shadow: 0 12px 28px -6px rgba(4, 9, 18, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    select.pcm-select option {
+      padding: 8px 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    select.pcm-select option:hover,
+    select.pcm-select option:focus-visible {
+      background-color: var(--surface-hover);
+      outline: none;
+    }
+
+    select.pcm-select option:checked {
+      background-color: var(--surface-clinical-subtle);
+      color: var(--ink-clinical);
+      font-weight: 600;
+    }
+
+    select.pcm-select option::checkmark {
+      color: var(--ink-clinical);
+      margin-left: auto;
+      order: 2;
+    }
+
+    .panel-navy select.pcm-select option {
+      background-color: transparent;
+      color: #E2E8F0;
+    }
+
+    .panel-navy select.pcm-select option:hover,
+    .panel-navy select.pcm-select option:focus-visible {
+      background-color: rgba(255, 255, 255, 0.09);
+      color: #FFFFFF;
+      outline: none;
+    }
+
+    .panel-navy select.pcm-select option:checked {
+      background-color: rgba(255, 255, 255, 0.13);
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+
+    .panel-navy select.pcm-select option::checkmark {
+      color: #5EEAD4;
+    }
+  }
+
+  .a4-bench-stage {
+    background-color: var(--a4-bench-bg, #E4EBF2);
+    border: 1px solid var(--a4-bench-border, #CBD6E3);
+    border-radius: 14px;
+    padding: 0.75rem;
   }
 
   /* Micro-chip Técnico para Atalhos de Teclado (Alt+1..8 / Ctrl+K) */
@@ -421,4 +534,13 @@
   .a4-editor-canvas {
     forced-color-adjust: none;
   }
+}
+
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition-duration: 0ms;
+  transition-delay: 0ms;
+  animation-duration: 0ms;
 }

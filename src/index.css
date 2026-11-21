@@ -166,8 +166,13 @@
     --surface-raised: #FFFFFF;
     --surface-contrast: #0F172A;
     --accent-point: #3B526B;
-    --accent-focus: #243447;
+    --accent-focus: #115E59;
     --ink-accent: #243447;
+    --ink-clinical: #0F5954;
+    --surface-clinical-subtle: #EDF6F5;
+    --border-clinical-subtle: #B6DDD8;
+    --a4-bench-bg: #E4EBF2;
+    --a4-bench-border: #CBD6E3;
 
     --bg-canvas: #EFF3F8;
     --bg-app: #EFF3F8;
@@ -339,9 +344,9 @@
   .dark .btn-tactile-primary,
   .dark .btn-primary-tactile,
   .dark .button-primary {
-    background-color: oklch(0.43 0.055 245);
+    background-color: oklch(0.39 0.052 246);
     color: var(--text-inverse, #FFFFFF);
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.16);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.28),
       0 4px 8px -2px rgba(0, 0, 0, 0.34),

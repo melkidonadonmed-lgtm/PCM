@@ -43,7 +43,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
         >
           <div className="flex items-center gap-2 min-w-0">
             <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-            <span className="font-medium truncate">
+            <span className="font-medium leading-snug">
               Configure nome e CRM do médico para emitir documentos.
             </span>
           </div>
@@ -51,7 +51,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
             <button
               type="button"
               onClick={onAbrirPerfilMedico}
-              className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-lg bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] border border-[var(--border-subtle)] font-semibold text-xs transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-lg bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] border border-[var(--border-control)] font-semibold text-xs transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none"
             >
               Configurar médico
             </button>
@@ -59,62 +59,60 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {/* Botão Primário: Imprimir / Gerar PDF (sempre ativo, inclusive para imprimir receita em branco para anotações à mão) */}
-          <ActionButton
-            variant="primary"
-            iconName="print"
-            onClick={onNavigateToPrint}
-            aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-            className="px-2.5 py-2 gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-btn"
-            title={
-              itemsCount === 0
-                ? 'Imprimir ou gerar PDF da receita em branco (para anotações à mão e carimbo)'
-                : 'Emitir receita oficial: imprimir folha A4 ou gerar PDF'
-            }
-          >
-            Imprimir / Gerar PDF
-          </ActionButton>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {/* Botão Primário: Imprimir / Gerar PDF (sempre ativo, inclusive para imprimir receita em branco para anotações à mão) */}
+        <ActionButton
+          variant="primary"
+          iconName="print"
+          onClick={onNavigateToPrint}
+          aria-describedby={isDisabledSemMedico ? avisoId : undefined}
+          className="w-full justify-center px-3 py-2 gap-1.5 text-xs rounded-xl font-bold shadow-tactile-btn whitespace-nowrap"
+          title={
+            itemsCount === 0
+              ? 'Imprimir ou gerar PDF da receita em branco (para anotações à mão e carimbo)'
+              : 'Emitir receita oficial: imprimir folha A4 ou gerar PDF'
+          }
+        >
+          Imprimir / Gerar PDF
+        </ActionButton>
 
-          {/* Botão Secundário: Editor de Folha A4 (para edições manuais livres de timbrado ou texto) */}
-          {onNavigateToEditor && (
-            <ActionButton
-              variant="secondary"
-              iconName="description"
-              onClick={onNavigateToEditor}
-              className="px-2.5 py-2 gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm text-slate-700 dark:text-slate-300"
-              title="Abrir no Editor visual A4 para ajustes de texto livre, layout ou timbrados"
-            >
-              Editor de Folha A4
-            </ActionButton>
-          )}
-
-          {/* Botão Secundário: WhatsApp (sem fundo verde, com contorno secundário) */}
+        {/* Botão Secundário: Editor de Folha A4 (para edições manuais livres de timbrado ou texto) */}
+        {onNavigateToEditor && (
           <ActionButton
             variant="secondary"
-            iconName="send"
-            onClick={onSendWhatsApp}
-            disabled={isTextShareDisabled}
-            aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-            className="px-2.5 py-2 gap-1 text-[11px] 2xl:text-xs rounded-xl font-bold shadow-tactile-sm"
-            title={
-              isTextShareDisabled
-                ? 'Adicione ao menos um medicamento para enviar o texto pelo WhatsApp'
-                : 'Enviar receita no WhatsApp'
-            }
+            iconName="description"
+            onClick={onNavigateToEditor}
+            className="w-full justify-center px-3 py-2 gap-1.5 text-xs rounded-xl font-bold shadow-tactile-sm text-[var(--text-main)] whitespace-nowrap"
+            title="Abrir no Editor visual A4 para ajustes de texto livre, layout ou timbrados"
           >
-            WhatsApp
+            Editor de Folha A4
           </ActionButton>
-        </div>
+        )}
 
-        {/* Botão Terciário: Copiar texto */}
+        {/* Botão Secundário: WhatsApp (sem fundo verde, com contorno secundário) */}
+        <ActionButton
+          variant="secondary"
+          iconName="send"
+          onClick={onSendWhatsApp}
+          disabled={isTextShareDisabled}
+          aria-describedby={isDisabledSemMedico ? avisoId : undefined}
+          className="w-full justify-center px-3 py-2 gap-1.5 text-xs rounded-xl font-bold shadow-tactile-sm whitespace-nowrap"
+          title={
+            isTextShareDisabled
+              ? 'Adicione ao menos um medicamento para enviar o texto pelo WhatsApp'
+              : 'Enviar receita no WhatsApp'
+          }
+        >
+          WhatsApp
+        </ActionButton>
+
+        {/* Botão Secundário Simétrico: Copiar texto */}
         <button
           type="button"
           onClick={onCopyText}
           disabled={isTextShareDisabled}
           aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-          className="touch-target min-h-[44px] min-w-[44px] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:underline flex items-center justify-center gap-1.5 py-2 px-2 cursor-pointer transition rounded-lg focus-visible:ring-2 focus-visible:ring-sky-500"
+          className="w-full touch-target min-h-[44px] min-w-[44px] text-xs font-bold text-[var(--text-main)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] border border-[var(--border-control)] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 py-2 px-3 cursor-pointer transition rounded-xl shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 whitespace-nowrap"
           title={
             isTextShareDisabled
               ? 'Adicione ao menos um medicamento para copiar o texto'

@@ -205,25 +205,25 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
       <div className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-2.5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <Icon name="monitor_heart" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="monitor_heart" size={18} className="text-[var(--ink-clinical)] shrink-0" />
             <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
               Scoreboard CDSS
             </h1>
-            <span className="rounded-md bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] px-2 py-0.5 font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+            <span className="rounded-md bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)] px-2 py-0.5 font-mono text-[11px] font-semibold text-[var(--text-secondary)] clinical-tabular-nums">
               {SCOREBOARD_TOTAL_COUNT} Escores Monográficos
             </span>
             {activeHospitalBed && onReturnToHospitalBed && (
               <button
                 type="button"
                 onClick={() => onReturnToHospitalBed(activeHospitalBed.id)}
-                className="touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] px-2 py-0.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-100/70 dark:hover:bg-sky-950/50 transition-colors cursor-pointer clinical-tabular-nums"
+                className="touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-inset)] px-2.5 py-0.5 text-[11px] font-semibold text-[var(--text-main)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer clinical-tabular-nums"
                 title={`Retornar diretamente ao prontuário do Leito ${activeHospitalBed.wardAndBed}`}
               >
                 <Icon name="arrow_back" size={12} />
                 <span>Voltar ao Leito {activeHospitalBed.wardAndBed}</span>
               </button>
             )}
-            <div aria-label="Caminho de navegação" className="hidden xl:block">
+            <div aria-label="Caminho de navegação" className="hidden 2xl:block">
               <ol role="list" className="breadcrumbsList">
                 <li>
                   <a
@@ -270,7 +270,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               onClick={() => setTabMode('CALCULATOR')}
               className={`touch-target inline-flex items-center justify-center gap-1.5 rounded-lg min-h-[44px] px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'CALCULATOR'
-                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
+                  ? 'nav-segmented-pill-active text-[var(--ink-clinical)] font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
@@ -282,7 +282,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               onClick={() => setTabMode('CATALOG')}
               className={`touch-target inline-flex items-center justify-center gap-1.5 rounded-lg min-h-[44px] px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'CATALOG'
-                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
+                  ? 'nav-segmented-pill-active text-[var(--ink-clinical)] font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
@@ -294,7 +294,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               onClick={() => setTabMode('BIC_DVA')}
               className={`touch-target inline-flex items-center justify-center gap-1.5 rounded-lg min-h-[44px] px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'BIC_DVA'
-                  ? 'nav-segmented-pill-active text-sky-700 dark:text-sky-300 font-bold'
+                  ? 'nav-segmented-pill-active text-[var(--ink-clinical)] font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
@@ -306,7 +306,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               onClick={() => setTabMode('EPARADA_ONCO')}
               className={`touch-target inline-flex items-center justify-center gap-1.5 rounded-lg min-h-[44px] px-2.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 tabMode === 'EPARADA_ONCO'
-                  ? 'bg-red-600 text-white shadow-xs font-bold'
+                  ? 'bg-[#9F1239] text-white shadow-xs font-bold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
@@ -318,9 +318,9 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
         {/* Barra de Acesso Rápido (Quick-Pins Favoritos) em Linha Única */}
         <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 border-t border-subtle dark:border-strong pt-2">
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none fade-scroll-x pr-6 min-w-0 flex-1 py-0.5">
-            <span className="mr-1 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] shrink-0">
-              <Icon name="star" size={12} className="text-amber-500" />
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0 flex-1 py-0.5">
+            <span className="mr-0.5 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] shrink-0">
+              <Icon name="bookmark_add" size={12} className="text-[var(--text-muted)]" />
               Rápido:
             </span>
             {quickPinManifestItems.map((pin) => {
@@ -331,9 +331,9 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                   key={pin.id}
                   type="button"
                   onClick={() => handleSelectScore(pin.id)}
-                  className={`touch-target rounded-lg border min-h-[44px] px-2 font-mono text-[11px] font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  className={`touch-target rounded-lg border min-h-[44px] px-1.5 font-mono text-[11px] font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                     isActive
-                      ? 'border-navy-900 bg-navy-900 dark:border-sky-500/30 dark:bg-[#0369A1] text-white'
+                      ? 'border-[var(--clinical)] bg-[var(--clinical)] text-white shadow-xs'
                       : 'border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.08]'
                   }`}
                 >
@@ -345,23 +345,30 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
 
           <div className="flex items-center gap-1.5 shrink-0">
             {hospitalBeds.length > 0 && activeHospitalBed && onSelectHospitalBed ? (
-              <div className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] min-h-[44px] px-2.5 text-[11px] font-semibold text-sky-800 dark:text-sky-200">
-                <Icon name="local_hospital" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <div className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] min-h-[44px] px-2.5 text-[11px] font-semibold text-[var(--text-main)]">
+                <Icon name="local_hospital" size={14} className="text-[var(--ink-clinical)] shrink-0" />
                 <label htmlFor="scoreboard-top-bed-select" className="sr-only">
                   Leito Hospitalar Vinculado (MOD-03)
                 </label>
-                <select
-                  id="scoreboard-top-bed-select"
-                  value={activeHospitalBed.id}
-                  onChange={(e) => onSelectHospitalBed(e.target.value)}
-                  className="bg-transparent min-h-[44px] font-mono text-[11px] font-semibold focus:outline-none cursor-pointer clinical-tabular-nums max-w-44 truncate"
-                >
-                  {hospitalBeds.map((b) => (
-                    <option key={b.id} value={b.id} className="text-slate-900">
-                      Leito {b.wardAndBed} — {b.patientNameOrInitials || 'Sem ID'}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative flex items-center">
+                  <select
+                    id="scoreboard-top-bed-select"
+                    value={activeHospitalBed.id}
+                    onChange={(e) => onSelectHospitalBed(e.target.value)}
+                    className="pcm-select appearance-none bg-transparent min-h-[44px] pr-6 font-mono text-[11px] font-semibold focus:outline-none cursor-pointer clinical-tabular-nums max-w-52"
+                  >
+                    {hospitalBeds.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        Leito {b.wardAndBed} • {(b.patientNameOrInitials || 'Sem ID').replace(/\s*\(Pront\.[^)]*\)/i, '')}
+                      </option>
+                    ))}
+                  </select>
+                  <Icon
+                    name="expand_more"
+                    size={14}
+                    className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                  />
+                </div>
               </div>
             ) : null}
 
@@ -370,7 +377,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
               onClick={() => setTabMode('CATALOG')}
               className="touch-target inline-flex items-center gap-1 rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] min-h-[44px] px-2.5 text-[11px] font-semibold text-[var(--text-main)] cursor-pointer whitespace-nowrap"
             >
-              <Icon name="search" size={13} className="text-sky-600 dark:text-sky-400" />
+              <Icon name="search" size={13} className="text-[var(--ink-clinical)]" />
               <span>Buscar ({SCOREBOARD_TOTAL_COUNT})</span>
             </button>
           </div>
@@ -452,7 +459,7 @@ export const ScoreboardModuleView: React.FC<ScoreboardModuleViewProps> = ({
                     Math.max(1, parseFloat(e.target.value) || 70)
                   )
                 }
-                className="w-20 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-2.5 py-1 font-mono text-xs font-bold text-slate-900 dark:text-white clinical-tabular-nums"
+                className="w-24 h-11 min-h-[44px] rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] px-2.5 py-1 font-mono text-xs font-bold text-[var(--text-main)] clinical-tabular-nums"
               />
               <span className="font-mono text-xs text-slate-500 clinical-unit">
                 kg

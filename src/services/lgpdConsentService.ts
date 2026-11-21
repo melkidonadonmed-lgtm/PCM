@@ -132,6 +132,7 @@ class LgpdConsentService {
       {
         consentedAt: Date.now(),
         cloudAuthCookies: false,
+        dismissedNoLoginNotice: true,
       },
       { markConsentedNow: true }
     );
@@ -145,6 +146,7 @@ class LgpdConsentService {
       {
         consentedAt: Date.now(),
         cloudAuthCookies: true,
+        dismissedNoLoginNotice: true,
       },
       { markConsentedNow: true }
     );

@@ -206,9 +206,10 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlExpanded).toContain('id="sidebar-patient-chip"');
     expect(htmlExpanded).toContain('Carlos Eduardo Lima');
     expect(htmlExpanded).toContain('18,5 kg');
-    expect(htmlExpanded).toContain('Guias Oficiais SUS');
+    expect(htmlExpanded).toContain('Prescrever');
+    expect(htmlExpanded).toContain('APAC');
     expect(htmlExpanded).toContain('Módulo de Apoio Clínico');
-    expect(htmlExpanded).toContain('Calculadora Ped.');
+    expect(htmlExpanded).toContain('Pediatria');
     expect(htmlExpanded).toContain('Protocolos');
     expect(htmlExpanded).toContain('Scores');
     expect(htmlExpanded).toContain('Hospitalar');

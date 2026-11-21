@@ -67,7 +67,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
           <Icon
             name="analytics"
             size={18}
-            className="text-sky-600 dark:text-sky-400 shrink-0"
+            className="text-[var(--ink-clinical)] shrink-0"
           />
           <h4 className="text-sm font-semibold text-[var(--text-main)]">
             Matriz de Estratificação do Escore
@@ -104,7 +104,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
             <Icon
               name="clinical_notes"
               size={18}
-              className="text-sky-600 dark:text-sky-400 shrink-0"
+              className="text-[var(--ink-clinical)] shrink-0"
             />
             <h4 className="text-sm font-semibold text-[var(--text-main)] truncate">
               Exportação Prontuário (PEP / SBAR / Editor A4)
@@ -198,7 +198,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
           <button
             type="button"
             onClick={onSendScoreToA4}
-            className="touch-target min-h-[44px] flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-700 cursor-pointer"
+            className="touch-target min-h-[44px] flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--clinical)] px-3 py-2 text-xs font-bold text-white shadow-xs hover:opacity-90 cursor-pointer"
           >
             <Icon
               name={copyFeedback === 'A4' ? 'check' : 'description'}
@@ -212,13 +212,13 @@ export const ScoreExportAndBedBridgeCard: React.FC<
 
         {/* Ponte Direta: Registrar Escore no Módulo de Internação (MOD-03) e Dashboard */}
         {onRecordScoreToBed && selectedHospitalBed ? (
-          <div className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-3 space-y-2.5">
+          <div className="rounded-xl border border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)] p-3 space-y-2.5">
             <div className="flex items-center justify-between gap-2">
-              <span className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-300">
+              <span className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[var(--ink-clinical)]">
                 <Icon name="local_hospital" size={14} />
                 Integração Internação & Dashboard (MOD-03)
               </span>
-              <span className="rounded bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] px-1.5 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+              <span className="rounded bg-[var(--surface-card)] border border-[var(--border-clinical-subtle)] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[var(--ink-clinical)] clinical-tabular-nums">
                 EF/LT {selectedHospitalBed.wardAndBed}
               </span>
             </div>
@@ -277,7 +277,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
               <button
                 type="button"
                 onClick={onRecordScoreInHospitalBed}
-                className="touch-target min-h-[44px] flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-sky-700 cursor-pointer"
+                className="touch-target min-h-[44px] flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-[var(--clinical)] px-3 py-2 text-xs font-bold text-white shadow-xs hover:opacity-90 cursor-pointer"
               >
                 <Icon
                   name={
@@ -301,7 +301,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                       calculator.acronym
                     )
                   }
-                  className="touch-target min-h-[44px] flex items-center justify-center gap-1 rounded-lg border border-sky-500/40 bg-white dark:bg-slate-900 px-2.5 py-2 text-xs font-bold text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-slate-800 cursor-pointer"
+                  className="touch-target min-h-[44px] flex items-center justify-center gap-1 rounded-lg border border-[var(--border-control)] bg-[var(--surface-card)] px-2.5 py-2 text-xs font-bold text-[var(--ink-clinical)] hover:bg-[var(--surface-hover)] cursor-pointer"
                 >
                   <Icon name="monitor_heart" size={14} />
                   <span>Ver no Dashboard</span>

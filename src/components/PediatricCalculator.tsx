@@ -263,7 +263,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             placeholder="Ex.: Paracetamol, Amoxicilina, Dipirona, Ondansetrona..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition tactile-input"
+            className="w-full h-11 min-h-[44px] pl-9 pr-3 rounded-lg border-[var(--border-control)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 transition tactile-input"
           />
         </div>
 

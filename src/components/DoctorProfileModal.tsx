@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UserCheck, Check, X, Shield, Eraser, Building2, Phone, MapPin, Sparkles } from './Icon';
+import { Icon, UserCheck, Check, X, Shield, Eraser, Building2, Phone, MapPin } from './Icon';
 import { DoctorProfile, WorkContext } from '../types';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
@@ -166,7 +166,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       ref={modalRef}
       data-state={validationError ? 'error' : 'idle'}
       aria-busy={false}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.70)] isolate animate-backdrop-fade surface-raised"
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.70)] isolate animate-backdrop-fade surface-raised"
       role="dialog"
       aria-modal="true"
       aria-labelledby="doctor-modal-title"
@@ -181,7 +181,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-card)] flex items-center justify-between"
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[var(--surface-info-subtle)] text-navy-900 dark:text-blue-300 border border-[var(--border-info-subtle)] flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-[10px] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center font-bold">
               <UserCheck className="w-4 h-4" strokeWidth={2} />
             </div>
             <div>
@@ -197,7 +197,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-[10px] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             <X className="w-5 h-5" strokeWidth={2} />
           </button>
@@ -218,26 +218,26 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           )}
 
           {/* Identificação Principal (Essencial) */}
-          <div className="space-y-3 p-3.5 rounded-xl bg-slate-50 dark:bg-navy-950 border border-subtle dark:border-navy-800">
-            <div className="flex items-center justify-between">
-              <span className="text-xs uppercase font-bold tracking-wider text-sky-700 dark:text-sky-400">
+          <div className="space-y-3 p-3.5 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)]">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs uppercase font-bold tracking-wider text-[var(--ink-clinical)]">
                 Identificação Obrigatória
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button 
                   type="button"
                   onClick={handleFillSample}
-                  className="touch-target min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-xs font-semibold text-sky-700 dark:text-sky-300 hover:bg-[var(--surface-info-subtle)] flex items-center gap-1 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                  className="touch-target min-h-[44px] min-w-[44px] px-2.5 rounded-[10px] text-xs font-semibold text-[var(--ink-clinical)] hover:bg-[var(--surface-clinical-subtle)] flex items-center gap-1.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                   title="Preencher com dados de exemplo (Dr. Melki Donadon / CRM 123456-SP)"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                  <Icon name="fact_check" size={14} className="shrink-0" />
                   <span>Usar exemplo</span>
                 </button>
-                <span className="text-slate-300 dark:text-slate-700" aria-hidden="true">•</span>
+                <span className="text-[var(--border-medium)]" aria-hidden="true">•</span>
                 <button 
                   type="button"
                   onClick={handleClear}
-                  className="touch-target min-h-[44px] min-w-[44px] px-3 rounded-lg text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 flex items-center justify-center gap-1 cursor-pointer transition bg-rose-50/90 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-400/35 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                  className="touch-target min-h-[44px] min-w-[44px] px-3 rounded-[10px] text-xs font-semibold border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:text-rose-700 dark:hover:text-rose-300 hover:border-rose-300 dark:hover:border-rose-400/40 hover:bg-rose-50/70 dark:hover:bg-rose-950/40 flex items-center justify-center gap-1.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
                 >
                   <Eraser className="w-3.5 h-3.5" />
                   <span>Limpar</span>
@@ -246,7 +246,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             </div>
 
             <div>
-              <label htmlFor="doc-input-name" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              <label htmlFor="doc-input-name" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                 Nome Completo com Título *
               </label>
               <input
@@ -257,13 +257,13 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Ex.: Melki Donadon"
-                className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100"
+                className="w-full h-11 min-h-[44px] px-3.5 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-sm font-semibold text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] transition"
               />
             </div>
 
             <div className="grid grid-cols-12 gap-2.5">
               <div className="col-span-8">
-                <label htmlFor="doc-input-crm" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="doc-input-crm" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                   Número do CRM *
                 </label>
                 <input
@@ -273,30 +273,37 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   value={formData.crm}
                   onChange={(e) => setFormData({ ...formData, crm: e.target.value })}
                   placeholder="Ex.: 123456"
-                  className="w-full px-3.5 py-2 rounded-xl border text-sm font-bold text-sky-700 dark:text-sky-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 clinical-tabular-nums"
+                  className="w-full h-11 min-h-[44px] px-3.5 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-sm font-bold text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] transition clinical-tabular-nums"
                 />
               </div>
 
               <div className="col-span-4">
-                <label htmlFor="doc-input-state" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="doc-input-state" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                   UF do CRM *
                 </label>
-                <select
-                  id="doc-input-state"
-                  value={formData.crmState}
-                  onChange={(e) => setFormData({ ...formData, crmState: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 cursor-pointer"
-                >
-                  {states.map(st => (
-                    <option key={st} value={st}>{st}</option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="doc-input-state"
+                    value={formData.crmState}
+                    onChange={(e) => setFormData({ ...formData, crmState: e.target.value })}
+                    className="pcm-select appearance-none w-full h-11 min-h-[44px] pl-3 pr-8 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-sm font-semibold text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] transition cursor-pointer"
+                  >
+                    {states.map(st => (
+                      <option key={st} value={st}>{st}</option>
+                    ))}
+                  </select>
+                  <Icon
+                    name="expand_more"
+                    size={16}
+                    className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-12 gap-2.5">
               <div className="col-span-7">
-                <label htmlFor="doc-input-specialty" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="doc-input-specialty" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                   Especialidade Principal
                 </label>
                 <input
@@ -305,12 +312,12 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   value={formData.specialty}
                   onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
                   placeholder="Ex.: Clínica Médica / Pediatria"
-                  className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100"
+                  className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-medium text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] transition"
                 />
               </div>
 
               <div className="col-span-5">
-                <label htmlFor="doc-input-rqe" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="doc-input-rqe" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                   RQE (Opcional)
                 </label>
                 <input
@@ -319,7 +326,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                   value={formData.rqe || ''}
                   onChange={(e) => setFormData({ ...formData, rqe: e.target.value })}
                   placeholder="Ex.: 67890"
-                  className="w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition bg-white dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 clinical-tabular-nums"
+                  className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-medium text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] transition clinical-tabular-nums"
                 />
               </div>
             </div>
@@ -330,21 +337,21 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <button
               type="button"
               onClick={() => setShowAdvancedClinic(!showAdvancedClinic)}
-              className="w-full py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-between transition bg-slate-100 dark:bg-navy-900 hover:bg-slate-200 dark:hover:bg-navy-800 border-medium dark:border-navy-700 text-slate-700 dark:text-slate-300 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="w-full min-h-[44px] py-2 px-3 rounded-[10px] border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-bold flex items-center justify-between transition text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             >
               <span className="flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-slate-500" />
+                <Building2 className="w-4 h-4 text-[var(--text-muted)]" />
                 <span>Dados de Consultório / Unidade (Opcional)</span>
               </span>
-              <span className="text-xs font-bold text-sky-700 dark:text-sky-400">
+              <span className="text-xs font-bold text-[var(--ink-clinical)]">
                 {showAdvancedClinic ? 'Ocultar' : 'Exibir campos'}
               </span>
             </button>
 
             {showAdvancedClinic && (
-              <div className="mt-2.5 space-y-2.5 p-3 rounded-xl border bg-white dark:bg-navy-950 border-subtle dark:border-navy-800 animate-tab-fade">
+              <div className="mt-2.5 space-y-2.5 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] animate-tab-fade">
                 <div>
-                  <label htmlFor="doc-input-clinic" className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                  <label htmlFor="doc-input-clinic" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                     Nome da Unidade / Consultório
                   </label>
                   <input
@@ -353,13 +360,13 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                     value={formData.clinicName || ''}
                     onChange={(e) => setFormData({ ...formData, clinicName: e.target.value })}
                     placeholder="Ex.: USF Hamilton Gondim / Consultório Particular"
-                    className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)]"
                   />
                 </div>
 
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-7">
-                    <label htmlFor="doc-input-city" className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                    <label htmlFor="doc-input-city" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       Cidade - UF
                     </label>
                     <input
@@ -368,11 +375,11 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                       value={formData.cityState || ''}
                       onChange={(e) => setFormData({ ...formData, cityState: e.target.value })}
                       placeholder="Ex.: Porto Velho - RO"
-                      className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                      className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)]"
                     />
                   </div>
                   <div className="col-span-5">
-                    <label htmlFor="doc-input-phone" className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                    <label htmlFor="doc-input-phone" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       Telefone / Contato
                     </label>
                     <input
@@ -381,13 +388,13 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                       value={formData.phone || ''}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="Ex.: (69) 99999-9999"
-                      className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums"
+                      className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] clinical-tabular-nums"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="doc-input-address" className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                  <label htmlFor="doc-input-address" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                     Endereço Completo
                   </label>
                   <input
@@ -396,17 +403,17 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                     value={formData.address || ''}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     placeholder="Ex.: Av. 7 de Setembro, 1200 - Sala 04"
-                    className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)]"
                   />
                 </div>
 
-                <div className="pt-2 border-t border-subtle dark:border-navy-800">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                <div className="pt-2 border-t border-[var(--border-subtle)]">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-muted)] mb-2">
                     Identificação SUS (APAC / LME / SISREG — opcional)
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
-                      <label htmlFor="doc-input-cns" className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                      <label htmlFor="doc-input-cns" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                         CNS do Médico (LME)
                       </label>
                       <input
@@ -416,11 +423,11 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                         value={formData.cns || ''}
                         onChange={(e) => setFormData({ ...formData, cns: e.target.value })}
                         placeholder="Ex.: 700 0000 0000 0000"
-                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 font-mono clinical-tabular-nums"
+                        className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] font-mono clinical-tabular-nums"
                       />
                     </div>
                     <div>
-                      <label htmlFor="doc-input-cpf" className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                      <label htmlFor="doc-input-cpf" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                         CPF do Médico (APAC)
                       </label>
                       <input
@@ -430,11 +437,11 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                         value={formData.cpf || ''}
                         onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
                         placeholder="Ex.: 000.000.000-00"
-                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 font-mono clinical-tabular-nums"
+                        className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] font-mono clinical-tabular-nums"
                       />
                     </div>
                     <div>
-                      <label htmlFor="doc-input-cnes" className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                      <label htmlFor="doc-input-cnes" className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                         CNES da Unidade
                       </label>
                       <input
@@ -444,7 +451,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                         value={formData.cnes || ''}
                         onChange={(e) => setFormData({ ...formData, cnes: e.target.value })}
                         placeholder="Ex.: 1234567"
-                        className="w-full px-3 py-2 rounded-lg border text-xs bg-slate-50 dark:bg-navy-900 border-medium dark:border-navy-700 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 font-mono clinical-tabular-nums"
+                        className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-focus)] font-mono clinical-tabular-nums"
                       />
                     </div>
                   </div>
@@ -454,16 +461,16 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           </div>
 
           {/* Timbrado e Logotipo Institucional */}
-          <div className="p-3.5 rounded-xl border flex items-center justify-between bg-slate-50 dark:bg-navy-950 border-subtle dark:border-navy-800">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[var(--accent-amber-subtle)] text-amber-800 dark:text-amber-300 border border-[var(--accent-amber-border)] flex items-center justify-center font-bold shrink-0">
-                <Sparkles className="w-4 h-4" />
+          <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-[10px] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center shrink-0">
+                <Icon name="approval" size={18} />
               </div>
-              <div>
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-[var(--text-main)]">
                   Timbrado e Logotipo Clínico (SVG)
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-[var(--text-muted)]">
                   {activeContext?.logoDataUrl 
                     ? `Logotipo ativo no contexto: ${activeContext.name}`
                     : 'Personalize o brasão médico ou logotipo do consultório/UBS'}
@@ -474,22 +481,22 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <button
               type="button"
               onClick={() => setIsLogoModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl border border-warning dark:border-warning bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
+              className="btn-tactile-secondary min-h-[44px] px-3.5 py-2 rounded-[10px] text-xs font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <Icon name="edit" size={14} className="text-[var(--ink-clinical)] shrink-0" />
               <span>{activeContext?.logoDataUrl ? 'Editar Logo SVG' : 'Criar Logo / Timbre SVG'}</span>
             </button>
           </div>
 
           {/* Assinatura & Carimbo */}
-          <div className="p-3 rounded-xl border flex items-center justify-between bg-slate-50 dark:bg-navy-950 border-subtle dark:border-navy-800">
+          <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <Shield className="w-4 h-4 text-emerald-500" />
+              <Shield className="w-4 h-4 text-[var(--ink-clinical)] shrink-0" />
               <label htmlFor="doc-input-show-sig" className="cursor-pointer">
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                <p className="text-xs font-bold text-[var(--text-main)]">
                   Exibir Linha de Assinatura e Carimbo
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-[var(--text-muted)]">
                   Inclui campo formal no rodapé das folhas A4
                 </p>
               </label>
@@ -499,22 +506,22 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
               id="doc-input-show-sig"
               checked={formData.showSignature}
               onChange={(e) => setFormData({ ...formData, showSignature: e.target.checked })}
-              className="w-4 h-4 rounded text-sky-700 focus:ring-sky-500 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="w-4 h-4 rounded cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-subtle dark:border-navy-800">
+          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-[var(--border-subtle)]">
             <button
               type="button"
               onClick={onClose}
-              className="touch-target min-h-[44px] px-4 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-100 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-200 cursor-pointer transition active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="btn-tactile-secondary min-h-[44px] px-4 rounded-[10px] text-xs font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="btn-tactile-primary px-6 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="btn-tactile-clinical min-h-[44px] px-5 rounded-[10px] text-xs font-bold transition active:scale-95 flex items-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             >
               <Check className="w-4 h-4" />
               <span>Salvar Perfil</span>

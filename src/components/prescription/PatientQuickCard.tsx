@@ -39,7 +39,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
       {/* Cabeçalho compacto com quebra responsiva limpa */}
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
         <div className="flex items-center gap-2 min-w-0">
-          <Icon name="person" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+          <Icon name="person" size={18} className="text-[var(--ink-clinical)] shrink-0" />
           <label
             htmlFor="quick-patient-name"
             className="text-sm font-semibold text-[var(--text-main)] cursor-pointer whitespace-nowrap"
@@ -69,10 +69,10 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           <button
             type="button"
             onClick={onOpenPatientModal}
-            className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-medium inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 transition duration-150"
+            className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 transition duration-150"
             title="Abrir cadastro clínico detalhado (CPF, endereço, alergias)"
           >
-            <Icon name="person_add" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="person_add" size={14} className="text-[var(--ink-clinical)] shrink-0" />
             <span>Cadastro completo</span>
           </button>
         </div>
@@ -89,7 +89,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             value={patient.name || ''}
             onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
             placeholder="Ex.: Maria de Oliveira Santos"
-            className="w-full h-11 min-h-[44px] px-3 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm transition"
+            className="w-full h-11 min-h-[44px] px-3 bg-[var(--surface-inset)] border border-[var(--border-control)] rounded-lg text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 shadow-tactile-sm transition"
           />
         </div>
 
@@ -113,7 +113,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             }}
             onBlur={() => setWeightDraft(null)}
             placeholder="Ex.: Peso"
-            className="w-full h-11 min-h-[44px] pl-2.5 pr-8 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums transition"
+            className="w-full h-11 min-h-[44px] pl-2.5 pr-8 bg-[var(--surface-inset)] border border-[var(--border-control)] rounded-lg text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 shadow-tactile-sm clinical-tabular-nums transition"
           />
           <span className="absolute right-2.5 text-[11px] font-semibold text-[var(--text-muted)] pointer-events-none clinical-unit">
             kg

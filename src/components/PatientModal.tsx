@@ -119,7 +119,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       ref={modalRef}
       data-state="idle"
       aria-busy={false}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.60)] isolate animate-backdrop-fade"
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.60)] isolate animate-backdrop-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="patient-modal-title"
@@ -132,7 +132,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         {/* Header */}
         <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-card)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[var(--surface-info-subtle)] text-navy-900 dark:text-blue-300 border border-[var(--border-info-subtle)] flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-[10px] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center font-bold">
               <Icon name="person" className="text-[18px]" />
             </div>
             <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-[var(--text-main)]">
@@ -143,7 +143,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de dados do paciente"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-[10px] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           >
             <Icon name="close" className="text-[20px]" />
           </button>
@@ -152,7 +152,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-5 space-y-3.5">
           <div>
-            <label htmlFor="patient-modal-name" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate">
+            <label htmlFor="patient-modal-name" className="block text-xs font-bold uppercase text-[var(--text-muted)] mb-1 truncate">
               Nome do Paciente ou Identificação
             </label>
             <input
@@ -164,7 +164,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Ex.: Seu Melki"
-              className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-semibold focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+              className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] text-xs font-semibold focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-[var(--text-main)] transition"
             />
           </div>
 
@@ -172,7 +172,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
           <div
             className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
               formData.weightCalcEnabled
-                ? 'bg-[var(--accent-emerald-subtle)] border-[var(--accent-emerald-border)]'
+                ? 'bg-[var(--surface-clinical-subtle)] border-[var(--border-clinical-subtle)]'
                 : 'bg-[var(--surface-inset)] border-[var(--border-subtle)]'
             }`}
           >
@@ -180,7 +180,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               <span className="text-xs font-bold block text-[var(--text-main)]">
                 Cálculo de Dose por Peso (Pediátrico)
               </span>
-              <span className="text-xs text-[var(--text-muted)] dark:text-slate-400 block">
+              <span className="text-xs text-[var(--text-muted)] block">
                 {formData.weightCalcEnabled ? 'Ativado: calcula gotas e mL/kg automaticamente' : 'Desativado: modo adulto / doses padrão'}
               </span>
             </div>
@@ -191,12 +191,12 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               aria-checked={formData.weightCalcEnabled}
               aria-label="Ativar cálculo pediátrico de dose por peso"
               onClick={() => setFormData({ ...formData, weightCalcEnabled: !formData.weightCalcEnabled })}
-              className="touch-target relative inline-flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center cursor-pointer rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
+              className="touch-target relative inline-flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center cursor-pointer rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             >
               <span
                 aria-hidden="true"
                 className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
-                  formData.weightCalcEnabled ? 'bg-emerald-600' : 'bg-slate-400 dark:bg-slate-700'
+                  formData.weightCalcEnabled ? 'bg-[var(--clinical)]' : 'bg-slate-400 dark:bg-slate-700'
                 }`}
               >
                 <span
@@ -210,7 +210,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
             <div className="flex flex-col justify-end min-w-0">
-              <label htmlFor="patient-modal-weight" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate whitespace-nowrap">
+              <label htmlFor="patient-modal-weight" className="block text-xs font-bold uppercase text-[var(--text-muted)] mb-1 truncate whitespace-nowrap">
                 Peso (kg) {formData.weightCalcEnabled ? '*' : ''}
               </label>
               <div className="relative">
@@ -232,14 +232,14 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                   }}
                   onBlur={() => setWeightDraft(null)}
                   placeholder="Ex.: 14,5"
-                  className="w-full h-11 min-h-[44px] pl-3 pr-8 rounded-xl border border-[var(--border-subtle)] text-xs font-bold focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-emerald-700 dark:text-emerald-400 transition clinical-tabular-nums"
+                  className="w-full h-11 min-h-[44px] pl-3 pr-8 rounded-[10px] border border-[var(--border-control)] text-xs font-bold focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-[var(--ink-clinical)] transition clinical-tabular-nums"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--text-muted)] dark:text-slate-400 clinical-unit pointer-events-none">kg</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--text-muted)] clinical-unit pointer-events-none">kg</span>
               </div>
             </div>
 
             <div className="flex flex-col justify-end min-w-0">
-              <label htmlFor="patient-modal-age" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate whitespace-nowrap">
+              <label htmlFor="patient-modal-age" className="block text-xs font-bold uppercase text-[var(--text-muted)] mb-1 truncate whitespace-nowrap">
                 Idade / Nasc.
               </label>
               <input
@@ -249,30 +249,37 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.ageText || formData.birthDate || ''}
                 onChange={(e) => setFormData(applyAgeOrBirthDateInput(formData, e.target.value))}
                 placeholder="Ex.: 35 anos ou 07/03/1990"
-                className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition"
+                className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] text-xs font-medium focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-[var(--text-main)] transition"
               />
             </div>
 
             <div className="flex flex-col justify-end min-w-0">
-              <label htmlFor="patient-modal-sex" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate whitespace-nowrap">
+              <label htmlFor="patient-modal-sex" className="block text-xs font-bold uppercase text-[var(--text-muted)] mb-1 truncate whitespace-nowrap">
                 Sexo (RDC 471 / SUS)
               </label>
-              <select
-                id="patient-modal-sex"
-                value={formData.sex || ''}
-                onChange={(e) => setFormData({ ...formData, sex: (e.target.value as '' | 'M' | 'F') })}
-                className="w-full h-11 min-h-[44px] px-2.5 rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition cursor-pointer"
-              >
-                <option value="">Não informado</option>
-                <option value="F">Feminino</option>
-                <option value="M">Masculino</option>
-              </select>
+              <div className="relative">
+                <select
+                  id="patient-modal-sex"
+                  value={formData.sex || ''}
+                  onChange={(e) => setFormData({ ...formData, sex: (e.target.value as '' | 'M' | 'F') })}
+                  className="pcm-select appearance-none w-full h-11 min-h-[44px] pl-2.5 pr-8 rounded-[10px] border border-[var(--border-control)] text-xs font-medium focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-[var(--text-main)] transition cursor-pointer"
+                >
+                  <option value="">Não informado</option>
+                  <option value="F">Feminino</option>
+                  <option value="M">Masculino</option>
+                </select>
+                <Icon
+                  name="expand_more"
+                  size={16}
+                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                />
+              </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
             <div className="flex flex-col justify-end min-w-0">
-              <label htmlFor="patient-modal-doc" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate whitespace-nowrap">
+              <label htmlFor="patient-modal-doc" className="block text-xs font-bold uppercase text-[var(--text-muted)] mb-1 truncate whitespace-nowrap">
                 Documento (CPF / RG / CNS)
               </label>
               <input
@@ -282,12 +289,12 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.documentNumber || ''}
                 onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
                 placeholder="Ex.: 542.189.708-44"
-                className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition clinical-tabular-nums"
+                className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] text-xs font-medium focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-[var(--text-main)] transition clinical-tabular-nums"
               />
             </div>
 
             <div className="flex flex-col justify-end min-w-0">
-              <label htmlFor="patient-modal-phone" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate whitespace-nowrap">
+              <label htmlFor="patient-modal-phone" className="block text-xs font-bold uppercase text-[var(--text-muted)] mb-1 truncate whitespace-nowrap">
                 Telefone / Responsável
               </label>
               <input
@@ -299,13 +306,13 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="Ex.: (11) 98765-4321"
-                className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-[var(--text-main)] transition clinical-tabular-nums"
+                className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] text-xs font-medium focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-[var(--text-main)] transition clinical-tabular-nums"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="patient-modal-allergies" className="block text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 mb-1 truncate">
+            <label htmlFor="patient-modal-allergies" className="block text-xs font-bold uppercase text-[var(--text-muted)] mb-1 truncate">
               Alergias Conhecidas (Medicamentosas ou Alimentares)
             </label>
             <input
@@ -322,15 +329,15 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 });
               }}
               placeholder="Ex.: Penicilina, Dipirona, AINEs, Frutos do mar..."
-              className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-medium focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input text-rose-700 dark:text-rose-400 transition"
+              className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] text-xs font-medium focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-rose-700 dark:text-rose-400 transition"
             />
           </div>
 
-          <div className="pt-3 border-t border-subtle dark:border-strong flex items-center justify-between gap-2">
+          <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={handleClear}
-              className="h-11 min-h-[44px] px-3.5 rounded-xl border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-bold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 transition duration-150 inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+              className="h-11 min-h-[44px] px-3.5 rounded-[10px] border border-[var(--border-subtle)] bg-[var(--surface-card)] text-xs font-semibold text-[var(--text-secondary)] hover:text-rose-700 dark:hover:text-rose-300 hover:border-rose-300 dark:hover:border-rose-400/40 hover:bg-rose-50/70 dark:hover:bg-rose-950/40 transition duration-150 inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
               title="Limpar todos os campos para digitar novo paciente"
             >
               <Icon name="ink_eraser" className="text-[16px]" />
@@ -340,13 +347,13 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="btn-tactile-secondary h-11 min-h-[44px] px-4 rounded-xl text-xs font-semibold inline-flex items-center justify-center cursor-pointer active:scale-95 transition duration-150 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="btn-tactile-secondary h-11 min-h-[44px] px-4 rounded-[10px] text-xs font-semibold inline-flex items-center justify-center cursor-pointer active:scale-95 transition duration-150 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="btn-tactile-primary h-11 min-h-[44px] px-5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition duration-150"
+                className="btn-tactile-clinical h-11 min-h-[44px] px-5 rounded-[10px] text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none transition duration-150"
               >
                 <Icon name="check" className="text-[16px]" />
                 <span>Salvar Paciente</span>

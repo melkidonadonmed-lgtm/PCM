@@ -74,7 +74,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
               isDanger 
                 ? 'bg-[var(--accent-rose-subtle)] text-rose-700 dark:text-rose-300 border-[var(--accent-rose-border)]' 
-                : 'bg-[var(--surface-info-subtle)] text-blue-800 dark:text-blue-300 border-info dark:border-info'
+                : 'bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border-[var(--border-clinical-subtle)]'
             }`}
           >
             <Icon name="warning" className="text-[24px]" />
@@ -98,17 +98,17 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <button
             onClick={onCancel}
             aria-label="Fechar modal de confirmação"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             <Icon name="close" className="text-[18px]" />
           </button>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-subtle dark:border-white/10">
+        <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-[var(--border-subtle)]">
           <button
             type="button"
             onClick={onCancel}
-            className="min-h-[44px] px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl border border-medium dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="min-h-[44px] px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] transition cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             {cancelLabel}
           </button>
@@ -118,11 +118,11 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             type="button"
             onClick={onConfirm}
             className={`min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl shadow-tactile-btn flex items-center gap-2 cursor-pointer transition active:scale-95 focus-visible:ring-2 ${
-              isDanger ? 'focus-visible:ring-rose-500' : 'focus-visible:ring-sky-500'
+              isDanger ? 'focus-visible:ring-rose-500' : 'focus-visible:ring-[var(--accent-focus)]'
             } focus-visible:outline-none ${
               isDanger 
                 ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white' 
-                : 'bg-navy-900 hover:bg-navy-950 text-white dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white'
+                : 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
             }`}
           >
             <Icon name="check" className="text-[16px]" />

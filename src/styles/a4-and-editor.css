@@ -79,20 +79,14 @@
 
   .modal-surface-spring {
     animation: modalSurfaceSpring 0.22s var(--ease-spring) both;
-    @starting-style {
-      opacity: 0;
-      transform: scale(0.96) translate3d(0, 8px, 0);
-    }
   }
 
   @keyframes tabFadeIn {
     0% {
-      opacity: 0;
-      transform: translate3d(0, 6px, 0);
+      opacity: 0.94;
     }
     100% {
       opacity: 1;
-      transform: translate3d(0, 0, 0);
     }
   }
 
@@ -118,8 +112,8 @@
 
   @keyframes modalSurfaceSpring {
     0% {
-      opacity: 0;
-      transform: scale(0.96) translate3d(0, 8px, 0);
+      opacity: 1;
+      transform: scale(0.985) translate3d(0, 6px, 0);
     }
     100% {
       opacity: 1;

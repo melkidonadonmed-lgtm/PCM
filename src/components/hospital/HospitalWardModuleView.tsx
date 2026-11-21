@@ -179,7 +179,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
       <section className="cq-card card-surface surface-card-minimal rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 flex flex-col gap-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <Icon name="local_hospital" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="local_hospital" size={18} className="text-[var(--ink-clinical)] shrink-0" />
             <h1 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
               Módulo Hospitalar e Gestão de Pacientes
             </h1>
@@ -207,7 +207,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
               onClick={() => setIsMultimodalModalOpen(true)}
               className="btn-tactile-secondary touch-target min-h-[44px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
             >
-              <Icon name="auto_awesome" size={14} className="text-sky-600 dark:text-sky-400" />
+              <Icon name="upload" size={14} className="text-[var(--text-muted)]" />
               <span>Importação Multimodal IA</span>
             </button>
 
@@ -217,7 +217,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                 onClick={() => onOpenScoreboardForBed(activeBed)}
                 className="btn-tactile-secondary touch-target min-h-[44px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer clinical-tabular-nums"
               >
-                <Icon name="monitor_heart" size={14} className="text-sky-600 dark:text-sky-400" />
+                <Icon name="monitor_heart" size={14} className="text-[var(--ink-clinical)]" />
                 <span>Escores do Leito ({activeBed.scoreEntries?.length || 0})</span>
               </button>
             )}
@@ -225,7 +225,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
         </div>
 
         {/* Trilho Segmentado das 5 Visões Hospitalares (iniciando no Mapa de Leitos) */}
-        <div className="grid grid-cols-2 lg:flex lg:items-center gap-1 p-1 rounded-xl nav-segmented-track">
+        <div className="flex items-center gap-1 p-1 rounded-xl nav-segmented-track overflow-x-auto scrollbar-none">
           {subNavItems.map((tab) => {
             const isActive = activeSubView === tab.id;
             return (
@@ -234,7 +234,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                 type="button"
                 onClick={() => setActiveSubView(tab.id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`touch-target flex-1 min-h-[44px] px-2.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                className={`touch-target shrink-0 whitespace-nowrap lg:flex-1 min-h-[44px] px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   isActive
                     ? 'nav-segmented-pill-active font-bold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold'
@@ -244,9 +244,9 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                   name={tab.icon}
                   size={14}
                   filled={isActive}
-                  className={isActive ? 'text-sky-600 dark:text-sky-400' : 'opacity-75'}
+                  className={isActive ? 'text-[var(--ink-clinical)]' : 'opacity-75'}
                 />
-                <span className="truncate">{tab.label}</span>
+                <span>{tab.label}</span>
               </button>
             );
           })}
@@ -303,7 +303,7 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                 </button>
 
                 <div className="min-w-0">
-                  <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                  <span className="text-xs font-extrabold text-[var(--ink-clinical)] clinical-tabular-nums">
                     Leito Ativo: EF/LT {activeBed.wardAndBed}
                   </span>
                   <span className="text-xs font-semibold text-[var(--text-main)] ml-1.5">
@@ -329,14 +329,14 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                       onClick={() => handleSelectBed(bed.id)}
                       className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl border text-left transition cursor-pointer shrink-0 ${
                         isSelected
-                          ? 'bg-sky-600/15 border-sky-500/50 text-[var(--text-main)] font-bold'
+                          ? 'bg-[var(--surface-clinical-subtle)] border-[var(--border-clinical-subtle)] text-[var(--text-main)] font-bold'
                           : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] font-medium'
                       }`}
                     >
-                      <span className="text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                      <span className="text-xs font-extrabold text-[var(--ink-clinical)] clinical-tabular-nums">
                         EF/LT {bed.wardAndBed}
                       </span>
-                      <span className="text-xs ml-1.5 truncate max-w-28 inline-block align-bottom">
+                      <span className="text-xs ml-1.5 truncate max-w-44 inline-block align-bottom">
                         {bed.patientNameOrInitials || 'Sem ID'}
                       </span>
                       {stayDays > 0 && (

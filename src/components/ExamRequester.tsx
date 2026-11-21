@@ -423,7 +423,7 @@ export const ExamRequester: React.FC<ExamRequesterProps> = ({
               value={clinicalIndication}
               onChange={(e) => onUpdateClinicalIndication(e.target.value)}
               placeholder="Ex.: Investigação de síndrome febril aguda, controle de rotina..."
-              className="w-full h-9 px-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+              className="w-full h-11 min-h-[44px] px-3 rounded-lg border-[var(--border-control)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input"
             />
           </div>
 

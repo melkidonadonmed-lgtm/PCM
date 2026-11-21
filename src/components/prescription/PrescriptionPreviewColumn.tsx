@@ -74,16 +74,16 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
       <div
         data-state="idle"
         aria-busy={false}
-        className={`xl:col-span-5 xl:sticky xl:top-20 space-y-3.5 ${mobileSection === 'composer' ? 'hidden md:block' : 'block'}`}
+        className={`xl:col-span-5 xl:sticky xl:top-20 card-surface border border-[var(--border-subtle)] rounded-2xl p-3.5 sm:p-4 space-y-3 ${mobileSection === 'composer' ? 'hidden md:block' : 'block'}`}
       >
-        <div className="flex items-center justify-between gap-2 px-1">
-          <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-            <Icon name="visibility" className="text-[15px] text-sky-600 dark:text-sky-400" />
-            <span>Prévia da folha — é exatamente o que será impresso</span>
+        <div className="flex items-center justify-between gap-2 px-0.5">
+          <h3 className="text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+            <Icon name="visibility" className="text-[15px] text-[var(--ink-clinical)]" />
+            <span>Prévia da folha A4 — fiel à impressão</span>
           </h3>
           {!isDoctorConfigured && (
-            <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
-              Folha para carimbo / anotação manual
+            <span className="text-[11px] font-medium text-[var(--text-muted)]">
+              Carimbo manual habilitado
             </span>
           )}
         </div>
@@ -120,15 +120,17 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
         )}
 
         {/* Folha A4 da bancada: o mesmo documento que será impresso / exportado em PDF (sempre paisagem no padrão PEC do SUS) */}
-        <FolhaA4 ref={folhaRef} id="printable-a4-sheet" orientacao="landscape" imprimivel>
-          <DocumentoClinico
-            tipo={DOCUMENTO_DO_REGIME[regimeAtivo]}
-            doctor={doctor}
-            patient={patient}
-            activeContext={activeContext}
-            prescriptionItems={itemsInPreview}
-          />
-        </FolhaA4>
+        <div className="a4-bench-stage">
+          <FolhaA4 ref={folhaRef} id="printable-a4-sheet" orientacao="landscape" imprimivel>
+            <DocumentoClinico
+              tipo={DOCUMENTO_DO_REGIME[regimeAtivo]}
+              doctor={doctor}
+              patient={patient}
+              activeContext={activeContext}
+              prescriptionItems={itemsInPreview}
+            />
+          </FolhaA4>
+        </div>
 
         {/* Action Buttons: visível no desktop (xl), nunca duplicado com o cartão */}
         <div className="hidden xl:block">

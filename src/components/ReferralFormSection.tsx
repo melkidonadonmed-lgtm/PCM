@@ -280,7 +280,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
               value={patient?.name ?? referral.patientName ?? ''}
               onChange={(e) => onPatientNameChange(e.target.value)}
               placeholder="Ex.: Maria de Oliveira Santos"
-              className="w-full h-9 px-3 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+              className="w-full h-11 min-h-[44px] px-3 rounded-lg border-[var(--border-control)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input"
             />
           </div>
 
@@ -297,7 +297,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
               value={patient?.documentNumber ?? referral.documentNumber ?? ''}
               onChange={(e) => onPatientDocChange(e.target.value)}
               placeholder="Ex.: 000.000.000-00"
-              className="w-full h-9 px-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input clinical-tabular-nums"
+              className="w-full h-11 min-h-[44px] px-3 rounded-lg border-[var(--border-control)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input clinical-tabular-nums"
             />
           </div>
         </div>
@@ -318,7 +318,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
               onChange={(e) =>
                 onUpdateReferral({ ...referral, destinationSpecialty: e.target.value })
               }
-              className="w-full h-9 px-2.5 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input cursor-pointer"
+              className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border-[var(--border-control)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input cursor-pointer"
             >
               {SPECIALTIES_LIST.map((s) => (
                 <option key={s} value={s}>
@@ -343,7 +343,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
                 onUpdateReferral({ ...referral, destinationInstitution: e.target.value })
               }
               placeholder="Ex.: Ambulatório de Especialidades / HU..."
-              className="w-full h-9 px-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+              className="w-full h-11 min-h-[44px] px-3 rounded-lg border-[var(--border-control)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input"
             />
           </div>
 
@@ -384,7 +384,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
             value={referral.reason}
             onChange={(e) => onUpdateReferral({ ...referral, reason: e.target.value })}
             placeholder="Ex.: Avaliação especializada e conduta terapêutica..."
-            className="w-full h-9 px-3 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border-[var(--border-control)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input"
           />
         </div>
 
@@ -476,7 +476,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
                     handleAppendCidForReferral({ code: found.code, description: found.label });
                   }
                 }}
-                className="w-full sm:flex-1 h-9 px-2.5 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input cursor-pointer"
+                className="w-full sm:flex-1 h-11 min-h-[44px] px-2.5 rounded-lg border-[var(--border-control)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input cursor-pointer"
               >
                 <option value="">Selecionar diagnóstico frequente da especialidade...</option>
                 {currentSpecialtySuggestions.map((item) => (

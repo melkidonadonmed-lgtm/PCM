@@ -217,7 +217,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                 value={newLabDateBr}
                 onChange={(e) => setNewLabDateBr(e.target.value)}
                 placeholder="Ex.: 24/10/2026"
-                className="w-full h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
               />
             </div>
             {CANONICAL_LAB_MARKERS.map((m) => (
@@ -234,7 +234,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                     setNewLabValues((prev) => ({ ...prev, [m.key]: e.target.value }))
                   }
                   placeholder={`Ex.: ${m.minNormal}`}
-                  className="w-full h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
                 />
               </div>
             ))}
@@ -310,7 +310,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
             onChange={(e) => setNewImgDateBr(e.target.value)}
             placeholder="Ex.: 24/10/2026"
             aria-label="Data do exame de imagem"
-            className="sm:col-span-2 h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+            className="sm:col-span-2 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
           <input
             id="hospital-img-modality-input"
@@ -320,7 +320,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
             onChange={(e) => setNewImgModality(e.target.value)}
             placeholder="Ex.: TC de Tórax sem contraste"
             aria-label="Modalidade do exame de imagem"
-            className="sm:col-span-4 h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="sm:col-span-4 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
           <input
             id="hospital-img-findings-input"
@@ -330,7 +330,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
             onChange={(e) => setNewImgFindings(e.target.value)}
             placeholder="Ex.: Descrição objetiva dos achados ou conclusão do laudo"
             aria-label="Achados ou laudo do exame de imagem"
-            className="sm:col-span-4 h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="sm:col-span-4 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
           <button
             type="button"

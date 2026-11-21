@@ -163,23 +163,23 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
       <SoftCard variant="flat" className="card-surface p-3 sm:p-3.5 rounded-2xl border border-subtle dark:border-strong flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
         {/* Identificação Enxuta do Contexto Clínico */}
         <div className="flex items-center gap-2.5 px-1 min-w-0">
-          <Icon name={activeTabInfo.icon} size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+          <Icon name={activeTabInfo.icon} size={18} className="text-[var(--ink-clinical)] shrink-0" />
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-semibold text-[var(--text-main)]">
                 Central de documentos clínicos
               </span>
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[var(--surface-info-subtle)] text-sky-700 dark:text-sky-300 border border-[var(--border-info-subtle)] clinical-tabular-nums">
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] clinical-tabular-nums">
                 {activeTabInfo.regulatoryTag}
               </span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${hasPatient ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${hasPatient ? 'bg-[var(--clinical)]' : 'bg-amber-500'}`} />
               <span className="text-xs font-medium text-[var(--text-secondary)] truncate">
                 {hasPatient ? patientName : 'Vincule um paciente para emissão'}
               </span>
               {hasPatient && patient.weightKg > 0 && (
-                <span className="text-xs font-semibold text-sky-700 dark:text-sky-300 clinical-unit clinical-tabular-nums shrink-0">
+                <span className="text-xs font-semibold text-[var(--ink-clinical)] clinical-unit clinical-tabular-nums shrink-0">
                   • {patient.weightKg.toLocaleString('pt-BR')} kg
                 </span>
               )}
@@ -206,7 +206,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => handleChangeSubTab(tab.id)}
                 onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
-                className={`touch-target min-h-[44px] w-full sm:w-auto min-w-0 px-2.5 sm:px-4 rounded-xl border text-xs flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 transition cursor-pointer sm:shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                className={`touch-target min-h-[44px] w-full sm:w-auto min-w-0 px-2.5 sm:px-4 rounded-xl border text-xs flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 transition cursor-pointer sm:shrink-0 whitespace-nowrap active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
                   isActive
                     ? 'bg-[var(--pill-active-bg)] border-[var(--pill-active-border)] text-white font-bold shadow-tactile-sm'
                     : 'bg-transparent border-transparent text-[var(--text-secondary)] hover:text-[var(--text-main)] hover:bg-[oklch(0.20_0.02_255/0.04)] dark:hover:bg-white/[0.06] font-semibold'
@@ -216,7 +216,7 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
                   name={tab.icon}
                   size={16}
                   filled={isActive}
-                  className={`shrink-0 ${isActive ? 'text-sky-300 dark:text-white' : 'text-sky-600 dark:text-sky-400 opacity-85'}`}
+                  className={`shrink-0 ${isActive ? 'text-teal-200 dark:text-white' : 'text-[var(--ink-clinical)] opacity-90'}`}
                 />
                 <span className="truncate">{tab.label}</span>
                 {tab.badge && (

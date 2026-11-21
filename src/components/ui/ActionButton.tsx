@@ -46,7 +46,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       data-state={resolvedState}
       aria-busy={isLoading || undefined}
       disabled={disabled || isLoading}
-      className={`min-h-[44px] min-w-[44px] btn-anti-squish inline-flex items-center justify-center gap-1.5 text-xs focus-visible:ring-2 focus-visible:ring-sky-500 outline-none disabled:opacity-40 disabled:cursor-not-allowed ${
+      className={`min-h-[44px] min-w-[44px] btn-anti-squish inline-flex items-center justify-center gap-1.5 text-xs focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none disabled:opacity-60 disabled:cursor-not-allowed ${
         VARIANT_CLASSES[variant]
       } ${tabular ? 'tabular-nums clinical-tabular-nums' : ''} ${className}`.trim()}
       {...rest}

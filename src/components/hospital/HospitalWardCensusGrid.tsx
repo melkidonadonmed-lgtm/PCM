@@ -86,7 +86,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por leito (110-15), paciente ou diagnóstico..."
               aria-label="Buscar leito por código, paciente ou diagnóstico"
-              className="w-full h-9 pl-9 pr-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-medium text-[var(--text-main)]"
+              className="w-full h-11 min-h-[44px] pl-9 pr-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
             />
           </div>
           {(searchQuery || selectedSpecialty !== 'all') && (
@@ -115,7 +115,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
             onClick={() => setSelectedSpecialty('all')}
             className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
               selectedSpecialty === 'all'
-                ? 'bg-sky-600/15 border border-sky-500/40 text-sky-700 dark:text-sky-300'
+                ? 'bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)]'
                 : 'bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
           >
@@ -132,7 +132,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                 onClick={() => setSelectedSpecialty(spec.id)}
                 className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer clinical-tabular-nums ${
                   isActive
-                    ? 'bg-sky-600/15 border border-sky-500/40 text-sky-700 dark:text-sky-300 font-bold'
+                    ? 'bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)] font-bold'
                     : 'bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                 }`}
               >
@@ -144,45 +144,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
       </div>
 
       {/* Grade de Cards de Leitos + Card de Nova Admissão */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 items-stretch">
-        {/* Card de Admissão Guiada de Novo Paciente */}
-        <div className="rounded-2xl border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] hover:bg-[var(--surface-hover)] transition p-3.5 sm:p-4 flex flex-col justify-between gap-3">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <span className="w-10 h-10 rounded-xl bg-sky-600/15 border border-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center">
-                <Icon name="person_add" size={20} />
-              </span>
-              <Badge tone="clinical">Novo Leito</Badge>
-            </div>
-            <h2 className="text-sm sm:text-base font-extrabold text-[var(--text-main)]">
-              + Admitir Novo Paciente
-            </h2>
-            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-              Adicione um paciente à enfermaria informando os dados essenciais (EF/LT, Nome, DN e
-              Diagnóstico) ou cole a nota de admissão para extração estruturada automática.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => onOpenQuickAdmissionModal('manual')}
-              className="btn-tactile-primary h-10 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <Icon name="add" size={16} />
-              <span>Cadastro Rápido</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onOpenQuickAdmissionModal('multimodal')}
-              className="btn-tactile-secondary h-10 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <Icon name="auto_awesome" size={15} className="text-sky-600 dark:text-sky-400" />
-              <span>Colar Prontuário / IA</span>
-            </button>
-          </div>
-        </div>
-
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${filteredBeds.length >= 3 ? 'xl:grid-cols-3' : ''} gap-3 items-stretch`}>
         {/* Cards Clínicos dos Leitos Ocupados */}
         {filteredBeds.map((bed) => {
           const stayDays = calculateHospitalStayDays(bed.dihDateBr);
@@ -203,7 +165,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
               aria-label={`Leito ${bed.wardAndBed} — ${bed.patientNameOrInitials || 'Sem identificação'}`}
               className={`cq-card card-surface surface-card-minimal rounded-2xl border p-3.5 sm:p-4 flex flex-col justify-between gap-3 transition ${
                 isSelected
-                  ? 'border-sky-500/60 ring-1 ring-sky-500/25 shadow-elevation-medium'
+                  ? 'border-[var(--border-clinical-subtle)] border-l-[3px] border-l-[var(--clinical)] shadow-elevation-medium'
                   : 'border-subtle dark:border-strong'
               }`}
             >
@@ -211,7 +173,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                 {/* Topo: EF/LT, Especialidade e Dias de Internação */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="px-2.5 py-1 rounded-lg bg-sky-600/15 border border-sky-500/35 text-xs font-extrabold text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                    <span className="px-2.5 py-1 rounded-lg bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)] text-xs font-extrabold text-[var(--text-main)] clinical-tabular-nums whitespace-nowrap">
                       EF/LT {bed.wardAndBed}
                     </span>
                     <span className="text-[11px] font-semibold text-[var(--text-muted)] truncate">
@@ -250,9 +212,9 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                 {/* Pílulas de Segurança Clínica: Alergias, Medicações em Uso, Escores e Pendências */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                   {hasDocumentedAllergy ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--accent-rose-subtle)] border border-[var(--accent-rose-border)] text-[11px] font-bold text-rose-800 dark:text-rose-200">
-                      <Icon name="warning" size={13} />
-                      <span className="truncate max-w-48">Alergia: {bed.allergiesText}</span>
+                    <span className="w-full flex items-start gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--accent-rose-subtle)] border border-[var(--accent-rose-border)] text-[11px] font-bold text-rose-800 dark:text-rose-200 leading-snug">
+                      <Icon name="warning" size={14} className="shrink-0 mt-0.5" />
+                      <span className="break-words">Alergia: {bed.allergiesText}</span>
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[11px] font-medium text-[var(--text-muted)]">
@@ -266,7 +228,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                   </span>
 
                   {latestScore && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] text-[11px] font-bold text-blue-800 dark:text-blue-200 clinical-tabular-nums">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[11px] font-bold text-[var(--ink-clinical)] clinical-tabular-nums">
                       <Icon name="monitor_heart" size={13} />
                       <span>
                         {latestScore.acronym}: {latestScore.scoreFormatted} pts
@@ -287,7 +249,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenBedSubView(bed.id, 'evolution_form')}
-                className="touch-target btn-tactile-primary flex-1 min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                className={`touch-target ${isSelected ? 'btn-tactile-clinical' : 'btn-tactile-secondary'} flex-1 min-h-[44px] px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0`}
               >
                 <Icon name="clinical_notes" size={15} />
                 <span>Evoluir Leito</span>
@@ -297,7 +259,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                 type="button"
                 onClick={() => onOpenBedSubView(bed.id, 'longitudinal_labs')}
                 title="Ver curva de exames laboratoriais"
-                className="touch-target btn-tactile-secondary min-h-[44px] px-2.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer clinical-tabular-nums"
+                className="touch-target btn-tactile-secondary min-h-[44px] px-2.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer clinical-tabular-nums whitespace-nowrap shrink-0"
               >
                 <Icon name="biotech" size={14} />
                 <span>Exames ({bed.labPanels.length})</span>
@@ -328,7 +290,78 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
             </article>
           );
         })}
+
+        {/* Estado vazio de Admissão Guiada quando nenhum leito corresponde ao filtro */}
+        {filteredBeds.length === 0 && (
+          <div className="md:col-span-2 xl:col-span-3 card-surface rounded-2xl border border-[var(--border-subtle)] p-4 flex flex-col justify-between gap-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="w-10 h-10 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] flex items-center justify-center">
+                  <Icon name="person_add" size={20} />
+                </span>
+                <Badge tone="neutral">Novo Leito</Badge>
+              </div>
+              <h2 className="text-sm sm:text-base font-extrabold text-[var(--text-main)]">
+                + Admitir Novo Paciente
+              </h2>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                Adicione um paciente à enfermaria informando os dados essenciais (EF/LT, Nome, DN e
+                Diagnóstico) ou cole a nota de admissão para extração estruturada automática.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => onOpenQuickAdmissionModal('manual')}
+                className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <Icon name="add" size={16} />
+                <span>Cadastro Rápido</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenQuickAdmissionModal('multimodal')}
+                className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <Icon name="upload" size={15} className="text-[var(--text-muted)]" />
+                <span>Colar Prontuário / IA</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Faixa silenciosa de admissão quando já existem leitos ocupados no censo */}
+      {filteredBeds.length > 0 && (
+        <div className="mt-1 px-4 py-2.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Icon name="person_add" size={16} className="text-[var(--ink-clinical)] shrink-0" />
+            <h2 className="text-xs font-bold text-[var(--text-main)]">+ Admitir Novo Paciente</h2>
+            <span className="hidden sm:inline text-xs text-[var(--text-muted)]">
+              • Adicione um novo leito ou extraia dados de prontuário
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onOpenQuickAdmissionModal('manual')}
+              className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+            >
+              <Icon name="add" size={15} />
+              <span>Cadastro Rápido</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenQuickAdmissionModal('multimodal')}
+              className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+            >
+              <Icon name="upload" size={14} className="text-[var(--text-muted)]" />
+              <span>Colar Prontuário / IA</span>
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

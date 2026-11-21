@@ -66,7 +66,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
     >
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
-          <Icon name="prescriptions" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+          <Icon name="prescriptions" size={18} className="text-[var(--ink-clinical)] shrink-0" />
           <h3 className="text-sm font-semibold text-[var(--text-main)]">
             Medicamentos prescritos
           </h3>
@@ -84,10 +84,10 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
           <button
             type="button"
             onClick={onOpenModelsModal}
-            className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-3"
+            className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 px-3"
             title="Abrir biblioteca de modelos de receitas salvos"
           >
-            <Icon name="folder_open" size={15} className="text-sky-600 dark:text-sky-400" />
+            <Icon name="folder_open" size={15} className="text-[var(--text-muted)]" />
             <span>Modelos</span>
             {savedModelsCount > 0 && (
               <span className="px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold clinical-tabular-nums">
@@ -100,20 +100,20 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
             <button
               type="button"
               onClick={onOpenSaveModelModal}
-              className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-3"
+              className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 px-3"
               title="Salvar esta combinação de medicamentos como um modelo reutilizável"
             >
-              <Icon name="bookmark_add" size={15} className="text-sky-600 dark:text-sky-400" />
+              <Icon name="bookmark_add" size={15} className="text-[var(--text-muted)]" />
               <span>Salvar modelo</span>
             </button>
           ) : (
             <button
               type="button"
               onClick={onOpenCreateCustomModel}
-              className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 px-3"
+              className="touch-target chip-neutral min-h-[44px] min-w-[44px] py-2 text-xs inline-flex items-center gap-1.5 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 px-3"
               title="Criar e salvar um novo modelo de receita reutilizável mesmo sem receita ativa na consulta"
             >
-              <Icon name="add" size={15} className="text-sky-600 dark:text-sky-400" />
+              <Icon name="add" size={15} className="text-[var(--text-muted)]" />
               <span>Novo modelo</span>
             </button>
           )}
@@ -150,8 +150,8 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
       )}
 
       {items.length === 0 ? (
-        <div className="p-6 text-center rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-[var(--text-muted)] text-xs">
-          Nenhum medicamento adicionado ainda. Busque acima ou aplique um kit de plantão na barra lateral.
+        <div className="p-5 text-center rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-muted)] text-xs leading-relaxed">
+          Nenhum medicamento prescrito ainda. Busque um fármaco acima ou escolha uma prescrição pronta em Modelos.
         </div>
       ) : (
         <div className="space-y-2">
@@ -165,7 +165,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                 key={it.id}
                 className={`p-3 rounded-xl border flex items-start justify-between gap-3 shadow-tactile-sm transition ${
                   isEditing
-                    ? 'bg-[var(--surface-chip-muted)] border-[var(--border-info-subtle)] ring-1 ring-sky-500/40'
+                    ? 'bg-[var(--surface-clinical-subtle)] border-[var(--border-clinical-subtle)] ring-1 ring-teal-600/30 dark:ring-teal-400/30'
                     : 'bg-[var(--surface-inset)] border border-subtle dark:border-strong'
                 }`}
               >
@@ -173,7 +173,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span
                       className={`w-5 h-5 rounded-full text-white text-xs font-black flex items-center justify-center shrink-0 clinical-tabular-nums ${
-                        isEditing ? 'bg-sky-600' : 'bg-navy-800 dark:bg-navy-700'
+                        isEditing ? 'bg-[var(--clinical)]' : 'bg-navy-800 dark:bg-navy-700'
                       }`}
                     >
                       {idx + 1}
@@ -218,9 +218,9 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                   <button
                     type="button"
                     onClick={() => onStartEdit(it)}
-                    className={`touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg transition focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer ${
+                    className={`touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg transition focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 cursor-pointer ${
                       isEditing
-                        ? 'bg-sky-600 text-white shadow-tactile-sm'
+                        ? 'bg-[var(--clinical)] text-white shadow-tactile-sm'
                         : 'hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
                     }`}
                     title="Editar este medicamento diretamente"
@@ -232,7 +232,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                     type="button"
                     onClick={() => onMoveItem(idx, 'up')}
                     disabled={idx === 0}
-                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
+                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 cursor-pointer"
                     title="Mover para cima"
                     aria-label={`Mover ${it.name} para cima`}
                   >
@@ -242,7 +242,7 @@ export const PrescribedItemsList: React.FC<PrescribedItemsListProps> = ({
                     type="button"
                     onClick={() => onMoveItem(idx, 'down')}
                     disabled={idx === items.length - 1}
-                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer"
+                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 cursor-pointer"
                     title="Mover para baixo"
                     aria-label={`Mover ${it.name} para baixo`}
                   >

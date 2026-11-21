@@ -60,12 +60,14 @@ const ClinicalDocumentsHub = React.lazy(() =>
 const ClinicalProtocolsView = React.lazy(() =>
   import('../ClinicalProtocolsView').then((m) => ({ default: m.ClinicalProtocolsView }))
 );
-const ScoreboardModuleView = React.lazy(() =>
-  import('../scores/ScoreboardModuleView').then((m) => ({ default: m.ScoreboardModuleView }))
-);
-const HospitalWardModuleView = React.lazy(() =>
-  import('../hospital/HospitalWardModuleView').then((m) => ({ default: m.HospitalWardModuleView }))
-);
+export const loadScoreboardModule = () =>
+  import('../scores/ScoreboardModuleView').then((m) => ({ default: m.ScoreboardModuleView }));
+
+export const loadHospitalWardModule = () =>
+  import('../hospital/HospitalWardModuleView').then((m) => ({ default: m.HospitalWardModuleView }));
+
+const ScoreboardModuleView = React.lazy(loadScoreboardModule);
+const HospitalWardModuleView = React.lazy(loadHospitalWardModule);
 
 const ONCOLOGY_SCREENING_EXAM_LABELS: Record<string, string> = {
   mamografia: 'Mamografia Bilateral para Rastreamento (SIGTAP 02.04.03.018-8)',
@@ -257,7 +259,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
   onShowToast,
 }) => {
   return (
-    <main id="conteudo-principal" tabIndex={-1} className="flex-1 min-w-0 pb-20 lg:pb-6 focus:outline-none">
+    <main id="conteudo-principal" tabIndex={-1} className="flex-1 min-w-0 pb-28 lg:pb-6 focus:outline-none">
       <LgpdLocalModeNotice
         isCloudAuthenticated={Boolean(cloudUser)}
         sharedComputerMode={lgpdConsent.sharedComputerMode}
@@ -281,6 +283,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
         onOpenPatientModal={handleOpenPatientModal}
         onOpenCommandPalette={handleOpenCommandPalette}
         compactOnDesktop={true}
+        hideSearchTrigger={true}
       />
       <div
         key={activeTab === 'documents' && documentsSubTab === 'sus' ? 'documents-sus' : activeTab}
@@ -316,7 +319,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
         )}
 
         {activeTab === 'pediatric_calc' && (
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className="min-h-[60vh] bg-[var(--bg-main)]" aria-busy="true" />}>
             <PediatricCalculator
               darkMode={darkMode}
               patient={patient}
@@ -328,7 +331,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
         )}
 
         {(activeTab === 'documents' || activeTab === 'certificate' || activeTab === 'referral' || activeTab === 'exams' || activeTab === 'sus') && (
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className="min-h-[60vh] bg-[var(--bg-main)]" aria-busy="true" />}>
             <ClinicalDocumentsHub
               darkMode={darkMode}
               patient={patient}
@@ -355,7 +358,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
         )}
 
         {activeTab === 'protocols' && (
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className="min-h-[60vh] bg-[var(--bg-main)]" aria-busy="true" />}>
             <ClinicalProtocolsView
               darkMode={darkMode}
               patient={patient}
@@ -370,7 +373,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
         )}
 
         {activeTab === 'scores' && (
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className="min-h-[60vh] bg-[var(--bg-main)]" aria-busy="true" />}>
             <ScoreboardModuleView
               patient={patient}
               initialCalculatorId={selectedScoreboardId}
@@ -398,7 +401,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
         )}
 
         {activeTab === 'hospital' && (
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className="min-h-[60vh] bg-[var(--bg-main)]" aria-busy="true" />}>
             <HospitalWardModuleView
               darkMode={darkMode}
               doctor={doctor}

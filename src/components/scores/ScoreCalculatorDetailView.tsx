@@ -47,12 +47,12 @@ interface ScoreCalculatorDetailViewProps {
 }
 
 const SEVERITY_BADGE_CLASSES: Record<RiskSeverityLevel, string> = {
-  low: 'border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300',
+  low: 'border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)]',
   intermediate:
-    'border-amber-500/40 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300',
-  high: 'border-orange-500/40 bg-orange-50 dark:bg-orange-950/40 text-orange-800 dark:text-orange-300',
+    'border-[var(--accent-amber-border)] bg-[var(--accent-amber-subtle)] text-amber-800 dark:text-amber-200',
+  high: 'border-orange-600/35 bg-orange-50 dark:bg-orange-950/35 text-orange-900 dark:text-orange-200',
   critical:
-    'border-red-500/50 bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300',
+    'border-[var(--accent-rose-border)] bg-[var(--accent-rose-subtle)] text-rose-800 dark:text-rose-200',
 };
 
 export const ScoreCalculatorDetailView: React.FC<
@@ -224,10 +224,10 @@ export const ScoreCalculatorDetailView: React.FC<
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="rounded-md bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] px-2 py-0.5 font-mono text-[11px] font-bold text-sky-700 dark:text-sky-300">
+              <span className="rounded-md bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] px-2 py-0.5 font-mono text-[11px] font-bold text-[var(--ink-clinical)]">
                 {calculator.acronym}
               </span>
-              <span className="text-[11px] font-medium text-[var(--text-muted)] truncate max-w-md">
+              <span className="text-[11px] font-medium text-[var(--text-muted)] leading-snug">
                 {calculator.categoryName ?? calculator.category} •{' '}
                 {calculator.moduleName ?? calculator.subcategory}
               </span>
@@ -247,11 +247,11 @@ export const ScoreCalculatorDetailView: React.FC<
                   }
                   className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
                     isFavorite
-                      ? 'border-amber-500/40 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
+                      ? 'border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)]'
                       : 'border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  <Icon name="star" size={12} />
+                  <Icon name="bookmark_add" size={12} filled={isFavorite} />
                   <span>{isFavorite ? 'Fixado' : 'Fixar'}</span>
                 </button>
                 <button
@@ -269,7 +269,7 @@ export const ScoreCalculatorDetailView: React.FC<
               <Icon
                 name="calculate"
                 size={18}
-                className="text-sky-600 dark:text-sky-400 shrink-0"
+                className="text-[var(--ink-clinical)] shrink-0"
               />
               <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)]">
                 {calculator.name}
@@ -325,7 +325,7 @@ export const ScoreCalculatorDetailView: React.FC<
               <button
                 type="button"
                 onClick={() => onOpenScoreBySlug('sofa')}
-                className="touch-target min-h-[44px] shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700 cursor-pointer"
+                className="touch-target min-h-[44px] shrink-0 rounded-lg border border-[var(--accent-amber-border)] bg-[var(--surface-card)] px-3 py-1.5 text-xs font-bold text-amber-900 dark:text-amber-200 hover:bg-[var(--accent-amber-subtle)] cursor-pointer transition-colors"
               >
                 Abrir SOFA Completo
               </button>
@@ -367,7 +367,7 @@ export const ScoreCalculatorDetailView: React.FC<
                   <Icon
                     name="shield_with_heart"
                     size={18}
-                    className="text-sky-600 dark:text-sky-400 shrink-0"
+                    className="text-[var(--ink-clinical)] shrink-0"
                   />
                   <h3 className="text-sm font-semibold text-[var(--text-main)]">
                     2. Estratificação de Risco e Plano Terapêutico Imediato
@@ -444,7 +444,7 @@ export const ScoreCalculatorDetailView: React.FC<
             {activeTier.pharmacologicalActions.length > 0 ? (
               <div className="space-y-2.5">
                 <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  <Icon name="medication" className="text-sm text-blue-600" />
+                  <Icon name="medication" className="text-sm text-[var(--ink-clinical)]" />
                   Prescrição Farmacológica Guiada pelo Escore
                 </h4>
                 {activeTier.pharmacologicalActions.map((rx) => {
@@ -462,7 +462,7 @@ export const ScoreCalculatorDetailView: React.FC<
                           <span className="text-sm font-bold text-slate-900 dark:text-white">
                             {rx.drugName}
                           </span>
-                          <div className="mt-0.5 font-mono text-xs font-semibold text-blue-700 dark:text-blue-300 clinical-tabular-nums">
+                          <div className="mt-0.5 font-mono text-xs font-semibold text-[var(--ink-clinical)] clinical-tabular-nums">
                             {rx.dosage} • {rx.route} • {rx.frequency}
                           </div>
                         </div>
@@ -474,8 +474,8 @@ export const ScoreCalculatorDetailView: React.FC<
                               onClick={() => handlePrescribeDrug(rx)}
                               className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
                                 alreadyPrescribed
-                                  ? 'border-emerald-600 bg-emerald-600 text-white'
-                                  : 'border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-100'
+                                  ? 'border-[var(--clinical)] bg-[var(--clinical)] text-white'
+                                  : 'border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] hover:opacity-90'
                               }`}
                             >
                               <Icon
@@ -498,8 +498,8 @@ export const ScoreCalculatorDetailView: React.FC<
                               }
                               className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
                                 isBicOpen
-                                  ? 'border-blue-600 bg-blue-600 text-white'
-                                  : 'border-blue-500/40 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100'
+                                  ? 'border-[var(--ink-accent)] bg-[var(--ink-accent)] text-white dark:text-slate-950'
+                                  : 'border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
                               }`}
                             >
                               <Icon name="calculate" className="text-sm" />

@@ -17,25 +17,34 @@ interface ScorePhysiologicalRadarProps {
   size?: number;
 }
 
+const formatRadarAxisLabel = (label: string): string => {
+  const compact = label
+    .replace(/Pressão Arterial Sistólica/gi, 'PA Sistólica')
+    .replace(/Frequência Respiratória/gi, 'Freq. Respiratória')
+    .replace(/Frequência Cardíaca/gi, 'Freq. Cardíaca')
+    .replace(/Nível de Consciência/gi, 'Consciência');
+  return compact.length > 22 ? `${compact.slice(0, 20)}…` : compact;
+};
+
 const SEVERITY_COLORS: Record<
   RiskSeverityLevel,
   { stroke: string; fill: string }
 > = {
   low: {
-    stroke: '#10b981',
-    fill: 'rgba(16, 185, 129, 0.22)',
+    stroke: '#0F766E',
+    fill: 'rgba(15, 118, 110, 0.20)',
   },
   intermediate: {
-    stroke: '#f59e0b',
-    fill: 'rgba(245, 158, 11, 0.24)',
+    stroke: '#B45309',
+    fill: 'rgba(180, 83, 9, 0.22)',
   },
   high: {
-    stroke: '#f97316',
-    fill: 'rgba(249, 115, 22, 0.26)',
+    stroke: '#C2410C',
+    fill: 'rgba(194, 65, 12, 0.24)',
   },
   critical: {
-    stroke: '#ef4444',
-    fill: 'rgba(239, 68, 68, 0.28)',
+    stroke: '#9F1239',
+    fill: 'rgba(159, 18, 57, 0.24)',
   },
 };
 
@@ -49,7 +58,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
 
   const centerX = size / 2;
   const centerY = size / 2;
-  const maxRadius = size * 0.31;
+  const maxRadius = size * 0.27;
   const baselineRatio = 0.22;
 
   const gridRings = generateGridRings(axes, centerX, centerY, maxRadius, [
@@ -91,7 +100,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
         </span>
         <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
           <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500/40 ring-1 ring-emerald-500" />
+            <span className="inline-block h-2 w-2 rounded-full bg-teal-700/35 ring-1 ring-teal-700 dark:ring-teal-400" />
             Basal
           </span>
           <span className="flex items-center gap-1">
@@ -107,7 +116,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
       <svg
         width="100%"
         height="100%"
-        viewBox={`-36 -6 ${size + 72} ${size + 12}`}
+        viewBox={`-62 -18 ${size + 124} ${size + 42}`}
         className="max-h-64 w-full max-w-[340px] overflow-visible select-none"
         role="img"
         aria-label="Gráfico polar de desvio fisiológico multissistêmico"
@@ -139,8 +148,8 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
 
         <polygon
           points={baselinePoints}
-          fill="rgba(16, 185, 129, 0.08)"
-          stroke="#10b981"
+          fill="rgba(15, 118, 110, 0.08)"
+          stroke="#0F766E"
           strokeWidth={1.25}
           strokeDasharray="3 2"
         />
@@ -173,7 +182,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
               cx={pt.x}
               cy={pt.y}
               r={val > 0 ? 4 : 3}
-              fill={val > 0 ? colors.stroke : '#10b981'}
+              fill={val > 0 ? colors.stroke : '#0F766E'}
               stroke="#0f172a"
               strokeWidth={1.2}
               style={{
@@ -194,7 +203,7 @@ export const ScorePhysiologicalRadar: React.FC<ScorePhysiologicalRadarProps> = (
                 dominantBaseline={lbl.dominantBaseline}
                 className="fill-slate-700 dark:fill-slate-200 text-[11px] font-semibold"
               >
-                {lbl.label.length > 24 ? `${lbl.label.slice(0, 22)}…` : lbl.label}
+                {formatRadarAxisLabel(lbl.label)}
               </text>
               <text
                 x={lbl.x}

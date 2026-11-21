@@ -127,7 +127,7 @@ export const FolhaA4: React.FC<FolhaA4Props> = ({
             <button
               type="button"
               onClick={() => setInspecaoReal((v) => !v)}
-              className="touch-target min-w-[44px] min-h-[44px] px-2 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--ink-accent)] font-bold cursor-pointer transition-colors inline-flex items-center justify-center focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="touch-target min-w-[44px] min-h-[44px] px-2 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--ink-clinical)] font-bold cursor-pointer transition-colors inline-flex items-center justify-center focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none"
               title={inspecaoReal ? 'Ajustar folha à largura do painel' : 'Inspecionar folha em tamanho real (100%)'}
             >
               {inspecaoReal ? 'Ajustar' : '100%'}

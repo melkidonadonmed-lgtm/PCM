@@ -97,7 +97,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: BEG, LOTE, corado, hidratado"
             aria-label="Exame físico geral"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
 
@@ -117,7 +117,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: PA 120/80 mmHg | FC 76 bpm | SpO2 97%"
             aria-label="Sinais vitais"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
 
@@ -137,7 +137,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: MV+ bilateral sem ruídos adventícios"
             aria-label="Aparelho respiratório"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
 
@@ -157,7 +157,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: RCR 2T BNF sem sopros"
             aria-label="Aparelho cardiovascular"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
 
@@ -177,7 +177,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: Plano, flácido, RHA+, indolor"
             aria-label="Abdome"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
 
@@ -200,7 +200,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: Panturrilhas livres, sem edema"
             aria-label="Membros e anexos"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
       </div>
@@ -233,7 +233,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
               }}
               placeholder={`Ex.: ${sec.title} — achados detalhados`}
               aria-label={sec.title}
-              className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+              className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
             />
           </div>
         ))}
@@ -247,7 +247,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             onChange={(e) => setNewFreeCategoryTitle(e.target.value)}
             placeholder="Adicionar seção específica (ex.: EXAME ORTOPÉDICO, NEUROLÓGICO, VM...)"
             aria-label="Título de nova categoria livre"
-            className="flex-1 h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="flex-1 h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
           <button
             type="button"
@@ -275,7 +275,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             onChange={(e) => updateField('dietDescription', e.target.value)}
             placeholder="Ex.: Dieta branda hipossódica via oral"
             aria-label="Dieta"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
 
@@ -300,7 +300,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: SF 0,9% 1000 mL EV 24/24h"
             aria-label="Hidratação"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
 
@@ -326,7 +326,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: Avaliar switch oral; Checar cultura"
             aria-label="Pendências"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
 
@@ -352,7 +352,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: Manter ATB D4/D7; Manter profilaxia TEV"
             aria-label="Condutas"
-            className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
           />
         </div>
       </div>

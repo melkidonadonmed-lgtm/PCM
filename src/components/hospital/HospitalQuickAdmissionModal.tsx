@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon } from '../Icon';
 import { Badge } from '../ui/Badge';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
@@ -178,7 +179,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
     onClose();
   };
 
-  return (
+  const modalMarkup = (
     <div
       role="dialog"
       aria-modal="true"
@@ -197,15 +198,15 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
         {/* Cabeçalho do Modal */}
         <div className="px-5 py-3.5 border-b border-[var(--border-subtle)] flex items-center justify-between gap-3 bg-[var(--surface-inset)]">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-9 h-9 rounded-xl bg-sky-600/15 border border-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+            <span className="w-9 h-9 rounded-xl bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)] flex items-center justify-center shrink-0">
               <Icon name="person_add" size={18} />
             </span>
             <div className="min-w-0">
-              <h2 id="hospital-quick-admission-title" className="text-sm sm:text-base font-bold truncate">
+              <h2 id="hospital-quick-admission-title" className="text-sm sm:text-base font-bold leading-snug">
                 Nova Admissão de Paciente no Mapa de Leitos
               </h2>
-              <p className="text-xs text-[var(--text-muted)] truncate">
-                Cadastre um novo leito manualmente em segundos ou extraia de um prontuário colado sem sobrescrever outros pacientes
+              <p className="text-xs text-[var(--text-muted)] leading-snug">
+                Cadastre um novo leito ou extraia dados de um prontuário colado.
               </p>
             </div>
           </div>
@@ -243,7 +244,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold'
               }`}
             >
-              <Icon name="auto_awesome" size={15} />
+              <Icon name="upload" size={15} />
               <span>B. Colar Prontuário / IA (Novo Leito)</span>
             </button>
           </div>
@@ -448,7 +449,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={wardAndBed}
                     onChange={(e) => setWardAndBed(e.target.value)}
                     placeholder="Ex.: 110-18 (ou extraído do texto)"
-                    className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-bold clinical-tabular-nums"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
                   />
                 </div>
                 <div>
@@ -462,7 +463,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     id="quick-adm-mm-specialty"
                     value={specialty}
                     onChange={(e) => setSpecialty(e.target.value as HospitalSpecialtyTemplate)}
-                    className="w-full h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-semibold"
+                    className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
                   >
                     {HOSPITAL_SPECIALTY_OPTIONS.map((opt) => (
                       <option key={opt.id} value={opt.id}>
@@ -542,7 +543,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                   onClick={handleConfirmMultimodalNewBed}
                   className="btn-tactile-primary h-10 px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  <Icon name="auto_awesome" size={16} />
+                  <Icon name="upload" size={16} />
                   <span>Criar Novo Leito com Dados Extraídos</span>
                 </button>
               </div>
@@ -552,4 +553,6 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalMarkup, document.body) : modalMarkup;
 };

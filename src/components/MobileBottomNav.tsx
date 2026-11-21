@@ -78,14 +78,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             id={`mobile-nav-${item.id}`}
             onClick={() => onSelectTab(item.id)}
             aria-current={isActive ? 'page' : undefined}
-            className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none ${
-              isActive ? 'nav-item-active sidebar-active-surface' : 'opacity-80 hover:opacity-100'
+            className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 py-1.5 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none ${
+              isActive ? 'bg-white/[0.08]' : 'opacity-80 hover:opacity-100'
             }`}
           >
             {isActive && (
               <span
                 aria-hidden="true"
-                className="absolute top-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-slate-300"
+                className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-teal-400"
               />
             )}
             <div className="relative">
@@ -93,10 +93,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 name={item.iconName}
                 filled={isActive}
                 className="text-[20px] transition-colors"
-                style={{ color: isActive ? '#F8FAFC' : 'var(--surface-panel-muted)' }}
+                style={{ color: isActive ? '#2DD4BF' : 'var(--surface-panel-muted)' }}
               />
               {item.badge && (
-                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[11px] flex items-center justify-center bg-sky-500/30 text-sky-100 border border-sky-400/30 clinical-unit clinical-tabular-nums">
+                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[11px] flex items-center justify-center bg-teal-500/30 text-teal-100 border border-teal-400/30 clinical-unit clinical-tabular-nums">
                   {item.badge}
                 </span>
               )}
@@ -120,14 +120,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         aria-expanded={sidebarOpen}
         aria-controls="prescmed-sidebar"
         aria-label="Mais opções"
-        className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none ${
-          isMoreActive ? 'nav-item-active' : 'opacity-80 hover:opacity-100'
+        className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 py-1.5 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none ${
+          isMoreActive ? 'bg-white/[0.08]' : 'opacity-80 hover:opacity-100'
         }`}
-        style={
-          isMoreActive
-            ? { backgroundColor: 'var(--surface-panel-hover)' }
-            : {}
-        }
       >
         <div className="relative">
           <Icon

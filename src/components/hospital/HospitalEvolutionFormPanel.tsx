@@ -181,7 +181,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
                 value={newMedStatus}
                 onChange={(e) => setNewMedStatus(e.target.value as 'em_uso' | 'fez_uso')}
                 aria-label="Status de uso"
-                className="w-full h-9 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-bold"
+                className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
               >
                 <option value="em_uso">EM USO</option>
                 <option value="fez_uso">FEZ USO</option>
@@ -201,7 +201,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
                 onChange={(e) => setNewMedName(e.target.value)}
                 placeholder="Ex.: Ceftriaxona 1 g EV 12/12h"
                 aria-label="Medicação ou dispositivo"
-                className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
               />
             </div>
             <div className="sm:col-span-3">
@@ -218,7 +218,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
                 onChange={(e) => setNewMedDuration(e.target.value)}
                 placeholder="Ex.: D4/D7 (20/10)"
                 aria-label="Tempo e data"
-                className="w-full h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
               />
             </div>
             <button

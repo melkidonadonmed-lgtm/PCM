@@ -144,7 +144,7 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
               id="chat-instant-bed-selector"
               value={activeBed.id}
               onChange={(e) => onSelectBed(e.target.value)}
-              className="h-9 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-bold text-[var(--text-main)] clinical-tabular-nums"
+              className="h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold text-[var(--text-main)] clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
             >
               {allBeds.map((b) => (
                 <option key={b.id} value={b.id}>

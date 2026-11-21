@@ -82,7 +82,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
     <section className="cq-card card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 space-y-2 border border-subtle dark:border-strong">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Icon name="medication" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+          <Icon name="medication" size={18} className="text-[var(--ink-clinical)] shrink-0" />
           <h2 className="text-sm font-semibold text-[var(--text-main)]">
             Prescrição
           </h2>
@@ -93,7 +93,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
       {editingItemId && (
         <div className="p-2.5 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)] flex items-center justify-between gap-3 text-xs text-[var(--text-secondary)] shadow-tactile-sm animate-in fade-in duration-150">
           <div className="flex items-center gap-2 min-w-0">
-            <Icon name="edit" size={16} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="edit" size={16} className="text-[var(--ink-clinical)] shrink-0" />
             <span className="font-semibold truncate">
               Modo de edição: <strong className="text-[var(--text-main)]">{selectedMedName || 'Medicamento'}</strong>. Altere os campos e salve a alteração.
             </span>
@@ -118,7 +118,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                 Fármaco ou princípio ativo *
               </label>
               {selectedMedName.trim() && selectedRegime !== 'simples' && (
-                <span className="text-[11px] font-semibold text-sky-600 dark:text-sky-400 hidden sm:inline shrink-0">
+                <span className="text-[11px] font-semibold text-[var(--ink-clinical)] hidden sm:inline shrink-0">
                   {regimeLabels[selectedRegime].rotulo} • 2 vias automático
                 </span>
               )}
@@ -143,8 +143,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                 onFocus={onFocusSearch}
                 onBlur={onBlurSearch}
                 onKeyDown={onMedInputKeyDown}
-                placeholder="Ex.: Dipirona 500 mg, Amoxicilina, Losartana..."
-                className="w-full h-11 min-h-[44px] pl-8 pr-20 bg-[var(--surface-inset)] border border-subtle dark:border-strong rounded-xl text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition placeholder:text-[var(--text-placeholder)] placeholder:font-normal shadow-tactile-sm"
+                placeholder="Buscar medicamento (ex.: Dipirona, Amoxicilina)..."
+                className="w-full h-11 min-h-[44px] pl-8 pr-12 bg-[var(--surface-inset)] border border-[var(--border-control)] rounded-lg text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 transition placeholder:text-[var(--text-placeholder)] placeholder:font-normal shadow-tactile-sm"
               />
               {selectedMedName ? (
                 <div className="absolute right-0.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
@@ -154,16 +154,12 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                     onClick={onClearMedication}
                     aria-label="Limpar medicamento"
                     title="Limpar medicamento"
-                    className="text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500"
+                    className="text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
                   >
                     <Icon name="close" size={15} />
                   </button>
                 </div>
-              ) : (
-                <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-mono text-[var(--text-muted)] bg-[var(--surface-card)] px-1.5 py-0.5 rounded border border-subtle dark:border-strong hidden sm:block pointer-events-none">
-                  Ctrl+K
-                </kbd>
-              )}
+              ) : null}
 
               {/* Suggestions Dropdown (Instant, Keyboard-Navigable) */}
               {showSuggestions && searchSuggestions.length > 0 && (
@@ -188,8 +184,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                         onMouseEnter={() => onHighlightSuggestion(idx)}
                         className={`p-2.5 cursor-pointer flex items-center justify-between gap-2 transition ${
                           isHighlighted
-                            ? 'bg-sky-50 dark:bg-[var(--surface-hover)]'
-                            : 'hover:bg-sky-50/60 dark:hover:bg-[var(--surface-hover)]/60'
+                            ? 'bg-[var(--surface-clinical-subtle)]'
+                            : 'hover:bg-[var(--surface-clinical-subtle)]'
                         }`}
                       >
                         <div className="min-w-0 flex-1">
@@ -207,7 +203,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                             {med.defaultPosology}
                           </p>
                         </div>
-                        <span className="text-xs px-2 py-0.5 rounded-md font-medium bg-[var(--surface-inset)] text-sky-600 dark:text-sky-400 shrink-0">
+                        <span className="text-xs px-2 py-0.5 rounded-md font-medium bg-[var(--surface-inset)] text-[var(--ink-clinical)] shrink-0">
                           {med.route}
                         </span>
                       </div>
@@ -229,7 +225,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               value={selectedQuantity}
               onChange={(e) => onChangeQuantity(e.target.value)}
               placeholder="Ex.: 15 comp, 1 frasco"
-              className="w-full h-11 min-h-[44px] px-2.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-[var(--text-main)] shadow-tactile-sm clinical-tabular-nums"
+              className="w-full h-11 min-h-[44px] px-2.5 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-control)] text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 text-[var(--text-main)] shadow-tactile-sm clinical-tabular-nums"
             />
           </div>
         </div>
@@ -258,7 +254,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = parseFloat(e.target.value) || 1;
               onAtualizarConstrutor(val, doseUnit, doseFrequency, doseDays, isContinuousDose);
             }}
-            className="w-full h-11 min-h-[44px] px-1 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+            className="w-full h-11 min-h-[44px] px-1 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-control)] text-xs font-medium text-[var(--text-main)] text-center outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 shadow-tactile-sm clinical-tabular-nums"
           />
         </div>
 
@@ -267,6 +263,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           <label htmlFor="presc-unit-select" className="block text-xs font-medium text-[var(--text-muted)] mb-1 truncate">
             Apresentação
           </label>
+          <div className="relative">
           <select
             id="presc-unit-select"
             value={doseUnit}
@@ -274,7 +271,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = e.target.value as UnidadeDose;
               onAtualizarConstrutor(doseAmount, val, doseFrequency, doseDays, isContinuousDose);
             }}
-            className="w-full h-11 min-h-[44px] px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+            className="pcm-select appearance-none w-full h-11 min-h-[44px] pl-2.5 pr-7 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-control)] text-xs font-medium text-[var(--text-main)] outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 shadow-tactile-sm cursor-pointer"
           >
             <option value="comprimido">Comprimido</option>
             <option value="cápsula">Cápsula</option>
@@ -285,6 +282,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             <option value="ampola">Ampola</option>
             <option value="aplicação">Aplicação</option>
           </select>
+          <Icon name="expand_more" size={16} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          </div>
         </div>
 
         {/* 3. Frequência / Horário */}
@@ -292,6 +291,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           <label htmlFor="presc-frequency-select" className="block text-xs font-medium text-[var(--text-muted)] mb-1 truncate">
             Frequência
           </label>
+          <div className="relative">
           <select
             id="presc-frequency-select"
             value={doseFrequency}
@@ -299,7 +299,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               const val = e.target.value as FrequenciaHorario;
               onAtualizarConstrutor(doseAmount, doseUnit, val, doseDays, isContinuousDose);
             }}
-            className="w-full h-11 min-h-[44px] px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm cursor-pointer"
+            className="pcm-select appearance-none w-full h-11 min-h-[44px] pl-2.5 pr-7 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-control)] text-xs font-medium text-[var(--text-main)] outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 shadow-tactile-sm cursor-pointer"
           >
             <option value="8/8h">8/8h</option>
             <option value="12/12h">12/12h</option>
@@ -315,6 +315,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             <option value="DU">Dose única</option>
             <option value="SOS">Se necessário</option>
           </select>
+          <Icon name="expand_more" size={16} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          </div>
         </div>
 
         {/* 4. Duração em dias */}
@@ -338,7 +340,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
                 onAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, dias, false);
               }
             }}
-            className="w-full h-11 min-h-[44px] px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium text-[var(--text-main)] text-center outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shadow-tactile-sm clinical-tabular-nums"
+            className="w-full h-11 min-h-[44px] px-1.5 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-control)] text-xs font-medium text-[var(--text-main)] text-center outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 shadow-tactile-sm clinical-tabular-nums"
           />
         </div>
 
@@ -347,6 +349,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           <label htmlFor="presc-route-select" className="block text-xs font-medium text-[var(--text-muted)] mb-1 truncate">
             Via
           </label>
+          <div className="relative">
           <select
             id="presc-route-select"
             value={selectedRoute}
@@ -355,7 +358,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
               onChangeRoute(novaVia);
               onAtualizarConstrutor(doseAmount, doseUnit, doseFrequency, doseDays, isContinuousDose, novaVia);
             }}
-            className="w-full h-11 min-h-[44px] px-1.5 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-[var(--text-main)] shadow-tactile-sm cursor-pointer"
+            className="pcm-select appearance-none w-full h-11 min-h-[44px] pl-2.5 pr-7 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-control)] text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 text-[var(--text-main)] shadow-tactile-sm cursor-pointer"
           >
             <option value="Uso Oral">Uso Oral</option>
             <option value="Uso Tópico">Uso Tópico</option>
@@ -369,6 +372,8 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             <option value="Uso Intravenoso">Uso Intravenoso</option>
             <option value="Uso Subcutâneo">Uso Subcutâneo</option>
           </select>
+          <Icon name="expand_more" size={16} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          </div>
         </div>
       </div>
 
@@ -384,7 +389,7 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
             value={selectedPosology}
             onChange={(e) => onChangePosology(e.target.value)}
             placeholder="Ex.: Tomar 1 comprimido VO de 8/8h por 5 dias"
-            className="block w-full h-11 min-h-[44px] py-3 px-3 rounded-xl bg-[var(--surface-inset)] border border-subtle dark:border-strong text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-500 text-[var(--text-main)] shadow-tactile-sm resize-none leading-tight overflow-hidden"
+            className="block w-full h-11 min-h-[44px] py-3 px-3 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-control)] text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 text-[var(--text-main)] shadow-tactile-sm resize-none leading-tight overflow-hidden"
           />
         </div>
 
@@ -392,10 +397,10 @@ export const MedicationComposerCard: React.FC<MedicationComposerCardProps> = ({
           <button
             type="button"
             onClick={onSubmitMedication}
-            className={`flex-1 h-11 min-h-[44px] px-3 rounded-xl font-semibold text-xs inline-flex items-center justify-center gap-1.5 transition active:translate-y-px cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-sky-500 whitespace-nowrap ${
+            className={`flex-1 h-11 min-h-[44px] px-3 rounded-xl font-semibold text-xs inline-flex items-center justify-center gap-1.5 transition active:translate-y-px cursor-pointer shadow-tactile-btn focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 whitespace-nowrap ${
               editingItemId
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                : 'btn-tactile-primary button-primary'
+                : 'btn-tactile-clinical'
             }`}
             title={editingItemId ? 'Salvar alterações feitas neste medicamento' : 'Inserir este medicamento na receita'}
           >

@@ -26,15 +26,16 @@ export function buildSidebarNavGroups(
     coreHubNavItems: [
       {
         id: 'prescription',
-        label: 'Receitas Médicas',
-        shortLabel: 'Receitas',
+        label: 'Prescrever',
+        fullLabel: 'Prescrição Médica',
+        shortLabel: 'Prescrever',
         iconName: 'receita',
         shortcut: 'Alt+1',
         badge: prescriptionCount > 0 ? `${prescriptionCount}` : undefined,
       },
       {
         id: 'documents',
-        label: 'Central de Documentos',
+        label: 'Documentos',
         fullLabel: 'Central de Documentos (Atestados, Encaminhamentos e Exames)',
         shortLabel: 'Documentos',
         iconName: 'documentos',
@@ -43,9 +44,9 @@ export function buildSidebarNavGroups(
       },
       {
         id: 'sus',
-        label: 'Guias Oficiais SUS',
+        label: 'APAC',
         fullLabel: 'Guias Oficiais SUS (APAC, LME, SISREG, GAL/LACEN, SISCAN, TRM-TB)',
-        shortLabel: 'Guias SUS',
+        shortLabel: 'APAC',
         iconName: 'sus',
         shortcut: 'Alt+6',
       },
@@ -61,9 +62,9 @@ export function buildSidebarNavGroups(
     clinicalToolsNavItems: [
       {
         id: 'pediatric_calc',
-        label: 'Calculadora Ped.',
+        label: 'Pediatria',
         fullLabel: 'Calculadora Pediátrica por Peso (mg/kg)',
-        shortLabel: 'Doses',
+        shortLabel: 'Pediatria',
         iconName: 'calculate',
         shortcut: 'Alt+3',
         badge: patientWeight > 0 ? `${patientWeight}kg` : undefined,
@@ -120,7 +121,7 @@ export const SidebarKitsGroupSection: React.FC<SidebarKitsGroupSectionProps> = (
           onExpandAndShowKits();
           storageService.saveRawString('prescmed_show_kits', 'true');
         }}
-        className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition duration-200 cursor-pointer group hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative text-slate-300 bg-white/[0.02] hover:text-white hover:bg-white/10 border border-transparent hover:border-white/15"
+        className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition duration-200 cursor-pointer group hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative text-slate-300 bg-white/[0.02] hover:text-white hover:bg-white/10 border border-transparent hover:border-white/15"
         aria-label="Kits de plantão"
       >
         <Icon
@@ -142,11 +143,11 @@ export const SidebarKitsGroupSection: React.FC<SidebarKitsGroupSectionProps> = (
         onClick={onToggleKits}
         aria-expanded={showKits}
         aria-controls="sidebar-kits-list"
-        className="w-full min-h-[44px] py-1.5 px-2.5 rounded-xl text-[13px] tracking-[-0.01em] font-medium text-[var(--sidebar-text-secondary,#E2E8F0)] border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.07] hover:border-white/10 active:translate-y-px transition-colors duration-150 ease-out cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+        className="w-full min-h-[44px] py-1 px-2.5 rounded-xl text-[13px] tracking-[-0.01em] font-medium text-[var(--sidebar-text-secondary,#E2E8F0)] border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.06] active:translate-y-px transition-colors duration-150 ease-out cursor-pointer group outline-none focus-visible:ring-1 focus-visible:ring-white/35"
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          <span className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.06] group-hover:bg-white/[0.10] group-hover:border-white/15 transition-colors duration-150 flex items-center justify-center shrink-0">
-            <Icon name="medication" size={15} opticalSize={20} className="text-slate-300 group-hover:text-white" />
+          <span className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-slate-300 group-hover:text-white">
+            <Icon name="medication" size={15} opticalSize={20} />
           </span>
           <span className="truncate">Kits de plantão ({CLINICAL_KITS.length})</span>
         </div>
@@ -164,7 +165,7 @@ export const SidebarKitsGroupSection: React.FC<SidebarKitsGroupSectionProps> = (
               key={kit.id}
               type="button"
               onClick={() => onApplyKit(kit)}
-              className="w-full min-h-[44px] text-left px-2.5 py-2 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 active:translate-y-px transition-colors duration-150 cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-sky-400 flex items-center"
+              className="w-full min-h-[44px] text-left px-2.5 py-2 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 active:translate-y-px transition-colors duration-150 cursor-pointer group outline-none focus-visible:ring-1 focus-visible:ring-white/35 flex items-center"
               title={`Aplicar kit: ${kit.name} (${kit.badge})`}
             >
               <div className="flex items-center justify-between gap-1.5 w-full min-w-0">
@@ -212,56 +213,51 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
 }) => {
   return (
     <div
-      className={`shrink-0 border-t border-white/10 bg-[oklch(0.12_0.02_258/0.28)] rounded-b-2xl overflow-hidden ${
+      className={`shrink-0 border-t border-white/[0.07] rounded-b-2xl overflow-hidden ${
         isOpen
-          ? 'p-2 space-y-1.5 pb-[calc(0.875rem+env(safe-area-inset-bottom))] lg:pb-2'
-          : 'py-2.5 px-1.5 space-y-2 flex flex-col items-center'
+          ? 'px-2 py-1.5 space-y-0.5 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:pb-1.5'
+          : 'py-2 px-1.5 space-y-1.5 flex flex-col items-center'
       }`}
     >
       {isOpen ? (
         <>
-          {/* Botão dedicado de Download / Instalação do App no Celular ou PC */}
-          {isInstallable && onInstallApp && (
+          {/* Linha 1: Ação primária limpa + Recolher Menu */}
+          <div className="flex items-center gap-1 w-full">
             <button
-              id="btn-sidebar-install-pwa"
               type="button"
-              onClick={() => {
-                onInstallApp();
-                if (!isDesktop) onClose?.();
-              }}
-              className="w-full min-h-[44px] py-2 px-2.5 rounded-xl border border-sky-400/35 bg-sky-400/20 text-sky-100 hover:bg-sky-400/30 hover:text-white hover:border-sky-400/50 active:translate-y-[1px] transition duration-150 cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shadow-tactile-sm"
-              title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
+              onClick={onTriggerResetAll}
+              className="flex-1 min-w-0 min-h-[44px] py-1 px-2 rounded-lg text-xs font-medium text-slate-200 hover:text-white hover:bg-white/[0.07] active:translate-y-px transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-white/35 whitespace-nowrap flex items-center gap-2 group"
+              title="Iniciar uma nova consulta do zero"
             >
-              <Icon name="download" size={15} className="text-sky-300 shrink-0" />
-              <span className="truncate">Baixar / Instalar App</span>
+              <Icon
+                name="refresh"
+                size={15}
+                className="text-slate-300 group-hover:text-white group-hover:rotate-45 transition-transform duration-200 shrink-0"
+              />
+              <span className="truncate">Novo Atendimento</span>
             </button>
-          )}
 
-          {/* Novo Atendimento em linha única limpa */}
-          <button
-            type="button"
-            onClick={onTriggerResetAll}
-            className="w-full min-h-[44px] py-2 flex items-center justify-center gap-1.5 px-2.5 rounded-xl text-xs font-semibold text-white bg-white/[0.08] hover:bg-white/[0.14] hover:border-white/20 active:translate-y-px border border-white/10 transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-sky-400 whitespace-nowrap group"
-            title="Iniciar uma nova consulta do zero"
-          >
-            <Icon
-              name="refresh"
-              size={15}
-              className="text-sky-300 group-hover:rotate-45 transition-transform duration-200 shrink-0"
-            />
-            <span className="truncate">Novo Atendimento</span>
-          </button>
+            <button
+              type="button"
+              onClick={onToggleOpen}
+              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.07] items-center justify-center transition duration-150 cursor-pointer active:scale-95 focus-visible:ring-1 focus-visible:ring-white/35 outline-none shrink-0"
+              title="Recolher menu lateral"
+              aria-label="Recolher Menu"
+            >
+              <Icon name="chevron_left" size={16} />
+            </button>
+          </div>
 
-          {/* Utilitários secundários uniformes: Backup, LGPD e Recolher Menu */}
-          <div className="flex items-center gap-1.5 w-full min-w-0">
+          {/* Linha 2: Utilitários silenciosos (sem caixas aninhadas) */}
+          <div className="flex items-center justify-between gap-0.5 pt-0.5 border-t border-white/[0.05] w-full min-w-0">
             {onOpenBackupModal && (
               <button
                 type="button"
                 onClick={onOpenBackup}
-                className="flex-1 min-w-0 min-h-[44px] py-1.5 px-1.5 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                className="min-h-[44px] px-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/[0.06] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center gap-1 text-[11px] font-medium outline-none focus-visible:ring-1 focus-visible:ring-white/35 min-w-0"
                 title="Exportar ou restaurar arquivo de backup (.pcm.json)"
               >
-                <Icon name="cloud_download" size={13} className="text-slate-300 shrink-0" />
+                <Icon name="cloud_download" size={13} className="shrink-0" />
                 <span className="truncate">Backup (.pcm)</span>
               </button>
             )}
@@ -271,24 +267,31 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
                 id="btn-sidebar-lgpd-security"
                 type="button"
                 onClick={onOpenLgpd}
-                className="min-h-[44px] min-w-[44px] py-1.5 px-2 rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] tracking-tight font-medium outline-none focus-visible:ring-2 focus-visible:ring-sky-400 shrink-0"
+                className="min-h-[44px] min-w-[44px] px-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/[0.06] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] font-medium outline-none focus-visible:ring-1 focus-visible:ring-white/35 shrink-0"
                 title="Segurança, Seleção de Cookies e Conformidade LGPD"
                 aria-label="Segurança, Seleção de Cookies e LGPD"
               >
-                <Icon name="shield" size={13} className="text-emerald-400 shrink-0" />
+                <Icon name="shield" size={13} className="text-slate-400 group-hover:text-slate-200 shrink-0" />
                 <span>LGPD</span>
               </button>
             )}
 
-            <button
-              type="button"
-              onClick={onToggleOpen}
-              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.10] hover:border-white/20 items-center justify-center transition duration-150 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none shrink-0"
-              title="Recolher menu lateral"
-              aria-label="Recolher Menu"
-            >
-              <Icon name="chevron_left" size={15} />
-            </button>
+            {isInstallable && onInstallApp && (
+              <button
+                id="btn-sidebar-install-pwa"
+                type="button"
+                onClick={() => {
+                  onInstallApp();
+                  if (!isDesktop) onClose?.();
+                }}
+                className="min-h-[44px] min-w-[44px] px-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/[0.06] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] font-semibold outline-none focus-visible:ring-1 focus-visible:ring-white/35 shrink-0"
+                title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
+                aria-label="Baixar / Instalar App"
+              >
+                <Icon name="download" size={13} className="shrink-0" />
+                <span>App</span>
+              </button>
+            )}
           </div>
         </>
       ) : (
@@ -296,7 +299,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
           <button
             type="button"
             onClick={onTriggerResetAll}
-            className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+            className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
             aria-label="Novo Atendimento"
           >
             <Icon name="refresh" size={20} />
@@ -309,7 +312,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             <button
               type="button"
               onClick={onOpenBackup}
-              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
               aria-label="Backup e Portabilidade"
             >
               <Icon name="cloud_download" size={20} />
@@ -323,10 +326,10 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             <button
               type="button"
               onClick={onOpenLgpd}
-              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
               aria-label="Segurança, Cookies e LGPD"
             >
-              <Icon name="shield" size={20} className="text-emerald-400" />
+              <Icon name="shield" size={20} className="text-slate-300" />
               <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 Segurança, Cookies &amp; LGPD
               </span>
@@ -337,7 +340,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             <button
               type="button"
               onClick={onInstallApp}
-              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-400 outline-none relative group"
+              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
               aria-label="Instalar App Offline"
             >
               <Icon name="download" size={20} />
@@ -350,7 +353,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
           <button
             type="button"
             onClick={onToggleOpen}
-            className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-400 outline-none"
+            className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-1 focus-visible:ring-white/35 outline-none"
             title="Expandir Menu Lateral"
             aria-label="Expandir Menu Lateral"
           >
