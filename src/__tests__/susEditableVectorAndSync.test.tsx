@@ -95,15 +95,15 @@ const BASE_SUS_DATA: SusFilledFormData = {
   doctorCns: BASE_DOCTOR.cns,
   patientName: BASE_PATIENT.name,
   patientCns: BASE_PATIENT.cns || '',
-  patientCpf: BASE_PATIENT.documentNumber,
-  patientBirthDate: BASE_PATIENT.birthDate,
-  patientAge: BASE_PATIENT.ageText,
+  patientCpf: BASE_PATIENT.documentNumber || '',
+  patientBirthDate: BASE_PATIENT.birthDate || '',
+  patientAge: BASE_PATIENT.ageText || '',
   patientGender: 'male',
   patientSex: 'M',
   patientWeightKg: '78.5',
   patientHeightCm: '176',
   patientMotherName: BASE_PATIENT.motherName || '',
-  patientPhone: BASE_PATIENT.phone,
+  patientPhone: BASE_PATIENT.phone || '',
   patientAddress: BASE_PATIENT.address || '',
   patientNeighborhood: BASE_PATIENT.neighborhood || '',
   patientCity: BASE_PATIENT.city || '',
@@ -344,7 +344,7 @@ describe('Documentos SUS exclusivamente em Folha A4 Vetorial Editável & Sincron
       DEFAULT_DOCTOR,
       syncedDocs.certificate
     );
-    expect(certCityUpdated.cityDateText.startsWith('Porto Velho - RO,')).toBe(true);
+    expect((certCityUpdated.cityDateText ?? '').startsWith('Porto Velho - RO,')).toBe(true);
 
     // Caso adversarial: cidade customizada manualmente no atestado não pode ser sobrescrita
     const customCert = {

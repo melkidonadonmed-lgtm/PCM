@@ -539,7 +539,7 @@ describe('Governança de Rotas e Navegação do Editor', () => {
     expect(stripSaltPrefix('sulfato de zinco')).toBe('sulfato de zinco');
 
     // 5. EditorLogoConfigDropdown: selo de contagem de logos e renderização do menu aberto
-    expect(resolveLogoBadgeLabel({ dataUrl: null, position: 'header-left', size: 'md', visible: true })).toBeNull();
+    expect(resolveLogoBadgeLabel({ dataUrl: undefined, position: 'header-left', size: 'md', visible: true })).toBeNull();
     expect(resolveLogoBadgeLabel({ dataUrl: 'data:image/png;base64,AAA', position: 'header-left', size: 'md', visible: true })).toBe('1 Logo');
     expect(
       resolveLogoBadgeLabel({

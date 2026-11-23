@@ -34,7 +34,7 @@ export const CLINICAL_KITS: ClinicalKit[] = [
         route: 'Uso Oral',
         quantity: '1 caixa (10 comprimidos)',
         instructions: 'Tomar 1 comprimido via oral de 8 em 8 horas após as refeições por 3 dias.',
-        pediaDrugKey: 'ibuprofeno_100'
+        pediaDrugKey: 'ibuprofeno_100' // gitleaks:allow
       },
       {
         name: 'Dipirona Sódica 500mg comprimido (Novalgina)',

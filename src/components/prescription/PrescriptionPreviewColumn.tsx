@@ -37,7 +37,7 @@ interface PrescriptionPreviewColumnProps {
   onCopyText: () => void;
   onAbrirPerfilMedico?: () => void;
   onClosePediatricDrawer: () => void;
-  onUpdatePatientWeight: (weightKg?: number) => void;
+  onUpdatePatientWeight: (weightKg: number) => void;
   onAddPediatricItem: (item: PrescriptionItem) => void;
 }
 

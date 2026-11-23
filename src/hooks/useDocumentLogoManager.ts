@@ -183,7 +183,7 @@ export function useDocumentLogoManager({
     );
   };
 
-  const handleChangeLogoSize = (size: 'sm' | 'md' | 'lg' | 'xl') => {
+  const handleChangeLogoSize = (size: DocumentLogoConfig['size']) => {
     const updated: DocumentLogoConfig = {
       ...logoConfig,
       size,
@@ -281,7 +281,7 @@ export function useDocumentLogoManager({
     showToast(`Logotipo direito "${name}" aplicado!`);
   };
 
-  const handleChangeSecondaryLogoSize = (secondarySize: 'sm' | 'md' | 'lg' | 'xl') => {
+  const handleChangeSecondaryLogoSize = (secondarySize: DocumentLogoConfig['size']) => {
     const updated: DocumentLogoConfig = {
       ...logoConfig,
       secondarySize,

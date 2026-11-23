@@ -41,7 +41,7 @@ export function montarItensDoKit(
         itemPresentation = '1 frasco (15 mL)';
         itemInstructions = `Administrar ${gotas(drops)} via oral de 6 em 6 horas se dor ou febre.`;
         itemDoseCalculatedText = `${gotas(drops)}`;
-      } else if (kitItem.pediaDrugKey === 'ibuprofeno_100') {
+      } else if (kitItem.pediaDrugKey === 'ibuprofeno_100') { // gitleaks:allow
         const drops = Math.min(Math.round(patientWeight), 40);
         itemName = 'Ibuprofeno 100mg/mL suspensão gotas (Alivium)';
         itemPresentation = '1 frasco (20 mL)';
