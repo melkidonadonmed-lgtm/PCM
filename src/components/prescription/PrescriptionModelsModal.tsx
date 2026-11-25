@@ -98,10 +98,10 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
             onClick={(e) => e.stopPropagation()}
             className="tactile-modal modal-content rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 modal-surface-spring"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-subtle dark:border-strong">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--hairline)]">
               <div className="flex items-center gap-2">
                 <Icon name="bookmark_add" className="text-[20px] text-[var(--ink-clinical)]" />
-                <h3 className="font-semibold text-sm sm:text-base text-[var(--text-main)]">
+                <h3 className="font-semibold text-sm sm:text-base text-[var(--ink-primary)]">
                   Salvar como modelo de receita
                 </h3>
               </div>
@@ -109,18 +109,18 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                 type="button"
                 onClick={onCloseSaveModelModal}
                 aria-label="Fechar modal"
-                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 focus-visible:outline-none transition"
+                className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
               >
                 <Icon name="close" className="text-[20px]" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Este modelo salvará os <strong className="clinical-tabular-nums">{items.length} medicamentos</strong> prescritos para reutilização em 1 clique.
+            <p className="text-xs text-[var(--ink-secondary)]">
+              Este modelo salvará os <strong className="clinical-tabular-nums text-[var(--ink-primary)]">{items.length} medicamentos</strong> prescritos para reutilização em 1 clique.
             </p>
 
             <div>
-              <label htmlFor="model-name-input" className="block text-xs font-bold uppercase text-slate-500 mb-1">
+              <label htmlFor="model-name-input" className="block text-xs font-bold uppercase text-[var(--ink-muted)] mb-1">
                 Nome do modelo
               </label>
               <input
@@ -133,17 +133,17 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   if (e.key === 'Enter') onSavePrescriptionModel();
                 }}
                 placeholder="Ex.: Hipertensão inicial, GECA pediátrica, Amigdalite..."
-                className="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold border border-medium dark:border-strong bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                className="tactile-input w-full min-h-[44px] p-3 rounded-xl text-xs sm:text-sm font-semibold focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
 
-            <div className="max-h-36 overflow-y-auto rounded-xl border border-subtle dark:border-strong p-2.5 bg-slate-50/50 dark:bg-slate-950/40 space-y-1.5 text-xs">
-              <span className="text-xs font-bold text-slate-400 uppercase block">Itens inclusos:</span>
+            <div className="max-h-36 overflow-y-auto rounded-xl border border-[var(--hairline)] p-2.5 bg-[var(--surface-card-lit)] space-y-1.5 text-xs">
+              <span className="text-xs font-bold text-[var(--ink-muted)] uppercase block">Itens inclusos:</span>
               {items.map((it, idx) => (
-                <div key={it.id} className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5 truncate">
-                  <span className="font-mono text-slate-400 clinical-tabular-nums">{idx + 1}.</span>
-                  <span className="font-semibold truncate">{it.name}</span>
-                  <span className="text-xs text-slate-500">({it.quantity})</span>
+                <div key={it.id} className="text-[var(--ink-secondary)] flex items-center gap-1.5 truncate">
+                  <span className="font-mono text-[var(--ink-muted)] clinical-tabular-nums">{idx + 1}.</span>
+                  <span className="font-semibold text-[var(--ink-primary)] truncate">{it.name}</span>
+                  <span className="text-xs text-[var(--ink-muted)]">({it.quantity})</span>
                 </div>
               ))}
             </div>
@@ -179,26 +179,26 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
             onClick={(e) => e.stopPropagation()}
             className="tactile-modal modal-content rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col modal-surface-spring"
           >
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-subtle dark:border-strong">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[var(--hairline)]">
               {isCreatingCustomModel ? (
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={onExitCreateCustomModel}
                     aria-label="Voltar para a lista de modelos"
-                    className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 focus-visible:outline-none transition"
+                    className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
                     title="Voltar para a lista de modelos"
                   >
                     <Icon name="arrow_back" className="text-[18px]" />
                   </button>
-                  <h3 className="font-semibold text-base text-[var(--text-main)]">
+                  <h3 className="font-semibold text-base text-[var(--ink-primary)]">
                     Novo modelo de receita
                   </h3>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Icon name="folder_open" className="text-[20px] text-amber-500" />
-                  <h3 className="font-semibold text-base text-[var(--text-main)]">
+                  <Icon name="folder_open" className="text-[20px] text-[var(--accent-amber)]" />
+                  <h3 className="font-semibold text-base text-[var(--ink-primary)]">
                     Modelos de receitas salvos
                   </h3>
                 </div>
@@ -209,7 +209,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   <button
                     type="button"
                     onClick={onStartCreateCustomModel}
-                    className="chip-neutral px-2.5 py-1 text-xs font-bold rounded-lg cursor-pointer flex items-center gap-1 transition focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 focus-visible:outline-none"
+                    className="btn-tactile-secondary min-h-[44px] px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
                   >
                     <Icon name="add" className="text-[14px] text-[var(--ink-clinical)]" />
                     <span>+ Criar modelo</span>
@@ -219,7 +219,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   type="button"
                   onClick={onCloseLoadModelModal}
                   aria-label="Fechar biblioteca de modelos"
-                  className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 focus-visible:outline-none transition"
+                  className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
                 >
                   <Icon name="close" className="text-[20px]" />
                 </button>
@@ -229,7 +229,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
             {isCreatingCustomModel ? (
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 custom-scrollbar">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                  <label className="text-xs font-bold text-[var(--ink-secondary)] block mb-1">
                     Nome do modelo
                   </label>
                   <input
@@ -239,17 +239,17 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                     value={customModelDraftTitle}
                     onChange={(e) => onChangeCustomModelDraftTitle(e.target.value)}
                     placeholder="Ex.: Hipertensão leve, ITU ambulatorial, Pós-operatório..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-subtle dark:border-strong text-xs font-semibold text-slate-900 dark:text-white outline-none focus:border-info"
+                    className="tactile-input w-full min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold outline-none focus:border-[var(--accent-focus)]"
                     autoFocus
                   />
                 </div>
 
                 <div className="relative">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                  <label className="text-xs font-bold text-[var(--ink-secondary)] block mb-1">
                     Adicionar medicamento ao modelo
                   </label>
                   <div className="relative">
-                    <Icon name="search" className="text-[16px] text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Icon name="search" className="text-[16px] text-[var(--ink-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       id="custom-model-med-search"
                       name="customModelSearchTerm"
@@ -257,7 +257,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                       value={customModelSearchTerm}
                       onChange={(e) => onCustomModelSearchChange(e.target.value)}
                       placeholder="Ex.: Amoxicilina 500 mg, Dipirona 500 mg, Losartana..."
-                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-subtle dark:border-strong text-xs text-slate-900 dark:text-white outline-none focus:border-info"
+                      className="tactile-input w-full min-h-[44px] pl-9 pr-3 py-2 rounded-xl text-xs outline-none focus:border-[var(--accent-focus)]"
                     />
                   </div>
 
@@ -268,13 +268,13 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                           key={sug.id}
                           type="button"
                           onClick={() => onAddCustomModelItem(sug)}
-                          className="w-full text-left p-2 rounded-lg hover:bg-[var(--surface-clinical-subtle)] dark:hover:bg-slate-800 transition cursor-pointer flex items-center justify-between text-xs"
+                          className="w-full min-h-[44px] text-left p-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors cursor-pointer flex items-center justify-between text-xs"
                         >
                           <div>
-                            <span className="font-bold text-slate-900 dark:text-white block">
+                            <span className="font-bold text-[var(--ink-primary)] block">
                               {sug.name}
                             </span>
-                            <span className="text-xs text-slate-500">
+                            <span className="text-xs text-[var(--ink-muted)]">
                               {sug.route} • {sug.defaultQuantity}
                             </span>
                           </div>
@@ -286,29 +286,29 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                 </div>
 
                 <div className="space-y-2.5 pt-1">
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block clinical-tabular-nums">
+                  <span className="text-xs font-bold text-[var(--ink-secondary)] block clinical-tabular-nums">
                     Medicamentos deste modelo ({customModelDraftItems.length}):
                   </span>
 
                   {customModelDraftItems.length === 0 ? (
-                    <div className="p-4 text-center rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-xs text-slate-600 dark:text-slate-300">
+                    <div className="p-4 text-center rounded-xl bg-[var(--surface-inset)] border border-[var(--hairline)] text-xs text-[var(--ink-secondary)]">
                       Nenhum medicamento incluído ainda. Digite o nome acima para adicionar.
                     </div>
                   ) : (
                     customModelDraftItems.map((item, idx) => (
                       <div
                         key={item.id}
-                        className="p-3 rounded-xl border border-subtle dark:border-strong bg-slate-50/60 dark:bg-slate-950/40 space-y-2"
+                        className="p-3 rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] space-y-2"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-bold text-slate-900 dark:text-white">
+                          <span className="text-xs font-bold text-[var(--ink-primary)]">
                             {idx + 1}. {item.name}
                           </span>
                           <button
                             type="button"
                             onClick={() => onRemoveCustomModelItem(item.id)}
                             aria-label={`Remover ${item.name} do modelo`}
-                            className="p-1.5 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                            className="btn-tactile-danger min-h-[44px] min-w-[44px] p-0 inline-flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] focus-visible:outline-none"
                             title="Remover do modelo"
                           >
                             <Icon name="delete" className="text-[14px]" />
@@ -317,7 +317,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
 
                         <div className="grid grid-cols-12 gap-2">
                           <div className="col-span-4">
-                            <label className="text-xs font-semibold text-slate-500 block mb-0.5 truncate">
+                            <label className="text-xs font-semibold text-[var(--ink-muted)] block mb-0.5 truncate">
                               Quantidade
                             </label>
                             <input
@@ -326,11 +326,11 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                               value={item.quantity}
                               onChange={(e) => onUpdateCustomModelItem(item.id, { quantity: e.target.value })}
                               placeholder="Ex.: 30 comp"
-                              className="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-slate-800 dark:text-slate-200 outline-none focus:border-info clinical-tabular-nums"
+                              className="tactile-input w-full min-h-[44px] px-2.5 py-1 text-xs rounded-lg outline-none focus:border-[var(--accent-focus)] clinical-tabular-nums"
                             />
                           </div>
                           <div className="col-span-8">
-                            <label className="text-xs font-semibold text-slate-500 block mb-0.5 truncate">
+                            <label className="text-xs font-semibold text-[var(--ink-muted)] block mb-0.5 truncate">
                               Posologia / Instruções
                             </label>
                             <input
@@ -339,7 +339,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                               value={item.instructions}
                               onChange={(e) => onUpdateCustomModelItem(item.id, { instructions: e.target.value })}
                               placeholder="Ex.: Tomar 1 comprimido de 8 em 8 horas"
-                              className="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-subtle dark:border-strong text-slate-800 dark:text-slate-200 outline-none focus:border-info"
+                              className="tactile-input w-full min-h-[44px] px-2.5 py-1 text-xs rounded-lg outline-none focus:border-[var(--accent-focus)]"
                             />
                           </div>
                         </div>
@@ -351,13 +351,13 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
             ) : (
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
                 {savedPrescriptionModels.length === 0 ? (
-                  <div className="p-8 text-center rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] space-y-3">
-                    <Icon name="bookmark_add" className="text-[32px] text-slate-400 mx-auto" />
+                  <div className="p-8 text-center rounded-xl bg-[var(--surface-inset)] border border-[var(--hairline)] space-y-3">
+                    <Icon name="bookmark_add" className="text-[32px] text-[var(--ink-muted)] mx-auto" />
                     <div>
-                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      <p className="text-xs font-semibold text-[var(--ink-primary)]">
                         Nenhum modelo de receita salvo ainda.
                       </p>
-                      <p className="text-xs text-slate-500 max-w-xs mx-auto mt-0.5">
+                      <p className="text-xs text-[var(--ink-muted)] max-w-xs mx-auto mt-0.5">
                         Você pode criar um modelo agora mesmo ou salvar uma receita ativa na consulta.
                       </p>
                     </div>
@@ -369,14 +369,14 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                   savedPrescriptionModels.map((model) => (
                     <div
                       key={model.id}
-                      className="p-3.5 rounded-xl border border-subtle dark:border-strong bg-slate-50/60 dark:bg-slate-950/40 hover:border-info dark:hover:border-info transition space-y-2"
+                      className="p-3.5 rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] hover:border-[var(--border-control)] transition-colors space-y-2"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                          <h4 className="font-bold text-xs sm:text-sm text-[var(--ink-primary)]">
                             {model.title}
                           </h4>
-                          <span className="text-xs font-semibold text-slate-500 clinical-tabular-nums">
+                          <span className="text-xs font-semibold text-[var(--ink-muted)] clinical-tabular-nums">
                             {model.prescriptionItems?.length || 0} medicamentos cadastrados
                           </span>
                         </div>
@@ -384,22 +384,22 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                           type="button"
                           onClick={() => onDeletePrescriptionModel(model.id, model.title)}
                           aria-label={`Excluir modelo ${model.title}`}
-                          className="p-1.5 text-slate-400 hover:text-rose-500 cursor-pointer transition rounded focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                          className="btn-tactile-danger min-h-[44px] min-w-[44px] p-0 inline-flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] focus-visible:outline-none"
                           title="Excluir este modelo"
                         >
                           <Icon name="delete" className="text-[14px]" />
                         </button>
                       </div>
 
-                      <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
+                      <p className="text-xs text-[var(--ink-secondary)] truncate">
                         {model.prescriptionItems?.map((i) => i.name).join(' • ')}
                       </p>
 
-                      <div className="flex items-center justify-end gap-2 pt-1 border-t border-subtle dark:border-strong">
+                      <div className="flex items-center justify-end gap-2 pt-1 border-t border-[var(--hairline)]">
                         <button
                           type="button"
                           onClick={() => onApplyPrescriptionModel(model, 'append')}
-                          className="touch-target chip-neutral min-h-[44px] px-3 py-1 rounded-lg text-xs cursor-pointer transition"
+                          className="btn-tactile-secondary touch-target min-h-[44px] px-3 py-1 rounded-lg text-xs font-semibold focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
                           title="Adicionar estes medicamentos mantendo os que já estão na receita"
                         >
                           Adicionar (+)
@@ -407,7 +407,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
                         <button
                           type="button"
                           onClick={() => onApplyPrescriptionModel(model, 'replace')}
-                          className="touch-target btn-tactile-primary px-3 py-1 min-h-[44px] rounded-lg text-xs font-bold cursor-pointer transition"
+                          className="touch-target btn-tactile-primary px-3 py-1 min-h-[44px] rounded-lg text-xs font-bold focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
                           title="Substituir todos os medicamentos da receita por este modelo"
                         >
                           Substituir receita
@@ -419,7 +419,7 @@ export const PrescriptionModelsModal: React.FC<PrescriptionModelsModalProps> = (
               </div>
             )}
 
-            <div className="p-4 border-t border-slate-100 dark:border-strong flex justify-end gap-2">
+            <div className="p-4 border-t border-[var(--hairline)] flex justify-end gap-2">
               {isCreatingCustomModel ? (
                 <>
                   <ActionButton variant="ghost" onClick={onExitCreateCustomModel}>

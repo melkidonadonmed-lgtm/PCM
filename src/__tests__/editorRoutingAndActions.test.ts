@@ -369,7 +369,7 @@ describe('Governança de Rotas e Navegação do Editor', () => {
     expect(groupsZero.coreHubNavItems[0].badge).toBeUndefined();
     expect(groupsZero.coreHubNavItems[1].badge).toBeUndefined();
     expect(groupsZero.clinicalToolsNavItems[0].badge).toBeUndefined();
-    expect(groupsZero.clinicalToolsNavItems[2].badge).toBe('114');
+    expect(groupsZero.clinicalToolsNavItems[2].badge).toBeUndefined();
 
     const groupsActive = buildSidebarNavGroups(3, 5, 18.5);
     expect(groupsActive.coreHubNavItems[0].badge).toBe('3');

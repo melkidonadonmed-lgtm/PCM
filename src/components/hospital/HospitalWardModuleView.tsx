@@ -327,20 +327,30 @@ export const HospitalWardModuleView: React.FC<HospitalWardModuleViewProps> = ({
                       role="tab"
                       aria-selected={isSelected}
                       onClick={() => handleSelectBed(bed.id)}
-                      className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl border text-left transition cursor-pointer shrink-0 ${
+                      className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl text-left cursor-pointer shrink-0 ${
                         isSelected
-                          ? 'bg-[var(--surface-clinical-subtle)] border-[var(--border-clinical-subtle)] text-[var(--text-main)] font-bold'
-                          : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] font-medium'
+                          ? 'btn-tactile-primary font-bold'
+                          : 'btn-tactile-secondary font-medium'
                       }`}
                     >
-                      <span className="text-xs font-extrabold text-[var(--ink-clinical)] clinical-tabular-nums">
+                      <span
+                        className={`text-xs font-extrabold clinical-tabular-nums ${
+                          isSelected ? 'text-white' : 'text-[var(--ink-clinical)]'
+                        }`}
+                      >
                         EF/LT {bed.wardAndBed}
                       </span>
                       <span className="text-xs ml-1.5 truncate max-w-44 inline-block align-bottom">
                         {bed.patientNameOrInitials || 'Sem ID'}
                       </span>
                       {stayDays > 0 && (
-                        <span className="ml-1.5 text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
+                        <span
+                          className={`ml-1.5 text-[11px] font-bold px-1.5 py-0.5 rounded-[6px] border clinical-tabular-nums ${
+                            isSelected
+                              ? 'bg-white/15 border-white/20 text-white'
+                              : 'bg-[var(--surface-chip-muted)] border-[var(--hairline)] text-[var(--ink-primary)]'
+                          }`}
+                        >
                           D{stayDays}
                         </span>
                       )}

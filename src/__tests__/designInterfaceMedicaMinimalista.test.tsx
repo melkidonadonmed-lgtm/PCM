@@ -83,8 +83,8 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
         onSwitchContext={vi.fn()}
       />
     );
-    expect(html).toContain('bg-white/[0.05]');
-    expect(html).toContain('surface-inset');
+    expect(html).toContain('bg-[var(--sidebar-chip-bg)]');
+    expect(html).toContain('text-[var(--sidebar-text-primary)]');
     expect(html).toContain('Local de Atuação (SUS)');
   });
 
@@ -155,7 +155,8 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
         patient={emptyPatient}
       />
     );
-    expect(sidebarDarkHtml).toContain('#1E293B');
+    expect(sidebarDarkHtml).toContain('panel-navy');
+    expect(sidebarDarkHtml).not.toContain('#1E293B');
 
     const confirmHtml = renderToStaticMarkup(
       <ConfirmationModal
@@ -206,15 +207,16 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
         activeTab="prescription"
       />
     );
-    expect(headerHtml).toContain('bg-[var(--surface-card)]/80');
-    expect(headerHtml).toContain('backdrop-blur-md');
+    expect(headerHtml).toContain('bg-[var(--surface-card)]');
+    expect(headerHtml).not.toContain('backdrop-blur-md');
 
     const indexCss = fs.readFileSync(path.resolve(__dirname, '../index.css'), 'utf8');
-    expect(indexCss).toContain('--bg-main: #f8fafc;');
-    expect(indexCss).toContain('--text-title: #0f172a;');
-    expect(indexCss).toContain('--text-body: #475569;');
-    expect(indexCss).toContain('--text-muted: #475569;');
-    expect(indexCss).toContain('line-height: 1.6;');
+    expect(indexCss).toContain('--surface-canvas: oklch(0.962 0.006 248);');
+    expect(indexCss).toContain('--bg-main: var(--surface-canvas);');
+    expect(indexCss).toContain('--text-title: var(--ink-primary);');
+    expect(indexCss).toContain('--text-body: var(--ink-secondary);');
+    expect(indexCss).toContain('--text-muted: var(--ink-muted);');
+    expect(indexCss).toContain('line-height: 1.55;');
     expect(indexCss).toContain('.dark img:not(:is(.a4-editor-canvas, #printable-a4-sheet, .folha-a4, #pcm-print-root) *)');
 
     const nginxHeaders = fs.readFileSync(path.resolve(__dirname, '../../nginx-security-headers.conf'), 'utf8');
@@ -275,13 +277,14 @@ describe('Design Interface Médica Minimalista (v3.0.0) — Regressão Mobile & 
     );
 
     // Positivos: controles elevados, SC 1.4.11 >= 3:1, AAA --ink-accent em Light/Dark, skip-link e media fallbacks
-    expect(indexCss).toContain('--border-control: #8594A6;');
-    expect(indexCss).toContain('--ink-accent: #243447;');
-    expect(darkThemeCss).toContain('--surface-inset: #2C3B50;');
-    expect(darkThemeCss).toContain('--border-control: #73869F;');
-    expect(darkThemeCss).toContain('--ink-accent: #C5DCF8;');
-    expect(darkThemeCss).toContain('--surface-modal: #202B3C;');
-    expect(globalsCss).toContain('color: var(--ink-accent, #243447);');
+    expect(indexCss).toContain('--border-control: oklch(0.575 0.020 248);');
+    expect(indexCss).toContain('--ink-accent: oklch(0.300 0.036 248);');
+    expect(darkThemeCss).toContain('--surface-inset: var(--surface-card-lit);');
+    expect(darkThemeCss).toContain('--surface-card-lit: oklch(0.295 0.020 248);');
+    expect(darkThemeCss).toContain('--border-control: oklch(0.610 0.024 248);');
+    expect(darkThemeCss).toContain('--ink-accent: oklch(0.860 0.045 245);');
+    expect(darkThemeCss).toContain('--surface-modal: var(--surface-card);');
+    expect(globalsCss).toContain('color: var(--ink-accent);');
     expect(globalsCss).toContain('.skip-link');
     expect(globalsCss).toContain('@media (prefers-reduced-transparency: reduce)');
     expect(globalsCss).toContain('@media (forced-colors: active)');

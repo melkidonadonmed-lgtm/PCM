@@ -220,8 +220,8 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
         {/* Header Enxuto */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-subtle dark:border-strong pb-2.5">
           <div className="flex items-center gap-2 min-w-0">
-            <Share2 className="w-4.5 h-4.5 text-sky-600 dark:text-sky-400 shrink-0" strokeWidth={1.75} />
-            <h3 className="text-sm font-semibold text-[var(--text-main)] truncate">
+            <Share2 className="w-4.5 h-4.5 text-[var(--ink-clinical)] shrink-0" strokeWidth={1.75} />
+            <h3 className="text-sm font-semibold text-[var(--ink-primary)] truncate">
               Guia de Encaminhamento & Referência Especializada
             </h3>
           </div>
@@ -231,7 +231,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
               type="button"
               onClick={handleSendReferralWhatsApp}
               disabled={!medicoConfigurado(doctor)}
-              className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="btn-tactile-secondary min-h-[44px] text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               title={
                 medicoConfigurado(doctor)
                   ? 'Enviar a guia de encaminhamento diretamente pelo WhatsApp'
@@ -246,10 +246,10 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
               <button
                 type="button"
                 onClick={handleOpenReferralInEditor}
-                className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="btn-tactile-secondary min-h-[44px] text-xs flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                 title="Editar e personalizar o encaminhamento no Editor de Folha A4"
               >
-                <FileText className="w-4 h-4 text-[var(--text-muted)]" />
+                <FileText className="w-4 h-4 text-[var(--ink-muted)]" />
                 <span>Editar no Editor A4</span>
               </button>
             )}
@@ -257,7 +257,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
             <button
               type="button"
               onClick={() => onNavigateToPrint('referral')}
-              className="btn-tactile-primary text-xs flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="btn-tactile-primary min-h-[44px] text-xs flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             >
               <Download className="w-4 h-4" strokeWidth={1.75} />
               <span>Visualizar & Baixar PDF</span>
@@ -357,10 +357,10 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
                   key={p}
                   type="button"
                   onClick={() => onUpdateReferral({ ...referral, priority: p })}
-                  className={`touch-target flex-1 min-h-[44px] rounded-xl text-xs font-bold capitalize border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+                  className={`touch-target flex-1 min-h-[44px] rounded-xl text-xs font-bold capitalize border transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
                     referral.priority === p
                       ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] shadow-sm'
-                      : 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--surface-chip-muted-hover)]'
+                      : 'bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border-[var(--border-control)] hover:bg-[var(--surface-chip-muted-hover)]'
                   }`}
                 >
                   {p}
@@ -401,7 +401,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
             value={referral.clinicalSummary}
             onChange={(e) => onUpdateReferral({ ...referral, clinicalSummary: e.target.value })}
             placeholder="Ex.: Paciente com história de episódios recorrentes de broncoespasmo..."
-            className="w-full p-2.5 rounded-xl text-xs font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input leading-relaxed"
+            className="w-full p-2.5 rounded-xl text-xs font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] tactile-input leading-relaxed"
           />
         </div>
 
@@ -409,7 +409,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
           <div>
             <label
               htmlFor="referral-relevant-exams"
-              className="block text-xs font-medium text-[var(--text-muted)] mb-1"
+              className="block text-xs font-medium text-[var(--ink-muted)] mb-1"
             >
               Exames relevantes realizados
             </label>
@@ -419,14 +419,14 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
               value={referral.relevantExams}
               onChange={(e) => onUpdateReferral({ ...referral, relevantExams: e.target.value })}
               placeholder="Ex.: Hemograma completo sem alterações, RX de tórax com hiperinsuflação discreta..."
-              className="w-full p-2.5 rounded-xl text-xs font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input leading-relaxed"
+              className="w-full p-2.5 rounded-xl text-xs font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] tactile-input leading-relaxed"
             />
           </div>
 
           <div>
             <label
               htmlFor="referral-hypothesis-cid"
-              className="block text-xs font-medium text-[var(--text-muted)] mb-1"
+              className="block text-xs font-medium text-[var(--ink-muted)] mb-1"
             >
               Texto da hipótese diagnóstica (CID-10)
             </label>
@@ -436,7 +436,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
               value={referral.hypothesisCID}
               onChange={(e) => onUpdateReferral({ ...referral, hypothesisCID: e.target.value })}
               placeholder="Ex.: J45.9 - Asma não especificada / J30.4 - Rinite alérgica..."
-              className="w-full p-2.5 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input leading-relaxed font-sans"
+              className="w-full p-2.5 rounded-xl text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] tactile-input leading-relaxed font-sans"
             />
           </div>
         </div>
@@ -445,7 +445,7 @@ export const ReferralFormSection: React.FC<ReferralFormSectionProps> = ({
         <div className="surface-inset p-3 sm:p-3.5 rounded-xl border border-subtle dark:border-strong flex flex-col gap-2.5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-subtle dark:border-strong pb-2">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+              <Sparkles className="w-4 h-4 text-[var(--ink-clinical)] shrink-0" />
               <h4 className="text-xs font-semibold text-[var(--text-main)]">
                 Buscador de CID-10 para Encaminhamento
               </h4>

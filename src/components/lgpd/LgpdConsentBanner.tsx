@@ -32,10 +32,10 @@ export const LgpdConsentBanner: React.FC<LgpdConsentBannerProps> = ({
       aria-busy={false}
       className="fixed bottom-16 lg:bottom-4 inset-x-2.5 sm:inset-x-4 lg:inset-x-6 z-[58] max-w-screen-xl mx-auto no-print animate-tab-fade"
     >
-      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)]/95 backdrop-blur-md p-3.5 sm:p-4 shadow-tactile-lg text-[var(--text-main)] flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
+      <div className="rounded-2xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] bg-[var(--surface-card)] p-3.5 sm:p-4 shadow-[var(--elevation-high)] text-[var(--text-main)] flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
         {/* Texto explicativo de 1º acesso, LGPD e operação sem login */}
         <div className="flex items-start gap-3 min-w-0 flex-1">
-          <div className="w-10 h-10 rounded-xl bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center shrink-0 mt-0.5">
+          <div className="w-10 h-10 rounded-xl bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border border-[var(--hairline)] flex items-center justify-center shrink-0 mt-0.5">
             <Icon name="shield" size={20} filled />
           </div>
           <div className="space-y-1 min-w-0">
@@ -43,8 +43,9 @@ export const LgpdConsentBanner: React.FC<LgpdConsentBannerProps> = ({
               <span className="text-xs sm:text-sm font-bold text-[var(--text-main)]">
                 Segurança Clínica, Cookies &amp; LGPD (Lei nº 13.709/2018)
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)]">
-                100% Local-First • Zero Rastreadores
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border border-[var(--hairline)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
+                <span>100% Local-First • Zero Rastreadores</span>
               </span>
             </div>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -61,7 +62,7 @@ export const LgpdConsentBanner: React.FC<LgpdConsentBannerProps> = ({
             id="btn-lgpd-customize"
             type="button"
             onClick={onOpenCustomizeModal}
-            className="w-full sm:w-auto min-h-[44px] px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+            className="btn-tactile-secondary w-full sm:w-auto min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           >
             <Icon name="tune" size={16} className="text-[var(--ink-clinical)] shrink-0" />
             <span>Selecionar Cookies &amp; LGPD</span>
@@ -71,10 +72,10 @@ export const LgpdConsentBanner: React.FC<LgpdConsentBannerProps> = ({
             id="btn-lgpd-accept-essential"
             type="button"
             onClick={onAcceptEssential}
-            className="flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl border border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)] hover:bg-[var(--surface-hover)] text-[var(--ink-clinical)] text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+            className="btn-tactile-secondary flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             title="Ativar apenas armazenamento local essencial offline e bloquear cookies de nuvem"
           >
-            <Icon name="lock" size={15} className="shrink-0" />
+            <Icon name="lock" size={15} className="text-[var(--ink-clinical)] shrink-0" />
             <span>Apenas Necessários (100% Local)</span>
           </button>
 
@@ -82,7 +83,7 @@ export const LgpdConsentBanner: React.FC<LgpdConsentBannerProps> = ({
             id="btn-lgpd-accept-all"
             type="button"
             onClick={onAcceptAll}
-            className="flex-1 sm:flex-initial btn-tactile-primary min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-tactile-btn transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+            className="flex-1 sm:flex-initial btn-tactile-primary min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             title="Permitir armazenamento local essencial e cookies opcionais caso conecte a Nuvem Google"
           >
             <Icon name="check" size={16} className="shrink-0" />

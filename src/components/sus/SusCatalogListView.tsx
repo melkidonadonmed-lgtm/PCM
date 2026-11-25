@@ -32,12 +32,13 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
       <div className="cq-card card-surface surface-card-minimal p-3.5 sm:p-4 rounded-2xl border border-subtle dark:border-strong flex flex-col gap-2.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <Icon name="description" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="description" size={18} className="text-[var(--ink-clinical)] shrink-0" />
             <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
               Documentos & Requisições Oficiais do SUS
             </h2>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[var(--surface-info-subtle)] text-sky-700 dark:text-sky-300 border border-[var(--border-info-subtle)] clinical-tabular-nums shrink-0">
-              9 modelos A4 editáveis
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border border-[var(--hairline)] clinical-tabular-nums shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
+              <span>9 modelos A4 editáveis</span>
             </span>
           </div>
 
@@ -46,7 +47,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
               href="/formularios-sus-offline.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-target text-xs font-semibold px-3 min-h-[44px] rounded-lg border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition flex items-center gap-1.5 clinical-tabular-nums"
+              className="touch-target btn-tactile-secondary text-xs font-semibold px-3 min-h-[44px] flex items-center gap-1.5 clinical-tabular-nums"
               title="Abrir Central Regulatória SUS A4 Vetorial (9 modelos editáveis diretos na folha)"
             >
               <Icon name="print" size={14} />
@@ -104,7 +105,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
               placeholder="Ex.: APAC, LME, Tomografia, Mamografia, Dengue..."
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 min-h-[44px] text-xs rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder:text-[var(--text-placeholder)] focus:border-info focus-visible:ring-1 focus-visible:ring-sky-500 outline-none transition"
+              className="w-full pl-8 pr-3 py-2 min-h-[44px] text-xs rounded-xl bg-[var(--surface-inset)] border border-[var(--border-control)] text-[var(--text-main)] placeholder:text-[var(--text-placeholder)] focus:border-[var(--accent-focus)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none transition"
             />
           </div>
         </div>
@@ -126,9 +127,9 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
                   onStartFillingSingle(doc.id);
                 }
               }}
-              className={`cq-card tactile-card-interactive rounded-2xl p-3.5 sm:p-4 flex items-start gap-3 border relative group cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+              className={`cq-card tactile-card-interactive rounded-2xl p-3.5 sm:p-4 flex items-start gap-3 border relative group cursor-pointer transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
                 isSelected
-                  ? 'border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] shadow-elevation-medium'
+                  ? 'bg-[var(--surface-card-lit)] border-[var(--border-control)] ring-1 ring-[var(--accent-focus)]/30 shadow-elevation-medium'
                   : 'border-subtle dark:border-strong hover:border-slate-300 dark:hover:border-white/20'
               }`}
             >
@@ -140,7 +141,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
                   e.stopPropagation();
                   onToggleDocSelection(doc.id);
                 }}
-                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] -ml-2 -mt-2 mr-0 flex items-center justify-center shrink-0 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] -ml-2 -mt-2 mr-0 flex items-center justify-center shrink-0 cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
                 <span
                   className={`w-5 h-5 rounded-md flex items-center justify-center transition border ${
@@ -158,18 +159,19 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
                 <div className="flex items-center justify-between gap-1.5">
                   <h3
                     title={doc.title}
-                    className="text-xs sm:text-[13px] font-bold text-[var(--text-main)] group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate leading-snug"
+                    className="text-xs sm:text-[13px] font-bold text-[var(--text-main)] group-hover:text-[var(--ink-clinical)] transition-colors truncate leading-snug"
                   >
                     {doc.shortTitle}
                   </h3>
                   <div className="flex items-center gap-1 shrink-0">
                     <span
                       title="Folha A4 vetorial nítida e editável em alta definição"
-                      className="text-[11px] font-bold uppercase px-1.5 py-0.5 rounded bg-[var(--accent-emerald-subtle)] text-emerald-800 dark:text-emerald-200 border border-[var(--accent-emerald-border)] whitespace-nowrap"
+                      className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border border-[var(--hairline)] whitespace-nowrap"
                     >
-                      A4 Editável
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
+                      <span>A4 Editável</span>
                     </span>
-                    <span className="text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded bg-[var(--surface-chip-muted)] text-sky-700 dark:text-sky-300 border border-[var(--border-subtle)] whitespace-nowrap">
+                    <span className="text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded bg-[var(--surface-chip-muted)] text-[var(--ink-accent)] border border-[var(--border-subtle)] whitespace-nowrap">
                       {doc.system.split(' ')[0].replace(',', '')}
                     </span>
                   </div>
@@ -183,7 +185,7 @@ export const SusCatalogListView: React.FC<SusCatalogListViewProps> = ({
                   <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400 clinical-tabular-nums truncate">
                     SIGTAP {doc.defaultSigtap || 'Diversos'}
                   </span>
-                  <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 group-hover:underline inline-flex items-center gap-0.5 shrink-0">
+                  <span className="text-[11px] font-bold text-[var(--ink-clinical)] group-hover:underline inline-flex items-center gap-0.5 shrink-0">
                     <span>Preencher</span>
                     <Icon name="chevron_right" size={13} />
                   </span>

@@ -311,38 +311,38 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
 
   return (
     <div data-state="idle" aria-busy={false} className="w-full max-w-7xl mx-auto flex flex-col gap-3 sm:gap-3.5 surface-raised">
-      <header className="hidden lg:flex items-baseline justify-between gap-4 pb-2 border-b border-[var(--border-subtle)]">
+      <header className="hidden lg:flex items-baseline justify-between gap-4 pb-2.5 border-b border-[var(--hairline)]">
         <div className="flex items-baseline gap-3 min-w-0">
-          <h1 className="font-serif-doc text-[26px] leading-none font-bold tracking-tight text-[var(--text-main)]">
+          <h1 className="font-sans text-[clamp(1.375rem,1.2rem+0.45vw,1.5625rem)] font-semibold tracking-[-0.02em] leading-tight text-[var(--ink-primary)]">
             Prescrição Médica
           </h1>
-          <span className="text-xs font-medium text-[var(--text-muted)]">
+          <span className="text-xs font-medium text-[var(--ink-muted)]">
             Instrumento clínico • prévia simultânea em folha A4
           </span>
         </div>
-        <span className="text-[11px] font-semibold clinical-tabular-nums text-[var(--ink-clinical)] shrink-0">
+        <span className="text-xs font-semibold tabular-nums clinical-tabular-nums text-[var(--ink-clinical)] shrink-0">
           {items.length} {items.length === 1 ? 'item prescrito' : 'itens prescritos'}
         </span>
       </header>
-      <div className="flex md:hidden items-center justify-between p-1 rounded-2xl nav-segmented-track gap-1">
+      <div className="flex md:hidden items-center justify-between p-1 rounded-[12px] nav-segmented-track gap-1">
         <button
           type="button"
           onClick={() => setMobileSection('composer')}
-          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 cursor-pointer ${
-            mobileSection === 'composer' ? 'nav-segmented-pill-active font-bold' : 'text-[var(--text-secondary)] font-semibold'
+          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-[10px] text-[13px] flex items-center justify-center gap-1.5 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] cursor-pointer ${
+            mobileSection === 'composer' ? 'nav-segmented-pill-active font-semibold' : 'text-[var(--ink-secondary)] font-medium'
           }`}
         >
-          <Icon name="medication" size={15} filled={mobileSection === 'composer'} className={mobileSection === 'composer' ? 'text-[var(--ink-clinical)]' : 'opacity-70'} />
+          <Icon name="medication" size={16} filled={mobileSection === 'composer'} className={mobileSection === 'composer' ? 'text-[var(--ink-clinical)]' : 'opacity-75'} />
           <span>Prescrever medicamentos</span>
         </button>
         <button
           type="button"
           onClick={() => setMobileSection('preview')}
-          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 cursor-pointer clinical-tabular-nums ${
-            mobileSection === 'preview' ? 'nav-segmented-pill-active font-bold' : 'text-[var(--text-secondary)] font-semibold'
+          className={`touch-target flex-1 min-h-[44px] py-2 px-3 rounded-[10px] text-[13px] flex items-center justify-center gap-1.5 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] cursor-pointer tabular-nums clinical-tabular-nums ${
+            mobileSection === 'preview' ? 'nav-segmented-pill-active font-semibold' : 'text-[var(--ink-secondary)] font-medium'
           }`}
         >
-          <Icon name="description" size={15} filled={mobileSection === 'preview'} className={mobileSection === 'preview' ? 'text-[var(--ink-clinical)]' : 'opacity-70'} />
+          <Icon name="description" size={16} filled={mobileSection === 'preview'} className={mobileSection === 'preview' ? 'text-[var(--ink-clinical)]' : 'opacity-75'} />
           <span>Visualizar receita ({items.length})</span>
         </button>
       </div>
@@ -492,9 +492,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center gap-2 shadow-tactile-lg animate-tab-fade"
+          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 px-4 py-2.5 rounded-[10px] bg-[var(--clinical)] text-white text-xs font-semibold flex items-center gap-2 shadow-tactile-lg animate-tab-fade"
         >
-          <Icon name="check" className="text-[16px]" />
+          <Icon name="check" size={16} />
           <span>Medicamento inserido na receita com sucesso!</span>
         </div>
       )}
@@ -503,9 +503,9 @@ export const PrescriptionBuilder: React.FC<PrescriptionBuilderProps> = ({
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade"
+          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 bg-[var(--sidebar-surface-bg)] text-[var(--sidebar-text-primary)] px-4 py-2.5 rounded-[10px] shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-[var(--surface-panel-border)] animate-tab-fade"
         >
-          <Icon name="check" className="text-[16px] text-emerald-400" />
+          <Icon name="check" size={16} className="text-teal-300" />
           <span>{prescriptionModelToast}</span>
         </div>
       )}

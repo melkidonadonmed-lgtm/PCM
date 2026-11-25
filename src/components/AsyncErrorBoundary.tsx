@@ -49,16 +49,16 @@ export class AsyncErrorBoundary extends Component<Props, State> {
       const moduleTitle = this.props.moduleName || 'este módulo';
 
       return (
-        <div data-state="idle" aria-busy={false} className="w-full max-w-xl mx-auto my-12 p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-warning dark:border-warning shadow-tactile-lg text-center space-y-4 surface-raised">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-100 dark:bg-amber-950/60 border border-warning dark:border-warning text-amber-600 dark:text-amber-400 flex items-center justify-center">
+        <div data-state="error" aria-busy={false} className="w-full max-w-xl mx-auto my-12 p-6 sm:p-8 rounded-2xl bg-[var(--surface-card)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)] shadow-[var(--elevation-high)] text-center space-y-4 surface-raised">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--accent-amber)] flex items-center justify-center">
             <Icon name="warning" className="text-[24px]" />
           </div>
 
           <div className="space-y-1.5">
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base sm:text-lg font-bold text-[var(--ink-primary)]">
               Não foi possível carregar {moduleTitle}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-md mx-auto">
+            <p className="text-xs sm:text-sm text-[var(--ink-secondary)] leading-relaxed max-w-md mx-auto">
               Pode ter ocorrido uma oscilação na conexão ou atualização recente de versão salva em cache do navegador.
             </p>
           </div>
@@ -67,7 +67,7 @@ export class AsyncErrorBoundary extends Component<Props, State> {
             <button
               type="button"
               onClick={this.handleRetry}
-              className="btn-tactile-primary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition active:scale-95"
+              className="btn-tactile-primary min-h-[44px] px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             >
               <Icon name="restart_alt" className="text-[16px]" />
               <span>Tentar Carregar Novamente</span>
@@ -76,7 +76,7 @@ export class AsyncErrorBoundary extends Component<Props, State> {
             <button
               type="button"
               onClick={this.handleHardReload}
-              className="btn-tactile-secondary px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition active:scale-95 text-slate-700 dark:text-slate-300"
+              className="btn-tactile-secondary min-h-[44px] px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             >
               <Icon name="refresh" className="text-[16px]" />
               <span>Recarregar Página</span>

@@ -218,7 +218,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
     content: '',
     editorProps: {
       attributes: {
-        class: 'min-h-48 leading-relaxed text-inherit selection:bg-sky-200 dark:selection:bg-sky-800',
+        class: 'min-h-48 leading-relaxed text-inherit selection:bg-teal-200/70',
       },
     },
     onCreate: ({ editor: ed }) => {
@@ -340,7 +340,7 @@ export const DocumentEditorView: React.FC<DocumentEditorViewProps> = ({
           aria-live="polite"
           data-state="idle"
           aria-busy={false}
-          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-tactile-lg text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade no-print"
+          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-[var(--elevation-high)] text-xs font-semibold flex items-center gap-2 border border-strong animate-tab-fade no-print"
         >
           <Icon name="check" size={16} className="text-emerald-400" />
           <span>{toastMessage}</span>

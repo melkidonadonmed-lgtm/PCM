@@ -432,7 +432,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
                   data-state="loading"
                   className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5"
                 >
-                  <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
+                  <div className="w-8 h-8 border-3 border-[var(--clinical)] border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
                   <span className="font-medium text-slate-600 dark:text-slate-300">
                     Carregando processador de texto clínico e canvas A4...
                   </span>
@@ -470,7 +470,7 @@ export const AppModuleWorkspaceSection: React.FC<AppModuleWorkspaceSectionProps>
                   data-state="loading"
                   className="flex flex-col items-center justify-center p-12 text-center text-sm opacity-80 gap-3.5"
                 >
-                  <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
+                  <div className="w-8 h-8 border-3 border-[var(--clinical)] border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
                   <span className="font-medium text-slate-600 dark:text-slate-300">
                     Carregando visualização médica e módulos de exportação...
                   </span>

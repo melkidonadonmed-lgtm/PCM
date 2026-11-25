@@ -92,27 +92,32 @@ export const EparadaAndScreeningPanel: React.FC<
   return (
     <div className="space-y-4" data-state="idle">
       {/* Seletor entre EPARADA (PCR ACLS/PALS) e Rastreio Oncológico Rápido */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-3">
-        <div className="flex items-center gap-2">
+      <div className="card-surface flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--hairline)] p-3">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
+            aria-pressed={subMode === 'EPARADA'}
             onClick={() => setSubMode('EPARADA')}
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-colors cursor-pointer ${
+            className={`touch-target min-h-[44px] inline-flex items-center gap-2 rounded-[10px] px-4 py-2 text-xs font-bold cursor-pointer ${
               subMode === 'EPARADA'
-                ? 'bg-red-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                ? 'btn-tactile-primary'
+                : 'btn-tactile-secondary'
             }`}
           >
-            <Icon name="emergency" className="text-base" />
+            <Icon
+              name="emergency"
+              className={`text-base ${subMode === 'EPARADA' ? 'text-white' : 'text-[var(--status-danger)]'}`}
+            />
             Painel EPARADA (PCR ACLS / PALS & 5H/5T)
           </button>
           <button
             type="button"
+            aria-pressed={subMode === 'ONCO_SCREENING'}
             onClick={() => setSubMode('ONCO_SCREENING')}
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-colors cursor-pointer ${
+            className={`touch-target min-h-[44px] inline-flex items-center gap-2 rounded-[10px] px-4 py-2 text-xs font-bold cursor-pointer ${
               subMode === 'ONCO_SCREENING'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                ? 'btn-tactile-primary'
+                : 'btn-tactile-secondary'
             }`}
           >
             <Icon name="fact_check" className="text-base" />
@@ -120,7 +125,7 @@ export const EparadaAndScreeningPanel: React.FC<
           </button>
         </div>
 
-        <span className="text-xs text-slate-500 dark:text-slate-400">
+        <span className="text-xs text-[var(--ink-muted)]">
           Cálculo determinístico com tetos de segurança e exportação direta A4
         </span>
       </div>
@@ -129,31 +134,32 @@ export const EparadaAndScreeningPanel: React.FC<
         <div className="space-y-4">
           {/* Painel Superior: Cronômetro de Ciclo 2:00 + Contadores + Ritmo + Peso */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <div className="rounded-xl border border-red-500/40 bg-white dark:bg-slate-800/90 p-4 lg:col-span-5 space-y-3">
+            <div className="card-surface rounded-2xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)] p-4 lg:col-span-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--status-danger)]">
                   Cronômetro de Ciclo RCP (2:00 min)
                 </span>
-                <span className="rounded bg-[var(--accent-rose-subtle)] border border-[var(--accent-rose-border)] px-2 py-0.5 font-mono text-xs font-bold text-rose-800 dark:text-rose-200 clinical-tabular-nums">
+                <span className="inline-flex items-center gap-1.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-2 py-0.5 font-mono text-xs font-bold text-[var(--ink-primary)] clinical-tabular-nums">
+                  <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--status-danger)] shrink-0" />
                   Ciclo #{cyclesCount}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3">
+              <div className="flex items-center justify-between rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-3">
                 <div>
-                  <span className="block text-[11px] uppercase text-slate-500">
+                  <span className="block text-[11px] uppercase text-[var(--ink-muted)]">
                     Tempo Total
                   </span>
-                  <span className="font-mono text-2xl font-black text-slate-900 dark:text-white clinical-tabular-nums">
+                  <span className="font-mono text-2xl font-black text-[var(--ink-primary)] clinical-tabular-nums">
                     {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:
                     {String(elapsedSeconds % 60).padStart(2, '0')}
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="block text-[11px] uppercase text-slate-500">
+                  <span className="block text-[11px] uppercase text-[var(--ink-muted)]">
                     Próx. Checagem Ritmo
                   </span>
-                  <span className="font-mono text-xl font-bold text-amber-600 dark:text-amber-400 clinical-tabular-nums">
+                  <span className="font-mono text-xl font-bold text-[var(--accent-amber)] clinical-tabular-nums">
                     {String(Math.floor(cycleRemainingSecs / 60)).padStart(
                       2,
                       '0'
@@ -167,13 +173,15 @@ export const EparadaAndScreeningPanel: React.FC<
                 <button
                   type="button"
                   onClick={() => setIsTimerRunning((prev) => !prev)}
-                  className={`flex-1 rounded-lg px-3 py-2 text-xs font-bold text-white cursor-pointer ${
-                    isTimerRunning
-                      ? 'bg-amber-600 hover:bg-amber-700'
-                      : 'bg-red-600 hover:bg-red-700'
-                  }`}
+                  className="touch-target btn-tactile-primary flex-1 min-h-[44px] inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold cursor-pointer"
                 >
-                  {isTimerRunning ? 'Pausar RCP' : 'Iniciar / Retomar RCP'}
+                  <span
+                    aria-hidden="true"
+                    className={`w-2 h-2 rounded-full shrink-0 ${
+                      isTimerRunning ? 'bg-[var(--accent-amber)]' : 'bg-[var(--status-danger)]'
+                    }`}
+                  />
+                  <span>{isTimerRunning ? 'Pausar RCP' : 'Iniciar / Retomar RCP'}</span>
                 </button>
                 <button
                   type="button"
@@ -185,7 +193,7 @@ export const EparadaAndScreeningPanel: React.FC<
                     setAmiodaroneCount(0);
                     setPcrOutcome('EM_ANDAMENTO');
                   }}
-                  className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 cursor-pointer"
+                  className="touch-target btn-tactile-danger min-h-[44px] px-3 py-2 text-xs font-semibold cursor-pointer"
                 >
                   Zerar
                 </button>
@@ -196,45 +204,45 @@ export const EparadaAndScreeningPanel: React.FC<
                 <button
                   type="button"
                   onClick={() => setShocksCount((c) => c + 1)}
-                  className="flex flex-col items-center rounded-lg border border-amber-500/40 bg-amber-50/70 dark:bg-amber-950/30 p-2 text-center hover:bg-amber-100 cursor-pointer"
+                  className="touch-target btn-tactile-secondary flex flex-col items-center justify-center rounded-xl border-l-[3px] border-l-[var(--accent-amber)] p-2 text-center cursor-pointer"
                 >
-                  <span className="text-[11px] font-bold uppercase text-amber-800 dark:text-amber-300">
+                  <span className="text-[11px] font-bold uppercase text-[var(--ink-secondary)]">
                     Choques
                   </span>
-                  <span className="font-mono text-lg font-black text-amber-900 dark:text-white clinical-tabular-nums">
+                  <span className="font-mono text-lg font-black text-[var(--ink-primary)] clinical-tabular-nums">
                     {shocksCount}
                   </span>
-                  <span className="text-[11px] text-amber-700 dark:text-amber-400">
+                  <span className="text-[11px] text-[var(--ink-muted)]">
                     +1 Choque
                   </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setEpinephrineCount((c) => c + 1)}
-                  className="flex flex-col items-center rounded-lg border border-red-500/40 bg-red-50/70 dark:bg-red-950/30 p-2 text-center hover:bg-red-100 cursor-pointer"
+                  className="touch-target btn-tactile-secondary flex flex-col items-center justify-center rounded-xl border-l-[3px] border-l-[var(--status-danger)] p-2 text-center cursor-pointer"
                 >
-                  <span className="text-[11px] font-bold uppercase text-red-800 dark:text-red-300">
+                  <span className="text-[11px] font-bold uppercase text-[var(--ink-secondary)]">
                     Adrenalina
                   </span>
-                  <span className="font-mono text-lg font-black text-red-900 dark:text-white clinical-tabular-nums">
+                  <span className="font-mono text-lg font-black text-[var(--ink-primary)] clinical-tabular-nums">
                     {epinephrineCount}
                   </span>
-                  <span className="text-[11px] text-red-700 dark:text-red-400">
+                  <span className="text-[11px] text-[var(--ink-muted)]">
                     +1 Dose (3-5m)
                   </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setAmiodaroneCount((c) => c + 1)}
-                  className="flex flex-col items-center rounded-lg border border-blue-500/40 bg-blue-50/70 dark:bg-blue-950/30 p-2 text-center hover:bg-blue-100 cursor-pointer"
+                  className="touch-target btn-tactile-secondary flex flex-col items-center justify-center rounded-xl border-l-[3px] border-l-[var(--ink-clinical)] p-2 text-center cursor-pointer"
                 >
-                  <span className="text-[11px] font-bold uppercase text-blue-800 dark:text-blue-300">
+                  <span className="text-[11px] font-bold uppercase text-[var(--ink-secondary)]">
                     Amiodarona
                   </span>
-                  <span className="font-mono text-lg font-black text-blue-900 dark:text-white clinical-tabular-nums">
+                  <span className="font-mono text-lg font-black text-[var(--ink-primary)] clinical-tabular-nums">
                     {amiodaroneCount}
                   </span>
-                  <span className="text-[11px] text-blue-700 dark:text-blue-400">
+                  <span className="text-[11px] text-[var(--ink-muted)]">
                     +1 Bolus
                   </span>
                 </button>
@@ -242,30 +250,32 @@ export const EparadaAndScreeningPanel: React.FC<
             </div>
 
             {/* Configuração de Ritmo, Peso e Modo Adulto/PALS */}
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 lg:col-span-7 space-y-3">
+            <div className="card-surface rounded-2xl border border-[var(--hairline)] p-4 lg:col-span-7 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
                   Parâmetros da Reanimação (ACLS Adulto & PALS Pediátrico)
                 </h3>
-                <div className="flex items-center gap-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 p-0.5 text-xs">
+                <div className="flex items-center gap-1.5 text-xs">
                   <button
                     type="button"
+                    aria-pressed={!isPediatricMode}
                     onClick={() => setIsPediatricMode(false)}
-                    className={`rounded-md px-2.5 py-1 font-semibold cursor-pointer ${
+                    className={`touch-target min-h-[44px] rounded-[10px] px-3 py-1.5 font-semibold cursor-pointer ${
                       !isPediatricMode
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-600 dark:text-slate-400'
+                        ? 'btn-tactile-primary'
+                        : 'btn-tactile-secondary'
                     }`}
                   >
                     Adulto (ACLS)
                   </button>
                   <button
                     type="button"
+                    aria-pressed={isPediatricMode}
                     onClick={() => setIsPediatricMode(true)}
-                    className={`rounded-md px-2.5 py-1 font-semibold cursor-pointer ${
+                    className={`touch-target min-h-[44px] rounded-[10px] px-3 py-1.5 font-semibold cursor-pointer ${
                       isPediatricMode
-                        ? 'bg-purple-600 text-white'
-                        : 'text-slate-600 dark:text-slate-400'
+                        ? 'btn-tactile-primary'
+                        : 'btn-tactile-secondary'
                     }`}
                   >
                     Pediátrico (PALS)
@@ -277,7 +287,7 @@ export const EparadaAndScreeningPanel: React.FC<
                 <div>
                   <label
                     htmlFor="eparada-weight-input"
-                    className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300"
+                    className="block text-[11px] font-semibold text-[var(--ink-muted)]"
                   >
                     Peso Corporal (<span className="clinical-unit">kg</span>)
                   </label>
@@ -291,14 +301,14 @@ export const EparadaAndScreeningPanel: React.FC<
                     onChange={(e) =>
                       onWeightChange(parseFloat(e.target.value) || 0)
                     }
-                    className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 font-mono text-sm font-bold text-slate-900 dark:text-white clinical-tabular-nums"
+                    className="tactile-input mt-1 w-full h-11 min-h-[44px] rounded-[10px] border border-[var(--border-control)] px-3 py-1.5 font-mono text-sm font-bold text-[var(--ink-primary)] clinical-tabular-nums"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="eparada-rhythm-select"
-                    className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300"
+                    className="block text-[11px] font-semibold text-[var(--ink-muted)]"
                   >
                     Ritmo Inicial / Atual
                   </label>
@@ -307,7 +317,7 @@ export const EparadaAndScreeningPanel: React.FC<
                     aria-label="Ritmo cardíaco na PCR"
                     value={rhythm}
                     onChange={(e) => setRhythm(e.target.value as PcrRhythmType)}
-                    className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-900 dark:text-white"
+                    className="tactile-input mt-1 w-full h-11 min-h-[44px] rounded-[10px] border border-[var(--border-control)] px-2.5 py-1.5 text-xs font-semibold text-[var(--ink-primary)]"
                   >
                     <option value="FV">FV — Fibrilação Ventricular (Chocável)</option>
                     <option value="TVSP">TVSP — TV sem Pulso (Chocável)</option>
@@ -319,7 +329,7 @@ export const EparadaAndScreeningPanel: React.FC<
                 <div>
                   <label
                     htmlFor="eparada-outcome-select"
-                    className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300"
+                    className="block text-[11px] font-semibold text-[var(--ink-muted)]"
                   >
                     Status / Desfecho
                   </label>
@@ -335,7 +345,7 @@ export const EparadaAndScreeningPanel: React.FC<
                           | 'OBITO_CONSTATADO'
                       )
                     }
-                    className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-900 dark:text-white"
+                    className="tactile-input mt-1 w-full h-11 min-h-[44px] rounded-[10px] border border-[var(--border-control)] px-2.5 py-1.5 text-xs font-semibold text-[var(--ink-primary)]"
                   >
                     <option value="EM_ANDAMENTO">RCP em Andamento</option>
                     <option value="RCE_ATINGIDO">RCE Atingido (Cuidados Pós-PCR)</option>
@@ -346,30 +356,35 @@ export const EparadaAndScreeningPanel: React.FC<
 
               {/* Trava Sem Peso Sem Dose ou Tabela de Doses Calculadas */}
               {!eparadaCalc.isValidWeight ? (
-                <div className="rounded-xl border border-red-500/50 bg-red-50 dark:bg-red-950/40 p-3 text-xs font-bold text-red-800 dark:text-red-200">
-                  {eparadaCalc.validationMessage}
+                <div
+                  role="alert"
+                  className="flex items-start gap-2 rounded-xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)] bg-[var(--surface-card-lit)] p-3 text-xs font-semibold text-[var(--ink-primary)]"
+                >
+                  <Icon name="warning" size={16} className="shrink-0 mt-0.5 text-[var(--status-danger)]" />
+                  <span>{eparadaCalc.validationMessage}</span>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {eparadaCalc.doses.map((d) => (
                     <div
                       key={d.id}
-                      className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs"
+                      className="rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-2.5 text-xs"
                     >
                       <div className="flex items-center justify-between gap-1">
-                        <span className="font-bold text-slate-900 dark:text-white">
+                        <span className="font-bold text-[var(--ink-primary)]">
                           {d.drugOrAction}
                         </span>
                         {d.ceilingApplied ? (
-                          <span className="rounded bg-[var(--accent-amber-subtle)] border border-[var(--accent-amber-border)] px-1.5 py-0.5 font-mono text-[11px] font-semibold text-amber-800 dark:text-amber-200">
+                          <span className="inline-flex items-center gap-1 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-1.5 py-0.5 font-mono text-[11px] font-semibold text-[var(--ink-primary)]">
+                            <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--accent-amber)] shrink-0" />
                             Teto Máx
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-0.5 font-mono text-xs font-extrabold text-blue-700 dark:text-blue-300 clinical-tabular-nums">
+                      <div className="mt-0.5 font-mono text-xs font-extrabold text-[var(--ink-clinical)] clinical-tabular-nums">
                         {d.calculatedDose}
                       </div>
-                      <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400">
+                      <p className="mt-1 text-[11px] text-[var(--ink-muted)]">
                         {d.preparationAndAdministration}
                       </p>
                     </div>
@@ -396,13 +411,13 @@ export const EparadaAndScreeningPanel: React.FC<
                       'PCR_SOAP'
                     )
                   }
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 cursor-pointer"
+                  className="touch-target btn-tactile-secondary min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold cursor-pointer"
                 >
                   <Icon
                     name={
                       copiedFeedback === 'PCR_SOAP' ? 'check' : 'content_copy'
                     }
-                    className="text-sm"
+                    className="text-sm text-[var(--ink-clinical)]"
                   />
                   {copiedFeedback === 'PCR_SOAP'
                     ? 'Resumo Copiado!'
@@ -412,7 +427,7 @@ export const EparadaAndScreeningPanel: React.FC<
                   <button
                     type="button"
                     onClick={handleExportPcrToA4}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer"
+                    className="touch-target btn-tactile-primary min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold cursor-pointer"
                   >
                     <Icon name="description" className="text-sm" />
                     Enviar Registro de PCR ao Editor A4
@@ -423,8 +438,8 @@ export const EparadaAndScreeningPanel: React.FC<
           </div>
 
           {/* Checklist Interativo 5H e 5T */}
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4">
-            <h4 className="mb-2.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+          <div className="card-surface rounded-2xl border border-[var(--hairline)] p-4">
+            <h4 className="mb-2.5 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
               Checklist de Causas Reversíveis de PCR (5H e 5T) — Marque as causas revisadas/tratadas
             </h4>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
@@ -434,18 +449,19 @@ export const EparadaAndScreeningPanel: React.FC<
                   <button
                     key={cause.id}
                     type="button"
+                    aria-pressed={checked}
                     onClick={() => toggleCause(cause.id)}
-                    className={`flex items-start gap-2.5 rounded-lg border p-2.5 text-left text-xs transition-colors cursor-pointer ${
+                    className={`touch-target min-h-[44px] flex items-start gap-2.5 rounded-xl border p-2.5 text-left text-xs transition-colors cursor-pointer ${
                       checked
-                        ? 'border-emerald-500/60 bg-emerald-50/80 dark:bg-emerald-950/30 text-emerald-950 dark:text-emerald-100'
-                        : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300'
+                        ? 'border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)]'
+                        : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:border-[var(--border-control)]'
                     }`}
                   >
                     <span
                       className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border font-mono text-[11px] font-bold ${
                         checked
-                          ? 'border-emerald-600 bg-emerald-600 text-white'
-                          : 'border-slate-400'
+                          ? 'border-[var(--ink-clinical)] bg-[var(--clinical)] text-white'
+                          : 'border-[var(--border-control)] text-[var(--ink-muted)]'
                       }`}
                     >
                       {checked ? (
@@ -455,13 +471,13 @@ export const EparadaAndScreeningPanel: React.FC<
                       )}
                     </span>
                     <div>
-                      <div className="font-bold">
+                      <div className="font-bold text-[var(--ink-primary)]">
                         [{cause.group}] {cause.name}
                       </div>
-                      <div className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                      <div className="mt-0.5 text-[11px] text-[var(--ink-muted)]">
                         <strong>Pista:</strong> {cause.diagnosticClue}
                       </div>
-                      <div className="mt-0.5 text-[11px] font-medium text-blue-700 dark:text-blue-300">
+                      <div className="mt-0.5 text-[11px] font-medium text-[var(--ink-clinical)]">
                         <strong>Conduta:</strong> {cause.immediateIntervention}
                       </div>
                     </div>

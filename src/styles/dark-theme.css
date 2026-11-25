@@ -1,160 +1,181 @@
 /**
- * Dark Mode Semantic Tokens & Mobile Elevation Overrides (Mineral Slate Matte)
+ * Dark Mode Semantic Tokens & Adaptive Elevation Overrides (Mineral Slate Matte OKLCH)
+ * Specificity (0,2,0) guarantees precedence over :root (0,1,0) after @import.
  */
 @layer base {
-  /* TEMA ESCURO: Ardósia Fosco Mineral com Caixas Mais Claras (#141C27 Canvas / #243042 Cards) */
-  /* Especificidade (0,2,0) garante precedência sobre :root (0,1,0) após @import */
   :root.dark,
   .dark:is(.dark),
   [data-theme="dark"]:is([data-theme="dark"]) {
     color-scheme: dark;
-    --canvas: #141c27;
-    --bg-main: #141c27;
-    --surface: #243042;
-    --border: #36455b;
-    --text-primary: #f8fafc;
-    --text-title: #f8fafc;
-    --text-body: #cbd5e1;
-    --text-muted: #c4d2e3;
-    --primary: oklch(0.43 0.055 245);
-    --primary-hover: oklch(0.45 0.055 245);
-    --clinical: #14635d;
-    --clinical-hover: #0f4f4a;
 
-    /* Hierarquia Tonal Ascendente sem Efeito Escavado (#141C27 Canvas < #243042 Card < #2C3B50 Controles < #2E3E54 Raised) */
-    --surface-sunken: #101722;
-    --surface-canvas: #141C27;
-    --surface-inset: #2C3B50;
-    --surface-flat: #243042;
-    --surface-raised: #2E3E54;
-    --surface-contrast: #0F172A;
-    --surface-modal: #202B3C;
-    --accent-point: #93B7DB;
-    --accent-focus: #5EEAD4;
-    --ink-accent: #C5DCF8;
-    --ink-clinical: #5EEAD4;
-    --surface-clinical-subtle: rgba(20, 184, 166, 0.14);
-    --border-clinical-subtle: rgba(94, 234, 212, 0.28);
-    --a4-bench-bg: #101722;
-    --a4-bench-border: rgba(255, 255, 255, 0.10);
+    /* Primitives (Dark Polarity) */
+    --p-navy-700: oklch(0.390 0.052 246);
+    --p-navy-800: oklch(0.440 0.054 246);
+    --p-teal-600: oklch(0.435 0.074 186);
+    --p-teal-700: oklch(0.385 0.070 186);
+    --p-rose-700: oklch(0.785 0.145 18);
 
-    --bg-canvas: #141C27;
-    --bg-app: #141C27;
-    --bg-surface: #243042;
-    --surface-card: #243042;
-    --bg-surface-elevated: #2E3E54;
-    --surface-elevated: #2E3E54;
-    --surface-hover: #354760;
-    --surface-active: #3D516E;
+    /* Semantic Monotonic Ladder: canvas 0.185 < card 0.245 < card-lit 0.295 (Delta L >= 0.05) */
+    --surface-canvas: oklch(0.185 0.015 248);
+    --surface-card: oklch(0.245 0.018 248);
+    --surface-card-lit: oklch(0.295 0.020 248);
+    --ink-primary: oklch(0.975 0.004 248);
+    --ink-secondary: oklch(0.865 0.012 248);
+    --ink-muted: oklch(0.790 0.014 248);
+    --ink-accent: oklch(0.860 0.045 245);
+    --ink-clinical: oklch(0.840 0.110 180);
+    --status-danger: oklch(0.785 0.145 18);
+    --border-control: oklch(0.610 0.024 248);
+    --border-control-hover: oklch(0.700 0.026 248);
+    --hairline: color-mix(in oklab, var(--ink-primary) 12%, transparent);
 
-    /* Cores de Navegação no Dark */
-    --nav-bg: #1E293B;
-    --surface-panel: #16202E;
-    --surface-panel-2: #243042;
-    --surface-panel-hover: #33435A;
-    --nav-border: #ffffff1a;
-    --surface-panel-border: #ffffff1a;
-    --nav-text: #F8FAFC;
-    --surface-panel-text: #F8FAFC;
-    --nav-text-muted: #94A3B8;
-    --surface-panel-muted: #94A3B8;
-    --nav-active-bg: oklch(0.43 0.055 245);
+    /* Legacy Surface Aliases Mapped to OKLCH Ladder */
+    --canvas: var(--surface-canvas);
+    --bg-main: var(--surface-canvas);
+    --bg-canvas: var(--surface-canvas);
+    --bg-app: var(--surface-canvas);
+    --surface: var(--surface-card);
+    --bg-surface: var(--surface-card);
+    --surface-flat: var(--surface-card);
+    --surface-modal: var(--surface-card);
+    --surface-inset: var(--surface-card-lit);
+    --surface-raised: var(--surface-card-lit);
+    --bg-surface-elevated: var(--surface-card-lit);
+    --surface-elevated: var(--surface-card-lit);
+    --surface-sunken: oklch(0.155 0.014 248);
+    --surface-contrast: oklch(0.165 0.016 250);
+    --surface-hover: oklch(0.325 0.022 248);
+    --surface-active: oklch(0.355 0.024 248);
+
+    --surface-clinical-subtle: oklch(0.435 0.074 186 / 0.20);
+    --border-clinical-subtle: oklch(0.840 0.110 180 / 0.30);
+    --a4-bench-bg: oklch(0.155 0.014 248);
+    --a4-bench-border: oklch(1 0 0 / 0.10);
+
+    /* Sidebar & Navigation Shell Tokens */
+    --sidebar-surface-bg: oklch(0.225 0.024 252);
+    --sidebar-surface-elevated: oklch(0.268 0.025 252);
+    --sidebar-text-primary: oklch(0.975 0.004 248);
+    --sidebar-text-secondary: oklch(0.880 0.012 248);
+    --sidebar-text-muted: oklch(0.810 0.014 252);
+
+    --nav-bg: var(--sidebar-surface-bg);
+    --surface-panel: var(--sidebar-surface-bg);
+    --surface-panel-2: var(--sidebar-surface-elevated);
+    --surface-panel-hover: oklch(0.310 0.024 252);
+    --nav-border: oklch(1 0 0 / 0.14);
+    --surface-panel-border: oklch(1 0 0 / 0.14);
+    --nav-text: var(--sidebar-text-primary);
+    --surface-panel-text: var(--sidebar-text-primary);
+    --nav-text-muted: var(--sidebar-text-muted);
+    --surface-panel-muted: var(--sidebar-text-muted);
+    --nav-active-bg: oklch(1 0 0 / 0.10);
     --nav-active-text: #FFFFFF;
-    --nav-active-glow: 0 2px 6px rgba(0, 0, 0, 0.28);
+    --nav-active-glow: inset 0 1px 0 oklch(1 0 0 / 0.08);
 
-    /* Texto: #FFFFFF em --text-inverse (>= 7:1 AAA em CTAs); --text-placeholder >= 7.4:1 AAA sobre #2C3B50 */
-    --text-main: #F8FAFC;
-    --text-secondary: #CBD5E1;
-    --text-placeholder: #C4D2E3;
-    --text-subtle: #9BB0C9;
+    /* Legacy Text Aliases (AAA >= 7.0:1; #FFFFFF on CTAs via --text-inverse) */
+    --text-primary: var(--ink-primary);
+    --text-title: var(--ink-primary);
+    --text-main: var(--ink-primary);
+    --text-secondary: var(--ink-secondary);
+    --text-body: var(--ink-secondary);
+    --text-muted: var(--ink-muted);
+    --text-placeholder: var(--ink-muted);
+    --text-subtle: var(--ink-muted);
     --text-inverse: #FFFFFF;
 
-    /* Acentos & Botões Primários (Steel Slate Sólido em OKLCH — Sem Azul Neon) */
-    --accent: #94A3B8;
-    --accent-hover: #CBD5E1;
-    --nav-accent: #F8FAFC;
+    /* Accents & Action Surfaces */
+    --primary: var(--p-navy-700);
+    --primary-hover: var(--p-navy-800);
+    --oklch-primary: var(--p-navy-700);
+    --oklch-primary-hover: var(--p-navy-800);
+    --clinical: var(--p-teal-600);
+    --clinical-hover: var(--p-teal-700);
 
-    --oklch-primary: oklch(0.43 0.055 245);
-    --oklch-primary-hover: oklch(0.45 0.055 245);
-    --accent-primary: oklch(0.43 0.055 245);
-    --accent-primary-hover: oklch(0.45 0.055 245);
-    --accent-primary-subtle: rgba(148, 163, 184, 0.12);
-    --accent-primary-border: rgba(148, 163, 184, 0.26);
+    --accent: var(--ink-accent);
+    --accent-hover: var(--ink-primary);
+    --accent-point: var(--ink-accent);
+    --accent-focus: var(--ink-clinical);
+    --nav-accent: var(--ink-primary);
 
-    --accent-clinical: #14635D;
-    --accent-clinical-hover: #0F4F4A;
-    --accent-emerald: #14635D;
-    --accent-emerald-hover: #0F4F4A;
-    --accent-emerald-subtle: rgba(29, 122, 115, 0.16);
-    --accent-emerald-border: rgba(29, 122, 115, 0.34);
+    --accent-primary: var(--p-navy-700);
+    --accent-primary-hover: var(--p-navy-800);
+    --accent-primary-subtle: color-mix(in oklab, var(--ink-accent) 12%, transparent);
+    --accent-primary-border: color-mix(in oklab, var(--ink-accent) 28%, transparent);
 
-    --accent-amber: #D97706;
-    --accent-amber-hover: #B45309;
-    --accent-amber-subtle: rgba(217, 119, 6, 0.16);
-    --accent-amber-border: rgba(217, 119, 6, 0.34);
+    --accent-clinical: var(--p-teal-600);
+    --accent-clinical-hover: var(--p-teal-700);
+    --accent-emerald: var(--p-teal-600);
+    --accent-emerald-hover: var(--p-teal-700);
+    --accent-emerald-subtle: oklch(0.435 0.074 186 / 0.18);
+    --accent-emerald-border: oklch(0.840 0.110 180 / 0.32);
 
-    --accent-rose: #E11D48;
-    --accent-rose-hover: #BE123C;
-    --accent-rose-subtle: rgba(225, 29, 72, 0.14);
-    --accent-rose-border: rgba(225, 29, 72, 0.30);
+    --accent-amber: oklch(0.780 0.125 75);
+    --accent-amber-hover: oklch(0.720 0.130 70);
+    --accent-amber-subtle: oklch(0.780 0.125 75 / 0.16);
+    --accent-amber-border: oklch(0.780 0.125 75 / 0.32);
 
-    /* Luz Zenital Especular Superior nos Cartões e Controles Projetados */
-    --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
-    --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.10), inset 0 -1px 0 rgba(0, 0, 0, 0.26);
-    --tactile-card-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.11);
-    --bevel-tactile-card: inset 0 1px 0 rgba(255, 255, 255, 0.11);
+    --accent-rose: var(--status-danger);
+    --accent-rose-hover: oklch(0.810 0.145 18);
+    --accent-rose-subtle: oklch(0.785 0.145 18 / 0.16);
+    --accent-rose-border: oklch(0.785 0.145 18 / 0.34);
 
-    /* Elevações Projetadas com Fio Zenital Superior no tema escuro */
-    --shadow-control: 0 1px 2px rgba(4, 9, 18, 0.30), 0 2px 5px -1px rgba(4, 9, 18, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.10);
-    --shadow-control-focus: 0 2px 6px -1px rgba(4, 9, 18, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 3px color-mix(in oklab, var(--accent-focus) 24%, transparent);
+    /* Borders (Hairlines for Dividers, --border-control for Controls) */
+    --border: var(--hairline);
+    --border-subtle: var(--hairline);
+    --border-medium: color-mix(in oklab, var(--ink-primary) 18%, transparent);
+    --border-strong: var(--border-control);
+
+    /* Quiet Optical Dark Elevations (1px Top Hairline + Single Contact Shadow) */
+    --rim-light-top: inset 0 1px 0 oklch(1 0 0 / 0.09);
+    --tactile-bevel: inset 0 1px 0 oklch(1 0 0 / 0.12);
+    --bevel-tactile-nav: inset 0 1px 0 oklch(1 0 0 / 0.08);
+    --tactile-card-bevel: inset 0 1px 0 oklch(1 0 0 / 0.09);
+    --bevel-tactile-card: inset 0 1px 0 oklch(1 0 0 / 0.09);
+
+    --shadow-control: inset 0 1px 0 oklch(1 0 0 / 0.07), 0 1px 2px oklch(0.06 0.012 252 / 0.28);
+    --shadow-control-focus: 0 0 0 3px color-mix(in oklab, var(--accent-focus) 26%, transparent);
     --elev-tactile: var(--elevation-low);
-    --elev-tactile-sm: 0 1px 2px rgba(4, 9, 18, 0.26), 0 2px 6px -1px rgba(4, 9, 18, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    --elev-tactile-sm: inset 0 1px 0 oklch(1 0 0 / 0.08), 0 1px 2px oklch(0.06 0.012 252 / 0.28);
     --elev-tactile-lg: var(--elevation-high);
-    --elev-tactile-navy: 0 2px 6px -1px rgba(4, 9, 18, 0.30), 0 10px 24px -4px rgba(4, 9, 18, 0.36);
+    --elev-tactile-navy: 0 4px 16px -4px oklch(0.05 0.012 252 / 0.40);
     --elev-tactile-dark: var(--elevation-low);
-    --elev-tactile-btn: 0 1px 2px rgba(4, 9, 18, 0.30), 0 3px 6px -1px rgba(4, 9, 18, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    --elev-tactile-btn: inset 0 1px 0 oklch(1 0 0 / 0.12), 0 1px 3px oklch(0.06 0.012 252 / 0.34);
     --elev-tactile-inset: var(--shadow-control);
-    --elev-tactile-blue: 0 2px 6px -2px rgba(4, 9, 18, 0.32);
+    --elev-tactile-blue: 0 2px 6px -2px oklch(0.06 0.012 252 / 0.32);
 
-    --shadow-subtle: 0 1px 2px rgba(4, 9, 18, 0.26), 0 2px 6px -1px rgba(4, 9, 18, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    --shadow-subtle: inset 0 1px 0 oklch(1 0 0 / 0.08), 0 1px 3px oklch(0.06 0.012 252 / 0.28);
     --shadow-projected: var(--elevation-medium);
     --shadow-card-projected: var(--elevation-low);
     --shadow-card-hover: var(--elevation-medium);
-    --shadow-nav: 0 2px 6px rgba(4, 9, 18, 0.26), 0 6px 16px -2px rgba(4, 9, 18, 0.30);
-    --shadow-sidebar-projected: 2px 0 10px rgba(4, 9, 18, 0.28), 6px 0 20px -2px rgba(4, 9, 18, 0.32);
-    --shadow-header-projected: 0 1px 3px rgba(4, 9, 18, 0.24), 0 4px 14px -2px rgba(4, 9, 18, 0.28);
-    --shadow-bottomnav-projected: 0 -2px 6px rgba(4, 9, 18, 0.24), 0 -6px 14px -2px rgba(4, 9, 18, 0.28);
-
-    --border-subtle: rgba(255, 255, 255, 0.075);
-    --border-medium: rgba(255, 255, 255, 0.13);
-    --border-strong: rgba(255, 255, 255, 0.12);
-    --border-control: #73869F;
-    --border-control-hover: #94A8C2;
-    --rim-light-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    --shadow-nav: 0 2px 10px -2px oklch(0.05 0.012 252 / 0.34);
+    --shadow-sidebar-projected: 2px 0 12px -2px oklch(0.05 0.012 252 / 0.36);
+    --shadow-header-projected: 0 1px 8px -2px oklch(0.05 0.012 252 / 0.30);
+    --shadow-bottomnav-projected: 0 -2px 10px -2px oklch(0.05 0.012 252 / 0.32);
 
     --elevation-z0: var(--shadow-control);
     --elevation-z1: var(--elevation-low);
     --elevation-z2: var(--elevation-medium);
     --elevation-z3: var(--elevation-high);
-    --elevation-z4: 0 4px 10px -2px rgba(4, 9, 18, 0.40), 0 14px 30px -6px rgba(4, 9, 18, 0.44), 0 26px 48px -10px rgba(4, 9, 18, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    --elevation-z4: inset 0 1px 0 oklch(1 0 0 / 0.12), 0 16px 36px -8px oklch(0.04 0.012 252 / 0.52);
 
-    --shadow-pressed: 0 1px 2px rgba(4, 9, 18, 0.34);
+    --shadow-pressed: 0 1px 1px oklch(0.05 0.012 252 / 0.36);
   }
 
-  /* Filtro de profundidade mobile adaptativo (calibrado sem sombras pesadas de 0.60–0.85) */
+  /* Adaptive Compact Mobile Depth */
   @media (max-width: 767px) {
     html:root {
-      --elevation-z1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.05);
-      --elevation-z2: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.07);
-      --elevation-z3: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 16px -3px rgba(15, 23, 42, 0.09);
-      --elevation-z4: 0 3px 6px rgba(15, 23, 42, 0.10), 0 14px 28px -6px rgba(15, 23, 42, 0.12);
+      --elevation-z1: 0 1px 2px oklch(0.195 0.024 252 / 0.06), 0 2px 6px -1px oklch(0.195 0.024 252 / 0.05);
+      --elevation-z2: 0 2px 6px -1px oklch(0.195 0.024 252 / 0.08), 0 6px 14px -3px oklch(0.195 0.024 252 / 0.07);
+      --elevation-z3: 0 3px 8px -2px oklch(0.195 0.024 252 / 0.09), 0 10px 20px -4px oklch(0.195 0.024 252 / 0.10);
+      --elevation-z4: 0 4px 12px -2px oklch(0.195 0.024 252 / 0.10), 0 16px 30px -6px oklch(0.195 0.024 252 / 0.12);
     }
     :root.dark,
     .dark:is(.dark) {
-      --elevation-z1: 0 1px 2px rgba(4, 9, 18, 0.30), 0 3px 8px -1px rgba(4, 9, 18, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.10);
-      --elevation-z2: 0 1px 3px rgba(4, 9, 18, 0.34), 0 6px 14px -2px rgba(4, 9, 18, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      --elevation-z3: 0 2px 4px rgba(4, 9, 18, 0.38), 0 10px 22px -3px rgba(4, 9, 18, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.13);
-      --elevation-z4: 0 3px 8px rgba(4, 9, 18, 0.44), 0 16px 32px -6px rgba(4, 9, 18, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      --elevation-z1: inset 0 1px 0 oklch(1 0 0 / 0.08), 0 2px 6px -1px oklch(0.05 0.012 252 / 0.32);
+      --elevation-z2: inset 0 1px 0 oklch(1 0 0 / 0.10), 0 6px 14px -2px oklch(0.05 0.012 252 / 0.36);
+      --elevation-z3: inset 0 1px 0 oklch(1 0 0 / 0.11), 0 10px 22px -4px oklch(0.04 0.012 252 / 0.42);
+      --elevation-z4: inset 0 1px 0 oklch(1 0 0 / 0.12), 0 16px 32px -6px oklch(0.04 0.012 252 / 0.48);
     }
   }
 }

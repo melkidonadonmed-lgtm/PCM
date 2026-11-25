@@ -67,79 +67,79 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
     <div className="lg:col-span-7 space-y-5">
       {/* 1. Símbolo Central */}
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)] mb-2">
           1. Símbolo Clínico Central
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <button
             type="button"
             onClick={() => setSymbol('asclepius')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               symbol === 'asclepius'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
-            <Activity className="w-4 h-4 text-sky-600 shrink-0" />
+            <Activity className="w-4 h-4 text-[var(--ink-clinical)] shrink-0" />
             <span className="truncate">Bastão Asclépio</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSymbol('cross')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               symbol === 'cross'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
-            <Shield className="w-4 h-4 text-emerald-600 shrink-0" />
+            <Shield className="w-4 h-4 text-[var(--ink-clinical)] shrink-0" />
             <span className="truncate">Cruz da Saúde</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSymbol('stethoscope')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               symbol === 'stethoscope'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
-            <Activity className="w-4 h-4 text-sky-600 shrink-0" />
+            <Activity className="w-4 h-4 text-[var(--ink-clinical)] shrink-0" />
             <span className="truncate">Estetoscópio</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSymbol('ecg_heart')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               symbol === 'ecg_heart'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
-            <Heart className="w-4 h-4 text-rose-500 shrink-0" />
+            <Heart className="w-4 h-4 text-[var(--status-danger)] shrink-0" />
             <span className="truncate">Coração com ECG</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSymbol('monogram')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition cursor-pointer col-span-2 sm:col-span-1 ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer col-span-2 sm:col-span-1 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               symbol === 'monogram'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
-            <Type className="w-4 h-4 text-amber-500 shrink-0" />
+            <Type className="w-4 h-4 text-[var(--accent-amber)] shrink-0" />
             <span className="truncate">Monograma</span>
           </button>
         </div>
 
         {symbol === 'monogram' && (
           <div className="mt-2.5 flex items-center gap-2">
-            <span className="text-xs text-[var(--text-muted)] font-medium">Iniciais:</span>
+            <span className="text-xs text-[var(--ink-muted)] font-medium">Iniciais:</span>
             <input
               id="logo-monogram-initials"
               name="monogramText"
@@ -148,27 +148,27 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
               aria-label="Iniciais do monograma"
               value={monogramText}
               onChange={(e) => setMonogramText(e.target.value.toUpperCase())}
-              className="w-24 px-2.5 py-1 text-xs font-bold uppercase rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info text-center"
+              className="w-24 min-h-[44px] px-2.5 py-1 text-xs font-bold uppercase rounded-lg border border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus:border-[var(--accent-focus)] text-center"
               placeholder="Ex.: MD"
             />
-            <span className="text-xs text-[var(--text-muted)]">Até 4 caracteres</span>
+            <span className="text-xs text-[var(--ink-muted)]">Até 4 caracteres</span>
           </div>
         )}
       </div>
 
       {/* 2. Estilo de Moldura */}
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)] mb-2">
           2. Moldura &amp; Estrutura
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <button
             type="button"
             onClick={() => setFrame('double_circle')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition cursor-pointer text-center ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition-colors cursor-pointer text-center focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               frame === 'double_circle'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
             <Circle className="w-4 h-4" />
@@ -178,10 +178,10 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
           <button
             type="button"
             onClick={() => setFrame('shield')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition cursor-pointer text-center ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition-colors cursor-pointer text-center focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               frame === 'shield'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
             <Shield className="w-4 h-4" />
@@ -191,10 +191,10 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
           <button
             type="button"
             onClick={() => setFrame('hexagon')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition cursor-pointer text-center ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition-colors cursor-pointer text-center focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               frame === 'hexagon'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
             <Hexagon className="w-4 h-4" />
@@ -204,10 +204,10 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
           <button
             type="button"
             onClick={() => setFrame('none')}
-            className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition cursor-pointer text-center ${
+            className={`min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition-colors cursor-pointer text-center focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               frame === 'none'
-                ? 'border-info bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500'
-                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
             }`}
           >
             <Square className="w-4 h-4" />
@@ -218,9 +218,9 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
 
       {/* 3. Paleta de Cores Institucional */}
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2 flex items-center justify-between">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)] mb-2 flex items-center justify-between">
           <span>3. Paleta de Cores</span>
-          <span className="text-xs font-semibold text-sky-600 dark:text-sky-400 normal-case">
+          <span className="text-xs font-semibold text-[var(--ink-clinical)] normal-case">
             {currentPalette.name}
           </span>
         </label>
@@ -233,10 +233,10 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
                 key={key}
                 type="button"
                 onClick={() => setPaletteKey(key)}
-                className={`p-2 rounded-xl border transition cursor-pointer flex flex-col items-center gap-1.5 ${
+                className={`min-h-[44px] p-2 rounded-xl border transition-colors cursor-pointer flex flex-col items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
                   isSelected
-                    ? 'border-info ring-2 ring-sky-500/40 bg-[var(--surface-hover)]'
-                    : 'border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                    ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-[var(--accent-focus)]/30'
+                    : 'border-[var(--hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
                 }`}
               >
                 <div className="flex items-center gap-1">
@@ -260,12 +260,12 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
 
       {/* 4. Tipografia Integrada */}
       <div className="space-y-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
           4. Textos do Timbre Institucional
         </label>
 
         <div>
-          <span className="block text-xs font-medium text-[var(--text-muted)] mb-1">
+          <span className="block text-xs font-medium text-[var(--ink-muted)] mb-1">
             Nome da Instituição (Texto Superior / Principal)
           </span>
           <input
@@ -276,12 +276,12 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
             value={institutionName}
             onChange={(e) => setInstitutionName(e.target.value.toUpperCase())}
             placeholder="Ex.: SECRETARIA MUNICIPAL DE SAÚDE"
-            className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info font-semibold"
+            className="w-full min-h-[44px] px-3 py-2 text-xs rounded-xl border border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus:border-[var(--accent-focus)] font-semibold"
           />
         </div>
 
         <div>
-          <span className="block text-xs font-medium text-[var(--text-muted)] mb-1">
+          <span className="block text-xs font-medium text-[var(--ink-muted)] mb-1">
             Subtítulo / Esfera (Texto Inferior)
           </span>
           <input
@@ -292,30 +292,30 @@ export const LogoGeneratorControlsColumn: React.FC<LogoGeneratorControlsColumnPr
             value={subtitle}
             onChange={(e) => setSubtitle(e.target.value.toUpperCase())}
             placeholder="Ex.: ATENÇÃO BÁSICA — SUS"
-            className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-info font-semibold"
+            className="w-full min-h-[44px] px-3 py-2 text-xs rounded-xl border border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus:border-[var(--accent-focus)] font-semibold"
           />
         </div>
 
         {frame === 'double_circle' && (
           <div className="flex items-center gap-4 text-xs pt-1">
-            <span className="text-[var(--text-muted)] font-medium">Disposição do Texto:</span>
-            <label className="flex items-center gap-1.5 cursor-pointer">
+            <span className="text-[var(--ink-muted)] font-medium">Disposição do Texto:</span>
+            <label className="flex items-center gap-1.5 cursor-pointer min-h-[44px]">
               <input
                 type="radio"
                 name="text_layout"
                 checked={textLayout === 'curved'}
                 onChange={() => setTextLayout('curved')}
-                className="text-sky-600 focus:ring-sky-500"
+                className="text-[var(--clinical)] focus:ring-[var(--accent-focus)]"
               />
               <span>Arco Circular</span>
             </label>
-            <label className="flex items-center gap-1.5 cursor-pointer">
+            <label className="flex items-center gap-1.5 cursor-pointer min-h-[44px]">
               <input
                 type="radio"
                 name="text_layout"
                 checked={textLayout === 'bottom_banner'}
                 onChange={() => setTextLayout('bottom_banner')}
-                className="text-sky-600 focus:ring-sky-500"
+                className="text-[var(--clinical)] focus:ring-[var(--accent-focus)]"
               />
               <span>Faixa Inferior</span>
             </label>

@@ -49,7 +49,7 @@ export const VectorCell: React.FC<VectorCellProps> = ({
 
   return (
     <div
-      className={`${colClass} relative group/suscell border-r border-b border-[#0F172A] p-1.5 flex flex-col justify-between bg-white focus-within:bg-sky-50/70 transition-colors`}
+      className={`${colClass} relative group/suscell border-r border-b border-[#0F172A] p-1.5 flex flex-col justify-between bg-white focus-within:bg-teal-50/70 transition-colors`}
     >
       <div className="flex items-center justify-between gap-1 mb-0.5">
         <span className="text-[0.5rem] font-bold uppercase tracking-tight text-slate-800 leading-none select-none">
@@ -62,7 +62,7 @@ export const VectorCell: React.FC<VectorCellProps> = ({
             onClick={() => onFieldChange(fieldKey, '')}
             title={`Limpar ${label}`}
             aria-label={`Limpar ${label}`}
-            className="no-print opacity-0 group-hover/suscell:opacity-100 focus:opacity-100 w-3.5 h-3.5 rounded flex items-center justify-center text-[0.625rem] font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-opacity cursor-pointer leading-none"
+            className="no-print opacity-0 group-hover/suscell:opacity-100 focus:opacity-100 w-3.5 h-3.5 rounded flex items-center justify-center text-[0.625rem] font-bold text-slate-500 hover:text-[var(--status-danger)] hover:bg-slate-200/80 transition-opacity cursor-pointer leading-none"
           >
             ×
           </button>
@@ -186,7 +186,7 @@ export const SusVectorLmeBlock: React.FC<SusVectorLmeBlockProps> = ({
 
       {rows.map((row, idx) => (
         <React.Fragment key={idx}>
-          <div className="col-span-6 border-r border-b border-[#0F172A] p-1.5 bg-white focus-within:bg-sky-50/70">
+          <div className="col-span-6 border-r border-b border-[#0F172A] p-1.5 bg-white focus-within:bg-teal-50/70">
             {staticPrintMode ? (
               <div className="text-[11px] font-semibold text-slate-950 min-h-[16px]">
                 {row.name ? `${idx + 1}. ${row.name}` : `${idx + 1}.`}
@@ -214,7 +214,7 @@ export const SusVectorLmeBlock: React.FC<SusVectorLmeBlockProps> = ({
             return (
               <div
                 key={mIdx}
-                className="col-span-1 border-r border-b border-[#0F172A] p-1 bg-white flex items-center justify-center focus-within:bg-sky-50/70"
+                className="col-span-1 border-r border-b border-[#0F172A] p-1 bg-white flex items-center justify-center focus-within:bg-teal-50/70"
               >
                 {staticPrintMode ? (
                   <div className="text-[11px] font-mono font-bold text-slate-950 text-center clinical-tabular-nums min-h-[16px]">

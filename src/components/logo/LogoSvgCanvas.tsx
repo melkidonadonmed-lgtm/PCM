@@ -88,15 +88,15 @@ export const LogoSvgCanvas: React.FC<LogoSvgCanvasProps> = ({
 
   return (
     <div className="lg:col-span-5 flex flex-col items-center justify-between gap-4 p-4 rounded-2xl bg-[var(--bg-app)] border border-[var(--border-subtle)]">
-      <div className="w-full flex items-center justify-between text-xs font-semibold text-[var(--text-muted)]">
+      <div className="w-full flex items-center justify-between text-xs font-semibold text-[var(--ink-muted)]">
         <span className="flex items-center gap-1.5">
-          <Eye className="w-4 h-4 text-sky-600" />
+          <Eye className="w-4 h-4 text-[var(--ink-clinical)]" />
           <span>Visualização Vetorial em Tempo Real</span>
         </span>
         <button
           type="button"
           onClick={onTogglePreviewDarkBg}
-          className="text-xs hover:text-[var(--text-main)] underline cursor-pointer"
+          className="min-h-[44px] px-1 text-xs hover:text-[var(--ink-primary)] underline cursor-pointer"
         >
           Fundo {previewDarkBg ? 'Claro' : 'Escuro'}
         </button>
@@ -104,7 +104,7 @@ export const LogoSvgCanvas: React.FC<LogoSvgCanvasProps> = ({
 
       {/* SVG Render Box */}
       <div
-        className={`w-full aspect-square max-w-[280px] sm:max-w-80 rounded-2xl p-4 flex items-center justify-center transition-colors shadow-tactile-md border ${
+        className={`w-full aspect-square max-w-[280px] sm:max-w-80 rounded-2xl p-4 flex items-center justify-center transition-colors shadow-[var(--elevation-medium)] border ${
           previewDarkBg ? 'bg-slate-900 border-strong' : 'bg-white border-subtle'
         }`}
       >

@@ -43,23 +43,23 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="touch-target min-h-[44px] px-3 rounded-xl border border-medium dark:border-navy-700 bg-white dark:bg-navy-900 hover:bg-slate-50 dark:hover:bg-navy-800 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-tactile-sm transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+        className="btn-tactile-secondary touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
         title="Selecionar marca d'água de papel timbrado para a folha A4"
       >
-        <Icon name="layers" className="text-[15px] text-sky-600 dark:text-sky-400" />
+        <Icon name="layers" className="text-[15px] text-[var(--ink-clinical)]" />
         <span className="hidden sm:inline font-sans">
           {compact ? currentPreset.name.split('—')[0].trim() : `Marca d'água: ${currentPreset.name.split('—')[0].trim()}`}
         </span>
-        <Icon name="expand_more" className="text-[14px] text-[var(--text-muted)] dark:text-slate-400 ml-0.5" />
+        <Icon name="expand_more" className="text-[14px] text-[var(--ink-muted)] ml-0.5" />
       </button>
 
       {isOpen && (
-        <div data-state="idle" aria-busy={false} className="absolute right-0 top-full mt-1.5 w-72 rounded-2xl bg-white dark:bg-navy-900 border border-subtle dark:border-navy-700 shadow-tactile-lg p-2 z-50 animate-tab-fade font-sans surface-raised">
-          <div className="px-2.5 py-1.5 mb-1 border-b border-slate-100 dark:border-navy-800">
-            <p className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+        <div data-state="idle" aria-busy={false} className="absolute right-0 top-full mt-1.5 w-72 rounded-2xl bg-[var(--surface-card)] border border-[var(--hairline)] shadow-[var(--elevation-high)] p-2 z-50 animate-tab-fade font-sans surface-raised">
+          <div className="px-2.5 py-1.5 mb-1 border-b border-[var(--hairline)]">
+            <p className="text-xs font-bold text-[var(--ink-primary)] uppercase tracking-wider">
               Marca d'Água no Papel A4
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-[var(--ink-muted)]">
               Imprime suavemente no fundo da folha médica
             </p>
           </div>
@@ -75,20 +75,20 @@ export const WatermarkSelector: React.FC<WatermarkSelectorProps> = ({
                     onChange(item.id);
                     setIsOpen(false);
                   }}
-                  className={`touch-target min-h-[44px] w-full text-left p-2 rounded-xl text-xs flex items-center justify-between gap-2.5 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none border ${
+                  className={`touch-target min-h-[44px] w-full text-left p-2 rounded-xl text-xs flex items-center justify-between gap-2.5 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none border ${
                     isSelected
-                      ? 'bg-slate-100 dark:bg-[#27354A] text-slate-900 dark:text-slate-100 font-semibold border-slate-300 dark:border-white/15'
-                      : 'border-transparent hover:bg-slate-100 dark:hover:bg-[#27354A]/60 text-slate-700 dark:text-slate-300 font-medium'
+                      ? 'bg-[var(--surface-card-lit)] text-[var(--ink-primary)] font-semibold border-[var(--border-control)] ring-1 ring-[var(--accent-focus)]/30'
+                      : 'border-transparent hover:bg-[var(--surface-hover)] text-[var(--ink-secondary)] font-medium'
                   }`}
                 >
                   <div className="flex-1 min-w-0">
                     <p className="truncate text-xs leading-snug">{item.name}</p>
-                    <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 truncate mt-0.5">
+                    <p className="text-xs text-[var(--ink-muted)] truncate mt-0.5">
                       {item.description}
                     </p>
                   </div>
                   {isSelected && (
-                    <Icon name="check" className="text-[16px] text-sky-600 dark:text-sky-400 shrink-0" />
+                    <Icon name="check" className="text-[16px] text-[var(--ink-clinical)] shrink-0" />
                   )}
                 </button>
               );

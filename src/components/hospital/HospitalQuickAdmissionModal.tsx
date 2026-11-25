@@ -189,7 +189,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[1100] flex items-center justify-center p-3 sm:p-4 bg-[oklch(0.14_0.02_258/0.65)] backdrop-blur-xs animate-backdrop-fade no-print"
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-3 sm:p-4 bg-[oklch(0.14_0.02_252/0.56)] animate-backdrop-fade no-print"
     >
       <div
         ref={modalRef}
@@ -198,7 +198,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
         {/* Cabeçalho do Modal */}
         <div className="px-5 py-3.5 border-b border-[var(--border-subtle)] flex items-center justify-between gap-3 bg-[var(--surface-inset)]">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-9 h-9 rounded-xl bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)] flex items-center justify-center shrink-0">
+            <span className="w-9 h-9 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-clinical)] flex items-center justify-center shrink-0">
               <Icon name="person_add" size={18} />
             </span>
             <div className="min-w-0">
@@ -214,7 +214,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de nova admissão"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
+            className="touch-target btn-tactile-icon cursor-pointer shrink-0"
           >
             <Icon name="close" size={18} />
           </button>
@@ -270,7 +270,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={wardAndBed}
                     onChange={(e) => setWardAndBed(e.target.value)}
                     placeholder="Ex.: 110-18 ou UTI-02"
-                    className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-bold clinical-tabular-nums"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
 
@@ -285,7 +285,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     id="quick-adm-specialty"
                     value={specialty}
                     onChange={(e) => setSpecialty(e.target.value as HospitalSpecialtyTemplate)}
-                    className="w-full h-10 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-semibold"
+                    className="w-full h-11 min-h-[44px] px-2.5 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   >
                     {HOSPITAL_SPECIALTY_OPTIONS.map((opt) => (
                       <option key={opt.id} value={opt.id}>
@@ -308,7 +308,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={dihDateBr}
                     onChange={(e) => setDihDateBr(e.target.value)}
                     placeholder="DD/MM/AAAA"
-                    className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
 
@@ -326,7 +326,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={patientNameOrInitials}
                     onChange={(e) => setPatientNameOrInitials(e.target.value)}
                     placeholder="Ex.: J. P. S. (Pront. 55102)"
-                    className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-semibold"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
 
@@ -343,7 +343,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={birthDateBr}
                     onChange={(e) => handleBirthDateChange(e.target.value)}
                     placeholder="Ex.: 14/05/1962"
-                    className="w-full h-10 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                    className="w-full h-11 min-h-[44px] px-2.5 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
 
@@ -360,7 +360,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={cns}
                     onChange={(e) => setCns(e.target.value)}
                     placeholder="Opcional"
-                    className="w-full h-10 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                    className="w-full h-11 min-h-[44px] px-2.5 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
 
@@ -377,7 +377,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={primaryHd}
                     onChange={(e) => setPrimaryHd(e.target.value)}
                     placeholder="Ex.: Pneumonia Adquirida na Comunidade — CURB-65 2"
-                    className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
 
@@ -394,7 +394,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={chiefComplaintQp}
                     onChange={(e) => setChiefComplaintQp(e.target.value)}
                     placeholder="Ex.: Dispneia aos esforços e febre há 3 dias"
-                    className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
 
@@ -411,7 +411,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={allergiesText}
                     onChange={(e) => setAllergiesText(e.target.value)}
                     placeholder="Ex.: Dipirona ou Nega alergias"
-                    className="w-full h-10 px-3 rounded-xl border border-rose-500/35 bg-rose-500/5 text-xs font-semibold"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] border-l-[3px] border-l-[var(--status-danger)] bg-[var(--surface-inset)] text-xs font-semibold text-[var(--ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
               </div>
@@ -420,13 +420,13 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                 <button
                   type="button"
                   onClick={onClose}
-                  className="btn-tactile-secondary h-10 px-4 rounded-xl text-xs font-bold cursor-pointer"
+                  className="touch-target btn-tactile-secondary h-11 min-h-[44px] px-4 rounded-xl text-xs font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="btn-tactile-primary h-10 px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  className="touch-target btn-tactile-primary h-11 min-h-[44px] px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   <Icon name="check_circle" size={16} />
                   <span>Confirmar Admissão e Abrir Prontuário</span>
@@ -449,7 +449,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     value={wardAndBed}
                     onChange={(e) => setWardAndBed(e.target.value)}
                     placeholder="Ex.: 110-18 (ou extraído do texto)"
-                    className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                    className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                 </div>
                 <div>
@@ -463,7 +463,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     id="quick-adm-mm-specialty"
                     value={specialty}
                     onChange={(e) => setSpecialty(e.target.value as HospitalSpecialtyTemplate)}
-                    className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                    className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   >
                     {HOSPITAL_SPECIALTY_OPTIONS.map((opt) => (
                       <option key={opt.id} value={opt.id}>
@@ -487,7 +487,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                     setRawClinicalText(SAMPLE_NEW_ADMISSION_TEXT);
                     handlePreviewExtraction(SAMPLE_NEW_ADMISSION_TEXT);
                   }}
-                  className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                  className="touch-target min-h-[44px] inline-flex items-center text-xs font-bold text-[var(--ink-clinical)] hover:underline cursor-pointer"
                 >
                   Carregar exemplo de admissão
                 </button>
@@ -502,14 +502,14 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                   handlePreviewExtraction(e.target.value);
                 }}
                 placeholder="Ex.: EF/LT : 110-18 | ID: L. M. S. | DN: 22/07/1968 | DIH: 25/10/2026 | QP: ... | 25/10/2026: HB 12,4 | LEU 14800..."
-                className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] p-3 text-xs font-mono leading-relaxed text-[var(--text-main)]"
+                className="w-full rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] p-3 text-xs font-mono leading-relaxed text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
 
               {extractionPreview && (
-                <div className="p-3 rounded-xl border border-sky-500/30 bg-sky-500/5 space-y-1.5">
+                <div className="p-3 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] space-y-1.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-sky-700 dark:text-sky-300 flex items-center gap-1.5">
-                      <Icon name="fact_check" size={15} />
+                    <span className="text-xs font-bold text-[var(--ink-primary)] flex items-center gap-1.5">
+                      <Icon name="fact_check" size={15} className="text-[var(--ink-clinical)]" />
                       <span>Extração Determinística (Zero Alucinação)</span>
                     </span>
                     <Badge tone="clinical" tabular>
@@ -533,7 +533,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                 <button
                   type="button"
                   onClick={onClose}
-                  className="btn-tactile-secondary h-10 px-4 rounded-xl text-xs font-bold cursor-pointer"
+                  className="touch-target btn-tactile-secondary h-11 min-h-[44px] px-4 rounded-xl text-xs font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -541,7 +541,7 @@ export const HospitalQuickAdmissionModal: React.FC<HospitalQuickAdmissionModalPr
                   type="button"
                   disabled={!rawClinicalText.trim()}
                   onClick={handleConfirmMultimodalNewBed}
-                  className="btn-tactile-primary h-10 px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="touch-target btn-tactile-primary h-11 min-h-[44px] px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   <Icon name="upload" size={16} />
                   <span>Criar Novo Leito com Dados Extraídos</span>

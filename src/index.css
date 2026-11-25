@@ -11,18 +11,30 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-navy-700: #24344D;
-  --color-navy-800: #1B283C;
-  --color-navy-850: #142032;
-  --color-navy-900: #0F1A2A;
-  --color-navy-950: #0A111C;
+  --color-navy-700: oklch(0.300 0.036 248);
+  --color-navy-800: oklch(0.245 0.032 248);
+  --color-navy-850: oklch(0.215 0.026 250);
+  --color-navy-900: oklch(0.205 0.022 252);
+  --color-navy-950: oklch(0.165 0.018 252);
 
-  --color-slate-elevated: #334155;
-  --color-slate-surface: #1E293B;
-  --color-slate-canvas: #0F172A;
+  --color-slate-elevated: oklch(0.295 0.020 248);
+  --color-slate-surface: oklch(0.245 0.018 248);
+  --color-slate-canvas: oklch(0.185 0.015 248);
 
-  --color-clinical-500: #14635D;
-  --color-clinical-600: #115E59;
+  --color-clinical-500: oklch(0.435 0.074 186);
+  --color-clinical-600: oklch(0.415 0.072 186);
+
+  --color-surface-canvas: var(--surface-canvas);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-lit: var(--surface-card-lit);
+  --color-ink-primary: var(--ink-primary);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-accent: var(--ink-accent);
+  --color-ink-clinical: var(--ink-clinical);
+  --color-status-danger: var(--status-danger);
+  --color-border-control: var(--border-control);
+  --color-hairline: var(--hairline);
 
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
@@ -32,7 +44,7 @@
   --color-strong: var(--border-strong);
   --color-info: var(--accent-point);
   --color-warning: var(--accent-amber);
-  --color-danger: var(--accent-rose);
+  --color-danger: var(--status-danger);
   --color-text-primary: var(--text-primary);
   --color-text-muted: var(--text-muted);
   --color-primary: var(--primary);
@@ -40,10 +52,10 @@
   --color-clinical: var(--clinical);
   --color-clinical-hover: var(--clinical-hover);
 
-  --shadow-tactile-card: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.06), 0 12px 24px -6px rgba(15, 23, 42, 0.05);
-  --shadow-tactile-card-dark: 0 1px 2px rgba(4, 9, 18, 0.34), 0 6px 14px -3px rgba(4, 9, 18, 0.36), 0 14px 28px -8px rgba(4, 9, 18, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --shadow-tactile-inset-dark: 0 1px 2px rgba(4, 9, 18, 0.28), 0 2px 6px -1px rgba(4, 9, 18, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.09);
-  --shadow-tactile-md: 0 2px 4px -1px rgba(15, 23, 42, 0.06), 0 6px 14px -3px rgba(15, 23, 42, 0.08), 0 14px 28px -6px rgba(15, 23, 42, 0.06);
+  --shadow-tactile-card: var(--elevation-low);
+  --shadow-tactile-card-dark: inset 0 1px 0 oklch(1 0 0 / 0.09), 0 2px 8px -2px oklch(0.06 0.012 252 / 0.36);
+  --shadow-tactile-inset-dark: inset 0 1px 0 oklch(1 0 0 / 0.07), 0 1px 2px oklch(0.06 0.012 252 / 0.28);
+  --shadow-tactile-md: var(--elevation-medium);
 
   --shadow-elevation-low: var(--elevation-low);
   --shadow-elevation-medium: var(--elevation-medium);
@@ -61,7 +73,6 @@
     -webkit-text-size-adjust: 100%;
     font-synthesis: none;
     font-optical-sizing: auto;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   html {
@@ -80,18 +91,18 @@
 
   body {
     font-family: var(--font-main);
-    background-color: var(--bg-main, var(--bg-app));
-    color: var(--text-main);
-    line-height: 1.6;
+    background-color: var(--surface-canvas);
+    color: var(--ink-primary);
+    line-height: 1.55;
     min-height: 100vh;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: auto;
   }
 
   h1, h2, h3 {
-    color: var(--text-title, var(--text-main));
+    color: var(--ink-primary);
     text-rendering: optimizeLegibility;
   }
 
@@ -109,24 +120,25 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--accent-focus);
     outline-offset: 2px;
   }
 
   .dark body,
   body.dark {
-    background-color: var(--bg-app);
+    background-color: var(--surface-canvas);
   }
 
   :root {
     color-scheme: light;
-    --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-main: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     --font-serif-doc: 'Cormorant Garamond', Georgia, Cambria, 'Times New Roman', Times, serif;
 
-    --scrollbar-thumb: rgba(142, 156, 174, 0.35);
-    --scrollbar-thumb-hover: rgba(142, 156, 174, 0.55);
+    --scrollbar-thumb: oklch(0.62 0.018 248 / 0.38);
+    --scrollbar-thumb-hover: oklch(0.54 0.020 248 / 0.58);
     --scrollbar-track: transparent;
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -138,136 +150,156 @@
     --radius-lg: 10px;
     --radius-xl: 12px;
     --radius-2xl: 16px;
-    --radius-card: 18px;
+    --radius-badge: 6px;
+    --radius-control: 10px;
+    --radius-card: 16px;
     --radius-pill: 9999px;
 
     --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
-    --transition-smooth: transform 0.26s var(--ease-spring), opacity 0.24s var(--ease-spring), background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    --transition-smooth: transform 0.24s var(--ease-spring), opacity 0.2s var(--ease-spring), background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
     --transition-snap: transform 0.15s ease-out, opacity 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
 
-    /* TEMA CLARO: Elevated Clinical Matte (Mineral Alabaster #EFF3F8 + Cartões e Controles Projetados #FFFFFF) */
-    --canvas: #eff3f8;
-    --bg-main: #f8fafc;
-    --surface: #ffffff;
-    --border: #d8e0ea;
-    --text-primary: #0f172a;
-    --text-title: #0f172a;
-    --text-body: #475569;
-    --text-muted: #475569;
-    --primary: #243447;
-    --primary-hover: #182433;
-    --clinical: #115e59;
-    --clinical-hover: #0d4b47;
+    /* Light Mode OKLCH Semantic Palette (WCAG 2.2 AAA >= 7.0:1 & SC 1.4.11 >= 3.0:1) */
+    --surface-canvas: oklch(0.962 0.006 248);
+    --surface-card: oklch(1.000 0.000 0);
+    --surface-card-lit: oklch(0.985 0.004 248);
+    --ink-primary: oklch(0.195 0.024 252);
+    --ink-secondary: oklch(0.315 0.022 252);
+    --ink-muted: oklch(0.390 0.016 248);
+    --ink-accent: oklch(0.300 0.036 248);
+    --ink-clinical: oklch(0.395 0.072 186);
+    --status-danger: oklch(0.445 0.185 18);
+    --border-control: oklch(0.575 0.020 248);
+    --border-control-hover: oklch(0.450 0.024 248);
+    --hairline: color-mix(in oklab, var(--ink-primary) 10%, transparent);
 
-    --surface-sunken: #E2E8F0;
-    --surface-canvas: #EFF3F8;
-    --surface-inset: #FFFFFF;
-    --surface-flat: #FFFFFF;
-    --surface-raised: #FFFFFF;
-    --surface-contrast: #0F172A;
-    --accent-point: #3B526B;
-    --accent-focus: #115E59;
-    --ink-accent: #243447;
-    --ink-clinical: #0F5954;
-    --surface-clinical-subtle: #EDF6F5;
-    --border-clinical-subtle: #B6DDD8;
-    --a4-bench-bg: #E4EBF2;
-    --a4-bench-border: #CBD6E3;
+    /* Legacy CSS Aliases Mapped to OKLCH Tokens */
+    --canvas: var(--surface-canvas);
+    --bg-main: var(--surface-canvas);
+    --bg-canvas: var(--surface-canvas);
+    --bg-app: var(--surface-canvas);
+    --surface: var(--surface-card);
+    --bg-surface: var(--surface-card);
+    --bg-surface-elevated: var(--surface-card);
+    --surface-elevated: var(--surface-card);
+    --surface-inset: var(--surface-card);
+    --surface-flat: var(--surface-card);
+    --surface-raised: var(--surface-card-lit);
+    --surface-modal: var(--surface-card);
+    --surface-sunken: oklch(0.925 0.010 248);
+    --surface-contrast: oklch(0.195 0.024 252);
+    --surface-hover: oklch(0.968 0.006 248);
+    --surface-active: oklch(0.940 0.010 248);
 
-    --bg-canvas: #EFF3F8;
-    --bg-app: #EFF3F8;
-    --bg-surface: #FFFFFF;
-    --surface-card: #FFFFFF;
-    --bg-surface-elevated: #FFFFFF;
-    --surface-elevated: #FFFFFF;
-    --surface-hover: #F4F7FB;
-    --surface-active: #E6ECF4;
+    --surface-clinical-subtle: oklch(0.965 0.016 186);
+    --border-clinical-subtle: oklch(0.840 0.042 186);
+    --a4-bench-bg: oklch(0.935 0.010 248);
+    --a4-bench-border: oklch(0.865 0.016 248);
 
-    --nav-bg: #0F172A;
-    --surface-panel: #0F172A;
-    --surface-panel-2: #1E293B;
-    --surface-panel-hover: #334155;
-    --nav-border: rgba(255, 255, 255, 0.08);
-    --surface-panel-border: rgba(255, 255, 255, 0.08);
-    --nav-text: #F8FAFC;
-    --surface-panel-text: #F8FAFC;
-    --nav-text-muted: #94A3B8;
-    --surface-panel-muted: #94A3B8;
-    --nav-active-bg: #243447;
+    --sidebar-surface-bg: oklch(0.205 0.022 252);
+    --sidebar-surface-elevated: oklch(0.255 0.024 252);
+    --sidebar-text-primary: oklch(0.985 0.004 248);
+    --sidebar-text-secondary: oklch(0.890 0.012 248);
+    --sidebar-text-muted: oklch(0.800 0.014 252);
+
+    --nav-bg: var(--sidebar-surface-bg);
+    --surface-panel: var(--sidebar-surface-bg);
+    --surface-panel-2: var(--sidebar-surface-elevated);
+    --surface-panel-hover: oklch(0.305 0.026 252);
+    --nav-border: oklch(1 0 0 / 0.10);
+    --surface-panel-border: oklch(1 0 0 / 0.10);
+    --nav-text: var(--sidebar-text-primary);
+    --surface-panel-text: var(--sidebar-text-primary);
+    --nav-text-muted: var(--sidebar-text-muted);
+    --surface-panel-muted: var(--sidebar-text-muted);
+    --nav-active-bg: oklch(1 0 0 / 0.10);
     --nav-active-text: #FFFFFF;
-    --nav-active-glow: 0 2px 6px rgba(15, 23, 42, 0.22);
+    --nav-active-glow: inset 0 1px 0 oklch(1 0 0 / 0.08);
 
-    --text-main: #0F172A;
-    --text-secondary: #334155;
-    --text-placeholder: #5B6B80;
-    --text-subtle: #64748B;
+    --text-primary: var(--ink-primary);
+    --text-title: var(--ink-primary);
+    --text-main: var(--ink-primary);
+    --text-secondary: var(--ink-secondary);
+    --text-body: var(--ink-secondary);
+    --text-muted: var(--ink-muted);
+    --text-placeholder: oklch(0.415 0.016 248);
+    --text-subtle: var(--ink-muted);
     --text-inverse: #FFFFFF;
 
-    --accent: #243447;
-    --accent-hover: #182433;
+    --primary: var(--p-navy-700);
+    --primary-hover: var(--p-navy-800);
+    --oklch-primary: var(--p-navy-700);
+    --oklch-primary-hover: var(--p-navy-800);
+    --clinical: var(--p-teal-600);
+    --clinical-hover: var(--p-teal-700);
+
+    --accent: var(--ink-accent);
+    --accent-hover: var(--p-navy-800);
+    --accent-point: oklch(0.390 0.042 248);
+    --accent-focus: var(--p-teal-600);
     --nav-accent: #FFFFFF;
 
-    --accent-primary: #243447;
-    --accent-primary-hover: #182433;
-    --accent-primary-subtle: rgba(36, 52, 71, 0.08);
-    --accent-primary-border: rgba(36, 52, 71, 0.18);
+    --accent-primary: var(--p-navy-700);
+    --accent-primary-hover: var(--p-navy-800);
+    --accent-primary-subtle: color-mix(in oklab, var(--p-navy-700) 8%, transparent);
+    --accent-primary-border: color-mix(in oklab, var(--p-navy-700) 20%, transparent);
 
-    --accent-clinical: #115E59;
-    --accent-clinical-hover: #0D4B47;
-    --accent-emerald: #115E59;
-    --accent-emerald-hover: #0D4B47;
-    --accent-emerald-subtle: rgba(17, 94, 89, 0.08);
-    --accent-emerald-border: rgba(17, 94, 89, 0.18);
+    --accent-clinical: var(--p-teal-600);
+    --accent-clinical-hover: var(--p-teal-700);
+    --accent-emerald: var(--p-teal-600);
+    --accent-emerald-hover: var(--p-teal-700);
+    --accent-emerald-subtle: color-mix(in oklab, var(--p-teal-600) 8%, transparent);
+    --accent-emerald-border: color-mix(in oklab, var(--p-teal-600) 22%, transparent);
 
-    --accent-amber: #B45309;
-    --accent-amber-hover: #92400E;
-    --accent-amber-subtle: rgba(180, 83, 9, 0.08);
-    --accent-amber-border: rgba(180, 83, 9, 0.18);
+    --accent-amber: var(--p-amber-700);
+    --accent-amber-hover: oklch(0.420 0.115 60);
+    --accent-amber-subtle: color-mix(in oklab, var(--p-amber-700) 9%, transparent);
+    --accent-amber-border: color-mix(in oklab, var(--p-amber-700) 24%, transparent);
 
-    --accent-rose: #9F1239;
-    --accent-rose-hover: #881337;
-    --accent-rose-subtle: rgba(159, 18, 57, 0.08);
-    --accent-rose-border: rgba(159, 18, 57, 0.18);
+    --accent-rose: var(--status-danger);
+    --accent-rose-hover: oklch(0.380 0.175 18);
+    --accent-rose-subtle: color-mix(in oklab, var(--status-danger) 9%, transparent);
+    --accent-rose-border: color-mix(in oklab, var(--status-danger) 24%, transparent);
 
-    --tactile-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.24);
-    --bevel-tactile-nav: inset 0 1px 0 rgba(255, 255, 255, 0.10), inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+    --border: var(--hairline);
+    --border-subtle: var(--hairline);
+    --border-medium: color-mix(in oklab, var(--ink-primary) 18%, transparent);
+    --border-strong: var(--border-control);
+
+    /* Optical 1-2 Layer Elevation Primitives (Zero Stacked 6-8 Shadow Bloat) */
+    --rim-light-top: inset 0 1px 0 oklch(1 0 0 / 0.80);
+    --tactile-bevel: inset 0 1px 0 oklch(1 0 0 / 0.16);
+    --bevel-tactile-nav: inset 0 1px 0 oklch(1 0 0 / 0.10);
     --tactile-card-bevel: 0 0 0 0 transparent;
     --bevel-tactile-card: 0 0 0 0 transparent;
 
+    --shadow-control: 0 1px 2px oklch(0.195 0.024 252 / 0.06);
+    --shadow-control-focus: 0 0 0 3px color-mix(in oklab, var(--accent-focus) 18%, transparent);
     --elev-tactile: var(--elevation-low);
-    --elev-tactile-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.05);
+    --elev-tactile-sm: 0 1px 2px oklch(0.195 0.024 252 / 0.07);
     --elev-tactile-lg: var(--elevation-high);
-    --elev-tactile-navy: 0 4px 12px -2px rgba(10, 15, 29, 0.22), 0 12px 28px -6px rgba(10, 15, 29, 0.28);
-    --elev-tactile-dark: 0 2px 6px -1px rgba(4, 9, 18, 0.28), 0 8px 20px -4px rgba(4, 9, 18, 0.34);
-    --elev-tactile-btn: 0 1px 2px rgba(15, 23, 42, 0.14), 0 3px 6px -1px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+    --elev-tactile-navy: 0 4px 16px -4px oklch(0.16 0.024 252 / 0.24);
+    --elev-tactile-dark: 0 2px 10px -2px oklch(0.12 0.020 252 / 0.28);
+    --elev-tactile-btn: inset 0 1px 0 oklch(1 0 0 / 0.16), 0 1px 3px oklch(0.195 0.024 252 / 0.18);
     --elev-tactile-inset: var(--shadow-control);
-    --elev-tactile-blue: 0 2px 6px -2px rgba(36, 52, 71, 0.22);
+    --elev-tactile-blue: 0 2px 6px -2px oklch(0.300 0.036 248 / 0.20);
 
-    --shadow-control: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px -1px rgba(15, 23, 42, 0.04);
-    --shadow-control-focus: 0 1px 3px rgba(15, 23, 42, 0.08), 0 0 0 3px color-mix(in oklab, var(--accent-focus) 16%, transparent);
-    --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.05);
+    --shadow-subtle: 0 1px 2px oklch(0.195 0.024 252 / 0.06);
     --shadow-projected: var(--elevation-medium);
     --shadow-card-projected: var(--elevation-low);
     --shadow-card-hover: var(--elevation-medium);
-    --shadow-nav: 0 2px 6px -1px rgba(15, 23, 42, 0.08), 0 8px 20px -4px rgba(15, 23, 42, 0.10);
-    --shadow-sidebar-projected: 2px 0 10px -1px rgba(15, 23, 42, 0.10), 6px 0 22px -4px rgba(15, 23, 42, 0.12);
-    --shadow-header-projected: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 14px -2px rgba(15, 23, 42, 0.06);
-    --shadow-bottomnav-projected: 0 -2px 6px -1px rgba(15, 23, 42, 0.08), 0 -6px 18px -4px rgba(15, 23, 42, 0.10);
-
-    --border-subtle: #D8E0EA;
-    --border-medium: #BCC8D7;
-    --border-strong: #94A3B8;
-    --border-control: #8594A6;
-    --border-control-hover: #5E7087;
-    --rim-light-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+    --shadow-nav: 0 2px 8px -2px oklch(0.195 0.024 252 / 0.09);
+    --shadow-sidebar-projected: 2px 0 12px -2px oklch(0.195 0.024 252 / 0.12);
+    --shadow-header-projected: 0 1px 6px -1px oklch(0.195 0.024 252 / 0.07);
+    --shadow-bottomnav-projected: 0 -2px 8px -2px oklch(0.195 0.024 252 / 0.09);
 
     --elevation-z0: var(--shadow-control);
     --elevation-z1: var(--elevation-low);
     --elevation-z2: var(--elevation-medium);
     --elevation-z3: var(--elevation-high);
-    --elevation-z4: 0 4px 10px -2px rgba(15, 23, 42, 0.07), 0 14px 28px -4px rgba(15, 23, 42, 0.09), 0 26px 48px -8px rgba(15, 23, 42, 0.10);
+    --elevation-z4: 0 6px 18px -4px oklch(0.195 0.024 252 / 0.10), 0 18px 36px -8px oklch(0.195 0.024 252 / 0.12);
 
-    --shadow-pressed: 0 1px 1px rgba(15, 23, 42, 0.10);
+    --shadow-pressed: 0 1px 1px oklch(0.195 0.024 252 / 0.12);
   }
 
   ::placeholder {
@@ -287,169 +319,110 @@
 }
 
 @layer components {
-  /* Botões Primários & Clínicos (Light & Dark >= 7:1 AAA com #FFFFFF via --text-inverse) */
+  /* Primary & Clinical Sculpted Tactile CTAs (Machined Top-Lit Sheen + Crisp Rim + Grounded Contact) */
   .tactile-btn-primary,
   .btn-tactile-primary,
   .btn-primary-tactile,
   .button-primary {
-    background-color: #243447;
+    background-color: var(--primary);
+    background-image: linear-gradient(180deg, oklch(0.345 0.038 248) 0%, oklch(0.275 0.036 248) 100%);
     color: var(--text-inverse, #FFFFFF);
-    border: 1px solid rgba(15, 23, 42, 0.22);
-    box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.14),
-      0 3px 6px -1px rgba(15, 23, 42, 0.12),
-      0 6px 12px -3px rgba(15, 23, 42, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.24);
-    border-radius: 12px;
+    border: 1px solid oklch(0.220 0.032 248);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.22), 0 1px 2px oklch(0.14 0.024 252 / 0.26), 0 3px 8px -2px oklch(0.14 0.024 252 / 0.20);
+    border-radius: var(--radius-control);
     padding: 0.5rem 0.875rem;
-    font-weight: 700;
+    font-weight: 600;
     min-height: 44px;
     min-width: 44px;
     touch-action: manipulation;
     user-select: none;
     cursor: pointer;
     isolation: isolate;
-    will-change: transform, box-shadow;
-    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1),
-                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1),
-                background-color 0.2s ease,
-                color 0.2s ease;
+    transition: transform 0.15s var(--ease-spring), box-shadow 0.16s ease, border-color 0.16s ease;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .tactile-btn-primary:hover:not(:disabled),
-    .btn-tactile-primary:hover:not(:disabled),
-    .btn-primary-tactile:hover:not(:disabled),
-    .button-primary:hover:not(:disabled) {
-      background-color: #182433;
-      box-shadow:
-        0 1px 2px rgba(15, 23, 42, 0.16),
-        0 4px 10px -2px rgba(15, 23, 42, 0.16),
-        0 8px 16px -4px rgba(15, 23, 42, 0.10),
-        inset 0 1px 0 rgba(255, 255, 255, 0.22),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    :is(.tactile-btn-primary, .btn-tactile-primary, .btn-primary-tactile, .button-primary):hover:not(:disabled) {
+      background-color: var(--primary-hover);
+      background-image: linear-gradient(180deg, oklch(0.375 0.040 248) 0%, oklch(0.295 0.036 248) 100%);
+      transform: translate3d(0, -0.5px, 0);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.26), 0 2px 4px oklch(0.14 0.024 252 / 0.28), 0 6px 14px -4px oklch(0.14 0.024 252 / 0.24);
     }
   }
 
-  .tactile-btn-primary:active:not(:disabled),
-  .btn-tactile-primary:active:not(:disabled),
-  .btn-primary-tactile:active:not(:disabled),
-  .button-primary:active:not(:disabled) {
+  :is(.tactile-btn-primary, .btn-tactile-primary, .btn-primary-tactile, .button-primary):active:not(:disabled) {
     transform: translate3d(0, 1px, 0);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.28), inset 0 1px 2px rgba(0, 0, 0, 0.18);
+    box-shadow: inset 0 1px 2px oklch(0.08 0.02 252 / 0.38);
   }
 
-  .dark .tactile-btn-primary,
-  .dark .btn-tactile-primary,
-  .dark .btn-primary-tactile,
-  .dark .button-primary {
-    background-color: oklch(0.39 0.052 246);
+  .dark :is(.tactile-btn-primary, .btn-tactile-primary, .btn-primary-tactile, .button-primary) {
+    background-color: var(--primary);
+    background-image: linear-gradient(180deg, oklch(0.435 0.056 246) 0%, oklch(0.365 0.050 246) 100%);
     color: var(--text-inverse, #FFFFFF);
-    border-color: rgba(255, 255, 255, 0.16);
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.28),
-      0 4px 8px -2px rgba(0, 0, 0, 0.34),
-      inset 0 1px 0 rgba(255, 255, 255, 0.16),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.28);
-    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1),
-                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1),
-                background-color 0.2s ease,
-                color 0.2s ease;
+    border-color: oklch(1 0 0 / 0.18);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.24), 0 1px 2px oklch(0.04 0.012 252 / 0.48), 0 4px 10px -3px oklch(0.04 0.012 252 / 0.42);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .dark .tactile-btn-primary:hover:not(:disabled),
-    .dark .btn-tactile-primary:hover:not(:disabled),
-    .dark .btn-primary-tactile:hover:not(:disabled),
-    .dark .button-primary:hover:not(:disabled) {
-      background-color: oklch(0.45 0.055 245);
-      box-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.32),
-        0 6px 12px -2px rgba(0, 0, 0, 0.38),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.30);
+    .dark :is(.tactile-btn-primary, .btn-tactile-primary, .btn-primary-tactile, .button-primary):hover:not(:disabled) {
+      background-color: var(--primary-hover);
+      background-image: linear-gradient(180deg, oklch(0.475 0.058 246) 0%, oklch(0.400 0.052 246) 100%);
+      border-color: oklch(1 0 0 / 0.26);
+      transform: translate3d(0, -0.5px, 0);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.28), 0 2px 6px oklch(0.04 0.012 252 / 0.52), 0 6px 14px -4px oklch(0.04 0.012 252 / 0.46);
     }
   }
 
-  .dark .tactile-btn-primary:active:not(:disabled),
-  .dark .btn-tactile-primary:active:not(:disabled),
-  .dark .btn-primary-tactile:active:not(:disabled),
-  .dark .button-primary:active:not(:disabled) {
+  .dark :is(.tactile-btn-primary, .btn-tactile-primary, .btn-primary-tactile, .button-primary):active:not(:disabled) {
     transform: translate3d(0, 1px, 0);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.42);
+    box-shadow: inset 0 1px 2px oklch(0.04 0.012 252 / 0.50);
   }
 
   .tactile-btn-success,
   .btn-tactile-clinical {
-    background: #115E59;
+    background-color: var(--clinical);
+    background-image: linear-gradient(180deg, oklch(0.455 0.074 186) 0%, oklch(0.390 0.070 186) 100%);
     color: var(--text-inverse, #FFFFFF);
-    border: 1px solid rgba(13, 75, 71, 0.28);
-    box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.14),
-      0 3px 6px -1px rgba(17, 94, 89, 0.18),
-      0 6px 12px -3px rgba(17, 94, 89, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.24);
-    border-radius: 12px;
+    border: 1px solid oklch(0.320 0.064 186);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.22), 0 1px 2px oklch(0.14 0.024 186 / 0.24), 0 3px 8px -2px oklch(0.14 0.024 186 / 0.18);
+    border-radius: var(--radius-control);
     padding: 0.5rem 0.875rem;
-    font-weight: 700;
+    font-weight: 600;
     min-height: 44px;
     min-width: 44px;
     touch-action: manipulation;
     user-select: none;
     cursor: pointer;
     isolation: isolate;
-    will-change: transform, box-shadow;
-    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1),
-                box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1),
-                background 0.2s ease;
+    transition: transform 0.15s var(--ease-spring), box-shadow 0.16s ease, border-color 0.16s ease;
   }
 
-  .dark .tactile-btn-success,
-  .dark .btn-tactile-clinical {
-    background: #14635D;
+  .dark :is(.tactile-btn-success, .btn-tactile-clinical) {
+    background-color: var(--clinical);
+    background-image: linear-gradient(180deg, oklch(0.475 0.076 186) 0%, oklch(0.405 0.072 186) 100%);
     color: var(--text-inverse, #FFFFFF);
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.28),
-      0 4px 8px -2px rgba(0, 0, 0, 0.34),
-      inset 0 1px 0 rgba(255, 255, 255, 0.16),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    border-color: oklch(1 0 0 / 0.18);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.24), 0 1px 2px oklch(0.04 0.012 252 / 0.46), 0 4px 10px -3px oklch(0.04 0.012 252 / 0.40);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .tactile-btn-success:hover:not(:disabled),
-    .btn-tactile-clinical:hover:not(:disabled) {
-      background: #0D4B47;
-      box-shadow:
-        0 1px 2px rgba(15, 23, 42, 0.16),
-        0 4px 10px -2px rgba(17, 94, 89, 0.24),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    :is(.tactile-btn-success, .btn-tactile-clinical):hover:not(:disabled) {
+      background-color: var(--clinical-hover);
+      background-image: linear-gradient(180deg, oklch(0.425 0.072 186) 0%, oklch(0.360 0.068 186) 100%);
+      transform: translate3d(0, -0.5px, 0);
     }
 
-    .dark .tactile-btn-success:hover:not(:disabled),
-    .dark .btn-tactile-clinical:hover:not(:disabled) {
-      background: #0F4F4A;
+    .dark :is(.tactile-btn-success, .btn-tactile-clinical):hover:not(:disabled) {
+      background-color: var(--clinical-hover);
+      background-image: linear-gradient(180deg, oklch(0.505 0.078 186) 0%, oklch(0.435 0.074 186) 100%);
+      border-color: oklch(1 0 0 / 0.26);
+      transform: translate3d(0, -0.5px, 0);
     }
   }
 
-  .tactile-btn-success:active:not(:disabled),
-  .btn-tactile-clinical:active:not(:disabled) {
+  :is(.tactile-btn-success, .btn-tactile-clinical):active:not(:disabled) {
     transform: translate3d(0, 1px, 0);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.32);
-  }
-
-  .nav-item-active {
-    position: relative;
-    background-color: rgba(255, 255, 255, 0.09);
-    color: var(--text-inverse, #FFFFFF);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow:
-      0 2px 6px -1px rgba(0, 0, 0, 0.24),
-      0 4px 10px -2px rgba(0, 0, 0, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 2px oklch(0.06 0.015 252 / 0.40);
   }
 }
 

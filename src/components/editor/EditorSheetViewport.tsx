@@ -237,7 +237,7 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
               setLogoSelected(true);
             }}
             className={`absolute select-none z-30 group touch-none cursor-move transition-shadow ${
-              logoSelected ? 'ring-2 ring-sky-500 rounded p-1' : ''
+              logoSelected ? 'ring-2 ring-[var(--accent-focus)] rounded p-1' : ''
             }`}
             style={{
               left: `${logoConfig.x ?? 4}%`,
@@ -250,8 +250,8 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
               className={`${getLogoSizeClass(logoConfig.size)} object-contain pointer-events-none drop-shadow-xs`}
             />
 
-            <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-0 bg-slate-900 text-white rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-tactile-lg text-xs whitespace-nowrap">
-              <Icon name="move" size={12} className="text-sky-400" />
+            <div className="no-print opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-0 bg-slate-900 text-white rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-[var(--elevation-high)] text-xs whitespace-nowrap">
+              <Icon name="move" size={12} className="text-teal-300" />
               <span>Arraste para onde quiser</span>
               <button
                 type="button"
@@ -270,18 +270,18 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
 
         {/* AVISO E RESTAURAÇÃO DE CABEÇALHO OCULTADO (no-print) */}
         {!headerConfig.showHeader && (
-          <div className="no-print mb-4 p-2.5 rounded-xl border border-amber-300 bg-amber-50/70 text-amber-800 text-xs flex items-center justify-between">
+          <div className="no-print mb-4 p-2.5 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)] text-[var(--ink-secondary)] text-xs flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Icon name="visibility_off" size={16} className="text-amber-600 shrink-0" />
+              <Icon name="visibility_off" size={16} className="text-[var(--accent-amber)] shrink-0" />
               <span>
-                <strong>Cabeçalho Ocultado:</strong> A folha será impressa sem cabeçalho (ideal
+                <strong className="text-[var(--ink-primary)]">Cabeçalho Ocultado:</strong> A folha será impressa sem cabeçalho (ideal
                 para papel timbrado físico).
               </span>
             </div>
             <button
               type="button"
               onClick={() => handleHeaderFieldChange('showHeader', true)}
-              className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+              className="btn-tactile-secondary min-h-[44px] px-3 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0"
             >
               <Icon name="visibility" size={14} />
               <span>Restaurar Cabeçalho</span>
@@ -322,17 +322,17 @@ export const EditorSheetViewport: React.FC<EditorSheetViewportProps> = ({
 
         {/* AVISO E RESTAURAÇÃO DE RODAPÉ OCULTADO (no-print) */}
         {!headerConfig.showFooter && (
-          <div className="no-print mt-4 p-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-600 text-xs flex items-center justify-between">
+          <div className="no-print mt-4 p-2.5 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--border-control)] text-[var(--ink-secondary)] text-xs flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Icon name="visibility_off" size={14} className="text-slate-500 shrink-0" />
+              <Icon name="visibility_off" size={14} className="text-[var(--ink-muted)] shrink-0" />
               <span>
-                <strong>Rodapé Ocultado:</strong> Carimbo e assinatura não serão impressos.
+                <strong className="text-[var(--ink-primary)]">Rodapé Ocultado:</strong> Carimbo e assinatura não serão impressos.
               </span>
             </div>
             <button
               type="button"
               onClick={() => handleHeaderFieldChange('showFooter', true)}
-              className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+              className="btn-tactile-secondary min-h-[44px] px-3 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0"
             >
               <Icon name="visibility" size={14} />
               <span>Restaurar Rodapé</span>

@@ -14,9 +14,9 @@ import {
 } from './SidebarKitsAndFooterSection';
 
 /**
- * Menu Lateral Deep Navy e Kits Clínicos de Plantão.
- * Estados de UI cobertos: empty (nenhum kit expandido), loading (carregando aplicação de kit),
- * success (kit aplicado com sucesso) e error (confirmação/alerta de limpeza).
+ * Deep Navy Clinical Sidebar and On-Call Clinical Kits.
+ * Covered UI states: empty (no kit expanded), loading (applying kit),
+ * success (kit applied), and error (destructive reset confirmation gate).
  */
 interface SidebarProps {
   darkMode: boolean;
@@ -189,10 +189,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={() => handleNavClick(item.id)}
           aria-current={isActive ? 'page' : undefined}
           aria-label={item.fullLabel || item.label}
-          className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl flex items-center justify-center transition duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer group hover:-translate-y-0.5 active:translate-y-0 active:scale-95 focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative ${
-            isActive
-              ? 'nav-item-active sidebar-active-surface text-white font-bold'
-              : 'text-slate-300 bg-white/[0.02] hover:bg-white/[0.10] hover:border-white/15 hover:text-white border border-transparent'
+          className={`sidebar-nav-item w-11 h-11 min-w-[44px] min-h-[44px] mx-auto flex items-center justify-center cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40 outline-none ${
+            isActive ? 'font-bold' : ''
           }`}
         >
           {isActive && <span aria-hidden="true" className="sidebar-active-bar" />}
@@ -200,19 +198,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             name={item.iconName}
             size={20}
             filled={isActive}
-            className={`transition-transform duration-200 group-hover:scale-110 ${
-              isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
+            className={`transition-transform duration-150 group-hover:scale-105 ${
+              isActive
+                ? 'text-[var(--sidebar-text-primary)]'
+                : 'text-[var(--sidebar-text-secondary)] group-hover:text-[var(--sidebar-text-primary)]'
             }`}
           />
           {item.badge && (
-            <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-teal-700 text-white text-[11px] font-black flex items-center justify-center shadow-sm border border-white/20 clinical-unit clinical-tabular-nums">
+            <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[var(--clinical)] text-white text-[11px] font-bold flex items-center justify-center border border-white/20 clinical-unit clinical-tabular-nums">
               {item.badge}
             </span>
           )}
-          <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50 flex items-center gap-2">
+          <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50 flex items-center gap-2">
             <span>{item.label}</span>
             {item.shortcut && (
-              <span className="kbd-shortcut-chip bg-white/10 text-slate-200 font-semibold">
+              <span className="kbd-shortcut-chip bg-white/10 text-[var(--sidebar-text-secondary)] font-semibold">
                 {item.shortcut}
               </span>
             )}
@@ -228,38 +228,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
         type="button"
         onClick={() => handleNavClick(item.id)}
         aria-current={isActive ? 'page' : undefined}
-        className={`relative w-full min-h-[44px] py-1 flex items-center justify-between px-2.5 rounded-xl text-[13px] tracking-[-0.01em] transition-colors duration-150 ease-out cursor-pointer group active:translate-y-px focus-visible:ring-1 focus-visible:ring-white/35 outline-none ${
-          isActive
-            ? 'nav-item-active sidebar-active-surface text-[var(--sidebar-text-primary,#F8FAFC)] font-semibold'
-            : 'text-[var(--sidebar-text-secondary,#E2E8F0)] hover:bg-white/[0.06] hover:text-white font-medium border border-transparent'
+        className={`sidebar-nav-item w-full min-h-[44px] py-1.5 pl-3 pr-2.5 flex items-center justify-between text-[13px] tracking-[-0.01em] cursor-pointer group active:translate-y-px focus-visible:ring-2 focus-visible:ring-white/40 outline-none ${
+          isActive ? 'font-semibold' : 'font-medium'
         }`}
         title={item.shortcut ? `${item.fullLabel || item.label} (${item.shortcut})` : (item.fullLabel || item.label)}
       >
         {isActive && <span aria-hidden="true" className="sidebar-active-bar" />}
         <div className="flex items-center gap-2.5 min-w-0">
-          <span
-            className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-150 ${
+          <Icon
+            name={item.iconName}
+            size={18}
+            opticalSize={20}
+            filled={isActive}
+            className={`shrink-0 transition-colors duration-150 ${
               isActive
-                ? 'text-white'
-                : 'text-slate-400 group-hover:text-slate-100'
+                ? 'text-[var(--sidebar-text-primary)]'
+                : 'text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text-primary)]'
             }`}
-          >
-            <Icon 
-              name={item.iconName}
-              size={15}
-              opticalSize={20}
-              filled={isActive}
-              className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-100'} 
-            />
-          </span>
+          />
           <span className="truncate">
             {item.label}
           </span>
         </div>
         {item.badge ? (
-          <span 
-            className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0 ml-1 clinical-unit clinical-tabular-nums ${
-              isActive ? 'bg-white/[0.14] text-white border border-white/[0.12]' : 'bg-white/[0.08] text-slate-300'
+          <span
+            className={`text-[11px] font-bold px-1.5 py-0.5 rounded-[6px] flex-shrink-0 ml-1 clinical-unit clinical-tabular-nums ${
+              isActive
+                ? 'bg-white/[0.14] text-[var(--sidebar-text-primary)] border border-white/[0.14]'
+                : 'bg-white/[0.08] text-[var(--sidebar-text-secondary)]'
             }`}
           >
             {item.badge}
@@ -267,11 +263,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ) : item.shortcut ? (
           <span
             aria-hidden="true"
-            className={`kbd-shortcut-chip flex-shrink-0 ml-1 transition-colors ${
-              isActive
-                ? 'bg-white/[0.10] text-slate-200 font-semibold'
-                : 'text-[var(--sidebar-text-muted,#94A3B8)] group-hover:text-slate-200 bg-white/[0.04]'
-            }`}
+            className="kbd-shortcut-chip flex-shrink-0 ml-1 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 bg-white/[0.08] text-[var(--sidebar-text-secondary)] font-semibold"
           >
             {item.shortcut}
           </span>
@@ -280,17 +272,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
-  const activeMacroModuleLabel =
-    activeTab === 'hospital'
-      ? 'MOD-03 Ativo'
-      : activeTab === 'scores'
-        ? 'MOD-02 Ativo'
-        : 'MOD-01 Ativo';
-
   return (
     <>
       {/* Overlay Backdrop on Mobile */}
-      <div 
+      <div
         onClick={onClose || onToggleOpen}
         aria-hidden="true"
         className={`fixed inset-0 z-[55] bg-[oklch(0.14_0.02_258/0.70)] lg:hidden transition-opacity duration-300 cursor-pointer ${
@@ -302,21 +287,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         id="prescmed-sidebar"
         data-state="idle"
         aria-busy={false}
-        aria-label="Menu Lateral de Navegação"
+        aria-label="Menu clínico"
         aria-hidden={!isOpen && !isDesktop}
         inert={!isOpen && !isDesktop ? true : undefined}
-        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform will-change-transform lg:will-change-auto transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] border border-white/10 ${
+        className={`panel-navy fixed top-0 left-0 h-dvh z-[60] w-72 sm:w-80 max-w-[85vw] flex flex-col flex-shrink-0 no-print rounded-r-2xl transform will-change-transform lg:will-change-auto max-lg:transition-transform max-lg:duration-250 max-lg:ease-[cubic-bezier(0.22,1,0.36,1)] lg:transition-none border border-white/10 dark:border-white/[0.15] ${
           isOpen ? 'translate-x-0 shadow-tactile-navy lg:shadow-tactile-sm' : '-translate-x-full pointer-events-none shadow-none lg:shadow-tactile-sm'
         } lg:pointer-events-auto lg:sticky lg:top-[4.25rem] lg:h-[calc(100dvh-4.75rem)] lg:translate-x-0 lg:z-40 lg:rounded-2xl ${
           isOpen
             ? 'lg:w-64'
             : 'lg:w-16 overflow-visible'
         }`}
-        style={{
-          backgroundColor: darkMode ? '#1E293B' : '#162231'
-        }}
       >
-        {/* TOPO FIXO SEM SCROLL: Cabeçalho, Posto de Trabalho (SUS), Médico e Paciente */}
+        {/* Fixed Top Section: Context Switcher (SUS), Doctor, and Patient Identity */}
         <div
           id="sidebar-top-fixed"
           className={`shrink-0 border-b border-white/[0.08] ${
@@ -325,26 +307,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'pt-2 pb-1.5 px-1.5 space-y-1.5 flex flex-col items-center overflow-visible'
           }`}
         >
-          {/* Header da Navegação Clínica (Mobile & Desktop Expandido) */}
+          {/* Mobile Drawer Close Header / Collapsed Desktop Expand Trigger */}
           {isOpen ? (
-            <div className="flex items-center justify-between px-1 pb-0.5 pt-0.5">
+            <div className="flex items-center justify-between px-1 pt-0.5 lg:hidden">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Icon name="layers" size={14} className="text-slate-400 shrink-0" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--sidebar-text-secondary,#E2E8F0)] truncate">
+                <Icon name="layers" size={14} className="text-[var(--sidebar-text-muted)] shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--sidebar-text-secondary)] truncate">
                   Menu
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-white/[0.07] border border-white/[0.10] px-1.5 py-0.5 rounded shrink-0 leading-none clinical-tabular-nums">
-                  {activeMacroModuleLabel}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={onClose || onToggleOpen}
                 aria-label="Fechar menu lateral"
-                title={isDesktop ? 'Recolher menu lateral' : 'Fechar menu lateral'}
-                className="lg:hidden touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.12] hover:border-white/20 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:translate-y-px focus-visible:ring-1 focus-visible:ring-white/35 outline-none transition-colors duration-150 shrink-0"
+                title="Fechar menu lateral"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-[10px] border border-[oklch(1_0_0/0.12)] bg-[var(--sidebar-chip-bg)] hover:bg-[var(--sidebar-chip-hover)] flex items-center justify-center text-[var(--sidebar-text-secondary)] hover:text-[var(--sidebar-text-primary)] cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-white/40 outline-none transition-colors duration-150 shrink-0"
               >
-                <Icon name={isDesktop ? 'chevron_left' : 'close'} size={15} />
+                <Icon name="close" size={16} />
               </button>
             </div>
           ) : (
@@ -352,16 +331,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               type="button"
               onClick={onToggleOpen}
               aria-label="Abrir Janela de Navegação"
-              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-slate-200 items-center justify-center transition duration-200 cursor-pointer hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
+              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-[10px] bg-[var(--sidebar-chip-bg)] hover:bg-[var(--sidebar-chip-hover)] border border-[oklch(1_0_0/0.12)] text-[var(--sidebar-text-secondary)] hover:text-[var(--sidebar-text-primary)] items-center justify-center transition-colors duration-150 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40 outline-none relative group"
             >
               <Icon name="menu_open" size={20} className="rotate-180" />
-              <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+              <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 Expandir Navegação Clínica
               </span>
             </button>
           )}
 
-          {/* Context Switcher (SUS Multi-Instituição) — Prioridade 1 no Topo Fixo */}
+          {/* Context Switcher (SUS Multi-Institution) */}
           {contexts && contexts.length > 0 && activeContext && onSwitchContext && (
             <ContextSwitcher
               contexts={contexts}
@@ -371,74 +350,66 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           )}
 
-          {/* Doctor Profile Chip de Linha Única — Sem legenda secundária poluente */}
+          {/* Doctor Profile Identity Button */}
           {isOpen ? (
-            <div
+            <button
               id="sidebar-doctor-chip"
+              type="button"
               onClick={handleOpenDoctor}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleOpenDoctor();
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              className="min-h-[44px] py-1 px-2 rounded-lg border border-transparent hover:bg-white/[0.07] active:translate-y-px transition-colors duration-150 cursor-pointer group focus-visible:ring-1 focus-visible:ring-white/35 outline-none flex items-center justify-between gap-2"
+              className="w-full text-left min-h-[44px] py-1.5 px-2.5 rounded-[10px] border border-[oklch(1_0_0/0.12)] bg-[var(--sidebar-chip-bg)] hover:bg-[var(--sidebar-chip-hover)] active:translate-y-px transition-colors duration-150 cursor-pointer group focus-visible:ring-2 focus-visible:ring-white/40 outline-none flex items-center justify-between gap-2"
               title={
                 hasDoctor
                   ? `${doctor?.name} — CRM ${doctor?.crm}/${doctor?.crmState || 'SP'}${doctor?.rqe ? ' • RQE ' + doctor.rqe : ''}`
                   : 'Configurar médico e CRM'
               }
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <div className="w-6 h-6 rounded-lg bg-white/[0.08] text-slate-200 border border-white/[0.12] flex items-center justify-center font-bold text-[10px] shrink-0">
-                  CRM
-                </div>
-                <span className="text-[13px] font-semibold tracking-[-0.01em] truncate text-[var(--sidebar-text-primary,#F8FAFC)]">
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <Icon
+                  name="badge"
+                  size={18}
+                  className="text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text-primary)] transition-colors duration-150 shrink-0"
+                />
+                <span className="text-[13px] font-semibold tracking-[-0.01em] truncate text-[var(--sidebar-text-primary)]">
                   {hasDoctor ? doctor?.name : 'Configurar médico'}
                 </span>
               </div>
               {hasDoctor && doctor?.crm ? (
-                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-white/[0.07] text-slate-200 border border-white/[0.10] shrink-0 clinical-unit clinical-tabular-nums">
+                <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-[6px] bg-white/[0.08] text-[var(--sidebar-text-secondary)] shrink-0 clinical-unit clinical-tabular-nums">
                   {doctor.crm}/{doctor.crmState || 'SP'}
                 </span>
               ) : (
-                <Icon name="edit" size={14} className="text-slate-400 group-hover:text-white transition-colors shrink-0" />
+                <Icon
+                  name="edit"
+                  size={14}
+                  className="text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text-primary)] transition-colors duration-150 shrink-0"
+                />
               )}
-            </div>
+            </button>
           ) : (
             <button
               id="sidebar-doctor-chip"
               type="button"
               onClick={handleOpenDoctor}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl bg-white/[0.08] text-slate-200 border border-white/[0.12] hover:bg-white/[0.15] font-bold text-xs flex items-center justify-center transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-[10px] bg-[var(--sidebar-chip-bg)] text-[var(--sidebar-text-secondary)] border border-[oklch(1_0_0/0.12)] hover:bg-[var(--sidebar-chip-hover)] hover:text-[var(--sidebar-text-primary)] font-bold text-xs flex items-center justify-center transition-colors duration-150 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 outline-none relative group"
               aria-label="Perfil do Médico"
             >
               <span>CRM</span>
-              <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+              <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 {hasDoctor ? `Dr(a). ${doctor?.name}` : 'Configurar médico'}
               </span>
             </button>
           )}
 
-          {/* Patient Identification Chip de Linha Única — Sem legenda secundária poluente */}
+          {/* Patient Identification Button */}
           {isOpen ? (
-            <div
+            <button
               id="sidebar-patient-chip"
+              type="button"
               onClick={handleOpenPatient}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleOpenPatient();
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              className={`min-h-[44px] py-1 px-2 rounded-lg border transition-colors duration-150 active:translate-y-px cursor-pointer group focus-visible:ring-1 focus-visible:ring-white/35 outline-none flex items-center justify-between gap-2 ${
+              className={`w-full text-left min-h-[44px] py-1.5 px-2.5 rounded-[10px] border border-[oklch(1_0_0/0.12)] transition-colors duration-150 active:translate-y-px cursor-pointer group focus-visible:ring-2 focus-visible:ring-white/40 outline-none flex items-center justify-between gap-2 ${
                 hasPatient
-                  ? 'border-white/[0.10] bg-white/[0.06] hover:bg-white/[0.10]'
-                  : 'border-transparent hover:bg-white/[0.07]'
+                  ? 'bg-white/[0.08] hover:bg-white/[0.12]'
+                  : 'bg-[var(--sidebar-chip-bg)] hover:bg-[var(--sidebar-chip-hover)]'
               }`}
               title={
                 hasPatient
@@ -446,47 +417,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   : 'Identificar paciente'
               }
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <div
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border ${
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <Icon
+                  name={hasPatient ? 'person' : 'person_add'}
+                  size={18}
+                  filled={hasPatient}
+                  className={`shrink-0 transition-colors duration-150 ${
                     hasPatient
-                      ? 'bg-white/[0.10] text-slate-100 border-white/[0.14]'
-                      : 'bg-white/[0.08] text-slate-300 border-white/10'
+                      ? 'text-[oklch(0.840_0.110_180)]'
+                      : 'text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text-primary)]'
                   }`}
-                >
-                  <Icon name={hasPatient ? 'person' : 'person_add'} size={15} filled={hasPatient} />
-                </div>
-                <span className="text-[13px] font-semibold tracking-[-0.01em] truncate text-[var(--sidebar-text-primary,#F8FAFC)]">
+                />
+                <span className="text-[13px] font-semibold tracking-[-0.01em] truncate text-[var(--sidebar-text-primary)]">
                   {hasPatient ? patientName : 'Identificar paciente'}
                 </span>
               </div>
               {hasPatient && patientWeight > 0 ? (
-                <span className="text-[11px] font-extrabold px-1.5 py-0.5 rounded-md bg-white/[0.12] text-slate-100 border border-white/[0.14] shrink-0 clinical-unit clinical-tabular-nums">
+                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-[6px] bg-white/[0.12] text-[var(--sidebar-text-primary)] shrink-0 clinical-unit clinical-tabular-nums">
                   {patientWeight.toLocaleString('pt-BR')} kg
                 </span>
               ) : (
-                <Icon name="edit" size={14} className="text-slate-400 group-hover:text-white transition-colors shrink-0" />
+                <Icon
+                  name="edit"
+                  size={14}
+                  className="text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text-primary)] transition-colors duration-150 shrink-0"
+                />
               )}
-            </div>
+            </button>
           ) : (
             <button
               id="sidebar-patient-chip"
               type="button"
               onClick={handleOpenPatient}
-              className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl border flex items-center justify-center transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group ${
+              className={`w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-[10px] border border-[oklch(1_0_0/0.12)] flex items-center justify-center transition-colors duration-150 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 outline-none relative group ${
                 hasPatient
-                  ? 'bg-white/[0.12] text-white border-white/20 hover:bg-white/[0.18]'
-                  : 'bg-white/[0.06] text-slate-300 border-white/10 hover:bg-white/15 hover:text-white'
+                  ? 'bg-white/[0.12] text-[var(--sidebar-text-primary)] hover:bg-white/[0.16]'
+                  : 'bg-[var(--sidebar-chip-bg)] text-[var(--sidebar-text-secondary)] hover:bg-[var(--sidebar-chip-hover)] hover:text-[var(--sidebar-text-primary)]'
               }`}
               aria-label="Identificar paciente"
             >
               <Icon name={hasPatient ? 'person' : 'person_add'} size={20} filled={hasPatient} />
               {hasPatient && patientWeight > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-teal-700 text-white text-[11px] font-black flex items-center justify-center shadow-sm border border-white/20 clinical-unit clinical-tabular-nums">
+                <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[var(--clinical)] text-white text-[11px] font-bold flex items-center justify-center border border-white/20 clinical-unit clinical-tabular-nums">
                   {patientWeight.toLocaleString('pt-BR')}kg
                 </span>
               )}
-              <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+              <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 {hasPatient
                   ? `${patientName}${patientWeight > 0 ? ` • ${patientWeight.toLocaleString('pt-BR')} kg` : ''}`
                   : 'Identificar paciente'}
@@ -495,7 +471,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
-        {/* Área de Navegação por Grupos (overflow-visible quando recolhida para tooltips flutuantes) */}
+        {/* Grouped Navigation Area (overflow-visible when collapsed for floating tooltips) */}
         <div
           id="sidebar-nav-scroll"
           className={`flex-1 min-h-0 ${
@@ -505,35 +481,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <nav
-            aria-label="Menu Lateral de Navegação"
-            className={isOpen ? 'w-full flex flex-col gap-1.5 relative' : 'w-full flex flex-col items-center gap-1.5 relative'}
+            aria-label="Módulos principais"
+            className={isOpen ? 'w-full flex flex-col gap-0.5 relative' : 'w-full flex flex-col items-center gap-1 relative'}
           >
-            {/* Grupo 1: Atendimento Clínico Principal (4 itens <= 6 por <nav>) */}
+            {/* Group 1: Primary Clinical Care (4 items <= 6 per <nav>) */}
             <div role="group" aria-label="Atendimento" className="w-full">
               {isOpen && (
-                <p className="text-[10px] font-bold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted,#94A3B8)] px-2.5 mb-0.5 leading-tight">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted)] px-3 mb-0.5 leading-tight">
                   Atendimento
                 </p>
               )}
-              <div className={isOpen ? 'space-y-0' : 'space-y-1 w-full flex flex-col items-center'}>
+              <div className={isOpen ? 'flex flex-col gap-0.5' : 'space-y-1 w-full flex flex-col items-center'}>
                 {coreHubNavItems.map(renderNavButton)}
               </div>
             </div>
           </nav>
 
-          {/* Grupo 2: Módulo de Apoio Clínico (fora de <nav> para respeitar <= 6 itens por landmark) */}
+          {/* Group 2: Clinical Decision Support Tools (outside <nav> to keep <= 6 items per nav landmark) */}
           <div role="region" aria-label="Módulo de Apoio Clínico" className="w-full">
             {isOpen && (
-              <p className="text-[10px] font-bold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted,#94A3B8)] px-2.5 mb-0.5 leading-tight">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--sidebar-text-muted)] px-3 mb-0.5 leading-tight">
                 Módulo de Apoio Clínico
               </p>
             )}
-            <div className={isOpen ? 'space-y-0' : 'space-y-1 w-full flex flex-col items-center'}>
+            <div className={isOpen ? 'flex flex-col gap-0.5' : 'space-y-1 w-full flex flex-col items-center'}>
               {clinicalToolsNavItems.map(renderNavButton)}
             </div>
           </div>
 
-          {/* Grupo 3: Kits de Plantão */}
+          {/* Group 3: On-Call Clinical Kits */}
           <div role="region" aria-label="Kits de Plantão" className="w-full">
             <SidebarKitsGroupSection
               isOpen={isOpen}

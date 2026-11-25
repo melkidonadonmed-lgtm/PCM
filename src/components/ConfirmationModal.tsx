@@ -71,10 +71,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       >
         <div className="flex items-start gap-4">
           <div 
-            className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
+            className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border bg-[var(--surface-chip-muted)] border-[var(--hairline)] ${
               isDanger 
-                ? 'bg-[var(--accent-rose-subtle)] text-rose-700 dark:text-rose-300 border-[var(--accent-rose-border)]' 
-                : 'bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border-[var(--border-clinical-subtle)]'
+                ? 'text-[var(--status-danger)]' 
+                : 'text-[var(--ink-clinical)]'
             }`}
           >
             <Icon name="warning" className="text-[24px]" />
@@ -96,19 +96,20 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </div>
 
           <button
+            type="button"
             onClick={onCancel}
             aria-label="Fechar modal de confirmação"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
+            className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             <Icon name="close" className="text-[18px]" />
           </button>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-[var(--border-subtle)]">
+        <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-[var(--hairline)]">
           <button
             type="button"
             onClick={onCancel}
-            className="min-h-[44px] px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] transition cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
+            className="btn-tactile-secondary min-h-[44px] px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             {cancelLabel}
           </button>
@@ -117,15 +118,13 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             ref={confirmButtonRef}
             type="button"
             onClick={onConfirm}
-            className={`min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl shadow-tactile-btn flex items-center gap-2 cursor-pointer transition active:scale-95 focus-visible:ring-2 ${
-              isDanger ? 'focus-visible:ring-rose-500' : 'focus-visible:ring-[var(--accent-focus)]'
-            } focus-visible:outline-none ${
-              isDanger 
-                ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white' 
-                : 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
+            className={`min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl flex items-center gap-2 focus-visible:ring-2 focus-visible:outline-none ${
+              isDanger
+                ? 'btn-tactile-danger focus-visible:ring-[var(--status-danger)]'
+                : 'btn-tactile-primary focus-visible:ring-[var(--accent-focus)]'
             }`}
           >
-            <Icon name="check" className="text-[16px]" />
+            <Icon name="check" className={`text-[16px] ${isDanger ? 'text-[var(--status-danger)]' : ''}`} />
             <span>{confirmLabel}</span>
           </button>
         </div>

@@ -154,11 +154,11 @@ export const PrescriptionPreviewColumn: React.FC<PrescriptionPreviewColumnProps>
           role="dialog"
           aria-modal="true"
           aria-label="Calculadora pediátrica por peso"
-          className="fixed inset-0 z-50 flex justify-end bg-[oklch(0.14_0.02_258/0.50)] animate-backdrop-fade"
+          className="fixed inset-0 z-50 flex justify-end bg-[oklch(0.14_0.02_252/0.56)] animate-backdrop-fade"
           onClick={onClosePediatricDrawer}
         >
           <div
-            className="w-full max-w-3xl h-full bg-[var(--surface-card)] shadow-2xl border-l border-[var(--border-subtle)] flex flex-col animate-drawer-right overflow-hidden"
+            className="w-full max-w-3xl h-full bg-[var(--surface-card)] shadow-[var(--elevation-high)] border-l border-[var(--border-subtle)] flex flex-col animate-drawer-right overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header do Drawer */}

@@ -84,7 +84,6 @@ export function buildSidebarNavGroups(
         shortLabel: 'Scores',
         iconName: 'monitor_heart',
         shortcut: 'Alt+8',
-        badge: '114',
       },
       {
         id: 'hospital',
@@ -121,15 +120,15 @@ export const SidebarKitsGroupSection: React.FC<SidebarKitsGroupSectionProps> = (
           onExpandAndShowKits();
           storageService.saveRawString('prescmed_show_kits', 'true');
         }}
-        className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center transition duration-200 cursor-pointer group hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative text-slate-300 bg-white/[0.02] hover:text-white hover:bg-white/10 border border-transparent hover:border-white/15"
+        className="sidebar-nav-item w-11 h-11 min-w-[44px] min-h-[44px] mx-auto flex items-center justify-center cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40 outline-none relative"
         aria-label="Kits de plantão"
       >
         <Icon
           name="medication"
           size={20}
-          className="transition-transform duration-200 group-hover:scale-110 text-slate-300 group-hover:text-white"
+          className="transition-transform duration-150 group-hover:scale-105 text-[var(--sidebar-text-secondary)] group-hover:text-[var(--sidebar-text-primary)]"
         />
-        <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+        <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
           Kits de plantão
         </span>
       </button>
@@ -143,18 +142,21 @@ export const SidebarKitsGroupSection: React.FC<SidebarKitsGroupSectionProps> = (
         onClick={onToggleKits}
         aria-expanded={showKits}
         aria-controls="sidebar-kits-list"
-        className="w-full min-h-[44px] py-1 px-2.5 rounded-xl text-[13px] tracking-[-0.01em] font-medium text-[var(--sidebar-text-secondary,#E2E8F0)] border border-transparent flex items-center justify-between hover:text-white hover:bg-white/[0.06] active:translate-y-px transition-colors duration-150 ease-out cursor-pointer group outline-none focus-visible:ring-1 focus-visible:ring-white/35"
+        className="sidebar-nav-item w-full min-h-[44px] py-1.5 pl-3 pr-2.5 text-[13px] tracking-[-0.01em] font-medium flex items-center justify-between active:translate-y-px cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-white/40"
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          <span className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-slate-300 group-hover:text-white">
-            <Icon name="medication" size={15} opticalSize={20} />
-          </span>
+          <Icon
+            name="medication"
+            size={18}
+            opticalSize={20}
+            className="text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text-primary)] transition-colors duration-150 shrink-0"
+          />
           <span className="truncate">Kits de plantão ({CLINICAL_KITS.length})</span>
         </div>
         <Icon
           name={showKits ? 'expand_less' : 'expand_more'}
           size={16}
-          className="text-slate-400 group-hover:text-white transition-transform duration-200 shrink-0"
+          className="text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text-primary)] transition-colors duration-150 shrink-0"
         />
       </button>
 
@@ -165,14 +167,14 @@ export const SidebarKitsGroupSection: React.FC<SidebarKitsGroupSectionProps> = (
               key={kit.id}
               type="button"
               onClick={() => onApplyKit(kit)}
-              className="w-full min-h-[44px] text-left px-2.5 py-2 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 active:translate-y-px transition-colors duration-150 cursor-pointer group outline-none focus-visible:ring-1 focus-visible:ring-white/35 flex items-center"
+              className="w-full min-h-[44px] text-left px-2.5 py-2 rounded-[10px] border border-[oklch(1_0_0/0.08)] bg-[var(--sidebar-chip-bg)] hover:bg-[var(--sidebar-chip-hover)] hover:border-white/15 active:translate-y-px transition-colors duration-150 cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-white/40 flex items-center"
               title={`Aplicar kit: ${kit.name} (${kit.badge})`}
             >
               <div className="flex items-center justify-between gap-1.5 w-full min-w-0">
-                <span className="text-xs font-medium text-slate-200 group-hover:text-white truncate">
+                <span className="text-xs font-medium text-[var(--sidebar-text-secondary)] group-hover:text-[var(--sidebar-text-primary)] truncate">
                   {kit.name}
                 </span>
-                <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/10 text-slate-300 shrink-0 clinical-tabular-nums">
+                <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-[6px] bg-white/10 text-[var(--sidebar-text-secondary)] shrink-0 clinical-tabular-nums">
                   {kit.badge}
                 </span>
               </div>
@@ -213,26 +215,26 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
 }) => {
   return (
     <div
-      className={`shrink-0 border-t border-white/[0.07] rounded-b-2xl overflow-hidden ${
+      className={`shrink-0 border-t border-white/[0.08] rounded-b-2xl overflow-hidden ${
         isOpen
           ? 'px-2 py-1.5 space-y-0.5 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:pb-1.5'
-          : 'py-2 px-1.5 space-y-1.5 flex flex-col items-center'
+          : 'py-1.5 px-1.5 space-y-1 flex flex-col items-center'
       }`}
     >
       {isOpen ? (
         <>
-          {/* Linha 1: Ação primária limpa + Recolher Menu */}
-          <div className="flex items-center gap-1 w-full">
+          {/* Row 1: Primary session reset + Collapse sidebar */}
+          <div className="flex items-center gap-0.5 w-full">
             <button
               type="button"
               onClick={onTriggerResetAll}
-              className="flex-1 min-w-0 min-h-[44px] py-1 px-2 rounded-lg text-xs font-medium text-slate-200 hover:text-white hover:bg-white/[0.07] active:translate-y-px transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-white/35 whitespace-nowrap flex items-center gap-2 group"
+              className="flex-1 min-w-0 min-h-[44px] py-1 px-2.5 rounded-[10px] text-xs font-medium text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] active:translate-y-px transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/40 whitespace-nowrap flex items-center gap-2 group"
               title="Iniciar uma nova consulta do zero"
             >
               <Icon
                 name="refresh"
-                size={15}
-                className="text-slate-300 group-hover:text-white group-hover:rotate-45 transition-transform duration-200 shrink-0"
+                size={16}
+                className="text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text-primary)] group-hover:rotate-45 transition-transform duration-200 shrink-0"
               />
               <span className="truncate">Novo Atendimento</span>
             </button>
@@ -240,7 +242,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             <button
               type="button"
               onClick={onToggleOpen}
-              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.07] items-center justify-center transition duration-150 cursor-pointer active:scale-95 focus-visible:ring-1 focus-visible:ring-white/35 outline-none shrink-0"
+              className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] items-center justify-center transition-colors duration-150 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40 outline-none shrink-0"
               title="Recolher menu lateral"
               aria-label="Recolher Menu"
             >
@@ -248,17 +250,18 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             </button>
           </div>
 
-          {/* Linha 2: Utilitários silenciosos (sem caixas aninhadas) */}
-          <div className="flex items-center justify-between gap-0.5 pt-0.5 border-t border-white/[0.05] w-full min-w-0">
+          {/* Row 2: Quiet utilities (AAA contrast >= 7.8:1 via --sidebar-text-muted) */}
+          <div className="flex items-center justify-between gap-0.5 pt-0.5 border-t border-white/[0.06] w-full min-w-0">
             {onOpenBackupModal && (
               <button
                 type="button"
                 onClick={onOpenBackup}
-                className="min-h-[44px] px-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/[0.06] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center gap-1 text-[11px] font-medium outline-none focus-visible:ring-1 focus-visible:ring-white/35 min-w-0"
+                aria-label="Backup (.pcm)"
+                className="min-h-[44px] px-2 rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center gap-1.5 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-white/40 shrink-0"
                 title="Exportar ou restaurar arquivo de backup (.pcm.json)"
               >
-                <Icon name="cloud_download" size={13} className="shrink-0" />
-                <span className="truncate">Backup (.pcm)</span>
+                <Icon name="cloud_download" size={14} className="shrink-0" />
+                <span>Backup</span>
               </button>
             )}
 
@@ -267,11 +270,11 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
                 id="btn-sidebar-lgpd-security"
                 type="button"
                 onClick={onOpenLgpd}
-                className="min-h-[44px] min-w-[44px] px-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/[0.06] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] font-medium outline-none focus-visible:ring-1 focus-visible:ring-white/35 shrink-0"
+                className="min-h-[44px] min-w-[44px] px-2 rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-white/40 shrink-0"
                 title="Segurança, Seleção de Cookies e Conformidade LGPD"
                 aria-label="Segurança, Seleção de Cookies e LGPD"
               >
-                <Icon name="shield" size={13} className="text-slate-400 group-hover:text-slate-200 shrink-0" />
+                <Icon name="shield" size={14} className="shrink-0" />
                 <span>LGPD</span>
               </button>
             )}
@@ -284,11 +287,11 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
                   onInstallApp();
                   if (!isDesktop) onClose?.();
                 }}
-                className="min-h-[44px] min-w-[44px] px-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/[0.06] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-[11px] font-semibold outline-none focus-visible:ring-1 focus-visible:ring-white/35 shrink-0"
+                className="min-h-[44px] min-w-[44px] px-2 rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] active:translate-y-px transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-white/40 shrink-0"
                 title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
                 aria-label="Baixar / Instalar App"
               >
-                <Icon name="download" size={13} className="shrink-0" />
+                <Icon name="download" size={14} className="shrink-0" />
                 <span>App</span>
               </button>
             )}
@@ -299,11 +302,11 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
           <button
             type="button"
             onClick={onTriggerResetAll}
-            className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] flex items-center justify-center transition-colors duration-150 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 outline-none relative group"
             aria-label="Novo Atendimento"
           >
             <Icon name="refresh" size={20} />
-            <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+            <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
               Novo Atendimento
             </span>
           </button>
@@ -312,11 +315,11 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             <button
               type="button"
               onClick={onOpenBackup}
-              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] flex items-center justify-center transition-colors duration-150 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 outline-none relative group"
               aria-label="Backup e Portabilidade"
             >
               <Icon name="cloud_download" size={20} />
-              <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+              <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 Backup (.pcm.json)
               </span>
             </button>
@@ -326,11 +329,11 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             <button
               type="button"
               onClick={onOpenLgpd}
-              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] flex items-center justify-center transition-colors duration-150 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 outline-none relative group"
               aria-label="Segurança, Cookies e LGPD"
             >
-              <Icon name="shield" size={20} className="text-slate-300" />
-              <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+              <Icon name="shield" size={20} />
+              <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 Segurança, Cookies &amp; LGPD
               </span>
             </button>
@@ -340,11 +343,11 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
             <button
               type="button"
               onClick={onInstallApp}
-              className="w-11 h-11 mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition active:scale-95 cursor-pointer focus-visible:ring-1 focus-visible:ring-white/35 outline-none relative group"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] flex items-center justify-center transition-colors duration-150 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 outline-none relative group"
               aria-label="Instalar App Offline"
             >
               <Icon name="download" size={20} />
-              <span className="absolute left-[calc(100%+10px)] bg-slate-900 border border-white/15 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
+              <span className="absolute left-[calc(100%+10px)] bg-[var(--sidebar-surface-elevated)] border border-white/15 text-[var(--sidebar-text-primary)] text-xs px-2.5 py-1.5 rounded-[10px] opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 whitespace-nowrap shadow-tactile-md z-50">
                 Instalar App Offline
               </span>
             </button>
@@ -353,7 +356,7 @@ export const SidebarPinnedFooterSection: React.FC<SidebarPinnedFooterSectionProp
           <button
             type="button"
             onClick={onToggleOpen}
-            className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-xl text-slate-300 hover:text-white hover:bg-white/10 items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-1 focus-visible:ring-white/35 outline-none"
+            className="hidden lg:flex w-11 h-11 min-w-[44px] min-h-[44px] mx-auto rounded-[10px] text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)] items-center justify-center transition-colors duration-150 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40 outline-none"
             title="Expandir Menu Lateral"
             aria-label="Expandir Menu Lateral"
           >

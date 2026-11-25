@@ -188,25 +188,25 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
   const temTextoCompartilhavel = Boolean(getFormattedDocumentText());
   const tituloAcao = (texto: string) => texto;
   const classeBotaoSecundario =
-    'btn-tactile-secondary touch-target min-h-[44px] px-3.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 shrink-0 whitespace-nowrap transition active:scale-95 cursor-pointer shadow-tactile-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none';
+    'btn-tactile-secondary touch-target min-h-[44px] px-3.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 shrink-0 whitespace-nowrap transition active:scale-95 cursor-pointer shadow-[var(--shadow-control)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none';
 
   return (
     <div data-state="idle" aria-busy={false} id="print-preview-section" className="space-y-4 sm:space-y-5 pb-12">
       {/* Barra de ações */}
-      <div className="tactile-card surface-card-minimal p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 no-print bg-[var(--surface-card)] border-[var(--border-subtle)]">
+      <div className="tactile-card surface-card-minimal p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 no-print bg-[var(--surface-card)] border-[var(--hairline)]">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBack}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] p-0 rounded-xl border flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer transition active:scale-95 tactile-btn-secondary bg-[var(--surface-inset)] focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             title="Voltar para edição"
             aria-label="Voltar para edição"
           >
             <Icon name="arrow_back" className="text-[20px]" />
           </button>
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)]">Emitir documento</h2>
-            <p className="text-xs text-[var(--text-muted)] font-medium mt-0.5">
+            <h2 className="text-base sm:text-lg font-bold text-[var(--ink-primary)]">Emitir documento</h2>
+            <p className="text-xs text-[var(--ink-muted)] font-medium mt-0.5">
               O PDF e a impressão saem exatamente como a folha abaixo.
             </p>
           </div>
@@ -216,17 +216,17 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           {!isConfigured && (
             <div
               role="status"
-              className="w-full flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl text-xs font-medium border bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)]"
+              className="w-full flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl text-xs font-medium bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)] text-[var(--ink-secondary)]"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-[var(--accent-amber)] shrink-0" aria-hidden="true" />
                 <span>Configure nome e CRM do médico para emitir documentos.</span>
               </div>
               {onAbrirPerfilMedico && (
                 <button
                   type="button"
                   onClick={onAbrirPerfilMedico}
-                  className="touch-target px-3 py-1.5 min-h-[44px] rounded-lg bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] border border-[var(--border-subtle)] font-semibold text-xs shrink-0 cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                  className="btn-tactile-secondary touch-target px-3 py-1.5 min-h-[44px] rounded-lg font-semibold text-xs shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
                 >
                   Configurar médico
                 </button>
@@ -237,13 +237,16 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           {pdfError && (
             <div
               role="alert"
-              className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-medium border bg-[var(--surface-chip-muted)] text-rose-700 dark:text-rose-300 border-[var(--border-subtle)]"
+              className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-medium bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)] text-[var(--ink-primary)]"
             >
-              <span>{pdfError}</span>
+              <span className="flex items-center gap-2 min-w-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-danger)] shrink-0" aria-hidden="true" />
+                <span>{pdfError}</span>
+              </span>
               <button
                 type="button"
                 onClick={() => setPdfError(null)}
-                className="touch-target min-h-[44px] px-2 inline-flex items-center text-slate-600 dark:text-slate-300 font-semibold hover:underline shrink-0 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target min-h-[44px] px-2 inline-flex items-center text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] font-semibold hover:underline shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
               >
                 Fechar
               </button>
@@ -259,9 +262,9 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               title={tituloAcao('Copiar o texto do documento para o prontuário')}
             >
               {textoCopiado ? (
-                <Icon name="check" className="text-[16px] text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <Icon name="check" className="text-[16px] text-[var(--ink-clinical)] shrink-0" />
               ) : (
-                <Icon name="content_copy" className="text-[16px] text-slate-500 dark:text-slate-400 shrink-0" />
+                <Icon name="content_copy" className="text-[16px] text-[var(--ink-muted)] shrink-0" />
               )}
               <span>{textoCopiado ? 'Copiado!' : 'Copiar texto'}</span>
             </button>
@@ -273,7 +276,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               className={`${classeBotaoSecundario} flex`}
               title={tituloAcao('Enviar o texto do documento pelo WhatsApp')}
             >
-              <Icon name="send" className="text-[16px] text-slate-500 dark:text-slate-400 shrink-0" />
+              <Icon name="send" className="text-[16px] text-[var(--ink-muted)] shrink-0" />
               <span>WhatsApp</span>
             </button>
 
@@ -291,12 +294,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
                 </>
               ) : exportSuccess ? (
                 <>
-                  <Icon name="check" className="text-[16px] text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <Icon name="check" className="text-[16px] text-[var(--ink-clinical)] shrink-0" />
                   <span>PDF baixado</span>
                 </>
               ) : (
                 <>
-                  <Icon name="download" className="text-[16px] text-slate-500 dark:text-slate-400 shrink-0" />
+                  <Icon name="download" className="text-[16px] text-[var(--ink-muted)] shrink-0" />
                   <span>Baixar PDF</span>
                 </>
               )}
@@ -306,7 +309,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               type="button"
               onClick={handlePrint}
               aria-label="Imprimir a folha"
-              className="btn-tactile-primary touch-target min-h-[44px] px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-tactile-btn transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="btn-tactile-primary touch-target min-h-[44px] px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 whitespace-nowrap shadow-[var(--shadow-control)] transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
               title={tituloAcao('Imprimir a folha direto na impressora (Ctrl+P)')}
             >
               <Icon name="print" className="text-[16px] shrink-0" />
@@ -325,10 +328,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
               type="button"
               onClick={() => setDocType(id)}
               aria-pressed={docType === id}
-              className={`touch-target text-xs font-semibold px-4 py-2 min-h-[44px] rounded-xl whitespace-nowrap border transition cursor-pointer active:scale-95 flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+              className={`touch-target text-xs px-4 py-2 min-h-[44px] rounded-xl whitespace-nowrap flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none ${
                 docType === id
-                  ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] shadow-tactile-sm font-bold'
-                  : 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--surface-chip-muted-hover)]'
+                  ? 'btn-tactile-primary font-bold'
+                  : 'btn-tactile-secondary font-semibold'
               }`}
             >
               <Icon name={icone} className="text-[16px]" />
@@ -343,7 +346,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
           <button
             type="button"
             onClick={() => setAjustarATela(!ajustarATela)}
-            className="lg:hidden touch-target px-3 py-2 min-h-[44px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] text-xs font-semibold flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95 btn-tactile-secondary transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="lg:hidden btn-tactile-secondary touch-target px-3 py-2 min-h-[44px] rounded-xl text-xs font-semibold flex items-center gap-1.5 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             title={ajustarATela ? 'Ver em tamanho real' : 'Ajustar à tela'}
           >
             <Icon name={ajustarATela ? 'open_in_full' : 'close_fullscreen'} className="text-[16px]" />
@@ -354,7 +357,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
 
       {/* Mais de uma receita na mesma consulta: cada uma é um documento e precisa ser emitida */}
       {receitasComItens.length > 1 && itensDoTipo(docType) !== null && (
-        <div role="status" className="no-print px-4 py-2.5 rounded-xl border text-xs font-medium bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)]">
+        <div role="status" className="no-print px-4 py-2.5 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] text-xs font-medium text-[var(--ink-secondary)]">
           Esta consulta gera {receitasComItens.length} receitas separadas ({receitasComItens.map((r) => NOME_DO_REGIME[r]).join(', ')}).
           Emita cada uma pela sua aba.
         </div>
@@ -364,7 +367,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({
       {docType === 'special_prescription' && <AvisoNotificacaoReceita items={itensDaFolha} />}
 
       {/* Bancada com a folha A4: única fonte da prévia, da impressão e do PDF */}
-      <div className="p-3 sm:p-8 bg-slate-900/5 dark:bg-slate-950/40 rounded-2xl border border-subtle dark:border-strong shadow-tactile-inset dark:shadow-tactile-inset-dark">
+      <div className="p-3 sm:p-8 bg-[var(--a4-bench-bg)] rounded-2xl border border-[var(--a4-bench-border)] shadow-[var(--shadow-inset-sunken)]">
         <FolhaA4
           ref={folhaRef}
           id="printable-a4-sheet"

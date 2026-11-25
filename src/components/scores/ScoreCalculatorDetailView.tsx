@@ -224,42 +224,33 @@ export const ScoreCalculatorDetailView: React.FC<
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="rounded-md bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] px-2 py-0.5 font-mono text-[11px] font-bold text-[var(--ink-clinical)]">
+              <span className="inline-flex items-center gap-1.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-2 py-0.5 font-mono text-[11px] font-bold text-[var(--ink-primary)]">
+                <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" />
                 {calculator.acronym}
               </span>
               <span className="text-[11px] font-medium text-[var(--text-muted)] leading-snug">
                 {calculator.categoryName ?? calculator.category} •{' '}
                 {calculator.moduleName ?? calculator.subcategory}
               </span>
-              <div className="inline-flex items-center gap-1">
+              <div className="inline-flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => onToggleFavorite(calculator.id)}
-                  title={
-                    isFavorite
-                      ? 'Remover dos Favoritos Rápidos'
-                      : 'Fixar nos Favoritos Rápidos'
-                  }
-                  aria-label={
-                    isFavorite
-                      ? `Remover ${calculator.acronym} dos favoritos`
-                      : `Fixar ${calculator.acronym} nos favoritos`
-                  }
-                  className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
-                    isFavorite
-                      ? 'border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)]'
-                      : 'border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  title={isFavorite ? 'Remover dos Favoritos Rápidos' : 'Fixar nos Favoritos Rápidos'}
+                  aria-label={isFavorite ? `Remover ${calculator.acronym} dos favoritos` : `Fixar ${calculator.acronym} nos favoritos`}
+                  className={`touch-target min-h-[44px] inline-flex items-center gap-1.5 rounded-[10px] px-3 py-1 text-xs font-semibold cursor-pointer ${
+                    isFavorite ? 'btn-tactile-primary' : 'btn-tactile-secondary'
                   }`}
                 >
-                  <Icon name="bookmark_add" size={12} filled={isFavorite} />
+                  <Icon name="bookmark_add" size={13} filled={isFavorite} />
                   <span>{isFavorite ? 'Fixado' : 'Fixar'}</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleResetBaseline}
-                  className="touch-target min-h-[44px] chip-neutral inline-flex items-center gap-1 rounded-md border border-subtle/80 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer"
+                  className="touch-target min-h-[44px] chip-neutral btn-tactile-secondary inline-flex items-center gap-1.5 rounded-[10px] px-3 py-1 text-xs font-semibold cursor-pointer"
                 >
-                  <Icon name="restart_alt" size={12} />
+                  <Icon name="restart_alt" size={13} />
                   <span>Zerar Basal</span>
                 </button>
               </div>
@@ -308,14 +299,14 @@ export const ScoreCalculatorDetailView: React.FC<
 
         {/* Alerta Mandatório SSC 2021 (qSOFA) */}
         {result.sscWarning ? (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-500/50 bg-amber-50/90 dark:bg-amber-950/40 px-3.5 py-2.5 text-xs text-amber-950 dark:text-amber-200">
-            <div className="flex items-start gap-2.5">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)] bg-[var(--surface-card-lit)] px-3.5 py-2.5 text-xs text-[var(--ink-secondary)]">
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
               <Icon
                 name="warning"
-                className="mt-0.5 text-base shrink-0 text-amber-600 dark:text-amber-400"
+                className="mt-0.5 text-base shrink-0 text-[var(--accent-amber)]"
               />
-              <div>
-                <span className="font-bold text-amber-900 dark:text-amber-300">
+              <div className="leading-relaxed">
+                <span className="font-semibold text-[var(--ink-primary)]">
                   Diretriz Surviving Sepsis Campaign (SSC 2021):{' '}
                 </span>
                 {result.sscWarning}
@@ -325,7 +316,7 @@ export const ScoreCalculatorDetailView: React.FC<
               <button
                 type="button"
                 onClick={() => onOpenScoreBySlug('sofa')}
-                className="touch-target min-h-[44px] shrink-0 rounded-lg border border-[var(--accent-amber-border)] bg-[var(--surface-card)] px-3 py-1.5 text-xs font-bold text-amber-900 dark:text-amber-200 hover:bg-[var(--accent-amber-subtle)] cursor-pointer transition-colors"
+                className="touch-target btn-tactile-secondary shrink-0 px-3 py-1.5 text-xs whitespace-nowrap"
               >
                 Abrir SOFA Completo
               </button>
@@ -340,11 +331,11 @@ export const ScoreCalculatorDetailView: React.FC<
           {/* Parâmetros Clínicos */}
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between px-1">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
                 1. Parâmetros Clínicos à Beira do Leito ({sortedGroups.length}{' '}
                 domínios)
               </h3>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="text-[11px] text-[var(--ink-muted)]">
                 Cálculo determinístico instantâneo
               </span>
             </div>
@@ -379,8 +370,8 @@ export const ScoreCalculatorDetailView: React.FC<
                   {activeTier.label}
                 </span>
               </div>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-700 dark:text-slate-200">
-                <strong>Desfecho / Evidência:</strong>{' '}
+              <p className="mt-1.5 text-xs leading-relaxed text-[var(--ink-secondary)]">
+                <strong className="text-[var(--ink-primary)]">Desfecho / Evidência:</strong>{' '}
                 {activeTier.statisticalOutcome}
               </p>
             </div>
@@ -388,49 +379,47 @@ export const ScoreCalculatorDetailView: React.FC<
             {/* Medidas Não Farmacológicas */}
             {activeTier.nonPharmacologicalActions.length > 0 ? (
               <div className="space-y-2">
-                <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  <Icon
-                    name="shield_with_heart"
-                    className="text-sm text-emerald-600"
-                  />
+                <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
+                  <Icon name="shield_with_heart" className="text-sm text-[var(--ink-clinical)]" />
                   Destinação, Monitorização e Suporte Não-Farmacológico
                 </h4>
                 {activeTier.nonPharmacologicalActions.map((act) => (
                   <div
                     key={act.id}
-                    className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-3 text-xs space-y-1.5"
+                    className="rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-3 text-xs space-y-1.5"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-bold text-slate-900 dark:text-white">
+                      <span className="font-bold text-[var(--ink-primary)]">
                         {act.recommendationTitle}
                       </span>
-                      <span className="rounded-md bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-800 dark:text-emerald-200">
+                      <span className="inline-flex items-center gap-1.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-2 py-0.5 font-mono text-[11px] font-bold text-[var(--ink-primary)]">
+                        <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" />
                         Destino: {act.dispositionTarget}
                       </span>
                     </div>
-                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                      <strong>Plano de Monitorização:</strong>{' '}
+                    <p className="text-[var(--ink-secondary)] leading-relaxed">
+                      <strong className="text-[var(--ink-primary)]">Plano de Monitorização:</strong>{' '}
                       {act.monitoringPlan}
                     </p>
                     {act.ventilatorySupport ? (
-                      <p className="text-slate-600 dark:text-slate-400">
+                      <p className="text-[var(--ink-muted)]">
                         <strong>Suporte Ventilatório:</strong>{' '}
                         {act.ventilatorySupport}
                       </p>
                     ) : null}
                     {act.vascularAccess ? (
-                      <p className="text-slate-600 dark:text-slate-400">
+                      <p className="text-[var(--ink-muted)]">
                         <strong>Acesso Vascular:</strong> {act.vascularAccess}
                       </p>
                     ) : null}
                     {act.interventionalProcedure ? (
-                      <p className="text-slate-600 dark:text-slate-400">
+                      <p className="text-[var(--ink-muted)]">
                         <strong>Procedimento / Intervenção:</strong>{' '}
                         {act.interventionalProcedure}
                       </p>
                     ) : null}
                     {act.laboratoryPanel ? (
-                      <p className="text-slate-600 dark:text-slate-400">
+                      <p className="text-[var(--ink-muted)]">
                         <strong>Painel Laboratorial:</strong>{' '}
                         {act.laboratoryPanel}
                       </p>
@@ -443,7 +432,7 @@ export const ScoreCalculatorDetailView: React.FC<
             {/* Condutas Farmacológicas + Prescrição Direta / BIC */}
             {activeTier.pharmacologicalActions.length > 0 ? (
               <div className="space-y-2.5">
-                <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
                   <Icon name="medication" className="text-sm text-[var(--ink-clinical)]" />
                   Prescrição Farmacológica Guiada pelo Escore
                 </h4>
@@ -455,11 +444,11 @@ export const ScoreCalculatorDetailView: React.FC<
                   return (
                     <div
                       key={rx.id}
-                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-3 text-xs space-y-2"
+                      className="rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-3 text-xs space-y-2"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div>
-                          <span className="text-sm font-bold text-slate-900 dark:text-white">
+                          <span className="text-sm font-bold text-[var(--ink-primary)]">
                             {rx.drugName}
                           </span>
                           <div className="mt-0.5 font-mono text-xs font-semibold text-[var(--ink-clinical)] clinical-tabular-nums">
@@ -472,40 +461,25 @@ export const ScoreCalculatorDetailView: React.FC<
                             <button
                               type="button"
                               onClick={() => handlePrescribeDrug(rx)}
-                              className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
-                                alreadyPrescribed
-                                  ? 'border-[var(--clinical)] bg-[var(--clinical)] text-white'
-                                  : 'border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] hover:opacity-90'
+                              className={`touch-target min-h-[44px] inline-flex items-center gap-1.5 rounded-[10px] px-3 py-1 text-xs font-semibold cursor-pointer ${
+                                alreadyPrescribed ? 'btn-tactile-clinical' : 'btn-tactile-primary'
                               }`}
                             >
-                              <Icon
-                                name={
-                                  alreadyPrescribed ? 'check' : 'add_circle'
-                                }
-                                className="text-sm"
-                              />
-                              {alreadyPrescribed
-                                ? 'Adicionado à Receita'
-                                : 'Prescrever na Receita'}
+                              <Icon name={alreadyPrescribed ? 'check' : 'add_circle'} className="text-sm" />
+                              {alreadyPrescribed ? 'Adicionado à Receita' : 'Prescrever na Receita'}
                             </button>
                           ) : null}
 
                           {hasBic ? (
                             <button
                               type="button"
-                              onClick={() =>
-                                setOpenBicDrugId(isBicOpen ? null : rx.id)
-                              }
-                              className={`touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
-                                isBicOpen
-                                  ? 'border-[var(--ink-accent)] bg-[var(--ink-accent)] text-white dark:text-slate-950'
-                                  : 'border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                              onClick={() => setOpenBicDrugId(isBicOpen ? null : rx.id)}
+                              className={`touch-target min-h-[44px] inline-flex items-center gap-1.5 rounded-[10px] px-3 py-1 text-xs font-semibold cursor-pointer ${
+                                isBicOpen ? 'btn-tactile-primary' : 'btn-tactile-secondary'
                               }`}
                             >
                               <Icon name="calculate" className="text-sm" />
-                              {isBicOpen
-                                ? 'Ocultar BIC'
-                                : 'Calcular BIC (mL/h)'}
+                              {isBicOpen ? 'Ocultar BIC' : 'Calcular BIC (mL/h)'}
                             </button>
                           ) : null}
                         </div>
@@ -513,18 +487,18 @@ export const ScoreCalculatorDetailView: React.FC<
 
                       {rx.dilutionInstructions &&
                       rx.dilutionInstructions !== 'Não aplicável' ? (
-                        <p className="text-slate-600 dark:text-slate-300">
+                        <p className="text-[var(--ink-secondary)]">
                           <strong>Preparo / Diluição:</strong>{' '}
                           {rx.dilutionInstructions}
                         </p>
                       ) : null}
                       {rx.renalAdjustment ? (
-                        <p className="text-slate-600 dark:text-slate-400">
+                        <p className="text-[var(--ink-muted)]">
                           <strong>Ajuste Renal:</strong> {rx.renalAdjustment}
                         </p>
                       ) : null}
                       {rx.contraindications ? (
-                        <p className="text-amber-700 dark:text-amber-300">
+                        <p className="text-[var(--accent-amber)]">
                           <strong>Cautelas / Contraindicações:</strong>{' '}
                           {rx.contraindications}
                         </p>

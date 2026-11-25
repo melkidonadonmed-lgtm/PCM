@@ -170,7 +170,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
     <div
       data-state="idle"
       aria-busy={false}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[oklch(0.14_0.02_258/0.70)] isolate animate-tab-fade"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[oklch(0.14_0.02_252/0.56)] isolate animate-tab-fade"
       role="dialog"
       aria-modal="true"
       aria-labelledby="logo-modal-title"
@@ -181,20 +181,20 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
     >
       <div
         ref={modalContainerRef}
-        className="w-full max-w-4xl tactile-modal modal-content text-[var(--text-main)] rounded-2xl overflow-hidden flex flex-col max-h-[92vh] animate-tab-fade"
+        className="w-full max-w-4xl tactile-modal modal-content text-[var(--ink-primary)] rounded-2xl overflow-hidden flex flex-col max-h-[92vh] animate-tab-fade shadow-[var(--elevation-high)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-3.5 sm:p-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-card)]">
+        <div className="p-3.5 sm:p-4 border-b border-[var(--hairline)] flex items-center justify-between bg-[var(--surface-card)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-sky-600/15 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-clinical)] flex items-center justify-center font-bold">
               <Sparkles size={18} />
             </div>
             <div>
               <h2 id="logo-modal-title" className="text-sm font-semibold">
                 Logos Institucionais e Timbrados Oficiais
               </h2>
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-[var(--ink-muted)]">
                 Selecione os logos oficiais de Rondônia/SUS ou crie um timbre vetorial SVG personalizado
               </p>
             </div>
@@ -203,28 +203,31 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar gerador de logotipo"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+            className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {errorMsg && (
-          <div role="alert" className="px-4 py-2 bg-[var(--accent-rose-subtle)] border-b border-[var(--accent-rose-border)] text-xs font-semibold text-rose-700 dark:text-rose-300 flex items-center justify-between">
-            <span>{errorMsg}</span>
-            <button type="button" onClick={() => setErrorMsg(null)} className="touch-target min-h-[44px] px-2 inline-flex items-center underline ml-2 cursor-pointer">Fechar</button>
+          <div role="alert" className="px-4 py-2 bg-[var(--surface-card-lit)] border-b border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)] text-xs font-semibold text-[var(--ink-primary)] flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-danger)] shrink-0" aria-hidden="true" />
+              <span>{errorMsg}</span>
+            </span>
+            <button type="button" onClick={() => setErrorMsg(null)} className="touch-target min-h-[44px] px-2 inline-flex items-center text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] underline ml-2 cursor-pointer">Fechar</button>
           </div>
         )}
 
         {/* Navigation Tabs: Presets vs Generator */}
-        <div className="px-4 sm:px-6 py-2 border-b border-[var(--border-subtle)] flex items-center gap-2 bg-[var(--surface-inset)]">
+        <div className="px-4 sm:px-6 py-2 border-b border-[var(--hairline)] flex items-center gap-2 bg-[var(--surface-card-lit)]">
           <button
             type="button"
             onClick={() => setActiveModalTab('presets')}
-            className={`touch-target min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+            className={`touch-target min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none ${
               activeModalTab === 'presets'
-                ? 'bg-sky-600 text-white shadow-tactile-sm'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                ? 'btn-tactile-primary'
+                : 'btn-tactile-secondary'
             }`}
           >
             <Shield className="w-4 h-4" />
@@ -234,10 +237,10 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveModalTab('generator')}
-            className={`touch-target min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+            className={`touch-target min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none ${
               activeModalTab === 'generator'
-                ? 'bg-sky-600 text-white shadow-tactile-sm'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                ? 'btn-tactile-primary'
+                : 'btn-tactile-secondary'
             }`}
           >
             <Sparkles className="w-4 h-4" />
@@ -247,9 +250,9 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
 
         {activeModalTab === 'presets' ? (
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar space-y-4">
-            <div className="bg-sky-50 dark:bg-sky-950/30 border border-info dark:border-info rounded-xl p-3.5 text-xs text-sky-800 dark:text-sky-300">
-              <p className="font-bold">Logos Oficiais Salvos da Instituição</p>
-              <p className="text-xs mt-0.5 opacity-90">
+            <div className="bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] rounded-xl p-3.5 text-xs text-[var(--ink-secondary)]">
+              <p className="font-bold text-[var(--ink-primary)]">Logos Oficiais Salvos da Instituição</p>
+              <p className="text-xs mt-0.5 text-[var(--ink-secondary)]">
                 Selecione o logotipo oficial correspondente ao local de atuação. A imagem é gravada localmente no IndexedDB e exibida automaticamente nos receituários e documentos A4.
               </p>
             </div>
@@ -265,10 +268,10 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                     tabIndex={0}
                     role="button"
                     aria-pressed={isSelected}
-                    className={`p-4 rounded-2xl border transition cursor-pointer flex flex-col justify-between gap-3 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                    className={`p-4 rounded-2xl border transition-colors cursor-pointer flex flex-col justify-between gap-3 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none ${
                       isSelected
-                        ? 'border-info bg-sky-50/50 dark:bg-sky-950/30 shadow-tactile-sm ring-1 ring-sky-500'
-                        : 'border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)]'
+                        ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] shadow-[var(--elevation-low)] ring-1 ring-[var(--accent-focus)]/30'
+                        : 'border-[var(--hairline)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)]'
                     }`}
                   >
                     <div>
@@ -281,20 +284,20 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                       </div>
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h3 className="text-sm font-bold text-[var(--text-main)]">
+                          <h3 className="text-sm font-bold text-[var(--ink-primary)]">
                             {logo.name}
                           </h3>
-                          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                          <p className="text-xs text-[var(--ink-muted)] mt-0.5">
                             {logo.description}
                           </p>
                         </div>
-                        <span className="text-xs font-bold uppercase px-2 py-0.5 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 shrink-0">
+                        <span className="text-xs font-bold uppercase px-2 py-0.5 rounded-full bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-secondary)] shrink-0">
                           {logo.sphere === 'municipal' ? 'Municipal' : logo.sphere === 'state' ? 'Estadual' : 'Federal'}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-subtle)]">
+                    <div className="flex items-center gap-2 pt-2 border-t border-[var(--hairline)]">
                       <button
                         type="button"
                         onClick={(e) => {
@@ -302,7 +305,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                           handleApplyPreset(logo);
                         }}
                         disabled={isApplying}
-                        className="btn-tactile-primary flex-1 py-2 px-3 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="btn-tactile-primary min-h-[44px] flex-1 py-2 px-3 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <Check className="w-3.5 h-3.5" />
                         <span>Aplicar ao Contexto</span>
@@ -311,7 +314,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
                         href={logo.publicUrl}
                         download={`${logo.id}.png`}
                         onClick={(e) => e.stopPropagation()}
-                        className="p-2 rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] text-xs text-[var(--text-muted)] flex items-center justify-center cursor-pointer"
+                        className="btn-tactile-icon text-xs text-[var(--ink-secondary)]"
                         title="Baixar arquivo de imagem"
                       >
                         <Download className="w-4 h-4" />
@@ -362,12 +365,12 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
         )}
 
         {/* Modal Footer */}
-        <div className="p-4 sm:p-5 border-t border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-app)]">
-          <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-            <Building2 className="w-4 h-4 text-sky-600" />
+        <div className="p-4 sm:p-5 border-t border-[var(--hairline)] flex items-center justify-between bg-[var(--surface-canvas)]">
+          <div className="flex items-center gap-2 text-xs text-[var(--ink-muted)]">
+            <Building2 className="w-4 h-4 text-[var(--ink-clinical)]" />
             <span>
               Contexto:{' '}
-              <strong className="text-[var(--text-main)]">
+              <strong className="text-[var(--ink-primary)]">
                 {activeContext?.name || 'Local Ativo'}
               </strong>
             </span>
@@ -377,7 +380,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="btn-tactile-secondary min-h-[44px] px-4 py-2 text-xs font-semibold rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             >
               Cancelar
             </button>
@@ -385,7 +388,7 @@ export const LogoGeneratorModal: React.FC<LogoGeneratorModalProps> = ({
               type="button"
               onClick={activeModalTab === 'presets' ? () => handleApplyPreset(PRESET_LOGOS[selectedPresetId]) : handleApply}
               disabled={isApplying}
-              className="btn-tactile-primary px-5 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-tactile-btn disabled:opacity-50 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="btn-tactile-primary min-h-[44px] px-5 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-[var(--shadow-control)] disabled:opacity-50 transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             >
               {isApplying ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />

@@ -144,7 +144,7 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
               id="chat-instant-bed-selector"
               value={activeBed.id}
               onChange={(e) => onSelectBed(e.target.value)}
-              className="h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold text-[var(--text-main)] clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+              className="h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold text-[var(--text-main)] clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
             >
               {allBeds.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -154,14 +154,14 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
             </select>
           </div>
 
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)]">
+          <div className="flex flex-wrap items-center gap-1.5">
             <button
               type="button"
               onClick={() => setChannel('bed_copilot')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+              className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer ${
                 channel === 'bed_copilot'
-                  ? 'bg-sky-600 text-white'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'
+                  ? 'btn-tactile-primary'
+                  : 'btn-tactile-secondary'
               }`}
             >
               Assistente do Leito
@@ -169,10 +169,10 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
             <button
               type="button"
               onClick={() => setChannel('science_protocol')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+              className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer ${
                 channel === 'science_protocol'
-                  ? 'bg-emerald-600 text-white'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'
+                  ? 'btn-tactile-primary'
+                  : 'btn-tactile-secondary'
               }`}
             >
               Agente Science (Literatura)
@@ -180,12 +180,15 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
             <button
               type="button"
               onClick={handleToggleLiveVoiceSession}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
+              className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer ${
                 isLiveListening || channel === 'live_voice'
-                  ? 'bg-rose-600 text-white'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'
+                  ? 'btn-tactile-primary'
+                  : 'btn-tactile-secondary'
               }`}
             >
+              {isLiveListening && (
+                <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--status-danger)] shrink-0" />
+              )}
               <Icon name="call" size={13} />
               <span>{isLiveListening ? 'Live Ativo...' : 'Live API (Voz)'}</span>
             </button>
@@ -209,14 +212,14 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
                 key={msg.id}
                 className={`p-4 rounded-xl border text-xs leading-relaxed space-y-1.5 ${
                   msg.role === 'user'
-                    ? 'bg-[var(--surface-info-subtle)] border-[var(--border-info-subtle)] ml-6'
+                    ? 'bg-[var(--surface-card-lit)] border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-accent)] ml-6'
                     : msg.role === 'science'
-                      ? 'bg-[var(--accent-emerald-subtle)] border-[var(--accent-emerald-border)] mr-4'
-                      : 'bg-[var(--surface-inset)] border-[var(--border-subtle)] mr-4'
+                      ? 'bg-[var(--surface-card-lit)] border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] mr-4'
+                      : 'bg-[var(--surface-card)] border-[var(--hairline)] mr-4'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-extrabold uppercase tracking-wider text-[11px] text-sky-700 dark:text-sky-300">
+                  <span className="font-extrabold uppercase tracking-wider text-[11px] text-[var(--ink-clinical)]">
                     {msg.role === 'user'
                       ? 'Médico Assistente'
                       : msg.role === 'science'
@@ -258,7 +261,7 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
               onClick={() => fileInputRef.current?.click()}
               title="Enviar arquivo de exame ou evolução no chat"
               aria-label="Anexar arquivo no chat"
-              className="w-10 h-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] flex items-center justify-center text-sky-600 dark:text-sky-400 cursor-pointer shrink-0"
+              className="touch-target btn-tactile-icon text-[var(--ink-clinical)] cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
             >
               <Icon name="upload" size={18} />
             </button>
@@ -276,12 +279,12 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
               }}
               placeholder="Ex.: Avaliar resposta ao antibiótico, checar critérios de switch VO ou consultar diretriz KDIGO..."
               aria-label="Mensagem para o assistente do leito ou Agente Science"
-              className="flex-1 h-10 px-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              className="flex-1 h-11 min-h-[44px] px-3.5 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus:outline-none"
             />
             <button
               type="button"
               onClick={() => handleSendMessage()}
-              className="btn-tactile-primary h-10 px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0"
+              className="touch-target btn-tactile-primary h-11 min-h-[44px] px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0"
             >
               <Icon name="send" size={15} />
               <span>Enviar</span>
@@ -293,7 +296,7 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
       {/* Coluna Lateral: Biblioteca Rápida do Agente Science (Diretrizes e Protocolos Mundiais) */}
       <div className="lg:col-span-4 card-surface rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5 space-y-3">
         <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2.5">
-          <Icon name="science" size={18} className="text-emerald-600 dark:text-emerald-400" />
+          <Icon name="science" size={18} className="text-[var(--ink-clinical)]" />
           <div>
             <h3 className="text-sm font-bold text-[var(--text-main)]">Agente Science — Diretrizes</h3>
             <p className="text-[11px] text-[var(--text-muted)]">Toque para discutir a conduta do leito sob evidência</p>
@@ -309,12 +312,12 @@ export const HospitalBedChatAndSciencePanel: React.FC<HospitalBedChatAndScienceP
                 setChannel('science_protocol');
                 handleSendMessage(`Discutir conduta segundo: ${g.title} (${g.societyAndYear})`);
               }}
-              className="w-full text-left p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] transition space-y-1 cursor-pointer"
+              className="tactile-card-interactive w-full text-left p-3 rounded-xl space-y-1 cursor-pointer"
             >
               <div className="flex items-center justify-between gap-1">
                 <span className="text-xs font-bold text-[var(--text-main)]">{g.title}</span>
               </div>
-              <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+              <p className="text-[11px] font-semibold text-[var(--ink-clinical)]">
                 {g.societyAndYear}
               </p>
             </button>

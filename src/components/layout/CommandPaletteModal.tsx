@@ -414,7 +414,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[1200] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-[oklch(0.14_0.02_258/0.60)] backdrop-blur-xs animate-backdrop-fade no-print"
+      className="fixed inset-0 z-[1200] flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-[oklch(0.14_0.02_252/0.56)] animate-backdrop-fade no-print"
     >
       <div
         ref={dialogRef}
@@ -422,7 +422,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       >
         {/* Barra de Pesquisa */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-subtle dark:border-strong bg-[var(--surface-card)]">
-          <Icon name="search" size={20} className="text-sky-600 dark:text-sky-400 shrink-0" />
+          <Icon name="search" size={20} className="text-[var(--ink-clinical)] shrink-0" />
           <input
             ref={inputRef}
             id="global-command-palette-input"
@@ -448,7 +448,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar busca rápida"
-            className="touch-target min-w-[44px] min-h-[44px] px-2.5 py-1.5 rounded-lg border border-subtle dark:border-strong text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] inline-flex items-center justify-center cursor-pointer"
+            className="btn-tactile-secondary touch-target min-w-[44px] min-h-[44px] px-2.5 py-1.5 rounded-lg text-xs font-bold inline-flex items-center justify-center"
           >
             ESC
           </button>
@@ -475,18 +475,18 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                   aria-selected={isSelected}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   onClick={item.action}
-                  className={`w-full min-h-[48px] px-4 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition cursor-pointer border ${
+                  className={`w-full min-h-[48px] px-4 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition-colors cursor-pointer border ${
                     isSelected
-                      ? 'bg-slate-100 dark:bg-[#27354A] border-slate-300 dark:border-white/15 text-[var(--text-main)] shadow-tactile-sm'
-                      : 'bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] border-transparent text-[var(--text-secondary)]'
+                      ? 'bg-[var(--surface-card-lit)] border-[var(--border-control)] ring-1 ring-[var(--accent-focus)]/30 text-[var(--ink-primary)]'
+                      : 'bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] border-transparent text-[var(--ink-secondary)]'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
                         isSelected
-                          ? 'bg-sky-600 text-white border-sky-500'
-                          : 'bg-[var(--bg-app)] text-sky-600 dark:text-sky-400 border-subtle dark:border-strong'
+                          ? 'bg-[var(--primary)] text-white border-transparent'
+                          : 'bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border-[var(--hairline)]'
                       }`}
                     >
                       <Icon name={item.icon} size={18} />

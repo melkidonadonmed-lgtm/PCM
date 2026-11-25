@@ -133,7 +133,7 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     );
 
     expect(htmlUnconfigured).toContain('aria-label="PresCMed — Início"');
-    expect(htmlUnconfigured).toContain('aria-label="Navegação rápida entre áreas clínicas"');
+    expect(htmlUnconfigured).toContain('aria-label="Áreas clínicas"');
     expect(htmlUnconfigured).toContain('hidden lg:flex');
     expect(htmlUnconfigured).toContain('nav-segmented-track');
     expect(htmlUnconfigured).toContain('nav-segmented-pill-active');
@@ -201,7 +201,8 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlExpanded).toContain('lg:will-change-auto');
     expect(htmlExpanded).toContain('id="sidebar-top-fixed"');
     expect(htmlExpanded).toContain('id="sidebar-doctor-chip"');
-    expect(htmlExpanded).toContain('sidebar-active-surface');
+    expect(htmlExpanded).toContain('sidebar-nav-item');
+    expect(htmlExpanded).toContain('aria-current="page"');
     expect(htmlExpanded).toContain('sidebar-active-bar');
     expect(htmlExpanded).toContain('id="sidebar-patient-chip"');
     expect(htmlExpanded).toContain('Carlos Eduardo Lima');
@@ -213,7 +214,7 @@ describe('UI/UX Minimalista, Organização e Navegação Fluida', () => {
     expect(htmlExpanded).toContain('Protocolos');
     expect(htmlExpanded).toContain('Scores');
     expect(htmlExpanded).toContain('Hospitalar');
-    expect(htmlExpanded).toContain('MOD-01 Ativo');
+    expect(htmlExpanded).not.toContain('MOD-01 Ativo');
     expect(htmlExpanded).toContain('Novo Atendimento');
     expect(htmlExpanded).toContain('Backup (.pcm)');
     expect(htmlExpanded).toContain('id="btn-sidebar-install-pwa"');

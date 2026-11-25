@@ -39,7 +39,7 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
           <div className="relative flex-1 min-w-[240px]">
             <Icon
               name="search"
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)]"
             />
             <input
               id="score-catalog-search-input"
@@ -49,7 +49,7 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
               placeholder="Ex.: qSOFA, SOFA, Glasgow-P, Wells TEP, CHA2DS2-VASc, Child-Pugh, Balanço Sagital..."
               value={searchQuery}
               onChange={(e) => onSearchQueryChange(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 py-2 pl-9 pr-4 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none"
+              className="w-full h-11 min-h-[44px] rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] py-2 pl-9 pr-4 text-xs text-[var(--ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
             />
           </div>
 
@@ -57,7 +57,7 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
             <button
               type="button"
               onClick={onClearFilters}
-              className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-xl border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+              className="touch-target btn-tactile-danger min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               title="Limpar busca e filtros do catálogo"
             >
               <Icon name="close" size={14} />
@@ -67,14 +67,18 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
 
           <button
             type="button"
+            aria-pressed={onlyFavoritesFilter}
             onClick={onToggleOnlyFavorites}
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition-colors cursor-pointer ${
+            className={`touch-target min-h-[44px] inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold cursor-pointer ${
               onlyFavoritesFilter
-                ? 'border-amber-500 bg-amber-500 text-white'
-                : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300'
+                ? 'btn-tactile-primary'
+                : 'btn-tactile-secondary'
             }`}
           >
-            <Icon name="star" className="text-sm" />
+            <Icon
+              name="star"
+              className={`text-sm ${onlyFavoritesFilter ? 'text-white' : 'text-[var(--accent-amber)]'}`}
+            />
             Apenas Favoritos ({favoriteIdsCount})
           </button>
         </div>
@@ -87,16 +91,23 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
               <button
                 key={blk.blockId}
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() => onSelectBlockId(blk.blockId)}
-                className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                className={`touch-target min-h-[44px] inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer ${
                   isSelected
-                    ? 'border-blue-600 bg-blue-600 text-white'
-                    : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-slate-400'
+                    ? 'btn-tactile-primary'
+                    : 'btn-tactile-secondary'
                 }`}
               >
                 <Icon name={blk.icon} className="text-sm" />
                 <span>{blk.shortLabel}</span>
-                <span className="rounded bg-[oklch(0.20_0.02_255/0.10)] dark:bg-white/10 px-1.5 py-0.5 font-mono text-[11px] clinical-tabular-nums">
+                <span
+                  className={`rounded-[6px] px-1.5 py-0.5 font-mono text-[11px] clinical-tabular-nums ${
+                    isSelected
+                      ? 'bg-white/15 text-white'
+                      : 'bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-secondary)]'
+                  }`}
+                >
                   {blk.count}
                 </span>
               </button>
@@ -111,16 +122,18 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
           return (
             <div
               key={item.id}
-              className="cq-card card-surface surface-card-minimal flex flex-col justify-between rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 transition hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-elevation-medium"
+              className="cq-card card-surface surface-card-minimal flex flex-col justify-between rounded-2xl border border-subtle dark:border-strong p-3.5 sm:p-4 transition hover:-translate-y-0.5 hover:border-[var(--border-control)] hover:shadow-elevation-medium"
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
-                  <span className="rounded-md bg-blue-600/10 dark:bg-blue-500/20 px-2 py-0.5 font-mono text-xs font-bold text-blue-700 dark:text-blue-300">
+                  <span className="inline-flex items-center gap-1.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-2 py-0.5 font-mono text-xs font-bold text-[var(--ink-primary)]">
+                    <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" />
                     {item.acronym}
                   </span>
                   <div className="flex items-center gap-1">
                     {item.hasInfusionProtocol ? (
-                      <span className="rounded bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] px-1.5 py-0.5 font-mono text-[11px] font-bold text-emerald-800 dark:text-emerald-200">
+                      <span className="inline-flex items-center gap-1 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[var(--ink-primary)]">
+                        <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" />
                         +BIC
                       </span>
                     ) : null}
@@ -134,8 +147,8 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
                       }
                       className={`touch-target w-11 h-11 min-w-[44px] min-h-[44px] -mr-2 -mt-2 inline-flex items-center justify-center rounded-xl transition-colors cursor-pointer ${
                         isFav
-                          ? 'text-amber-500'
-                          : 'text-slate-400 hover:text-slate-600'
+                          ? 'text-[var(--accent-amber)]'
+                          : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)]'
                       }`}
                     >
                       <Icon name="star" className="text-sm" />
@@ -143,22 +156,22 @@ export const ScoreCatalogTabSection: React.FC<ScoreCatalogTabSectionProps> = ({
                   </div>
                 </div>
 
-                <h3 className="mt-1.5 text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                <h3 className="mt-1.5 text-sm font-bold text-[var(--ink-primary)] leading-snug">
                   {item.name}
                 </h3>
-                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 line-clamp-2">
+                <p className="mt-1 text-xs text-[var(--ink-secondary)] line-clamp-2">
                   {item.summary}
                 </p>
               </div>
 
-              <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-700/70 pt-2.5">
-                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-44">
+              <div className="mt-3 flex items-center justify-between border-t border-[var(--hairline)] pt-2.5">
+                <span className="text-[11px] font-medium text-[var(--ink-muted)] truncate max-w-44">
                   {item.categoryName}
                 </span>
                 <button
                   type="button"
                   onClick={() => onSelectScore(item.id)}
-                  className="touch-target min-h-[44px] inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer"
+                  className="touch-target btn-tactile-primary min-h-[44px] inline-flex items-center gap-1 px-3 py-2 text-xs font-bold cursor-pointer"
                 >
                   Abrir Escore
                   <Icon name="arrow_forward" className="text-xs" />

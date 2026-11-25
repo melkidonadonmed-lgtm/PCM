@@ -120,8 +120,8 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
     <div data-state="idle" aria-busy={false} ref={containerRef} className="space-y-2.5">
       {/* Label and Quick Diagnoses Pop-up Trigger */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label htmlFor={cidInputId} className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 text-[var(--text-muted)]">
-          <Icon name="search" className="text-[14px] text-sky-600 dark:text-sky-400" />
+        <label htmlFor={cidInputId} className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 text-[var(--ink-muted)]">
+          <Icon name="search" className="text-[14px] text-[var(--ink-clinical)]" />
           <span>{label}</span>
         </label>
 
@@ -136,15 +136,15 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 setIsQuickListOpen((prev) => !prev);
                 setIsOpen(false);
               }}
-              className="touch-target chip-neutral min-h-[44px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+              className="touch-target chip-neutral min-h-[44px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               title="Abrir lista rápida de diagnósticos mais frequentes"
             >
-              <Icon name="sell" size={14} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <Icon name="sell" size={14} className="text-[var(--ink-clinical)] shrink-0" />
               <span>Diagnósticos frequentes</span>
               <Icon
                 name="expand_more"
                 size={15}
-                className={`text-[var(--text-muted)] transition-transform duration-150 ${isQuickListOpen ? 'rotate-180' : ''}`}
+                className={`text-[var(--ink-muted)] transition-transform duration-150 ${isQuickListOpen ? 'rotate-180' : ''}`}
               />
             </button>
 
@@ -152,19 +152,19 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               <div
                 role="dialog"
                 aria-label="Diagnósticos mais frequentes"
-                className="absolute right-0 left-auto z-40 top-full mt-1.5 w-72 sm:w-80 max-w-[calc(100vw-2.5rem)] rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] shadow-tactile-lg overflow-hidden animate-tab-fade"
+                className="absolute right-0 left-auto z-40 top-full mt-1.5 w-72 sm:w-80 max-w-[calc(100vw-2.5rem)] rounded-2xl border border-[var(--hairline)] bg-[var(--surface-card)] shadow-[var(--elevation-high)] overflow-hidden animate-tab-fade"
               >
                 <div
-                  className="px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--surface-inset)] flex items-center justify-between gap-2"
+                  className="px-3 py-2 border-b border-[var(--hairline)] bg-[var(--surface-card-lit)] flex items-center justify-between gap-2"
                 >
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] dark:text-slate-400">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-muted)]">
                     Diagnósticos frequentes (1 clique)
                   </span>
                   <button
                     type="button"
                     onClick={() => setIsQuickListOpen(false)}
                     aria-label="Fechar lista de diagnósticos frequentes"
-                    className="p-0.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                    className="btn-tactile-icon -my-1 -mr-1 text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                   >
                     <Icon name="close" size={14} />
                   </button>
@@ -183,28 +183,28 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                             onSelectCid({ code: pick.code, description: pick.description, category: pick.category });
                             setIsQuickListOpen(false);
                           }}
-                          className={`w-full px-3 py-2 text-left flex items-center justify-between gap-2.5 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 outline-none ${
+                          className={`w-full min-h-[44px] px-3 py-2 text-left flex items-center justify-between gap-2.5 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent-focus)] outline-none ${
                             isSelected
-                              ? 'bg-[var(--surface-info-subtle)] text-[var(--text-main)]'
-                              : 'hover:bg-slate-500/10'
+                              ? 'bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ring-1 ring-inset ring-[var(--accent-focus)]/30'
+                              : 'hover:bg-[var(--surface-hover)]'
                           }`}
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <span
-                              className={`px-1.5 py-0.5 rounded font-mono font-bold text-xs shrink-0 clinical-tabular-nums ${
+                              className={`px-1.5 py-0.5 rounded font-mono font-bold text-xs shrink-0 clinical-tabular-nums border ${
                                 isSelected
-                                  ? 'bg-[var(--pill-active-bg)] text-white'
-                                  : 'bg-[var(--surface-chip-muted)] text-sky-700 dark:text-sky-300'
+                                  ? 'bg-[var(--primary)] text-white border-transparent'
+                                  : 'bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border-[var(--hairline)]'
                               }`}
                             >
                               {pick.code}
                             </span>
-                            <span className="text-xs font-medium text-[var(--text-main)] truncate">
+                            <span className="text-xs font-medium text-[var(--ink-primary)] truncate">
                               {pick.description}
                             </span>
                           </div>
                           {isSelected && (
-                            <Icon name="check" size={15} className="text-sky-600 dark:text-sky-400 shrink-0" />
+                            <Icon name="check" size={15} className="text-[var(--ink-clinical)] shrink-0" />
                           )}
                         </button>
                       </li>
@@ -220,23 +220,23 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
       {/* Selected CID Visual Summary Card (if present and in single selection mode) */}
       {selectedCode && (
         <div 
-          className="p-3 rounded-xl border border-[var(--border-info-subtle)] bg-[var(--surface-info-subtle)] flex items-start justify-between gap-3 transition animate-tab-fade"
+          className="p-3 rounded-xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] bg-[var(--surface-card-lit)] flex items-start justify-between gap-3 transition-colors animate-tab-fade"
         >
           <div className="flex items-start gap-2.5 min-w-0">
             <span 
-              className={`px-2.5 py-1 rounded-lg text-xs font-black tracking-wider flex-shrink-0 ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-black tracking-wider flex-shrink-0 clinical-tabular-nums ${
                 variant === 'referral'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-sky-700 dark:bg-sky-600 text-white shadow-sm'
+                  ? 'bg-[var(--clinical)] text-white'
+                  : 'bg-[var(--primary)] text-white shadow-sm'
               }`}
             >
               {selectedCode}
             </span>
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm font-bold truncate leading-tight text-[var(--text-main)]">
+              <p className="text-xs sm:text-sm font-bold truncate leading-tight text-[var(--ink-primary)]">
                 {selectedDescription || 'Diagnóstico selecionado'}
               </p>
-              <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-[var(--ink-muted)] mt-0.5">
                 Código CID-10 preenchido automaticamente no documento
               </p>
             </div>
@@ -249,7 +249,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 setIsOpen(true);
                 inputRef.current?.focus();
               }}
-              className="text-xs font-bold px-2.5 py-1 rounded-lg border border-[var(--border-subtle)] text-sky-700 dark:text-sky-300 hover:bg-slate-500/10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="btn-tactile-secondary min-h-[44px] text-xs font-bold px-2.5 py-1 rounded-lg focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             >
               Trocar
             </button>
@@ -259,7 +259,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 type="button"
                 onClick={onClearCid}
                 title="Remover CID selecionado"
-                className="p-1 rounded-lg text-[var(--text-muted)] dark:text-slate-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-[var(--accent-rose-subtle)] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                className="btn-tactile-danger min-h-[44px] min-w-[44px] p-0 flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] focus-visible:outline-none"
               >
                 <Icon name="close" className="text-[16px]" />
               </button>
@@ -271,7 +271,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
       {/* Main Search Input & Trigger Box */}
       <div className="relative">
         <div className="relative flex items-center">
-          <div className="absolute left-3 pointer-events-none text-[var(--text-muted)] dark:text-slate-400">
+          <div className="absolute left-3 pointer-events-none text-[var(--ink-muted)]">
             <Icon name="search" className="text-[16px]" />
           </div>
 
@@ -292,8 +292,8 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               setIsQuickListOpen(false);
             }}
             placeholder={placeholder}
-            className={`w-full min-h-[44px] pl-9 pr-24 py-2.5 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40 tactile-input transition bg-[var(--surface-card)] dark:bg-[var(--surface-inset)] text-[var(--text-main)] ${
-              isOpen ? 'border-[var(--border-info-subtle)]' : 'border-[var(--border-subtle)]'
+            className={`w-full min-h-[44px] pl-9 pr-24 py-2.5 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] tactile-input transition bg-[var(--surface-card)] dark:bg-[var(--surface-card-lit)] text-[var(--ink-primary)] ${
+              isOpen ? 'border-[var(--accent-focus)]' : 'border-[var(--border-control)]'
             }`}
           />
 
@@ -306,7 +306,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   setSearchTerm('');
                   inputRef.current?.focus();
                 }}
-                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--ink-muted)] hover:text-[var(--ink-primary)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
               >
                 <Icon name="close" className="text-[14px]" />
               </button>
@@ -316,7 +316,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
               type="button"
               aria-label="Abrir catálogo completo de CID-10"
               onClick={() => setIsOpen(!isOpen)}
-              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--text-muted)] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--ink-muted)] hover:text-[var(--ink-primary)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
               title="Abrir catálogo completo"
             >
               <Icon name="expand_more" className={`text-[16px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -327,13 +327,13 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
         {/* Dropdown Floating Results Panel */}
         {isOpen && (
           <div 
-            className="absolute z-30 top-full left-0 right-0 mt-1.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] shadow-tactile-lg overflow-hidden animate-tab-fade"
+            className="absolute z-30 top-full left-0 right-0 mt-1.5 rounded-2xl border border-[var(--hairline)] bg-[var(--surface-card)] shadow-[var(--elevation-high)] overflow-hidden animate-tab-fade"
           >
             {/* Category Filter Pills in Dropdown Header */}
             <div 
-              className="p-2 border-b border-[var(--border-subtle)] bg-[var(--surface-inset)] overflow-x-auto flex items-center gap-1.5"
+              className="p-2 border-b border-[var(--hairline)] bg-[var(--surface-card-lit)] overflow-x-auto flex items-center gap-1.5"
             >
-              <div className="flex items-center gap-1 text-xs font-bold uppercase text-[var(--text-muted)] dark:text-slate-400 pl-1 pr-1 flex-shrink-0">
+              <div className="flex items-center gap-1 text-xs font-bold uppercase text-[var(--ink-muted)] pl-1 pr-1 flex-shrink-0">
                 <Icon name="filter_list" className="text-[14px]" />
                 <span>Filtro:</span>
               </div>
@@ -343,10 +343,10 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold whitespace-nowrap transition cursor-pointer border focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${
+                  className={`min-h-[44px] text-xs px-2.5 py-1 rounded-lg whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none ${
                     selectedCategory === cat
-                      ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] font-bold shadow-xs'
-                      : 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--surface-chip-muted-hover)]'
+                      ? 'btn-tactile-primary font-bold'
+                      : 'border bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border-[var(--hairline)] hover:bg-[var(--surface-chip-muted-hover)] hover:text-[var(--ink-primary)] font-semibold transition-colors cursor-pointer'
                   }`}
                 >
                   {cat}
@@ -373,27 +373,27 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                       }}
                       className={`p-2.5 sm:p-3 flex items-center justify-between gap-3 cursor-pointer transition-colors group ${
                         isCurrent 
-                          ? 'bg-[var(--surface-info-subtle)]' 
-                          : 'hover:bg-slate-500/10'
+                          ? 'bg-[var(--surface-card-lit)] ring-1 ring-inset ring-[var(--accent-focus)]/30' 
+                          : 'hover:bg-[var(--surface-hover)]'
                       }`}
                     >
                       <div className="flex items-start gap-2.5 min-w-0">
                         <span 
-                          className={`px-2 py-0.5 rounded-md font-mono font-bold text-xs flex-shrink-0 ${
+                          className={`px-2 py-0.5 rounded-md font-mono font-bold text-xs flex-shrink-0 clinical-tabular-nums border ${
                             isCurrent
-                              ? 'bg-[var(--pill-active-bg)] text-white'
-                              : 'bg-[var(--surface-chip-muted)] text-sky-700 dark:text-sky-300 group-hover:bg-[var(--surface-chip-muted-hover)]'
+                              ? 'bg-[var(--primary)] text-white border-transparent'
+                              : 'bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border-[var(--hairline)] group-hover:bg-[var(--surface-chip-muted-hover)]'
                           }`}
                         >
                           {item.code}
                         </span>
 
                         <div className="min-w-0">
-                          <p className="text-xs sm:text-sm font-semibold leading-snug text-[var(--text-main)]">
+                          <p className="text-xs sm:text-sm font-semibold leading-snug text-[var(--ink-primary)]">
                             {item.description}
                           </p>
                           {item.keywords && item.keywords.length > 0 && (
-                            <p className="text-xs text-[var(--text-muted)] dark:text-slate-400 truncate mt-0.5">
+                            <p className="text-xs text-[var(--ink-muted)] truncate mt-0.5">
                               Termos: {item.keywords.slice(0, 3).join(', ')}
                             </p>
                           )}
@@ -401,7 +401,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                       </div>
 
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-500/10 text-[var(--text-muted)] dark:text-slate-400 hidden sm:inline-block">
+                        <span className="text-xs font-medium px-2 py-0.5 rounded bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-muted)] hidden sm:inline-block">
                           {item.category}
                         </span>
 
@@ -409,7 +409,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                           <button
                             type="button"
                             onClick={(e) => handleAppend(item, e)}
-                            className="text-xs font-bold px-2 py-1 rounded bg-emerald-600/20 text-emerald-500 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"
+                            className="btn-tactile-secondary min-h-[44px] text-xs font-bold px-2.5 py-1 rounded-lg focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
                             title="Inserir na hipótese"
                           >
                             + Inserir
@@ -417,7 +417,7 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                         )}
 
                         {isCurrent && (
-                          <span className="text-sky-600 dark:text-sky-400">
+                          <span className="text-[var(--ink-clinical)]">
                             <Icon name="check" className="text-[16px]" />
                           </span>
                         )}
@@ -427,15 +427,15 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
                 })
               ) : (
                 <div className="p-6 text-center space-y-3">
-                  <p className="text-xs text-[var(--text-muted)] dark:text-slate-400">
-                    Nenhum código CID-10 encontrado para "<span className="font-semibold text-slate-800 dark:text-slate-200">{searchTerm}</span>".
+                  <p className="text-xs text-[var(--ink-muted)]">
+                    Nenhum código CID-10 encontrado para "<span className="font-semibold text-[var(--ink-primary)]">{searchTerm}</span>".
                   </p>
 
                   {allowCustomEntry && searchTerm && (
                     <button
                       type="button"
                       onClick={handleCustomSubmit}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                      className="btn-tactile-primary inline-flex min-h-[44px] items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
                     >
                       <Icon name="auto_awesome" className="text-[14px]" />
                       <span>Usar diagnóstico digitado "{searchTerm}"</span>
@@ -447,14 +447,14 @@ export const CidSearchBar: React.FC<CidSearchBarProps> = ({
 
             {/* Footer summary & manual action */}
             <div 
-              className="p-2.5 border-t border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs flex items-center justify-between text-[var(--text-muted)] dark:text-slate-400"
+              className="p-2.5 border-t border-[var(--hairline)] bg-[var(--surface-card-lit)] text-xs flex items-center justify-between text-[var(--ink-muted)]"
             >
               <span className="clinical-tabular-nums">{results.length} resultados no catálogo</span>
 
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none rounded"
+                className="min-h-[44px] px-2 text-xs font-semibold text-[var(--ink-clinical)] hover:underline cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none rounded"
               >
                 Fechar catálogo
               </button>

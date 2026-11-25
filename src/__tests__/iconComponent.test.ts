@@ -104,6 +104,8 @@ describe('Icon Component — Anti-Mutation, Alias Resolution & WOFF2 Subset Eval
       'BED_RECORDED',
       'PCR_SOAP',
       'btn-tactile-icon w-11 h-11 min-w-[44px] min-h-[44px]',
+      'btn-tactile-icon',
+      'p-0 w-11 h-11',
     ]);
     const unmappedUsages: string[] = [];
 

@@ -86,7 +86,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por leito (110-15), paciente ou diagnóstico..."
               aria-label="Buscar leito por código, paciente ou diagnóstico"
-              className="w-full h-11 min-h-[44px] pl-9 pr-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+              className="w-full h-11 min-h-[44px] pl-9 pr-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
             />
           </div>
           {(searchQuery || selectedSpecialty !== 'all') && (
@@ -96,7 +96,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                 setSearchQuery('');
                 setSelectedSpecialty('all');
               }}
-              className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-xl border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+              className="touch-target btn-tactile-danger min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               title="Limpar busca e filtro de setor"
             >
               <Icon name="close" size={14} />
@@ -112,11 +112,12 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
         >
           <button
             type="button"
+            aria-pressed={selectedSpecialty === 'all'}
             onClick={() => setSelectedSpecialty('all')}
-            className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+            className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-bold whitespace-nowrap cursor-pointer clinical-tabular-nums ${
               selectedSpecialty === 'all'
-                ? 'bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)]'
-                : 'bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                ? 'btn-tactile-primary'
+                : 'btn-tactile-secondary'
             }`}
           >
             Todos ({beds.length})
@@ -129,11 +130,12 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
               <button
                 key={spec.id}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() => setSelectedSpecialty(spec.id)}
-                className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer clinical-tabular-nums ${
+                className={`touch-target min-h-[44px] px-3 rounded-xl text-xs whitespace-nowrap cursor-pointer clinical-tabular-nums ${
                   isActive
-                    ? 'bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)] font-bold'
-                    : 'bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                    ? 'btn-tactile-primary font-bold'
+                    : 'btn-tactile-secondary font-semibold'
                 }`}
               >
                 {spec.label} ({count})
@@ -165,7 +167,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
               aria-label={`Leito ${bed.wardAndBed} — ${bed.patientNameOrInitials || 'Sem identificação'}`}
               className={`cq-card card-surface surface-card-minimal rounded-2xl border p-3.5 sm:p-4 flex flex-col justify-between gap-3 transition ${
                 isSelected
-                  ? 'border-[var(--border-clinical-subtle)] border-l-[3px] border-l-[var(--clinical)] shadow-elevation-medium'
+                  ? 'border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] shadow-elevation-medium'
                   : 'border-subtle dark:border-strong'
               }`}
             >
@@ -209,27 +211,29 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                   </p>
                 </div>
 
-                {/* Pílulas de Segurança Clínica: Alergias, Medicações em Uso, Escores e Pendências */}
+                {/* Indicadores de Segurança Clínica: Alergias, Medicações em Uso, Escores e Pendências */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                   {hasDocumentedAllergy ? (
-                    <span className="w-full flex items-start gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--accent-rose-subtle)] border border-[var(--accent-rose-border)] text-[11px] font-bold text-rose-800 dark:text-rose-200 leading-snug">
-                      <Icon name="warning" size={14} className="shrink-0 mt-0.5" />
-                      <span className="break-words">Alergia: {bed.allergiesText}</span>
+                    <span className="w-full flex items-start gap-2 px-2.5 py-1.5 rounded-[8px] bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)] text-[11px] font-semibold text-[var(--ink-primary)] leading-snug">
+                      <Icon name="warning" size={14} className="shrink-0 mt-0.5 text-[var(--status-danger)]" />
+                      <span className="break-words">
+                        <strong className="font-bold text-[var(--status-danger)]">Alergia:</strong> {bed.allergiesText}
+                      </span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[11px] font-medium text-[var(--text-muted)]">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[11px] font-medium text-[var(--ink-muted)]">
                       {bed.allergiesText || 'Alergias não registradas'}
                     </span>
                   )}
 
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[11px] font-semibold text-[var(--text-secondary)] clinical-tabular-nums">
-                    <Icon name="medication" size={13} />
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[11px] font-semibold text-[var(--ink-secondary)] clinical-tabular-nums">
+                    <Icon name="medication" size={13} className="text-[var(--ink-muted)]" />
                     <span>{bed.currentMedicationsAndDevices.length} em uso</span>
                   </span>
 
                   {latestScore && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[11px] font-bold text-[var(--ink-clinical)] clinical-tabular-nums">
-                      <Icon name="monitor_heart" size={13} />
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[11px] font-semibold text-[var(--ink-primary)] clinical-tabular-nums">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
                       <span>
                         {latestScore.acronym}: {latestScore.scoreFormatted} pts
                       </span>
@@ -237,7 +241,8 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                   )}
 
                   {bed.pendingItemsList.length > 0 && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--accent-amber-subtle)] border border-[var(--accent-amber-border)] text-[11px] font-bold text-amber-800 dark:text-amber-200 clinical-tabular-nums">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[11px] font-semibold text-[var(--ink-primary)] clinical-tabular-nums">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-amber)] shrink-0" aria-hidden="true" />
                       <span>{bed.pendingItemsList.length} pendência(s)</span>
                     </span>
                   )}
@@ -249,7 +254,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenBedSubView(bed.id, 'evolution_form')}
-                className={`touch-target ${isSelected ? 'btn-tactile-clinical' : 'btn-tactile-secondary'} flex-1 min-h-[44px] px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0`}
+                className={`touch-target ${isSelected ? 'btn-tactile-primary' : 'btn-tactile-secondary'} flex-1 min-h-[44px] px-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0`}
               >
                 <Icon name="clinical_notes" size={15} />
                 <span>Evoluir Leito</span>
@@ -281,7 +286,7 @@ export const HospitalWardCensusGrid: React.FC<HospitalWardCensusGridProps> = ({
                   onClick={() => onDeleteBed(bed.id)}
                   title="Dar alta ou remover este leito do mapa"
                   aria-label={`Dar alta ou remover leito ${bed.wardAndBed}`}
-                  className="touch-target min-h-[44px] min-w-[44px] px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--accent-rose-subtle)] hover:border-[var(--accent-rose-border)] text-[var(--text-muted)] hover:text-rose-800 dark:hover:text-rose-200 text-xs font-semibold flex items-center justify-center gap-1 transition cursor-pointer"
+                  className="touch-target btn-tactile-danger min-h-[44px] min-w-[44px] px-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
                 >
                   <Icon name="delete" size={14} />
                 </button>

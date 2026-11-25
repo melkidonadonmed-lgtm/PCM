@@ -3,9 +3,9 @@ import { Icon, IconName } from './Icon';
 import { ActiveTab } from '../types';
 
 /**
- * Barra de Navegação Inferior Mobile (5 destinos).
- * Estados de UI cobertos: empty (contadores vazios), loading (carregando aba),
- * success (aba ativa selecionada com sucesso) e error (estado de fallback).
+ * Mobile Bottom Navigation Bar (5 primary clinical shortcuts).
+ * Covered UI states: empty (zero counters), loading (tab transition),
+ * success (active tab highlighted), and error (fallback route).
  */
 interface MobileBottomNavProps {
   darkMode?: boolean;
@@ -59,13 +59,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     activeTab === 'print_preview';
 
   return (
-    <nav data-state="idle" aria-busy={false}
+    <nav
+      data-state="idle"
+      aria-busy={false}
       id="mobile-bottom-nav"
-      aria-label="Navegação Inferior Mobile"
-      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-1.5 sm:px-3 border-t no-print pb-safe isolate panel-navy panel-projected-top overflow-x-hidden surface-raised"
-      style={{
-        borderColor: 'var(--surface-panel-border)'
-      }}
+      aria-label="Atalhos móveis"
+      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-1.5 sm:px-3 border-t border-[var(--surface-panel-border)] no-print pb-safe isolate panel-navy panel-projected-top overflow-x-hidden surface-raised"
     >
       {items.map((item) => {
         const isActive = item.id === 'documents'
@@ -76,34 +75,39 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           <button
             key={item.id}
             id={`mobile-nav-${item.id}`}
+            type="button"
             onClick={() => onSelectTab(item.id)}
             aria-current={isActive ? 'page' : undefined}
-            className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 py-1.5 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none ${
-              isActive ? 'bg-white/[0.08]' : 'opacity-80 hover:opacity-100'
+            className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 py-1.5 rounded-[10px] transition-colors duration-150 cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none ${
+              isActive
+                ? 'bg-white/[0.10] text-[var(--sidebar-text-primary)]'
+                : 'text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)]'
             }`}
           >
             {isActive && (
               <span
                 aria-hidden="true"
-                className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-teal-400"
+                className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[oklch(0.840_0.110_180)]"
               />
             )}
             <div className="relative">
               <Icon
                 name={item.iconName}
                 filled={isActive}
-                className="text-[20px] transition-colors"
-                style={{ color: isActive ? '#2DD4BF' : 'var(--surface-panel-muted)' }}
+                className={`text-[20px] transition-colors duration-150 ${
+                  isActive ? 'text-[oklch(0.840_0.110_180)]' : 'text-[var(--sidebar-text-muted)]'
+                }`}
               />
               {item.badge && (
-                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-0.5 rounded-full font-extrabold text-[11px] flex items-center justify-center bg-teal-500/30 text-teal-100 border border-teal-400/30 clinical-unit clinical-tabular-nums">
+                <span className="absolute -top-1 -right-2.5 min-w-[16px] h-3.5 px-1 rounded-full font-bold text-[11px] flex items-center justify-center bg-[var(--clinical)] text-white border border-white/20 clinical-unit clinical-tabular-nums">
                   {item.badge}
                 </span>
               )}
             </div>
             <span
-              className="text-[11px] sm:text-xs font-bold mt-0.5 tracking-tight transition-colors whitespace-nowrap text-center leading-none"
-              style={{ color: isActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
+              className={`text-[11px] sm:text-xs font-semibold mt-0.5 tracking-tight transition-colors duration-150 whitespace-nowrap text-center leading-none ${
+                isActive ? 'text-[var(--sidebar-text-primary)]' : 'text-[var(--sidebar-text-muted)]'
+              }`}
             >
               {item.label}
             </span>
@@ -111,7 +115,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         );
       })}
 
-      {/* Mais: abre o menu lateral completo (inclui Exames, Encaminhamentos e Exportar) */}
+      {/* More: opens the full clinical drawer */}
       <button
         id="mobile-nav-more"
         type="button"
@@ -120,20 +124,24 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         aria-expanded={sidebarOpen}
         aria-controls="prescmed-sidebar"
         aria-label="Mais opções"
-        className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 py-1.5 rounded-xl transition cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none ${
-          isMoreActive ? 'bg-white/[0.08]' : 'opacity-80 hover:opacity-100'
+        className={`flex flex-col items-center justify-center flex-1 min-w-0 min-h-[48px] h-12 px-1 py-1.5 rounded-[10px] transition-colors duration-150 cursor-pointer relative active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none ${
+          isMoreActive
+            ? 'bg-white/[0.10] text-[var(--sidebar-text-primary)]'
+            : 'text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text-primary)] hover:bg-[var(--sidebar-chip-hover)]'
         }`}
       >
         <div className="relative">
           <Icon
             name="menu"
-            className="text-[20px] transition-colors"
-            style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
+            className={`text-[20px] transition-colors duration-150 ${
+              isMoreActive ? 'text-[oklch(0.840_0.110_180)]' : 'text-[var(--sidebar-text-muted)]'
+            }`}
           />
         </div>
         <span
-          className="text-[11px] sm:text-xs font-bold mt-0.5 tracking-tight transition-colors whitespace-nowrap text-center leading-none"
-          style={{ color: isMoreActive ? 'var(--nav-accent)' : 'var(--surface-panel-muted)' }}
+          className={`text-[11px] sm:text-xs font-semibold mt-0.5 tracking-tight transition-colors duration-150 whitespace-nowrap text-center leading-none ${
+            isMoreActive ? 'text-[var(--sidebar-text-primary)]' : 'text-[var(--sidebar-text-muted)]'
+          }`}
         >
           Mais
         </span>

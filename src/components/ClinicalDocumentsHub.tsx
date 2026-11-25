@@ -169,12 +169,13 @@ export const ClinicalDocumentsHub: React.FC<ClinicalDocumentsHubProps> = ({
               <span className="text-xs font-semibold text-[var(--text-main)]">
                 Central de documentos clínicos
               </span>
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] clinical-tabular-nums">
-                {activeTabInfo.regulatoryTag}
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border border-[var(--hairline)] clinical-tabular-nums">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
+                <span>{activeTabInfo.regulatoryTag}</span>
               </span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${hasPatient ? 'bg-[var(--clinical)]' : 'bg-amber-500'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${hasPatient ? 'bg-[var(--ink-clinical)]' : 'bg-[var(--accent-amber)]'}`} />
               <span className="text-xs font-medium text-[var(--text-secondary)] truncate">
                 {hasPatient ? patientName : 'Vincule um paciente para emissão'}
               </span>

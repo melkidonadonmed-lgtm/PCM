@@ -6,6 +6,7 @@ import {
   AlertCircle,
   FileText,
   Send,
+  Icon,
 } from './Icon';
 import { MedicalCertificate, MedicalReferral, Patient, DoctorProfile } from '../types';
 import { CidSearchBar } from './CidSearchBar';
@@ -203,12 +204,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
           <button
             type="button"
             onClick={() => handleSwitchTab('certificate')}
-            className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+            className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               currentSubTab === 'certificate'
-                ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border border-navy-800 dark:border-info shadow-tactile-navy dark:shadow-tactile-blue'
-                : darkMode
-                  ? 'text-slate-400 hover:text-white'
-                  : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[var(--primary)] text-white border border-[var(--primary)] shadow-[var(--shadow-control)]'
+                : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)]'
             }`}
           >
             <Award className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -218,12 +217,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
           <button
             type="button"
             onClick={() => handleSwitchTab('referral')}
-            className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none ${
+            className={`flex-1 py-2.5 min-h-[44px] rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
               currentSubTab === 'referral'
-                ? 'bg-navy-900 text-white dark:bg-sky-600 dark:text-white border border-navy-800 dark:border-info shadow-tactile-navy dark:shadow-tactile-blue'
-                : darkMode
-                  ? 'text-slate-400 hover:text-white'
-                  : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[var(--primary)] text-white border border-[var(--primary)] shadow-[var(--shadow-control)]'
+                : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)]'
             }`}
           >
             <Share2 className="w-4 h-4 icon-sculpted" strokeWidth={1.75} />
@@ -239,8 +236,8 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
             {/* Header Enxuto */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-subtle dark:border-strong pb-2.5">
               <div className="flex items-center gap-2 min-w-0">
-                <Award className="w-4.5 h-4.5 text-sky-600 dark:text-sky-400 shrink-0" strokeWidth={1.75} />
-                <h3 className="text-sm font-semibold text-[var(--text-main)] truncate">
+                <Award className="w-4.5 h-4.5 text-[var(--ink-clinical)] shrink-0" strokeWidth={1.75} />
+                <h3 className="text-sm font-semibold text-[var(--ink-primary)] truncate">
                   Emissão de Atestado Médico
                 </h3>
               </div>
@@ -250,7 +247,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   type="button"
                   onClick={handleSendCertificateWhatsApp}
                   disabled={!medicoConfigurado(doctor)}
-                  className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                  className="btn-tactile-secondary min-h-[44px] text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                   title={
                     medicoConfigurado(doctor)
                       ? 'Enviar o atestado médico diretamente pelo WhatsApp'
@@ -265,10 +262,10 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   <button
                     type="button"
                     onClick={handleOpenCertificateInEditor}
-                    className="btn-tactile-secondary text-xs flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                    className="btn-tactile-secondary min-h-[44px] text-xs flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                     title="Editar e personalizar o atestado no Editor de Folha A4"
                   >
-                    <FileText className="w-4 h-4 text-[var(--text-muted)]" />
+                    <FileText className="w-4 h-4 text-[var(--ink-muted)]" />
                     <span>Editar no Editor A4</span>
                   </button>
                 )}
@@ -276,7 +273,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigateToPrint('certificate')}
-                  className="btn-tactile-primary text-xs flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                  className="btn-tactile-primary min-h-[44px] text-xs flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
                   <span>Visualizar & Baixar PDF</span>
@@ -327,34 +324,41 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                 >
                   Finalidade / motivo
                 </label>
-                <select
-                  id="certificate-period-select"
-                  aria-label="Finalidade ou motivo do atestado"
-                  value={certificate.periodText}
-                  onChange={(e) =>
-                    onUpdateCertificate({ ...certificate, periodText: e.target.value })
-                  }
-                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border-[var(--border-control)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 tactile-input cursor-pointer"
-                >
-                  <option value="por motivo de doença e necessidade de repouso">
-                    Afastamento por motivo de doença / Repouso
-                  </option>
-                  <option value="para fins de comparecimento a consulta médica e realização de exames">
-                    Comparecimento a consulta e exames
-                  </option>
-                  <option value="para fins de acompanhamento de dependente menor de idade">
-                    Acompanhamento de dependente menor
-                  </option>
-                  <option value="para fins de aptidão física e práticas desportivas">
-                    Aptidão para atividades físicas
-                  </option>
-                  <option value="por motivo de pós-operatório e recuperação cirúrgica">
-                    Recuperação pós-cirúrgica
-                  </option>
-                  <option value="para fins de perícia médica e avaliação previdenciária">
-                    Avaliação pericial / Previdência
-                  </option>
-                </select>
+                <div className="relative">
+                  <select
+                    id="certificate-period-select"
+                    aria-label="Finalidade ou motivo do atestado"
+                    value={certificate.periodText}
+                    onChange={(e) =>
+                      onUpdateCertificate({ ...certificate, periodText: e.target.value })
+                    }
+                    className="tactile-input pcm-select appearance-none w-full h-11 min-h-[44px] pl-3 pr-8 rounded-[10px] border border-[var(--border-control)] text-xs font-semibold text-[var(--ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] cursor-pointer leading-none"
+                  >
+                    <option value="por motivo de doença e necessidade de repouso">
+                      Afastamento por motivo de doença / Repouso
+                    </option>
+                    <option value="para fins de comparecimento a consulta médica e realização de exames">
+                      Comparecimento a consulta e exames
+                    </option>
+                    <option value="para fins de acompanhamento de dependente menor de idade">
+                      Acompanhamento de dependente menor
+                    </option>
+                    <option value="para fins de aptidão física e práticas desportivas">
+                      Aptidão para atividades físicas
+                    </option>
+                    <option value="por motivo de pós-operatório e recuperação cirúrgica">
+                      Recuperação pós-cirúrgica
+                    </option>
+                    <option value="para fins de perícia médica e avaliação previdenciária">
+                      Avaliação pericial / Previdência
+                    </option>
+                  </select>
+                  <Icon
+                    name="expand_more"
+                    size={16}
+                    className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--ink-muted)]"
+                  />
+                </div>
               </div>
             </div>
 
@@ -426,7 +430,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                     onChange={(e) =>
                       onUpdateCertificate({ ...certificate, includeCID: e.target.checked })
                     }
-                    className="w-4 h-4 rounded text-sky-700 focus:ring-sky-500 focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer"
+                    className="w-4 h-4 rounded text-[var(--clinical)] focus:ring-[var(--accent-focus)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none cursor-pointer"
                   />
                   <label
                     htmlFor="toggle-include-cid"
@@ -531,7 +535,7 @@ export const CertificateAndReferral: React.FC<CertificateAndReferralProps> = ({
                   onUpdateCertificate({ ...certificate, observations: e.target.value })
                 }
                 placeholder="Ex.: Paciente esteve sob cuidados médicos das 08h às 11h. Recomenda-se repouso domiciliar e hidratação oral..."
-                className="w-full p-2.5 rounded-xl text-xs font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 tactile-input leading-relaxed"
+                className="w-full p-2.5 rounded-xl text-xs font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] tactile-input leading-relaxed"
               />
             </div>
           </div>

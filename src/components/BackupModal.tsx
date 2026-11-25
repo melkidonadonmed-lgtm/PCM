@@ -208,9 +208,9 @@ export const BackupModal: React.FC<BackupModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-card)]">
+        <div className="p-4 sm:p-5 border-b border-[var(--hairline)] flex items-center justify-between bg-[var(--surface-card)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-xl bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border border-[var(--hairline)] flex items-center justify-center font-bold">
               <Database className="w-5 h-5" />
             </div>
             <div>
@@ -226,7 +226,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de backup"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
+            className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             <X className="w-5 h-5" />
           </button>
@@ -236,7 +236,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar">
 
           {/* CARD 1: EXPORTAR BASE COMPLETA */}
-          <div className="p-4 sm:p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] shadow-tactile-sm space-y-4">
+          <div className="p-4 sm:p-5 rounded-2xl border border-[var(--hairline)] bg-[var(--bg-app)] shadow-tactile-sm space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-sm font-bold flex items-center gap-2">
@@ -250,11 +250,12 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
               {/* Badges de Contagem */}
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="px-2 py-1 rounded-lg bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] text-xs font-bold flex items-center gap-1 clinical-tabular-nums">
-                  <Building2 className="w-3 h-3" />
+                <span className="px-2 py-1 rounded-lg bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border border-[var(--hairline)] text-xs font-bold flex items-center gap-1.5 clinical-tabular-nums">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
+                  <Building2 className="w-3 h-3 text-[var(--ink-clinical)]" />
                   <span>{stats.contextsCount} locais</span>
                 </span>
-                <span className="px-2 py-1 rounded-lg bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)] text-xs font-bold flex items-center gap-1 clinical-tabular-nums">
+                <span className="px-2 py-1 rounded-lg bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border border-[var(--hairline)] text-xs font-bold flex items-center gap-1 clinical-tabular-nums">
                   <FileText className="w-3 h-3" />
                   <span>{stats.templatesCount} modelos</span>
                 </span>
@@ -317,15 +318,13 @@ export const BackupModal: React.FC<BackupModalProps> = ({
               tabIndex={0}
               role="button"
               aria-label="Selecionar arquivo de backup"
-              className={`p-6 rounded-2xl border transition cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none ${
-                isDragOver 
-                  ? 'border-[var(--clinical)] bg-[var(--surface-clinical-subtle)]' 
-                  : selectedFile
-                  ? 'border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)]/70'
-                  : 'border-[var(--border-medium)] bg-[var(--surface-inset)] hover:border-[var(--clinical)] hover:bg-[var(--surface-hover)]'
+              className={`p-6 rounded-2xl border transition-colors cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none ${
+                isDragOver || selectedFile
+                  ? 'border-[var(--border-control)] bg-[var(--surface-card-lit)] ring-1 ring-[var(--accent-focus)]/30'
+                  : 'border-[var(--border-control)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)]'
               }`}
             >
-              <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+              <div className="w-10 h-10 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--hairline)] flex items-center justify-center text-[var(--ink-muted)]">
                 {selectedFile ? <FileCheck className="w-5 h-5 text-[var(--ink-clinical)]" /> : <HardDrive className="w-5 h-5" />}
               </div>
 
@@ -341,25 +340,25 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
             {/* Alerta de Erro de Validação */}
             {validationError && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-300 text-xs font-medium flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
+              <div className="p-3 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)] text-[var(--ink-primary)] text-xs font-medium flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-[var(--status-danger)]" />
                 <span>{validationError}</span>
               </div>
             )}
 
             {/* Sucesso na Restauração */}
             {importSuccess && (
-              <div className="p-3 rounded-xl bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)] text-xs font-semibold flex items-center gap-2 animate-tab-fade">
-                <Check className="w-4 h-4 shrink-0" />
+              <div className="p-3 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] text-[var(--ink-primary)] text-xs font-semibold flex items-center gap-2 animate-tab-fade">
+                <Check className="w-4 h-4 shrink-0 text-[var(--ink-clinical)]" />
                 <span>{importSuccess}</span>
               </div>
             )}
 
             {/* Prévia dos Dados a Importar e Estratégia */}
             {parsedBackup && (
-              <div className="p-4 rounded-xl border border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)]/60 space-y-3 animate-tab-fade">
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-[var(--border-clinical-subtle)]">
-                  <span className="font-bold text-[var(--ink-clinical)] flex items-center gap-1.5">
+              <div className="p-4 rounded-xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] bg-[var(--surface-card-lit)] space-y-3 animate-tab-fade">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-[var(--hairline)]">
+                  <span className="font-bold text-[var(--ink-primary)] flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-[var(--ink-clinical)]" />
                     <span>Backup Válido ({parsedBackup.system})</span>
                   </span>
@@ -369,15 +368,15 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 text-xs">
-                  <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                  <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--hairline)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Locais de Atendimento</span>
                     <strong className="text-sm font-bold text-[var(--text-main)] clinical-tabular-nums">{parsedBackup.data.workContexts?.length || 0}</strong>
                   </div>
-                  <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                  <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--hairline)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Modelos e Documentos</span>
                     <strong className="text-sm font-bold text-[var(--text-main)] clinical-tabular-nums">{parsedBackup.data.savedDocuments?.length || 0}</strong>
                   </div>
-                  <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                  <div className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--hairline)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase font-semibold block">Leitos Hospitalares</span>
                     <strong className="text-sm font-bold text-[var(--text-main)] clinical-tabular-nums">{parsedBackup.data.hospitalBeds?.length || 0}</strong>
                   </div>
@@ -390,7 +389,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                   </label>
 
                   <div className="space-y-1.5 text-xs">
-                    <label className="flex items-center gap-2 p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] cursor-pointer">
+                    <label className="flex items-center gap-2 p-2 rounded-xl border border-[var(--hairline)] bg-[var(--surface-card)] cursor-pointer">
                       <input
                         type="radio"
                         name="import_strategy"
@@ -409,17 +408,17 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                       </div>
                     </label>
 
-                    <label className="flex items-center gap-2 p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] cursor-pointer">
+                    <label className="flex items-center gap-2 p-2 rounded-xl border border-[var(--hairline)] bg-[var(--surface-card)] cursor-pointer">
                       <input
                         type="radio"
                         name="import_strategy"
                         value="replace"
                         checked={importStrategy === 'replace'}
                         onChange={() => setImportStrategy('replace')}
-                        className="text-rose-600 focus:ring-rose-500"
+                        className="focus-visible:ring-2 focus-visible:ring-[var(--status-danger)]"
                       />
                       <div>
-                        <span className="font-bold text-rose-600 dark:text-rose-400 block">
+                        <span className="font-bold text-[var(--status-danger)] block">
                           Substituir base local completa
                         </span>
                         <span className="text-xs text-[var(--text-muted)] block">
@@ -436,10 +435,10 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                     type="button"
                     onClick={handleExecuteImport}
                     disabled={isImporting}
-                    className={`px-5 py-2.5 text-xs font-bold rounded-xl flex items-center gap-2 shadow-tactile-btn cursor-pointer transition active:scale-95 disabled:opacity-50 text-white focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none ${
+                    className={`min-h-[44px] px-5 py-2.5 text-xs font-bold rounded-xl flex items-center gap-2 disabled:opacity-50 focus-visible:ring-2 focus-visible:outline-none ${
                       importStrategy === 'replace'
-                        ? 'bg-rose-600 hover:bg-rose-700'
-                        : 'bg-[var(--clinical)] hover:bg-[var(--clinical-hover)]'
+                        ? 'btn-tactile-danger focus-visible:ring-[var(--status-danger)]'
+                        : 'btn-tactile-primary focus-visible:ring-[var(--accent-focus)]'
                     }`}
                   >
                     {isImporting ? (
@@ -459,7 +458,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:p-5 border-t border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-app)]">
+        <div className="p-4 sm:p-5 border-t border-[var(--hairline)] flex items-center justify-between bg-[var(--bg-app)]">
           <span className="text-xs text-[var(--text-muted)]">
             Operação 100% offline no navegador • Sem envio a servidores externos
           </span>
@@ -467,7 +466,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="touch-target min-h-[44px] min-w-[44px] px-4 py-2 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
+            className="btn-tactile-secondary touch-target min-h-[44px] min-w-[44px] px-4 py-2 text-xs font-semibold rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             Fechar
           </button>

@@ -262,7 +262,7 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
             }
             className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] flex items-center justify-center cursor-pointer transition active:scale-95 shrink-0"
           >
-            <Edit3 className="w-4 h-4 text-sky-500" />
+            <Edit3 className="w-4 h-4 text-[var(--ink-clinical)]" />
           </button>
 
           <button
@@ -281,7 +281,7 @@ export const SusSheetPreviewAndActionsColumn: React.FC<SusSheetPreviewAndActions
       <div className="p-2 rounded-2xl bg-slate-900/5 dark:bg-slate-950/40 border border-subtle dark:border-strong space-y-2">
         <div className="no-print flex items-center justify-between gap-2 px-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-            <Icon name="edit_document" size={14} className="text-sky-600 dark:text-sky-400" />
+            <Icon name="edit_document" size={14} className="text-[var(--ink-clinical)]" />
             <span>Folha A4 Vetorial Editável</span>
           </span>
           <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">

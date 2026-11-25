@@ -110,10 +110,10 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
   onClose,
 }) => {
   return (
-    <div className="editor-toolbar no-print relative z-20 rounded-2xl p-2 sm:p-2.5 border shadow-tactile-sm bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-main)] flex flex-wrap items-center gap-1.5 animate-tab-fade">
+    <div className="editor-toolbar no-print relative z-20 rounded-2xl p-2 sm:p-2.5 border shadow-[var(--elevation-low)] bg-[var(--surface-card)] border-[var(--hairline)] text-[var(--ink-primary)] flex flex-wrap items-center gap-1.5 animate-tab-fade">
       {/* Seletor Rápido de Estilo de Receita Atual */}
-      <div className="flex items-center gap-1 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2 py-1 text-xs">
-        <span className="text-xs font-bold text-sky-700 dark:text-sky-300">Estilo:</span>
+      <div className="flex items-center gap-1 bg-[var(--surface-card-lit)] border border-[var(--border-control)] rounded-xl px-2 min-h-[44px] text-xs">
+        <span className="text-xs font-bold text-[var(--ink-clinical)]">Estilo:</span>
         <select
           id="editor-style-select"
           name="editorStyle"
@@ -124,20 +124,20 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
             const found = [...DEFAULT_PRESCRIPTION_STYLES, ...customStyles].find(s => s.id === val);
             if (found) handleApplyStyle(found);
           }}
-          className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-40 truncate"
+          className="bg-transparent text-[var(--ink-primary)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] rounded text-xs max-w-40 min-h-[44px] truncate"
           title="Selecionar estilo visual da receita médica atual (1 via, 2 vias, SUS, clássico...)"
           aria-label="Selecionar estilo visual da receita"
         >
-          <option className="bg-[var(--surface-card)] text-[var(--text-main)]" value="" disabled>Selecionar estilo...</option>
-          <optgroup label="Estilos Padrão" className="bg-[var(--surface-card)] text-[var(--text-main)]">
+          <option className="bg-[var(--surface-card)] text-[var(--ink-primary)]" value="" disabled>Selecionar estilo...</option>
+          <optgroup label="Estilos Padrão" className="bg-[var(--surface-card)] text-[var(--ink-primary)]">
             {DEFAULT_PRESCRIPTION_STYLES.map(s => (
-              <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
+              <option className="bg-[var(--surface-card)] text-[var(--ink-primary)]" key={s.id} value={s.id}>{s.name}</option>
             ))}
           </optgroup>
           {customStyles.length > 0 && (
-            <optgroup label="Meus Estilos Salvos" className="bg-[var(--surface-card)] text-[var(--text-main)]">
+            <optgroup label="Meus Estilos Salvos" className="bg-[var(--surface-card)] text-[var(--ink-primary)]">
               {customStyles.map(s => (
-                <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={s.id} value={s.id}>{s.name}</option>
+                <option className="bg-[var(--surface-card)] text-[var(--ink-primary)]" key={s.id} value={s.id}>{s.name}</option>
               ))}
             </optgroup>
           )}
@@ -145,7 +145,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
         <button
           type="button"
           onClick={() => setIsSaveStyleModalOpen(true)}
-          className="p-1 rounded hover:bg-[var(--surface-hover)] text-sky-600 dark:text-sky-400 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+          className="min-w-[44px] min-h-[44px] -mr-2 flex items-center justify-center rounded-lg hover:bg-[var(--surface-hover)] text-[var(--ink-clinical)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           title="Salvar configuração visual atual como novo estilo personalizado"
         >
           <BookmarkPlus className="w-3.5 h-3.5" />
@@ -153,19 +153,19 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       </div>
 
       {/* Seletor Tipográfico Docs Style (12 fontes) */}
-      <div className="flex items-center gap-1.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-xl px-2.5 py-1 text-xs">
-        <Type className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
+      <div className="flex items-center gap-1.5 bg-[var(--surface-card-lit)] border border-[var(--border-control)] rounded-xl px-2.5 min-h-[44px] text-xs">
+        <Type className="w-3.5 h-3.5 text-[var(--ink-muted)] shrink-0" />
         <select
           id="editor-font-family-select"
           name="editorFontFamily"
           value={fontFamilyId}
           onChange={(e) => onChangeFontFamily(e.target.value)}
-          className="bg-transparent text-[var(--text-main)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded text-xs max-w-44 truncate"
+          className="bg-transparent text-[var(--ink-primary)] font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] rounded text-xs max-w-44 min-h-[44px] truncate"
           aria-label="Família Tipográfica da Folha A4"
           title="Trocar fonte da receita médica estilo Google Docs"
         >
           {FONT_OPTIONS.map(f => (
-            <option className="bg-[var(--surface-card)] text-[var(--text-main)]" key={f.id} value={f.id}>
+            <option className="bg-[var(--surface-card)] text-[var(--ink-primary)]" key={f.id} value={f.id}>
               {f.name}
             </option>
           ))}
@@ -173,12 +173,12 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       </div>
 
       {/* Alternador de Orientação: Retrato / Paisagem */}
-      <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
+      <div className="flex items-center rounded-xl bg-[var(--surface-card-lit)] border border-[var(--border-control)] p-0.5 text-xs shrink-0 whitespace-nowrap">
         <button
           type="button"
           onClick={() => setPageOrientation('portrait')}
-          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-            pageOrientation === 'portrait' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
+            pageOrientation === 'portrait' ? 'bg-[var(--primary)] text-white shadow-xs font-bold' : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)]'
           }`}
           title="Orientação Retrato (Vertical 210×297mm)"
         >
@@ -188,8 +188,8 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
         <button
           type="button"
           onClick={() => setPageOrientation('landscape')}
-          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-            pageOrientation === 'landscape' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
+            pageOrientation === 'landscape' ? 'bg-[var(--primary)] text-white shadow-xs font-bold' : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)]'
           }`}
           title="Orientação Paisagem (Horizontal 297×210mm — Ideal para 2 Vias)"
         >
@@ -199,12 +199,12 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       </div>
 
       {/* Alternador de Vias: 1 Via / 2 Vias na Mesma Folha */}
-      <div className="flex items-center rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] p-0.5 text-xs shrink-0 whitespace-nowrap">
+      <div className="flex items-center rounded-xl bg-[var(--surface-card-lit)] border border-[var(--border-control)] p-0.5 text-xs shrink-0 whitespace-nowrap">
         <button
           type="button"
           onClick={() => setViaLayout('1-via')}
-          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-            viaLayout === '1-via' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
+            viaLayout === '1-via' ? 'bg-[var(--primary)] text-white shadow-xs font-bold' : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)]'
           }`}
           title="Folha Única (1 Via Padrão)"
         >
@@ -220,8 +220,8 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
               showToast('Modo 2 Vias ativado! Paisagem recomendada para imprimir as duas vias lado a lado.');
             }
           }}
-          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
-            viaLayout === '2-vias' ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-xs font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+          className={`touch-target min-h-[44px] px-2 py-1 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
+            viaLayout === '2-vias' ? 'bg-[var(--primary)] text-white shadow-xs font-bold' : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)]'
           }`}
           title="2 Vias na Mesma Folha (1ª Via Farmácia + 2ª Via Paciente — Portaria 344/98)"
         >
@@ -234,14 +234,14 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       <button
         type="button"
         onClick={() => handleHeaderFieldChange('showHeader', !headerConfig.showHeader)}
-        className={`touch-target min-h-[44px] px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+        className={`touch-target btn-tactile-secondary min-h-[44px] px-2.5 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
           headerConfig.showHeader
-            ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
-            : 'border-warning bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
+            ? ''
+            : 'border-l-[3px] border-l-[var(--accent-amber)] font-bold'
         }`}
         title={headerConfig.showHeader ? 'Cabeçalho visível. Clique para ocultar (ideal para papel já timbrado)' : 'Cabeçalho ocultado. Clique para restaurar'}
       >
-        {headerConfig.showHeader ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-amber-500" />}
+        {headerConfig.showHeader ? <Eye className="w-3.5 h-3.5 text-[var(--ink-secondary)]" /> : <EyeOff className="w-3.5 h-3.5 text-[var(--accent-amber)]" />}
         <span>Cabeçalho</span>
         <span className="text-xs opacity-75">({headerConfig.showHeader ? 'Sim' : 'Não'})</span>
       </button>
@@ -250,14 +250,14 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       <button
         type="button"
         onClick={() => handleHeaderFieldChange('showFooter', !headerConfig.showFooter)}
-        className={`touch-target min-h-[44px] px-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+        className={`touch-target btn-tactile-secondary min-h-[44px] px-2.5 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
           headerConfig.showFooter
-            ? 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)]'
-            : 'border-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold'
+            ? ''
+            : 'border-l-[3px] border-l-[var(--border-control)] font-bold'
         }`}
         title={headerConfig.showFooter ? 'Rodapé de carimbo visível. Clique para ocultar' : 'Rodapé ocultado. Clique para restaurar'}
       >
-        {headerConfig.showFooter ? <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-slate-400" />}
+        {headerConfig.showFooter ? <Eye className="w-3.5 h-3.5 text-[var(--ink-secondary)]" /> : <EyeOff className="w-3.5 h-3.5 text-[var(--ink-muted)]" />}
         <span>Rodapé</span>
         <span className="text-xs opacity-75">({headerConfig.showFooter ? 'Sim' : 'Não'})</span>
       </button>
@@ -266,14 +266,14 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
       <button
         type="button"
         onClick={() => handleLoadActivePrescription(true)}
-        className="touch-target min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-sm transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
+        className="touch-target btn-tactile-secondary min-h-[44px] px-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
         title="Preencher a folha A4 com os dados do paciente e medicamentos prescritos nesta consulta"
       >
-        <RotateCcw className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
+        <RotateCcw className="w-3.5 h-3.5 text-[var(--ink-secondary)]" />
         <span className="hidden sm:inline">Carregar Receita Atual</span>
         <span className="sm:hidden">Receita</span>
         {prescriptionItems && prescriptionItems.length > 0 && (
-          <span className="w-4 h-4 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold flex items-center justify-center">
+          <span className="w-4 h-4 rounded-full bg-[var(--primary)] text-white text-xs font-bold flex items-center justify-center tabular-nums">
             {prescriptionItems.length}
           </span>
         )}
@@ -314,7 +314,7 @@ export const EditorSheetConfigBar: React.FC<EditorSheetConfigBarProps> = ({
           onClick={onClose}
           aria-label="Recolher ajustes da folha"
           title="Recolher barra de ajustes da folha"
-          className="touch-target ml-auto min-h-[44px] px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition shrink-0"
+          className="touch-target btn-tactile-secondary ml-auto min-h-[44px] px-2.5 text-xs font-semibold flex items-center gap-1 cursor-pointer shrink-0"
         >
           <X className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Fechar</span>

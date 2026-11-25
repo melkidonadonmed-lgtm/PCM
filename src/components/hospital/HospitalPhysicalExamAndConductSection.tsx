@@ -44,7 +44,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
     <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-3.5 sm:p-4 space-y-3">
       <div className="flex items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-2">
         <div className="flex items-center gap-2">
-          <Icon name="clinical_notes" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+          <Icon name="clinical_notes" size={18} className="text-[var(--ink-clinical)] shrink-0" />
           <h3 className="text-sm font-semibold text-[var(--text-main)]">
             3. Evolução 24h, Exame Físico e Conduta do Dia (CD)
           </h3>
@@ -53,7 +53,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
           <button
             type="button"
             onClick={handleClear24hEvolution}
-            className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+            className="touch-target btn-tactile-danger min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
             title="Limpar texto da evolução 24h"
           >
             <Icon name="close" size={12} />
@@ -76,7 +76,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
           onChange={(e) => updateField('evolution24h', e.target.value)}
           placeholder="Ex.: Paciente permaneceu afebril nas últimas 24h, SSVV estáveis, boa aceitação da dieta..."
           aria-label="Evolução 24 horas"
-          className="w-full p-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+          className="w-full p-2.5 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
         />
       </div>
 
@@ -97,7 +97,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: BEG, LOTE, corado, hidratado"
             aria-label="Exame físico geral"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
@@ -117,7 +117,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: PA 120/80 mmHg | FC 76 bpm | SpO2 97%"
             aria-label="Sinais vitais"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
@@ -137,7 +137,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: MV+ bilateral sem ruídos adventícios"
             aria-label="Aparelho respiratório"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
@@ -157,7 +157,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: RCR 2T BNF sem sopros"
             aria-label="Aparelho cardiovascular"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
@@ -177,7 +177,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: Plano, flácido, RHA+, indolor"
             aria-label="Abdome"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
@@ -200,7 +200,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: Panturrilhas livres, sem edema"
             aria-label="Membros e anexos"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
       </div>
@@ -210,14 +210,14 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
         {(bedRecord.physicalExam.customSections || []).map((sec, idx) => (
           <div key={sec.id} className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-bold text-sky-700 dark:text-sky-300">
+              <label className="text-[11px] font-bold text-[var(--ink-clinical)]">
                 {sec.title}
               </label>
               <button
                 type="button"
                 onClick={() => handleRemoveFreeCategory(sec.id)}
                 aria-label={`Remover categoria ${sec.title}`}
-                className="text-[11px] text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
+                className="touch-target btn-tactile-danger min-h-[44px] px-2.5 rounded-lg text-[11px] font-semibold inline-flex items-center justify-center cursor-pointer"
               >
                 Remover
               </button>
@@ -233,7 +233,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
               }}
               placeholder={`Ex.: ${sec.title} — achados detalhados`}
               aria-label={sec.title}
-              className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+              className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
             />
           </div>
         ))}
@@ -247,7 +247,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             onChange={(e) => setNewFreeCategoryTitle(e.target.value)}
             placeholder="Adicionar seção específica (ex.: EXAME ORTOPÉDICO, NEUROLÓGICO, VM...)"
             aria-label="Título de nova categoria livre"
-            className="flex-1 h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="flex-1 h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
           <button
             type="button"
@@ -275,7 +275,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             onChange={(e) => updateField('dietDescription', e.target.value)}
             placeholder="Ex.: Dieta branda hipossódica via oral"
             aria-label="Dieta"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
@@ -300,14 +300,14 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: SF 0,9% 1000 mL EV 24/24h"
             aria-label="Hidratação"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
         <div>
           <label
             htmlFor="hosp-pendings"
-            className="block text-[11px] font-bold text-amber-700 dark:text-amber-300 mb-1"
+            className="block text-[11px] font-bold text-[var(--accent-amber)] mb-1"
           >
             Pendências do Leito (separar por ;)
           </label>
@@ -326,14 +326,14 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: Avaliar switch oral; Checar cultura"
             aria-label="Pendências"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
         <div>
           <label
             htmlFor="hosp-conduct"
-            className="block text-[11px] font-bold text-sky-700 dark:text-sky-300 mb-1"
+            className="block text-[11px] font-bold text-[var(--ink-clinical)] mb-1"
           >
             Conduta do Dia — CD (separar por ;)
           </label>
@@ -352,7 +352,7 @@ export const HospitalPhysicalExamAndConductSection: React.FC<
             }
             placeholder="Ex.: Manter ATB D4/D7; Manter profilaxia TEV"
             aria-label="Condutas"
-            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
       </div>

@@ -44,18 +44,18 @@ export const LgpdLocalModeNotice: React.FC<LgpdLocalModeNoticeProps> = ({
       aria-live="polite"
       data-state="idle"
       aria-busy={false}
-      className={`mb-2 rounded-2xl border px-3 py-1.5 text-xs no-print transition-colors flex flex-col md:flex-row md:items-center justify-between gap-2 ${
+      className={`mb-2 rounded-2xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] px-3 py-1.5 text-xs no-print transition-colors flex flex-col md:flex-row md:items-center justify-between gap-2 text-[var(--ink-secondary)] ${
         sharedComputerMode
-          ? 'bg-[var(--accent-amber-subtle)] border-[var(--accent-amber-border)] text-[var(--text-main)]'
-          : 'bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-secondary)] shadow-tactile-sm'
+          ? 'border-l-[var(--accent-amber)]'
+          : 'border-l-[var(--ink-clinical)]'
       }`}
     >
       <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
         <span
-          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
+          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[var(--surface-chip-muted)] border border-[var(--hairline)] ${
             sharedComputerMode
-              ? 'bg-[var(--accent-amber-subtle)] text-amber-800 dark:text-amber-300 border-[var(--accent-amber-border)]'
-              : 'bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border-[var(--border-clinical-subtle)]'
+              ? 'text-[var(--accent-amber)]'
+              : 'text-[var(--ink-clinical)]'
           }`}
         >
           <Icon name={sharedComputerMode ? 'warning' : 'shield'} size={15} />
@@ -64,15 +64,15 @@ export const LgpdLocalModeNotice: React.FC<LgpdLocalModeNoticeProps> = ({
         <div className="min-w-0 flex-1 leading-snug">
           {sharedComputerMode ? (
             <p>
-              <strong className="font-bold text-amber-800 dark:text-amber-300">
+              <strong className="font-bold text-[var(--ink-primary)]">
                 Computador Compartilhado de Plantão (LGPD Art. 46):
               </strong>{' '}
               Os dados da consulta ficam gravados localmente neste navegador. Ao encerrar seu turno na UBS/Hospital, clique em{' '}
-              <strong>Limpar Plantão</strong> para remover dados de pacientes.
+              <strong className="text-[var(--ink-primary)]">Limpar Plantão</strong> para remover dados de pacientes.
             </p>
           ) : (
             <p>
-              <strong className="font-bold text-[var(--text-main)]">
+              <strong className="font-bold text-[var(--ink-primary)]">
                 Modo Local • Sem Login (LGPD):
               </strong>{' '}
               Dados salvos <strong>apenas neste navegador</strong>.
@@ -89,10 +89,10 @@ export const LgpdLocalModeNotice: React.FC<LgpdLocalModeNoticeProps> = ({
             id="btn-lgpd-notice-sanitize"
             type="button"
             onClick={onSanitizeShiftData}
-            className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl border border-[var(--accent-amber-border)] bg-[var(--accent-amber-subtle)] hover:bg-amber-100/80 dark:hover:bg-amber-950/50 text-amber-900 dark:text-amber-200 font-bold text-[11px] flex items-center gap-1 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
+            className="btn-tactile-danger touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl font-bold text-[11px] flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] outline-none"
             title="Limpar imediatamente dados do paciente, receita, exames e atestado atual deste navegador"
           >
-            <Icon name="ink_eraser" size={14} />
+            <Icon name="ink_eraser" size={14} className="text-[var(--accent-amber)]" />
             <span>Limpar Plantão</span>
           </button>
         )}
@@ -101,7 +101,7 @@ export const LgpdLocalModeNotice: React.FC<LgpdLocalModeNoticeProps> = ({
           id="btn-lgpd-notice-backup"
           type="button"
           onClick={onOpenBackupModal}
-          className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] font-semibold text-[11px] flex items-center gap-1 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none"
+          className="btn-tactile-secondary touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl font-semibold text-[11px] flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           title="Exportar ou restaurar backup portátil (.pcm.json) sem precisar de login"
         >
           <Icon name="cloud_download" size={14} className="text-[var(--ink-clinical)]" />
@@ -112,7 +112,7 @@ export const LgpdLocalModeNotice: React.FC<LgpdLocalModeNoticeProps> = ({
           id="btn-lgpd-notice-settings"
           type="button"
           onClick={onOpenLgpdModal}
-          className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] font-semibold text-[11px] flex items-center gap-1 transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none"
+          className="btn-tactile-secondary touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl font-semibold text-[11px] flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           title="Gerenciar seleção de cookies, privacidade e direitos LGPD"
         >
           <Icon name="tune" size={14} className="text-[var(--ink-clinical)]" />
@@ -126,7 +126,7 @@ export const LgpdLocalModeNotice: React.FC<LgpdLocalModeNoticeProps> = ({
             onClick={onDismiss}
             aria-label="Ocultar aviso de modo local sem login"
             title="Ocultar aviso (você pode reabrir a qualquer momento no escudo LGPD no topo ou menu lateral)"
-            className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] font-semibold text-[11px] flex items-center justify-center gap-1 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none"
+            className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl text-[var(--ink-muted)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-hover)] font-semibold text-[11px] flex items-center justify-center gap-1 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           >
             <Icon name="close" size={14} />
             <span className="sr-only sm:not-sr-only">Ocultar</span>

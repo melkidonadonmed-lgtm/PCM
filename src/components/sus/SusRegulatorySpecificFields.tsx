@@ -85,7 +85,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
 
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 border-b border-[var(--border-subtle)] pb-2">
         <div className="flex items-center gap-2">
-          <Icon name="auto_awesome" className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+          <Icon name="auto_awesome" className="w-4 h-4 text-[var(--ink-clinical)]" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
             3. Dados Regulatórios • {currentDocItem.shortTitle}
           </h3>
@@ -98,10 +98,10 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
             <button
               type="button"
               onClick={onResetDoc}
-              className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-semibold text-rose-800 dark:text-rose-200 border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+              className="touch-target btn-tactile-danger px-3 text-xs inline-flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               title="Limpar os dados clínicos deste documento"
             >
-              <Icon name="delete" size={14} className="text-rose-800 dark:text-rose-200" />
+              <Icon name="delete" size={14} />
               <span>Limpar campos</span>
             </button>
           )}
@@ -125,7 +125,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               value={formData.sigtapCode || ''}
               onChange={(e) => onFieldChange('sigtapCode', e.target.value)}
               placeholder="Ex.: 00.00.00.000-0"
-              className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+              className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
             />
           </div>
           <div className={currentDocItem.id === 'apac_principal' ? 'col-span-5 sm:col-span-7' : 'col-span-8'}>
@@ -138,7 +138,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               value={formData.procedureName || ''}
               onChange={(e) => onFieldChange('procedureName', e.target.value)}
               placeholder="Ex.: Ressonância magnética de coluna..."
-              className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
+              className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-semibold"
             />
           </div>
           {currentDocItem.id === 'apac_principal' && (
@@ -153,7 +153,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                 value={formData.procedureQuantity || ''}
                 onChange={(e) => onFieldChange('procedureQuantity', e.target.value)}
                 placeholder="Ex.: 01"
-                className="w-full min-h-[40px] px-2 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-info clinical-tabular-nums"
+                className="w-full min-h-[44px] px-2 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] text-center outline-none focus:border-info clinical-tabular-nums"
               />
             </div>
           )}
@@ -174,7 +174,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   if (currentDocItem.id === 'apac_principal' && !formData.procedureQuantity?.trim())
                     onFieldChange('procedureQuantity', '01');
                 }}
-                className="touch-target min-h-[44px] inline-flex items-center font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                className="touch-target min-h-[44px] inline-flex items-center font-bold text-[var(--ink-clinical)] hover:underline cursor-pointer"
               >
                 Usar o procedimento habitual deste documento ({currentDocItem.defaultSigtap})
               </button>
@@ -193,7 +193,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               value={formData.cid10Code || ''}
               onChange={(e) => handleCidCodeChange(e.target.value)}
               placeholder="Ex.: M54.5"
-              className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase font-mono font-bold"
+              className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info uppercase font-mono font-bold"
             />
           </div>
           <div className="col-span-8 sm:col-span-9">
@@ -206,7 +206,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
               value={formData.cid10Description || ''}
               onChange={(e) => onFieldChange('cid10Description', e.target.value)}
               placeholder="Ex.: Dor lombar baixa"
-              className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+              className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
             />
           </div>
         </div>
@@ -217,7 +217,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
             <button
               type="button"
               onClick={handleApplyDefaultCid}
-              className="touch-target min-h-[44px] inline-flex items-center font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+              className="touch-target min-h-[44px] inline-flex items-center font-bold text-[var(--ink-clinical)] hover:underline cursor-pointer"
             >
               Usar o código habitual deste documento ({currentDocItem.defaultCid10}
               {buscarDescricaoCid(currentDocItem.defaultCid10)
@@ -243,7 +243,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   value={formData.sinanNumber || ''}
                   onChange={(e) => onFieldChange('sinanNumber', e.target.value)}
                   placeholder="Ex.: 0000000 (7 dígitos)"
-                  className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
+                  className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info font-mono clinical-tabular-nums"
                 />
               </div>
               <div>
@@ -256,7 +256,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   value={formData.symptomsStartDate || ''}
                   onChange={(e) => onFieldChange('symptomsStartDate', e.target.value)}
                   placeholder="Ex.: DD/MM/AAAA"
-                  className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                  className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
                 />
               </div>
             </div>
@@ -272,7 +272,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   value={formData.specimenType || ''}
                   onChange={(e) => onFieldChange('specimenType', e.target.value)}
                   placeholder={currentDocItem.id === 'gal_trm_tb' ? 'Ex.: Escarro (1ª amostra), LBA...' : 'Ex.: Soro, Sangue Total, Swab, LCR...'}
-                  className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                  className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                 />
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {(currentDocItem.id === 'gal_trm_tb'
@@ -302,7 +302,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                     value={formData.tuberculosisSymptomsDuration || ''}
                     onChange={(e) => onFieldChange('tuberculosisSymptomsDuration', e.target.value)}
                     placeholder="Ex.: 3 semanas, 1 mês..."
-                    className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                    className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                   />
                 </div>
               )}
@@ -325,7 +325,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                     value={formData.gynecologyDum || ''}
                     onChange={(e) => onFieldChange('gynecologyDum', e.target.value)}
                     placeholder="Ex.: DD/MM/AAAA ou Menopausa"
-                    className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                    className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                   />
                 </div>
                 <div>
@@ -338,7 +338,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                     value={formData.gynecologyPreviousExam || ''}
                     onChange={(e) => onFieldChange('gynecologyPreviousExam', e.target.value)}
                     placeholder="Ex.: 2024 (Normal)"
-                    className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                    className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                   />
                 </div>
               </div>
@@ -355,7 +355,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   value={formData.gynecologyPreviousExam || ''}
                   onChange={(e) => onFieldChange('gynecologyPreviousExam', e.target.value)}
                   placeholder="Ex.: 2024 — BI-RADS 2"
-                  className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                  className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                 />
               </div>
             )}
@@ -371,7 +371,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                   value={formData.specimenType || ''}
                   onChange={(e) => onFieldChange('specimenType', e.target.value)}
                   placeholder="Ex.: Colo uterino (12h), Mama direita (QSE)..."
-                  className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
+                  className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info"
                 />
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {[
@@ -410,7 +410,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                 value={formData.renalCreatinine || ''}
                 onChange={(e) => onFieldChange('renalCreatinine', e.target.value)}
                 placeholder="Ex.: 0,9"
-                className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
               />
             </div>
             <div>
@@ -423,7 +423,7 @@ export const SusRegulatorySpecificFields: React.FC<SusRegulatorySpecificFieldsPr
                 value={formData.renalEtfg || ''}
                 onChange={(e) => onFieldChange('renalEtfg', e.target.value)}
                 placeholder="Ex.: > 60 mL/min/1,73m²"
-                className="w-full min-h-[40px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
+                className="w-full min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-main)] outline-none focus:border-info clinical-tabular-nums"
               />
             </div>
             <div>

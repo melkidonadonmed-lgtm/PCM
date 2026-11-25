@@ -150,18 +150,21 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             <h2 className="text-sm font-semibold tracking-tight text-[var(--text-main)] truncate">
               Calculadora de doses pediátricas
             </h2>
-            <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-[var(--surface-info-subtle)] text-sky-700 dark:text-sky-300 border border-[var(--border-info-subtle)] truncate">
-              Paciente: <span className="font-semibold">{patientName}</span>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border border-[var(--hairline)] truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
+              <span>
+                Paciente: <span className="font-semibold text-[var(--ink-primary)]">{patientName}</span>
+              </span>
             </span>
           </div>
 
           {/* Right: Interactive Weight Stepper & Display (Compact & Ergonomic) */}
-          <div className="flex items-center justify-between sm:justify-center gap-1.5 px-2 py-1.5 rounded-xl border w-full @3xl:w-auto shrink-0 tactile-flat bg-[var(--surface-inset)] border-[var(--border-subtle)] clinical-tabular-nums">
+          <div className="flex items-center justify-between sm:justify-center gap-1.5 px-2 py-1.5 rounded-xl border w-full @3xl:w-auto shrink-0 tactile-flat bg-[var(--surface-card-lit)] border-[var(--hairline)] clinical-tabular-nums">
             <button
               type="button"
               onClick={() => handleWeightDirectChange(Math.max(0, +(patientWeight - 1).toFixed(1)))}
               aria-label="Diminuir 1 kg"
-              className="touch-target min-h-[44px] min-w-[44px] px-2 rounded-lg font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
+              className="touch-target min-h-[44px] min-w-[44px] px-2 rounded-lg font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] clinical-tabular-nums shrink-0"
               title="Diminuir 1 kg"
             >
               -1
@@ -170,7 +173,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               type="button"
               onClick={() => handleWeightDirectChange(Math.max(0, +(patientWeight - 0.5).toFixed(1)))}
               aria-label="Diminuir 0,5 kg"
-              className="touch-target min-h-[44px] min-w-[44px] px-2 rounded-lg font-semibold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
+              className="touch-target min-h-[44px] min-w-[44px] px-2 rounded-lg font-semibold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--ink-muted)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] clinical-tabular-nums shrink-0"
               title="Diminuir 0.5 kg"
             >
               -0.5
@@ -180,7 +183,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             <div className="px-2 text-center min-w-[88px]">
               <label
                 htmlFor="peso-paciente"
-                className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block cursor-pointer whitespace-nowrap"
+                className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-muted)] block cursor-pointer whitespace-nowrap"
               >
                 Peso atual (kg)
               </label>
@@ -201,9 +204,9 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                     onUpdatePatientWeight(Number.isNaN(parsed) || parsed < 0 ? 0 : parsed);
                   }}
                   onBlur={() => setWeightDraft(null)}
-                  className="w-16 sm:w-20 font-bold text-sm sm:text-base text-center bg-transparent border-b border-slate-300 dark:border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus:border-sky-500 text-sky-700 dark:text-sky-400 placeholder:text-xs placeholder:font-normal placeholder:text-[var(--text-placeholder)] rounded clinical-tabular-nums"
+                  className="w-16 sm:w-20 min-h-[44px] font-bold text-sm sm:text-base text-center bg-transparent border-b border-[var(--border-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus:border-[var(--accent-focus)] text-[var(--ink-clinical)] placeholder:text-xs placeholder:font-normal placeholder:text-[var(--text-placeholder)] rounded clinical-tabular-nums"
                 />
-                <span className="text-[11px] font-semibold text-[var(--text-muted)] clinical-unit">kg</span>
+                <span className="text-[11px] font-semibold text-[var(--ink-muted)] clinical-unit">kg</span>
               </div>
             </div>
 
@@ -211,7 +214,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               type="button"
               onClick={() => handleWeightDirectChange(Math.min(120, +(patientWeight + 0.5).toFixed(1)))}
               aria-label="Aumentar 0,5 kg"
-              className="touch-target min-h-[44px] min-w-[44px] px-2 rounded-lg font-semibold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-muted)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
+              className="touch-target min-h-[44px] min-w-[44px] px-2 rounded-lg font-semibold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--ink-muted)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] clinical-tabular-nums shrink-0"
               title="Aumentar 0.5 kg"
             >
               +0.5
@@ -220,7 +223,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               type="button"
               onClick={() => handleWeightDirectChange(Math.min(120, +(patientWeight + 1).toFixed(1)))}
               aria-label="Aumentar 1 kg"
-              className="touch-target min-h-[44px] min-w-[44px] px-2 rounded-lg font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums shrink-0"
+              className="touch-target min-h-[44px] min-w-[44px] px-2 rounded-lg font-bold text-xs flex items-center justify-center transition cursor-pointer tactile-btn-secondary active:scale-95 bg-[var(--surface-card)] text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] clinical-tabular-nums shrink-0"
               title="Aumentar 1 kg"
             >
               +1
@@ -230,18 +233,18 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
 
         {/* Quick Weight Range Presets */}
         <div className="mt-2.5 pt-2 border-t border-subtle dark:border-strong flex items-center gap-1.5 overflow-x-auto pb-0.5 max-w-full scrollbar-none fade-scroll-x">
-          <span className="text-[11px] font-semibold whitespace-nowrap text-[var(--text-muted)] flex items-center gap-1 shrink-0 mr-0.5">
-            <Icon name="calculate" size={14} className="text-sky-500" /> Faixas:
+          <span className="text-[11px] font-semibold whitespace-nowrap text-[var(--ink-muted)] flex items-center gap-1 shrink-0 mr-0.5">
+            <Icon name="calculate" size={14} className="text-[var(--ink-clinical)]" /> Faixas:
           </span>
           {weightPresets.map((p) => (
             <button
               key={p.label}
               type="button"
               onClick={() => handleWeightDirectChange(p.weight)}
-              className={`touch-target text-[11px] min-h-[44px] px-2.5 rounded-lg border font-medium whitespace-nowrap transition cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 clinical-tabular-nums ${
+              className={`touch-target text-[11px] min-h-[44px] px-2.5 rounded-lg border font-medium whitespace-nowrap transition cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] clinical-tabular-nums ${
                 patientWeight === p.weight
                   ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] shadow-xs font-semibold'
-                  : 'bg-[var(--surface-inset)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--surface-chip-muted-hover)]'
+                  : 'bg-[var(--surface-card-lit)] text-[var(--ink-secondary)] border-[var(--border-control)] hover:bg-[var(--surface-chip-muted-hover)]'
               }`}
             >
               {p.label}
@@ -254,7 +257,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
       <div className="flex flex-row gap-2 items-center justify-between">
         {/* Search */}
         <div className="relative flex-1 min-w-0">
-          <Icon name="search" className="text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] dark:text-slate-400 pointer-events-none" />
+          <Icon name="search" className="text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none" />
           <input
             id="pediatric-med-search"
             name="pediatricMedSearch"
@@ -263,7 +266,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             placeholder="Ex.: Paracetamol, Amoxicilina, Dipirona, Ondansetrona..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-11 min-h-[44px] pl-9 pr-3 rounded-lg border-[var(--border-control)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 transition tactile-input"
+            className="w-full h-11 min-h-[44px] pl-9 pr-3 rounded-lg border-[var(--border-control)] text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] transition tactile-input"
           />
         </div>
 
@@ -274,7 +277,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               setSearchTerm('');
               setSelectedCategory('Todos');
             }}
-            className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-xl border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+            className="touch-target btn-tactile-danger min-h-[44px] min-w-[44px] px-3 text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] outline-none"
             title="Limpar busca e filtro de categoria"
           >
             <Icon name="close" size={14} />
@@ -286,7 +289,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         <button
           type="button"
           onClick={isDrawer && onClose ? onClose : onNavigateToPrescription}
-          className="touch-target tactile-btn-primary px-3.5 sm:px-4 min-h-[44px] flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500"
+          className="touch-target tactile-btn-primary px-3.5 sm:px-4 min-h-[44px] flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
         >
           <span>{isDrawer ? 'Voltar à receita' : 'Ir para receita'}</span>
           <Icon name="arrow_forward" className="text-[15px]" />
@@ -302,10 +305,10 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs font-semibold px-3 py-1.5 min-h-[36px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+              className={`text-xs font-semibold px-3 py-1.5 min-h-[44px] rounded-xl whitespace-nowrap transition cursor-pointer border active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] ${
                 isSelected
                   ? 'bg-[var(--pill-active-bg)] text-white border-[var(--pill-active-border)] shadow-sm'
-                  : 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--surface-chip-muted-hover)]'
+                  : 'bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border-[var(--border-control)] hover:bg-[var(--surface-chip-muted-hover)]'
               }`}
             >
               {cat}
@@ -320,10 +323,10 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
           id="aviso-peso-obrigatorio"
           role="alert"
           aria-live="assertive"
-          className="px-3.5 py-2.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[var(--surface-chip-muted)] border-[var(--border-subtle)] text-[var(--text-secondary)]"
+          className="px-3.5 py-2.5 rounded-xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[var(--surface-card-lit)] text-[var(--ink-secondary)]"
         >
           <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" aria-hidden="true" />
+            <span className="w-2 h-2 rounded-full bg-[var(--accent-amber)] flex-shrink-0" aria-hidden="true" />
             <span className="text-xs font-medium">
               Informe o peso do paciente para calcular as doses.
             </span>
@@ -334,7 +337,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
               weightInputRef.current?.focus();
               weightInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }}
-            className="btn-tactile-secondary px-3 py-1.5 min-h-[40px] text-xs font-semibold whitespace-nowrap cursor-pointer self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-sky-500"
+            className="btn-tactile-secondary px-3 py-1.5 min-h-[44px] text-xs font-semibold whitespace-nowrap cursor-pointer self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           >
             Definir peso
           </button>
@@ -380,30 +383,30 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                 return (
                   <tr 
                     key={med.id}
-                    className={`transition-colors hover:bg-slate-500/5 ${isAdded ? 'bg-[var(--surface-info-subtle)]' : ''}`}
+                    className={`transition-colors hover:bg-slate-500/5 ${isAdded ? 'bg-[var(--surface-card-lit)]' : ''}`}
                   >
                     <td className="py-3 px-4">
                       <div className="font-bold text-xs text-[var(--text-main)]">
                         {med.name}
                       </div>
-                      <div className="text-xs text-sky-700 dark:text-sky-400 font-medium">{med.presentation}</div>
-                      <span className="inline-block mt-0.5 text-xs uppercase font-bold px-1.5 py-0.5 rounded bg-slate-500/10 text-[var(--text-muted)] dark:text-slate-400">
+                      <div className="text-xs text-[var(--ink-clinical)] font-medium">{med.presentation}</div>
+                      <span className="inline-block mt-0.5 text-xs uppercase font-bold px-1.5 py-0.5 rounded bg-[var(--surface-chip-muted)] text-[var(--ink-muted)]">
                         {med.category}
                       </span>
                     </td>
-                    <td className="py-3 px-3 font-semibold clinical-tabular-nums clinical-unit text-[var(--text-secondary)]">
+                    <td className="py-3 px-3 font-semibold clinical-tabular-nums clinical-unit text-[var(--ink-secondary)]">
                       {med.concentrationMgPerMl > 0 ? `${med.concentrationMgPerMl} mg/mL` : '-'}
                     </td>
-                    <td className="py-3 px-3 clinical-tabular-nums text-[var(--text-muted)]">
+                    <td className="py-3 px-3 clinical-tabular-nums text-[var(--ink-muted)]">
                       <span className="clinical-unit">{med.standardDoseMgKg > 0 ? `${med.standardDoseMgKg} mg/kg` : 'Dose Fixa'}</span>
                       {med.maxDoseMg > 0 && (
                         <div className="text-xs text-amber-700 dark:text-amber-400 clinical-tabular-nums clinical-unit">Máx {med.maxDoseMg} mg</div>
                       )}
                     </td>
-                    <td className="py-3 px-3 bg-[var(--surface-inset)] border-x border-[var(--border-subtle)] clinical-tabular-nums">
+                    <td className="py-3 px-3 bg-[var(--surface-card-lit)] border-x border-[var(--hairline)] clinical-tabular-nums">
                       {patientWeight > 0 ? (
                         <>
-                          <div className="font-black text-sm text-sky-700 dark:text-sky-400 clinical-tabular-nums clinical-unit">
+                          <div className="font-black text-sm text-[var(--ink-clinical)] clinical-tabular-nums clinical-unit">
                             {calc.rawDoseText}
                           </div>
                           {calc.isMaxDoseReached && (
@@ -413,24 +416,24 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                           )}
                         </>
                       ) : (
-                        <span className="font-semibold text-sm text-[var(--text-muted)] dark:text-slate-400">—</span>
+                        <span className="font-semibold text-sm text-[var(--ink-muted)]">—</span>
                       )}
                     </td>
-                    <td className="py-3 px-3 bg-[var(--surface-inset)] clinical-tabular-nums">
-                      <span className="font-black text-sm text-emerald-700 dark:text-emerald-400 clinical-tabular-nums clinical-unit">
+                    <td className="py-3 px-3 bg-[var(--surface-card-lit)] clinical-tabular-nums">
+                      <span className="font-black text-sm text-[var(--ink-clinical)] clinical-tabular-nums clinical-unit">
                         {patientWeight > 0 ? calc.volumeText : '—'}
                       </span>
                     </td>
-                    <td className="py-3 px-3 bg-[var(--surface-inset)] border-r border-[var(--border-subtle)] clinical-tabular-nums">
-                      <span className={`font-black text-sm clinical-tabular-nums clinical-unit ${patientWeight > 0 && calc.dropsText !== '-' ? 'text-amber-700 dark:text-amber-400' : 'text-[var(--text-muted)] dark:text-slate-400'}`}>
+                    <td className="py-3 px-3 bg-[var(--surface-card-lit)] border-r border-[var(--hairline)] clinical-tabular-nums">
+                      <span className={`font-black text-sm clinical-tabular-nums clinical-unit ${patientWeight > 0 && calc.dropsText !== '-' ? 'text-amber-700 dark:text-amber-400' : 'text-[var(--ink-muted)]'}`}>
                         {patientWeight > 0 ? calc.dropsText : '—'}
                       </span>
                     </td>
                     <td className="py-3 px-4 max-w-xs">
-                      <div className="font-medium text-xs line-clamp-2 text-[var(--text-secondary)]">
+                      <div className="font-medium text-xs line-clamp-2 text-[var(--ink-secondary)]">
                         {med.frequency}
                       </div>
-                      <div className="text-xs text-[var(--text-muted)] dark:text-slate-400 line-clamp-1 italic mt-0.5">
+                      <div className="text-xs text-[var(--ink-muted)] line-clamp-1 italic mt-0.5">
                         {med.observations}
                       </div>
                     </td>
@@ -440,7 +443,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                         onClick={() => handleAddMedication(med)}
                         disabled={patientWeight <= 0}
                         aria-describedby={patientWeight <= 0 ? "aviso-peso-obrigatorio" : undefined}
-                        className={`px-3 py-1.5 min-h-[40px] rounded-xl font-semibold text-xs transition flex items-center gap-1.5 ml-auto focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                        className={`px-3 py-1.5 min-h-[44px] rounded-xl font-semibold text-xs transition flex items-center gap-1.5 ml-auto focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] ${
                           isAdded
                             ? 'bg-[var(--pill-active-bg)] text-white border border-[var(--pill-active-border)]'
                             : 'btn-tactile-secondary cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed'
@@ -467,7 +470,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
         </div>
 
         {/* Mobile / Tablet / Drawer Cards View (@container < 4xl) */}
-        <div className="@4xl:hidden divide-y divide-[var(--border-subtle)] clinical-tabular-nums">
+        <div className="@4xl:hidden divide-y divide-[var(--hairline)] clinical-tabular-nums">
           {filteredMedications.map((med) => {
             const calc = calculatePediatricDose(med, patientWeight);
             const isAdded = addedMedsMap[med.id];
@@ -475,17 +478,17 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
             return (
               <div 
                 key={med.id} 
-                className={`p-3.5 sm:p-4 space-y-3 transition-colors ${isAdded ? 'bg-[var(--surface-info-subtle)]' : ''}`}
+                className={`p-3.5 sm:p-4 space-y-3 transition-colors ${isAdded ? 'bg-[var(--surface-card-lit)] border-l-[3px] border-l-[var(--ink-clinical)]' : ''}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <span className="inline-flex items-center whitespace-nowrap text-[11px] uppercase font-bold tracking-wide px-2 py-0.5 rounded-md bg-slate-500/10 text-[var(--text-muted)] dark:text-slate-400 border border-subtle">
+                    <span className="inline-flex items-center whitespace-nowrap text-[11px] uppercase font-bold tracking-wide px-2 py-0.5 rounded-md bg-[var(--surface-chip-muted)] text-[var(--ink-muted)] border border-[var(--hairline)]">
                       {med.category}
                     </span>
-                    <h4 className="font-bold text-sm mt-1 text-[var(--text-main)]">
+                    <h4 className="font-bold text-sm mt-1 text-[var(--ink-primary)]">
                       {med.name}
                     </h4>
-                    <p className="text-xs font-semibold text-sky-700 dark:text-sky-400">{med.presentation}</p>
+                    <p className="text-xs font-semibold text-[var(--ink-clinical)]">{med.presentation}</p>
                   </div>
 
                   <button
@@ -493,7 +496,7 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
                     onClick={() => handleAddMedication(med)}
                     disabled={patientWeight <= 0}
                     aria-describedby={patientWeight <= 0 ? "aviso-peso-obrigatorio" : undefined}
-                    className={`px-3 py-1.5 min-h-[40px] rounded-xl font-semibold text-xs flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                    className={`px-3 py-1.5 min-h-[44px] rounded-xl font-semibold text-xs flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] ${
                       isAdded
                         ? 'bg-[var(--pill-active-bg)] text-white border border-[var(--pill-active-border)]'
                         : 'btn-tactile-secondary cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed'
@@ -506,11 +509,11 @@ export const PediatricCalculator: React.FC<PediatricCalculatorProps> = ({
 
                 {/* Calculation Badges Grid */}
                 <div 
-                  className="grid grid-cols-3 gap-2 p-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] tactile-flat clinical-tabular-nums"
+                  className="grid grid-cols-3 gap-2 p-2.5 rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] tactile-flat clinical-tabular-nums"
                 >
                   <div className="text-center">
-                    <span className="text-xs font-bold text-[var(--text-muted)] dark:text-slate-400 uppercase block">Dose (mg)</span>
-                    <span className="text-xs font-bold text-sky-700 dark:text-sky-400 clinical-tabular-nums">
+                    <span className="text-xs font-bold text-[var(--ink-muted)] uppercase block">Dose (mg)</span>
+                    <span className="text-xs font-bold text-[var(--ink-clinical)] clinical-tabular-nums">
                       {patientWeight > 0 ? calc.rawDoseText : '—'}
                     </span>
                   </div>

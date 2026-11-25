@@ -114,9 +114,9 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-card)]">
+        <div className="p-4 sm:p-5 border-b border-[var(--hairline)] flex items-center justify-between bg-[var(--surface-card)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border border-[var(--hairline)] flex items-center justify-center shrink-0">
               <Icon name="shield" size={22} filled />
             </div>
             <div>
@@ -133,7 +133,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar central de segurança e LGPD"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] cursor-pointer transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+            className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           >
             <Icon name="close" size={20} />
           </button>
@@ -142,24 +142,24 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 custom-scrollbar">
           {/* Status Atual: Modo Local Sem Login vs Conectado */}
-          <div className="p-3.5 rounded-2xl border flex items-start gap-3 bg-[var(--surface-clinical-subtle)] border-[var(--border-clinical-subtle)]">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 bg-[var(--surface-card)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)]">
+          <div className="p-3.5 rounded-2xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border border-[var(--hairline)]">
               <Icon name={isCloudAuthenticated ? 'cloud_done' : 'lock'} size={18} />
             </div>
             <div className="space-y-1 text-xs leading-relaxed">
               <div className="flex flex-wrap items-center gap-2">
-                <strong className="font-bold text-sm text-[var(--text-main)]">
+                <strong className="font-bold text-sm text-[var(--ink-primary)]">
                   {isCloudAuthenticated
                     ? `Nuvem Opcional Conectada (${cloudUserEmail || 'Conta Google'})`
                     : 'Operando em Modo 100% Local (Sem Login)'}
                 </strong>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border border-[var(--hairline)]">
                   {consent.consentedAt
                     ? `Consentimento registrado em ${new Date(consent.consentedAt).toLocaleDateString('pt-BR')}`
                     : 'Aguardando seleção de cookies'}
                 </span>
               </div>
-              <p className="text-[var(--text-secondary)]">
+              <p className="text-[var(--ink-secondary)]">
                 {isCloudAuthenticated
                   ? 'A sincronização em nuvem armazena apenas seus postos de trabalho (timbrados) e modelos reutilizáveis em branco. Dados nominais de pacientes, receitas ativas e leitos hospitalares jamais são enviados à nuvem.'
                   : 'Você não fez login. Todos os dados clínicos, receitas, timbrados e modelos estão gravados exclusivamente neste navegador (localStorage e IndexedDB), sem qualquer comunicação com servidores externos.'}
@@ -177,7 +177,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             </div>
 
             {/* Categoria 1: Estritamente Necessários */}
-            <div className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-2">
+            <div className="p-4 rounded-2xl border border-[var(--hairline)] bg-[var(--bg-app)] space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <Icon name="verified_user" size={18} className="text-[var(--ink-clinical)] shrink-0" />
@@ -185,8 +185,9 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                     Cookies e Armazenamento Estritamente Necessários (Offline-First)
                   </span>
                 </div>
-                <span className="px-2.5 py-1 rounded-lg bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] text-[11px] font-bold shrink-0">
-                  Sempre Ativo
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border border-[var(--hairline)] text-[11px] font-bold shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
+                  <span>Sempre Ativo</span>
                 </span>
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -232,10 +233,10 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             </div>
 
             {/* Categoria 3: Modo Computador Compartilhado de Plantão */}
-            <div className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-2">
+            <div className="p-4 rounded-2xl border border-[var(--hairline)] bg-[var(--bg-app)] space-y-2">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Icon name="local_hospital" size={18} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                  <Icon name="local_hospital" size={18} className="text-[var(--accent-amber)] shrink-0" />
                   <label htmlFor="switch-shared-pc-mode" className="text-xs sm:text-sm font-bold text-[var(--text-main)] cursor-pointer">
                     Modo Computador Compartilhado de Plantão (UBS / UPA / Enfermaria)
                   </label>
@@ -246,13 +247,13 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                   role="switch"
                   aria-checked={sharedPcEnabled}
                   onClick={() => setSharedPcEnabled((prev) => !prev)}
-                  className="touch-target relative inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
+                  className="touch-target relative inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                 >
                   <span className="sr-only">Ativar modo computador compartilhado de plantão</span>
                   <span
                     aria-hidden="true"
                     className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
-                      sharedPcEnabled ? 'bg-amber-600' : 'bg-slate-400 dark:bg-slate-700'
+                      sharedPcEnabled ? 'bg-[var(--accent-amber)]' : 'bg-slate-400 dark:bg-slate-700'
                     }`}
                   >
                     <span
@@ -301,13 +302,13 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                   onClose();
                   onOpenBackupModal();
                 }}
-                className="p-3.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--surface-hover)] text-left flex flex-col justify-between gap-2 transition cursor-pointer group focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+                className="p-3.5 rounded-2xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] bg-[var(--surface-card-lit)] hover:border-[var(--border-control)] text-left flex flex-col justify-between gap-2 transition-colors cursor-pointer group focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
-                <div className="flex items-center gap-2 text-[var(--ink-clinical)] font-bold text-xs">
-                  <Icon name="cloud_download" size={18} />
+                <div className="flex items-center gap-2 text-[var(--ink-primary)] font-bold text-xs">
+                  <Icon name="cloud_download" size={18} className="text-[var(--ink-clinical)] shrink-0" />
                   <span>Portabilidade (.pcm)</span>
                 </div>
-                <p className="text-[11px] text-[var(--text-secondary)] leading-snug">
+                <p className="text-[11px] text-[var(--ink-secondary)] leading-snug">
                   Exporte ou restaure todos os seus locais, modelos e leitos em arquivo local (Art. 18, V).
                 </p>
               </button>
@@ -317,13 +318,13 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                 id="btn-lgpd-modal-sanitize-shift"
                 type="button"
                 onClick={handleSanitizeClick}
-                className="p-3.5 rounded-2xl border border-[var(--accent-amber-border)] bg-[var(--accent-amber-subtle)] hover:bg-amber-100/80 dark:hover:bg-amber-950/50 text-left flex flex-col justify-between gap-2 transition cursor-pointer group focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
+                className="p-3.5 rounded-2xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)] bg-[var(--surface-card-lit)] hover:border-[var(--border-control)] text-left flex flex-col justify-between gap-2 transition-colors cursor-pointer group focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
-                <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs">
-                  <Icon name="ink_eraser" size={18} />
+                <div className="flex items-center gap-2 text-[var(--ink-primary)] font-bold text-xs">
+                  <Icon name="ink_eraser" size={18} className="text-[var(--accent-amber)] shrink-0" />
                   <span>Limpar Consulta Atual</span>
                 </div>
-                <p className="text-[11px] text-[var(--text-secondary)] leading-snug">
+                <p className="text-[11px] text-[var(--ink-secondary)] leading-snug">
                   Apaga imediatamente paciente, receita, exames e atestado ativos, mantendo seu CRM e timbrados.
                 </p>
               </button>
@@ -333,13 +334,13 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                 id="btn-lgpd-modal-erase-all"
                 type="button"
                 onClick={() => setConfirmEraseAllOpen(true)}
-                className="p-3.5 rounded-2xl border border-[var(--accent-rose-border)] bg-[var(--accent-rose-subtle)] hover:bg-rose-100/80 dark:hover:bg-rose-950/50 text-left flex flex-col justify-between gap-2 transition cursor-pointer group focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                className="p-3.5 rounded-2xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)] bg-[var(--surface-card-lit)] hover:border-[var(--status-danger)]/50 text-left flex flex-col justify-between gap-2 transition-colors cursor-pointer group focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] outline-none"
               >
-                <div className="flex items-center gap-2 text-rose-800 dark:text-rose-200 font-bold text-xs">
-                  <Icon name="delete" size={18} />
+                <div className="flex items-center gap-2 text-[var(--ink-primary)] group-hover:text-[var(--status-danger)] font-bold text-xs transition-colors">
+                  <Icon name="delete" size={18} className="text-[var(--status-danger)] shrink-0" />
                   <span>Eliminar Base Local</span>
                 </div>
-                <p className="text-[11px] text-[var(--text-secondary)] leading-snug">
+                <p className="text-[11px] text-[var(--ink-secondary)] leading-snug">
                   Apaga 100% dos dados do PresCMed (<code className="font-mono">localStorage</code> + <code className="font-mono">IndexedDB</code>) deste navegador (Art. 18, VI).
                 </p>
               </button>
@@ -351,16 +352,16 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             <div
               role="status"
               aria-live="polite"
-              className="p-3 rounded-xl bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-tab-fade"
+              className="p-3 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] text-[var(--ink-primary)] text-xs font-semibold flex items-center gap-2 animate-tab-fade"
             >
-              <Icon name="check_circle" size={16} className="shrink-0" />
+              <Icon name="check_circle" size={16} className="text-[var(--ink-clinical)] shrink-0" />
               <span>{feedbackMessage}</span>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:p-5 border-t border-[var(--border-subtle)] bg-[var(--bg-app)] flex flex-col sm:flex-row items-center justify-between gap-2.5">
+        <div className="p-4 sm:p-5 border-t border-[var(--hairline)] bg-[var(--bg-app)] flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
@@ -368,7 +369,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                 onAcceptEssentialOnly();
                 onClose();
               }}
-              className="touch-target flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold cursor-pointer transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+              className="btn-tactile-secondary touch-target flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             >
               Apenas Necessários
             </button>
@@ -378,7 +379,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
                 onAcceptAll();
                 onClose();
               }}
-              className="touch-target flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold cursor-pointer transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+              className="btn-tactile-secondary touch-target flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             >
               Aceitar Todos
             </button>
@@ -388,7 +389,7 @@ export const LgpdSecurityModal: React.FC<LgpdSecurityModalProps> = ({
             id="btn-lgpd-save-preferences"
             type="button"
             onClick={handleSaveCustom}
-            className="touch-target w-full sm:w-auto btn-tactile-primary min-h-[44px] px-5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-tactile-btn cursor-pointer transition active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+            className="touch-target w-full sm:w-auto btn-tactile-primary min-h-[44px] px-5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           >
             <Icon name="check" size={16} />
             <span>Salvar Preferências LGPD</span>

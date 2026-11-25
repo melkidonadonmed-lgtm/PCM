@@ -60,7 +60,7 @@ export const SusInteractiveVectorSheet: React.FC<SusInteractiveVectorSheetProps>
             {docItem.title}
           </div>
           {!staticPrintMode && (
-            <div className="no-print text-[0.5625rem] font-semibold text-sky-700 mt-0.5">
+            <div className="no-print text-[0.5625rem] font-semibold text-[var(--ink-clinical)] mt-0.5">
               Folha Vetorial Editável — Clique em qualquer célula para editar diretamente no documento
             </div>
           )}

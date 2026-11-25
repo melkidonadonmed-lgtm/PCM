@@ -88,7 +88,7 @@ export const SusLmeMedicationFieldsSection: React.FC<SusLmeMedicationFieldsSecti
                     quantities: MESES_DA_LME.map(() => l.quantities[0]),
                   }))
                 }
-                className="touch-target min-h-[44px] inline-flex items-center ml-5 text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                className="touch-target min-h-[44px] inline-flex items-center ml-5 text-xs font-bold text-[var(--ink-clinical)] hover:underline cursor-pointer"
               >
                 Repetir a quantidade do 1º mês nos 6 meses
               </button>

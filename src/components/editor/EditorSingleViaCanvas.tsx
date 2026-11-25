@@ -43,16 +43,16 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
       {headerConfig.showHeader && (
         <header className="border-b-2 border-slate-900 pb-4 mb-6 relative z-10 transition">
           {/* Barra de Ferramentas Discreta do Cabeçalho (no-print) */}
-          <div className="no-print mb-2 flex items-center justify-between text-xs text-slate-500 pb-1 border-b border-subtle">
-            <span className="flex items-center gap-1 text-slate-600 font-semibold">
-              <Pencil className="w-3 h-3 text-sky-600" />
+          <div className="no-print mb-2 flex items-center justify-between text-xs text-slate-600 pb-1 border-b border-subtle">
+            <span className="flex items-center gap-1 text-slate-700 font-semibold">
+              <Pencil className="w-3 h-3 text-teal-700" />
               <span>Clique em qualquer texto do cabeçalho para editar</span>
             </span>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={handleResetHeaderFromProfile}
-                className="hover:text-sky-700 font-medium flex items-center gap-1 cursor-pointer"
+                className="hover:text-teal-800 font-medium flex items-center gap-1 cursor-pointer min-h-[44px] px-1.5 print:min-h-0"
                 title="Preencher com os dados do seu Perfil Médico cadastrado"
               >
                 <RotateCcw className="w-3 h-3" />
@@ -61,7 +61,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
               <button
                 type="button"
                 onClick={() => handleHeaderFieldChange('showHeader', false)}
-                className="hover:text-amber-600 font-medium flex items-center gap-1 cursor-pointer"
+                className="hover:text-amber-700 font-medium flex items-center gap-1 cursor-pointer min-h-[44px] px-1.5 print:min-h-0"
                 title="Ocultar cabeçalho (ideal se usar folha já timbrada)"
               >
                 <EyeOff className="w-3 h-3" />
@@ -87,7 +87,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                   <button
                     type="button"
                     onClick={() => handleChangeLogoPosition('free')}
-                    className="hover:text-sky-300 flex items-center gap-0.5 cursor-pointer"
+                    className="hover:text-teal-200 flex items-center gap-0.5 cursor-pointer"
                     title="Ativar modo livre e arrastar para qualquer lugar"
                   >
                     <Move className="w-2.5 h-2.5" />
@@ -97,7 +97,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                   <button
                     type="button"
                     onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
-                    className="hover:text-sky-300 cursor-pointer"
+                    className="hover:text-teal-200 cursor-pointer"
                   >
                     Tamanho ({String(logoConfig.size).toUpperCase()})
                   </button>
@@ -121,7 +121,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                       <button
                         type="button"
                         onClick={() => handleChangeLogoSize(logoConfig.size === 'sm' ? 'md' : logoConfig.size === 'md' ? 'lg' : 'sm')}
-                        className="hover:text-sky-300 cursor-pointer"
+                        className="hover:text-teal-200 cursor-pointer"
                       >
                         {String(logoConfig.size).toUpperCase()}
                       </button>
@@ -140,7 +140,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                     name="editorClinicName"
                     aria-label="Nome do local de atendimento"
                     style={{ fontFamily: 'inherit' }}
-                    className="text-sm font-bold uppercase tracking-tight text-slate-900 leading-snug w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
+                    className="text-sm font-bold uppercase tracking-tight text-slate-900 leading-snug w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus:ring-1 focus:ring-[var(--accent-focus)] rounded px-1 -mx-1 outline-none transition min-h-[44px] print:min-h-0 print:py-0 flex items-center border-0 border-b border-transparent hover:border-subtle"
                     title="Clique para editar o nome do local de atendimento"
                   />
 
@@ -154,7 +154,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                     name="editorClinicAddress"
                     aria-label="Endereço e contato do local de atendimento"
                     style={{ fontFamily: 'inherit' }}
-                    className="text-xs font-medium text-slate-600 mt-0.5 w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus:ring-1 focus:ring-sky-500 rounded px-1 -mx-1 outline-none transition min-h-6 flex items-center border-0 border-b border-transparent hover:border-subtle"
+                    className="text-xs font-medium text-slate-600 mt-0.5 w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus:ring-1 focus:ring-[var(--accent-focus)] rounded px-1 -mx-1 outline-none transition min-h-[44px] print:min-h-0 print:py-0 flex items-center border-0 border-b border-transparent hover:border-subtle"
                     title="Clique para editar o endereço"
                   />
                 </div>
@@ -172,7 +172,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                     <button
                       type="button"
                       onClick={() => handleChangeSecondaryLogoSize(logoConfig.secondarySize === 'sm' ? 'md' : logoConfig.secondarySize === 'md' ? 'lg' : 'sm')}
-                      className="hover:text-sky-300 cursor-pointer"
+                      className="hover:text-teal-200 cursor-pointer"
                     >
                       Tamanho ({String(logoConfig.secondarySize || logoConfig.size).toUpperCase()})
                     </button>
@@ -198,7 +198,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                 onChange={e => handleHeaderFieldChange('badgeText', e.target.value)}
                 placeholder="TIPO DE DOCUMENTO"
                 style={{ fontFamily: 'inherit', width: `${Math.max(12, (headerConfig.badgeText || 'TIPO DE DOCUMENTO').length) * 0.72 + 2}em` }}
-                className="text-[11px] font-extrabold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-medium text-left hover:bg-slate-200/80 focus:bg-sky-50 focus:border-info outline-none transition max-w-[65%]"
+                className="text-[11px] font-extrabold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-medium text-left hover:bg-slate-200/80 focus:bg-teal-50 focus:border-[var(--accent-focus)] outline-none transition max-w-[65%] min-h-[44px] print:min-h-0 print:py-0"
                 title="Clique para personalizar o tipo do documento (ex: RELATÓRIO MÉDICO, LAUDO, RECEITUÁRIO)"
               />
 
@@ -211,7 +211,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                 onChange={e => handleHeaderFieldChange('dateText', e.target.value)}
                 placeholder="Data de emissão"
                 style={{ fontFamily: 'inherit' }}
-                className="text-xs text-slate-500 text-right bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 rounded px-1 outline-none transition flex-1 min-w-28 min-h-6"
+                className="text-xs text-slate-600 text-right bg-transparent hover:bg-slate-100/70 focus:bg-teal-50 focus:ring-1 focus:ring-[var(--accent-focus)] rounded px-1 outline-none transition flex-1 min-w-28 min-h-[44px] print:min-h-0 print:py-0"
                 title="Clique para editar a data de emissão"
               />
             </div>
@@ -238,7 +238,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
                   onChange={e => handleHeaderFieldChange('patientCustomText', e.target.value)}
                   placeholder="Identificação do paciente (opcional: digite o nome e documento aqui)"
                   style={{ fontFamily: 'inherit' }}
-                  className="w-full text-xs text-slate-700 italic bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none min-h-6 transition placeholder:text-slate-400"
+                  className="w-full text-xs text-slate-700 italic bg-transparent hover:bg-slate-100/60 focus:bg-teal-50 focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 outline-none min-h-[44px] print:min-h-0 print:py-0 transition placeholder:text-slate-500"
                 />
               )}
             </div>
@@ -268,7 +268,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
             value={headerConfig.footerDocName || headerConfig.doctorName || ''}
             onChange={e => handleHeaderFieldChange('footerDocName', e.target.value)}
             placeholder="Dr(a). Médico(a)"
-            className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs min-h-6 flex items-center justify-center"
+            className="text-xs font-bold text-slate-900 uppercase text-center bg-transparent hover:bg-slate-100/60 focus:bg-teal-50 focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 outline-none transition w-full max-w-xs min-h-[44px] print:min-h-0 print:py-0 flex items-center justify-center"
             title="Clique para editar o nome na assinatura"
           />
 
@@ -281,7 +281,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
             value={headerConfig.footerCrm || headerConfig.doctorCrm || ''}
             onChange={e => handleHeaderFieldChange('footerCrm', e.target.value)}
             placeholder="Médico(a) — CRM-SP 00000"
-            className="text-xs text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs mt-0.5 min-h-6 flex items-center justify-center"
+            className="text-xs text-slate-600 font-semibold text-center bg-transparent hover:bg-slate-100/60 focus:bg-teal-50 focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 outline-none transition w-full max-w-xs mt-0.5 min-h-[44px] print:min-h-0 print:py-0 flex items-center justify-center"
             title="Clique para editar CRM na assinatura"
           />
 
@@ -294,7 +294,7 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
             value={headerConfig.footerSpecialty || headerConfig.doctorSpecialty || ''}
             onChange={e => handleHeaderFieldChange('footerSpecialty', e.target.value)}
             placeholder="Especialidade"
-            className="text-xs text-slate-500 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-xs min-h-6 flex items-center justify-center"
+            className="text-xs text-slate-600 font-medium text-center bg-transparent hover:bg-slate-100/60 focus:bg-teal-50 focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 outline-none transition w-full max-w-xs min-h-[44px] print:min-h-0 print:py-0 flex items-center justify-center"
             title="Clique para editar a especialidade no carimbo"
           />
 
@@ -306,14 +306,14 @@ export const EditorSingleViaCanvas: React.FC<EditorSingleViaCanvasProps> = ({
             aria-label="Subtexto regulamentar CFM"
             value={headerConfig.footerSubtext || ''}
             onChange={e => handleHeaderFieldChange('footerSubtext', e.target.value)}
-            className="text-xs text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 outline-none transition w-full max-w-md min-h-6"
+            className="text-xs text-slate-600 mt-1.5 text-center bg-transparent hover:bg-slate-100/60 focus:bg-teal-50 focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 outline-none transition w-full max-w-md min-h-[44px] print:min-h-0 print:py-0"
           />
 
           {/* Botão no-print para Ocultar Rodapé */}
           <button
             type="button"
             onClick={() => handleHeaderFieldChange('showFooter', false)}
-            className="no-print opacity-0 group-hover:opacity-100 text-xs text-slate-400 hover:text-amber-600 mt-1 flex items-center gap-1 transition-opacity cursor-pointer"
+            className="no-print opacity-0 group-hover:opacity-100 text-xs text-slate-500 hover:text-amber-700 mt-1 flex items-center gap-1 transition-opacity cursor-pointer min-h-[44px] px-2 print:min-h-0"
             title="Ocultar rodapé de assinatura"
           >
             <EyeOff className="w-2.5 h-2.5" />

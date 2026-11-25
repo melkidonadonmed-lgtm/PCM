@@ -1,11 +1,10 @@
 import React from 'react';
-import { Icon } from './Icon';
 import { ActionButton } from './ui/ActionButton';
 
 /**
- * Barra de Ações da Receita.
- * Estados de UI cobertos: empty (nenhum item na receita), loading (carregando emissão),
- * success (sucesso ao copiar texto) e error (alerta de médico não configurado).
+ * Prescription Action Bar.
+ * Covers explicit UI states: empty (no items), loading (issuance),
+ * success (text copied), and error/alert (doctor profile unconfigured).
  */
 export interface AcoesDaReceitaProps {
   itemsCount: number;
@@ -28,7 +27,7 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
   onCopyText,
   copiedSuccess = false,
   onAbrirPerfilMedico,
-  className = ''
+  className = '',
 }) => {
   const isDisabledSemMedico = !isMedicoConfigurado;
   const isTextShareDisabled = itemsCount === 0;
@@ -37,36 +36,39 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
   return (
     <div className={`space-y-2.5 ${className}`}>
       {isDisabledSemMedico && (
-        <div data-state="idle" aria-busy={false}
+        <div
+          data-state="idle"
+          aria-busy={false}
           id={avisoId}
-          className="px-3 py-2 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--border-subtle)] text-[var(--text-secondary)] text-xs flex items-center justify-between gap-2"
+          className="px-3 py-2 rounded-[10px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-secondary)] text-xs flex items-center justify-between gap-2.5"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[var(--accent-amber)] shrink-0" aria-hidden="true" />
             <span className="font-medium leading-snug">
               Configure nome e CRM do médico para emitir documentos.
             </span>
           </div>
           {onAbrirPerfilMedico && (
-            <button
-              type="button"
+            <ActionButton
+              variant="secondary"
+              size="sm"
               onClick={onAbrirPerfilMedico}
-              className="touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-lg bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-[var(--text-main)] border border-[var(--border-control)] font-semibold text-xs transition shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none"
+              className="shrink-0 whitespace-nowrap"
             >
               Configurar médico
-            </button>
+            </ActionButton>
           )}
         </div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {/* Botão Primário: Imprimir / Gerar PDF (sempre ativo, inclusive para imprimir receita em branco para anotações à mão) */}
+        {/* Primary CTA: Print / Generate PDF (always enabled, including blank sheet printing) */}
         <ActionButton
           variant="primary"
           iconName="print"
           onClick={onNavigateToPrint}
           aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-          className="w-full justify-center px-3 py-2 gap-1.5 text-xs rounded-xl font-bold shadow-tactile-btn whitespace-nowrap"
+          className="w-full whitespace-nowrap"
           title={
             itemsCount === 0
               ? 'Imprimir ou gerar PDF da receita em branco (para anotações à mão e carimbo)'
@@ -76,27 +78,27 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
           Imprimir / Gerar PDF
         </ActionButton>
 
-        {/* Botão Secundário: Editor de Folha A4 (para edições manuais livres de timbrado ou texto) */}
+        {/* Secondary CTA: A4 Sheet Editor */}
         {onNavigateToEditor && (
           <ActionButton
             variant="secondary"
             iconName="description"
             onClick={onNavigateToEditor}
-            className="w-full justify-center px-3 py-2 gap-1.5 text-xs rounded-xl font-bold shadow-tactile-sm text-[var(--text-main)] whitespace-nowrap"
+            className="w-full whitespace-nowrap"
             title="Abrir no Editor visual A4 para ajustes de texto livre, layout ou timbrados"
           >
             Editor de Folha A4
           </ActionButton>
         )}
 
-        {/* Botão Secundário: WhatsApp (sem fundo verde, com contorno secundário) */}
+        {/* Secondary CTA: WhatsApp */}
         <ActionButton
           variant="secondary"
           iconName="send"
           onClick={onSendWhatsApp}
           disabled={isTextShareDisabled}
           aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-          className="w-full justify-center px-3 py-2 gap-1.5 text-xs rounded-xl font-bold shadow-tactile-sm whitespace-nowrap"
+          className="w-full whitespace-nowrap"
           title={
             isTextShareDisabled
               ? 'Adicione ao menos um medicamento para enviar o texto pelo WhatsApp'
@@ -106,26 +108,24 @@ export const AcoesDaReceita: React.FC<AcoesDaReceitaProps> = ({
           WhatsApp
         </ActionButton>
 
-        {/* Botão Secundário Simétrico: Copiar texto */}
-        <button
-          type="button"
+        {/* Secondary CTA: Copy text */}
+        <ActionButton
+          variant="secondary"
+          iconName={copiedSuccess ? 'check' : 'content_copy'}
+          iconClassName={copiedSuccess ? 'text-[var(--ink-clinical)]' : undefined}
           onClick={onCopyText}
           disabled={isTextShareDisabled}
+          state={copiedSuccess ? 'success' : 'idle'}
           aria-describedby={isDisabledSemMedico ? avisoId : undefined}
-          className="w-full touch-target min-h-[44px] min-w-[44px] text-xs font-bold text-[var(--text-main)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] border border-[var(--border-control)] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 py-2 px-3 cursor-pointer transition rounded-xl shadow-tactile-sm focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 whitespace-nowrap"
+          className="w-full whitespace-nowrap"
           title={
             isTextShareDisabled
               ? 'Adicione ao menos um medicamento para copiar o texto'
               : 'Copiar texto da receita'
           }
         >
-          {copiedSuccess ? (
-            <Icon name="check" className="text-[14px] text-emerald-500" />
-          ) : (
-            <Icon name="content_copy" className="text-[14px]" />
-          )}
-          <span>{copiedSuccess ? 'Copiado!' : 'Copiar texto'}</span>
-        </button>
+          {copiedSuccess ? 'Copiado!' : 'Copiar texto'}
+        </ActionButton>
       </div>
     </div>
   );

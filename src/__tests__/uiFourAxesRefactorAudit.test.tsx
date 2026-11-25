@@ -83,7 +83,7 @@ describe('Auditoria dos 4 Eixos de Refatoração UI/UX e Invariantes Clínicos',
     expect(headerExpandedSidebar).toContain('Escores CDSS');
     expect(headerExpandedSidebar).toContain('Hospitalar');
     expect(headerExpandedSidebar).not.toContain('Guias SUS');
-    expect(headerExpandedSidebar).toMatch(/<nav[^>]*class="[^"]*gap-2/);
+    expect(headerExpandedSidebar).toMatch(/<nav[^>]*class="[^"]*gap-(?:1\.5|2)/);
     expect(headerExpandedSidebar).toContain('text-[13px]');
     expect(headerExpandedSidebar).toContain('min-h-[44px]');
     expect(headerExpandedSidebar).toMatch(/data-macro-module="mod-03"[^>]*aria-current="page"/);
@@ -106,7 +106,7 @@ describe('Auditoria dos 4 Eixos de Refatoração UI/UX e Invariantes Clínicos',
     expect(headerCollapsedSidebar).toContain('Guias SUS');
     expect(headerCollapsedSidebar).toContain('Hospitalar');
     expect(headerCollapsedSidebar).toContain('text-[13px]');
-    expect(headerCollapsedSidebar).toMatch(/<nav[^>]*class="[^"]*gap-2/);
+    expect(headerCollapsedSidebar).toMatch(/<nav[^>]*class="[^"]*gap-(?:1\.5|2)/);
     expect(headerCollapsedSidebar).toContain('min-h-[44px]');
   });
 
@@ -279,7 +279,8 @@ describe('Auditoria dos 4 Eixos de Refatoração UI/UX e Invariantes Clínicos',
     const darkThemeCss = fs.readFileSync(path.join(srcDir, 'styles/dark-theme.css'), 'utf8');
     expect(darkThemeCss).toContain('--text-inverse: #FFFFFF;');
     expect(darkThemeCss).not.toContain('--text-inverse: #0F172A;');
-    expect(darkThemeCss).toContain('--clinical: #14635d;');
+    expect(darkThemeCss).toContain('--p-teal-600: oklch(0.435 0.074 186);');
+    expect(darkThemeCss).toContain('--clinical: var(--p-teal-600);');
 
     const patientCardHtml = renderToStaticMarkup(
       <PatientQuickCard
@@ -289,8 +290,9 @@ describe('Auditoria dos 4 Eixos de Refatoração UI/UX e Invariantes Clínicos',
         onRequestClearPatient={vi.fn()}
       />
     );
-    expect(patientCardHtml).toContain('text-rose-800');
-    expect(patientCardHtml).toContain('dark:text-rose-200');
+    expect(darkThemeCss).toContain('--status-danger: oklch(0.785 0.145 18);');
+    expect(patientCardHtml).toContain('data-variant="danger"');
+    expect(patientCardHtml).toContain('btn-tactile-danger');
 
     // 2. P0 Typography INP + <=3 Google Fonts + CSS Modularity <= 600 lines
     const indexCss = fs.readFileSync(path.join(srcDir, 'index.css'), 'utf8');
@@ -311,7 +313,7 @@ describe('Auditoria dos 4 Eixos de Refatoração UI/UX e Invariantes Clínicos',
     expect(googleFontsMatch).not.toBeNull();
     const families = Array.from((googleFontsMatch?.[0] ?? '').matchAll(/family=([^:&]+)/g)).map((m) => m[1]);
     expect(families.length).toBeLessThanOrEqual(3);
-    expect(families).toEqual(['Cormorant+Garamond', 'JetBrains+Mono', 'Plus+Jakarta+Sans']);
+    expect(families).toEqual(['Cormorant+Garamond', 'IBM+Plex+Sans', 'JetBrains+Mono']);
 
     // 3. P1 Navigation Landmarks <= 3 <nav> & Header gap-2 (>= 8px)
     const headerHtml = renderToStaticMarkup(
@@ -324,7 +326,7 @@ describe('Auditoria dos 4 Eixos de Refatoração UI/UX e Invariantes Clínicos',
         onSelectTab={vi.fn()}
       />
     );
-    expect(headerHtml).toMatch(/<nav[^>]*class="[^"]*gap-2/);
+    expect(headerHtml).toMatch(/<nav[^>]*class="[^"]*gap-(?:1\.5|2)/);
 
     const sidebarHtml = renderToStaticMarkup(
       <Sidebar

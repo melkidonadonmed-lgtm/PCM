@@ -95,7 +95,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
           <button
             type="button"
             onClick={() => setIsAdmissionSectionOpen((prev) => !prev)}
-            className="touch-target min-h-[44px] px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-[11px] font-bold text-[var(--text-secondary)] cursor-pointer"
+            className="touch-target btn-tactile-secondary min-h-[44px] px-2.5 rounded-xl text-[11px] font-bold cursor-pointer"
           >
             {isAdmissionSectionOpen ? 'Recolher' : 'Expandir'}
           </button>
@@ -119,7 +119,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 value={bedRecord.wardAndBed}
                 onChange={(e) => updateField('wardAndBed', e.target.value)}
                 placeholder="Ex.: 110-15"
-                className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-bold clinical-tabular-nums"
+                className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-bold clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
             <div className="col-span-1 sm:col-span-2">
@@ -138,7 +138,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                     e.target.value as HospitalSpecialtyTemplate
                   )
                 }
-                className="w-full h-10 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-semibold"
+                className="w-full h-11 min-h-[44px] px-2.5 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               >
                 {HOSPITAL_SPECIALTY_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id}>
@@ -160,7 +160,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 value={bedRecord.dihDateBr}
                 onChange={(e) => updateField('dihDateBr', e.target.value)}
                 placeholder="Ex.: 20/10/2026"
-                className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
             <div className="col-span-2 sm:col-span-3">
@@ -178,7 +178,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                   updateField('patientNameOrInitials', e.target.value)
                 }
                 placeholder="Ex.: M. A. S. (Pront. 48291)"
-                className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs font-semibold"
+                className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
             <div className="col-span-1 sm:col-span-1">
@@ -194,7 +194,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 value={bedRecord.birthDateBr}
                 onChange={(e) => handleBirthDateChange(e.target.value)}
                 placeholder="Ex.: 14/05/1962"
-                className="w-full h-10 px-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                className="w-full h-11 min-h-[44px] px-2.5 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
             <div className="col-span-1 sm:col-span-2">
@@ -210,7 +210,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 value={bedRecord.cns}
                 onChange={(e) => updateField('cns', e.target.value)}
                 placeholder="Ex.: 704801239481029"
-                className="w-full h-10 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums"
+                className="w-full h-11 min-h-[44px] px-3 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
           </div>
@@ -232,7 +232,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                   updateField('chiefComplaintQp', e.target.value)
                 }
                 placeholder="Ex.: Falta de ar aos pequenos esforços e tosse produtiva há 4 dias"
-                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
 
@@ -256,14 +256,14 @@ export const HospitalAdmissionIdentitySection: React.FC<
                       },
                     ])
                   }
-                  className="text-xs font-bold text-[var(--ink-clinical)] cursor-pointer"
+                  className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-bold inline-flex items-center cursor-pointer"
                 >
                   + Adicionar HD
                 </button>
               </div>
               {bedRecord.diagnosticHypotheses.map((hd, idx) => (
                 <div key={hd.id} className="flex items-center gap-2">
-                  <span className="text-xs font-extrabold px-2 py-1 rounded bg-[var(--surface-inset)] clinical-tabular-nums">
+                  <span className="text-xs font-extrabold px-2 py-1 rounded bg-[var(--surface-chip-muted)] border border-[var(--hairline)] clinical-tabular-nums">
                     {hd.codeNumber} -
                   </span>
                   <input
@@ -277,7 +277,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                     }}
                     placeholder="Ex.: Pneumonia Adquirida na Comunidade (20/10/2026)"
                     aria-label={`Hipótese diagnóstica ${hd.codeNumber}`}
-                    className="flex-1 h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                    className="flex-1 h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   />
                   {bedRecord.diagnosticHypotheses.length > 1 && (
                     <button
@@ -292,7 +292,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                         updateField('diagnosticHypotheses', next);
                       }}
                       aria-label={`Remover hipótese diagnóstica ${hd.codeNumber}`}
-                      className="touch-target min-h-[44px] min-w-[44px] inline-flex items-center justify-center px-2.5 rounded-xl border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-rose-600 cursor-pointer"
+                      className="touch-target btn-tactile-danger min-h-[44px] min-w-[44px] inline-flex items-center justify-center px-2.5 rounded-xl cursor-pointer"
                     >
                       <Icon name="close" size={14} />
                     </button>
@@ -316,14 +316,14 @@ export const HospitalAdmissionIdentitySection: React.FC<
                   updateField('historyPresentIllnessHda', e.target.value)
                 }
                 placeholder="Ex.: 20/10/2026: Admitido com febre... 22/10/2026: Afebril..."
-                className="w-full p-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] text-xs"
+                className="w-full p-2.5 rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
 
             <div>
               <label
                 htmlFor="hosp-allergies"
-                className="block text-[11px] font-bold text-rose-700 dark:text-rose-300 mb-1"
+                className="block text-[11px] font-bold text-[var(--status-danger)] mb-1"
               >
                 Alergias Medicamentosas
               </label>
@@ -334,7 +334,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 onChange={(e) => updateField('allergiesText', e.target.value)}
                 placeholder="Ex.: Dipirona ou Nega alergias"
                 aria-label="Alergias"
-                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-rose-500/40 bg-rose-500/5 text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] border-l-[3px] border-l-[var(--status-danger)] bg-[var(--surface-inset)] text-xs font-semibold text-[var(--ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
 
@@ -352,7 +352,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 onChange={(e) => updateField('serologiesText', e.target.value)}
                 placeholder="Ex.: HIV NR | VDRL NR | HBsAg NR"
                 aria-label="Sorologias"
-                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
 
@@ -372,7 +372,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 }
                 placeholder="Ex.: HAS há 12 anos, DM2"
                 aria-label="História Patológica Pregressa"
-                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
 
@@ -398,7 +398,7 @@ export const HospitalAdmissionIdentitySection: React.FC<
                 }
                 placeholder="Ex.: Nega tabagismo; Mora com esposa"
                 aria-label="História familiar e social"
-                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                className="w-full h-11 min-h-[44px] px-3 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
           </div>

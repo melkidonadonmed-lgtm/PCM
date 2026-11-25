@@ -109,34 +109,35 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
 
   return (
     <div
-      className="rounded-xl border border-blue-500/30 bg-white dark:bg-slate-800/90 p-4 shadow-xs"
+      className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface-card)] p-4 shadow-elevation-low"
       data-state="idle"
       aria-busy={false}
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--hairline)] pb-3">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-clinical)]">
             <Icon name="Vaccines" className="text-lg" />
           </span>
           <div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+            <h4 className="text-sm font-bold text-[var(--ink-primary)]">
               {protocol.drugName}
             </h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-[var(--ink-muted)]">
               Calculadora de Vazão em Bomba de Infusão Contínua (mL/h)
             </p>
           </div>
         </div>
 
         {protocol.concentratedSolution ? (
-          <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 p-0.5 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
             <button
               type="button"
+              aria-pressed={!useConcentrated}
               onClick={() => setUseConcentrated(false)}
-              className={`rounded-md px-2.5 py-1 font-medium transition-colors cursor-pointer ${
+              className={`touch-target min-h-[44px] rounded-[10px] px-3 py-1.5 font-semibold cursor-pointer ${
                 !useConcentrated
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  ? 'btn-tactile-primary'
+                  : 'btn-tactile-secondary'
               }`}
             >
               Padrão ({protocol.standardSolution.concentrationMcgMl}{' '}
@@ -147,50 +148,55 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
             </button>
             <button
               type="button"
+              aria-pressed={useConcentrated}
               onClick={() => setUseConcentrated(true)}
-              className={`rounded-md px-2.5 py-1 font-medium transition-colors cursor-pointer ${
+              className={`touch-target min-h-[44px] inline-flex items-center gap-1.5 rounded-[10px] px-3 py-1.5 font-semibold cursor-pointer ${
                 useConcentrated
-                  ? 'bg-amber-600 text-white'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  ? 'btn-tactile-primary'
+                  : 'btn-tactile-secondary'
               }`}
             >
-              Concentrada 2x ({protocol.concentratedSolution.concentrationMcgMl}{' '}
-              <span className="clinical-unit">
-                {protocol.doseUnit === 'UI/min' ? 'UI/mL' : 'mcg/mL'}
+              <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--accent-amber)] shrink-0" />
+              <span>
+                Concentrada 2x ({protocol.concentratedSolution.concentrationMcgMl}{' '}
+                <span className="clinical-unit">
+                  {protocol.doseUnit === 'UI/min' ? 'UI/mL' : 'mcg/mL'}
+                </span>
+                )
               </span>
-              )
             </button>
           </div>
         ) : null}
       </div>
 
-      <div className="mt-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-3">
+      <div className="mt-3 rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-3">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-          <span className="font-semibold text-slate-700 dark:text-slate-200">
+          <span className="font-semibold text-[var(--ink-secondary)]">
             Preparo Magistral:{' '}
-            <span className="font-mono text-blue-700 dark:text-blue-300">
+            <span className="font-mono text-[var(--ink-clinical)]">
               {activeSolution.ampoules} + {activeSolution.diluent}
             </span>
           </span>
-          <span className="rounded bg-blue-500/10 px-2 py-0.5 font-mono text-[11px] font-bold text-blue-700 dark:text-blue-300 clinical-tabular-nums">
+          <span className="inline-flex items-center gap-1.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-2 py-0.5 font-mono text-[11px] font-bold text-[var(--ink-primary)] clinical-tabular-nums">
+            <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" />
             Volume Total: {activeSolution.totalVolumeMl} mL (
             {calculation.concentrationFormatted})
           </span>
         </div>
         {activeSolution.mandatoryVehicleNotice ? (
-          <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-amber-700 dark:text-amber-300">
-            <Icon name="warning" className="text-sm shrink-0" />
-            {activeSolution.mandatoryVehicleNotice}
+          <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-[var(--ink-secondary)]">
+            <Icon name="warning" className="text-sm shrink-0 text-[var(--accent-amber)]" />
+            <span>{activeSolution.mandatoryVehicleNotice}</span>
           </p>
         ) : null}
       </div>
 
       <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
         {!protocol.isFixedDose ? (
-          <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-3">
+          <div className="rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-3">
             <label
               htmlFor={`bic-weight-${protocol.drugId ?? protocol.drugName}`}
-              className="block text-[11px] font-medium text-slate-500 dark:text-slate-400"
+              className="block text-[11px] font-medium text-[var(--ink-muted)]"
             >
               Peso do Paciente (<span className="clinical-unit">kg</span>)
             </label>
@@ -207,34 +213,34 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
                     Math.max(1, parseFloat(e.target.value) || 70)
                   )
                 }
-                className="w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2.5 py-1.5 font-mono text-sm font-bold text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none clinical-tabular-nums"
+                className="tactile-input w-full h-11 min-h-[44px] rounded-[10px] border border-[var(--border-control)] px-2.5 py-1.5 font-mono text-sm font-bold text-[var(--ink-primary)] clinical-tabular-nums"
               />
-              <span className="font-mono text-xs text-slate-500 clinical-unit">
+              <span className="font-mono text-xs text-[var(--ink-muted)] clinical-unit">
                 kg
               </span>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-3">
-            <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex flex-col justify-center rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-3">
+            <span className="text-[11px] font-medium text-[var(--ink-muted)]">
               Regime de Dosagem
             </span>
-            <span className="mt-1 font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+            <span className="mt-1 font-mono text-xs font-semibold text-[var(--ink-clinical)]">
               Dose Fixa (Independente do Peso)
             </span>
           </div>
         )}
 
-        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-3">
+        <div className="rounded-xl border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-3">
           <div className="flex items-center justify-between">
             <label
               htmlFor={`bic-dose-${protocol.drugId ?? protocol.drugName}`}
-              className="text-[11px] font-medium text-slate-500 dark:text-slate-400"
+              className="text-[11px] font-medium text-[var(--ink-muted)]"
             >
               Dose Alvo (
               <span className="clinical-unit">{protocol.doseUnit}</span>)
             </label>
-            <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-300 clinical-tabular-nums">
+            <span className="font-mono text-xs font-bold text-[var(--ink-clinical)] clinical-tabular-nums">
               {dose} <span className="clinical-unit">{protocol.doseUnit}</span>
             </span>
           </div>
@@ -247,9 +253,9 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
             step={stepSize}
             value={dose}
             onChange={(e) => setDose(parseFloat(e.target.value))}
-            className="mt-2 w-full accent-blue-600 cursor-pointer"
+            className="mt-2 w-full accent-[var(--primary)] cursor-pointer"
           />
-          <div className="mt-1 flex justify-between font-mono text-[11px] text-slate-500 clinical-tabular-nums">
+          <div className="mt-1 flex justify-between font-mono text-[11px] text-[var(--ink-muted)] clinical-tabular-nums">
             <span>Início: {protocol.initialDose}</span>
             <span>
               Alvo: {protocol.maintenanceDoseMin}–{protocol.maintenanceDoseMax}
@@ -258,19 +264,19 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center rounded-lg border border-blue-500/40 bg-blue-50/70 dark:bg-blue-950/40 p-3 text-center">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] bg-[var(--surface-card-lit)] p-3 text-center">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-clinical)]">
             Vazão na Bomba (BIC)
           </span>
           <div className="mt-0.5 flex items-baseline gap-1">
-            <span className="font-mono text-2xl font-extrabold text-slate-900 dark:text-white clinical-tabular-nums">
+            <span className="font-mono text-2xl font-extrabold text-[var(--ink-primary)] clinical-tabular-nums">
               {calculation.rateMlPerHour}
             </span>
-            <span className="font-mono text-xs font-semibold text-blue-700 dark:text-blue-300 clinical-unit">
+            <span className="font-mono text-xs font-semibold text-[var(--ink-clinical)] clinical-unit">
               mL/h
             </span>
           </div>
-          <span className="text-[11px] text-slate-600 dark:text-slate-400 clinical-tabular-nums">
+          <span className="text-[11px] text-[var(--ink-muted)] clinical-tabular-nums">
             para {calculation.formattedDose}
           </span>
         </div>
@@ -281,9 +287,9 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
           {calculation.safetyAlerts.map((alertText, i) => (
             <div
               key={i}
-              className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-50/80 dark:bg-amber-950/40 px-3 py-2 text-xs text-amber-900 dark:text-amber-200"
+              className="flex items-start gap-2 rounded-xl border border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)] bg-[var(--surface-card-lit)] px-3 py-2 text-xs text-[var(--ink-secondary)]"
             >
-              <Icon name="warning" className="mt-0.5 text-sm shrink-0 text-amber-600" />
+              <Icon name="warning" className="mt-0.5 text-sm shrink-0 text-[var(--accent-amber)]" />
               <span>{alertText}</span>
             </div>
           ))}
@@ -291,50 +297,54 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
       ) : null}
 
       <div className="mt-3">
-        <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[var(--ink-muted)]">
           Matriz Rápida de Titulação à Beira do Leito (Toque para selecionar)
         </span>
         <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5 md:grid-cols-8">
-          {titrationSteps.map((step) => (
-            <button
-              key={step.dose}
-              type="button"
-              onClick={() => setDose(step.dose)}
-              className={`flex flex-col items-center rounded border px-2 py-1.5 text-center font-mono transition-colors cursor-pointer clinical-tabular-nums ${
-                Math.abs(dose - step.dose) < 0.001
-                  ? 'border-blue-600 bg-blue-600 text-white'
-                  : step.isWarning
-                    ? 'border-red-500/30 bg-red-50/60 dark:bg-red-950/30 text-red-700 dark:text-red-300 hover:border-red-500/50'
-                    : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 hover:border-slate-400'
-              }`}
-            >
-              <span className="text-[11px] opacity-80">{step.dose}</span>
-              <span className="text-xs font-bold">{step.rateMlPerHour} mL/h</span>
-            </button>
-          ))}
+          {titrationSteps.map((step) => {
+            const isActiveStep = Math.abs(dose - step.dose) < 0.001;
+            return (
+              <button
+                key={step.dose}
+                type="button"
+                aria-pressed={isActiveStep}
+                onClick={() => setDose(step.dose)}
+                className={`touch-target min-h-[44px] flex flex-col items-center justify-center rounded-[10px] px-2 py-1.5 text-center font-mono cursor-pointer clinical-tabular-nums ${
+                  isActiveStep
+                    ? 'btn-tactile-primary'
+                    : step.isWarning
+                      ? 'btn-tactile-secondary border-l-[3px] border-l-[var(--status-danger)]'
+                      : 'btn-tactile-secondary'
+                }`}
+              >
+                <span className="text-[11px] opacity-80">{step.dose}</span>
+                <span className="text-xs font-bold">{step.rateMlPerHour} mL/h</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 dark:border-slate-700 pt-2.5 text-[11px] text-slate-500 dark:text-slate-400">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--hairline)] pt-2.5 text-[11px] text-[var(--ink-muted)]">
         <span>
-          <strong>Via:</strong> {protocol.administrationRoute}
+          <strong className="text-[var(--ink-primary)]">Via:</strong> {protocol.administrationRoute}
         </span>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleCopyBicSummary}
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="touch-target btn-tactile-secondary min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer"
           >
-            <Icon name={copiedFeedback ? 'check' : 'content_copy'} className="text-sm" />
+            <Icon name={copiedFeedback ? 'check' : 'content_copy'} className="text-sm text-[var(--ink-clinical)]" />
             {copiedFeedback ? 'Copiado!' : 'Copiar Vazão PEP'}
           </button>
           {onAddPrescriptionItem ? (
             <button
               type="button"
               onClick={handlePrescribeBic}
-              className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-200 hover:bg-emerald-100 cursor-pointer"
+              className="touch-target btn-tactile-secondary min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer"
             >
-              <Icon name="add_circle" className="text-sm" />
+              <Icon name="add_circle" className="text-sm text-[var(--ink-clinical)]" />
               Prescrever na Receita
             </button>
           ) : null}
@@ -342,7 +352,7 @@ export const ScoreBicInfusionCard: React.FC<ScoreBicInfusionCardProps> = ({
             <button
               type="button"
               onClick={handleSendBicToA4}
-              className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-blue-700 cursor-pointer"
+              className="touch-target btn-tactile-primary min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer"
             >
               <Icon name="description" className="text-sm" />
               Enviar BIC ao Editor A4

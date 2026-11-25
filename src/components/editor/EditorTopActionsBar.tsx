@@ -101,7 +101,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
   }, [isActionsMenuOpen]);
 
   return (
-    <div className="no-print bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-2xl px-2.5 py-2 sm:px-3.5 sm:py-2.5 shadow-tactile-sm flex items-center justify-between gap-2">
+    <div className="no-print bg-[var(--surface-card)] border border-[var(--hairline)] rounded-2xl px-2.5 py-2 sm:px-3.5 sm:py-2.5 shadow-[var(--elevation-low)] flex items-center justify-between gap-2">
       {/* Lado Esquerdo: Voltar + Título Compacto Estilo Google Docs + Status */}
       <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
         {onNavigateBack && (
@@ -111,18 +111,18 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
               syncWithActivePrescription();
               onNavigateBack();
             }}
-            className="touch-target min-h-[44px] px-2 sm:px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-bold text-[var(--text-main)] flex items-center gap-1 cursor-pointer transition active:scale-95 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="touch-target btn-tactile-secondary min-h-[44px] px-2 sm:px-2.5 text-xs font-bold flex items-center gap-1 cursor-pointer shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             title="Sincronizar e voltar à tela de montagem de receitas"
             aria-label="Voltar à Receita"
           >
-            <ChevronLeft className="w-4 h-4 text-[var(--text-muted)]" />
+            <ChevronLeft className="w-4 h-4 text-[var(--ink-muted)]" />
             <span className="hidden md:inline">Receita</span>
           </button>
         )}
 
         {/* Título do Documento Compacto + Edição Inline */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-xs min-w-0 max-w-full">
-          <LayoutTemplate className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0 hidden sm:inline" />
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] text-xs min-w-0 max-w-full">
+          <LayoutTemplate className="w-3.5 h-3.5 text-[var(--ink-clinical)] shrink-0 hidden sm:inline" />
           {isEditingModelTitle ? (
             <div className="flex items-center gap-1 min-w-0" onClick={e => e.stopPropagation()}>
               <input
@@ -137,12 +137,12 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                 }}
                 placeholder="Ex.: Receituário Clínico..."
                 autoFocus
-                className="px-2 py-0.5 text-xs font-bold rounded border border-medium dark:border-strong bg-white dark:bg-slate-900 text-[var(--text-main)] outline-none w-36 sm:w-48"
+                className="px-2 min-h-[44px] text-xs font-bold rounded border border-[var(--border-control)] bg-[var(--surface-card)] text-[var(--ink-primary)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] w-36 sm:w-48"
               />
               <button
                 type="button"
                 onClick={handleSaveCurrentModelTitle}
-                className="touch-target min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-slate-800 text-white hover:bg-slate-900 dark:bg-slate-700 cursor-pointer shrink-0"
+                className="touch-target min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] cursor-pointer shrink-0"
                 title="Salvar título"
               >
                 <Check className="w-3 h-3" />
@@ -150,7 +150,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
               <button
                 type="button"
                 onClick={() => setIsEditingModelTitle(false)}
-                className="touch-target min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer text-slate-500 shrink-0"
+                className="touch-target min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-[var(--surface-hover)] cursor-pointer text-[var(--ink-muted)] shrink-0"
                 title="Cancelar"
               >
                 <X className="w-3 h-3" />
@@ -164,19 +164,19 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                 setTempModelTitle(currentModel.title);
                 setIsEditingModelTitle(true);
               }}
-              className="touch-target min-h-[44px] flex items-center gap-1.5 min-w-0 text-left cursor-pointer group focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded"
+              className="touch-target min-h-[44px] flex items-center gap-1.5 min-w-0 text-left cursor-pointer group focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none rounded"
               title={`Documento: ${currentModel.title} (clique para renomear)`}
             >
-              <span className="font-bold text-[var(--text-main)] truncate max-w-28 sm:max-w-48 md:max-w-64">
+              <span className="font-bold text-[var(--ink-primary)] truncate max-w-28 sm:max-w-48 md:max-w-64">
                 {currentModel.title}
               </span>
-              <Pencil className="w-3 h-3 text-[var(--text-muted)] group-hover:text-[var(--text-main)] shrink-0" />
+              <Pencil className="w-3 h-3 text-[var(--ink-muted)] group-hover:text-[var(--ink-primary)] shrink-0" />
             </button>
           )}
 
           {/* Status de Salvamento Compacto Integrado */}
           <span
-            className="pl-1.5 border-l border-[var(--border-subtle)] flex items-center gap-1 text-[11px] text-[var(--text-muted)] shrink-0"
+            className="pl-1.5 border-l border-[var(--hairline)] flex items-center gap-1 text-[11px] text-[var(--ink-muted)] shrink-0"
             title={
               saveStatus === 'saving'
                 ? 'Salvando alterações...'
@@ -186,11 +186,11 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
             }
           >
             {saveStatus === 'saving' ? (
-              <Loader2 className="w-3 h-3 animate-spin text-slate-500" />
+              <Loader2 className="w-3 h-3 animate-spin text-[var(--ink-muted)]" />
             ) : saveStatus === 'saved' ? (
-              <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+              <Check className="w-3 h-3 text-[var(--ink-clinical)]" />
             ) : (
-              <Clock className="w-3 h-3 text-slate-400" />
+              <Clock className="w-3 h-3 text-[var(--ink-muted)]" />
             )}
             <span className="hidden xl:inline">
               {saveStatus === 'saving'
@@ -213,15 +213,15 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
             aria-haspopup="menu"
             aria-expanded={isActionsMenuOpen}
             onClick={() => setIsActionsMenuOpen((prev) => !prev)}
-            className="touch-target min-h-[44px] px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+            className="touch-target btn-tactile-secondary min-h-[44px] px-2.5 text-xs font-semibold flex items-center gap-1 cursor-pointer shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
             title="Carregar dados da consulta, salvar modelo ou criar documento em branco"
           >
-            <FileText className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+            <FileText className="w-3.5 h-3.5 text-[var(--ink-clinical)]" />
             <span className="hidden sm:inline">Arquivo / Consulta</span>
             <Icon
               name="expand_more"
               size={14}
-              className={`text-[var(--text-muted)] transition-transform duration-150 ${isActionsMenuOpen ? 'rotate-180' : ''}`}
+              className={`text-[var(--ink-muted)] transition-transform duration-150 ${isActionsMenuOpen ? 'rotate-180' : ''}`}
             />
           </button>
 
@@ -229,9 +229,9 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
             <div
               role="menu"
               aria-label="Opções de arquivo e sincronização com a consulta"
-              className="absolute right-0 top-full mt-1.5 w-60 bg-[var(--surface-card)] border border-[var(--border-subtle)] dark:border-strong rounded-2xl shadow-tactile-lg p-1.5 z-50 animate-tab-fade"
+              className="absolute right-0 top-full mt-1.5 w-60 bg-[var(--surface-card)] border border-[var(--hairline)] rounded-2xl shadow-[var(--elevation-high)] p-1.5 z-50 animate-tab-fade"
             >
-              <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--ink-muted)]">
                 Importar da consulta ativa
               </div>
               <button
@@ -241,9 +241,9 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleLoadActivePrescription(true);
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full min-h-[44px] text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-hover)] flex items-center gap-2 text-[var(--ink-primary)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
-                <Pill className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                <Pill className="w-3.5 h-3.5 text-[var(--ink-clinical)] shrink-0" />
                 <span>Carregar Receita Ativa</span>
               </button>
               <button
@@ -253,9 +253,9 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleLoadActiveReferral(true);
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full min-h-[44px] text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-hover)] flex items-center gap-2 text-[var(--ink-primary)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
-                <Stethoscope className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <Stethoscope className="w-3.5 h-3.5 text-[var(--ink-clinical)] shrink-0" />
                 <span>Carregar Encaminhamento</span>
               </button>
               <button
@@ -265,14 +265,14 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleLoadActiveCertificate(true);
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full min-h-[44px] text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-hover)] flex items-center gap-2 text-[var(--ink-primary)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
-                <Award className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                <Award className="w-3.5 h-3.5 text-[var(--accent-amber)] shrink-0" />
                 <span>Carregar Atestado Médico</span>
               </button>
 
-              <div className="border-t border-[var(--border-subtle)] my-1" />
-              <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              <div className="border-t border-[var(--hairline)] my-1" />
+              <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--ink-muted)]">
                 Salvar e modelos
               </div>
 
@@ -283,9 +283,9 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleSaveModelDirectly();
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full min-h-[44px] text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-hover)] flex items-center gap-2 text-[var(--ink-primary)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
-                <Save className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                <Save className="w-3.5 h-3.5 text-[var(--ink-clinical)] shrink-0" />
                 <span>Salvar na Receita Ativa</span>
               </button>
               <button
@@ -296,13 +296,13 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   setIsSaveModelModalOpen(true);
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-info-subtle)] flex items-center gap-2 text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+                className="w-full min-h-[44px] text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-hover)] flex items-center gap-2 text-[var(--ink-primary)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
-                <BookmarkPlus className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
+                <BookmarkPlus className="w-3.5 h-3.5 text-[var(--ink-muted)] shrink-0" />
                 <span>Salvar como Novo Modelo...</span>
               </button>
 
-              <div className="border-t border-[var(--border-subtle)] my-1" />
+              <div className="border-t border-[var(--hairline)] my-1" />
               <button
                 type="button"
                 role="menuitem"
@@ -310,7 +310,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
                   handleStartNewDocument();
                   setIsActionsMenuOpen(false);
                 }}
-                className="w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--accent-rose-subtle)] flex items-center gap-2 text-rose-800 dark:text-rose-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                className="w-full min-h-[44px] text-left px-2.5 py-2 text-xs font-semibold rounded-xl hover:bg-[var(--surface-hover)] flex items-center gap-2 text-[var(--ink-secondary)] hover:text-[var(--status-danger)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] outline-none"
               >
                 <Plus className="w-3.5 h-3.5 shrink-0" />
                 <span>Novo Documento em Branco</span>
@@ -323,14 +323,14 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
         <button
           type="button"
           onClick={() => setIsModelsDrawerOpen(true)}
-          className="touch-target min-h-[44px] px-2.5 rounded-xl border border-[var(--border-medium)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5 cursor-pointer shadow-tactile-sm shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-sky-500 outline-none"
+          className="touch-target btn-tactile-secondary min-h-[44px] px-2.5 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           title="Abrir biblioteca de modelos clínicos e laudos salvos"
           aria-label="Abrir biblioteca de modelos"
         >
-          <FolderOpen className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+          <FolderOpen className="w-3.5 h-3.5 text-[var(--ink-muted)]" />
           <span className="hidden md:inline">Modelos</span>
           {savedTemplates.length > 0 && (
-            <span className="px-1.5 py-0.5 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[11px] font-bold leading-none clinical-tabular-nums">
+            <span className="px-1.5 py-0.5 rounded-full bg-[var(--primary)] text-white text-[11px] font-bold leading-none clinical-tabular-nums">
               {savedTemplates.length}
             </span>
           )}
@@ -346,9 +346,9 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
           title="Baixar documento em PDF preservando rigorosamente a tipografia e o layout visual do editor"
         >
           {isExportingPdf ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--text-muted)]" />
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--ink-muted)]" />
           ) : (
-            <Download className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+            <Download className="w-3.5 h-3.5 text-[var(--ink-muted)]" />
           )}
           <span>{isExportingPdf ? '...' : 'PDF'}</span>
         </button>
@@ -358,7 +358,7 @@ export const EditorTopActionsBar: React.FC<EditorTopActionsBarProps> = ({
           type="button"
           onClick={handlePrint}
           aria-label="Imprimir folha A4"
-          className={`touch-target btn-tactile-primary min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-tactile-btn transition active:scale-95 shrink-0 whitespace-nowrap ${
+          className={`touch-target btn-tactile-primary min-h-[44px] px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[var(--shadow-control)] transition active:scale-95 shrink-0 whitespace-nowrap ${
             !medicoConfigurado(doctor) ? 'ring-1 ring-amber-400/50' : ''
           }`}
           title={medicoConfigurado(doctor) ? 'Imprimir folha A4 milimétrica (Ctrl+P)' : 'Clique para configurar o médico emitente e imprimir'}

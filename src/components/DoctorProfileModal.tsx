@@ -178,10 +178,10 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
       >
         {/* Header */}
         <div 
-          className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-card)] flex items-center justify-between"
+          className="p-4 border-b border-[var(--hairline)] bg-[var(--surface-card)] flex items-center justify-between"
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-[10px] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-[10px] bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border border-[var(--hairline)] flex items-center justify-center font-bold">
               <UserCheck className="w-4 h-4" strokeWidth={2} />
             </div>
             <div>
@@ -197,7 +197,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-[10px] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
+            className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
           >
             <X className="w-5 h-5" strokeWidth={2} />
           </button>
@@ -210,15 +210,15 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           {validationError && (
             <div 
               role="alert" 
-              className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 text-xs font-semibold flex items-center gap-2 animate-tab-fade"
+              className="p-3 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)] text-[var(--ink-primary)] text-xs font-semibold flex items-center gap-2 animate-tab-fade"
             >
-              <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-[var(--status-danger)] shrink-0" aria-hidden="true" />
               <span>{validationError}</span>
             </div>
           )}
 
           {/* Identificação Principal (Essencial) */}
-          <div className="space-y-3 p-3.5 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)]">
+          <div className="space-y-3 p-3.5 rounded-xl bg-[var(--bg-app)] border border-[var(--hairline)]">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs uppercase font-bold tracking-wider text-[var(--ink-clinical)]">
                 Identificação Obrigatória
@@ -227,17 +227,17 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
                 <button 
                   type="button"
                   onClick={handleFillSample}
-                  className="touch-target min-h-[44px] min-w-[44px] px-2.5 rounded-[10px] text-xs font-semibold text-[var(--ink-clinical)] hover:bg-[var(--surface-clinical-subtle)] flex items-center gap-1.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+                  className="btn-tactile-secondary touch-target min-h-[44px] min-w-[44px] px-3 py-1.5 rounded-[10px] text-xs font-semibold flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                   title="Preencher com dados de exemplo (Dr. Melki Donadon / CRM 123456-SP)"
                 >
-                  <Icon name="fact_check" size={14} className="shrink-0" />
+                  <Icon name="fact_check" size={14} className="text-[var(--ink-clinical)] shrink-0" />
                   <span>Usar exemplo</span>
                 </button>
                 <span className="text-[var(--border-medium)]" aria-hidden="true">•</span>
                 <button 
                   type="button"
                   onClick={handleClear}
-                  className="touch-target min-h-[44px] min-w-[44px] px-3 rounded-[10px] text-xs font-semibold border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:text-rose-700 dark:hover:text-rose-300 hover:border-rose-300 dark:hover:border-rose-400/40 hover:bg-rose-50/70 dark:hover:bg-rose-950/40 flex items-center justify-center gap-1.5 cursor-pointer transition focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                  className="btn-tactile-danger touch-target min-h-[44px] min-w-[44px] px-3 py-1.5 rounded-[10px] text-xs font-semibold flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] outline-none"
                 >
                   <Eraser className="w-3.5 h-3.5" />
                   <span>Limpar</span>
@@ -337,7 +337,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             <button
               type="button"
               onClick={() => setShowAdvancedClinic(!showAdvancedClinic)}
-              className="w-full min-h-[44px] py-2 px-3 rounded-[10px] border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] text-xs font-bold flex items-center justify-between transition text-[var(--text-main)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
+              className="btn-tactile-secondary w-full min-h-[44px] py-2 px-3 rounded-[10px] text-xs font-bold flex items-center justify-between focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             >
               <span className="flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-[var(--text-muted)]" />
@@ -461,9 +461,9 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           </div>
 
           {/* Timbrado e Logotipo Institucional */}
-          <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] flex items-center justify-between gap-3">
+          <div className="p-3.5 rounded-xl border border-[var(--hairline)] bg-[var(--bg-app)] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-9 h-9 rounded-[10px] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-[10px] bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border border-[var(--hairline)] flex items-center justify-center shrink-0">
                 <Icon name="approval" size={18} />
               </div>
               <div className="min-w-0">
@@ -489,7 +489,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           </div>
 
           {/* Assinatura & Carimbo */}
-          <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] flex items-center justify-between gap-3">
+          <div className="p-3 rounded-xl border border-[var(--hairline)] bg-[var(--bg-app)] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <Shield className="w-4 h-4 text-[var(--ink-clinical)] shrink-0" />
               <label htmlFor="doc-input-show-sig" className="cursor-pointer">
@@ -511,7 +511,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-[var(--border-subtle)]">
+          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-[var(--hairline)]">
             <button
               type="button"
               onClick={onClose}
@@ -521,7 +521,7 @@ export const DoctorProfileModal: React.FC<DoctorProfileModalProps> = ({
             </button>
             <button
               type="submit"
-              className="btn-tactile-clinical min-h-[44px] px-5 rounded-[10px] text-xs font-bold transition active:scale-95 flex items-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
+              className="btn-tactile-primary min-h-[44px] px-5 rounded-[10px] text-xs font-bold flex items-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
             >
               <Check className="w-4 h-4" />
               <span>Salvar Perfil</span>

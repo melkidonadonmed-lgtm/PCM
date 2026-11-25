@@ -215,7 +215,7 @@ export const OncologyScreeningSubPanel: React.FC<
         <div className="flex flex-col justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 p-4 space-y-3">
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--ink-clinical)]">
                 2. Colo do Útero (25–64 anos)
               </span>
               <span className="rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 font-mono text-[11px] clinical-tabular-nums">

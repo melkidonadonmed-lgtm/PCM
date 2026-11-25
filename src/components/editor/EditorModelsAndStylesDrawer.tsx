@@ -137,22 +137,22 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
         >
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-[oklch(0.14_0.02_258/0.50)] transition-opacity cursor-pointer"
+            className="fixed inset-0 bg-[oklch(0.14_0.02_252/0.56)] transition-opacity cursor-pointer"
             onClick={() => setIsModelsDrawerOpen(false)}
           />
 
           <div
             ref={drawerRef}
-            className="relative w-full max-w-md bg-[var(--surface-card)] text-[var(--text-main)] shadow-tactile-lg border-l border-[var(--border-subtle)] flex flex-col h-full z-10 animate-tab-fade"
+            className="relative w-full max-w-md bg-[var(--surface-card)] text-[var(--ink-primary)] shadow-[var(--elevation-high)] border-l border-[var(--hairline)] flex flex-col h-full z-10 animate-tab-fade"
           >
             {/* Header do Drawer */}
-            <div className="p-3.5 sm:p-4 border-b border-[var(--border-subtle)] flex items-center justify-between">
+            <div className="p-3.5 sm:p-4 border-b border-[var(--hairline)] flex items-center justify-between">
               <div>
                 <h2 id="editor-models-drawer-title" className="text-sm font-semibold flex items-center gap-2">
-                  <FolderOpen size={18} className="text-amber-500" />
+                  <FolderOpen size={18} className="text-[var(--accent-amber)]" />
                   <span>Modelos & Estilos</span>
                 </h2>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                <p className="text-xs text-[var(--ink-muted)] mt-0.5">
                   Modelos de referência, rascunhos salvos e formatos de prescrição
                 </p>
               </div>
@@ -160,21 +160,21 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                 type="button"
                 onClick={() => setIsModelsDrawerOpen(false)}
                 aria-label="Fechar modelos e estilos"
-                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-sky-500 outline-none cursor-pointer transition"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-[var(--ink-muted)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none cursor-pointer transition"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* ABAS DO DRAWER */}
-            <div className="grid grid-cols-3 p-1.5 bg-[var(--bg-app)] border-b border-[var(--border-subtle)] gap-1">
+            <div className="grid grid-cols-3 p-1.5 bg-[var(--surface-canvas)] border-b border-[var(--hairline)] gap-1">
               <button
                 type="button"
                 onClick={() => setDrawerTab('padrao')}
-                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                className={`min-h-[44px] py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
                   drawerTab === 'padrao'
-                    ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                    ? 'bg-[var(--primary)] text-white shadow-[var(--shadow-control)]'
+                    : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]'
                 }`}
               >
                 <FileText className="w-3.5 h-3.5 shrink-0" />
@@ -183,10 +183,10 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
               <button
                 type="button"
                 onClick={() => setDrawerTab('salvos')}
-                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                className={`min-h-[44px] py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
                   drawerTab === 'salvos'
-                    ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                    ? 'bg-[var(--primary)] text-white shadow-[var(--shadow-control)]'
+                    : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]'
                 }`}
               >
                 <Save className="w-3.5 h-3.5 shrink-0" />
@@ -195,10 +195,10 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
               <button
                 type="button"
                 onClick={() => setDrawerTab('estilos')}
-                className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none ${
+                className={`min-h-[44px] py-2 px-1 text-center text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none ${
                   drawerTab === 'estilos'
-                    ? 'bg-navy-900 text-white dark:bg-sky-600 shadow-tactile-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)]'
+                    ? 'bg-[var(--primary)] text-white shadow-[var(--shadow-control)]'
+                    : 'text-[var(--ink-muted)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]'
                 }`}
               >
                 <LayoutTemplate className="w-3.5 h-3.5 shrink-0" />
@@ -212,7 +212,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
               {drawerTab === 'padrao' && (
                 <div className="space-y-3">
                   <div className="relative mb-2">
-                    <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Search className="w-4 h-4 text-[var(--ink-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       name="presetTemplateSearch"
                       type="text"
@@ -220,7 +220,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                       onChange={(e) => setTemplateSearch(e.target.value)}
                       placeholder="Ex.: Relatório médico, atestado, encaminhamento..."
                       aria-label="Buscar modelo padrão"
-                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 transition"
+                      className="w-full min-h-[44px] pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] focus:outline-none focus:border-[var(--accent-focus)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] transition"
                     />
                   </div>
 
@@ -229,24 +229,24 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                     .map((item) => (
                       <div
                         key={item.id}
-                        className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-info transition flex flex-col gap-1.5 shadow-tactile-sm"
+                        className="p-3 rounded-xl border border-[var(--hairline)] bg-[var(--surface-card)] hover:border-[var(--border-control)] transition flex flex-col gap-1.5 shadow-[var(--elevation-low)]"
                       >
                         <div className="flex items-center gap-1.5">
                           <span className={`px-1.5 py-0.5 rounded text-white text-xs font-extrabold uppercase ${item.badgeColor}`}>
                             {item.badge}
                           </span>
-                          <h4 className="text-xs font-bold text-[var(--text-main)]">
+                          <h4 className="text-xs font-bold text-[var(--ink-primary)]">
                             {item.title}
                           </h4>
                         </div>
-                        <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                        <p className="text-xs text-[var(--ink-muted)] leading-relaxed">
                           {item.desc}
                         </p>
-                        <div className="pt-1.5 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                        <div className="pt-1.5 border-t border-[var(--hairline)] flex items-center justify-between">
                           <button
                             type="button"
                             onClick={() => applyPresetTemplate(item.id)}
-                            className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded-md px-1 py-0.5"
+                            className="min-h-[44px] text-xs font-bold text-[var(--ink-clinical)] hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none rounded-md px-1 py-0.5"
                           >
                             <FileText className="w-3.5 h-3.5" />
                             <span>Carregar e Personalizar</span>
@@ -262,7 +262,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                 <div className="space-y-3">
                   <div className="flex flex-col gap-2">
                     <div className="relative">
-                      <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <Search className="w-4 h-4 text-[var(--ink-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         name="savedTemplateSearch"
                         type="text"
@@ -270,7 +270,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                         onChange={(e) => setTemplateSearch(e.target.value)}
                         placeholder="Ex.: Laudo cardiológico, receita padrão..."
                         aria-label="Buscar em meus modelos salvos"
-                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] focus:outline-none focus:border-info focus-visible:ring-2 focus-visible:ring-sky-500 transition"
+                        className="w-full min-h-[44px] pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] focus:outline-none focus:border-[var(--accent-focus)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] transition"
                       />
                     </div>
 
@@ -281,7 +281,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                         setNewModelTitle(currentModel.title !== 'Documento Livre (Rascunho)' ? currentModel.title : '');
                         setIsSaveModelModalOpen(true);
                       }}
-                      className="w-full py-2 px-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-tactile-btn cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
+                      className="btn-tactile-primary w-full min-h-[44px] py-2 px-3 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                     >
                       <BookmarkPlus className="w-4 h-4" />
                       <span>Salvar Documento Atual como Modelo</span>
@@ -289,12 +289,12 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                   </div>
 
                   {filteredSavedTemplates.length === 0 ? (
-                    <div className="p-4 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
+                    <div className="p-4 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] text-center text-xs text-[var(--ink-muted)]">
                       {templateSearch ? (
                         'Nenhum modelo encontrado para esta busca.'
                       ) : (
                         <>
-                          <BookmarkPlus className="w-6 h-6 mx-auto mb-1.5 text-slate-400 opacity-60" />
+                          <BookmarkPlus className="w-6 h-6 mx-auto mb-1.5 text-[var(--ink-muted)] opacity-60" />
                           <p className="font-medium">Nenhum modelo personalizado salvo ainda.</p>
                           <p className="text-xs mt-1 opacity-80">
                             Clique no botão acima para salvar a folha atual como um modelo reutilizável.
@@ -307,7 +307,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                       {filteredSavedTemplates.map((tpl) => (
                         <div
                           key={tpl.id}
-                          className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-info dark:hover:border-info transition flex flex-col gap-2 group shadow-tactile-sm"
+                          className="p-3 rounded-xl border border-[var(--hairline)] bg-[var(--surface-card)] hover:border-[var(--border-control)] transition flex flex-col gap-2 group shadow-[var(--elevation-low)]"
                         >
                           {editingTemplateId === tpl.id ? (
                             <div className="flex items-center gap-2">
@@ -317,14 +317,14 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                                 value={editingTemplateTitle}
                                 onChange={(e) => setEditingTemplateTitle(e.target.value)}
                                 aria-label="Editar título do modelo"
-                                className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-info bg-[var(--bg-app)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                                className="flex-1 min-h-[44px] px-2.5 py-1 text-xs rounded-lg border border-[var(--border-control)] bg-[var(--surface-card-lit)] text-[var(--ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                                 autoFocus
                               />
                               <button
                                 type="button"
                                 onClick={() => handleSaveRename(tpl.id)}
                                 aria-label="Salvar novo título"
-                                className="p-1.5 rounded-lg bg-emerald-700 text-white text-xs hover:bg-emerald-800 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
+                                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-[var(--clinical)] text-white text-xs hover:bg-[var(--clinical-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none transition"
                                 title="Salvar novo título"
                               >
                                 <Check className="w-3.5 h-3.5" />
@@ -333,7 +333,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                                 type="button"
                                 onClick={() => setEditingTemplateId(null)}
                                 aria-label="Cancelar edição do título"
-                                className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-xs hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
+                                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg border border-[var(--border-control)] text-xs hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none transition"
                                 title="Cancelar"
                               >
                                 <X className="w-3.5 h-3.5" />
@@ -342,20 +342,21 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                           ) : (
                             <div className="flex items-start justify-between gap-2">
                               <div>
-                                <h4 className="text-xs font-bold text-[var(--text-main)] group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
+                                <h4 className="text-xs font-bold text-[var(--ink-primary)] group-hover:text-[var(--ink-clinical)] transition-colors">
                                   {tpl.title}
                                 </h4>
-                                <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] mt-0.5">
+                                <div className="flex items-center gap-2 text-xs text-[var(--ink-muted)] mt-0.5">
                                   <span>
                                     {new Date(tpl.updatedAt).toLocaleDateString('pt-BR')} às{' '}
                                     {new Date(tpl.updatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                                   </span>
                                   {tpl.contextId && tpl.contextId !== 'global' ? (
-                                    <span className="px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold">
-                                      Local
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border border-[var(--hairline)] font-semibold">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" aria-hidden="true" />
+                                      <span>Local</span>
                                     </span>
                                   ) : (
-                                    <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium">
+                                    <span className="px-1.5 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border border-[var(--hairline)] font-medium">
                                       Global
                                     </span>
                                   )}
@@ -367,7 +368,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                                   type="button"
                                   onClick={() => handleStartRename(tpl)}
                                   aria-label="Renomear modelo"
-                                  className="p-1 rounded-lg hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-sky-600 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none transition"
+                                  className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[var(--surface-hover)] text-[var(--ink-muted)] hover:text-[var(--ink-clinical)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none transition"
                                   title="Renomear modelo"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
@@ -376,7 +377,7 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                                   type="button"
                                   onClick={() => handleDeleteTemplate(tpl.id, tpl.title)}
                                   aria-label="Excluir modelo"
-                                  className="p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-[var(--text-muted)] hover:text-red-500 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none transition"
+                                  className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[var(--surface-hover)] text-[var(--ink-muted)] hover:text-[var(--status-danger)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] outline-none transition"
                                   title="Excluir modelo"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -385,11 +386,11 @@ export const EditorModelsAndStylesDrawer: React.FC<EditorModelsAndStylesDrawerPr
                             </div>
                           )}
 
-                          <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                          <div className="pt-2 border-t border-[var(--hairline)] flex items-center justify-between">
                             <button
                               type="button"
                               onClick={() => handleApplyTemplate(tpl)}
-                              className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 outline-none rounded-md px-1 py-0.5"
+                              className="min-h-[44px] text-xs font-bold text-[var(--ink-clinical)] hover:underline flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none rounded-md px-1 py-0.5"
                             >
                               <FileText className="w-3.5 h-3.5" />
                               <span>Carregar e Editar na Folha</span>

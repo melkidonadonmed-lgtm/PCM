@@ -130,9 +130,9 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-card)] flex items-center justify-between">
+        <div className="p-4 border-b border-[var(--hairline)] bg-[var(--surface-card)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-[10px] bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border border-[var(--border-clinical-subtle)] flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-[10px] bg-[var(--surface-chip-muted)] text-[var(--ink-clinical)] border border-[var(--hairline)] flex items-center justify-center font-bold">
               <Icon name="person" className="text-[18px]" />
             </div>
             <h3 id="patient-modal-title" className="font-bold text-sm sm:text-base text-[var(--text-main)]">
@@ -143,7 +143,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar modal de dados do paciente"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-[10px] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer active:scale-95 transition focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+            className="btn-tactile-icon touch-target text-[var(--ink-muted)] hover:text-[var(--ink-primary)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           >
             <Icon name="close" className="text-[20px]" />
           </button>
@@ -172,8 +172,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
           <div
             className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
               formData.weightCalcEnabled
-                ? 'bg-[var(--surface-clinical-subtle)] border-[var(--border-clinical-subtle)]'
-                : 'bg-[var(--surface-inset)] border-[var(--border-subtle)]'
+                ? 'bg-[var(--surface-card-lit)] border-[var(--border-control)] ring-1 ring-[var(--accent-focus)]/30'
+                : 'bg-[var(--surface-inset)] border-[var(--hairline)]'
             }`}
           >
             <div className="min-w-0">
@@ -329,15 +329,15 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                 });
               }}
               placeholder="Ex.: Penicilina, Dipirona, AINEs, Frutos do mar..."
-              className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] text-xs font-medium focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-rose-700 dark:text-rose-400 transition"
+              className="w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] text-xs font-medium focus:outline-none focus:border-[var(--accent-focus)] tactile-input text-[var(--status-danger)] transition"
             />
           </div>
 
-          <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between gap-2">
+          <div className="pt-3 border-t border-[var(--hairline)] flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={handleClear}
-              className="h-11 min-h-[44px] px-3.5 rounded-[10px] border border-[var(--border-subtle)] bg-[var(--surface-card)] text-xs font-semibold text-[var(--text-secondary)] hover:text-rose-700 dark:hover:text-rose-300 hover:border-rose-300 dark:hover:border-rose-400/40 hover:bg-rose-50/70 dark:hover:bg-rose-950/40 transition duration-150 inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+              className="btn-tactile-danger h-11 min-h-[44px] px-3.5 rounded-[10px] text-xs font-semibold inline-flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] outline-none"
               title="Limpar todos os campos para digitar novo paciente"
             >
               <Icon name="ink_eraser" className="text-[16px]" />
@@ -347,13 +347,13 @@ export const PatientModal: React.FC<PatientModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="btn-tactile-secondary h-11 min-h-[44px] px-4 rounded-[10px] text-xs font-semibold inline-flex items-center justify-center cursor-pointer active:scale-95 transition duration-150 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
+                className="btn-tactile-secondary h-11 min-h-[44px] px-4 rounded-[10px] text-xs font-semibold inline-flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="btn-tactile-clinical h-11 min-h-[44px] px-5 rounded-[10px] text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none transition duration-150"
+                className="btn-tactile-primary h-11 min-h-[44px] px-5 rounded-[10px] text-xs font-bold inline-flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               >
                 <Icon name="check" className="text-[16px]" />
                 <span>Salvar Paciente</span>

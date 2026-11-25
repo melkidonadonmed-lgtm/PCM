@@ -141,7 +141,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
         <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-3.5 sm:p-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-2">
             <div className="flex items-center gap-2">
-              <Icon name="medication" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <Icon name="medication" size={18} className="text-[var(--ink-clinical)] shrink-0" />
               <h3 className="text-sm font-semibold text-[var(--text-main)]">
                 2. Medicações e Dispositivos — EM USO e FEZ USO
               </h3>
@@ -158,7 +158,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
                     setNewMedName('');
                     setNewMedDuration('');
                   }}
-                  className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+                  className="touch-target btn-tactile-danger px-3 text-xs inline-flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                   title="Limpar campos de nova medicação"
                 >
                   <Icon name="close" size={12} />
@@ -237,7 +237,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
             <div className="space-y-2 pt-1">
               {bedRecord.currentMedicationsAndDevices.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="block text-[11px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                  <span className="block text-[11px] font-extrabold uppercase tracking-wider text-[var(--ink-clinical)]">
                     Em Uso Atual ({bedRecord.currentMedicationsAndDevices.length})
                   </span>
                   <div className="space-y-1">
@@ -328,7 +328,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-2">
           <div>
             <div className="flex items-center gap-2">
-              <Icon name="description" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <Icon name="description" size={18} className="text-[var(--ink-clinical)] shrink-0" />
               <h3 className="text-sm font-semibold text-[var(--text-main)]">
                 Modelo Padronizado de Evolução / Admissão
               </h3>
@@ -374,7 +374,7 @@ export const HospitalEvolutionFormPanel: React.FC<HospitalEvolutionFormPanelProp
           onClick={handleSaveSnapshotToTimeline}
           className="touch-target w-full btn-tactile-secondary min-h-[44px] rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
         >
-          <Icon name="save" size={15} className="text-sky-600 dark:text-sky-400" />
+          <Icon name="save" size={15} className="text-[var(--ink-clinical)]" />
           <span>
             Registrar Evolução no Histórico Auditável do Leito (
             {bedRecord.evolutionHistoryTimeline.length})

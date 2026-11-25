@@ -82,7 +82,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                 className={`flex items-center justify-between rounded-xl border px-3 py-1.5 text-xs ${
                   isActive
                     ? severityBadgeClasses[tier.severityLevel]
-                    : 'border-subtle dark:border-strong bg-[var(--surface-inset)] text-slate-500 dark:text-slate-400'
+                    : 'border-subtle dark:border-strong bg-[var(--surface-inset)] text-[var(--ink-muted)]'
                 }`}
               >
                 <span className="font-medium">{tier.label}</span>
@@ -110,7 +110,8 @@ export const ScoreExportAndBedBridgeCard: React.FC<
               Exportação Prontuário (PEP / SBAR / Editor A4)
             </h4>
           </div>
-          <span className="rounded bg-[var(--accent-emerald-subtle)] border border-[var(--accent-emerald-border)] px-1.5 py-0.5 text-[11px] font-semibold text-emerald-800 dark:text-emerald-200 shrink-0">
+          <span className="inline-flex items-center gap-1.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ink-primary)] shrink-0">
+            <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" />
             Zero-PII / LGPD
           </span>
         </div>
@@ -120,7 +121,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
             <div className="flex items-center justify-between">
               <label
                 htmlFor="score-bed-id"
-                className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400"
+                className="block text-[11px] font-semibold text-[var(--ink-muted)]"
               >
                 Identificador de Leito
               </label>
@@ -128,7 +129,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                 <button
                   type="button"
                   onClick={() => onBedIdentifierChange('')}
-                  className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+                  className="touch-target btn-tactile-danger min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                   title="Limpar identificador de leito"
                 >
                   <Icon name="close" size={14} />
@@ -143,13 +144,13 @@ export const ScoreExportAndBedBridgeCard: React.FC<
               placeholder="Ex.: UTI-04, Sala Vermelha"
               value={bedIdentifier}
               onChange={(e) => onBedIdentifierChange(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
+              className="tactile-input mt-1 w-full h-11 min-h-[44px] rounded-[10px] border border-[var(--border-control)] px-2.5 py-1.5 text-xs text-[var(--ink-primary)]"
             />
           </div>
           <div>
             <label
               htmlFor="score-patient-weight"
-              className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400"
+              className="block text-[11px] font-semibold text-[var(--ink-muted)]"
             >
               Peso p/ BIC (<span className="clinical-unit">kg</span>)
             </label>
@@ -164,7 +165,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
               onChange={(e) =>
                 onWeightChange(Math.max(1, parseFloat(e.target.value) || 70))
               }
-              className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 font-mono text-xs text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none clinical-tabular-nums"
+              className="tactile-input mt-1 w-full h-11 min-h-[44px] rounded-[10px] border border-[var(--border-control)] px-2.5 py-1.5 font-mono text-xs text-[var(--ink-primary)] clinical-tabular-nums"
             />
           </div>
         </div>
@@ -173,22 +174,22 @@ export const ScoreExportAndBedBridgeCard: React.FC<
           <button
             type="button"
             onClick={() => onCopyText('PEP')}
-            className="touch-target min-h-[44px] flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="touch-target btn-tactile-secondary min-h-[44px] flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold cursor-pointer"
           >
             <Icon
               name={copyFeedback === 'PEP' ? 'check' : 'content_copy'}
-              className="text-sm text-emerald-600"
+              className="text-sm text-[var(--ink-clinical)]"
             />
             {copyFeedback === 'PEP' ? 'SOAP Copiado!' : 'Copiar Evolução SOAP'}
           </button>
           <button
             type="button"
             onClick={() => onCopyText('SBAR')}
-            className="touch-target min-h-[44px] flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="touch-target btn-tactile-secondary min-h-[44px] flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold cursor-pointer"
           >
             <Icon
               name={copyFeedback === 'SBAR' ? 'check' : 'share'}
-              className="text-sm text-blue-600"
+              className="text-sm text-[var(--ink-accent)]"
             />
             {copyFeedback === 'SBAR' ? 'SBAR Copiado!' : 'Copiar SBAR'}
           </button>
@@ -198,7 +199,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
           <button
             type="button"
             onClick={onSendScoreToA4}
-            className="touch-target min-h-[44px] flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--clinical)] px-3 py-2 text-xs font-bold text-white shadow-xs hover:opacity-90 cursor-pointer"
+            className="touch-target btn-tactile-primary flex w-full items-center justify-center gap-2 text-xs"
           >
             <Icon
               name={copyFeedback === 'A4' ? 'check' : 'description'}
@@ -212,13 +213,13 @@ export const ScoreExportAndBedBridgeCard: React.FC<
 
         {/* Ponte Direta: Registrar Escore no Módulo de Internação (MOD-03) e Dashboard */}
         {onRecordScoreToBed && selectedHospitalBed ? (
-          <div className="rounded-xl border border-[var(--border-clinical-subtle)] bg-[var(--surface-clinical-subtle)] p-3 space-y-2.5">
+          <div className="rounded-[12px] border border-[var(--hairline)] bg-[var(--surface-card-lit)] p-3 space-y-2.5">
             <div className="flex items-center justify-between gap-2">
-              <span className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[var(--ink-clinical)]">
-                <Icon name="local_hospital" size={14} />
+              <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
+                <Icon name="local_hospital" size={14} className="text-[var(--ink-clinical)]" />
                 Integração Internação & Dashboard (MOD-03)
               </span>
-              <span className="rounded bg-[var(--surface-card)] border border-[var(--border-clinical-subtle)] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[var(--ink-clinical)] clinical-tabular-nums">
+              <span className="rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] px-1.5 py-0.5 font-mono text-[11px] font-semibold text-[var(--ink-primary)] clinical-tabular-nums">
                 EF/LT {selectedHospitalBed.wardAndBed}
               </span>
             </div>
@@ -227,7 +228,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
               <div>
                 <label
                   htmlFor="score-hospital-bed-select"
-                  className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1"
+                  className="block text-[11px] font-semibold text-[var(--ink-muted)] mb-1"
                 >
                   Leito Hospitalar Alvo (MOD-03)
                 </label>
@@ -244,7 +245,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                       onBedIdentifierChange(chosen.wardAndBed);
                     }
                   }}
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-900 dark:text-slate-100 clinical-tabular-nums"
+                  className="tactile-input w-full h-11 min-h-[44px] rounded-[10px] border border-[var(--border-control)] px-2.5 text-xs font-semibold text-[var(--ink-primary)] clinical-tabular-nums"
                 >
                   {hospitalBeds.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -258,7 +259,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
 
             <label
               htmlFor="score-append-conduct-checkbox"
-              className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer"
+              className="flex items-center gap-2 text-xs text-[var(--ink-secondary)] cursor-pointer"
             >
               <input
                 id="score-append-conduct-checkbox"
@@ -266,10 +267,10 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                 type="checkbox"
                 checked={appendConductToBed}
                 onChange={(e) => onToggleAppendConductToBed(e.target.checked)}
-                className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                className="rounded border-[var(--border-control)] text-[var(--clinical)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
               <span>
-                Sincronizar conduta sugerida na lista <strong>CD</strong> do leito
+                Sincronizar conduta sugerida na lista <strong className="text-[var(--ink-primary)]">CD</strong> do leito
               </span>
             </label>
 
@@ -277,7 +278,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
               <button
                 type="button"
                 onClick={onRecordScoreInHospitalBed}
-                className="touch-target min-h-[44px] flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-[var(--clinical)] px-3 py-2 text-xs font-bold text-white shadow-xs hover:opacity-90 cursor-pointer"
+                className="touch-target btn-tactile-primary flex-1 flex items-center justify-center gap-1.5 text-xs"
               >
                 <Icon
                   name={
@@ -301,9 +302,9 @@ export const ScoreExportAndBedBridgeCard: React.FC<
                       calculator.acronym
                     )
                   }
-                  className="touch-target min-h-[44px] flex items-center justify-center gap-1 rounded-lg border border-[var(--border-control)] bg-[var(--surface-card)] px-2.5 py-2 text-xs font-bold text-[var(--ink-clinical)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                  className="touch-target btn-tactile-secondary flex items-center justify-center gap-1.5 text-xs whitespace-nowrap"
                 >
-                  <Icon name="monitor_heart" size={14} />
+                  <Icon name="monitor_heart" size={14} className="text-[var(--ink-muted)]" />
                   <span>Ver no Dashboard</span>
                 </button>
               ) : null}
@@ -311,7 +312,7 @@ export const ScoreExportAndBedBridgeCard: React.FC<
           </div>
         ) : null}
 
-        <div className="border-t border-slate-200 dark:border-slate-700 pt-2 text-[11px] text-slate-500 dark:text-slate-400">
+        <div className="border-t border-[var(--hairline)] pt-2 text-[11px] text-[var(--ink-muted)]">
           <strong>Fonte Científica:</strong> {calculator.evidenceSource}
         </div>
       </div>

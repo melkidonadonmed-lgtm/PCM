@@ -7,9 +7,9 @@ import { cloudAuthService, isBenignPopupAuthError, type DoctorUserProfile } from
 import { cloudSyncManager, type SyncStatus } from '../services/cloud/cloudSyncManager';
 
 /**
- * Cabeçalho Global da Aplicação.
- * Estados de UI cobertos: empty (nenhum paciente ou médico configurado), loading (carregando sincronização na nuvem),
- * success (sincronizado com sucesso) e error (erro de autenticação/sincronização).
+ * Global Application Header (Matte Mineral Surface).
+ * Covered UI states: empty (no patient or doctor configured), loading (cloud sync active),
+ * success (synced), and error (authentication or sync failure).
  */
 interface HeaderProps {
   darkMode: boolean;
@@ -77,33 +77,35 @@ const CloudAuthButton: React.FC = () => {
   if (user) {
     const cloudState = loading || syncStatus === 'syncing' ? 'loading' : syncStatus === 'error' ? 'error' : 'idle';
     return (
-      <div data-state={cloudState} aria-busy={cloudState === 'loading'} 
-        className="hidden sm:flex items-center gap-1.5 pl-2.5 pr-1 min-h-[44px] rounded-xl border text-xs shadow-tactile-sm transition bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-main)] shrink-0"
+      <div
+        data-state={cloudState}
+        aria-busy={cloudState === 'loading'}
+        className="hidden sm:flex items-center gap-1.5 pl-2.5 pr-1 min-h-[44px] rounded-[10px] border text-xs transition-colors duration-150 bg-[var(--surface-card)] border-[var(--border-control)] text-[var(--ink-primary)] shrink-0"
         title={`Conectado à nuvem: ${user.email || user.displayName} | Status: ${syncStatus}`}
       >
         <div className="relative flex-shrink-0">
           {user.photoURL ? (
-            <img 
-              src={user.photoURL} 
-              alt={user.displayName || 'Médico'} 
+            <img
+              src={user.photoURL}
+              alt={user.displayName || 'Médico'}
               className="w-5 h-5 rounded-full object-cover flex-shrink-0"
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="w-5 h-5 rounded-full bg-teal-700 flex items-center justify-center text-xs text-white font-bold flex-shrink-0">
+            <div className="w-5 h-5 rounded-full bg-[var(--clinical)] flex items-center justify-center text-xs text-white font-bold flex-shrink-0">
               {user.displayName ? user.displayName[0].toUpperCase() : 'M'}
             </div>
           )}
           <span
             aria-hidden="true"
-            className={`w-2 h-2 rounded-full absolute -bottom-0.5 -right-0.5 ring-2 ring-[var(--bg-app)] ${
+            className={`w-2 h-2 rounded-full absolute -bottom-0.5 -right-0.5 ring-2 ring-[var(--surface-card)] ${
               syncStatus === 'syncing'
-                ? 'bg-teal-500 animate-ping'
+                ? 'bg-[var(--clinical)] animate-ping'
                 : syncStatus === 'error'
-                  ? 'bg-rose-500'
+                  ? 'bg-[var(--status-danger)]'
                   : syncStatus === 'offline'
-                    ? 'bg-amber-500'
-                    : 'bg-teal-600'
+                    ? 'bg-[var(--accent-amber)]'
+                    : 'bg-[var(--clinical)]'
             }`}
           />
         </div>
@@ -121,17 +123,17 @@ const CloudAuthButton: React.FC = () => {
               </span>
             )}
             {syncStatus === 'offline' && (
-              <span className="text-amber-600 dark:text-amber-400 font-medium" title="Operando localmente">
+              <span className="text-[var(--accent-amber)] font-medium" title="Operando localmente">
                 Modo Local
               </span>
             )}
             {syncStatus === 'error' && (
-              <span className="text-rose-500 font-medium" title="Erro ao sincronizar na nuvem">
+              <span className="text-[var(--status-danger)] font-medium" title="Erro ao sincronizar na nuvem">
                 Erro Sync
               </span>
             )}
             {syncStatus === 'idle' && (
-              <span className="text-[var(--text-muted)] font-normal">
+              <span className="text-[var(--ink-muted)] font-normal">
                 Pronto
               </span>
             )}
@@ -140,7 +142,7 @@ const CloudAuthButton: React.FC = () => {
         <button
           type="button"
           onClick={handleToggleAuth}
-          className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center hover:text-rose-500 rounded-lg transition-colors text-[var(--text-muted)] cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none shrink-0"
+          className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center hover:text-[var(--status-danger)] rounded-[10px] transition-colors duration-150 text-[var(--ink-muted)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] outline-none shrink-0"
           title="Desconectar da nuvem"
           aria-label="Desconectar da Nuvem"
         >
@@ -157,11 +159,11 @@ const CloudAuthButton: React.FC = () => {
       disabled={loading}
       data-state={loading ? 'loading' : 'idle'}
       aria-busy={loading || undefined}
-      className="touch-target hidden sm:flex items-center justify-center gap-1.5 w-11 h-11 min-w-[44px] min-h-[44px] 2xl:w-auto 2xl:px-3 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none shrink-0"
+      className="touch-target btn-tactile-secondary hidden sm:flex items-center justify-center gap-1.5 w-11 h-11 2xl:w-auto 2xl:px-3 py-0 text-xs focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none shrink-0"
       title="Conectar Conta Google para sincronização em nuvem (opcional)"
       aria-label="Conectar Nuvem"
     >
-      <Icon name="cloud" size={16} className={`text-[var(--ink-clinical)] ${loading ? 'animate-pulse' : ''}`} />
+      <Icon name="cloud" size={16} className={`text-[var(--ink-secondary)] ${loading ? 'animate-pulse' : ''}`} />
       <span className="hidden 2xl:inline text-xs font-semibold">
         {loading ? 'Conectando...' : 'Nuvem'}
       </span>
@@ -285,9 +287,9 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header 
-      id="prescmed-header" 
-      className="sticky top-0 z-50 w-full border-b transition-colors no-print isolate bg-[var(--surface-card)]/80 backdrop-blur-md border-[var(--border-subtle)] panel-projected-bottom"
+    <header
+      id="prescmed-header"
+      className="sticky top-0 z-50 w-full border-b transition-colors duration-150 no-print isolate bg-[var(--surface-card)] border-[var(--hairline)] panel-projected-bottom"
     >
       <div className="w-full max-w-screen-2xl container mx-auto min-h-16 py-1.5 px-2.5 sm:px-4 lg:px-4 xl:px-6 flex items-center justify-between gap-2">
         {/* Left side: Menu trigger & Unified Brand Home Button */}
@@ -297,30 +299,30 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onToggleSidebar}
             aria-label="Abrir ou fechar menu lateral"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px flex-shrink-0 focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
+            className="touch-target btn-tactile-icon flex-shrink-0 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
           >
             <Icon name="menu" size={18} />
           </button>
 
-          {/* Brand Emblem + Swiss Clinical Wordmark / Botão Início */}
+          {/* Brand Emblem + Swiss Clinical Wordmark / Home Button */}
           <button
             type="button"
             aria-label="PresCMed — Início"
             onClick={onGoHome}
-            className="touch-target flex items-center justify-center gap-2 px-1.5 min-h-[44px] min-w-[44px] rounded-xl transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none group"
+            className="touch-target flex items-center justify-center gap-2 px-1.5 min-h-[44px] min-w-[44px] rounded-[10px] transition-colors duration-150 cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none group"
             title="Voltar ao início (Receitas — Alt+1)"
           >
             <BrandMark className="w-8 h-8 xl:w-9 xl:h-9 shrink-0 shadow-tactile-sm rounded-[10px] transition-transform duration-150 group-hover:scale-[1.03]" />
-            <div className="sm:hidden flex items-baseline font-extrabold text-sm tracking-tight text-[var(--text-main)]">
+            <div className="sm:hidden flex items-baseline font-extrabold text-sm tracking-tight text-[var(--ink-primary)]">
               <span>PC</span>
               <span className="text-[var(--ink-clinical)]">M</span>
             </div>
             <div className="hidden sm:flex lg:hidden xl:flex flex-col items-start leading-none">
-              <span className="text-sm xl:text-[15px] tracking-tight text-[var(--text-main)]">
+              <span className="text-sm xl:text-[15px] tracking-tight text-[var(--ink-primary)]">
                 <span className="font-extrabold">PresC</span>
                 <span className="font-bold text-[var(--ink-clinical)]">Med</span>
               </span>
-              <span className="hidden 2xl:inline text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--text-muted)] mt-0.5">
+              <span className="hidden 2xl:inline text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)] mt-0.5">
                 PEC • CFM • A4
               </span>
             </div>
@@ -328,12 +330,12 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Desktop Fluid Segmented Workspace Navigation:
-            - Sidebar expandida: exibe apenas os 3 Macro-Módulos (MOD-01..03) sem duplicar as 8 rotas laterais
-            - Sidebar recolhida: exibe acesso rápido às 6 áreas (incluindo os 3 Macro-Módulos) em 13px / gap 8px / min-h 44px */}
+            - Expanded sidebar: renders only the 3 Macro-Modules (MOD-01..03) without duplicating the 8 rail routes
+            - Collapsed sidebar: renders quick access to the 6 clinical areas (13px / gap 8px / min-h 44px) */}
         {onSelectTab && (
           <nav
-            aria-label="Navegação rápida entre áreas clínicas"
-            className="hidden lg:flex items-center gap-2 p-1 rounded-2xl nav-segmented-track min-w-0 max-w-full overflow-x-auto scrollbar-none"
+            aria-label="Áreas clínicas"
+            className="hidden lg:flex items-center gap-1.5 nav-segmented-track min-w-0 max-w-full overflow-x-auto scrollbar-none"
           >
             {isSidebarOpen
               ? macroModuleTabs.map((macro) => (
@@ -344,25 +346,25 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => onSelectTab(macro.id)}
                     aria-current={macro.isActive ? 'page' : undefined}
                     title={`${macro.label} (${macro.shortcut})`}
-                    className={`touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-xl text-[13px] flex items-center gap-1.5 transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none whitespace-nowrap shrink-0 ${
+                    className={`touch-target px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-[10px] text-[13px] flex items-center gap-1.5 transition-colors duration-150 cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none whitespace-nowrap shrink-0 ${
                       macro.isActive
                         ? 'nav-segmented-pill-active font-bold'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[oklch(0.20_0.02_255/0.04)] dark:hover:bg-white/[0.04] font-semibold border border-transparent'
+                        : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-hover)] font-semibold border border-transparent'
                     }`}
                   >
                     <Icon
                       name={macro.icon}
                       size={16}
                       filled={macro.isActive}
-                      className={macro.isActive ? 'text-[var(--ink-clinical)]' : 'opacity-75'}
+                      className={macro.isActive ? 'text-[var(--ink-clinical)]' : 'text-[var(--ink-secondary)]'}
                     />
                     <span>{macro.label}</span>
                     {macro.badge && (
                       <span
-                        className={`text-[11px] font-extrabold px-1.5 py-0.5 rounded-full clinical-unit clinical-tabular-nums ${
+                        className={`text-[11px] font-bold px-1.5 py-0.5 rounded-[6px] clinical-unit clinical-tabular-nums ${
                           macro.isActive
-                            ? 'bg-[var(--clinical)] text-white shadow-xs'
-                            : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
+                            ? 'bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border border-[var(--hairline)]'
+                            : 'bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border border-[var(--hairline)]'
                         }`}
                       >
                         {macro.badge}
@@ -389,25 +391,25 @@ export const Header: React.FC<HeaderProps> = ({
                       onClick={() => onSelectTab(tab.id)}
                       aria-current={isActive ? 'page' : undefined}
                       title={`${tab.label} (${tab.shortcut})`}
-                      className={`touch-target px-2.5 py-1.5 min-h-[44px] min-w-[44px] rounded-xl text-[13px] flex items-center gap-1.5 transition cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none whitespace-nowrap shrink-0 ${
+                      className={`touch-target px-2.5 py-1.5 min-h-[44px] min-w-[44px] rounded-[10px] text-[13px] flex items-center gap-1.5 transition-colors duration-150 cursor-pointer active:translate-y-px focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none whitespace-nowrap shrink-0 ${
                         isActive
                           ? 'nav-segmented-pill-active font-bold'
-                          : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[oklch(0.20_0.02_255/0.04)] dark:hover:bg-white/[0.04] font-semibold border border-transparent'
+                          : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-card)]/70 dark:hover:bg-white/[0.06] font-semibold border border-transparent'
                       }`}
                     >
                       <Icon
                         name={tab.icon}
                         size={15}
                         filled={isActive}
-                        className={`${isActive ? 'text-[var(--ink-clinical)]' : 'opacity-75'} hidden xl:inline-flex`}
+                        className={`${isActive ? 'text-[var(--ink-clinical)]' : 'text-[var(--ink-secondary)]'} hidden xl:inline-flex`}
                       />
                       <span>{tab.label}</span>
                       {tab.badge ? (
                         <span
-                          className={`text-[11px] font-extrabold px-1.5 py-0.5 rounded-full clinical-unit clinical-tabular-nums ${
+                          className={`text-[11px] font-extrabold px-1.5 py-0.5 rounded-[6px] clinical-unit clinical-tabular-nums ${
                             isActive
-                              ? 'bg-[var(--clinical)] text-white shadow-xs'
-                              : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
+                              ? 'bg-[var(--clinical)] text-white'
+                              : 'bg-[var(--surface-card)] text-[var(--ink-secondary)] border border-[var(--hairline)]'
                           }`}
                         >
                           {tab.badge}
@@ -415,11 +417,7 @@ export const Header: React.FC<HeaderProps> = ({
                       ) : (
                         <span
                           aria-hidden="true"
-                          className={`sr-only kbd-shortcut-chip ${
-                            isActive
-                              ? 'bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] font-bold'
-                              : 'text-[var(--text-muted)] opacity-60'
-                          }`}
+                          className="sr-only kbd-shortcut-chip"
                         >
                           {tab.shortcut}
                         </span>
@@ -430,7 +428,7 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
         )}
 
-        {/* Right Command & Context Cluster: Busca Ctrl+K, Nuvem, Instalar e Tema */}
+        {/* Right Command & Context Cluster: Search Ctrl+K, Cloud, Install & Theme */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 justify-end">
           {onOpenCommandPalette && (
             <button
@@ -438,13 +436,13 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onOpenCommandPalette}
               title="Busca rápida de medicamentos, kits, protocolos e guias SUS (Ctrl+K)"
-              className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] sm:w-auto sm:px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none bg-[var(--surface-inset)] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] dark:border-white/10 hover:bg-[var(--surface-hover)] shrink-0"
+              className="touch-target btn-tactile-secondary w-11 h-11 sm:w-auto sm:px-2.5 py-0 flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none shrink-0"
             >
-              <Icon name="search" size={16} className="text-[var(--ink-clinical)]" />
-              <span className="sr-only sm:not-sr-only text-xs font-medium text-[var(--text-muted)]">
+              <Icon name="search" size={16} className="text-[var(--ink-muted)]" />
+              <span className="sr-only sm:not-sr-only text-xs font-semibold text-[var(--ink-primary)]">
                 Buscar
               </span>
-              <span className="hidden md:inline kbd-shortcut-chip font-bold text-[var(--text-secondary)] bg-white/80 dark:bg-white/10 border border-[var(--border-subtle)] dark:border-white/10 clinical-tabular-nums">
+              <span className="hidden md:inline kbd-shortcut-chip font-bold text-[var(--ink-secondary)] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] clinical-tabular-nums">
                 Ctrl+K
               </span>
             </button>
@@ -454,10 +452,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onNavigateToEditor}
-              className="touch-target hidden md:flex items-center gap-1.5 px-2.5 min-h-[44px] min-w-[44px] rounded-xl border text-xs font-semibold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--surface-inset)] border-[var(--border-subtle)] text-[var(--text-main)] hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none shrink-0"
+              className="touch-target btn-tactile-secondary hidden md:flex items-center gap-1.5 px-2.5 py-0 text-xs focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none shrink-0"
               title="Abrir Editor Livre de Documentos A4"
             >
-              <Icon name="editor" size={16} className="text-[var(--ink-clinical)]" />
+              <Icon name="editor" size={16} className="text-[var(--ink-muted)]" />
               <span>Editor</span>
             </button>
           )}
@@ -471,9 +469,9 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenLgpdModal}
               aria-label="Segurança, Seleção de Cookies e LGPD"
               title="Central de Privacidade, Seleção de Cookies e Conformidade LGPD (Lei nº 13.709/2018)"
-              className="touch-target hidden sm:flex w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none bg-[var(--surface-inset)] text-[var(--text-secondary)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
+              className="touch-target btn-tactile-icon hidden sm:flex focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none shrink-0"
             >
-              <Icon name="shield" size={16} className="text-[var(--ink-clinical)]" />
+              <Icon name="shield" size={16} className="text-[var(--ink-secondary)]" />
             </button>
           )}
 
@@ -482,11 +480,11 @@ export const Header: React.FC<HeaderProps> = ({
               id="btn-header-install-pwa"
               type="button"
               onClick={onInstallApp}
-              className="touch-target hidden 2xl:flex items-center justify-center gap-1.5 px-2.5 min-w-[44px] min-h-[44px] w-auto rounded-xl border text-xs font-bold transition cursor-pointer shadow-tactile-sm active:translate-y-px bg-[var(--surface-clinical-subtle)] border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)] hover:brightness-95 focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none shrink-0"
+              className="touch-target btn-tactile-secondary hidden 2xl:flex items-center justify-center gap-1.5 px-3 py-0 text-xs focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none shrink-0"
               title="Baixar e instalar PresCMed como aplicativo offline no celular ou computador"
               aria-label="Instalar Aplicativo PresCMed"
             >
-              <Icon name="download" size={16} className="text-[var(--ink-clinical)] shrink-0" />
+              <Icon name="download" size={15} className="text-[var(--ink-secondary)] shrink-0" />
               <span>Baixar App</span>
             </button>
           )}
@@ -496,13 +494,13 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-toggle-theme"
             onClick={onToggleDarkMode}
             aria-label={darkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition cursor-pointer shadow-tactile-sm active:translate-y-px focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 outline-none bg-[var(--surface-inset)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)] shrink-0"
+            className="touch-target btn-tactile-icon focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none shrink-0"
             title={darkMode ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
           >
             {darkMode ? (
-              <Icon name="light_mode" size={18} className="text-amber-400" />
+              <Icon name="light_mode" size={18} className="text-amber-300" />
             ) : (
-              <Icon name="dark_mode" size={18} className="text-slate-700" />
+              <Icon name="dark_mode" size={18} className="text-[var(--ink-primary)]" />
             )}
           </button>
         </div>

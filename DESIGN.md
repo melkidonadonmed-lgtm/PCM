@@ -19,44 +19,44 @@ colors:
   on-rose: "#FFFFFF"
 typography:
   display:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: IBM Plex Sans
     fontSize: 2.25rem
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: -0.02em
   h1:
-    fontFamily: Plus Jakarta Sans
-    fontSize: 1.875rem
-    fontWeight: 700
-    lineHeight: 1.25
+    fontFamily: IBM Plex Sans
+    fontSize: 1.5625rem
+    fontWeight: 600
+    lineHeight: 1.2
     letterSpacing: -0.02em
   h2:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: IBM Plex Sans
     fontSize: 1.5rem
     fontWeight: 600
     lineHeight: 1.3
   h3:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: IBM Plex Sans
     fontSize: 1.25rem
     fontWeight: 600
     lineHeight: 1.4
   body-lg:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: IBM Plex Sans
     fontSize: 1.125rem
     fontWeight: 400
     lineHeight: 1.5
   body-md:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: IBM Plex Sans
     fontSize: 1rem
     fontWeight: 400
     lineHeight: 1.5
   body-sm:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: IBM Plex Sans
     fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.5
   label:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: IBM Plex Sans
     fontSize: 0.75rem
     fontWeight: 500
     lineHeight: 1

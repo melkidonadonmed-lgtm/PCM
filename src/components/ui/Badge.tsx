@@ -8,12 +8,18 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const TONE_CLASSES: Record<BadgeTone, string> = {
-  neutral: 'bg-slate-100/85 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 border-slate-200/90 dark:border-white/[0.08]',
-  info: 'bg-[var(--surface-chip-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)]',
-  clinical: 'bg-[var(--surface-clinical-subtle)] text-[var(--ink-clinical)] border-[var(--border-clinical-subtle)]',
-  warning: 'bg-amber-50/90 dark:bg-amber-950/45 text-amber-800 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/40',
-  danger: 'bg-rose-50/90 dark:bg-rose-950/45 text-rose-800 dark:text-rose-300 border-rose-200/80 dark:border-rose-800/40',
+  neutral: 'bg-[var(--surface-chip-muted)] text-[var(--ink-secondary)] border-[var(--hairline)]',
+  info: 'bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border-[var(--hairline)]',
+  clinical: 'bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border-[var(--hairline)]',
+  warning: 'bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border-[var(--hairline)]',
+  danger: 'bg-[var(--surface-chip-muted)] text-[var(--ink-primary)] border-[var(--hairline)]',
   navy: 'bg-navy-800 dark:bg-[#1E293B] text-white border-white/10',
+};
+
+const TONE_DOT_CLASSES: Partial<Record<BadgeTone, string>> = {
+  clinical: 'bg-[var(--ink-clinical)]',
+  warning: 'bg-[var(--accent-amber)]',
+  danger: 'bg-[var(--status-danger)]',
 };
 
 export const Badge: React.FC<BadgeProps> = ({
@@ -24,16 +30,18 @@ export const Badge: React.FC<BadgeProps> = ({
   ...rest
 }) => {
   const hasResponsiveDisplay = /\bhidden\b/.test(className);
+  const dotClass = TONE_DOT_CLASSES[tone];
   return (
     <span
       data-state="idle"
       aria-busy={false}
       role={tone === 'danger' ? 'alert' : undefined}
-      className={`${hasResponsiveDisplay ? '' : 'inline-flex '}items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold tracking-tight border shrink-0 select-none ${
+      className={`${hasResponsiveDisplay ? '' : 'inline-flex '}items-center gap-1.5 px-2 py-0.5 rounded-[6px] text-[11px] font-semibold tracking-tight border shrink-0 select-none ${
         TONE_CLASSES[tone]
       } ${tabular ? 'tabular-nums clinical-tabular-nums' : ''} ${className}`.trim()}
       {...rest}
     >
+      {dotClass && <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotClass}`} />}
       {children}
     </span>
   );

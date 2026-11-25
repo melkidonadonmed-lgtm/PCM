@@ -178,16 +178,16 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[1100] flex items-center justify-center p-3 sm:p-4 bg-[oklch(0.14_0.02_258/0.65)] backdrop-blur-xs animate-backdrop-fade no-print"
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-3 sm:p-4 bg-[oklch(0.14_0.02_252/0.56)] animate-backdrop-fade no-print"
     >
       <div
         ref={modalRef}
-        className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] shadow-2xl overflow-hidden modal-surface-spring"
+        className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[var(--text-main)] shadow-[var(--elevation-high)] overflow-hidden modal-surface-spring"
       >
         {/* Header */}
         <div className="px-5 py-3.5 border-b border-[var(--border-subtle)] flex items-center justify-between gap-3 bg-[var(--surface-inset)]">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-9 h-9 rounded-xl bg-[var(--surface-clinical-subtle)] border border-[var(--border-clinical-subtle)] text-[var(--ink-clinical)] flex items-center justify-center shrink-0">
+            <span className="w-9 h-9 rounded-xl bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-clinical)] flex items-center justify-center shrink-0">
               <Icon name="upload" size={18} />
             </span>
             <div className="min-w-0">
@@ -203,7 +203,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
             type="button"
             onClick={onClose}
             aria-label="Fechar importação multimodal"
-            className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer"
+            className="touch-target btn-tactile-icon cursor-pointer shrink-0"
           >
             <Icon name="close" size={18} />
           </button>
@@ -229,7 +229,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                 onClick={() => fileInputRef.current?.click()}
                 className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               >
-                <Icon name="upload" size={15} className="text-sky-600 dark:text-sky-400" />
+                <Icon name="upload" size={15} className="text-[var(--ink-clinical)]" />
                 <span>Arquivo (.pdf, .docx, Foto)</span>
               </button>
 
@@ -238,19 +238,22 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                 onClick={handlePasteFromClipboard}
                 className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               >
-                <Icon name="content_copy" size={15} className="text-sky-600 dark:text-sky-400" />
+                <Icon name="content_copy" size={15} className="text-[var(--ink-clinical)]" />
                 <span>Colar Prontuário</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleToggleVoiceDictation}
-                className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition cursor-pointer ${
+                className={`touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer ${
                   isRecordingVoice
-                    ? 'bg-rose-600 text-white border-rose-500'
+                    ? 'btn-tactile-primary'
                     : 'btn-tactile-secondary'
                 }`}
               >
+                {isRecordingVoice && (
+                  <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--status-danger)] shrink-0" />
+                )}
                 <Icon name="call" size={15} />
                 <span>{isRecordingVoice ? 'Ouvindo Ditado...' : 'Ditado por Voz'}</span>
               </button>
@@ -262,14 +265,14 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                   setSourceLabel('Prontuário de Demonstração (Rigor Terapêutico)');
                   handleRunDeterministicExtraction(SAMPLE_RAW_CLINICAL_TEXT, 'Prontuário de Demonstração');
                 }}
-                className="touch-target min-h-[44px] px-3 rounded-xl text-xs font-semibold border border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] cursor-pointer"
+                className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-semibold cursor-pointer"
               >
                 Carregar Exemplo Realista
               </button>
             </div>
 
             {voiceStatusMessage && (
-              <div role="status" className="px-3 py-2 rounded-xl bg-[var(--surface-info-subtle)] border border-[var(--border-info-subtle)] text-xs text-sky-700 dark:text-sky-300">
+              <div role="status" className="px-3 py-2 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] text-xs text-[var(--ink-secondary)]">
                 {voiceStatusMessage}
               </div>
             )}
@@ -285,7 +288,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                 value={rawInputText}
                 onChange={(e) => setRawInputText(e.target.value)}
                 placeholder="Ex.: EF/LT : 110-15 | ID: Paciente | DN: 14/05/1962 | 20/10/2026: HB 12,1 | HT 36 | LEU 14500 | CR 1,4 | K 4,5..."
-                className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] p-3 text-xs font-mono leading-relaxed text-[var(--text-main)] focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                className="w-full rounded-xl border border-[var(--border-control)] bg-[var(--surface-inset)] p-3 text-xs font-mono leading-relaxed text-[var(--text-main)] focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus:outline-none"
               />
             </div>
 
@@ -293,7 +296,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
               <button
                 type="button"
                 onClick={() => handleRunDeterministicExtraction()}
-                className="btn-tactile-primary h-10 px-4 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer"
+                className="touch-target btn-tactile-primary h-11 min-h-[44px] px-4 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer"
               >
                 <Icon name="fact_check" size={16} />
                 <span>Processar e Organizar em Ordem Cronológica</span>
@@ -318,9 +321,12 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                   Cole um registro bruto, envie um documento ou use o ditado por voz e clique em <strong>Processar</strong> para auditar os campos antes de preencher o leito.
                 </p>
               ) : extractionPreview.extractedFieldsCount === 0 ? (
-                <p className="text-xs text-amber-600 dark:text-amber-400 leading-relaxed py-4">
-                  Nenhum rótulo estruturado ou linha de exame datada foi detectado. Campos ausentes permanecem vazios sem invenção de dados.
-                </p>
+                <div className="flex items-start gap-2 p-3 rounded-xl bg-[var(--surface-card-lit)] border border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)] text-xs text-[var(--ink-secondary)] leading-relaxed">
+                  <Icon name="warning" size={15} className="shrink-0 mt-0.5 text-[var(--accent-amber)]" />
+                  <span>
+                    Nenhum rótulo estruturado ou linha de exame datada foi detectado. Campos ausentes permanecem vazios sem invenção de dados.
+                  </span>
+                </div>
               ) : (
                 <>
                   {extractionPreview.chronologicalDatesFound.length > 0 && (
@@ -328,7 +334,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                       <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1">
                         Linha do Tempo Cronológica Detectada
                       </p>
-                      <p className="text-xs font-semibold text-sky-600 dark:text-sky-400 clinical-tabular-nums">
+                      <p className="text-xs font-semibold text-[var(--ink-clinical)] clinical-tabular-nums">
                         {extractionPreview.chronologicalDatesFound.join(' -> ')}
                       </p>
                     </div>
@@ -341,8 +347,9 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
                         className="p-2 rounded-lg bg-[var(--surface-card)] border border-[var(--border-subtle)] text-xs space-y-0.5"
                       >
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-sky-700 dark:text-sky-300">{item.field}</span>
-                          <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                          <span className="font-bold text-[var(--ink-clinical)]">{item.field}</span>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[11px] font-semibold text-[var(--ink-primary)]">
+                            <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[var(--ink-clinical)] shrink-0" />
                             Verificado na fonte
                           </span>
                         </div>
@@ -360,7 +367,7 @@ export const HospitalMultimodalImportModal: React.FC<HospitalMultimodalImportMod
               <button
                 type="button"
                 onClick={onClose}
-                className="touch-target min-h-[44px] px-3 rounded-xl border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] cursor-pointer"
+                className="touch-target btn-tactile-secondary min-h-[44px] px-3 rounded-xl text-xs font-semibold cursor-pointer"
               >
                 Cancelar
               </button>

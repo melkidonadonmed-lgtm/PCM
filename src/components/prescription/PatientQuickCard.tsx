@@ -1,6 +1,7 @@
 import React from 'react';
 import { Patient } from '../../types';
 import { Icon } from '../Icon';
+import { ActionButton } from '../ui/ActionButton';
 import { Badge } from '../ui/Badge';
 
 export interface PatientQuickCardProps {
@@ -17,8 +18,8 @@ export interface PatientQuickCardProps {
 }
 
 /**
- * Ilha Compacta de Identificação Rápida do Paciente (Camada prescription/).
- * Exibe apenas Nome e Peso (kg) lado a lado na mesma linha, com espaçamento enxuto e superfície fosca mineral.
+ * Compact Quick Patient Identification Island (prescription/ layer).
+ * Displays Name and Weight (kg) side-by-side on a quiet mineral card surface.
  */
 export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
   patient,
@@ -34,15 +35,15 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
       data-state="idle"
       aria-busy={false}
       aria-label="Identificação rápida do paciente"
-      className="cq-card card-surface surface-card-minimal rounded-2xl p-3.5 sm:p-4 space-y-2 border border-subtle dark:border-strong"
+      className="cq-card card-surface surface-card-minimal rounded-[16px] p-3.5 sm:p-4 space-y-2.5"
     >
-      {/* Cabeçalho compacto com quebra responsiva limpa */}
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+      {/* Compact responsive header */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="flex items-center gap-2 min-w-0">
           <Icon name="person" size={18} className="text-[var(--ink-clinical)] shrink-0" />
           <label
             htmlFor="quick-patient-name"
-            className="text-sm font-semibold text-[var(--text-main)] cursor-pointer whitespace-nowrap"
+            className="text-sm font-semibold text-[var(--ink-primary)] cursor-pointer whitespace-nowrap"
           >
             Identificação do paciente
           </label>
@@ -53,32 +54,36 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 min-w-0">
           {patientName && onRequestClearPatient && (
-            <button
-              type="button"
+            <ActionButton
+              variant="danger"
+              size="sm"
+              iconName="delete"
               onClick={onRequestClearPatient}
-              className="touch-target min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 font-semibold inline-flex items-center justify-center gap-1 cursor-pointer active:scale-95 transition duration-150 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-rose-500"
+              aria-label="Limpar paciente e reiniciar consulta"
+              className="whitespace-nowrap"
               title="Limpar paciente e reiniciar consulta"
             >
-              <Icon name="delete" size={14} />
               <span className="hidden sm:inline">Limpar</span>
-            </button>
+            </ActionButton>
           )}
 
-          <button
-            type="button"
+          <ActionButton
+            variant="secondary"
+            size="sm"
+            iconName="person_add"
+            iconClassName="text-[var(--ink-clinical)]"
             onClick={onOpenPatientModal}
-            className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 transition duration-150"
+            className="whitespace-nowrap"
             title="Abrir cadastro clínico detalhado (CPF, endereço, alergias)"
           >
-            <Icon name="person_add" size={14} className="text-[var(--ink-clinical)] shrink-0" />
-            <span>Cadastro completo</span>
-          </button>
+            Cadastro completo
+          </ActionButton>
         </div>
       </div>
 
-      {/* Linha única lado a lado: Nome do Paciente (esquerda) + Peso em kg (direita) */}
+      {/* Single row: Patient Name (left) + Weight in kg (right) */}
       <div className="grid grid-cols-12 gap-2 sm:gap-2.5 items-center">
         <div className="col-span-8 sm:col-span-9 min-w-0">
           <input
@@ -89,7 +94,7 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             value={patient.name || ''}
             onChange={(e) => onUpdatePatient({ ...patient, name: e.target.value })}
             placeholder="Ex.: Maria de Oliveira Santos"
-            className="w-full h-11 min-h-[44px] px-3 bg-[var(--surface-inset)] border border-[var(--border-control)] rounded-lg text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 shadow-tactile-sm transition"
+            className="tactile-input w-full h-11 min-h-[44px] px-3 rounded-[10px] border border-[var(--border-control)] text-[13px] font-medium text-[var(--ink-primary)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
         </div>
 
@@ -113,9 +118,9 @@ export const PatientQuickCard: React.FC<PatientQuickCardProps> = ({
             }}
             onBlur={() => setWeightDraft(null)}
             placeholder="Ex.: Peso"
-            className="w-full h-11 min-h-[44px] pl-2.5 pr-8 bg-[var(--surface-inset)] border border-[var(--border-control)] rounded-lg text-xs font-medium text-[var(--text-main)] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400 shadow-tactile-sm clinical-tabular-nums transition"
+            className="tactile-input w-full h-11 min-h-[44px] pl-3 pr-8 rounded-[10px] border border-[var(--border-control)] text-[13px] font-medium text-[var(--ink-primary)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] tabular-nums clinical-tabular-nums"
           />
-          <span className="absolute right-2.5 text-[11px] font-semibold text-[var(--text-muted)] pointer-events-none clinical-unit">
+          <span className="absolute right-2.5 text-xs font-semibold text-[var(--ink-muted)] pointer-events-none clinical-unit">
             kg
           </span>
         </div>

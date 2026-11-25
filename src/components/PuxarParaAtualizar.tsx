@@ -242,13 +242,13 @@ export function PuxarParaAtualizar({ desativado }: PuxarParaAtualizarProps) {
         opacity: pullDistance > 10 ? 1 : 0
       }}
     >
-      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-tactile-sm bg-[var(--surface-card)] text-[var(--text-main)] border-[var(--border-subtle)] text-xs font-medium">
+      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-[var(--elevation-low)] bg-[var(--surface-card)] text-[var(--ink-primary)] border-[var(--hairline)] text-xs font-medium">
         {isUpdating ? (
           <Icon
             name="sync"
             spin={!prefersReducedMotion}
             size="sm"
-            className="text-sky-600 dark:text-sky-400"
+            className="text-[var(--ink-clinical)]"
           />
         ) : (
           <span
@@ -259,7 +259,7 @@ export function PuxarParaAtualizar({ desativado }: PuxarParaAtualizarProps) {
             <Icon
               name="arrow_downward"
               size="sm"
-              className={isThreshold ? 'text-sky-600 dark:text-sky-400' : 'text-slate-500 dark:text-slate-400'}
+              className={isThreshold ? 'text-[var(--ink-clinical)]' : 'text-[var(--ink-muted)]'}
             />
           </span>
         )}

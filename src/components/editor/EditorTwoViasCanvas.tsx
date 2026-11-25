@@ -62,7 +62,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         onChange={e => handleHeaderFieldChange('doctorName', e.target.value)}
                         placeholder="DR(A). MÉDICO(A)"
                         aria-label="Nome do médico emitente (1ª via)"
-                        className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
+                        className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 -mx-1 outline-none min-h-[44px] print:min-h-0 print:py-0 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
                       />
                       <input
                         name="via1DoctorCrm"
@@ -72,7 +72,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         placeholder="CRM-SP 000000"
                         aria-label="CRM do médico emitente (1ª via)"
                         style={{ fontFamily: 'inherit' }}
-                        className="text-xs font-bold text-sky-800 mt-0.5 w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
+                        className="text-xs font-bold text-teal-800 mt-0.5 w-full bg-transparent hover:bg-slate-50/80 focus:bg-white focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 -mx-1 outline-none min-h-[44px] print:min-h-0 print:py-0 flex items-center transition border-0 border-b border-transparent hover:border-subtle"
                       />
                       <p className="text-xs text-slate-600 leading-snug break-words mt-0.5">{headerConfig.clinicName || 'Rede de Atenção à Saúde'}</p>
                     </div>
@@ -84,7 +84,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                           className="h-7 max-w-18 object-contain"
                         />
                       )}
-                      <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-info block">
+                      <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-900 border border-slate-400 block">
                         {rotuloVia1}
                       </span>
                       <span className="text-xs text-slate-500 block">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
@@ -188,7 +188,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                       </h3>
                       <p
                         style={{ fontFamily: 'inherit' }}
-                        className="text-xs font-bold text-sky-800 mt-0.5 flex items-center"
+                        className="text-xs font-bold text-teal-800 mt-0.5 flex items-center"
                       >
                         {headerConfig.doctorCrm || 'CRM'}
                       </p>
@@ -307,7 +307,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         placeholder="DR(A). MÉDICO(A)"
                         aria-label="Nome do médico emitente (1ª via retrato)"
                         style={{ fontFamily: 'inherit' }}
-                        className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
+                        className="text-base font-bold uppercase tracking-tight text-slate-900 leading-tight w-full bg-transparent hover:bg-slate-100/70 focus:bg-teal-50 focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 -mx-1 outline-none min-h-[44px] print:min-h-0 print:py-0 flex items-center transition"
                       />
                       <input
                         name="via1PortraitDoctorCrm"
@@ -317,11 +317,11 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                         placeholder="CRM-SP 000000"
                         aria-label="CRM do médico emitente (1ª via retrato)"
                         style={{ fontFamily: 'inherit' }}
-                        className="text-xs font-bold text-sky-800 mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-sky-50 focus-visible:ring-1 focus-visible:ring-sky-500 rounded px-1 -mx-1 outline-none min-h-6 flex items-center transition"
+                        className="text-xs font-bold text-teal-800 mt-0.5 w-full bg-transparent hover:bg-slate-100/70 focus:bg-teal-50 focus-visible:ring-1 focus-visible:ring-[var(--accent-focus)] rounded px-1 -mx-1 outline-none min-h-[44px] print:min-h-0 print:py-0 flex items-center transition"
                       />
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-900 border border-info block">
+                      <span className="text-xs font-extrabold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-900 border border-slate-400 block">
                         {rotuloVia1}
                       </span>
                       <span className="text-xs text-slate-500 block mt-0.5">{headerConfig.dateText || new Date().toLocaleDateString('pt-BR')}</span>
@@ -408,7 +408,7 @@ export const EditorTwoViasCanvas: React.FC<EditorTwoViasCanvasProps> = ({
                       </h3>
                       <p
                         style={{ fontFamily: 'inherit' }}
-                        className="text-xs font-bold text-sky-800 mt-0.5 flex items-center"
+                        className="text-xs font-bold text-teal-800 mt-0.5 flex items-center"
                       >
                         {headerConfig.doctorCrm || 'CRM'}
                       </p>

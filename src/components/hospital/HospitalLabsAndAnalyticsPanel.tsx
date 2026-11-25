@@ -108,7 +108,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
       <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-3.5 sm:p-4 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-2.5">
           <div className="flex items-center gap-2">
-            <Icon name="biotech" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="biotech" size={18} className="text-[var(--ink-clinical)] shrink-0" />
             <h3 className="text-sm font-semibold text-[var(--text-main)]">
               Monitoramento Longitudinal de Exames — Leito {bedRecord.wardAndBed}
             </h3>
@@ -132,15 +132,25 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                 key={d.key}
                 className={`p-2.5 rounded-xl border space-y-1 ${
                   d.alertLevel === 'critical'
-                    ? 'border-[var(--accent-rose-border)] bg-[var(--accent-rose-subtle)]'
+                    ? 'bg-[var(--surface-card-lit)] border-[var(--hairline)] border-l-[3px] border-l-[var(--status-danger)]'
                     : d.alertLevel === 'abnormal'
-                      ? 'border-[var(--accent-amber-border)] bg-[var(--accent-amber-subtle)]'
-                      : 'border-[var(--border-subtle)] bg-[var(--surface-inset)]'
+                      ? 'bg-[var(--surface-card-lit)] border-[var(--hairline)] border-l-[3px] border-l-[var(--accent-amber)]'
+                      : 'bg-[var(--surface-card)] border-[var(--hairline)]'
                 }`}
               >
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-xs font-extrabold text-[var(--text-main)]">{d.label}</span>
-                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--surface-card)] border border-[var(--border-subtle)] clinical-tabular-nums">
+                  <span className="text-xs font-extrabold text-[var(--ink-primary)]">{d.label}</span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-1.5 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-primary)] clinical-tabular-nums">
+                    {d.alertLevel !== 'normal' && (
+                      <span
+                        aria-hidden="true"
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                          d.alertLevel === 'critical'
+                            ? 'bg-[var(--status-danger)]'
+                            : 'bg-[var(--accent-amber)]'
+                        }`}
+                      />
+                    )}
                     {arrowSymbol}
                   </span>
                 </div>
@@ -179,7 +189,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                   })
                 }
                 aria-label={`Remover coleta de ${panel.dateBr}`}
-                className="text-[var(--text-muted)] hover:text-rose-500 cursor-pointer"
+                className="touch-target btn-tactile-danger w-11 h-11 min-w-[44px] min-h-[44px] p-0 inline-flex items-center justify-center rounded-xl shrink-0 cursor-pointer"
               >
                 <Icon name="delete" size={15} />
               </button>
@@ -197,7 +207,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
               <button
                 type="button"
                 onClick={() => setNewLabValues({})}
-                className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+                className="touch-target btn-tactile-danger px-3 text-xs inline-flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
                 title="Limpar valores digitados da nova coleta"
               >
                 <Icon name="close" size={12} />
@@ -217,7 +227,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                 value={newLabDateBr}
                 onChange={(e) => setNewLabDateBr(e.target.value)}
                 placeholder="Ex.: 24/10/2026"
-                className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
               />
             </div>
             {CANONICAL_LAB_MARKERS.map((m) => (
@@ -234,7 +244,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                     setNewLabValues((prev) => ({ ...prev, [m.key]: e.target.value }))
                   }
                   placeholder={`Ex.: ${m.minNormal}`}
-                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+                  className="w-full h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
                 />
               </div>
             ))}
@@ -254,7 +264,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
       <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-3.5 sm:p-4 space-y-3">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-sm font-semibold text-[var(--text-main)] flex items-center gap-2">
-            <Icon name="radiology" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="radiology" size={18} className="text-[var(--ink-clinical)] shrink-0" />
             <span>Exames de Imagem Cronológicos ({sortedImages.length})</span>
           </h3>
           {hasImgDraft && (
@@ -264,7 +274,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                 setNewImgModality('');
                 setNewImgFindings('');
               }}
-              className="touch-target chip-neutral min-h-[44px] min-w-[44px] px-3 rounded-lg border border-rose-300 dark:border-rose-400/35 bg-rose-50/90 dark:bg-rose-950/50 text-xs font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:text-rose-900 dark:hover:text-rose-100 inline-flex items-center justify-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 transition"
+              className="touch-target btn-tactile-danger px-3 text-xs inline-flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] outline-none"
               title="Limpar campos de novo exame de imagem"
             >
               <Icon name="close" size={12} />
@@ -279,7 +289,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
               className="p-2.5 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)] text-xs flex items-start justify-between gap-2"
             >
               <div>
-                <strong className="text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                <strong className="text-[var(--ink-clinical)] clinical-tabular-nums">
                   {img.dateBr} — {img.examModalityAndRegion}:
                 </strong>{' '}
                 <span className="text-[var(--text-secondary)]">{img.findingsSummary}</span>
@@ -294,7 +304,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
                   })
                 }
                 aria-label={`Remover exame ${img.examModalityAndRegion}`}
-                className="text-[var(--text-muted)] hover:text-rose-500 cursor-pointer shrink-0"
+                className="touch-target btn-tactile-danger w-11 h-11 min-w-[44px] min-h-[44px] p-0 inline-flex items-center justify-center rounded-xl shrink-0 cursor-pointer"
               >
                 <Icon name="delete" size={15} />
               </button>
@@ -310,7 +320,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
             onChange={(e) => setNewImgDateBr(e.target.value)}
             placeholder="Ex.: 24/10/2026"
             aria-label="Data do exame de imagem"
-            className="sm:col-span-2 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="sm:col-span-2 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs clinical-tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
           <input
             id="hospital-img-modality-input"
@@ -320,7 +330,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
             onChange={(e) => setNewImgModality(e.target.value)}
             placeholder="Ex.: TC de Tórax sem contraste"
             aria-label="Modalidade do exame de imagem"
-            className="sm:col-span-4 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="sm:col-span-4 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
           <input
             id="hospital-img-findings-input"
@@ -330,7 +340,7 @@ export const HospitalLabsAndAnalyticsPanel: React.FC<HospitalLabsAndAnalyticsPan
             onChange={(e) => setNewImgFindings(e.target.value)}
             placeholder="Ex.: Descrição objetiva dos achados ou conclusão do laudo"
             aria-label="Achados ou laudo do exame de imagem"
-            className="sm:col-span-4 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:focus-visible:ring-teal-400"
+            className="sm:col-span-4 h-11 min-h-[44px] px-2.5 rounded-lg border border-[var(--border-control)] bg-[var(--surface-inset)] text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)]"
           />
           <button
             type="button"

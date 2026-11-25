@@ -421,12 +421,12 @@ export const AppGlobalModalsAndOverlays: React.FC<AppGlobalModalsAndOverlaysProp
           data-state="idle"
           aria-busy={false}
           aria-labelledby="install-help-modal-title"
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[oklch(0.14_0.02_258/0.60)] animate-backdrop-fade"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[oklch(0.14_0.02_252/0.56)] animate-backdrop-fade"
           onClick={closeInstallHelp}
         >
           <div
             ref={installHelpModalRef}
-            className="w-full max-w-md rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] p-5 shadow-2xl space-y-4 text-[var(--text-main)] modal-surface-spring"
+            className="w-full max-w-md rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] p-5 shadow-[var(--elevation-high)] space-y-4 text-[var(--text-main)] modal-surface-spring"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
@@ -435,7 +435,7 @@ export const AppGlobalModalsAndOverlays: React.FC<AppGlobalModalsAndOverlaysProp
                 type="button"
                 onClick={closeInstallHelp}
                 aria-label="Fechar instruções de instalação"
-                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--surface-hover)] cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
               >
                 <Icon name="close" size={18} />
               </button>
@@ -454,7 +454,7 @@ export const AppGlobalModalsAndOverlays: React.FC<AppGlobalModalsAndOverlaysProp
               <button
                 type="button"
                 onClick={closeInstallHelp}
-                className="touch-target btn-tactile-primary min-h-[44px] px-4 rounded-xl text-xs font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none"
+                className="touch-target btn-tactile-primary min-h-[44px] px-4 rounded-xl text-xs font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--accent-focus)] focus-visible:outline-none"
               >
                 Entendi
               </button>

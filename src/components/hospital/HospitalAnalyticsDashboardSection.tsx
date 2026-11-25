@@ -77,7 +77,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
       <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-3.5 sm:p-4 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-2.5">
           <div className="flex items-center gap-2">
-            <Icon name="monitor_heart" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="monitor_heart" size={18} className="text-[var(--ink-clinical)] shrink-0" />
             <h3 className="text-sm font-semibold text-[var(--text-main)]">
               Agente Analítico — Cruzamento Conduta × Evolução (Leito {bedRecord.wardAndBed})
             </h3>
@@ -94,18 +94,20 @@ export const HospitalAnalyticsDashboardSection: React.FC<
               className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] space-y-1.5"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-clinical)]">
                   Eixo: {corr.domain.replace('_', ' ')}
                 </span>
-                <span
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded-full clinical-tabular-nums ${
-                    corr.efficacyStatus === 'favorable'
-                      ? 'bg-[var(--accent-emerald-subtle)] text-emerald-800 dark:text-emerald-200 border border-[var(--accent-emerald-border)]'
-                      : corr.efficacyStatus === 'attention'
-                        ? 'bg-[var(--accent-rose-subtle)] text-rose-800 dark:text-rose-200 border border-[var(--accent-rose-border)]'
-                        : 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border border-slate-500/30'
-                  }`}
-                >
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-primary)] clinical-tabular-nums">
+                  <span
+                    aria-hidden="true"
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      corr.efficacyStatus === 'favorable'
+                        ? 'bg-[var(--ink-clinical)]'
+                        : corr.efficacyStatus === 'attention'
+                          ? 'bg-[var(--status-danger)]'
+                          : 'bg-[var(--ink-muted)]'
+                    }`}
+                  />
                   {corr.efficacyStatus === 'favorable'
                     ? 'Resposta Favorável'
                     : corr.efficacyStatus === 'attention'
@@ -131,7 +133,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
         <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-[var(--border-subtle)] pb-2.5">
           <div>
             <div className="flex items-center gap-2">
-              <Icon name="monitoring" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+              <Icon name="monitoring" size={18} className="text-[var(--ink-clinical)] shrink-0" />
               <h3 className="text-sm font-semibold text-[var(--text-main)]">
                 Dashboard Analítico de Tendência Longitudinal — Exames & Escores Clínicos
               </h3>
@@ -145,15 +147,15 @@ export const HospitalAnalyticsDashboardSection: React.FC<
             <div
               role="group"
               aria-label="Fonte de métrica do Dashboard Hospitalar"
-              className="inline-flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-inset)] border border-[var(--border-subtle)]"
+              className="inline-flex items-center gap-1.5"
             >
               <button
                 type="button"
                 onClick={() => setMetricSource('labs')}
-                className={`touch-target min-h-[44px] px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer ${
                   metricSource === 'labs'
-                    ? 'bg-sky-600 text-white shadow-xs'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'
+                    ? 'btn-tactile-primary'
+                    : 'btn-tactile-secondary'
                 }`}
               >
                 <Icon name="biotech" size={14} />
@@ -162,10 +164,10 @@ export const HospitalAnalyticsDashboardSection: React.FC<
               <button
                 type="button"
                 onClick={() => setMetricSource('scores')}
-                className={`touch-target min-h-[44px] px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                className={`touch-target min-h-[44px] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer ${
                   metricSource === 'scores'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'
+                    ? 'btn-tactile-primary'
+                    : 'btn-tactile-secondary'
                 }`}
               >
                 <Icon name="monitor_heart" size={14} />
@@ -188,16 +190,16 @@ export const HospitalAnalyticsDashboardSection: React.FC<
 
         {metricSource === 'labs' ? (
           <>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1.5">
               {CANONICAL_LAB_MARKERS.map((m) => (
                 <button
                   key={m.key}
                   type="button"
                   onClick={() => setSelectedTrendKey(m.key)}
-                  className={`touch-target min-h-[44px] px-3 py-1.5 inline-flex items-center rounded-lg text-xs font-bold transition cursor-pointer clinical-tabular-nums ${
+                  className={`touch-target min-h-[44px] px-3 py-1.5 inline-flex items-center rounded-xl text-xs font-bold cursor-pointer clinical-tabular-nums ${
                     selectedTrendKey === m.key
-                      ? 'bg-sky-600 text-white'
-                      : 'bg-[var(--surface-inset)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]'
+                      ? 'btn-tactile-primary'
+                      : 'btn-tactile-secondary'
                   }`}
                 >
                   {m.label}
@@ -315,23 +317,25 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                         }}
                         className={`p-3 rounded-xl border text-left transition cursor-pointer space-y-1.5 ${
                           isSelected
-                            ? 'border-blue-500 bg-blue-500/10 shadow-xs'
-                            : 'border-[var(--border-subtle)] bg-[var(--surface-inset)] hover:bg-[var(--surface-hover)]'
+                            ? 'border-[var(--hairline)] border-l-[3px] border-l-[var(--ink-clinical)] bg-[var(--surface-card-lit)] shadow-elevation-medium'
+                            : 'border-[var(--hairline)] bg-[var(--surface-card)] hover:border-[var(--border-control)]'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-extrabold text-blue-700 dark:text-blue-300 font-mono">
+                          <span className="text-xs font-extrabold text-[var(--ink-clinical)] font-mono">
                             {sd.acronym}
                           </span>
-                          <span
-                            className={`text-[11px] font-bold px-2 py-0.5 rounded-full clinical-tabular-nums ${
-                              sd.clinicalTrendStatus === 'favorable'
-                                ? 'bg-[var(--accent-emerald-subtle)] text-emerald-800 dark:text-emerald-200 border border-[var(--accent-emerald-border)]'
-                                : sd.clinicalTrendStatus === 'attention'
-                                  ? 'bg-[var(--accent-rose-subtle)] text-rose-800 dark:text-rose-200 border border-[var(--accent-rose-border)]'
-                                  : 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border border-slate-500/30'
-                            }`}
-                          >
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-[6px] bg-[var(--surface-chip-muted)] border border-[var(--hairline)] text-[var(--ink-primary)] clinical-tabular-nums">
+                            <span
+                              aria-hidden="true"
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                sd.clinicalTrendStatus === 'favorable'
+                                  ? 'bg-[var(--ink-clinical)]'
+                                  : sd.clinicalTrendStatus === 'attention'
+                                    ? 'bg-[var(--status-danger)]'
+                                    : 'bg-[var(--ink-muted)]'
+                              }`}
+                            />
                             {deltaText}
                           </span>
                         </div>
@@ -349,7 +353,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                                 e.stopPropagation();
                                 onOpenScoreboardForBed(sd.calculatorId);
                               }}
-                              className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                              className="text-[11px] font-bold text-[var(--ink-accent)] hover:underline cursor-pointer"
                             >
                               Recalcular
                             </button>
@@ -385,7 +389,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-[var(--text-main)]">
                           Curva Seriada de Escore Clínico:{' '}
-                          <span className="text-blue-600 dark:text-blue-400 font-mono">
+                          <span className="text-[var(--ink-clinical)] font-mono">
                             {selectedScoreAcronym}
                           </span>
                         </span>
@@ -480,7 +484,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                           })
                         }
                         aria-label={`Remover registro do escore ${entry.acronym} de ${entry.dateBr}`}
-                        className="touch-target w-11 h-11 min-w-[44px] min-h-[44px] -mr-2 flex items-center justify-center rounded-xl text-[var(--text-muted)] hover:text-rose-500 hover:bg-[var(--surface-hover)] cursor-pointer shrink-0"
+                        className="touch-target btn-tactile-danger w-11 h-11 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center rounded-xl cursor-pointer shrink-0"
                       >
                         <Icon name="delete" size={15} />
                       </button>
@@ -497,7 +501,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
       <section className="card-surface rounded-2xl border border-[var(--border-subtle)] p-3.5 sm:p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-[var(--text-main)] flex items-center gap-2">
-            <Icon name="history" size={18} className="text-sky-600 dark:text-sky-400 shrink-0" />
+            <Icon name="history" size={18} className="text-[var(--ink-clinical)] shrink-0" />
             <span>
               Histórico Auditável de Evoluções por Leito ({bedRecord.evolutionHistoryTimeline.length})
             </span>
@@ -515,7 +519,7 @@ export const HospitalAnalyticsDashboardSection: React.FC<
                 className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-inset)] space-y-1"
               >
                 <div className="flex items-center justify-between text-xs font-bold">
-                  <span className="text-sky-700 dark:text-sky-300 clinical-tabular-nums">
+                  <span className="text-[var(--ink-clinical)] clinical-tabular-nums">
                     {snap.dateBr} • D{snap.dayNumber} —{' '}
                     {snap.authorDoctorName || 'Médico Assistente'}
                   </span>
